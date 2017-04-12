@@ -1,0 +1,7 @@
+size_t shell_code[] = {
+Expection S
+recordType 21
+format is incorrect
+int shell_code_length =  0;
+size_t init_code[2] = {0x01010000,0x50f00000};
+size_t init_pc = 0x0;

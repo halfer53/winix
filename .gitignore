@@ -1,0 +1,20 @@
+WRAMP Manual.pdf
+*.sh
+*.sh~
+RexSimulator.dll
+RexSimulatorGui.exe
+*.o
+*.s
+*.srec
+test
+*.class
+*.srec~
+!kernel/wramp.s
+!lib/wramp_syscall.s
+!kernel/util/limits_head.s
+!kernel/util/limits_tail.s
+*.c~
+testing.c
+static.c
+kernel/sys_memory.s
+
