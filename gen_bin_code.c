@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+int winix_load_srec_words_length(char *line);
+int winix_load_srec_mem_val(char *line,size_t *memory_values,int start_index,int memvalLength);
 int main(int argc, char const *argv[]) {
   int i = 0;
   int length = 0;
@@ -19,12 +20,12 @@ int main(int argc, char const *argv[]) {
     size_t len = 0;
     ssize_t read;
 
-    fp = fopen("fork.srec", "r");
+    fp = fopen(argv[1], "r");
     if (fp == NULL)
         exit(EXIT_FAILURE);
     printf("size_t shell_code[] = {\n" );
     if ((read = getline(&line, &len, fp)) != -1) {
-      if (wordslength = winix_load_srec_words_length(line,6)) {
+      if (wordslength = winix_load_srec_words_length(line)) {
         if (memory_values = (size_t *)malloc(wordslength * sizeof(size_t))) {
 
           while ((read = getline(&line, &len, fp)) != -1) {

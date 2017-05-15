@@ -87,6 +87,8 @@ typedef struct proc {
 	unsigned long length;
 
 	int parent_proc_index;
+
+	void *heap_break;
 } proc_t;
 
 extern proc_t proc_table[NUM_PROCS];

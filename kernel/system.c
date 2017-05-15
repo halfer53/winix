@@ -53,8 +53,8 @@ void system_main() {
 	proc_t *currpro = current_proc;
 	int counter = 0;
 	//Find Upper Memory Limit
-	kprintf("Scanning Memory");
-	scan_memory();
+	// scan_memory();
+	FREE_MEM_END = 0x1ffff;
 	kprintf(" %d kWords Free\r\n", ((unsigned long)(FREE_MEM_END - FREE_MEM_BEGIN)) / 1024);
 
 	//Print Memory Map
@@ -65,19 +65,17 @@ void system_main() {
 
 	//Receive message, do work, repeat.
 	while(1) {
-
 		message_t m;
-		message_t *fork_m;
 		int who;
-		proc_t *p, *child_p;
+		proc_t *caller, *child_p;
 		size_t *sptr;
 		int response = 0;
-		void *ptr = NULL;
+		void *ptr = NULL, *ptr2 = NULL;
 
 		//Get a message
 		winix_receive(&m);
 		who = m.src;
-		p = &proc_table[who];
+		caller = &proc_table[who];
 		//kprintf("received from %s, call id %d, operation %d\n",p->name,p->proc_index,m.type );
 		//Do the work
 		switch(m.type) {
@@ -96,9 +94,9 @@ void system_main() {
 
 			//Exits the current process.
 			case SYSCALL_EXIT:
-				kprintf("\r\n[SYSTEM] Process \"%s (%d)\" exited with code %d\r\n", p->name, p->proc_index, m.i1);
+				kprintf("\r\n[SYSTEM] Process \"%s (%d)\" exited with code %d\r\n", caller->name, caller->proc_index, m.i1);
 				//TODO: keep process in zombie state until parent calls wait, so the exit value can be retrieved
-				end_process(p);
+				end_process(caller);
 				break;
 
 			case SYSCALL_PROCESS_OVERVIEW:
@@ -107,7 +105,7 @@ void system_main() {
 
 			case SYSCALL_FORK:
 				//fork the calling process
-				response = fork_proc(p);
+				response = fork_proc(caller);
 				m.i1 = response;
 				winix_send(who, &m);
 
@@ -135,14 +133,12 @@ void system_main() {
 				break;
 
 			case SYSCALL_SBRK:
-				sptr = (size_t *)_sbrk(m.s1);
-				m.p1 = sptr;
+				m.p1 = _sbrk(caller,m.l1);
 				winix_send(who, &m);
 				break;
 
 			case SYSCALL_MALLOC:
-				sptr = (size_t *)proc_malloc(m.s1);
-				m.p1 = sptr;
+				m.p1 = proc_malloc(m.l1);
 				winix_send(who, &m);
 				break;
 
@@ -158,10 +154,18 @@ void system_main() {
 				kputc(m.i1);
 				break;
 
+			case SYSCALL_PRINTF:
+				//p1: str pointer
+				//p2: args pointer
+				ptr = ((int *)m.p1) + (int)caller->rbase;
+				ptr2 = ((int *)m.p2) + (int)caller->rbase;
+				kprintf_vm(&ptr,&ptr2,caller->rbase);
+				break;
+
 			//System call number is unknown, or not yet implemented.
 			default:
-				kprintf("\r\n[SYSTEM] Process \"%s (%d)\" performed unknown system call %d\r\n", p->name, p->proc_index, m.type);
-				end_process(p);
+				kprintf("\r\n[SYSTEM] Process \"%s (%d)\" performed unknown system call %d\r\n", caller->name, caller->proc_index, m.type);
+				end_process(caller);
 				break;
 		}
 

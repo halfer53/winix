@@ -61,14 +61,23 @@ static void kputd(int n) {
 	}
 }
 
+static void kputs_vm(char *s, void *caller_rbase) {
+	char *sp = s;
+	sp += (int)caller_rbase;
+	while(*sp)
+		kputc(*sp++);
+}
+
 static void kputs(const char *s) {
 	while(*s)
 		kputc(*s++);
 }
 
-int kprintf(const char *format, ...) {
-	void *arg = &format;
-	arg = ((char*)arg) + 1;
+
+int kprintf_vm(const char **s_pptr, void **arg_pptr, void *caller_rbase){
+	const char *format = *s_pptr;
+	void *arg = *arg_pptr;
+	char c = *format;
 
 	//TODO: proper formats
 	while(*format) {
@@ -89,7 +98,13 @@ int kprintf(const char *format, ...) {
 					break;
 
 				case 's':
-					kputs(*(char **)arg);
+					kputs_vm(*(char **)arg,caller_rbase);
+					arg = ((char *)arg) + 1;
+					format++;
+					break;
+
+				case 'c':
+					kputc(*(int *)arg);
 					arg = ((char *)arg) + 1;
 					format++;
 					break;
@@ -104,3 +119,12 @@ int kprintf(const char *format, ...) {
 	}
 	return 0;
 }
+
+int kprintf(const char *format, ...) {
+	void *arg = &format;
+	arg = ((char*)arg) + 1;
+
+	return kprintf_vm(&format,&arg,0);
+}
+
+

@@ -8,6 +8,7 @@
 
 #include <sys/ipc.h>
 #include <sys/syscall.h>
+#include <type.h>
 
 /**
  * Get the system uptime.
@@ -73,24 +74,34 @@ int exec(){
 	return 0;
 }
 
-void *malloc(unsigned long size){
+void *sbrk(size_t size){
 	int response = 0;
 	message_t m;
 
-	m.type = SYSCALL_MALLOC;
-	m.s1 = size;
-	response = winix_sendrec(SYSTEM_TASK, &m); //TODO: error checking
+	m.type = SYSCALL_SBRK;
+	m.l1 = size;
+	response = winix_sendrec(SYSTEM_TASK, &m);
 	return m.p1;
 }
 
-void free(void *ptr){
-	int response = 0;
-	message_t m;
+// void *malloc(unsigned long size){
+// 	int response = 0;
+// 	message_t m;
 
-	m.type = SYSCALL_FREE;
-	m.p1 = ptr;
-	response = winix_send(SYSTEM_TASK, &m); //TODO: error checking
-}
+// 	m.type = SYSCALL_MALLOC;
+// 	m.s1 = size;
+// 	response = winix_sendrec(SYSTEM_TASK, &m); //TODO: error checking
+// 	return m.p1;
+// }
+
+// void free(void *ptr){
+// 	int response = 0;
+// 	message_t m;
+
+// 	m.type = SYSCALL_FREE;
+// 	m.p1 = ptr;
+// 	response = winix_send(SYSTEM_TASK, &m); //TODO: error checking
+// }
 
 void holes_overview(){
 	int response = 0;
@@ -119,4 +130,15 @@ void putc(int i){
 	m.i1 = i;
 	response = winix_send(SYSTEM_TASK, &m); //TODO: error checking
 	return;
+}
+
+int printf(const char *format, ...) {
+	int response = 0;
+	message_t m;
+	
+	m.type = SYSCALL_PRINTF;
+	m.p1 = (void *)format;
+	m.p2 = (void *)((int *)&format+1);
+	response = winix_send(SYSTEM_TASK,&m);
+	return 0;
 }

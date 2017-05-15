@@ -1,8 +1,9 @@
 objs = kernel/*.o lib/*.o user/*.o
 
 all:
-	$(MAKE) -C kernel
 	$(MAKE) -C lib
+	$(MAKE) shell
+	$(MAKE) -C kernel
 	$(MAKE) -C user
 	wlink -o winix.srec kernel/util/limits_head.o $(objs) kernel/util/limits_tail.o
 
@@ -23,7 +24,7 @@ shell:
 	cp user/shell.c .
 	wcc -S shell.c
 	wasm shell.s
-	wlink -o shell.srec shell.o lib/string.o lib/stdio.o lib/syscall.o lib/ipc.o lib/wramp_syscall.o
+	wlink -o shell.srec shell.o lib/string.o lib/stdlib.o lib/stdio.o lib/syscall.o lib/ipc.o lib/wramp_syscall.o
 	java reformat_srec shell.srec
 	rm shell.c
 	rm shell.o

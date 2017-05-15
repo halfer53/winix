@@ -1,5 +1,4 @@
-#include <stdio.h>
-#include <type.h>
+
 
 #define HEAD 0
 #define TAIL 1

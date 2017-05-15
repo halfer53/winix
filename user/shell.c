@@ -11,6 +11,7 @@
 #include <stddef.h>
 #include <type.h>
 #include <size.h>
+#include <stdlib.h>
 
 #define BUF_LEN		100
 
@@ -152,7 +153,12 @@ int uptime(int argc, char **argv) {
  * Shuts down OS.
  **/
 int shutdown(int argc, char **argv) {
-	printf("Placeholder for SHUTDOWN\r\n");
+	char *str = ("Placeholder for SHUTDOWN\r\n");
+	int *p = (int *)malloc(10);
+	*p++ = (int)str;
+	*p++ = (int)&str;
+	*p++ = *str;
+	printf(str);
 	return 0;
 }
 

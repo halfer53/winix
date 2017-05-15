@@ -18,7 +18,7 @@ typedef struct {
 	int type;
 	int i1, i2, i3;
 	void *p1, *p2, *p3;
-	unsigned long s1;
+	unsigned long l1;
 } message_t;
 
 

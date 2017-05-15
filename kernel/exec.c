@@ -71,6 +71,7 @@ static proc_t *exec_proc(proc_t *p,size_t *lines, size_t length, size_t entry, i
 		p->length = length;
 		//printProceInfo(p);
 		//kprintf("index %d length %d ptable %x\n",index, length,p->protection_table[index]);
+		p->heap_break = NULL;
 
 		add_to_scheduling_queue(p);
 

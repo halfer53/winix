@@ -187,6 +187,7 @@ void proc_set_default(proc_t *p){
 
 	p->length = 0;
 	p->parent_proc_index = 0;
+	p->heap_break = NULL;
 
 	//data not initialised
 	//unsigned long protection_table[PROTECTION_TABLE_LEN]
@@ -320,6 +321,8 @@ int fork_proc(proc_t *original){
 
 		p->parent_proc_index = original->proc_index;
 
+		p->heap_break = NULL;
+
 		//enqueue_tail(ready_q[priority], p);
 	}
 	assert(p != NULL, "Fork");
@@ -378,7 +381,7 @@ proc_t *new_proc(void (*entry)(), int priority, const char *name) {
 		}
 		//system task has access to everywhere in the memory
 
-		ptr = (size_t *)_sbrk(DEFAULT_STACK_SIZE);
+		ptr = (size_t *)expand_mem(DEFAULT_STACK_SIZE);
 		p->sp = ptr + (size_t)DEFAULT_STACK_SIZE-1;
 
 		//Set the process to runnable, and enqueue it.

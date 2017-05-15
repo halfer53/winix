@@ -16,6 +16,7 @@
 #include <type.h>
 #include <util.h>
 #include <size.h>
+#include <stdbool.h>
 
 #include "wramp.h"
 #include "proc.h"
@@ -24,6 +25,9 @@
 #include "idle.h"
 #include "sys_memory.h"
 #include "exec.h"
+#include "bitmap.h"
+
+#define DEBUG 0
 
 //Major and minor version numbers for WINIX.
 #define MAJOR_VERSION 1

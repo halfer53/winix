@@ -102,6 +102,9 @@ void main() {
 
 	//Initialise exceptions
 	init_exceptions();
+	
+	init_bitmap();
+	init_mem_table();
 
 	//Kick off first task. Note: never returns
 

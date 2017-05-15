@@ -26,6 +26,7 @@
 #define SYSCALL_FREE    12
 #define SYSCALL_PUTC    13
 #define SYSCALL_FORK_PID    14
+#define SYSCALL_PRINTF    15
 //TODO: create a sensible allocation scheme for system call numbers
 
 /**
@@ -52,5 +53,6 @@ void hole_list_overview();
 
 int getc();
 void putc(int i);
+int printf(const char *format, ...);
 
 #endif
