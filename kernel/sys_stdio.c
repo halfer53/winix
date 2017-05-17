@@ -21,7 +21,8 @@ int kgetc() {
 
 static void kputx(int n) {
 	int i;
-
+	kputc('0');
+	kputc('x');
 	for(i = 28; i >= 0; i -= 4) {
 		int d = (n >> i) & 0xf;
 		if(d < 10) {

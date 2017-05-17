@@ -56,6 +56,7 @@ void main() {
 	Scan_FREE_MEM_BEGIN();
 
 	init_memory();
+	init_mem_table();
 
 	//Set up process table
 
@@ -104,7 +105,6 @@ void main() {
 	init_exceptions();
 	
 	init_bitmap();
-	init_mem_table();
 
 	//Kick off first task. Note: never returns
 

@@ -20,9 +20,8 @@ int ps(int argc, char **argv);
 int uptime(int argc, char **argv);
 int shutdown(int argc, char **argv);
 int exit(int argc, char **argv);
-int testmalloc(int argc, char **argv);
+int test(int argc, char **argv);
 int generic(int argc, char **argv);
-#define my_sizeof(var) (char *)(&var+1)-(char*)(&var)
 
 //Input buffer & tokeniser
 static char buf[BUF_LEN];
@@ -40,7 +39,7 @@ struct cmd commands[] = {
 	{ "shutdown", shutdown },
 	{ "exit", exit },
 	{ "ps", ps },
-	{ "testmal", testmalloc},
+	{ "test", test},
 	{ NULL, generic }
 };
 //TODO: ps/uptime/shutdown should be moved to separate programs.
@@ -52,76 +51,78 @@ int isPrintable(int c) {
 	return ('!' <= c && c <= '~');
 }
 
-int testmalloc(int argc, char **argv){
-	// size_t a = 0;
-	// char b = 'a';
-	// int c = 0;
-	// long d = 0;
-	// size_t *ap = NULL;
-  // char *bp = NULL;
-	// int *cp = NULL;
-	// char **lines = NULL;
-	// int n = 2;
-	// char **prev_p = NULL;
-	// char *prev_p_line[2] = {NULL,NULL};
-	// int i = 0;
-	//
-	// if ((lines = (char **)malloc(n*POINTER_SIZE)) == NULL) {
-	// 	printf("not enough space\n");
-	// 	return 0;
-	// }else{
-	//
-	// 	prev_p = lines;
-	// }
-	//
+int testmalloc(){
+	size_t a = 0;
+	char b = 'a';
+	int c = 0;
+	long d = 0;
+	size_t *ap = NULL;
+  	char *bp = NULL;
+	int *cp = NULL;
+	char **lines = NULL;
+	int n = 2;
+	char **prev_p = NULL;
+	char *prev_p_line[2] = {NULL,NULL};
+	int i = 0;
+	
+	if ((lines = (char **)malloc(n*POINTER_SIZE)) == NULL) {
+		printf("not enough space\n");
+		return 0;
+	}else{
+		prev_p = lines;
+	}
+	
+	for ( i = 0; i < n; i++) {
+		if ((lines[i] = (char *)malloc(CHAR_SIZE * 10)) == NULL) {
+			printf("not enough space\n");
+			return 0;
+		}
+		prev_p_line[i] = lines[i];
+	
+	}
+	
+	
+	strcpy(lines[0],"a");
+	strcpy(lines[1],"ab");
+	
 	// for ( i = 0; i < n; i++) {
-	// 	if ((lines[i] = (char *)malloc(CHAR_SIZE * 10)) == NULL) {
-	// 		printf("not enough space\n");
-	// 		return 0;
-	// 	}
-	// 	prev_p_line[i] = lines[i];
-	//
+	// 	printf("line %d content %s\n",i,lines[i] );
 	// }
-	//
-	//
-	// strcpy(lines[0],"a");
-	// strcpy(lines[1],"ab");
-	//
-	// // for ( i = 0; i < n; i++) {
-	// // 	printf("line %d content %s\n",i,lines[i] );
-	// // }
-	//
-	// //holes_overview();
-	// for ( i = 0; i < n; i++) {
-	// 	free(lines[i]);
-	// 	holes_overview();
-	// }
-	// free(lines);
-	//
-	// holes_overview();
-	// if ((lines = (char **)malloc(n*POINTER_SIZE)) == NULL) {
-	// 	printf("not enough space\n");
-	// 	return 0;
-	// }else{
-	// 	if (prev_p != lines) {
-	// 		printf("incorrect free, new addr at %x, old addr at %x\n",lines,prev_p );
-	//
-	// 	}
-	// }
-	// holes_overview();
-	// for ( i = 0; i < n; i++) {
-	// 	if ((lines[i] = (char *)malloc(CHAR_SIZE * 10)) == NULL) {
-	// 		printf("not enough space\n");
-	// 		return 0;
-	// 	}
-	// 	if (prev_p_line[i] != lines[i]) {
-	// 		printf("incorrect free, new addr at %x, old addr at %x\n",lines[i],prev_p_line[i] );
-	//
-	// 	}
-	// 	holes_overview();
-	//
-	// }
+	
+	//holes_overview();
+	for ( i = 0; i < n; i++) {
+		free(lines[i]);
+		overview();
+	}
+	free(lines);
+	
+	overview();
+	if ((lines = (char **)malloc(n*POINTER_SIZE)) == NULL) {
+		printf("not enough space\n");
+		return 0;
+	}else{
+		if (prev_p != lines) {
+			printf("incorrect free, new addr at %x, old addr at %x\n",lines,prev_p );
+		}
+	}
+	overview();
+	for ( i = 0; i < n; i++) {
+		if ((lines[i] = (char *)malloc(CHAR_SIZE * 10)) == NULL) {
+			printf("not enough space\n");
+			return 0;
+		}
+		if (prev_p_line[i] != lines[i]) {
+			printf("incorrect free, new addr at %x, old addr at %x\n",lines[i],prev_p_line[i] );
+	
+		}
+		overview();
+	
+	}
 	return 0;
+}
+
+int test(int argc, char **argv){
+	return fork_pid(0);
 }
 
 int ps(int argc, char **argv){
@@ -153,12 +154,7 @@ int uptime(int argc, char **argv) {
  * Shuts down OS.
  **/
 int shutdown(int argc, char **argv) {
-	char *str = ("Placeholder for SHUTDOWN\r\n");
-	int *p = (int *)malloc(10);
-	*p++ = (int)str;
-	*p++ = (int)&str;
-	*p++ = *str;
-	printf(str);
+	printf("Placeholder for SHUTDOWN\r\n");
 	return 0;
 }
 
@@ -184,17 +180,26 @@ int generic(int argc, char **argv) {
 		}else if (strcmp("fork",argv[0]) == 0) {
 			int forkid = 0;
 			forkid = fork();
+			if (forkid != 0)
+			{
+				printf("I am parent\n");
+			}else{
+				printf("I am child\n");
+			}
 			return 0;
 		}
 	printf("Unknown command '%s'\r\n", argv[0]);
 	return -1;
 }
 
+
+
 void main() {
 	int i, j;
 	int argc;
 	char *c;
 	struct cmd *handler = NULL;
+
 	while(1) {
 		printf("WINIX> ");
 

@@ -17,13 +17,25 @@ void bitmap_reset(unsigned long *map, int map_len){
 		map[i] = 0;
 	}
 }
-
-int bitmap_search(unsigned long *map, int map_len, int num){
+/**
+ * search from start
+ * @param  map     memory map
+ * @param  map_len memory map length
+ * @param  start   starting bit to search from memory map, 0 <= start < 1024
+ * @param  num     number of bits to search
+ * @return         bit found
+ */
+int bitmap_search_from(unsigned long *map, int map_len, int start, int num){
 	register int i,j;
 	int count = 0;
-	if(num >= map_len * 32)	return -1;
-	for (i=0; i < map_len; ++i){
-		for (j=0; j< BITMASK_NR; j++) {
+
+	if(num >= map_len * 32 || start >= map_len * 32)	return -1;
+
+	i = start / 32;
+	j = start % 32;
+
+	for (; i < map_len; ++i){
+		for (; j< BITMASK_NR; j++) {
             if ((map[i] & mask[j]) == 0) {
                 count++;
                 if (count == num) {
@@ -35,6 +47,10 @@ int bitmap_search(unsigned long *map, int map_len, int num){
         }
 	}
 	return -1;
+}
+
+int bitmap_search(unsigned long *map, int map_len, int num){
+	return bitmap_search_from(map,map_len,0,num);
 }
 
 void bitmap_set_bit(unsigned long *map, int map_len,int start){

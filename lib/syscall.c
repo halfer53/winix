@@ -60,7 +60,7 @@ int fork_pid(int proc_index){
 
 	m.type = SYSCALL_FORK_PID;
 	m.i1 = proc_index;
-	response = winix_sendrec(SYSTEM_TASK, &m); //TODO: error checking
+	response = winix_send(SYSTEM_TASK, &m); //TODO: error checking
 
 	return m.i1;
 }

@@ -241,73 +241,38 @@ proc_t *kernel_fork_proc(proc_t *original){
 int fork_proc(proc_t *original){
 	proc_t *p = NULL;
 	void *ptr_base = NULL;
-	int priority = 0;
-	int i = 0;
-	int n = 0;
-	int length = 0;
-	int index =0;
+	int len =0;
+	int nstart = 0;
+	int pbak ;
+	int length;
+	int i,n,index;
 
 	if (original->length == 0 || (size_t)(original->rbase) == 0) {
 		//we can't fork p1 if it's a system task
-		kprintf("%s can't be forked since it's a system task\n",original->name );
+		kprintf("%s can't be forked\n",original->name );
 		return -1;
 	}
 
 	if(p = get_free_proc()) {
-		length = original->length;
-		length = length % 1024 == 0 ? length : length + 1024;
-	  length = length < 1024 ? 1024 : ((length / 1024) * 1024);
-		//kprintf("allocate %x original length %x\n",length,original->length);
-		//it's best to malloc text segment and stack together, so they stick together, and it's easier to manage
-		ptr_base = proc_malloc(length + DEFAULT_STACK_SIZE);
-		assert(ptr_base != NULL,"memory is full");
+		pbak = p->proc_index;
+		*p = *original;
+		p->proc_index = pbak;
+		
+		len = physical_len_to_page_len(original->length + DEFAULT_STACK_SIZE);
+
+		ptr_base = proc_malloc(original->length + DEFAULT_STACK_SIZE);
+
 		memcpy(ptr_base,original->rbase,original->length + DEFAULT_STACK_SIZE);
-
-		//p->sp = (size_t *)ptr_base + (size_t)DEFAULT_STACK_SIZE + length;
-		p->sp = original->sp; //SP should be the same if virtual address is take into account
-
-
-		for(i = 0;i<NUM_REGS;i++){
-			p->regs[i] = original->regs[i];
-		}
-		p->priority = original->priority;
-		p->pc = original->pc; //PC should be the same if virtual address is taken into account
-		//kprintf("%d's pc at %x\n",p->proc_index,(size_t)p->pc+(size_t)p->rbase);
-		p->ra = original->ra;
 		p->rbase = ptr_base;
-		p->cctrl = original->cctrl;
-
-		n = (size_t)ptr_base / 1024;
-		if ((size_t)ptr_base % 1024 != 0) {
-			kprintf("process in not in a 1024 block");
-		}
 
 		//Initialise protection table
-
+		//reset page table
 		p->ptable = p->protection_table;
-		for(i = 0; i < PROTECTION_TABLE_LEN; i++) {
-			p->protection_table[i] = 0;
-		}
+		bitmap_reset(p->ptable,PROTECTION_TABLE_LEN);
 
-		n = ((size_t)ptr_base / 1024);
-		index = ((size_t)ptr_base / 1024)/32;
-		for (i = n; i < n + length/1024 +1; i++) {
-			p->protection_table[index] |= (0x80000000 >> i);
-		}
-		p->protection_table[0] |= (0x80000000 >> ((SYS_BSS_START / 1024)));
-		//printProceInfo(p);
-		//kprintf("index %d length %d ptable %x\n",index, length,p->protection_table[index]);
-		//assume text and stack segment are connected together
-
-		priority = p->priority = original->priority;
-		p->quantum = original->quantum;
-		p->ticks_left = original->ticks_left;
-		p->next = NULL;
-		p->sender_q = original->sender_q;
-		p->next_sender = original->next_sender;
-		p->message = original->message;
-
-		p->time_used = original->time_used;
+		//get page table starting index, and its length
+		nstart = get_page_index(p->rbase);
+		bitmap_set_nbits(p->ptable,PROTECTION_TABLE_LEN, nstart,len);
 
 		strcpy(p->name,"fork_");
  	 	strcat(p->name,original->name);
@@ -315,18 +280,9 @@ int fork_proc(proc_t *original){
 		//Set the process to runnable, and enqueue it.
 		p->state = RUNNABLE;
 
-		p->flags = original->flags;
-
-		p->length = original->length;
-
 		p->parent_proc_index = original->proc_index;
-
-		p->heap_break = NULL;
-
-		//enqueue_tail(ready_q[priority], p);
 	}
 	assert(p != NULL, "Fork");
-	//kprintf("new proc %d parent %d\n",p->proc_index,p->parent_proc_index);
 	return p->proc_index;
 }
 
@@ -431,7 +387,7 @@ int process_overview(){
 
 //print the process state given
 void printProceInfo(proc_t* curr){
-	kprintf("name %s, i %d, rbase %x, length %d, pc %x, sp 0x%x, state %s\r\n",curr->name, curr->proc_index, curr->rbase, curr->length,curr->pc,curr->sp,getStateName(curr->state));
+	kprintf("name %s, i %d, rbase %x, length %d, pc %x, sp %x, state %s\r\n",curr->name, curr->proc_index, curr->rbase, curr->length,curr->pc,curr->sp,getStateName(curr->state));
 }
 
 //return the strign value of state name give proc_state_t state

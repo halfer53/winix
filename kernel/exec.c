@@ -392,7 +392,7 @@ static size_t winix_load_srec_mem_val(char *line,size_t *memory_values,int start
 
                     memory_values[start_index + wordsLoaded] = memVal;
 										wordsLoaded++;
-										//kprintf("0x%x\n",memVal );
+										//kprintf("%x\n",memVal );
 								}
 								break;
 

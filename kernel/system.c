@@ -58,10 +58,10 @@ void system_main() {
 	kprintf(" %d kWords Free\r\n", ((unsigned long)(FREE_MEM_END - FREE_MEM_BEGIN)) / 1024);
 
 	//Print Memory Map
-	kprintf("Text Segment: 0x%x - 0x%x\r\n", &TEXT_BEGIN, &TEXT_END);
-	kprintf("Data Segment: 0x%x - 0x%x\r\n", &DATA_BEGIN, &DATA_END);
-	kprintf("BSS Segment:  0x%x - 0x%x\r\n", &BSS_BEGIN, &BSS_END);
-	kprintf("Unallocated:  0x%x - 0x%x\r\n", FREE_MEM_BEGIN, FREE_MEM_END);
+	kprintf("Text Segment: %x - %x\r\n", &TEXT_BEGIN, &TEXT_END);
+	kprintf("Data Segment: %x - %x\r\n", &DATA_BEGIN, &DATA_END);
+	kprintf("BSS Segment:  %x - %x\r\n", &BSS_BEGIN, &BSS_END);
+	kprintf("Unallocated:  %x - %x\r\n", FREE_MEM_BEGIN, FREE_MEM_END);
 
 	//Receive message, do work, repeat.
 	while(1) {
@@ -120,12 +120,9 @@ void system_main() {
 
 			case SYSCALL_FORK_PID:
 				//fork specific process
-			 	response = fork_proc(get_proc(m.i1));
+			 	// fork_test(caller);
 				m.i1 = response;
 				winix_send(who,&m);
-
-				m.i1 = 0;
-				winix_send(response,&m);
 				break;
 
 			case SYSCALL_EXEC:

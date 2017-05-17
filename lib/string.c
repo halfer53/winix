@@ -50,11 +50,6 @@ int strlen(const char *s) {
  * copy the src into the destination string, the destination should be large enough to hold the src
  **/
 char *strcpy(char *dest, const char *src) {
-	// int i = 0;
-	// for (i = 0; src[i] != '\0'; i++) {
-	// 	dest[i] = src[i];
-	// }
-	// dest[i] = '\0';
 	char *saved = dest;
 	while (*src) {
 		*dest++ = *src++;

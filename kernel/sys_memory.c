@@ -12,7 +12,6 @@ static hole_t *used_holes[2];
 //Linked lists are defined by a head and tail pointer.
 
 static unsigned long mem_map[MEM_MAP_LEN];
-#define align1k(x) (((((x)-1)>>10)<<10)+1024)
 
 #define HEAD 0
 #define TAIL 1
@@ -118,13 +117,14 @@ static void hole_delete(hole_t **q, hole_t *h) {
 
 //scan the FREE_MEM_BEGIN
 void Scan_FREE_MEM_BEGIN() {
+	//TODO start kmalloc here
 	FREE_MEM_BEGIN = (size_t)&BSS_END;
 
 	//Round up to the next 1k boundary
 	FREE_MEM_BEGIN |= 0x03ff;
 	FREE_MEM_BEGIN++;
 
-	kprintf("\r\nfree memory begin 0x%x\r\n", FREE_MEM_BEGIN );
+	kprintf("\r\nfree memory begin %x\r\n", FREE_MEM_BEGIN );
 }
 
 
@@ -148,21 +148,41 @@ void *expand_mem(size_t size) {
 void *_sbrk( proc_t *caller, size_t size) {
 	unsigned long *ptable;
 	int nstart,len;
+	int *heap_break_bak;
 	void *ptr_addr;
 
-	if(size == 0)	return caller->heap_break;
+	if (size == 0)	return caller->heap_break;
+	
+	heap_break_bak = caller->heap_break;
+	if ((int)(caller->heap_break) > 0) {
+		if (is_addr_in_same_page( heap_break_bak, ( heap_break_bak + size)) ) {
+			caller->heap_break = heap_break_bak + size;
+			// kprintf("ptr %x pt %x brk %x\n", heap_break_bak, mem_map[0], caller->heap_break);
+			return get_virtual_addr(heap_break_bak,caller);
+		}
+	}
+
 	ptable = caller->protection_table;
-	len = size/1024 +1;
-	nstart = bitmap_search(mem_map,MEM_MAP_LEN,len);
-	if(nstart != -1){
-		bitmap_set_nbits(mem_map,MEM_MAP_LEN,nstart,len);
-		bitmap_set_nbits(ptable,PROTECTION_TABLE_LEN,nstart,len);
+	len = physical_len_to_page_len(size);
+	nstart = bitmap_search(mem_map, MEM_MAP_LEN, len);
+	if (nstart != -1) {
+		//set mem_map and caller's ptable's corresponding bits to 1
+		bitmap_set_nbits(mem_map, MEM_MAP_LEN, nstart, len);
+		bitmap_set_nbits(ptable, PROTECTION_TABLE_LEN, nstart, len);
 		ptr_addr = (void *)(nstart * 1024);
-		caller->heap_break = (int *)ptr_addr + align1k(size) -1;
-		kprintf("sbrk: optr 0x%x ",ptr_addr);
-		ptr_addr = (int *)ptr_addr - (int)caller->rbase;
-		kprintf("ptr 0x%x pt 0x%x brk 0x%x\n",ptr_addr, mem_map[0],caller->heap_break);
-		
+
+		if (is_addr_in_consecutive_page( heap_break_bak, ptr_addr)){
+			
+			caller->heap_break = heap_break_bak + size;
+			// kprintf("ptr %x pt %x obrk %x brk %x\n", heap_break_bak, mem_map[0], heap_break_bak,caller->heap_break);
+			return get_virtual_addr(heap_break_bak,caller);
+		}
+		caller->heap_break = (int *)ptr_addr + size;
+
+		// kprintf("sbrk: optr %x ", ptr_addr);
+		ptr_addr = get_virtual_addr(ptr_addr,caller);
+		// kprintf("ptr %x pt %x obrk %x brk %x\n", ptr_addr, mem_map[0],  heap_break_bak, caller->heap_break);
+
 		return ptr_addr;
 	}
 	return NULL;
@@ -197,8 +217,6 @@ void *proc_malloc(size_t size) {
 			hole_delete2(unused_holes, prev, h);
 			hole_enqueue_head(used_holes, h);
 		} else {
-			//otherwise decrease the size of the hole,
-			//add a new hole of the given size to the used hole list
 			h->start += size;
 			h->length -= size;
 			h = hole_dequeue(pending_holes);
@@ -206,7 +224,6 @@ void *proc_malloc(size_t size) {
 			h->length = size;
 			hole_enqueue_head(used_holes, h);
 		}
-		//kprintf("malloc: curr hole start 0x%x, length %d\n",old_base,h->length );
 		return (void *)old_base;
 	} else {
 		//if no hole size  that is big enough is found in the unused_holes list,
@@ -215,7 +232,6 @@ void *proc_malloc(size_t size) {
 			if (h = hole_dequeue(pending_holes)) {
 				h->start = p_start_addr;
 				h->length = size;
-				//kprintf("malloc: sbrk start 0x%x, length %d\n",h->start,h->length );
 				hole_enqueue_head(used_holes, h);
 				return p_start_addr;
 			}
@@ -241,7 +257,6 @@ void proc_free(void *ptr_parameter) {
 		h = h->next;
 	}
 	if (h != NULL) {
-		//kprintf("free: found start 0x%x, length %d\n",h->start,h->length );
 		for ( i = 0; i < h->length; i++) {
 			*p = DEFAULT_MEM_VALUE;
 			p++;
@@ -250,17 +265,9 @@ void proc_free(void *ptr_parameter) {
 		hole_delete(used_holes, h);
 		//try to merge the newly deleted hole with exiting unused holes
 		merge_holes(unused_holes, h);
-		//kprintf("holes merged\n" );
-
-
-
-	} else {
-		//kprintf("nothing found to be freed at addr %x\n",ptr_parameter );
 	}
 }
 
-//h => h must be a hole_t that doesn't below to any holes list
-//
 int merge_holes(hole_t **merging_holes_list, hole_t *h) {
 
 	register hole_t *curr = merging_holes_list[HEAD];
@@ -268,7 +275,6 @@ int merge_holes(hole_t **merging_holes_list, hole_t *h) {
 	//if the hole to be merged is adjacent to FREE_MEM_BEGIN
 	//simply delete it, and fall back the FREE_MEM_BEGIN
 	if (h->start + h->length == (size_t *)FREE_MEM_BEGIN) {
-		//kprintf("free mem %x, start %x, length %d, total %x\n",FREE_MEM_BEGIN,h->start,h->length,(size_t)(h->start + h->length) );
 		FREE_MEM_BEGIN -= h->length;
 		hole_enqueue_head(pending_holes, h);
 		return 1;
@@ -276,15 +282,11 @@ int merge_holes(hole_t **merging_holes_list, hole_t *h) {
 	while (curr != NULL) {
 		//if there is hole that is adjacent to the hole to be merged
 		if (curr->start + curr->length == h->start) {
-			//kprintf("before start 0x%x, length %d start 0x%x, length %d\n",h->start,h->length,curr->start,curr->length);
 			curr->length += h->length;
-			//kprintf("merged hole, start 0x%x, length %d\n",curr->start,curr->length);
 			break;
 		} else if (h->start + h->length == curr->start) {
-			//kprintf("before start 0x%x, length %d start 0x%x, length %d\n",h->start,h->length,curr->start,curr->length);
 			curr->start -= h->length;
 			curr->length += h->length;
-			//kprintf("merged hole, start 0x%x, length %d\n",curr->start,curr->length);
 			break;
 		}
 		curr = curr->next;
@@ -344,12 +346,12 @@ void init_memory() {
 	//the common bss segment for all processes. the reason to keep it as 1023
 	//is that process is allocated with a size of multiple of 1024, so making it
 	//smaller than 1024 allows to be ignored when allocating a new process
-	h = hole_dequeue(pending_holes);
-	h->start = (size_t *)expand_mem(1024);
-	SYS_BSS_START = (size_t)h->start;
-	h->length = 1023; //this is bit of hack here,
+	// h = hole_dequeue(pending_holes);
+	// h->start = (size_t *)expand_mem(1024);
+	// SYS_BSS_START = (size_t)h->start;
+	// h->length = 1023; //this is bit of hack here,
 
-	hole_enqueue_head(unused_holes, h);
+	// hole_enqueue_head(unused_holes, h);
 
 }
 
@@ -357,34 +359,39 @@ void init_memory() {
 void init_mem_table() {
 	int len = FREE_MEM_BEGIN / 1024;
 	int i;
-	for(i=0;i<MEM_MAP_LEN;i++){
+	for (i = 0; i < MEM_MAP_LEN; i++) {
 		mem_map[i] = 0;
 	}
 	bitmap_set_nbits(mem_map, MEM_MAP_LEN, 0, len);
 }
 
-int get_free_pages(int num) {
+void *get_free_pages(int num) {
 	int nstart = bitmap_search(mem_map, MEM_MAP_LEN, num);
 	if (nstart != 0)
 	{
 		bitmap_set_nbits(mem_map, MEM_MAP_LEN, nstart, num);
-		return nstart;
+		return (void *)(nstart*1024);
 	}
-	return -1;
+	return NULL;
 }
 
-void free_ages(int nstart, int len) {
-	bitmap_reset_nbits(mem_map, MEM_MAP_LEN, nstart, len);
+void free_page(void* ptr) {
+	int nstart = (int)ptr /1024;
+	bitmap_reset_bit(mem_map, MEM_MAP_LEN, nstart);
+}
+
+void print_mem_map(int i){
+	kprintf("%x\n",mem_map[i]);
 }
 
 
-void * kmalloc(size_t size){
+void * kmalloc(size_t size) {
 	return NULL;
 }
 
 
-void kfree(void *ptr){
-	
+void kfree(void *ptr) {
+
 }
 
 

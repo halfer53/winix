@@ -20,6 +20,9 @@ void *proc_malloc(size_t size);
 void init_memory();
 void *expand_mem(size_t size);
 
+void *get_free_pages(int num);
+void free_page(void* ptr);
+void print_mem_map(int i);
 
 #define MEM_MAP_LEN	32
 void init_mem_table();
