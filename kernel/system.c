@@ -134,8 +134,8 @@ void system_main() {
 				winix_send(who, &m);
 				break;
 
-			case SYSCALL_MALLOC:
-				m.p1 = proc_malloc(m.l1);
+			case SYSCALL_BRK:
+				m.i1 = _brk(caller,m.p1);
 				winix_send(who, &m);
 				break;
 

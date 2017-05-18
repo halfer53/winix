@@ -45,6 +45,7 @@ int bitmap_search_from(unsigned long *map, int map_len, int start, int num){
                 count = 0;
             }
         }
+        j=0;
 	}
 	return -1;
 }

@@ -22,7 +22,7 @@
 #define SYSCALL_EXEC    8
 #define SYSCALL_LOAD_SREC    9
 #define SYSCALL_SBRK    10
-#define SYSCALL_MALLOC    11
+#define SYSCALL_BRK    11
 #define SYSCALL_FREE    12
 #define SYSCALL_PUTC    13
 #define SYSCALL_FORK_PID    14

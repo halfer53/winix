@@ -84,6 +84,17 @@ void *sbrk(size_t size){
 	return m.p1;
 }
 
+
+int brk(void *addr){
+	int response = 0;
+	message_t m;
+
+	m.type = SYSCALL_BRK;
+	m.p1 = addr;
+	response = winix_sendrec(SYSTEM_TASK, &m);
+	return m.i1;
+}
+
 // void *malloc(unsigned long size){
 // 	int response = 0;
 // 	message_t m;

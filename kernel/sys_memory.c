@@ -145,22 +145,49 @@ void *expand_mem(size_t size) {
 	return (void *)temp;
 }
 
+/**
+ * implementation of brk
+ * @param  caller caller of this sys call
+ * @param  addr   set the end of data segment specified by the addr, note that this is virtual memory
+ * @return        status of result, 0 if success
+ */
+int _brk(proc_t *caller, void *addr){
+	int i,paddr;
+	addr = get_physical_addr(addr,caller);
+	if(is_addr_in_same_page(caller->heap_break, addr)){
+		caller->heap_break = addr;
+		return 0;
+	}
+	if(addr < caller->heap_break){
+		i = get_page_index(caller->heap_break);
+		paddr = get_page_index(addr);
+		for(; i> paddr; i--){
+			bitmap_reset_bit(mem_map,MEM_MAP_LEN,i);
+			bitmap_reset_bit(caller->ptable,MEM_MAP_LEN,i);
+		}
+		caller->heap_break = addr;
+		return 0;
+	}
+	return 1;
+}
+
 void *_sbrk( proc_t *caller, size_t size) {
+
 	unsigned long *ptable;
 	int nstart,len;
 	int *heap_break_bak;
 	void *ptr_addr;
-
-	if (size == 0)	return caller->heap_break;
+	if (size == 0)
+		return get_virtual_addr(caller->heap_break,caller);
 	
 	heap_break_bak = caller->heap_break;
-	if ((int)(caller->heap_break) > 0) {
-		if (is_addr_in_same_page( heap_break_bak, ( heap_break_bak + size)) ) {
-			caller->heap_break = heap_break_bak + size;
-			// kprintf("ptr %x pt %x brk %x\n", heap_break_bak, mem_map[0], caller->heap_break);
-			return get_virtual_addr(heap_break_bak,caller);
-		}
+
+	if (is_addr_in_same_page( heap_break_bak, ( heap_break_bak + size)) ) {
+		caller->heap_break = heap_break_bak + size;
+		// kprintf("ptr %x ptr+size %x heap_break %x %x\n", heap_break_bak,heap_break_bak + size, caller->heap_break,mem_map[0]);
+		return get_virtual_addr(heap_break_bak,caller);
 	}
+	
 
 	ptable = caller->protection_table;
 	len = physical_len_to_page_len(size);
@@ -173,7 +200,7 @@ void *_sbrk( proc_t *caller, size_t size) {
 
 		if (is_addr_in_consecutive_page( heap_break_bak, ptr_addr)){
 			
-			caller->heap_break = heap_break_bak + size;
+			caller->heap_break = heap_break_bak + size ;
 			// kprintf("ptr %x pt %x obrk %x brk %x\n", heap_break_bak, mem_map[0], heap_break_bak,caller->heap_break);
 			return get_virtual_addr(heap_break_bak,caller);
 		}
@@ -182,8 +209,14 @@ void *_sbrk( proc_t *caller, size_t size) {
 		// kprintf("sbrk: optr %x ", ptr_addr);
 		ptr_addr = get_virtual_addr(ptr_addr,caller);
 		// kprintf("ptr %x pt %x obrk %x brk %x\n", ptr_addr, mem_map[0],  heap_break_bak, caller->heap_break);
-
 		return ptr_addr;
+	}else{
+		kprintf("System out of memory\n");
+		for (nstart = 0; nstart < 32; ++nstart)
+		{
+			kprintf(" %x |",mem_map[nstart]);
+		}
+		kprintf("\n");
 	}
 	return NULL;
 }
@@ -363,6 +396,7 @@ void init_mem_table() {
 		mem_map[i] = 0;
 	}
 	bitmap_set_nbits(mem_map, MEM_MAP_LEN, 0, len);
+	kprintf("Free %x len %d map %x\n",FREE_MEM_BEGIN,len,mem_map[0]);
 }
 
 void *get_free_pages(int num) {

@@ -52,28 +52,25 @@ void main() {
 	//Print boot message.
 	kprintf("\r\nWINIX v%d.%d\r\n", MAJOR_VERSION, MINOR_VERSION);
 
-	//scan memory, initialise FREE_MEM_BEGIN and FREE_MEM_END
+	//scan memory, initialise FREE_MEM_BEGIN
 	Scan_FREE_MEM_BEGIN();
 
 	init_memory();
-	init_mem_table();
+	init_bitmap();
 
 	//Set up process table
-
 	init_proc();
 
 	//Initialise the system task
-
 	p = new_proc(system_main, SYSTEM_PRIORITY, "SYSTEM");
 	assert(p != NULL, "Create sys task");
 	p->quantum = 64;
 
 	//Idle Task
-
 	p = new_proc(idle_main, IDLE_PRIORITY, "IDLE");
 	assert(p != NULL, "Create idle task");
 
-
+	//init
 	p = exec_new_proc(init_code,2,0, USER_PRIORITY,"init");
 	p->quantum = 1;
 
@@ -103,8 +100,9 @@ void main() {
 
 	//Initialise exceptions
 	init_exceptions();
-	
-	init_bitmap();
+	init_mem_table();
+
+	kprintf("emain %d hpv %x | ",p->proc_index,*((int *)p->heap_break));
 
 	//Kick off first task. Note: never returns
 

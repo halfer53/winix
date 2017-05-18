@@ -31,7 +31,7 @@ shell:
 	rm shell.s
 	gcc gen_bin_code.c
 	./a.out shell.srec > include/exec_codes.c
-	rm shell.srec
+	#rm shell.srec
 
 printf:
 	cp user/printf.c .

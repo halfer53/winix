@@ -20,7 +20,7 @@ int ps(int argc, char **argv);
 int uptime(int argc, char **argv);
 int shutdown(int argc, char **argv);
 int exit(int argc, char **argv);
-int test(int argc, char **argv);
+int testmalloc(int argc, char **argv);
 int generic(int argc, char **argv);
 
 //Input buffer & tokeniser
@@ -39,7 +39,7 @@ struct cmd commands[] = {
 	{ "shutdown", shutdown },
 	{ "exit", exit },
 	{ "ps", ps },
-	{ "test", test},
+	{ "test", testmalloc},
 	{ NULL, generic }
 };
 //TODO: ps/uptime/shutdown should be moved to separate programs.
@@ -51,78 +51,24 @@ int isPrintable(int c) {
 	return ('!' <= c && c <= '~');
 }
 
-int testmalloc(){
-	size_t a = 0;
-	char b = 'a';
-	int c = 0;
-	long d = 0;
-	size_t *ap = NULL;
-  	char *bp = NULL;
-	int *cp = NULL;
-	char **lines = NULL;
-	int n = 2;
-	char **prev_p = NULL;
-	char *prev_p_line[2] = {NULL,NULL};
-	int i = 0;
-	
-	if ((lines = (char **)malloc(n*POINTER_SIZE)) == NULL) {
-		printf("not enough space\n");
-		return 0;
-	}else{
-		prev_p = lines;
-	}
-	
-	for ( i = 0; i < n; i++) {
-		if ((lines[i] = (char *)malloc(CHAR_SIZE * 10)) == NULL) {
-			printf("not enough space\n");
-			return 0;
-		}
-		prev_p_line[i] = lines[i];
-	
-	}
-	
-	
-	strcpy(lines[0],"a");
-	strcpy(lines[1],"ab");
-	
-	// for ( i = 0; i < n; i++) {
-	// 	printf("line %d content %s\n",i,lines[i] );
-	// }
-	
-	//holes_overview();
-	for ( i = 0; i < n; i++) {
-		free(lines[i]);
-		overview();
-	}
-	free(lines);
-	
-	overview();
-	if ((lines = (char **)malloc(n*POINTER_SIZE)) == NULL) {
-		printf("not enough space\n");
-		return 0;
-	}else{
-		if (prev_p != lines) {
-			printf("incorrect free, new addr at %x, old addr at %x\n",lines,prev_p );
-		}
-	}
-	overview();
-	for ( i = 0; i < n; i++) {
-		if ((lines[i] = (char *)malloc(CHAR_SIZE * 10)) == NULL) {
-			printf("not enough space\n");
-			return 0;
-		}
-		if (prev_p_line[i] != lines[i]) {
-			printf("incorrect free, new addr at %x, old addr at %x\n",lines[i],prev_p_line[i] );
-	
-		}
-		overview();
-	
-	}
-	return 0;
-}
-
-int test(int argc, char **argv){
-	return fork_pid(0);
+int testmalloc(int argc, char **argv){
+  void *p0 = malloc(512);
+  void *p1 = malloc(512);
+  void *p2 = malloc(1024);
+  void *p3 = malloc(512);
+  void *p4 = malloc(1024);
+  void *p5 = malloc(2048);
+  void *p6 = malloc(512);
+  void *p7 = malloc(1024);
+  void *p8 = malloc(512);
+  void *p9 = malloc(1024);
+  overview();
+  free(p5);
+  free(p6);
+  free(p2);
+  free(p8);
+  overview();
+  return 0;
 }
 
 int ps(int argc, char **argv){

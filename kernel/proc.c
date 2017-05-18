@@ -243,7 +243,7 @@ int fork_proc(proc_t *original){
 	void *ptr_base = NULL;
 	int len =0;
 	int nstart = 0;
-	int pbak ;
+	int pbak;
 	int length;
 	int i,n,index;
 
@@ -258,11 +258,12 @@ int fork_proc(proc_t *original){
 		*p = *original;
 		p->proc_index = pbak;
 		
-		len = physical_len_to_page_len(original->length + DEFAULT_STACK_SIZE);
+		length = original->length + DEFAULT_STACK_SIZE + DEFAULT_HEAP_SIZE;
+		len = physical_len_to_page_len(length);
 
-		ptr_base = proc_malloc(original->length + DEFAULT_STACK_SIZE);
+		ptr_base = proc_malloc(length);
 
-		memcpy(ptr_base,original->rbase,original->length + DEFAULT_STACK_SIZE);
+		memcpy(ptr_base,original->rbase,length);
 		p->rbase = ptr_base;
 
 		//Initialise protection table
@@ -281,6 +282,7 @@ int fork_proc(proc_t *original){
 		p->state = RUNNABLE;
 
 		p->parent_proc_index = original->proc_index;
+		// kprintf("efork %d hpv %x | ",p->proc_index,*((int *)p->heap_break));
 	}
 	assert(p != NULL, "Fork");
 	return p->proc_index;
@@ -387,7 +389,7 @@ int process_overview(){
 
 //print the process state given
 void printProceInfo(proc_t* curr){
-	kprintf("name %s, i %d, rbase %x, length %d, pc %x, sp %x, state %s\r\n",curr->name, curr->proc_index, curr->rbase, curr->length,curr->pc,curr->sp,getStateName(curr->state));
+	kprintf("name %s, i %d, rbase %x, length %d, pc %x, sp %x, heap brk %x, state %d\r\n",curr->name, curr->proc_index, curr->rbase, curr->length,curr->pc,curr->sp,curr->heap_break,curr->state);
 }
 
 //return the strign value of state name give proc_state_t state
