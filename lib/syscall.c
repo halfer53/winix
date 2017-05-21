@@ -127,7 +127,6 @@ int getc(){
 	message_t m;
 
 	m.type = SYSCALL_GETC;
-	//printf("get c %d\n",m.type );
 	response = winix_sendrec(SYSTEM_TASK, &m); //TODO: error checking
 	return m.i1;
 }

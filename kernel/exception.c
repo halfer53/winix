@@ -48,6 +48,15 @@ static void (*handlers[])(void) = {
 //System uptime, stored as number of timer interrupts since boot
 int system_uptime = 0;
 
+proc_t *waiting_proc = NULL;
+message_t m;
+
+void set_waiting_proc(proc_t *who, message_t *message){
+	waiting_proc = who;
+	m = *message;
+	// kprintf("seting waiting %d src %d type %d\n",who->proc_index,m.src,m.type);
+}
+
 /**
  * User Interrupt Button (IRQ1)
  **/
@@ -81,13 +90,33 @@ static void parallel_handler() {
  * Serial Port 1 (IRQ4)
  **/
 static void serial1_handler() {
+
+	int stat = RexSp1->Stat;
+	if(stat & 1 == 1){
+		if (waiting_proc != NULL && m.src != 0){
+			m.i1 = RexSp1->Rx;
+			// kprintf("E Get %c",m.i1);
+			waiting_proc = NULL;
+			add_message(&m);
+			RexSp1->Iack = 0;
+		}else{
+			kprintf("Err waiting %x %d\n",waiting_proc,m.src);
+		}
+	}
 	RexSp1->Iack = 0;
+	// run_message_queue();
 }
 
 /**
  * Serial Port 2 (IRQ5)
  **/
 static void serial2_handler() {
+	int stat = RexSp2->Stat;
+	if(stat & 1 == 1){
+		kprintf("Got %c\n",RexSp2->Rx);
+	}else{
+		kprintf("Error %x",RexSp2->Stat);
+	}
 	RexSp2->Iack = 0;
 }
 
@@ -139,7 +168,6 @@ static void syscall_handler() {
 	m->src = current_proc->proc_index;			//Don't trust the caller to specify their own source process number
 
 	retval = (int*)&current_proc->regs[0];		//Result is returned in register $1
-	//kprintf(" sp %x, operation %d, dest %d\n",sp,operation,dest );
 	//Default return value is an error code
 	*retval = -1;
 
@@ -170,7 +198,7 @@ static void syscall_handler() {
 
 	//A system call could potentially make a high-priority process runnable.
 	//Run scheduler.
-	// if (m->type == 7) {
+	// if (dest == 4) {
 	// 	kprintf("$ %s syscall from %d to %d type %d ",op_name,current_proc->proc_index,dest,m->type);
 	// }
 	sched();

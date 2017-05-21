@@ -94,8 +94,8 @@ typedef struct proc {
 
 extern proc_t proc_table[NUM_PROCS];
 extern proc_t *ready_q[NUM_QUEUES][2];
-void enqueue_tail(proc_t **q, proc_t *proc);
- void enqueue_head(proc_t **q, proc_t *proc);
+// void enqueue_tail(proc_t **q, proc_t *proc);
+//  void enqueue_head(proc_t **q, proc_t *proc);
 /**
  * Initialises the process table and scheduling queues.
  **/

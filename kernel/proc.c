@@ -10,14 +10,14 @@
 #include <sys/syscall.h>
 
 //Linked lists are defined by a head and tail pointer.
-#define HEAD 0
-#define TAIL 1
+
+int debug = 0;
 
 //Process table
 proc_t proc_table[NUM_PROCS];
 
 //Scheduling queues
- proc_t *ready_q[NUM_QUEUES][2];
+proc_t *ready_q[NUM_QUEUES][2];
 
 //Entries in the process table that are not in use
 static proc_t *free_proc[2];
@@ -31,6 +31,7 @@ proc_t *current_proc;
 //Limits for memory allocation
 size_t FREE_MEM_BEGIN = 0;
 size_t FREE_MEM_END = 0;
+
 
 
 /**
@@ -275,11 +276,11 @@ int fork_proc(proc_t *original){
 		nstart = get_page_index(p->rbase);
 		bitmap_set_nbits(p->ptable,PROTECTION_TABLE_LEN, nstart,len);
 
-		strcpy(p->name,"fork_");
- 	 	strcat(p->name,original->name);
+		// strcpy(p->name,"fork_");
+ 	//  	strcat(p->name,original->name);
 
-		//Set the process to runnable, and enqueue it.
-		p->state = RUNNABLE;
+		// //Set the process to runnable, and enqueue it.
+		// p->state = RUNNABLE;
 
 		p->parent_proc_index = original->proc_index;
 		// kprintf("efork %d hpv %x | ",p->proc_index,*((int *)p->heap_break));
@@ -499,7 +500,7 @@ proc_t *get_proc(int proc_nr) {
 }
 
 /**
- * Receives a message.
+ * sends a message.
  *
  * Parameters:
  *   m				Pointer to write the message to.
@@ -508,6 +509,7 @@ proc_t *get_proc(int proc_nr) {
  *   0 on success
  *   -1 if destination is invalid
  **/
+
 int wini_send(int dest, message_t *m) {
 	proc_t *pDest;
 
@@ -515,32 +517,34 @@ int wini_send(int dest, message_t *m) {
 
 	//Is the destination valid?
 	if(pDest = get_proc(dest)) {
-
-		//kprintf("%d ",pDest->proc_index);
+		if(debug)
+			kprintf("%d ",pDest->proc_index);
 		//If destination is waiting, deliver message immediately.
 		if(pDest->flags & RECEIVING) {
-			//kprintf("data sent from %d\n",current_proc->proc_index);
+			if(debug)
+				kprintf("| data sent from %d\n",current_proc->proc_index);
 			//Copy message to destination
 			*(pDest->message) = *m;
 			//Unblock receiver
 			pDest->flags &= ~RECEIVING;
 			enqueue_head(ready_q[pDest->priority], pDest);
-      //kprintf("$at send %d enqueued curr %d type %d | ",dest,current_proc->proc_index,m->type );
-
+			if(debug)
+      			kprintf("$at send %d enqueued curr %d type %d | ",dest,current_proc->proc_index,m->type );
 		}
-
 
 		else {
 			//Otherwise, block current process and add it to head of sending queue of the destination.
 			current_proc->flags |= SENDING;
 			current_proc->next_sender = pDest->sender_q;
 			pDest->sender_q = current_proc;
-      //kprintf("$at send dest %d sender_q set curr %d type %d | ",dest,current_proc->proc_index,m->type);
+			if(debug)
+     			kprintf("$at send dest %d sender_q set curr %d type %d | ",dest,current_proc->proc_index,m->type);
 		}
 
 		return 0;
 	}else{
-		//kprintf("pid %d not found from %d\n",dest,current_proc->proc_index);
+		if(debug)
+			kprintf("pid %d not found from %d\n",dest,current_proc->proc_index);
 	}
 
 	return -1;

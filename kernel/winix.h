@@ -11,12 +11,13 @@
 
 #include <sys/rex.h>
 #include <sys/ipc.h>
-#include <stdio.h>
 #include <stddef.h>
 #include <type.h>
 #include <util.h>
 #include <size.h>
 #include <stdbool.h>
+
+#include "winix/slab.h"
 
 #include "wramp.h"
 #include "proc.h"
@@ -26,8 +27,12 @@
 #include "sys_memory.h"
 #include "exec.h"
 #include "bitmap.h"
+#include "message_queue.h"
+
 
 #define DEBUG 0
+#define HEAD 0
+#define TAIL 1
 
 //Major and minor version numbers for WINIX.
 #define MAJOR_VERSION 2

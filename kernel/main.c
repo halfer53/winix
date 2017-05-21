@@ -66,6 +66,11 @@ void main() {
 	assert(p != NULL, "Create sys task");
 	p->quantum = 64;
 
+
+	p = new_proc(message_queue_main, USER_PRIORITY, "MESSAGE");
+	assert(p != NULL, "Create Message Queue");
+	p->quantum = 4;
+
 	//Idle Task
 	p = new_proc(idle_main, IDLE_PRIORITY, "IDLE");
 	assert(p != NULL, "Create idle task");
@@ -100,6 +105,9 @@ void main() {
 
 	//Initialise exceptions
 	init_exceptions();
+	RexSp2->Ctrl = 0x5cd;
+	RexSp1->Ctrl = 0x5cd;
+	init_message_queue();
 	init_mem_table();
 
 	kprintf("emain %d hpv %x | ",p->proc_index,*((int *)p->heap_break));

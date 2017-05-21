@@ -7,43 +7,7 @@
  **/
 
 #include "winix.h"
-#include <stdio.h>
 #include <sys/syscall.h>
-
-
-/**
- * Scans the free memory and sets the globals FREE_MEM_BEGIN and FREE_MEM_END.
- *
- * Note: both of these values must fall on a 1k boundary for memory protection purposes.
- *
- * Side Effects:
- *   FREE_MEM_BEGIN and FREE_MEM_END are initialised.
- *   Characters are printed using putc.
- **/
-static void scan_memory() {
-	// FREE_MEM_BEGIN = (unsigned long)&BSS_END;
-	//
-	// //Round up to the next 1k boundary
-	// FREE_MEM_BEGIN |= 0x03ff;
-	// FREE_MEM_BEGIN++;
-
-	//Search for upper limit
-	//Note: this doubles as a memory test.
-	for(FREE_MEM_END = FREE_MEM_BEGIN; ; FREE_MEM_END++) {
-		*(unsigned long*)FREE_MEM_END = FREE_MEM_END; //Write address to memory location
-		if(*(unsigned long*)FREE_MEM_END != FREE_MEM_END) { //Check that the value was remembered
-			break;
-		}
-
-		if(!(FREE_MEM_END & 0x1fff)) { //print '.' every 8k
-			kputc('.');
-		}
-	}
-
-	//Wind back to the highest 1k block
-	FREE_MEM_END &= (unsigned long)~0x3ff;
-	FREE_MEM_END--;
-}
 
 /**
  * Entry point for system task.
@@ -67,9 +31,9 @@ void system_main() {
 	while(1) {
 		message_t m;
 		int who;
-		proc_t *caller, *child_p;
-		size_t *sptr;
+		proc_t *caller, *pcurr;
 		int response = 0;
+		int i,j;
 		void *ptr = NULL, *ptr2 = NULL;
 
 		//Get a message
@@ -78,13 +42,24 @@ void system_main() {
 		caller = &proc_table[who];
 		//kprintf("received from %s, call id %d, operation %d\n",p->name,p->proc_index,m.type );
 		//Do the work
-		switch(m.type) {
+		switch(m.type) {	
 
 			//Gets the system uptime.
 			case SYSCALL_GETC:
-				response = kgetc();
-				m.i1 = response;
-				winix_send(who,&m);
+				set_waiting_proc(caller,&m);
+				// for(i = 0; i < NUM_QUEUES; i++) {
+				// 	if(ready_q[i][0] != NULL) {
+				// 		pcurr = ready_q[i][0];
+				// 		while(pcurr != NULL)
+				// 		{
+				// 			kprintf("%d %d |",i,ready_q[i][j]->proc_index);
+				// 			pcurr = pcurr->next;
+				// 		}
+				// 	}
+				// }
+				// response = kgetc();
+				// m.i1 = response;
+				// winix_send(who,&m);
 				break;
 
 			case SYSCALL_UPTIME:

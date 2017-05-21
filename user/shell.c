@@ -62,12 +62,15 @@ int testmalloc(int argc, char **argv){
   void *p7 = malloc(1024);
   void *p8 = malloc(512);
   void *p9 = malloc(1024);
-  overview();
+  block_overview();
   free(p5);
   free(p6);
   free(p2);
   free(p8);
-  overview();
+  block_overview();
+  p0 = realloc(p0,900);
+  p9 = realloc(p9,3000);
+  block_overview();
   return 0;
 }
 
@@ -151,8 +154,8 @@ void main() {
 
 		//Read line from terminal
 		for(i = 0; i < BUF_LEN - 1; i++) {
+
 			buf[i] = getc(); 	//read
-			//printf2("%d\n",(int)buf[i] );
 			if(buf[i] == '\r') { //test for end
 				break;
 			}
@@ -165,7 +168,6 @@ void main() {
 				i--;
 				continue;
 			}
-
 			putc(buf[i]); 		//echo
 		}
 		buf[++i] = '\0';

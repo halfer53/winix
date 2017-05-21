@@ -1,12 +1,19 @@
 #include <sys/rex.h>
 
+
+
 /**
  * Writes a character to serial port 1.
  **/
 int kputc(const int c) {
-	//TODO: buffer outkput and print via system calls.
 	while(!(RexSp1->Stat & 2));
 	RexSp1->Tx = c;
+	return 0;
+}
+
+int kputc2(const int c) {
+	while(!(RexSp2->Stat & 2));
+	RexSp2->Tx = c;
 	return 0;
 }
 
@@ -15,6 +22,7 @@ int kputc(const int c) {
  **/
 int kgetc() {
 	//TODO: user interrupt-driven I/O
+	//Use thread
 	while(!(RexSp1->Stat & 1));
 	return RexSp1->Rx;
 }
