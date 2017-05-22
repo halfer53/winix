@@ -11,11 +11,6 @@ static hole_t *pending_holes[2];
 static hole_t *used_holes[2];
 //Linked lists are defined by a head and tail pointer.
 
-static unsigned long mem_map[MEM_MAP_LEN];
-
-#define HEAD 0
-#define TAIL 1
-
 size_t SYS_BSS_START = 0;
 
 
@@ -385,46 +380,6 @@ void init_memory() {
 	// h->length = 1023; //this is bit of hack here,
 
 	// hole_enqueue_head(unused_holes, h);
-
-}
-
-
-void init_mem_table() {
-	int len = FREE_MEM_BEGIN / 1024;
-	int i;
-	for (i = 0; i < MEM_MAP_LEN; i++) {
-		mem_map[i] = 0;
-	}
-	bitmap_set_nbits(mem_map, MEM_MAP_LEN, 0, len);
-	kprintf("Free %x len %d map %x\n",FREE_MEM_BEGIN,len,mem_map[0]);
-}
-
-void *get_free_pages(int num) {
-	int nstart = bitmap_search(mem_map, MEM_MAP_LEN, num);
-	if (nstart != 0)
-	{
-		bitmap_set_nbits(mem_map, MEM_MAP_LEN, nstart, num);
-		return (void *)(nstart*1024);
-	}
-	return NULL;
-}
-
-void free_page(void* ptr) {
-	int nstart = (int)ptr /1024;
-	bitmap_reset_bit(mem_map, MEM_MAP_LEN, nstart);
-}
-
-void print_mem_map(int i){
-	kprintf("%x\n",mem_map[i]);
-}
-
-
-void * kmalloc(size_t size) {
-	return NULL;
-}
-
-
-void kfree(void *ptr) {
 
 }
 

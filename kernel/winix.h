@@ -18,6 +18,7 @@
 #include <stdbool.h>
 
 #include "winix/slab.h"
+#include "winix/mem_map.h"
 
 #include "wramp.h"
 #include "proc.h"
@@ -37,18 +38,6 @@
 //Major and minor version numbers for WINIX.
 #define MAJOR_VERSION 2
 #define MINOR_VERSION 0
-
-#define align1k(x) (((((x)-1)>>10)<<10)+1024)
-
-#define is_addr_in_same_page(a,b)	((((int)a)/1024) == (((int)b)/1024))
-#define is_addr_in_consecutive_page(a,b)	((((int)a)/1024) == ((((int)b)/1024)-1))
-
-#define get_physical_addr(va,proc)	(((int *)va)+(int)proc->rbase)
-#define get_virtual_addr(pa,proc)	(((int *)pa)-(int)proc->rbase)
-
-#define get_page_index(pa)	( (align1k((int)pa)) / 1024 )
-#define physical_len_to_page_len(pa_len)	( (align1k((int)pa_len)) / 1024 )
-#define page_len_to_physical_len(p_len)	(p_len * 1024)
 
 /**
  * Print an error message and lock up the OS... the "Blue Screen of Death"

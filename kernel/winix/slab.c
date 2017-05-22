@@ -1,5 +1,7 @@
-#include "../winix.h"
-
+#include <type.h>
+#include <stddef.h>
+#include "slab.h"
+#include "mem_map.h"
 /**
  * block structure
  */
@@ -7,7 +9,7 @@ typedef struct s_block {
 	size_t size;
 	struct s_block *next;
 	struct s_block *prev;
-	int kfree;
+	int free;
 	void *ptr; //a pointer to the allocated block
 	char data[1]; //the pointer where the real data is pointed at. b->data is what kmalloc returns
 	//The reason we use data[1] is that c returns the address of array by default, 
@@ -22,11 +24,10 @@ static void *end = NULL;
 
 #define BLOCK_SIZE 5
 #define align4(x) (((((x)-1)>>2)<<2)+4)
-#define align1k(x) (((((x)-1)>>10)<<10)+1024)
 
 void printblock(block_t *b) {
 	int i = (int)b / 1024;
-	printf("%d %x size %d next %x prev %x kfree %d data %x\n",i, b, b->size, b->next , b->prev, b->kfree, b->data);
+	printf("%d %x size %d next %x prev %x kfree %d data %x\n",i, b, b->size, b->next , b->prev, b->free, b->data);
 }
 
 void block_overview() {
@@ -38,7 +39,7 @@ void block_overview() {
 		return;
 	}
 	while (b) {
-		if(b->kfree)
+		if(b->free)
 			kfrees += b->size;
 		printblock(b);
 		b = b->next;
@@ -49,7 +50,7 @@ void block_overview() {
 
 block_t *find_block(block_t **last , size_t size) {
 	block_t *b = base;
-	while (b && !(b->kfree && b->size >= size)) {
+	while (b && !(b->free && b->size >= size)) {
 		*last = b;
 		b = b->next;
 	}
@@ -67,7 +68,7 @@ void split_block(block_t *b, size_t s)
 	new->size = b->size - s - BLOCK_SIZE;
 	new->next = b->next;
 	new->prev = b;
-	new->kfree = 1;
+	new->free = 1;
 	new->ptr = new->data;
 	b->size = s;
 	// printf("new %x size %d orisize %d\n", new,new->size,b->size);
@@ -77,13 +78,13 @@ void split_block(block_t *b, size_t s)
 }
 
 
-void alloc_page_rest(block_t *prev, int end){
-	block_t b = (block_t)(last + last->size + BLOCK_SIZE);
-	b.size = (end - (int)b - BLOCK_SIZE);
-	b.prev = last;
-	b.next = last->next;
-	b.free = 1;
-	b.ptr = b->data;
+void alloc_page_rest(block_t *last, int end){
+	block_t *b = (block_t*)((int)(last->ptr) + last->size);
+	b->size = (end - (int)b - BLOCK_SIZE);
+	b->prev = last;
+	b->next = last->next;
+	b->free = 1;
+	b->ptr = b->data;
 
 	last->next = b;
 
@@ -104,7 +105,7 @@ block_t *alloc_page(block_t *last , size_t s)
 	//	else
 	//		get new pages and return
 	
-	int *p = get_free_pages(physical_len_to_page_len(s));
+	block_t *p = get_free_pages(physical_len_to_page_len(s));
 	p->size = s;
 	p->prev = last;
 	p->free = 0;
@@ -134,7 +135,7 @@ void *kmalloc(size_t size) {
 			/* can we split */
 			if ((b->size - s) >= (BLOCK_SIZE + 4))
 				split_block(b, s);
-			b->kfree = 0;
+			b->free = 0;
 		} else {
 			/* No fitting block , extend the heap */
 			// printf(" Extend Heap %x\n",b);
@@ -169,7 +170,7 @@ void copy_block(block_t *src, block_t *dst)
 
 block_t *fusion(block_t *b) {
 	block_t* next = b->next;
-	if (next && next->kfree && ((int)(b->ptr) + b->size == (int)next)) {
+	if (next && next->free && ((int)(b->ptr) + b->size == (int)next)) {
 		b->size += BLOCK_SIZE + next->size;
 		b->next = next->next;
 		if (next)
@@ -207,9 +208,9 @@ void kfree(void *p)
 	if (valid_addr(p))
 	{
 		b = get_block(p);
-		b->kfree = 1;
+		b->free = 1;
 		/* fusion with previous if possible */
-		if (b->prev && b->prev->kfree)
+		if (b->prev && b->prev->free)
 			b = fusion(b->prev);
 		/* then fusion with next */
 		if (b->next){
@@ -240,10 +241,6 @@ void *kcalloc(size_t number , size_t size) {
 }
 
 
-
-
-/* The realloc */
-/* See realloc(3) */
 void *krealloc(void *p, size_t size)
 {
 	size_t s;
@@ -264,7 +261,7 @@ void *krealloc(void *p, size_t size)
 		{
 			/* Try fusion with next if possible */
 			next = b->next;
-			if (next && next->kfree
+			if (next && next->free
 					&&	((int)(b->ptr) + b->size == (int)next)
 			        && (b->size + BLOCK_SIZE + next->size) >= s)
 			{
@@ -292,5 +289,6 @@ void *krealloc(void *p, size_t size)
 	}
 	return NULL;
 }
+
 
 

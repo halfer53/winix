@@ -1,4 +1,4 @@
-objs = kernel/*.o lib/*.o user/*.o
+objs = kernel/winix/*.o kernel/*.o user/*.o lib/ipc.o lib/string.o lib/util.o lib/syscall.o lib/wramp_syscall.o
 
 all:
 	$(MAKE) -C lib

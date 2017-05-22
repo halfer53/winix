@@ -26,6 +26,28 @@ void panic(const char* message) {
 	}
 }
 
+void testkmalloc(){
+	void *p0 = kmalloc(512);
+	  void *p1 = kmalloc(512);
+	  void *p2 = kmalloc(1024);
+	  void *p3 = kmalloc(512);
+	  void *p4 = kmalloc(1024);
+	  void *p5 = kmalloc(2048);
+	  void *p6 = kmalloc(512);
+	  void *p7 = kmalloc(1024);
+	  void *p8 = kmalloc(512);
+	  void *p9 = kmalloc(1024);
+	  block_overview();
+	  kfree(p5);
+	  kfree(p6);
+	  kfree(p2);
+	  kfree(p8);
+	  block_overview();
+	  p0 = krealloc(p0,900);
+	  p9 = krealloc(p9,3000);
+	  block_overview();
+}
+
 /**
  * Asserts that a condition is true.
  * If so, this function has no effect.
@@ -108,9 +130,9 @@ void main() {
 	RexSp2->Ctrl = 0x5cd;
 	RexSp1->Ctrl = 0x5cd;
 	init_message_queue();
-	init_mem_table();
+	init_mem_table(FREE_MEM_BEGIN);
 
-	kprintf("emain %d hpv %x | ",p->proc_index,*((int *)p->heap_break));
+	// testkmalloc();
 
 	//Kick off first task. Note: never returns
 
