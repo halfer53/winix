@@ -287,8 +287,8 @@ void *kset_proc(proc_t *p,void (*entry)(), int priority, const char *name){
 
 	p->ptable = p->protection_table;
 
-	// ptr = proc_malloc(DEFAULT_STACK_SIZE);
-	ptr = get_free_pages(DEFAULT_STACK_SIZE / 1024);
+	ptr = proc_malloc(DEFAULT_STACK_SIZE);
+	// ptr = get_free_pages(DEFAULT_STACK_SIZE / 1024);
 
 	
 	p->sp = (size_t *)ptr + DEFAULT_STACK_SIZE-512;

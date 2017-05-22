@@ -147,11 +147,6 @@ int bitmap_search_pattern(unsigned long *map, int map_len, unsigned long pattern
     return 0;
 }
 
-void bitmap_set_pattern(unsigned long *map, int map_len,int nstart, unsigned long pattern, int pattern_len){
-    int i = nstart/32,j = nstart%32;
-
-}
-
 unsigned long createMask(unsigned long a, unsigned long b)
 {
    unsigned long r = 0;
