@@ -147,6 +147,11 @@ int bitmap_search_pattern(unsigned long *map, int map_len, unsigned long pattern
     return 0;
 }
 
+void bitmap_set_pattern(unsigned long *map, int map_len,int nstart, unsigned long pattern, int pattern_len){
+    int i = nstart/32,j = nstart%32;
+
+}
+
 unsigned long createMask(unsigned long a, unsigned long b)
 {
    unsigned long r = 0;
@@ -176,12 +181,20 @@ pattern_t *extract_pattern(unsigned long *map, int map_len, int heap_break){
     if(end - start > 32 || (i==31 && j==31)){
         return NULL;
     }
-    result = map[i] << (j-1);
+    result = map[i] << (j);
     if(i < map_len && i != endi){
         tmask = createMask(0,end%32);
-        result |= (map[i+1] & tmask) >> (32 - j+1);
+        result |= (map[i+1] & tmask) >> (32 - j);
     }
     p->pattern = result;
     p->size = end - start;
     return p;
+}
+
+void bitmap_set_pattern(unsigned long *map, int map_len, int index, unsigned long pattern, int pattern_len){
+    int i= index/32, j=index%32;
+    map[i] |= (pattern >> j);
+    if(i < map_len -1 && 32 - j < pattern_len){
+        map[i+1] |= (pattern << (32 - j));
+    }
 }

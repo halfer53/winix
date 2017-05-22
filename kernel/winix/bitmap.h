@@ -20,5 +20,7 @@ void bitmap_reset_bit(unsigned long *map, int map_len,int start);
 void bitmap_reset_nbits(unsigned long *map, int map_len,int start, int len);
 int bitmap_search_pattern(unsigned long *map, int map_len, unsigned long pattern, int pattern_len);
 
+pattern_t *extract_pattern(unsigned long *map, int map_len, int heap_break);
+
 #endif
 

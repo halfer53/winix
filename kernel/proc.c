@@ -245,11 +245,13 @@ proc_t* _fork(proc_t *original){
 		*p = *original;
 		p->proc_index = pbak;
 		
-		length = original->length + DEFAULT_STACK_SIZE + DEFAULT_HEAP_SIZE;
-		len = physical_len_to_page_len(length);
+		// length = original->length + DEFAULT_STACK_SIZE + DEFAULT_HEAP_SIZE;
+		// len = physical_len_to_page_len(length);
 
-		// bitmap_search(mem_map,MEM_MAP_LEN,len);
-		ptr_base = proc_malloc(length);
+		pattern_t *ptn = extract_pattern(mem_map,MEM_MAP_LEN,(int)p->heap_break);
+		assert(ptn!= NULL,"Pattern searching failed");
+		index = bitmap_search_pattern(mem_map,MEM_MAP_LEN,ptn->pattern, ptn->size);
+		// ptr_base = proc_malloc(length);
 
 		memcpy(ptr_base,original->rbase,length);
 		p->rbase = ptr_base;
@@ -285,8 +287,8 @@ void *kset_proc(proc_t *p,void (*entry)(), int priority, const char *name){
 
 	p->ptable = p->protection_table;
 
-	ptr = proc_malloc(DEFAULT_STACK_SIZE);
-	// ptr = get_free_pages(DEFAULT_STACK_SIZE / 1024);
+	// ptr = proc_malloc(DEFAULT_STACK_SIZE);
+	ptr = get_free_pages(DEFAULT_STACK_SIZE / 1024);
 
 	
 	p->sp = (size_t *)ptr + DEFAULT_STACK_SIZE-512;
