@@ -49,6 +49,7 @@ void add_message(message_t *m) {
 
 void message_queue_main(){
 	message_t m;
+	init_message_queue();
 	while(1){
 		if (queue[HEAD] != 0){
 			mqueue_t* mq = mq_dequeue(queue);

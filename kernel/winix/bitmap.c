@@ -1,4 +1,4 @@
-#include "winix.h"
+#include "bitmap.h"
 
 static unsigned long mask[BITMASK_NR];
 
@@ -10,11 +10,19 @@ void init_bitmap(){
     }
 }
 
-void bitmap_reset(unsigned long *map, int map_len){
+void bitmap_reset_all(unsigned long *map, int map_len){
 	register int i;
 	for (i=0; i < map_len; ++i)
 	{
 		map[i] = 0;
+	}
+}
+
+void bitmap_set_all(unsigned long *map, int map_len){
+	register int i;
+	for (i=0; i < map_len; ++i)
+	{
+		map[i] = 0xffffffff;
 	}
 }
 /**

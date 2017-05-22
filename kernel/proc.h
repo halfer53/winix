@@ -15,6 +15,7 @@
 #define NUM_QUEUES				5
 #define IDLE_PRIORITY			4
 #define USER_PRIORITY			3
+#define KERNEL_PROCESS_PRIORITY			1
 #define SYSTEM_PRIORITY			0
 
 
@@ -136,8 +137,10 @@ proc_t *get_proc(int proc_nr);
 //fork the next process in the ready_q, return the new proc_index of the forked process
 //side effect: the head of the free_proc is dequeued, and added to the ready_q with all relevant values equal
 //to the original process, except stack pointer.
-int fork_proc(proc_t *p);
-proc_t *kernel_fork_proc(proc_t *original);
+proc_t* _fork(proc_t *p);
+proc_t *kexecp(proc_t *p,void (*entry)(), int priority, const char *name);
+proc_t *create_system(void (*entry)(), int priority, const char *name);
+proc_t* create_init(size_t *lines, size_t length, size_t entry);
 
 
 int process_overview();

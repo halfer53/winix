@@ -22,6 +22,7 @@ void idle_main() {
 	
 	int i = 0;
 	unsigned int delay = 0;
+	kprintf("IDLE");
 	
 	while(1) {
 		RexParallel->Ctrl = 0;

@@ -7,7 +7,6 @@
  **/
 
 #include "winix.h"
-#include <sys/syscall.h>
 
 //Linked lists are defined by a head and tail pointer.
 
@@ -31,7 +30,6 @@ proc_t *current_proc;
 //Limits for memory allocation
 size_t FREE_MEM_BEGIN = 0;
 size_t FREE_MEM_END = 0;
-
 
 
 /**
@@ -190,8 +188,8 @@ void proc_set_default(proc_t *p){
 	p->parent_proc_index = 0;
 	p->heap_break = NULL;
 
-	//data not initialised
-	//unsigned long protection_table[PROTECTION_TABLE_LEN]
+	p->ptable = p->protection_table;
+	bitmap_reset_all(p->ptable,PROTECTION_TABLE_LEN);
 }
 
 
@@ -218,18 +216,6 @@ void proc_set_default(proc_t *p){
 	return NULL;
 }
 
-
-
-proc_t *kernel_fork_proc(proc_t *original){
-  int pindex = 0;
-	proc_t *p_fork = NULL;
-
-  pindex = fork_proc(original);
-	p_fork = get_proc(pindex);
-  p_fork->next = NULL;
-	enqueue_tail(ready_q[p_fork->priority], p_fork);
-  return p_fork;
-}
 /**
  * fork the calling process
  *
@@ -239,7 +225,7 @@ proc_t *kernel_fork_proc(proc_t *original){
  * Side Effects:
  *   a new process forked onto the a new memory space, but not yet added to the scheduling queue
  **/
-int fork_proc(proc_t *original){
+proc_t* _fork(proc_t *original){
 	proc_t *p = NULL;
 	void *ptr_base = NULL;
 	int len =0;
@@ -251,7 +237,7 @@ int fork_proc(proc_t *original){
 	if (original->length == 0 || (size_t)(original->rbase) == 0) {
 		//we can't fork p1 if it's a system task
 		kprintf("%s can't be forked\n",original->name );
-		return -1;
+		return NULL;
 	}
 
 	if(p = get_free_proc()) {
@@ -270,14 +256,11 @@ int fork_proc(proc_t *original){
 		//Initialise protection table
 		//reset page table
 		p->ptable = p->protection_table;
-		bitmap_reset(p->ptable,PROTECTION_TABLE_LEN);
+		bitmap_reset_all(p->ptable,PROTECTION_TABLE_LEN);
 
 		//get page table starting index, and its length
 		nstart = get_page_index(p->rbase);
 		bitmap_set_nbits(p->ptable,PROTECTION_TABLE_LEN, nstart,len);
-
-		// strcpy(p->name,"fork_");
- 	//  	strcat(p->name,original->name);
 
 		// //Set the process to runnable, and enqueue it.
 		// p->state = RUNNABLE;
@@ -286,8 +269,35 @@ int fork_proc(proc_t *original){
 		// kprintf("efork %d hpv %x | ",p->proc_index,*((int *)p->heap_break));
 	}
 	assert(p != NULL, "Fork");
-	return p->proc_index;
+	return p;
 }
+
+
+
+void *kset_proc(proc_t *p,void (*entry)(), int priority, const char *name){
+	void *ptr = NULL;
+	int i=0;
+	p->priority = priority;
+	p->pc = entry;
+
+	strcpy(p->name,name);
+
+	p->ptable = p->protection_table;
+	//system task has access to everywhere in the memory
+	ptr = proc_malloc(DEFAULT_STACK_SIZE);
+	
+	p->sp = (size_t *)ptr + DEFAULT_STACK_SIZE-512;
+	p->heap_break = p->sp+1;
+	p->length = DEFAULT_STACK_SIZE;
+
+	//Set the process to runnable, and enqueue it.
+	p->state = RUNNABLE;
+	return ptr;
+}
+
+
+
+
 
 /**
  * Creates a new process and adds it to the runnable queue
@@ -316,38 +326,47 @@ proc_t *new_proc(void (*entry)(), int priority, const char *name) {
 	if(!(0 <= priority && priority < NUM_QUEUES)) {
 		return NULL;
 	}
-
-  /**
-   * Gets a proc struct that isn't currently in use.
-   *
-   * Returns:
-   *   A pointer to a proc struct that isn't in use.
-   *   NULL if there are no free slots in the process table.
-   *
-   * Side Effects:
-   *   A proc struct is removed from the free_proc list, and reinitialised.
-   **/
 	if(p = get_free_proc()) {
-		p->priority = priority;
-		p->pc = entry;
-
-		strcpy(p->name,name);
-
-
-		p->ptable = p->protection_table;
-		for(i = 0; i < PROTECTION_TABLE_LEN; i++) {
-			p->protection_table[i] = 0xffffffff;
-		}
-		//system task has access to everywhere in the memory
-
-		ptr = (size_t *)expand_mem(DEFAULT_STACK_SIZE);
-		p->sp = ptr + (size_t)DEFAULT_STACK_SIZE-1;
-
-		//Set the process to runnable, and enqueue it.
-		p->state = RUNNABLE;
+		kset_proc(p,entry,priority,name);
+		bitmap_set_all(p->ptable,PROTECTION_TABLE_LEN);
 		enqueue_tail(ready_q[priority], p);
 	}
+	return p;
+}
 
+
+proc_t *kexecp(proc_t *p,void (*entry)(), int priority, const char *name){
+	void *ptr = NULL;
+	int lower_bound = 0;
+	if(p->rbase == DEFAULT_RBASE){
+		lower_bound = i_align1k_lb(p->sp);
+		proc_free(lower_bound);
+	}else{
+		proc_free(p->rbase);
+	}
+	proc_set_default(p);
+	ptr = kset_proc(p,entry,priority,name);
+	bitmap_set_all(p->ptable,PROTECTION_TABLE_LEN);
+	add_to_scheduling_queue(p);
+	return p;
+}
+
+proc_t *create_system(void (*entry)(), int priority, const char *name){
+	return new_proc(entry,priority,name);
+}
+
+proc_t* create_init(size_t *lines, size_t length, size_t entry){
+	void *ptr_base;
+	int size = 1024,nstart = 0;
+	proc_t *p = NULL;
+	if(p = get_free_proc()){
+		ptr_base = kset_proc(p,(void (*)())entry,USER_PRIORITY,"INIT");
+		memcpy(ptr_base, lines,length);
+		p->rbase = ptr_base;
+		bitmap_set_bit(p->ptable,PROTECTION_TABLE_LEN,get_page_index(p->rbase));
+		//set protection table TODOK
+		add_to_scheduling_queue(p);
+	}
 	return p;
 }
 

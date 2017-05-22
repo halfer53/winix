@@ -58,7 +58,7 @@ static proc_t *exec_proc(proc_t *p,size_t *lines, size_t length, size_t entry, i
 		nstart = get_page_index(p->rbase);
 		len = physical_len_to_page_len(overall_length);
 
-		bitmap_reset(p->ptable,PROTECTION_TABLE_LEN);
+		bitmap_reset_all(p->ptable,PROTECTION_TABLE_LEN);
 		bitmap_set_nbits(p->ptable,PROTECTION_TABLE_LEN, nstart,len);
 
 		strcpy(p->name,name);

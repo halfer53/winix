@@ -19,6 +19,7 @@
 
 #include "winix/slab.h"
 #include "winix/mem_map.h"
+#include "winix/bitmap.h"
 
 #include "wramp.h"
 #include "proc.h"
@@ -27,7 +28,6 @@
 #include "idle.h"
 #include "sys_memory.h"
 #include "exec.h"
-#include "bitmap.h"
 #include "message_queue.h"
 
 

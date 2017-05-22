@@ -66,6 +66,7 @@ void assert(int expression, const char *message) {
 void main() {
 
 	proc_t *p = NULL;
+	proc_t *init = NULL;
 	size_t *ptr = NULL;
 	void *addr_p = NULL;
 	int pid = 0;
@@ -84,58 +85,36 @@ void main() {
 	init_proc();
 
 	//Initialise the system task
-	p = new_proc(system_main, SYSTEM_PRIORITY, "SYSTEM");
+	p = create_system(system_main, SYSTEM_PRIORITY, "SYSTEM");
 	assert(p != NULL, "Create sys task");
 	p->quantum = 64;
 
+	init = create_init(init_code,2,0);
+	init->quantum = 1;
 
-	p = new_proc(message_queue_main, USER_PRIORITY, "MESSAGE");
+	p = _fork(init);
+	p = kexecp(p,message_queue_main, USER_PRIORITY, "MESSAGE");
 	assert(p != NULL, "Create Message Queue");
 	p->quantum = 4;
-
+	
 	//Idle Task
-	p = new_proc(idle_main, IDLE_PRIORITY, "IDLE");
+	p = _fork(init);
+	p = kexecp(p,idle_main, IDLE_PRIORITY, "IDLE");
 	assert(p != NULL, "Create idle task");
 
-	//init
-	p = exec_new_proc(init_code,2,0, USER_PRIORITY,"init");
-	p->quantum = 1;
-
-	pid = fork_proc(p);
-
-	// pid = fork_proc(p);
-	p = get_proc(pid);
-
-	// p = new_proc(shell_main, USER_PRIORITY, "Shell");
-	// assert(p != NULL, "Create Shell task");
-	// p->quantum = 4;
-
+	p = _fork(init);
 	p = exec_replace_existing_proc(p,shell_code,shell_code_length,shell_pc, USER_PRIORITY,"Shell");
 	assert(p != NULL, "Create Shell task");
 	p->quantum = 10;
-
-	//Rocks game
-	/*p = new_proc(rocks_main, USER_PRIORITY, "Rocks");
-	assert(p != NULL, "Create rocks task");
-	p->quantum = 4;*/
-
-	//Parallel test program
-	// p = new_proc(parallel_main, USER_PRIORITY, "Parallel");
-	// assert(p != NULL, "Create parallel task");
-	// p->quantum = 1;
-	//###########################################
 
 	//Initialise exceptions
 	init_exceptions();
 	RexSp2->Ctrl = 0x5cd;
 	RexSp1->Ctrl = 0x5cd;
-	init_message_queue();
 	init_mem_table(FREE_MEM_BEGIN);
 
 	// testkmalloc();
 
 	//Kick off first task. Note: never returns
-
-	//process_overview();
 	sched();
 }

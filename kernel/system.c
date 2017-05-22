@@ -47,19 +47,6 @@ void system_main() {
 			//Gets the system uptime.
 			case SYSCALL_GETC:
 				set_waiting_proc(caller,&m);
-				// for(i = 0; i < NUM_QUEUES; i++) {
-				// 	if(ready_q[i][0] != NULL) {
-				// 		pcurr = ready_q[i][0];
-				// 		while(pcurr != NULL)
-				// 		{
-				// 			kprintf("%d %d |",i,ready_q[i][j]->proc_index);
-				// 			pcurr = pcurr->next;
-				// 		}
-				// 	}
-				// }
-				// response = kgetc();
-				// m.i1 = response;
-				// winix_send(who,&m);
 				break;
 
 			case SYSCALL_UPTIME:
@@ -80,8 +67,8 @@ void system_main() {
 
 			case SYSCALL_FORK:
 				//fork the calling process
-				response = fork_proc(caller);
-				m.i1 = response;
+				pcurr = _fork(caller);
+				m.i1 = pcurr->proc_index;
 				winix_send(who, &m);
 
 				//send 0 to child

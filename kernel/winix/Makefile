@@ -1,6 +1,6 @@
-sources = slab.c mem_map.c
-compile = slab.s mem_map.s
-assemble = slab.o mem_map.o
+sources = slab.c mem_map.c bitmap.c
+compile = slab.s mem_map.s bitmap.s
+assemble = slab.o mem_map.o bitmap.o
 
 all: $(assemble)
 
