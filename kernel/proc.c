@@ -248,10 +248,10 @@ proc_t* _fork(proc_t *original){
 		// length = original->length + DEFAULT_STACK_SIZE + DEFAULT_HEAP_SIZE;
 		// len = physical_len_to_page_len(length);
 
-		pattern_t *ptn = extract_pattern(mem_map,MEM_MAP_LEN,(int)p->heap_break);
-		assert(ptn!= NULL,"Pattern searching failed");
-		index = bitmap_search_pattern(mem_map,MEM_MAP_LEN,ptn->pattern, ptn->size);
-		// ptr_base = proc_malloc(length);
+		// pattern_t *ptn = extract_pattern(mem_map,MEM_MAP_LEN,(int)p->heap_break);
+		// assert(ptn!= NULL,"Pattern searching failed");
+		// index = bitmap_search_pattern(mem_map,MEM_MAP_LEN,ptn->pattern, ptn->size);
+		ptr_base = proc_malloc(length);
 
 		memcpy(ptr_base,original->rbase,length);
 		p->rbase = ptr_base;
