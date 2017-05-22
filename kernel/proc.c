@@ -189,7 +189,7 @@ void proc_set_default(proc_t *p){
 	p->heap_break = NULL;
 
 	p->ptable = p->protection_table;
-	bitmap_reset_all(p->ptable,PROTECTION_TABLE_LEN);
+	bitmap_clear(p->ptable,PROTECTION_TABLE_LEN);
 }
 
 
@@ -248,6 +248,7 @@ proc_t* _fork(proc_t *original){
 		length = original->length + DEFAULT_STACK_SIZE + DEFAULT_HEAP_SIZE;
 		len = physical_len_to_page_len(length);
 
+		// bitmap_search(mem_map,MEM_MAP_LEN,len);
 		ptr_base = proc_malloc(length);
 
 		memcpy(ptr_base,original->rbase,length);
@@ -256,7 +257,7 @@ proc_t* _fork(proc_t *original){
 		//Initialise protection table
 		//reset page table
 		p->ptable = p->protection_table;
-		bitmap_reset_all(p->ptable,PROTECTION_TABLE_LEN);
+		bitmap_clear(p->ptable,PROTECTION_TABLE_LEN);
 
 		//get page table starting index, and its length
 		nstart = get_page_index(p->rbase);
@@ -283,14 +284,16 @@ void *kset_proc(proc_t *p,void (*entry)(), int priority, const char *name){
 	strcpy(p->name,name);
 
 	p->ptable = p->protection_table;
-	//system task has access to everywhere in the memory
+
 	ptr = proc_malloc(DEFAULT_STACK_SIZE);
+	// ptr = get_free_pages(DEFAULT_STACK_SIZE / 1024);
+
 	
 	p->sp = (size_t *)ptr + DEFAULT_STACK_SIZE-512;
 	p->heap_break = p->sp+1;
 	p->length = DEFAULT_STACK_SIZE;
 
-	//Set the process to runnable, and enqueue it.
+	//Set the process to runnable, remember to enqueue it after you call this method
 	p->state = RUNNABLE;
 	return ptr;
 }
@@ -328,7 +331,7 @@ proc_t *new_proc(void (*entry)(), int priority, const char *name) {
 	}
 	if(p = get_free_proc()) {
 		kset_proc(p,entry,priority,name);
-		bitmap_set_all(p->ptable,PROTECTION_TABLE_LEN);
+		bitmap_fill(p->ptable,PROTECTION_TABLE_LEN);
 		enqueue_tail(ready_q[priority], p);
 	}
 	return p;
@@ -346,7 +349,7 @@ proc_t *kexecp(proc_t *p,void (*entry)(), int priority, const char *name){
 	}
 	proc_set_default(p);
 	ptr = kset_proc(p,entry,priority,name);
-	bitmap_set_all(p->ptable,PROTECTION_TABLE_LEN);
+	bitmap_fill(p->ptable,PROTECTION_TABLE_LEN);
 	add_to_scheduling_queue(p);
 	return p;
 }

@@ -2,7 +2,6 @@ objs = kernel/winix/*.o kernel/*.o user/*.o lib/ipc.o lib/string.o lib/util.o li
 
 all:
 	$(MAKE) -C lib
-	$(MAKE) shell
 	$(MAKE) -C kernel
 	$(MAKE) -C user
 	wlink -o winix.srec kernel/util/limits_head.o $(objs) kernel/util/limits_tail.o

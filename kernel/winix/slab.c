@@ -23,7 +23,6 @@ static void *base = NULL;
 static void *end = NULL;
 
 #define BLOCK_SIZE 5
-#define align4(x) (((((x)-1)>>2)<<2)+4)
 
 void printblock(block_t *b) {
 	int i = (int)b / 1024;

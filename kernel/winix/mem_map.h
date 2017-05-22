@@ -10,6 +10,7 @@ void init_mem_table();
 
 extern unsigned long mem_map[MEM_MAP_LEN];
 
+#define align4(x) (((((x)-1)>>2)<<2)+4)
 #define align1k(x) (((((x)-1)>>10)<<10)+1024)
 #define i_align1k_lb(x) ((((((int)x)-1)>>10)<<10))
 

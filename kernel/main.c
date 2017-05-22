@@ -26,6 +26,14 @@ void panic(const char* message) {
 	}
 }
 
+void testbitmap(){
+	unsigned long pattern = 0xa47b4000;
+	int retval = 0;
+	mem_map[1] = 0xf84b0000;
+	retval = bitmap_search_pattern(mem_map,MEM_MAP_LEN,pattern,20);
+	kprintf("Got %d\n",retval);
+}
+
 void testkmalloc(){
 	void *p0 = kmalloc(512);
 	  void *p1 = kmalloc(512);
@@ -114,7 +122,7 @@ void main() {
 	init_mem_table(FREE_MEM_BEGIN);
 
 	// testkmalloc();
-
+	testbitmap();
 	//Kick off first task. Note: never returns
 	sched();
 }

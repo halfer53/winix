@@ -131,8 +131,6 @@ void end_process(proc_t *p);
  **/
 proc_t *get_proc(int proc_nr);
 
-//void *pproc_malloc(size_t size);
-
 
 //fork the next process in the ready_q, return the new proc_index of the forked process
 //side effect: the head of the free_proc is dequeued, and added to the ready_q with all relevant values equal

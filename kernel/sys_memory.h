@@ -20,5 +20,4 @@ void *proc_malloc(size_t size);
 void init_memory();
 void *expand_mem(size_t size);
 
-
 #endif

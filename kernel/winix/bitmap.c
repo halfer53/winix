@@ -1,4 +1,7 @@
 #include "bitmap.h"
+#include "slab.h"
+#include <stddef.h>
+#include "mem_map.h"
 
 static unsigned long mask[BITMASK_NR];
 
@@ -10,7 +13,7 @@ void init_bitmap(){
     }
 }
 
-void bitmap_reset_all(unsigned long *map, int map_len){
+void bitmap_clear(unsigned long *map, int map_len){
 	register int i;
 	for (i=0; i < map_len; ++i)
 	{
@@ -18,7 +21,7 @@ void bitmap_reset_all(unsigned long *map, int map_len){
 	}
 }
 
-void bitmap_set_all(unsigned long *map, int map_len){
+void bitmap_fill(unsigned long *map, int map_len){
 	register int i;
 	for (i=0; i < map_len; ++i)
 	{
@@ -94,4 +97,91 @@ void bitmap_reset_bit(unsigned long *map, int map_len,int start){
 	int ibit = start/32;
 	if(start >= map_len * 32)	return;
     map[ibit] = map[ibit] & (~mask[start%32]);
+}
+
+int search_backtrace(unsigned long *map, int region_len,unsigned long pattern, int pattern_len,int j){
+    int i=0;
+    int count = 1;
+    int j_bak = j;
+	unsigned long map_bit, pattern_bit;
+	int result;
+    unsigned long curr_pattern = pattern >> (j-1);
+    for(;i<region_len;i++){
+        for(;j<32;j++){
+			map_bit = map[i] & mask[j];
+			pattern_bit = curr_pattern & mask[j];
+            result = map_bit & pattern_bit;
+            // printf("%d %d %x %x %x %x %x\n",j,count,(map[i]),(map[i] & mask[j]), curr_pattern, (((curr_pattern) & mask[j])),result);
+            if(result == 0){
+                count++;
+                if(count == pattern_len){
+                    return 1;
+                }
+            }else{
+                return 0;
+            }
+        }
+        j=0; 
+        curr_pattern = pattern << count;
+    }
+    return 0;
+}
+
+int bitmap_search_pattern(unsigned long *map, int map_len, unsigned long pattern, int pattern_len){
+    int i=0, j = 0;
+    unsigned long map_bit, pattern_bit;
+	int result;
+    for(i=0;i<map_len;i++){
+        for(j=0;j<32;j++){
+			map_bit = (map[i] & mask[j]);
+			pattern_bit = (pattern >> j) & mask[j];
+            result = map_bit & pattern_bit;
+            // printf("%d %x %x %x %x %x\n",j,(map[i]),(map[i] & mask[j]), pattern >> j, (((pattern >> j) & mask[j])),result);
+            if(result == 0){ 
+                if(search_backtrace(map+i,map_len - i, pattern,pattern_len, j+1)){
+                    return i*32 + j;
+                }
+            }
+        }
+    }
+    return 0;
+}
+
+unsigned long createMask(unsigned long a, unsigned long b)
+{
+   unsigned long r = 0;
+   unsigned long i;
+   for (i=a; i<=b; i++)
+       r |= (0x80000000 >> i);
+
+   return r;
+}
+
+pattern_t *extract_pattern(unsigned long *map, int map_len, int heap_break){
+    pattern_t *p = kmalloc(2);
+    int i,j,start = 0;
+    unsigned long result = 0;
+    int end = (align1k(heap_break) / 1024);
+    int endi = end/32;
+    unsigned long tmask;
+    for(i=0;i <map_len;i++){
+        for(j=0; j< 32; j++){
+            if((map[i] & mask[j]) == mask[j]){
+                start = i*32 + j;
+                goto then;
+            }
+        }
+    }
+    then:
+    if(end - start > 32 || (i==31 && j==31)){
+        return NULL;
+    }
+    result = map[i] << (j-1);
+    if(i < map_len && i != endi){
+        tmask = createMask(0,end%32);
+        result |= (map[i+1] & tmask) >> (32 - j+1);
+    }
+    p->pattern = result;
+    p->size = end - start;
+    return p;
 }

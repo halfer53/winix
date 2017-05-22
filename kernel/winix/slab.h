@@ -2,10 +2,10 @@
 #define _K_SLAB_H_
 
 
-void* kmalloc (size_t size);
+void* kmalloc (unsigned long size);
 void kfree(void *ptr);
-void* krealloc(void *p,size_t size);
-void *kcalloc(size_t number , size_t size);
+void* krealloc(void *p,unsigned long size);
+void *kcalloc(unsigned long number , unsigned long size);
 void block_overview();
 
 
