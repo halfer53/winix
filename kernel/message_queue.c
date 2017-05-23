@@ -2,9 +2,10 @@
 
 mqueue_t message_table[MESSAGE_Q_NUM];
 
-static mqueue_t *unused_messages[2];
+mqueue_t *unused_messages[2];
 
-static mqueue_t *queue[2];
+mqueue_t *sending_queue[2];
+mqueue_t *receiving_queue[2];
 
 void mq_enqueue_head(mqueue_t **q, mqueue_t *mq){
 	if(q[HEAD] == NULL) {
@@ -39,21 +40,24 @@ void init_message_queue(){
 	{
 		mq_enqueue_head(unused_messages,&message_table[i]);
 	}
+	receiving_queue[HEAD] = receiving_queue[TAIL] = NULL;
+	sending_queue[HEAD] = sending_queue[TAIL] = NULL;
 }
 
-void add_message(message_t *m) {
+void add_receving_message(message_t *m) {
 	mqueue_t* mq = mq_dequeue(unused_messages);
 	mq->m = *m;
-	mq_enqueue_head(queue,mq);
+	mq_enqueue_head(receiving_queue,mq);
 }
 
 void message_queue_main(){
 	message_t m;
 	init_message_queue();
 	while(1){
-		if (queue[HEAD] != 0){
-			mqueue_t* mq = mq_dequeue(queue);
+		if (sending_queue[HEAD] != 0){
+			mqueue_t* mq = mq_dequeue(sending_queue);
 			m = mq->m;
+			mq_enqueue_head(unused_messages,mq);
 			winix_send(m.src, &m);
 		}
 	}

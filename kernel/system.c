@@ -45,7 +45,7 @@ void system_main() {
 
 			//Gets the system uptime.
 			case SYSCALL_GETC:
-				set_waiting_proc(caller,&m);
+				add_receving_message(&m);
 				break;
 
 			case SYSCALL_UPTIME:

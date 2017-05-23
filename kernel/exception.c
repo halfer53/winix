@@ -48,14 +48,6 @@ static void (*handlers[])(void) = {
 //System uptime, stored as number of timer interrupts since boot
 int system_uptime = 0;
 
-proc_t *waiting_proc = NULL;
-message_t m;
-
-void set_waiting_proc(proc_t *who, message_t *message){
-	waiting_proc = who;
-	m = *message;
-	// kprintf("seting waiting %d src %d type %d\n",who->proc_index,m.src,m.type);
-}
 
 /**
  * User Interrupt Button (IRQ1)
@@ -92,15 +84,16 @@ static void parallel_handler() {
 static void serial1_handler() {
 
 	int stat = RexSp1->Stat;
+	mqueue_t *mq;
 	if(stat & 1 == 1){
-		if (waiting_proc != NULL && m.src != 0){
-			m.i1 = RexSp1->Rx;
+		if (receiving_queue[HEAD] != NULL){
+			mq = mq_dequeue(receiving_queue);
+			(mq->m).i1 = RexSp1->Rx;
 			// kprintf("E Get %c",m.i1);
-			waiting_proc = NULL;
-			add_message(&m);
+			mq_enqueue_head(sending_queue,mq);
 			RexSp1->Iack = 0;
 		}else{
-			kprintf("Err waiting %x %d\n",waiting_proc,m.src);
+			kprintf("Err waiting \n");
 		}
 	}
 	RexSp1->Iack = 0;
