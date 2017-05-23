@@ -128,11 +128,15 @@ static void serial2_handler() {
  *   Scheduler is called (i.e. this handler does not return).
  **/
 static void gpf_handler() {
+	int i=0;
+	proc_t *system = get_proc(0);
 	//Current process has performed an illegal operation and will be shut down.
-	kprintf("\r\n[SYSTEM] Process \"%s (%d)\" GPF: PC=%x.\r\n",
+	kprintf("\r\n[SYSTEM] Process \"%s (%d)\" Rbase=%x GPF: PC=%x SP=%x.\r\n",
 		current_proc->name,
 		current_proc->proc_index,
-		current_proc->pc);
+		current_proc->rbase,
+		current_proc->pc,
+		current_proc->sp);
 
 	//Kill process and call scheduler.
 	end_process(current_proc);

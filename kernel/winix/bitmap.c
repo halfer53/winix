@@ -111,7 +111,7 @@ int search_backtrace(unsigned long *map, int region_len,unsigned long pattern, i
 			map_bit = map[i] & mask[j];
 			pattern_bit = curr_pattern & mask[j];
             result = map_bit & pattern_bit;
-            // printf("%d %d %x %x %x %x %x\n",j,count,(map[i]),(map[i] & mask[j]), curr_pattern, (((curr_pattern) & mask[j])),result);
+            // kprintf(" %d |",j);
             if(result == 0){
                 count++;
                 if(count == pattern_len){
@@ -127,7 +127,7 @@ int search_backtrace(unsigned long *map, int region_len,unsigned long pattern, i
     return 0;
 }
 
-int bitmap_search_pattern(unsigned long *map, int map_len, unsigned long pattern, int pattern_len){
+int bitmap_search_pattern(unsigned long *map, int map_len,int start, unsigned long pattern, int pattern_len){
     int i=0, j = 0;
     unsigned long map_bit, pattern_bit;
 	int result;
@@ -136,8 +136,10 @@ int bitmap_search_pattern(unsigned long *map, int map_len, unsigned long pattern
 			map_bit = (map[i] & mask[j]);
 			pattern_bit = (pattern >> j) & mask[j];
             result = map_bit & pattern_bit;
-            // printf("%d %x %x %x %x %x\n",j,(map[i]),(map[i] & mask[j]), pattern >> j, (((pattern >> j) & mask[j])),result);
+            // kprintf("%d %x %x %x %x\n",j,(map[i]),map_bit, pattern_bit ,result);
             if(result == 0){ 
+                if(pattern_len == 1)
+                    return i*32+j;
                 if(search_backtrace(map+i,map_len - i, pattern,pattern_len, j+1)){
                     return i*32 + j;
                 }
@@ -172,6 +174,7 @@ pattern_t *extract_pattern(unsigned long *map, int map_len, int heap_break){
             }
         }
     }
+    
     then:
     if(end - start > 32 || (i==31 && j==31)){
         return NULL;
@@ -191,5 +194,13 @@ void bitmap_set_pattern(unsigned long *map, int map_len, int index, unsigned lon
     map[i] |= (pattern >> j);
     if(i < map_len -1 && 32 - j < pattern_len){
         map[i+1] |= (pattern << (32 - j));
+    }
+}
+
+
+void bitmap_xor(unsigned long *map1, unsigned long *map2, int map_len){
+    int i=0;
+    for(i = 0; i< map_len; i++){
+        map1[i] ^= map2[i];
     }
 }

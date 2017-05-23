@@ -20,7 +20,7 @@ extern unsigned long mem_map[MEM_MAP_LEN];
 #define get_physical_addr(va,proc)	(((int *)va)+(int)proc->rbase)
 #define get_virtual_addr(pa,proc)	(((int *)pa)-(int)proc->rbase)
 
-#define get_page_index(pa)	( (align1k((int)pa)) / 1024 )
+#define get_page_index(pa)	( ((int)pa) / 1024 )
 #define physical_len_to_page_len(pa_len)	( (align1k((int)pa_len)) / 1024 )
 #define page_len_to_physical_len(p_len)	(p_len * 1024)
 

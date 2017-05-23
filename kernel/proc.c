@@ -231,8 +231,8 @@ proc_t* _fork(proc_t *original){
 	int len =0;
 	int nstart = 0;
 	int pbak;
-	int length;
 	int i,n,index;
+	pattern_t *ptn;
 
 	if (original->length == 0 || (size_t)(original->rbase) == 0) {
 		//we can't fork p1 if it's a system task
@@ -244,33 +244,29 @@ proc_t* _fork(proc_t *original){
 		pbak = p->proc_index;
 		*p = *original;
 		p->proc_index = pbak;
-		
-		// length = original->length + DEFAULT_STACK_SIZE + DEFAULT_HEAP_SIZE;
-		// len = physical_len_to_page_len(length);
 
-		// pattern_t *ptn = extract_pattern(mem_map,MEM_MAP_LEN,(int)p->heap_break);
-		// assert(ptn!= NULL,"Pattern searching failed");
-		// index = bitmap_search_pattern(mem_map,MEM_MAP_LEN,ptn->pattern, ptn->size);
-		ptr_base = proc_malloc(length);
-
-		memcpy(ptr_base,original->rbase,length);
-		p->rbase = ptr_base;
-
-		//Initialise protection table
-		//reset page table
 		p->ptable = p->protection_table;
+
+		ptn = extract_pattern(p->ptable,MEM_MAP_LEN,(int)p->heap_break);
+
+		assert(ptn!= NULL,"Pattern searching failed");
+		index = bitmap_search_pattern(mem_map,MEM_MAP_LEN,BSS_END/1024,ptn->pattern, ptn->size);
+		// kprintf("i %d",index);
+
 		bitmap_clear(p->ptable,PROTECTION_TABLE_LEN);
 
-		//get page table starting index, and its length
-		nstart = get_page_index(p->rbase);
-		bitmap_set_nbits(p->ptable,PROTECTION_TABLE_LEN, nstart,len);
+		bitmap_set_pattern(mem_map,32,index,ptn->pattern,ptn->size);
+		bitmap_set_pattern(p->ptable,32,index,ptn->pattern,ptn->size);
 
-		// //Set the process to runnable, and enqueue it.
-		// p->state = RUNNABLE;
+		ptr_base = (void *)(index * 1024);
+		p->rbase = ptr_base;
+
+		memcpy(ptr_base,original->rbase,original->length);
+		
 
 		p->parent_proc_index = original->proc_index;
-		// kprintf("efork %d hpv %x | ",p->proc_index,*((int *)p->heap_break));
 	}
+	// printProceInfo(p);
 	assert(p != NULL, "Fork");
 	return p;
 }
@@ -279,18 +275,21 @@ proc_t* _fork(proc_t *original){
 
 void *kset_proc(proc_t *p,void (*entry)(), int priority, const char *name){
 	void *ptr = NULL;
-	int i=0;
+	int i=0, len= 0;
 	p->priority = priority;
 	p->pc = entry;
-
+	
+	len = DEFAULT_STACK_SIZE / 1024;
 	strcpy(p->name,name);
 
-	p->ptable = p->protection_table;
+	// p->ptable = p->protection_table;
 
-	ptr = proc_malloc(DEFAULT_STACK_SIZE);
-	// ptr = get_free_pages(DEFAULT_STACK_SIZE / 1024);
-
-	
+	// ptr = proc_malloc(DEFAULT_STACK_SIZE);
+	ptr = get_free_pages(len);
+	i = get_page_index(ptr);
+	bitmap_set_nbits(p->ptable,PROTECTION_TABLE_LEN,i,len);
+	bitmap_set_nbits(mem_map,PROTECTION_TABLE_LEN,i,len);
+	// kprintf("kset %x\n",p->ptable[0]);
 	p->sp = (size_t *)ptr + DEFAULT_STACK_SIZE-512;
 	p->heap_break = p->sp+1;
 	p->length = DEFAULT_STACK_SIZE;
@@ -299,10 +298,6 @@ void *kset_proc(proc_t *p,void (*entry)(), int priority, const char *name){
 	p->state = RUNNABLE;
 	return ptr;
 }
-
-
-
-
 
 /**
  * Creates a new process and adds it to the runnable queue
@@ -340,24 +335,57 @@ proc_t *new_proc(void (*entry)(), int priority, const char *name) {
 }
 
 
+
+
+
 proc_t *kexecp(proc_t *p,void (*entry)(), int priority, const char *name){
 	void *ptr = NULL;
 	int lower_bound = 0;
 	if(p->rbase == DEFAULT_RBASE){
-		lower_bound = i_align1k_lb(p->sp);
-		proc_free(lower_bound);
+		bitmap_set_bit(mem_map,MEM_MAP_LEN,get_page_index(p->sp));
+		// kprintf("Fork free stack %x %d\n",get_page_index(p->sp));
 	}else{
-		proc_free(p->rbase);
+		// proc_free(p->rbase);
+		// kprintf("%x ",p->ptable[0]);
+		// kprintf("fork before %x ",mem_map[0]);
+		bitmap_xor(mem_map,p->ptable,MEM_MAP_LEN);
+		// kprintf(" after %x ",mem_map[0]);
 	}
-	proc_set_default(p);
+	// proc_set_default(p);
 	ptr = kset_proc(p,entry,priority,name);
+	// kprintf("kset %x\n",mem_map[0]);
+	p->rbase = DEFAULT_RBASE;
 	bitmap_fill(p->ptable,PROTECTION_TABLE_LEN);
 	add_to_scheduling_queue(p);
 	return p;
 }
 
 proc_t *create_system(void (*entry)(), int priority, const char *name){
-	return new_proc(entry,priority,name);
+	proc_t *p = NULL;
+	int stack_size = 1024 * 1;
+	int *ptr = NULL;
+	if(p = get_free_proc()){
+		p->priority = priority;
+		p->pc = entry;
+
+		strcpy(p->name,name);
+
+		// p->ptable = p->protection_table;
+
+		// ptr = proc_malloc(DEFAULT_STACK_SIZE);
+		ptr = get_free_pages(stack_size / 1024);
+		bitmap_set_nbits(p->ptable,PROTECTION_TABLE_LEN,get_page_index(ptr), 1);
+		// kprintf("kset %x\n",p->ptable[0]);
+		
+		p->sp = (size_t *)ptr + stack_size-128;
+		p->heap_break = p->sp+1;
+		p->length = stack_size * 10;
+		//Set the process to runnable, remember to enqueue it after you call this method
+		p->state = RUNNABLE;
+	}
+	bitmap_fill(p->ptable,PROTECTION_TABLE_LEN);
+	add_to_scheduling_queue(p);
+	return p;
 }
 
 proc_t* create_init(size_t *lines, size_t length, size_t entry){
@@ -368,7 +396,8 @@ proc_t* create_init(size_t *lines, size_t length, size_t entry){
 		ptr_base = kset_proc(p,(void (*)())entry,USER_PRIORITY,"INIT");
 		memcpy(ptr_base, lines,length);
 		p->rbase = ptr_base;
-		bitmap_set_bit(p->ptable,PROTECTION_TABLE_LEN,get_page_index(p->rbase));
+		p->sp = (unsigned long *)get_virtual_addr(p->sp,p);
+		// bitmap_set_bit(p->ptable,PROTECTION_TABLE_LEN,get_page_index(p->rbase));
 		//set protection table TODOK
 		add_to_scheduling_queue(p);
 	}
@@ -414,7 +443,7 @@ int process_overview(){
 
 //print the process state given
 void printProceInfo(proc_t* curr){
-	kprintf("name %s, i %d, rbase %x, length %d, pc %x, sp %x, heap brk %x, state %d\r\n",curr->name, curr->proc_index, curr->rbase, curr->length,curr->pc,curr->sp,curr->heap_break,curr->state);
+	kprintf("%s i %d rbase %x len %d pc %x, sp %x, heap %x, ptable %x\r\n",curr->name, curr->proc_index, curr->rbase, curr->length,curr->pc,curr->sp,curr->heap_break,curr->ptable[0]);
 }
 
 //return the strign value of state name give proc_state_t state

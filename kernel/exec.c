@@ -14,8 +14,6 @@ proc_t *exec_new_proc(size_t *lines, size_t length, size_t entry, int priority, 
 //replace the currently running process with the new text, priority, and name provided
 proc_t *exec_replace_existing_proc(proc_t *p,size_t *lines, size_t length, size_t entry, int priority, char *name){
 	assert(p != NULL, "can't exec null process\n");
-	proc_free(p->rbase);
-	proc_set_default(p);
 	p = exec_proc(p,lines,length,entry,priority,name);
   assert(p != NULL,"Exec failed\n");
   return p;
@@ -31,7 +29,6 @@ static proc_t *exec_proc(proc_t *p,size_t *lines, size_t length, size_t entry, i
 	int nstart,len;
 
 	assert(p != NULL, "can't exec null process\n");
-
 		//it's easier to malloc text segment and stack together, so they stick together, and it's easier to manage
 		//TODO split the text segment and stack by 1024 bits, and prohibit access to the space in between
 		//so that stackoverflow is handled
@@ -39,27 +36,38 @@ static proc_t *exec_proc(proc_t *p,size_t *lines, size_t length, size_t entry, i
 		length = align1k(length);
 
 		overall_length = length + DEFAULT_STACK_SIZE + DEFAULT_HEAP_SIZE;
-		ptr_base = proc_malloc(overall_length);
-		p->heap_break = (int *)ptr_base + length + DEFAULT_STACK_SIZE;
-		assert(ptr_base != NULL,"memory is full\n");
-		// kprintf("exec bmemcpy %d hpv %x | ",p->proc_index,*((int *)p->heap_break));
-		memcpy(ptr_base, lines,length_bak);
-		// kprintf("exec amemcpy %d hpv %x | ",p->proc_index,*((int *)p->heap_break));
 
-		p->sp = (size_t *)(length + DEFAULT_STACK_SIZE-1); //SP should be the same if virtual address is take into account
-
-		p->priority = priority;
-		p->pc = (void (*)())entry; //PC should be the same if virtual address is taken into account
-
-		p->rbase = ptr_base;
-
-		//Initialise protection table
 		p->ptable = p->protection_table;
-		nstart = get_page_index(p->rbase);
+
+		if(p->rbase == DEFAULT_RBASE){
+			bitmap_set_bit(mem_map,MEM_MAP_LEN,get_page_index(p->sp));
+			// kprintf("Fork free stack %x %d\n",get_page_index(p->sp));
+		}else{
+			// proc_free(p->rbase);
+			bitmap_xor(mem_map,p->ptable,MEM_MAP_LEN);
+		}
+		bitmap_clear(p->ptable,PROTECTION_TABLE_LEN);
+
 		len = physical_len_to_page_len(overall_length);
+		nstart = bitmap_search(mem_map,MEM_MAP_LEN,len);
 
 		bitmap_clear(p->ptable,PROTECTION_TABLE_LEN);
 		bitmap_set_nbits(p->ptable,PROTECTION_TABLE_LEN, nstart,len);
+		bitmap_set_nbits(mem_map,MEM_MAP_LEN, nstart,len);
+
+		// kprintf("%x start %d len %d\n",mem_map[0],nstart,len);
+
+		ptr_base = (void *)(nstart * 1024);
+		p->heap_break = (int *)ptr_base + length + DEFAULT_STACK_SIZE;
+		assert(ptr_base != NULL,"memory is full\n");
+		memcpy(ptr_base, lines,length_bak);
+
+		p->sp = (size_t *)(length + DEFAULT_STACK_SIZE-1); 
+
+		p->priority = priority;
+		p->pc = (void (*)())entry; 
+
+		p->rbase = ptr_base;
 
 		strcpy(p->name,name);
 
@@ -67,7 +75,6 @@ static proc_t *exec_proc(proc_t *p,size_t *lines, size_t length, size_t entry, i
 		p->state = RUNNABLE;
 
 		p->length = length;
-		// kprintf("eexec %d hpv %x | ",p->proc_index,*((int *)p->heap_break));
 
 		add_to_scheduling_queue(p);
 

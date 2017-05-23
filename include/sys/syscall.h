@@ -48,7 +48,6 @@ int sys_exec();
 
 void *sbrk(unsigned long size);
 
-void *proc_malloc(unsigned long size);
 void hole_list_overview();
 
 int getc();

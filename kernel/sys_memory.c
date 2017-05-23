@@ -119,7 +119,7 @@ void Scan_FREE_MEM_BEGIN() {
 	FREE_MEM_BEGIN |= 0x03ff;
 	FREE_MEM_BEGIN++;
 
-	kprintf("\r\nfree memory begin %x\r\n", FREE_MEM_BEGIN );
+	// kprintf("\r\nfree memory begin %x\r\n", FREE_MEM_BEGIN );
 }
 
 
@@ -199,7 +199,8 @@ void *_sbrk( proc_t *caller, size_t size) {
 			// kprintf("ptr %x pt %x obrk %x brk %x\n", heap_break_bak, mem_map[0], heap_break_bak,caller->heap_break);
 			return get_virtual_addr(heap_break_bak,caller);
 		}
-		caller->heap_break = (int *)ptr_addr + size;
+		if((int *)ptr_addr > heap_break_bak)
+			caller->heap_break = (int *)ptr_addr + size;
 
 		// kprintf("sbrk: optr %x ", ptr_addr);
 		ptr_addr = get_virtual_addr(ptr_addr,caller);

@@ -27,11 +27,22 @@ void panic(const char* message) {
 }
 
 void testbitmap(){
-	unsigned long pattern = 0xa47b4000;
-	int retval = 0;
-	mem_map[1] = 0xf84b0000;
-	retval = bitmap_search_pattern(mem_map,MEM_MAP_LEN,pattern,20);
-	kprintf("Got %d\n",retval);
+	// static unsigned long map[32];
+	// static unsigned long tmap[32];
+
+	// int index = 0, len = 0;
+	// pattern_t *ptn = NULL;
+	// int retval = 0;
+	//  map[0] = 0xfffff100;
+	//  map[1] = 0x00000000;
+	// tmap[0] = 0x0000f145;
+	// tmap[1] = 0x10000000;
+	
+	// ptn = extract_pattern(tmap,32,35*1024);
+	// index = bitmap_search_pattern(map,32,ptn->pattern,ptn->size);
+	// kprintf("pattern %d %x %d\n",index, ptn->pattern,ptn->size);
+	// bitmap_set_pattern(map,32,index,ptn->pattern,ptn->size);
+	// kprintf("%x %x %x\n",ptn->pattern,map[0],map[1]);
 }
 
 void testkmalloc(){
@@ -75,6 +86,7 @@ void main() {
 
 	proc_t *p = NULL;
 	proc_t *init = NULL;
+	proc_t *system = NULL;
 	size_t *ptr = NULL;
 	void *addr_p = NULL;
 	int pid = 0;
@@ -88,27 +100,29 @@ void main() {
 
 	init_memory();
 	init_bitmap();
+	init_mem_table(FREE_MEM_BEGIN);
 
 	//Set up process table
 	init_proc();
 
 	//Initialise the system task
-	p = create_system(system_main, SYSTEM_PRIORITY, "SYSTEM");
-	assert(p != NULL, "Create sys task");
-	p->quantum = 64;
+	system = create_system(system_main, SYSTEM_PRIORITY, "SYSTEM");
+	assert(system != NULL, "Create sys task");
+	system->quantum = 64;
 
 	init = create_init(init_code,2,0);
 	init->quantum = 1;
 
 	p = _fork(init);
 	p = kexecp(p,message_queue_main, USER_PRIORITY, "MESSAGE");
-	assert(p != NULL, "Create Message Queue");
 	p->quantum = 4;
-	
+
 	//Idle Task
 	p = _fork(init);
 	p = kexecp(p,idle_main, IDLE_PRIORITY, "IDLE");
 	assert(p != NULL, "Create idle task");
+	p->quantum = 1;
+
 
 	p = _fork(init);
 	p = exec_replace_existing_proc(p,shell_code,shell_code_length,shell_pc, USER_PRIORITY,"Shell");
@@ -119,10 +133,11 @@ void main() {
 	init_exceptions();
 	RexSp2->Ctrl = 0x5cd;
 	RexSp1->Ctrl = 0x5cd;
-	init_mem_table(FREE_MEM_BEGIN);
-
+	i = bitmap_search(mem_map,MEM_MAP_LEN,1);
+	FREE_MEM_BEGIN = i*1024;
+	// init_mem_table(FREE_MEM_BEGIN);
 	// testkmalloc();
-	testbitmap();
+	// testbitmap();
 	//Kick off first task. Note: never returns
 	sched();
 }

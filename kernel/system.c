@@ -19,14 +19,13 @@ void system_main() {
 	//Find Upper Memory Limit
 	// scan_memory();
 	FREE_MEM_END = 0x1ffff;
-	kprintf(" %d kWords Free\r\n", ((unsigned long)(FREE_MEM_END - FREE_MEM_BEGIN)) / 1024);
-
+	
 	//Print Memory Map
 	kprintf("Text Segment: %x - %x\r\n", &TEXT_BEGIN, &TEXT_END);
 	kprintf("Data Segment: %x - %x\r\n", &DATA_BEGIN, &DATA_END);
 	kprintf("BSS Segment:  %x - %x\r\n", &BSS_BEGIN, &BSS_END);
 	kprintf("Unallocated:  %x - %x\r\n", FREE_MEM_BEGIN, FREE_MEM_END);
-
+	kprintf("%d kWords Free\r\n", ((unsigned long)(FREE_MEM_END - FREE_MEM_BEGIN)) / 1024);
 	//Receive message, do work, repeat.
 	while(1) {
 		message_t m;
