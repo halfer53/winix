@@ -45,7 +45,8 @@ void system_main() {
 
 			//Gets the system uptime.
 			case SYSCALL_GETC:
-				add_receving_message(&m);
+				m.i1 = kgetc();
+				winix_send(who,&m);
 				break;
 
 			case SYSCALL_UPTIME:

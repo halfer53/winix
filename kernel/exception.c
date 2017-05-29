@@ -83,19 +83,19 @@ static void parallel_handler() {
  **/
 static void serial1_handler() {
 
-	int stat = RexSp1->Stat;
-	mqueue_t *mq;
-	if(stat & 1 == 1){
-		if (receiving_queue[HEAD] != NULL){
-			mq = mq_dequeue(receiving_queue);
-			(mq->m).i1 = RexSp1->Rx;
-			// kprintf("E Get %c",m.i1);
-			mq_enqueue_head(sending_queue,mq);
-			RexSp1->Iack = 0;
-		}else{
-			kprintf("Err waiting \n");
-		}
-	}
+	// int stat = RexSp1->Stat;
+	// mqueue_t *mq;
+	// if(stat & 1 == 1){
+	// 	if (receiving_queue[HEAD] != NULL){
+	// 		mq = mq_dequeue(receiving_queue);
+	// 		(mq->m).i1 = RexSp1->Rx;
+	// 		// kprintf("E Get %c",m.i1);
+	// 		mq_enqueue_head(sending_queue,mq);
+	// 		RexSp1->Iack = 0;
+	// 	}else{
+	// 		kprintf("Err waiting \n");
+	// 	}
+	// }
 	RexSp1->Iack = 0;
 	// run_message_queue();
 }

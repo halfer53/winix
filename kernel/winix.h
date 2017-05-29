@@ -21,7 +21,7 @@
 #include "winix/mem_map.h"
 #include "winix/bitmap.h"
 
-#include "wramp.h"
+#include "kwramp.h"
 #include "proc.h"
 #include "exception.h"
 #include "system.h"

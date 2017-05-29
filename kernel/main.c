@@ -113,9 +113,9 @@ void main() {
 	init = create_init(init_code,2,0);
 	init->quantum = 1;
 
-	p = _fork(init);
-	p = kexecp(p,message_queue_main, USER_PRIORITY, "MESSAGE");
-	p->quantum = 4;
+	// p = _fork(init);
+	// p = kexecp(p,message_queue_main, USER_PRIORITY, "MESSAGE");
+	// p->quantum = 4;
 
 	//Idle Task
 	p = _fork(init);
@@ -132,7 +132,7 @@ void main() {
 	//Initialise exceptions
 	init_exceptions();
 	RexSp2->Ctrl = 0x5cd;
-	RexSp1->Ctrl = 0x5cd;
+	// RexSp1->Ctrl = 0x5cd;
 	i = bitmap_search(mem_map,MEM_MAP_LEN,1);
 	FREE_MEM_BEGIN = i*1024;
 	// init_mem_table(FREE_MEM_BEGIN);
