@@ -1,6 +1,6 @@
 sources = stdio.c string.c syscall.c ipc.c util.c stdlib.c
 compile = stdio.s string.s syscall.s ipc.s util.s stdlib.s
-assemble = stdio.o string.o syscall.o wramp_syscall.o ipc.o util.o stdlib.o
+assemble = stdio.o string.o syscall.o wramp_syscall.o ipc.o util.o stdlib.o ucontext.o
 
 all: $(assemble)
 

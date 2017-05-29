@@ -20,17 +20,20 @@ stat:
 	@echo "Assembly LoC: "
 	@find . -name "*.s" -exec cat {} \; | wc -l
 shell:
+	$(MAKE) clean
+	$(MAKE) -C lib
 	cp user/shell.c .
 	wcc -S shell.c
 	wasm shell.s
-	wlink -o shell.srec shell.o lib/string.o lib/syscall.o lib/ipc.o lib/wramp_syscall.o lib/stdlib.o
+	wlink -o shell.srec shell.o lib/ucontext.o lib/string.o lib/syscall.o lib/ipc.o lib/wramp_syscall.o lib/stdlib.o
 	java reformat_srec shell.srec
 	rm shell.c
 	rm shell.o
 	rm shell.s
 	gcc gen_bin_code.c
-	./a.out shell.srec > include/exec_codes.c
+	./a.out shell.srec > include/shell_codes.c
 	rm shell.srec
+	$(MAKE) all
 
 test:
 	wcc -S test.c

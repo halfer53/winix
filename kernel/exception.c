@@ -129,7 +129,9 @@ static void gpf_handler() {
 		current_proc->proc_index,
 		current_proc->rbase,
 		current_proc->pc,
-		current_proc->sp);
+		current_proc->sp,current_proc);
+	kprintf("$1: %x, $2, %x, $3, %x\n",current_proc->regs[0],current_proc->regs[1],current_proc->regs[2]);
+	kprintf("$4: %x, $5, %x, $6, %x\n",current_proc->regs[3],current_proc->regs[4],current_proc->regs[5]);
 
 	//Kill process and call scheduler.
 	end_process(current_proc);

@@ -32,14 +32,24 @@ typedef struct {
 } stack_t;
 
 typedef struct _ucontext_t{
-	mcontext_t uc_context;
-	stack_t uc_stack;
-	struct _ucontext_t *next;
+	
+	// mcontext_t uc_context;
+	unsigned long regs[REGS_NR];	//Register values
+	void *ra;
+	void (*pc)();
+	unsigned long *sp;
+
+	// stack_t uc_stack;
+	void  *ss_sp;     /* address of stack */
+	int    ss_flags;  /* Flags */
+	size_t ss_size;   /* Number of bytes in stack */
+
+	struct _ucontext_t *uc_link;
 }ucontext_t;
 
 int  getcontext(ucontext_t *);
 int  setcontext(const ucontext_t *);
-void makecontext(ucontext_t *, (void *)(), int, ...);
+void makecontext(ucontext_t *, void (* func)(), int argc, ...);
 int  swapcontext(ucontext_t *, const ucontext_t *);
 
 #endif

@@ -12,6 +12,7 @@
 #include <type.h>
 #include <size.h>
 #include <stdlib.h>
+#include <ucontext.h>
 
 #define BUF_LEN		100
 
@@ -51,26 +52,41 @@ int isPrintable(int c) {
 	return ('!' <= c && c <= '~');
 }
 
+
+
+ucontext_t context, *cp = &context;
+void func(int arg) {
+
+  printf("function called with value %d\n",arg);
+  printf("process will exit when function returns\n");
+  return;
+
+}
+
+
 int testmalloc(int argc, char **argv){
-  void *p0 = malloc(512);
-  void *p1 = malloc(512);
-  void *p2 = malloc(1024);
-  void *p3 = malloc(512);
-  void *p4 = malloc(1024);
-  void *p5 = malloc(2048);
-  void *p6 = malloc(512);
-  void *p7 = malloc(1024);
-  void *p8 = malloc(512);
-  void *p9 = malloc(1024);
-  block_overview();
-  free(p5);
-  free(p6);
-  free(p2);
-  free(p8);
-  block_overview();
-  p0 = realloc(p0,900);
-  p9 = realloc(p9,3000);
-  block_overview();
+  int  value = 1;
+  char *ptr = NULL;
+  context.regs[0] = 0x12345678;
+  printf("%x %x\n", cp, &context);
+  getcontext(cp);
+
+  context.uc_link = 0;
+  if ((ptr = (char *) malloc(1000)) != NULL) {
+  	context.ss_sp = ptr+ 1000 -1;
+    context.ss_size = 1000;
+    context.ss_flags = 0;
+    makecontext(cp,func,1,value);
+    printf("func %x, struct %x \n",&func,context.pc);
+    printf(" struct sp reg 1 %d 2 %d\n",*context.sp,*(context.sp+1));
+  }
+  else {
+    printf("not enough storage for stack");
+  }
+  // printf("context has been built\n");
+  // setcontext(cp);
+  // printf("returned from setcontext");
+  // abort();
   return 0;
 }
 
