@@ -47,8 +47,6 @@ int main(int argc, char const *argv[]) {
 	}
 
 	printf("int shell_code_length =  %d;\n", wordslength);
-	printf("size_t init_code[2] = {0x01010000,0x50f00000};\n" );
-	printf("size_t init_pc = 0x0;\n" );
 
 	return 0;
 

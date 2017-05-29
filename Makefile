@@ -23,23 +23,20 @@ shell:
 	cp user/shell.c .
 	wcc -S shell.c
 	wasm shell.s
-	wlink -o shell.srec shell.o lib/string.o lib/stdio.o lib/syscall.o lib/ipc.o lib/wramp_syscall.o lib/stdlib.o
+	wlink -o shell.srec shell.o lib/string.o lib/syscall.o lib/ipc.o lib/wramp_syscall.o lib/stdlib.o
 	java reformat_srec shell.srec
 	rm shell.c
 	rm shell.o
 	rm shell.s
 	gcc gen_bin_code.c
 	./a.out shell.srec > include/exec_codes.c
-	#rm shell.srec
+	rm shell.srec
 
-printf:
-	cp user/printf.c .
-	wcc -S printf.c
-	wasm printf.s
-	wlink -o printf.srec printf.o lib/stdio.o lib/syscall.o lib/ipc.o lib/wramp_syscall.o
-	java reformat_srec printf.srec
-	rm printf.c
-	rm printf.o
-	rm printf.s
+test:
+	wcc -S test.c
+	wasm test.s
+	wlink -o test.srec test.o lib/stdio.o lib/ucontext.o
+	rm test.o
+	rm test.s
 
 .DELETE_ON_ERROR:

@@ -7,7 +7,8 @@
  **/
 
 #include "winix.h"
-#include <exec_codes.c>
+#include <init_codes.c>
+#include <shell_codes.c>
 
 /**
  * Print an error message and lock up the OS... the "Blue Screen of Death"

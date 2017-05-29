@@ -3,5 +3,4 @@ size_t shell_code[] = {
 };
 int shell_pc =  0x00000105;
 int shell_code_length =  1861;
-size_t init_code[2] = {0x01010000,0x50f00000};
-size_t init_pc = 0x0;
+
