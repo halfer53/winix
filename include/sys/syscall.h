@@ -40,15 +40,7 @@ int sys_uptime();
 int sys_exit(int status);
 int sys_process_overview();
 
-int sys_process_overview();
-
-int sys_fork();
-
-int sys_exec();
-
 void *sbrk(unsigned long size);
-
-void hole_list_overview();
 
 int getc();
 void putc(int i);

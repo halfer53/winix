@@ -24,7 +24,7 @@
 #define PROTECTION_TABLE_LEN	32
 #define DEFAULT_STACK_SIZE		1024
 #define DEFAULT_HEAP_SIZE		1024
-#define DEFAULT_CCTRL			0xff9
+#define DEFAULT_CCTRL			0xffa
 #define DEFAULT_STACK_POINTER			0x00000
 #define USER_CCTRL			0x8 //OKU is set to 0
 #define DEFAULT_RBASE			0x00000
@@ -135,7 +135,7 @@ proc_t *get_proc(int proc_nr);
 //fork the next process in the ready_q, return the new proc_index of the forked process
 //side effect: the head of the free_proc is dequeued, and added to the ready_q with all relevant values equal
 //to the original process, except stack pointer.
-proc_t* _fork(proc_t *p);
+proc_t* do_fork(proc_t *p);
 proc_t *kexecp(proc_t *p,void (*entry)(), int priority, const char *name);
 proc_t *create_system(void (*entry)(), int priority, const char *name);
 proc_t* create_init(size_t *lines, size_t length, size_t entry);

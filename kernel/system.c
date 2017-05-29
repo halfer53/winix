@@ -41,7 +41,7 @@ void system_main() {
 		caller = &proc_table[who];
 		//kprintf("received from %s, call id %d, operation %d\n",p->name,p->proc_index,m.type );
 		//Do the work
-		switch(m.type) {	
+		switch(m.type) {
 
 			//Gets the system uptime.
 			case SYSCALL_GETC:
@@ -67,7 +67,7 @@ void system_main() {
 
 			case SYSCALL_FORK:
 				//fork the calling process
-				pcurr = _fork(caller);
+				pcurr = do_fork(caller);
 				m.i1 = pcurr->proc_index;
 				winix_send(who, &m);
 
@@ -92,21 +92,21 @@ void system_main() {
 				break;
 
 			case SYSCALL_SBRK:
-				m.p1 = _sbrk(caller,m.l1);
+				m.p1 = do_sbrk(caller,m.l1);
 				winix_send(who, &m);
 				break;
 
 			case SYSCALL_BRK:
-				m.i1 = _brk(caller,m.p1);
+				m.i1 = do_brk(caller,m.p1);
 				winix_send(who, &m);
 				break;
 
 			case SYSCALL_FREE:
-				proc_free(who);
+				// proc_free(who);
 				break;
 
 			case SYSCALL_HOLE_OVERVIEW:
-				hole_list_overview();
+				// hole_list_overview();
 				break;
 
 			case SYSCALL_PUTC:

@@ -1,7 +1,5 @@
 #include <sys/rex.h>
 
-
-
 /**
  * Writes a character to serial port 1.
  **/

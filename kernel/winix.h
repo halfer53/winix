@@ -17,23 +17,25 @@
 #include <size.h>
 #include <stdbool.h>
 
+#include "winix/kqueue.h"
 #include "winix/slab.h"
 #include "winix/mem_map.h"
 #include "winix/bitmap.h"
+#include "winix/kwramp.h"
+#include "winix/mem_alloc.h"
+#include "winix/sys_stdio.h"
 
-#include "kwramp.h"
+
 #include "proc.h"
 #include "exception.h"
 #include "system.h"
 #include "idle.h"
-#include "sys_memory.h"
 #include "exec.h"
+#include "sys_memory.h"
 #include "message_queue.h"
 
 
 #define DEBUG 0
-#define HEAD 0
-#define TAIL 1
 
 //Major and minor version numbers for WINIX.
 #define MAJOR_VERSION 2

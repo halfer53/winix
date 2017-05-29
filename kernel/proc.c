@@ -59,15 +59,6 @@ size_t FREE_MEM_END = 0;
  **/
  void enqueue_head(proc_t **q, proc_t *proc) {
 	proc_t *curr = NULL;
-	// if ((proc->proc_index == 3 || proc->proc_index == 4 )&& print) {
-	// 	curr = q[HEAD];
-	// 	kprintf("%d before enqueue head ",proc->proc_index);
-	// 	while (curr != NULL) {
-	// 		kprintf("%s ",curr->name);
-	// 		curr = curr->next;
-	// 	}
-	// 	kprintf("\n");
-	// }
 	if(q[HEAD] == NULL) {
 		proc->next = NULL;
 		q[HEAD] = q[TAIL] = proc;
@@ -76,15 +67,6 @@ size_t FREE_MEM_END = 0;
 		proc->next = q[HEAD];
 		q[HEAD] = proc;
 	}
-	// if ((proc->proc_index == 3 || proc->proc_index == 4 )&& print) {
-	// 	curr = q[HEAD];
-	// 	kprintf("%d after enqueue head ",proc->proc_index);
-	// 	while (curr != NULL) {
-	// 		kprintf("%s ",curr->name);
-	// 		curr = curr->next;
-	// 	}
-	// 	kprintf("\n");
-	// }
 }
 
 /**
@@ -225,7 +207,7 @@ void proc_set_default(proc_t *p){
  * Side Effects:
  *   a new process forked onto the a new memory space, but not yet added to the scheduling queue
  **/
-proc_t* _fork(proc_t *original){
+proc_t* do_fork(proc_t *original){
 	proc_t *p = NULL;
 	void *ptr_base = NULL;
 	int len =0;
@@ -443,7 +425,15 @@ int process_overview(){
 
 //print the process state given
 void printProceInfo(proc_t* curr){
-	kprintf("%s i %d rbase %x len %d pc %x, sp %x, heap %x, ptable %x\r\n",curr->name, curr->proc_index, curr->rbase, curr->length,curr->pc,curr->sp,curr->heap_break,curr->ptable[0]);
+	kprintf("%s %d rbase %x cctrl %x pc %x, sp %x, heap %x, ptable %x\r\n",
+		curr->name, 
+		curr->proc_index, 
+		curr->rbase, 
+		curr->cctrl,
+		curr->pc,
+		curr->sp,
+		curr->heap_break,
+		curr->ptable[0]);
 }
 
 //return the strign value of state name give proc_state_t state
