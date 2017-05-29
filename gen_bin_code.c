@@ -3,6 +3,23 @@
 #include <string.h>
 int winix_load_srec_words_length(char *line);
 int winix_load_srec_mem_val(char *line, size_t *memory_values, int start_index, int memvalLength);
+
+char *filename = NULL;
+
+char *remove_extension(const char* mystr) {
+    char *retstr;
+    char *lastdot;
+    if (mystr == NULL)
+         return NULL;
+    if ((retstr = malloc (strlen (mystr) + 1)) == NULL)
+        return NULL;
+    strcpy (retstr, mystr);
+    lastdot = strrchr (retstr, '.');
+    if (lastdot != NULL)
+        *lastdot = '\0';
+    return retstr;
+}
+
 int main(int argc, char const *argv[]) {
 	int i = 0;
 	int length = 0;
@@ -19,11 +36,13 @@ int main(int argc, char const *argv[]) {
 	char * line = NULL;
 	size_t len = 0;
 	ssize_t read;
+	
 
+	filename = remove_extension(argv[1]);
 	fp = fopen(argv[1], "r");
 	if (fp == NULL)
 		exit(EXIT_FAILURE);
-	printf("size_t shell_code[] = {\n" );
+	printf("size_t %s_code[] = {\n",filename );
 	if ((read = getline(&line, &len, fp)) != -1) {
 		if (wordslength = winix_load_srec_words_length(line)) {
 			if (memory_values = (size_t *)malloc(wordslength * sizeof(size_t))) {
@@ -46,7 +65,7 @@ int main(int argc, char const *argv[]) {
 		}
 	}
 
-	printf("int shell_code_length =  %d;\n", wordslength);
+	printf("int %s_code_length =  %d;\n",filename, wordslength);
 
 	return 0;
 
@@ -313,7 +332,7 @@ int winix_load_srec_mem_val(char *line, size_t *memory_values, int start_index, 
 
 
 	case 7: //entry point for the program.
-		printf("\n};\nint shell_pc =  0x%08x;\n", (unsigned int)address);
+		printf("\n};\nint %s_pc =  0x%08x;\n", filename,(unsigned int)address);
 		break;
 	}
 
