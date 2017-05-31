@@ -17,7 +17,7 @@
 #define USER_PRIORITY			3
 #define KERNEL_PROCESS_PRIORITY			1
 #define SYSTEM_PRIORITY			0
-
+#define PROCESS_STATE_LEN		18
 
 //Process Defaults
 #define DEFAULT_FLAGS			0

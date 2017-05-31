@@ -54,35 +54,53 @@ int isPrintable(int c) {
 
 
 
-ucontext_t context, *cp = &context;
+ucontext_t fcontext,mcontext;
+int x = 0;
+
+
 void func(int arg) {
 
   printf("function called with value %d\n",arg);
-  printf("process will exit when function returns\n");
-  return;
+  x++;
+  printf("function returning to main\n");
+  setcontext(&mcontext);
 
 }
 
 
 int testmalloc(int argc, char **argv){
-  int  value = 1;
-  char *ptr = NULL;
-  context.regs[0] = 0x12345678;
-  printf("%x %x\n", cp, &context);
-  getcontext(cp);
-
-  context.uc_link = 0;
-  if ((ptr = (char *) malloc(1000)) != NULL) {
-  	context.ss_sp = ptr+ 1000 -1;
-    context.ss_size = 1000;
-    context.ss_flags = 0;
-    makecontext(cp,func,1,value);
-    printf("func %x, struct %x \n",&func,context.pc);
-    printf(" struct sp reg 1 %d 2 %d\n",*context.sp,*(context.sp+1));
+	int  value = 3;
+  getcontext(&fcontext);
+  if ((fcontext.ss_sp = (uint32_t *) malloc(1000)) != NULL) {
+  	fcontext.ss_sp += 1000;
+    fcontext.ss_size = 1000;
+    fcontext.ss_flags = 0;
+    makecontext(&fcontext,func,1,value);
   }
   else {
     printf("not enough storage for stack");
   }
+  printf("context has been built\n");
+  swapcontext(&mcontext,&fcontext);
+  if (!x) {
+    printf("incorrect return from swapcontext");
+  }
+  else {
+    printf("returned from function\n");
+  }
+
+  // context.uc_link = 0;
+  // if ((ptr = (char *) malloc(1000)) != NULL) {
+  // 	context.ss_sp = ptr+ 1000 -1;
+  //   context.ss_size = 1000;
+  //   context.ss_flags = 0;
+  //   makecontext(cp,func,1,value);
+  //   printf("func %x, struct %x \n",&func,context.pc);
+  //   printf(" struct sp reg 1 %d 2 %d\n",*context.sp,*(context.sp+1));
+  // }
+  // else {
+  //   printf("not enough storage for stack");
+  // }
   // printf("context has been built\n");
   // setcontext(cp);
   // printf("returned from setcontext");

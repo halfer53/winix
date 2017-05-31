@@ -130,6 +130,7 @@ static void gpf_handler() {
 		current_proc->rbase,
 		current_proc->pc,
 		current_proc->sp,current_proc);
+	kprintf("ptable: %x %x %x\n",current_proc->ptable[0],current_proc->ptable[1],current_proc->ptable[2]);
 	kprintf("$1: %x, $2, %x, $3, %x\n",current_proc->regs[0],current_proc->regs[1],current_proc->regs[2]);
 	kprintf("$4: %x, $5, %x, $6, %x\n",current_proc->regs[3],current_proc->regs[4],current_proc->regs[5]);
 
@@ -197,9 +198,6 @@ static void syscall_handler() {
 
 	//A system call could potentially make a high-priority process runnable.
 	//Run scheduler.
-	// if (dest == 4) {
-	// 	kprintf("$ %s syscall from %d to %d type %d ",op_name,current_proc->proc_index,dest,m->type);
-	// }
 	sched();
 }
 

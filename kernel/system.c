@@ -13,11 +13,7 @@
  * Entry point for system task.
  **/
 void system_main() {
-	proc_t *curr = ready_q[3][0];
-	proc_t *currpro = current_proc;
 	int counter = 0;
-	//Find Upper Memory Limit
-	// scan_memory();
 	FREE_MEM_END = 0x1ffff;
 	
 	//Print Memory Map
@@ -32,8 +28,8 @@ void system_main() {
 		int who;
 		proc_t *caller, *pcurr;
 		int response = 0;
-		int i,j;
 		void *ptr = NULL, *ptr2 = NULL;
+		ucontext_t *ucp;
 
 		//Get a message
 		winix_receive(&m);
@@ -61,7 +57,7 @@ void system_main() {
 				end_process(caller);
 				break;
 
-			case SYSCALL_PROCESS_OVERVIEW:
+			case SYSCALL_PS:
 				response = process_overview();
 				break;
 
@@ -80,13 +76,6 @@ void system_main() {
 
 				break;
 
-			case SYSCALL_FORK_PID:
-				//fork specific process
-			 	// fork_test(caller);
-				m.i1 = response;
-				winix_send(who,&m);
-				break;
-
 			case SYSCALL_EXEC:
 				response = exec_read_srec(get_proc(who));
 				break;
@@ -101,14 +90,6 @@ void system_main() {
 				winix_send(who, &m);
 				break;
 
-			case SYSCALL_FREE:
-				// proc_free(who);
-				break;
-
-			case SYSCALL_HOLE_OVERVIEW:
-				// hole_list_overview();
-				break;
-
 			case SYSCALL_PUTC:
 				kputc(m.i1);
 				break;
@@ -121,12 +102,26 @@ void system_main() {
 				kprintf_vm(&ptr,&ptr2,caller->rbase);
 				break;
 
+			// case SYSCALL_GETCONTEXT:
+			// 	ptr = get_physical_addr(m.p1,caller);
+			// 	memcpy(ptr,caller,PROCESS_STATE_LEN);
+			// 	ucp = ptr;
+			// 	kprintf("ucp %x %x %x \n",ucp->rbase,ucp->pc,ucp->sp);
+			// 	break;
+
+			// case SYSCALL_SETCONTEXT:
+			// 	ucp = (ucontext_t *)get_physical_addr(m.p1,caller);
+			// 	memcpy(caller,ucp,PROCESS_STATE_LEN);
+			// 	kprintf("curr proc %x %x %x\n",caller->rbase,caller->pc,caller->sp);
+			// 	if(ucp->ss_flags ==0){
+			// 		caller->sp = (size_t *)ucp->ss_sp;
+			// 	}
+			// 	break;
 			//System call number is unknown, or not yet implemented.
 			default:
 				kprintf("\r\n[SYSTEM] Process \"%s (%d)\" performed unknown system call %d\r\n", caller->name, caller->proc_index, m.type);
 				end_process(caller);
 				break;
 		}
-
 	}
 }

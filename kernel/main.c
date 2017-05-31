@@ -10,6 +10,9 @@
 #include <init_codes.c>
 #include <shell_codes.c>
 
+
+int debug = 0;
+
 /**
  * Print an error message and lock up the OS... the "Blue Screen of Death"
  *
@@ -111,6 +114,7 @@ void main() {
 	assert(system != NULL, "Create sys task");
 	system->quantum = 64;
 
+	//TODO: init code has bugs
 	init = create_init(init_code,2,0);
 	init->quantum = 1;
 
@@ -123,14 +127,14 @@ void main() {
 	p = kexecp(p,idle_main, IDLE_PRIORITY, "IDLE");
 	assert(p != NULL, "Create idle task");
 	p->quantum = 1;
-
+	
 
 	p = do_fork(init);
 	p = exec_replace_existing_proc(p,shell_code,shell_code_length,shell_pc, USER_PRIORITY,"Shell");
 	assert(p != NULL, "Create Shell task");
 	p->quantum = 10;
 
-	
+
 	//Initialise exceptions
 	init_exceptions();
 	RexSp2->Ctrl = 0x5cd;
@@ -138,7 +142,7 @@ void main() {
 	
 	i = bitmap_search(mem_map,MEM_MAP_LEN,1);
 	FREE_MEM_BEGIN = i*1024;
-
+	// debug = 5;
 	// testkmalloc();
 
 	//Kick off first task. Note: never returns

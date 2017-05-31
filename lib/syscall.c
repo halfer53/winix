@@ -9,6 +9,7 @@
 #include <sys/ipc.h>
 #include <sys/syscall.h>
 #include <type.h>
+#include <ucontext.h>
 
 /**
  * Get the system uptime.
@@ -39,7 +40,7 @@ int sys_process_overview(){
 	int response = 0;
 	message_t m;
 
-	m.type = SYSCALL_PROCESS_OVERVIEW;
+	m.type = SYSCALL_PS;
 	response = winix_send(SYSTEM_TASK, &m); //TODO: error checking
 	return 0;
 }
@@ -54,16 +55,6 @@ int fork(){
 	return m.i1;
 }
 
-int fork_pid(int proc_index){
-	int response = 0;
-	message_t m;
-
-	m.type = SYSCALL_FORK_PID;
-	m.i1 = proc_index;
-	response = winix_send(SYSTEM_TASK, &m); //TODO: error checking
-
-	return m.i1;
-}
 
 int exec(){
 	int response = 0;
@@ -95,32 +86,6 @@ int brk(void *addr){
 	return m.i1;
 }
 
-// void *malloc(unsigned long size){
-// 	int response = 0;
-// 	message_t m;
-
-// 	m.type = SYSCALL_MALLOC;
-// 	m.s1 = size;
-// 	response = winix_sendrec(SYSTEM_TASK, &m); //TODO: error checking
-// 	return m.p1;
-// }
-
-// void free(void *ptr){
-// 	int response = 0;
-// 	message_t m;
-
-// 	m.type = SYSCALL_FREE;
-// 	m.p1 = ptr;
-// 	response = winix_send(SYSTEM_TASK, &m); //TODO: error checking
-// }
-
-void holes_overview(){
-	int response = 0;
-	message_t m;
-
-	m.type = SYSCALL_HOLE_OVERVIEW;
-	response = winix_send(SYSTEM_TASK, &m); //TODO: error checking
-}
 
 int getc(){
 	int response = 0;
@@ -152,3 +117,24 @@ int printf(const char *format, ...) {
 	response = winix_send(SYSTEM_TASK,&m);
 	return 0;
 }
+
+// int getcontext(ucontext_t *ucp){
+// 	int response = 0;
+// 	message_t m;
+
+// 	m.type = SYSCALL_GETCONTEXT;
+// 	m.p1 = ucp;
+// 	response = winix_send(SYSTEM_TASK,&m);
+// 	return 0;
+// }
+
+
+// int setcontext(const ucontext_t *ucp){
+// 	int response = 0;
+// 	message_t m;
+
+// 	m.type = SYSCALL_SETCONTEXT;
+// 	m.p1 = (void *)ucp;
+// 	response = winix_send(SYSTEM_TASK,&m);
+// 	return 0;
+// }

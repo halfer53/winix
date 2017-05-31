@@ -12,9 +12,12 @@
 
 typedef struct _mcontext_t{
 	unsigned long regs[REGS_NR];	//Register values
+	unsigned long *sp;
 	void *ra;
 	void (*pc)();
-	unsigned long *sp;
+	void *rbase;
+	unsigned long *ptable;
+	unsigned long cctrl;
 	// void *rbase;
 	// unsigned long *ptable;
 	// unsigned long cctrl;
@@ -33,20 +36,21 @@ typedef struct {
 
 typedef struct _ucontext_t{
 	
-	// mcontext_t uc_context;
+	/* Process State */
 	unsigned long regs[REGS_NR];	//Register values
+	unsigned long *sp;
 	void *ra;
 	void (*pc)();
-	unsigned long *sp;
 
 	// stack_t uc_stack;
-	void  *ss_sp;     /* address of stack */
+	unsigned long  *ss_sp;     /* address of stack */
 	int    ss_flags;  /* Flags */
 	size_t ss_size;   /* Number of bytes in stack */
 
 	struct _ucontext_t *uc_link;
 }ucontext_t;
 
+void _ctx_start();
 int  getcontext(ucontext_t *);
 int  setcontext(const ucontext_t *);
 void makecontext(ucontext_t *, void (* func)(), int argc, ...);

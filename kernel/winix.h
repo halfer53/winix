@@ -16,6 +16,7 @@
 #include <util.h>
 #include <size.h>
 #include <stdbool.h>
+#include <ucontext.h>
 
 #include "winix/kqueue.h"
 #include "winix/slab.h"
@@ -34,13 +35,10 @@
 #include "sys_memory.h"
 #include "message_queue.h"
 
-
-#define DEBUG 0
-
 //Major and minor version numbers for WINIX.
 #define MAJOR_VERSION 2
 #define MINOR_VERSION 0
-
+extern int debug;
 /**
  * Print an error message and lock up the OS... the "Blue Screen of Death"
  *

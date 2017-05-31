@@ -9,7 +9,8 @@ RexSimulatorGui.exe
 test
 *.class
 *.srec~
-!kernel/wramp.s
+!kernel/winix/kwramp.s
+!lib/ucontext.s
 !lib/wramp_syscall.s
 !kernel/util/limits_head.s
 !kernel/util/limits_tail.s
