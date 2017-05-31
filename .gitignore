@@ -20,3 +20,4 @@ static.c
 kernel/sys_memory.s
 *.out
 *.sublime-workspace
+.vscode/
