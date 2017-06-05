@@ -1,4 +1,4 @@
-#include <sys/rex.h>
+#include "rex.h"
 
 /**
  * Writes a character to serial port 1.

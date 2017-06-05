@@ -23,8 +23,11 @@
 #define SYSCALL_PUTC    	9
 #define SYSCALL_PRINTF    	10
 #define SYSCALL_LOAD_SREC	11
-#define SYSCALL_GETCONTEXT	12
-#define SYSCALL_SETCONTEXT	13
+#define SYSCALL_CREATE		12
+#define SYSCALL_OPEN		13
+#define SYSCALL_READ		14
+#define SYSCALL_WRITE		15
+#define SYSCALL_CLOSE		16
 
 //TODO: create a sensible allocation scheme for system call numbers
 

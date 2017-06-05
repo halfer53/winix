@@ -6,7 +6,6 @@
 #define SS_DISABLE 1
 #define SS_ONSTACK 2
 
-
 #define REGS_NR 13
 #define SIGSET_LEN 5
 

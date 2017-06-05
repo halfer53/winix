@@ -52,7 +52,7 @@ setcontext:
 	lw $12, ucontext_reg12($13)
 	
 	#load return address as the pc
-	lw $ra, ucontext_pc($13) 
+	lw $ra, ucontext_pc($13)
 
 	lw $1, ucontext_ss_flags($13)
 	beqz $1, setcontext_alternative_stack

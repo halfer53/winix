@@ -9,7 +9,6 @@
 #ifndef _WINIX_H_
 #define _WINIX_H_
 
-#include <sys/rex.h>
 #include <sys/ipc.h>
 #include <stddef.h>
 #include <type.h>
@@ -25,6 +24,7 @@
 #include "winix/kwramp.h"
 #include "winix/mem_alloc.h"
 #include "winix/sys_stdio.h"
+#include "winix/rex.h"
 
 
 #include "proc.h"

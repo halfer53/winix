@@ -324,15 +324,9 @@ proc_t *kexecp(proc_t *p, void (*entry)(), int priority, const char *name) {
 	int lower_bound = 0;
 	if (p->rbase == DEFAULT_RBASE) {
 		bitmap_set_bit(mem_map, MEM_MAP_LEN, get_page_index(p->sp));
-		// kprintf("Fork free stack %x %d\n",get_page_index(p->sp));
 	} else {
-		// proc_free(p->rbase);
-		// kprintf("%x ",p->ptable[0]);
-		// kprintf("fork before %x ",mem_map[0]);
 		bitmap_xor(mem_map, p->ptable, MEM_MAP_LEN);
-		// kprintf(" after %x ",mem_map[0]);
 	}
-	// proc_set_default(p);
 	ptr = kset_proc(p, entry, priority, name);
 	// kprintf("kset %x\n",mem_map[0]);
 	p->rbase = DEFAULT_RBASE;
@@ -355,8 +349,6 @@ proc_t *create_system(void (*entry)(), int priority, const char *name) {
 
 		// ptr = proc_malloc(DEFAULT_STACK_SIZE);
 		ptr = get_free_pages(stack_size / 1024);
-		bitmap_set_nbits(p->ptable, PROTECTION_TABLE_LEN, get_page_index(ptr), 1);
-		// kprintf("kset %x\n",p->ptable[0]);
 
 		p->sp = (size_t *)ptr + stack_size - 128;
 		p->heap_break = p->sp + 1;

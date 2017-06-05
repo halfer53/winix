@@ -135,14 +135,14 @@ void main() {
 	p->quantum = 10;
 
 
-	//Initialise exceptions
+	//Initialise 
 	init_exceptions();
-	RexSp2->Ctrl = 0x5cd;
+	// RexSp2->Ctrl = 0x5cd;
 	// RexSp1->Ctrl = 0x5cd;
 	
 	i = bitmap_search(mem_map,MEM_MAP_LEN,1);
 	FREE_MEM_BEGIN = i*1024;
-	// debug = 5;
+	// debug = 5;gaj
 	// testkmalloc();
 
 	//Kick off first task. Note: never returns

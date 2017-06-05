@@ -37,7 +37,8 @@ void makecontext(ucontext_t *ucp, void (* func)(), int argc, ...){
 	 *
 	 * 	The PC of the ucp will set to _ctx_start (refer to lib/ucontext.s)
 	 * 	_ctx_start will pop the top of the stack, which is func. After that, the Stack 
-	 * 	will be arranged such that all args are left on the stack. Then func() is called.
+	 * 	will be arranged such that all args are left on the top of the  stack. 
+	 * 	Then func() is called.
 	 * 	When func() returns, _ctx_start will pop ucp, then call and pass 
 	 * 	the parameter to _ctx_end
 	**/

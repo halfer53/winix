@@ -29,6 +29,7 @@ void system_main() {
 		proc_t *caller, *pcurr;
 		int response = 0;
 		void *ptr = NULL, *ptr2 = NULL;
+		ucontext_t context;
 		ucontext_t *ucp;
 
 		//Get a message
@@ -102,22 +103,9 @@ void system_main() {
 				kprintf_vm(&ptr,&ptr2,caller->rbase);
 				break;
 
-			// case SYSCALL_GETCONTEXT:
-			// 	ptr = get_physical_addr(m.p1,caller);
-			// 	memcpy(ptr,caller,PROCESS_STATE_LEN);
-			// 	ucp = ptr;
-			// 	kprintf("ucp %x %x %x \n",ucp->rbase,ucp->pc,ucp->sp);
-			// 	break;
-
-			// case SYSCALL_SETCONTEXT:
-			// 	ucp = (ucontext_t *)get_physical_addr(m.p1,caller);
-			// 	memcpy(caller,ucp,PROCESS_STATE_LEN);
-			// 	kprintf("curr proc %x %x %x\n",caller->rbase,caller->pc,caller->sp);
-			// 	if(ucp->ss_flags ==0){
-			// 		caller->sp = (size_t *)ucp->ss_sp;
-			// 	}
-			// 	break;
-			//System call number is unknown, or not yet implemented.
+			case SYSCALL_OPEN:
+				
+			
 			default:
 				kprintf("\r\n[SYSTEM] Process \"%s (%d)\" performed unknown system call %d\r\n", caller->name, caller->proc_index, m.type);
 				end_process(caller);
