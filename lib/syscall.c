@@ -8,7 +8,7 @@
 
 #include <sys/ipc.h>
 #include <sys/syscall.h>
-#include <type.h>
+#include <types.h>
 #include <ucontext.h>
 
 /**

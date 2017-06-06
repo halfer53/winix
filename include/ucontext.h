@@ -1,7 +1,7 @@
 #ifndef _UCONTEXT_H_
 #define _UCONTEXT_H_
 
-#include <type.h>
+#include <types.h>
 
 #define SS_DISABLE 1
 #define SS_ONSTACK 2

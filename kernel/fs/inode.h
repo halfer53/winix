@@ -1,12 +1,7 @@
 #ifndef _FS_INODE_H_
 #define _FS_INODE_H_
 
-#define INODE_NUM   496
-#define NR_TZONES   7
-
-typedef unsigned char nlink_t;
-typedef unsigned long zone_t;
-typedef unsigned long ino_t;
+#include "const.h"
 
 typedef struct _inode {
   mode_t i_mode;		/* file type, protection, etc. */
@@ -32,6 +27,8 @@ typedef struct _inode {
   char i_seek;			/* set on LSEEK, cleared on READ/WRITE */
   char i_update;		/* the ATIME, CTIME, and MTIME bits are here */
 }inode_t;
+
+extern inode_t inode_table[NR_INODES];
 
 #define NIL_INODE (struct _inode *) 0	/* indicates absence of inode slot */
 

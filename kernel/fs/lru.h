@@ -1,20 +1,17 @@
 #ifndef _FS_LRU_H_
 #define _FS_LRU_H_
 
-#include <type.h>
-
-#define SECTOR_SIZE 512
-#define BLOCK_SIZE  1024
+#include "const.h"
 
 typedef struct _buf
 {
     
-    char block[BLOCK_SIZE];
+    unsigned int block[BLOCK_SIZE];
 
     struct _buf *prev, *next;
-    size_t b_blocknr; //block number for this buffer
-    char b_dirt; //clean or dirty
-    char b_count; //number of users on this buffer
+    block_t b_blocknr; //block number for this buffer
+    int b_dirt; //clean or dirty
+    int b_count; //number of users on this buffer
 } buf_t;
 
 #define LRU_LEN         4

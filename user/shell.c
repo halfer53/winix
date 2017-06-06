@@ -9,7 +9,7 @@
 #include <sys/syscall.h>
 #include <stdio.h>
 #include <stddef.h>
-#include <type.h>
+#include <types.h>
 #include <size.h>
 #include <stdlib.h>
 #include <ucontext.h>

@@ -1,7 +1,7 @@
 #ifndef _MEM_ALLOC_H_
 #define _MEM_ALLOC_H_
 
-#include <type.h>
+#include <types.h>
 
 typedef struct _hole{
   size_t *start;

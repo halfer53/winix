@@ -3,13 +3,13 @@
 /**
  * Writes a character to serial port 1.
  **/
-int kputc(const int c) {
+void kputc(const int c) {
 	while(!(RexSp1->Stat & 2));
 	RexSp1->Tx = c;
 	return 0;
 }
 
-int kputc2(const int c) {
+void kputc2(const int c) {
 	while(!(RexSp2->Stat & 2));
 	RexSp2->Tx = c;
 	return 0;
@@ -81,7 +81,7 @@ static void kputs(const char *s) {
 }
 
 
-int kprintf_vm(const char **s_pptr, void **arg_pptr, void *caller_rbase){
+void kprintf_vm(const char **s_pptr, void **arg_pptr, void *caller_rbase){
 	const char *format = *s_pptr;
 	void *arg = *arg_pptr;
 	char c = *format;
@@ -127,7 +127,7 @@ int kprintf_vm(const char **s_pptr, void **arg_pptr, void *caller_rbase){
 	return 0;
 }
 
-int kprintf(const char *format, ...) {
+void kprintf(const char *format, ...) {
 	void *arg = &format;
 	arg = ((char*)arg) + 1;
 

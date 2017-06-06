@@ -1,4 +1,4 @@
-#include <type.h>
+#include <types.h>
 #include <stddef.h>
 #include "slab.h"
 #include "mem_map.h"
