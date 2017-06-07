@@ -210,9 +210,9 @@ proc_t* do_fork(proc_t *original) {
 	void *ptr_base = NULL;
 	int len = 0;
 	int nstart = 0;
-	int pbak;
-	int i, n, index;
-	pattern_t *ptn;
+	int pbak,index,j;
+	uint32_t *src, *dest;
+	pattern_t ptn;
 
 	if (original->length == 0 || (size_t)(original->rbase) == 0) {
 		//we can't fork p1 if it's a system task
@@ -227,25 +227,28 @@ proc_t* do_fork(proc_t *original) {
 
 		p->ptable = p->protection_table;
 
-		ptn = extract_pattern(p->ptable, MEM_MAP_LEN, (int)p->heap_break);
+		if(extract_pattern(p->ptable, MEM_MAP_LEN, (int)p->heap_break, &ptn) != 0){
+			kprintf("pat search failed");
+		}
 
-		assert(ptn != NULL, "Pattern searching failed");
-		index = bitmap_search_pattern(mem_map, MEM_MAP_LEN, BSS_END / 1024, ptn->pattern, ptn->size);
-		// kprintf("i %d",index);
-
+		index = bitmap_search_pattern(mem_map, MEM_MAP_LEN, BSS_END / 1024, ptn.pattern, ptn.size);
 		bitmap_clear(p->ptable, PROTECTION_TABLE_LEN);
 
-		bitmap_set_pattern(mem_map, 32, index, ptn->pattern, ptn->size);
-		bitmap_set_pattern(p->ptable, 32, index, ptn->pattern, ptn->size);
+		bitmap_set_pattern(mem_map, 32, index, ptn.pattern, ptn.size);
+		bitmap_set_pattern(p->ptable, 32, index, ptn.pattern, ptn.size);
 
 		ptr_base = (void *)(index * 1024);
 		p->rbase = ptr_base;
 
-		memcpy(ptr_base, original->rbase, original->length);
-
-
+		for( src = (uint32_t *)original->rbase, dest = (uint32_t *)p->rbase, j=0; j < ptn.size ; src+=1024,dest+=1024, j++){
+			if((0x80000000 >> j) & ptn.pattern){
+				memcpy(dest,src,1024);
+			}
+		}
 		p->parent_proc_index = original->proc_index;
 	}
+	// process_overview();
+	// printProceInfo(original);
 	// printProceInfo(p);
 	assert(p != NULL, "Fork");
 	return p;

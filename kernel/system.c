@@ -67,14 +67,12 @@ void system_main() {
 				pcurr = do_fork(caller);
 				m.i1 = pcurr->proc_index;
 				winix_send(who, &m);
-
 				//send 0 to child
 				//NOTE that the forked child should
 				//not belong to any scheduling queue, since winix_receive will do that automatically
 
 				m.i1 = 0;
-				winix_send(response,&m);
-
+				winix_send(pcurr->proc_index,&m);
 				break;
 
 			case SYSCALL_EXEC:

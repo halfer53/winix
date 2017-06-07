@@ -1,4 +1,4 @@
-#include "rex.h"
+#include <winix/rex.h>
 
 /**
  * Writes a character to serial port 1.

@@ -1,7 +1,7 @@
-#include "bitmap.h"
-#include "slab.h"
+#include <winix/bitmap.h>
+#include <winix/slab.h>
 #include <stddef.h>
-#include "mem_map.h"
+#include <winix/mem_map.h>
 
 static unsigned long mask[BITMASK_NR];
 
@@ -159,7 +159,8 @@ unsigned long createMask(unsigned long a, unsigned long b)
    return r;
 }
 
-int extract_pattern(unsigned long *map, int map_len, int heap_break, pattern_t *p){
+pattern_t *extract_pattern(unsigned long *map, int map_len, int heap_break){
+    pattern_t *p = kmalloc(2);
     int i,j,start = 0;
     unsigned long result = 0;
     int end = (align1k(heap_break) / 1024);
@@ -176,7 +177,7 @@ int extract_pattern(unsigned long *map, int map_len, int heap_break, pattern_t *
     
     then:
     if(end - start > 32 || (i==31 && j==31)){
-        return -1;
+        return NULL;
     }
     result = map[i] << (j);
     if(i < map_len && i != endi){
@@ -184,10 +185,8 @@ int extract_pattern(unsigned long *map, int map_len, int heap_break, pattern_t *
         result |= (map[i+1] & tmask) >> (32 - j);
     }
     p->pattern = result;
-    p->start = start;
-    p->end = end;
-    p->size = end - start +1;
-    return 0;
+    p->size = end - start;
+    return p;
 }
 
 void bitmap_set_pattern(unsigned long *map, int map_len, int index, unsigned long pattern, int pattern_len){

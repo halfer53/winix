@@ -14,6 +14,13 @@ proc_t *exec_new_proc(size_t *lines, size_t length, size_t entry, int priority, 
 //replace the currently running process with the new text, priority, and name provided
 proc_t *exec_replace_existing_proc(proc_t *p,size_t *lines, size_t length, size_t entry, int priority, char *name){
 	assert(p != NULL, "can't exec null process\n");
+	if(p->rbase == DEFAULT_RBASE){
+		// bitmap_set_bit(mem_map,MEM_MAP_LEN,get_page_index(p->sp));
+		// kprintf("Fork free stack %x %d\n",get_page_index(p->sp));
+	}else{
+		// proc_free(p->rbase);
+		bitmap_xor(mem_map,p->ptable,MEM_MAP_LEN);
+	}
 	p = exec_proc(p,lines,length,entry,priority,name);
   assert(p != NULL,"Exec failed\n");
   return p;
@@ -38,22 +45,18 @@ static proc_t *exec_proc(proc_t *p,size_t *lines, size_t length, size_t entry, i
 		overall_length = length + DEFAULT_STACK_SIZE + DEFAULT_HEAP_SIZE;
 
 		p->ptable = p->protection_table;
-
-		if(p->rbase == DEFAULT_RBASE){
-			bitmap_set_bit(mem_map,MEM_MAP_LEN,get_page_index(p->sp));
-			// kprintf("Fork free stack %x %d\n",get_page_index(p->sp));
-		}else{
-			// proc_free(p->rbase);
-			bitmap_xor(mem_map,p->ptable,MEM_MAP_LEN);
-		}
-		bitmap_clear(p->ptable,PROTECTION_TABLE_LEN);
+		// bitmap_clear(p->ptable,PROTECTION_TABLE_LEN);
 
 		len = physical_len_to_page_len(overall_length);
 		nstart = bitmap_search(mem_map,MEM_MAP_LEN,len);
 
+		kprintf("%d nstart %d mem %x\n",len,nstart, mem_map[0]);
+
 		bitmap_clear(p->ptable,PROTECTION_TABLE_LEN);
 		bitmap_set_nbits(p->ptable,PROTECTION_TABLE_LEN, nstart,len);
 		bitmap_set_nbits(mem_map,MEM_MAP_LEN, nstart,len);
+
+		kprintf("after %d nstart %d mem %x ptable %x\n",len,nstart, mem_map[0], p->ptable[0]);
 
 		// kprintf("%x start %d len %d\n",mem_map[0],nstart,len);
 
