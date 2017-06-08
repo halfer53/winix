@@ -4,7 +4,7 @@
 typedef struct _buf
 {
     
-    unsigned int block[BLOCK_SIZE];
+    char block[BLOCK_SIZE];
 
     struct _buf *prev, *next;
     block_t b_blocknr; //block number for this buffer

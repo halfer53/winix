@@ -1,4 +1,4 @@
-#include <types.h>
+#include <sys/types.h>
 #include <stddef.h>
 #include <winix/slab.h>
 #include <winix/mem_map.h>

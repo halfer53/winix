@@ -1,27 +1,64 @@
 #include "fs.h"
 inode_t inode_table[NR_INODES];
 
+
+inode_t* read_inode(int num){
+    block_t blocknr = sb->s_inode_tablenr + num / sb->s_inode_per_block;
+    int offset = (num) % sb->s_inode_per_block * sb->s_inode_size;
+    char *start;
+    int *ino_buf;
+    buf_t *buffer;
+    inode_t *inode = NIL_INODE;
+
+    for(inode = &inode_table[0]; inode < &inode_table[NR_INODES]; inode++){
+        if(inode->i_num == 0)
+            break;
+    }
+
+    if(inode == NIL_INODE)
+        return NIL_INODE;
+
+    buffer = get_block(blocknr);
+    ino_buf = (int *)inode;
+    for(start = buffer->block[offset]; start < sb->s_inode_size; start+=8, ino_buf++  ){
+        *ino_buf = hexstr2int(start,8);
+    }
+    return inode;
+
+}
+
 inode_t* get_inode(int num){
     register inode_t* rep;
     register int i=0;
+    buf_t *imap;
     for(rep = &inode_table[0]; rep < &inode_table[NR_INODES]; rep++ ){
         if(rep->i_num == num)
             return rep;
+    }
+    
+    imap = get_imap();
+    if(imap[num/32] & (0x80000000 >> (num%32))){ //if it is a inode
+        rep = read_inode(num);
+        return rep;
     }
     
     return NULL;
 }
 
 
+
+
+
+
 int put_inode(inode_t *inode){
 
     int inum = inode->i_num;
     block_t blocknr = inode->i_ndblock;
-    unsigned int *buf = sector_buffer;
-    int inode_block_offset = (inum -1) % sb->s_inode_per_block * sb->s_inode_size;  //inode 0 is not used, 
-    unsigned int *bak;
+    int inode_block_offset = (inum) % sb->s_inode_per_block * sb->s_inode_size;
+    char *bak;
 
     buf_t *buffer = get_block(blocknr);
+    char *buf = &buffer->block[0];
     //offset in terms of byte index, each sector in inode table contains four inode
     int i;
 
@@ -50,7 +87,7 @@ int put_inode(inode_t *inode){
     if(buf - bak > sb->s_inode_per_block){
         printf("oversize on put inode buffer");
     }
-    return put_block(buffer);
+    return put_block(buffer,WRITE_IMMED);
 }
 
 

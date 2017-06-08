@@ -42,7 +42,7 @@ register struct inode *rip;
   	if ((r = forbidden(rip, bits)) == OK) {
   		
 	  	switch (rip->i_mode & I_TYPE) {
-    		   case I_REGULAR: 
+    		case I_REGULAR: 
 			
 			if (oflags & O_TRUNC) {
 				if ((r = forbidden(rip, W_BIT)) !=OK) break;
@@ -108,3 +108,4 @@ register struct inode *rip;
   
   return(m_in.fd);
 }
+

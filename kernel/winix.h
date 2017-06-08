@@ -11,7 +11,7 @@
 
 #include <sys/ipc.h>
 #include <stddef.h>
-#include <types.h>
+#include <sys/types.h>
 #include <util.h>
 #include <size.h>
 #include <stdbool.h>

@@ -59,7 +59,7 @@ int main()
 			i+= 127;
 			continue;
 		}
-		*pdisk++ = '0';
+		*pdisk++ = 0;
 	}
 	//block for inode 1, which is the root directory
 	sprintf(pdisk,"%08x",1);
@@ -67,7 +67,7 @@ int main()
 	*pdisk++ = '.';
 	*pdisk++ = '\0';
 	for( int j=0; j<22; j++){
-		*pdisk++ = ' ';
+		*pdisk++ = 0;
 	}
 	sprintf(pdisk,"%08x",1);
 	pdisk += 8;
@@ -75,12 +75,12 @@ int main()
 	*pdisk++ = '.';
 	*pdisk++ = '\0';
 	for( int j=0; j<21; j++){
-		*pdisk++ = ' ';
+		*pdisk++ = 0;
 	}
 	i+=64;
 
 	for(;i<inode_tablesize + remaining;i++){
-		*pdisk++ = '0';
+		*pdisk++ = 0;
 	}
 	*pdisk = '\0';
 	printf("%lu, %d\n",pdisk - disk,totalsize);
