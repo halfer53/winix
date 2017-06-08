@@ -19,6 +19,7 @@ int main()
 	int blockmap = 1024;
 	int inodemap = 1024;
 	int inode_tablesize = 496*128; //at 64th block
+	int first_free_block = (sb + blockmap + inodemap + inode_tablesize) / 1024 +1;
 	long remaining = totalsize - sb - blockmap - inodemap - inode_tablesize;
 	int i=0;
 
@@ -34,32 +35,56 @@ int main()
 	// printf("%d %d %d %d\n",strlen(super_block),strlen(block_bitmap), strlen(block_bitmap2),strlen(inode_bitmap) );
 	// printf("%s%s%s%s",super_block,block_bitmap,block_bitmap2,inode_bitmap);
 	for(;i<inode_tablesize;i++){
-		if( i % 128==0){
-			sprintf(pdisk,"%08x",i/128+1);
+		if(i==128){ //the first one is left as empty deliberately
+			sprintf(pdisk,"%08x",0x41c0); //drwx------
 			pdisk += 8;
-			if(i==128){ //the first one is left as empty deliberately
-				sprintf(pdisk,"%08x",i/128+1);
+			for( int j=0; j< 3; j++){ //nlink gid uid set to 0
+				sprintf(pdisk,"%08x", 0);
 				pdisk += 8;
-				*pdisk++ = '.';
-				sprintf(pdisk,"%08x",i/128+1);
-				pdisk += 8;
-				*pdisk++ = '.';
-				*pdisk++ = '.';
-				i += 19;
 			}
-			i+=7;
+			sprintf(pdisk, "%08x", 64); //i_size
+			pdisk += 8;
+			for( int j=0; j< 3; j++){ //atime mtime ctime set to 0
+				sprintf(pdisk,"%08x", 0);
+				pdisk += 8;
+			}
+			printf("first free %d\n",first_free_block);
+			sprintf(pdisk, "%08x",first_free_block);
+			pdisk+=8;
+			for( int j=0; j< 7; j++){ //remaining zones
+				sprintf(pdisk,"%08x", 0);
+				pdisk += 8;
+			}
+			
+			i+= 127;
+			continue;
 		}
-		else{
-			*pdisk++ = '0';
-		}
+		*pdisk++ = '0';
 	}
+	//block for inode 1, which is the root directory
+	sprintf(pdisk,"%08x",1);
+	pdisk += 8;
+	*pdisk++ = '.';
+	*pdisk++ = '\0';
+	for( int j=0; j<22; j++){
+		*pdisk++ = ' ';
+	}
+	sprintf(pdisk,"%08x",1);
+	pdisk += 8;
+	*pdisk++ = '.';
+	*pdisk++ = '.';
+	*pdisk++ = '\0';
+	for( int j=0; j<21; j++){
+		*pdisk++ = ' ';
+	}
+	i+=64;
+
 	for(;i<inode_tablesize + remaining;i++){
 		*pdisk++ = '0';
 	}
 	*pdisk = '\0';
-	pdisk = disk;
-	printf("%lu, %d\n",strlen(pdisk),totalsize);
-	int curr = sb-1;
+	printf("%lu, %d\n",pdisk - disk,totalsize);
+	int curr = sb;
 	printf("\nsb 0 - 0x%x\n", curr);
 	curr++;
 	printf("block map 0x%x - 0x%x\n",curr, curr+blockmap );
@@ -68,7 +93,7 @@ int main()
 	curr += inodemap;
 	printf("inode table 0x%x - 0x%x\n",curr, curr+inode_tablesize );
 	curr += inode_tablesize;
-	printf("data block 0x%x - 0x%lx, free %ld\n",curr, curr+remaining, remaining/1024 );
+	printf("data block 0x%x - 0x%lx, free blocks %ld\n",curr, curr+remaining, remaining/1024 );
 	curr += remaining;
 	
 	return 0;

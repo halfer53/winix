@@ -28,33 +28,33 @@ struct stat {
 /* The ugly casts on only some of the definitions are to avoid suprising sign
  * extensions such as S_IFREG != (mode_t) S_IFREG when ints are 32 bits.
  */
-#define S_IFMT  ((mode_t) 0170000)	/* type of file */
-#define S_IFLNK ((mode_t) 0120000)	/* symbolic link, not implemented */
-#define S_IFREG ((mode_t) 0100000)	/* regular */
-#define S_IFBLK 0060000		/* block special */
-#define S_IFDIR 0040000  	/* directory */
-#define S_IFCHR 0020000		/* character special */
-#define S_IFIFO 0010000		/* this is a FIFO */
-#define S_ISUID 0004000		/* set user id on execution */
-#define S_ISGID 0002000		/* set group id on execution */
+#define S_IFMT  ((mode_t) 0xC000)	/* type of file */
+#define S_IFLNK ((mode_t) 0xA000)	/* symbolic link, not implemented */
+#define S_IFREG ((mode_t) 0x8000)	/* regular */
+#define S_IFBLK 0x006000		/* block special */
+#define S_IFDIR 0x004000  	/* directory */
+#define S_IFCHR 0x002000		/* character special */
+#define S_IFIFO 0x001000		/* this is a FIFO */
+#define S_ISUID 0x000800		/* set user id on execution */
+#define S_ISGID 0x000400		/* set group id on execution */
 				/* next is reserved for future use */
-#define S_ISVTX   01000		/* save swapped text even after use */
+#define S_ISVTX   0x0200		/* save swapped text even after use */
 
 /* POSIX masks for st_mode. */
-#define S_IRWXU   00700		/* owner:  rwx------ */
-#define S_IRUSR   00400		/* owner:  r-------- */
-#define S_IWUSR   00200		/* owner:  -w------- */
-#define S_IXUSR   00100		/* owner:  --x------ */
+#define S_IRWXU   0x01c0		/* owner:  rwx------ */
+#define S_IRUSR   0x0100		/* owner:  r-------- */
+#define S_IWUSR   0x0080		/* owner:  -w------- */
+#define S_IXUSR   0x0040		/* owner:  --x------ */
 
-#define S_IRWXG   00070		/* group:  ---rwx--- */
-#define S_IRGRP   00040		/* group:  ---r----- */
-#define S_IWGRP   00020		/* group:  ----w---- */
-#define S_IXGRP   00010		/* group:  -----x--- */
+#define S_IRWXG   0x0038		/* group:  ---rwx--- */
+#define S_IRGRP   0x0020		/* group:  ---r----- */
+#define S_IWGRP   0x0010		/* group:  ----w---- */
+#define S_IXGRP   0x0008		/* group:  -----x--- */
 
-#define S_IRWXO   00007		/* others: ------rwx */
-#define S_IROTH   00004		/* others: ------r-- */ 
-#define S_IWOTH   00002		/* others: -------w- */
-#define S_IXOTH   00001		/* others: --------x */
+#define S_IRWXO   0x0007		/* others: ------rwx */
+#define S_IROTH   0x0004		/* others: ------r-- */ 
+#define S_IWOTH   0x0002		/* others: -------w- */
+#define S_IXOTH   0x0001		/* others: --------x */
 
 /* The following macros test st_mode (from POSIX Sec. 5.6.1.1). */
 #define S_ISREG(m)	(((m) & S_IFMT) == S_IFREG)	/* is a reg file */

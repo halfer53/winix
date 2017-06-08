@@ -6,9 +6,9 @@ static buf_t buf_table[LRU_LEN];
 
 static buf_t *lru_cache[2];
 
-static buf_t imap = {.b_blocknr = sb->s_inodemapnr, .b_dirt = 0};
+static buf_t imap = {.b_blocknr = sb->s_inodemapnr, .b_dirt = 0};//inode map is assumed to be 1 block in length
 
-static buf_t bmap = {.b_blocknr = sb->s_blockmapnr, .b_dirt = 0};
+static buf_t bmap = {.b_blocknr = sb->s_blockmapnr, .b_dirt = 0}; //block map is also assumed to be 1 block in length
 
 buf_t *get_imap(){
     return &imap;
@@ -41,8 +41,7 @@ buf_t *get_block(block_t blocknr){
     int ret;
     if(hash_buf[blocknr] != NULL){
         tbuf = hash_buf[blocknr];
-        tbuf->b_count += 1;
-        tbuf->b_dirt = 1;
+        // tbuf->b_count += 1;
         buf_move_to_front(tbuf);
         return tbuf;
     }
@@ -54,7 +53,7 @@ buf_t *get_block(block_t blocknr){
 
     tbuf->b_blocknr = blocknr;
     tbuf->next = tbuf->prev = NULL;
-    tbuf->b_dirt = 1;
+    tbuf->b_dirt = 0;
     tbuf->b_count = 1;
 
     ret = dev_io(tbuf->block,blocknr,DEV_READ);
