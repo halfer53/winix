@@ -1,7 +1,8 @@
-objs = kernel/winix/*.o kernel/fs/*.o kernel/dev/*.o kernel/*.o lib/ipc.o lib/string.o lib/util.o lib/syscall.o lib/wramp_syscall.o
+objs = winix/*.o kernel/*.o lib/ipc.o lib/string.o lib/util.o lib/syscall.o lib/wramp_syscall.o
 
 all:
 	$(MAKE) -C lib
+	$(MAKE) -C winix
 	$(MAKE) -C kernel
 	$(MAKE) -C user
 	wlink -o winix.srec kernel/util/limits_head.o $(objs) kernel/util/limits_tail.o

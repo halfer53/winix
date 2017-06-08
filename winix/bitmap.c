@@ -159,8 +159,7 @@ unsigned long createMask(unsigned long a, unsigned long b)
    return r;
 }
 
-pattern_t *extract_pattern(unsigned long *map, int map_len, int heap_break){
-    pattern_t *p = kmalloc(2);
+int extract_pattern(unsigned long *map, int map_len, int heap_break, pattern_t *p){
     int i,j,start = 0;
     unsigned long result = 0;
     int end = (align1k(heap_break) / 1024);
@@ -177,7 +176,7 @@ pattern_t *extract_pattern(unsigned long *map, int map_len, int heap_break){
     
     then:
     if(end - start > 32 || (i==31 && j==31)){
-        return NULL;
+        return 1;
     }
     result = map[i] << (j);
     if(i < map_len && i != endi){
@@ -185,8 +184,8 @@ pattern_t *extract_pattern(unsigned long *map, int map_len, int heap_break){
         result |= (map[i+1] & tmask) >> (32 - j);
     }
     p->pattern = result;
-    p->size = end - start;
-    return p;
+    p->size = end - start +1;
+    return 0;
 }
 
 void bitmap_set_pattern(unsigned long *map, int map_len, int index, unsigned long pattern, int pattern_len){
