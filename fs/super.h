@@ -13,16 +13,13 @@ struct super_block {
     size_t s_inode_size;
     int s_rootnr;    
     
-    sector_t s_blockmapnr; //block map sector index
-    size_t s_blockmap_size; //block map sector size
-    sector_t s_inodemapnr; //inode map sector index
-    size_t s_inodemap_size; //block map sector size
-    sector_t s_inode_tablenr; //inode map sector index
-    size_t s_inode_tablesize; //block map sector size
+    block_t s_blockmapnr; //block map sector index
+    block_t s_inodemapnr; //inode map sector index
+    block_t s_inode_tablenr; //inode map sector index
     int s_ninode; //first free inode number
     int s_nblock; //first free block number
 
-    int inode_per_sector;
+    int s_inode_per_block;
     inode_t *s_iroot;
 };
 
