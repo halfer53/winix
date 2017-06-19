@@ -42,57 +42,44 @@ register struct inode *rip;
   	if ((r = forbidden(rip, bits)) == OK) {
   		
 	  	switch (rip->i_mode & I_TYPE) {
-    		case I_REGULAR: 
-			
-			if (oflags & O_TRUNC) {
-				if ((r = forbidden(rip, W_BIT)) !=OK) break;
-				truncate(rip);
-				wipe_inode(rip);
-				
-				rw_inode(rip, WRITING);
-			}
-			break;
- 
 	    	   case I_DIRECTORY: 
-			
-			r = (bits & W_BIT ? EISDIR : OK);
-			break;
+					r = (bits & W_BIT ? EISDIR : OK);
+					break;
 
 	     	   case I_CHAR_SPECIAL:
      		   case I_BLOCK_SPECIAL:
-			
-			dev = (dev_t) rip->i_zone[0];
-			r = dev_open(dev, who, bits | (oflags & ~O_ACCMODE));
-			break;
+					dev = (dev_t) rip->i_zone[0];
+					r = dev_open(dev, who, bits | (oflags & ~O_ACCMODE));
+					break;
 
-		   case I_NAMED_PIPE:
-			oflags |= O_APPEND;	
-			fil_ptr->filp_flags = oflags;
-			r = pipe_open(rip, bits, oflags);
-			if (r != ENXIO) {
-				
-				b = (bits & R_BIT ? R_BIT : W_BIT);
-				fil_ptr->filp_count = 0; 
-				if ((filp2 = find_filp(rip, b)) != NIL_FILP) {
-					
-					fp->fp_filp[m_in.fd] = filp2;
-					filp2->filp_count++;
-					filp2->filp_ino = rip;
-					filp2->filp_flags = oflags;
+				case I_NAMED_PIPE:
+					oflags |= O_APPEND;	
+					fil_ptr->filp_flags = oflags;
+					r = pipe_open(rip, bits, oflags);
+					if (r != ENXIO) {
+						
+						b = (bits & R_BIT ? R_BIT : W_BIT);
+						fil_ptr->filp_count = 0; 
+						if ((filp2 = find_filp(rip, b)) != NIL_FILP) {
+							
+							fp->fp_filp[m_in.fd] = filp2;
+							filp2->filp_count++;
+							filp2->filp_ino = rip;
+							filp2->filp_flags = oflags;
 
-					
-					rip->i_count--;
-				} else {
-					
-					fil_ptr->filp_count = 1;
-					if (b == R_BIT)
-					     pos = rip->i_zone[V2_NR_DZONES+0];
-					else
-					     pos = rip->i_zone[V2_NR_DZONES+1];
-					fil_ptr->filp_pos = pos;
-				}
-			}
-			break;
+							
+							rip->i_count--;
+						} else {
+							
+							fil_ptr->filp_count = 1;
+							if (b == R_BIT)
+								pos = rip->i_zone[V2_NR_DZONES+0];
+							else
+								pos = rip->i_zone[V2_NR_DZONES+1];
+							fil_ptr->filp_pos = pos;
+						}
+					}
+					break;
  		}
   	}
   }

@@ -94,7 +94,7 @@ typedef struct proc {
 
 	void *heap_break;
 
-	int fp_filp[PROC_FILEP_NR];
+	filp_t *fp_filp[PROC_FILEP_NR];
 	inode_t *fp_roodir;
 	inode_t *fp_workdir;
 } proc_t;

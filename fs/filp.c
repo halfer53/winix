@@ -25,7 +25,6 @@ int get_fd(proc_t *curr,int start, int *k, filp_t **fpt){
             return(OK);
         }
     }
-
     return(ENFILE);
 }
 

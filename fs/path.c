@@ -74,9 +74,9 @@ inode_t *advance(inode_t *dirp, char string[NAME_MAX]){
 
  
 
-inode_t *last_dir(char *path, int flag){
-    register inode_t *rip;
-
+inode_t *last_dir(char *path, char string[DIRSIZ]){
+    register inode_t *rip, *new_rip;
+    register char *component_name;
 
     rip = *path == '/' ? current_proc->fp_rootdir : current_proc->fp_workdir;
 
@@ -88,5 +88,24 @@ inode_t *last_dir(char *path, int flag){
 
     rip->i_count++;
 
+    while(1){
+        if((component_name = get_name(path,string)) == (char *)0){
+            return NIL_INODE; //bad parsing
+        }
 
+        if(component_name == '\0'){
+            if(rip->i_mode & I_DIRECTORY)
+                return rip;
+            else{
+                return NIL_INODE; //bad parsing
+            }
+        }
+        
+        new_rip = advance(rip,string);
+        if(new_rip == NIL_INODE)
+            return NIL_INODE;
+
+        rip = new_rip;
+        path = component_name;
+    }
 }
