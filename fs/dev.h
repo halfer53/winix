@@ -8,6 +8,6 @@
 
 #include "const.h"
 
-int dev_io(unsigned int *buf, block_t blocknr,mode_t mode);
+int dev_io(char *buf, block_t blocknr,mode_t mode);
 
 #endif

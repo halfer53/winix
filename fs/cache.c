@@ -6,9 +6,34 @@ static buf_t buf_table[LRU_LEN];
 
 static buf_t *lru_cache[2];
 
+static buf_t imap = {.b_blocknr = sb->s_inodemapnr, .b_dirt = 0};//inode map is assumed to be 1 block in length
 
-int put_block(buf_t *buffer){
-    return dev_io(buffer->block,buffer->b_blocknr,DEV_WRITE);
+static buf_t bmap = {.b_blocknr = sb->s_blockmapnr, .b_dirt = 0}; //block map is also assumed to be 1 block in length
+
+buf_t *get_imap(){
+    return &imap;
+}
+
+int put_imap(){
+    return dev_io(imap.block,imap.b_blocknr,DEV_WRITE);
+}
+
+buf_t *get_bmap(){
+    return &bmap;
+}
+
+int put_bmap(){
+    return dev_io(bmap.block,bmap.b_blocknr,DEV_WRITE);
+}
+
+int put_block(buf_t *buffer, mode_t mode){
+    if(mode * WRITE_IMMED && tbuf->b_dirt){
+        tbuf->b_dirt = 0;
+        buf_move_to_front(buffer);
+        return dev_io(buffer->block,buffer->b_blocknr,DEV_WRITE);
+    }else{ //mode = ONE_SHOT
+        buf_move_to_rear(buffer);
+    }
 }
 
 buf_t *get_block(block_t blocknr){
@@ -16,6 +41,7 @@ buf_t *get_block(block_t blocknr){
     int ret;
     if(hash_buf[blocknr] != NULL){
         tbuf = hash_buf[blocknr];
+        // tbuf->b_count += 1;
         buf_move_to_front(tbuf);
         return tbuf;
     }
@@ -28,20 +54,44 @@ buf_t *get_block(block_t blocknr){
     tbuf->b_blocknr = blocknr;
     tbuf->next = tbuf->prev = NULL;
     tbuf->b_dirt = 0;
-    tbuf->b_count = 0;
+    tbuf->b_count = 1;
 
     ret = dev_io(tbuf->block,blocknr,DEV_READ);
 
     enqueue_buf(tbuf);
+    return tbuf;
 }
 
-
-static void buf_move_to_front(buf_t *buffer){
+static void detach_buf(buf_t *buffer){
     if(buffer->prev)
         buffer->prev->next = buffer->next;
 
     if(buffer->next)
         buffer->next->prev = buffer->prev;
+        
+    if(lru_cache[REAR] == buffer)
+        lru_cache[REAR] = buffer->next;
+    
+    if(lru_cache[FRONT] == buffer)
+        lru_cache[FRONT] = buffer->prev;
+    
+}
+
+static void buf_move_to_front(buf_t *buffer){
+    if(lru_cache[FRONT] == buffer)
+        return;
+    
+    detach_buf(buffer);
+    enqueue_buf(buffer);
+}
+
+static void buf_move_to_rear(buf_t *buffer){
+    if(lru_cache[REAR] == buffer)
+        return;
+
+    detach_buf(buffer);
+    buffer->next = lru_cache[REAR];
+    lru_cache[REAR] = buffer;
 }
 
 buf_t* dequeue_buf(){
@@ -65,15 +115,6 @@ void enqueue_buf(register buf_t *tbuf){
         return;
     }
 
-    // tbuf = dequeue_buf();
-    // if(tbuf && tbuf->b_dirt)
-    //     // put_block(tbuf);
-
-    // tbuf->b_dirt = 0;
-    // tbuf->b_count = 0;
-    // tbuf->b_blocknr = blocknr;
-    // tbuf->next = tbuf->prev = NULL;
-
     lru_cache[FRONT]->next = tbuf;
     tbuf->prev = lru_cache[REAR];
     lru_cache[FRONT] = tbuf;
@@ -82,10 +123,9 @@ void enqueue_buf(register buf_t *tbuf){
 }
 
 void init_buf(){
-    int i=1;
+    int i=0;
     register buf_t *tbuf = NULL, *prevbuf = NULL;
-    for(;i<LRU_LEN;i++){
-        tbuf = &buf_table[i];
+    for(tbuf = &buf_table[0];tbufi< &buf_table[LRU_LEN];tbuf++){
         if(prevbuf == NULL){
             lru_cache[FRONT] = lru_cache[REAR] = tbuf;
             tbuf->next = tbuf->prev = NULL;
@@ -101,10 +141,6 @@ void init_buf(){
         hash_buf[i] = NULL;
     }
     
-}
-
-void init_fs(){
-
 }
 
 

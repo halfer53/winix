@@ -2,7 +2,7 @@
 #define _MEM_ALLOC_H_
 
 #ifndef _TYPE_H_
-#include <types.h>
+#include <sys/types.h>
 #endif
 
 typedef struct _hole{

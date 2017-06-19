@@ -33,12 +33,16 @@
 
 //each direct occupies 32 bytes, with 8 bytes for d_ino, and 24 bytes for directory name
 #ifndef DIRSIZ
-#define DIRSIZ	24
+#define DIRSIZ	32
+#endif
+
+#ifndef DIRNAME_LEN
+#define DIRNAME_LEN 24
 #endif
 
 struct direct {
   ino_t d_ino;
-  char d_name[DIRSIZ];
+  char d_name[DIRNAME_LEN];
 };
 
 #endif /* _DIR_H */

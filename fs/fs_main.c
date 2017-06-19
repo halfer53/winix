@@ -7,22 +7,19 @@ int main(){
     superblock = {
         0, //magic
         "WINIX_ROOTFS", //name
-        64, //blocks in use
+        65, //blocks in use
         1, //inode in use
-        16320, //free blocks
+        16319, //free blocks
         495, //free inodes
         1024, //block size
         128, //inode size
         1, //root inode number
-        1, //block bitmap sector index
-        2, //block bitmap sector size
-        3, //inode bitmap sector index
-        1, //inode bitmap sector size
-        4, //inode table sector index
-        124, //inode table sector len
+        1, //block bitmap block index
+        2, //inode bitmap block index
+        3, //inode table block index
         2, //first free inode number
-        65, //first free block number
-        4,
+        66, //first free block number
+        8,
         NULL
         };
     struct super_block* sb = superblock;

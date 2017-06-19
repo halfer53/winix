@@ -7,7 +7,7 @@ int get_fd(proc_t *curr,int start, int *k, filp_t **fpt){
     register filp_t *f;
 
     for( i=start; i< OPEN_MAX; i++){
-        if(curr->fp_filp[i] == NIL_FILP){
+        if(current_proc->fp_filp[i] == NIL_FILP){
             *k = i;
             break;
         }
