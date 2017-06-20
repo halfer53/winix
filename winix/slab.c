@@ -26,7 +26,7 @@ static void *end = NULL;
 
 void printblock(block_t *b) {
 	int i = (int)b / 1024;
-	printf("%d %x size %d next %x prev %x kfree %d data %x\n",i, b, b->size, b->next , b->prev, b->free, b->data);
+	kprintf("%d %x size %d next %x prev %x kfree %d data %x\n",i, b, b->size, b->next , b->prev, b->free, b->data);
 }
 
 void block_overview() {
@@ -34,7 +34,7 @@ void block_overview() {
 	block_t *b = base;
 	
 	if(!b){
-		printf("no heap mems\n");
+		kprintf("no heap mems\n");
 		return;
 	}
 	while (b) {
@@ -43,7 +43,7 @@ void block_overview() {
 		printblock(b);
 		b = b->next;
 	}
-	printf("total kfrees %d\n", kfrees);
+	kprintf("total kfrees %d\n", kfrees);
 }
 
 
@@ -62,7 +62,7 @@ block_t *find_block(block_t **last , size_t size) {
 void split_block(block_t *b, size_t s)
 {
 	block_t *new;
-	// printf("data %x new %x\n", b->data,new);
+	// kprintf("data %x new %x\n", b->data,new);
 	new = (block_t *)(b->data + s);
 	new->size = b->size - s - BLOCK_SIZE;
 	new->next = b->next;
@@ -70,7 +70,7 @@ void split_block(block_t *b, size_t s)
 	new->free = 1;
 	new->ptr = new->data;
 	b->size = s;
-	// printf("new %x size %d orisize %d\n", new,new->size,b->size);
+	// kprintf("new %x size %d orisize %d\n", new,new->size,b->size);
 	b->next = new;
 	if (new->next)
 		new->next ->prev = new;
@@ -122,11 +122,11 @@ void *kmalloc(size_t size) {
 	block_t *b, *last;
 	size_t s;
 
-	// printf("got size %d\n", s);
+	// kprintf("got size %d\n", s);
 	s = align4(size);
 
 	if (base) {
-		// printf("finding heap\n");
+		// kprintf("finding heap\n");
 		/* First find a block */
 		last = base;
 		b = find_block(&last , s);
@@ -137,7 +137,7 @@ void *kmalloc(size_t size) {
 			b->free = 0;
 		} else {
 			/* No fitting block , extend the heap */
-			// printf(" Extend Heap %x\n",b);
+			// kprintf(" Extend Heap %x\n",b);
 			b = alloc_page(last , s);
 			
 			if (!b)
@@ -191,7 +191,7 @@ int valid_addr(void *p)
 	block_t *b;
 	if (base)
 	{
-		if ( p > base && p < (void *)sbrk (0))
+		if ( p > base )
 		{
 			return (p == (get_block(p))->ptr);
 		}
@@ -222,7 +222,6 @@ void kfree(void *p)
 			else
 				/* No more block !*/
 				base = NULL;
-			brk(b);
 		}
 	}
 }

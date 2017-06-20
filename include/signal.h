@@ -49,7 +49,8 @@ typedef void (*sighandler_t)(int);
 
 
 struct sigaction {
-  sighandler_t sa_handler;	/* SIG_DFL, SIG_IGN, or pointer to function */
+  // sighandler_t sa_handler;	/* SIG_DFL, SIG_IGN, or pointer to function */
+  sighandler_t sa_handler;
   sigset_t sa_mask;		/* signals to be blocked during handler */
   int sa_flags;			/* special flags */
 };

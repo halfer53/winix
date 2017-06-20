@@ -1,7 +1,7 @@
 WINIXO = winix/*.o
-sources = main.c proc.c system.c exception.c idle.c sys_memory.c exec.c message_queue.c
-compile = main.s proc.s system.s exception.s idle.s sys_memory.s exec.s message_queue.s
-assemble = main.o proc.o system.o exception.o idle.o sys_memory.o exec.o message_queue.o util/limits_head.o util/limits_tail.o
+sources = main.c proc.c system.c exception.c idle.c sys_memory.c exec.c clock.c
+compile = main.s proc.s system.s exception.s idle.s sys_memory.s exec.s clock.s
+assemble = main.o proc.o system.o exception.o idle.o sys_memory.o exec.o clock.o util/limits_head.o util/limits_tail.o
 
 all: $(assemble)
 $(compile): %.s: %.c

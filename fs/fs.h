@@ -9,6 +9,9 @@
 #include "cache.h"
 #include "file.h"
 #include "dev.h"
+#include "path.h"
+#include "filp.h"
+#include "makefs.h"
 #include <errno.h>
 
 #include "proc.h"
@@ -47,6 +50,9 @@ struct direct {
 
 #endif /* _DIR_H */
 
+
+int hexstr2int(char *a, int len);
+void int2hexstr(char *buffer,int n, int bytenr);
 
 #endif
 

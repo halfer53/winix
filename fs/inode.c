@@ -20,11 +20,10 @@ inode_t* read_inode(int num){
 
     buffer = get_block(blocknr);
     ino_buf = (int *)inode;
-    for(start = buffer->block[offset]; start < sb->s_inode_size; start+=8, ino_buf++  ){
+    for(start = &buffer->block[offset]; start < &buffer->block[offset] + sb->s_inode_size; start+=8, ino_buf++  ){
         *ino_buf = hexstr2int(start,8);
     }
     return inode;
-
 }
 
 inode_t* get_inode(int num){
@@ -37,7 +36,7 @@ inode_t* get_inode(int num){
     }
     
     imap = get_imap();
-    if(imap[num/32] & (0x80000000 >> (num%32))){ //if it is a inode
+    if(imap->block[num/32]  & (0x80000000 >> (num%32))){ //if it is a inode
         rep = read_inode(num);
         return rep;
     }
@@ -81,7 +80,7 @@ int put_inode(inode_t *inode){
     int2hexstr(buf,inode->i_ctime,8); //64 bytes so far
     buf+=8;
     for(i=0; i< NR_INODES; i++){
-        hex2str(buf,inode->i_zone[i]);
+        int2hexstr(buf,inode->i_zone[i],8);
         buf+=8;
     }
     if(buf - bak > sb->s_inode_per_block){
@@ -109,11 +108,11 @@ inode_t* alloc_inode(){
 
     //allocate new inode and block
 
-    imap[inum/32] |= (0x80000000) >> (inum%32);
+    imap->block[inum/32] |= (0x80000000) >> (inum%32);
     if(put_imap(imap) == 0){
 
         bmap = get_bmap();
-        bmap[iblock/32] |= (0x80000000) >> (iblock%32);
+        bmap->block[iblock/32] |= (0x80000000) >> (iblock%32);
         if(put_bmap(bmap) == 0){
             inode->i_zone[0] = iblock;
             inode->i_num = inum;
@@ -124,7 +123,6 @@ inode_t* alloc_inode(){
         }
         
     }
-    
     return NIL_INODE;
 }
 

@@ -11,6 +11,7 @@
 #include <sys/types.h>
 #include <ucontext.h>
 #include <signal.h>
+#include <debug.h>
 
 /**
  * Get the system uptime.
@@ -71,7 +72,7 @@ void *sbrk(size_t size){
 	message_t m;
 
 	m.type = SYSCALL_SBRK;
-	m.l1 = size;
+	m.i1 = size;
 	response = winix_sendrec(SYSTEM_TASK, &m);
 	return m.p1;
 }
@@ -125,7 +126,27 @@ sighandler_t signal(int signum, sighandler_t handler){
 	
 	m.type = SYSCALL_SIGNAL;
 	m.i1 = signum;
-	m.p1 = (void *)handler;
+	m.s1 = handler;
 	response = winix_send(SYSTEM_TASK,&m);
 	return SIG_DFL;
+}
+
+void sigreturn(int signum){
+	int addr;
+	int response = 0;
+	message_t m;
+
+	m.type = SYSCALL_SIGRET;
+	m.i1 = signum;
+	response = winix_send(SYSTEM_TASK,&m);
+}
+
+unsigned long alarm(unsigned long seconds){
+	int response = 0;
+	message_t m;
+	
+	m.type = SYSCALL_ALARM;
+	m.i1 = seconds * 60;
+	response = winix_send(SYSTEM_TASK,&m);
+	return 0;
 }

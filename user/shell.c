@@ -13,6 +13,7 @@
 #include <size.h>
 #include <stdlib.h>
 #include <ucontext.h>
+#include <signal.h>
 
 #define BUF_LEN		100
 
@@ -22,6 +23,8 @@ int uptime(int argc, char **argv);
 int shutdown(int argc, char **argv);
 int exit(int argc, char **argv);
 int testmalloc(int argc, char **argv);
+int test_signal(int argc, char **argv);
+int test_fiber(int argc, char **argv);
 int generic(int argc, char **argv);
 
 //Input buffer & tokeniser
@@ -53,9 +56,29 @@ int isPrintable(int c) {
 	return ('!' <= c && c <= '~');
 }
 
+void sighandler(int signum){
+	
+	printf("\nSignal received, 1 second elapsed \n");
+}
 
 int test_signal(int argc, char **argv){
-	
+	int i;
+	if(!fork()){
+		signal(SIGALRM,sighandler);
+		alarm(1);
+		i = 10000;
+		while(1){
+			while(i--){
+				
+			}
+			putc('!');
+			i = 10000;
+		}
+	}else{
+		printf("Parent exit");
+		sys_exit(0);
+	}
+	return 0;
 }
 
 ucontext_t fcontext,mcontext;
@@ -91,6 +114,7 @@ int test_fiber(int argc, char **argv){
 	else {
 		printf("returned from function\n");
 	}
+	return 0;
 }
 
 
@@ -120,9 +144,9 @@ int uptime(int argc, char **argv) {
 	seconds %= 60;
 	minutes %= 60;
 	hours %= 24;
-	ticks %= 100;
+	// ticks %= 100;
 
-	printf("Uptime is %dd %dh %dm %d.%ds\r\n", days, hours, minutes, seconds, ticks);
+	printf("Uptime is %dd %dh %dm %d.%ds, total ticks: %d\r\n", days, hours, minutes, seconds, ticks%100, ticks);
 	return 0;
 }
 

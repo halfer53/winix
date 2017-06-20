@@ -8,6 +8,9 @@
 
 #ifndef _WINIX_IPC_H_
 #define _WINIX_IPC_H_
+
+#include <signal.h>
+
 typedef struct {int m1i1, m1i2, m1i3; void *m1p1, *m1p2, *m1p3;} mess_1;
 typedef struct {int m2i1, m2i2, m2i3; long m2l1;unsigned long m2ul1; void *m2p1; short m2s1;} mess_2;
 /**
@@ -18,7 +21,7 @@ typedef struct {
 	int type;
 	int i1, i2, i3;
 	void *p1, *p2, *p3;
-	unsigned long l1;
+	sighandler_t s1;
 } message_t;
 
 #define MESSAGE_LEN	9
@@ -30,7 +33,7 @@ typedef struct {
 #define WINIX_SEND		0x13370001
 #define WINIX_RECEIVE	0x13370002
 #define WINIX_SENDREC	0x13370003
-#define WINIX_SENDONCE	0x13370004
+#define WINIX_NOTIFY	0x13370004
 
 /**
  * Boot Image Task Numbers

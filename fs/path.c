@@ -1,4 +1,5 @@
 #include "fs.h"
+#include "proc.h"
 
 char dot1[2] = ".";	/* used for search_dir to bypass the access */
 char dot2[3] = "..";	/* permissions for . and ..		    */
@@ -40,7 +41,7 @@ char *get_name(char *old_name, char string[NAME_MAX]){
     if (np < &string[NAME_MAX]) *np = '\0';	/* Terminate string */
 
     if (rnp >= &old_name[PATH_MAX]) {
-      err_code = ENAMETOOLONG;
+    //   err_code = ENAMETOOLONG;
       return((char *) 0);
     }
     return(rnp);
@@ -59,7 +60,7 @@ inode_t *advance(inode_t *dirp, char string[NAME_MAX]){
         for(str = (char *)&buffer->block[0]; str < &buffer->block[BLOCK_SIZE]; str+= DIRSIZ){
           str += 8; //skip inode
           if(strcmp(str,string) == 0){
-              inum = hex2str(str-8);
+              inum = hexstr2int(str-8,8);
               break;
           }
         }

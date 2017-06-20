@@ -32,7 +32,8 @@
 #include "idle.h"
 #include "exec.h"
 #include "sys_memory.h"
-#include "message_queue.h"
+#include "clock.h"
+
 
 //Major and minor version numbers for WINIX.
 #define MAJOR_VERSION 2

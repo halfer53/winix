@@ -8,6 +8,7 @@
 
 #include "winix.h"
 #include <sys/syscall.h>
+#include "clock.h"
 
 //Number of exception sources
 #define NUM_HANDLERS 16
@@ -66,8 +67,10 @@ static void button_handler() {
 static void timer_handler() {
 	RexTimer->Iack = 0;
 
-	//Increment uptime and call scheduler
-	system_uptime++;
+	//Increment uptime, and check if there is any alarm
+	clock_handler();
+	// system_uptime++;
+
 	sched();
 }
 
@@ -133,6 +136,9 @@ static void gpf_handler() {
 	kprintf("ptable: %x %x %x\n",current_proc->ptable[0],current_proc->ptable[1],current_proc->ptable[2]);
 	kprintf("$1: %x, $2, %x, $3, %x\n",current_proc->regs[0],current_proc->regs[1],current_proc->regs[2]);
 	kprintf("$4: %x, $5, %x, $6, %x\n",current_proc->regs[3],current_proc->regs[4],current_proc->regs[5]);
+	kprintf("$7: %x, $8, %x, $9, %x\n",current_proc->regs[6],current_proc->regs[7],current_proc->regs[8]);
+	kprintf("$10: %x, $11, %x, $12, %x\n",current_proc->regs[9],current_proc->regs[10],current_proc->regs[11]);
+	kprintf("$13: %x, $sp, %x, $ra, %x\n",current_proc->regs[12],current_proc->regs[13],current_proc->regs[14]);
 
 	//Kill process and call scheduler.
 	end_process(current_proc);
@@ -175,21 +181,18 @@ static void syscall_handler() {
 	switch(operation) {
 		case WINIX_SENDREC:
 			current_proc->flags |= RECEIVING;
-			op_name = "sendrec";
 			//fall through to send
 
 		case WINIX_SEND:
-			op_name = "send";
 			*retval = wini_send(dest, m);
 			break;
 
 		case WINIX_RECEIVE:
-			op_name = "receive";
 			*retval = wini_receive(m);
 			break;
 
-		case WINIX_SENDONCE:
-			*retval = wini_sendonce(dest,m);
+		case WINIX_NOTIFY:
+			*retval = wini_notify(dest,m);
 			break;
 
 		default:

@@ -34,8 +34,8 @@ int winix_receive(message_t *m) {
 	return wramp_syscall(WINIX_RECEIVE, NULL, m);
 }
 
-int winix_sendonce(int dest, message_t *m) {
-	return wramp_syscall(WINIX_SENDONCE, NULL, m);
+int winix_notify(int dest, message_t *m) {
+	return wramp_syscall(WINIX_NOTIFY, NULL, m);
 }
 
 /**

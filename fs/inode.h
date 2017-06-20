@@ -33,6 +33,11 @@ typedef struct {
 extern inode_t inode_table[NR_INODES];
 void init_inodetable();
 
-#define NIL_INODE (struct _inode *) 0	/* indicates absence of inode slot */
+#define NIL_INODE (inode_t *) 0	/* indicates absence of inode slot */
+
+inode_t* read_inode(int num);
+inode_t* get_inode(int num);
+int put_inode(inode_t *inode);
+inode_t* alloc_inode();
 
 #endif

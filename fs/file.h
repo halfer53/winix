@@ -15,6 +15,6 @@ typedef struct _filp {
   // int filp_pipe_select_ops;
 }filp_t;
 
-#define NIL_FILP (struct filp *) 0	/* indicates absence of a filp slot */
+#define NIL_FILP (filp_t *) 0	/* indicates absence of a filp slot */
 
 #endif

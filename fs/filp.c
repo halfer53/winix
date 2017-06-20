@@ -35,7 +35,7 @@ filp_t *get_filp(int fd){
 
 filp_t *find_filp(inode_t *inode){
     int i;
-    for(i = 0; i< FILPNR; i++){
+    for(i = 0; i< NR_FILPS; i++){
         if(fd_table[i].filp_ino == inode){
             return &fd_table[i];
         }

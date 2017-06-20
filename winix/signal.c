@@ -6,7 +6,9 @@
 
 #define SIGFRAME_CODE_LEN   2
 
-static unsigned long sigframe_code[] = {0x1ee30001,0x200d0000};
+static unsigned long sigframe_code[] = {0x1ee10001,0x200d0000};
+//addui $sp, $sp, 1
+//syscall
 
 void set_signal(proc_t *caller, int signum, sighandler_t handler){
     caller->sig_table[signum].sa_handler = handler;
@@ -28,9 +30,7 @@ void send_signal(proc_t *who, int signum){
     //assembly code for invoking sigreturn
     sp -= SIGFRAME_CODE_LEN;
     memcpy(sp,sigframe_code,SIGFRAME_CODE_LEN);
-
-    sp -= 1;
-    *sp = 0x12345678;
+    ra = get_virtual_addr(sp,who);
 
     //message_t for sigreturn system call
     sigret_mesg.type = SYSCALL_SIGRET;
@@ -38,32 +38,50 @@ void send_signal(proc_t *who, int signum){
     sp-= MESSAGE_LEN;
     memcpy(sp,&sigret_mesg,MESSAGE_LEN);
 
-    who->pc = who->sig_table[signum].sa_handler;
-    ra = (unsigned long *)who->ra;
-    ra = get_virtual_addr(sp + MESSAGE_LEN, who);
+    //operating and dest for syscall
+    //see exception.c
+    sp--;
+    *sp = (unsigned long)get_virtual_addr(sp+1,who);
+    *--sp = SYSTEM_TASK;
+    *--sp = WINIX_SEND;
+    
+
+    who->pc = (void (*)())who->sig_table[signum].sa_handler;
     who->ra = ra;
-    sp -= 1;
-    *sp = signum;
+    *--sp = signum;
     who->sp = get_virtual_addr(sp,who);
 
-    ra = get_physical_addr(who->ra,who);
-    sp = get_physical_addr(who->sp,who);
-    kprintf("sig ra %x sp %x\n",*ra,sp);
+    // ra = get_physical_addr(who->ra,who);
+    // sp = get_physical_addr(who->sp+1,who);
+    // kprintf("sig sp %x\n",who->sp);
+    // kprintf("sig op %d dest %d mes %x VA ra %x sp %x pc %x\n",*sp, *(sp+1), *(sp+2), who->ra, who->sp,who->sig_table[signum].sa_handler);
 
+    if(current_proc != who){
+        current_proc->time_used++;
+
+		if (--current_proc->ticks_left) {
+			enqueue_head(ready_q[current_proc->priority], current_proc);
+		}
+		else { //Re-insert process at the tail of its priority queue
+			enqueue_tail(ready_q[current_proc->priority], current_proc);
+		}
+    }
     current_proc = who;
+
+    current_proc->ticks_left = current_proc->quantum;
     wramp_load_context();
 }
 
 
-void do_sigreturn(int signum){
+void do_sigreturn(proc_t *who,int signum){
     unsigned long *sp;
 
-    sp = get_physical_addr(current_proc->sp,current_proc);
-    sp += MESSAGE_LEN;
+    sp = get_physical_addr(who->sp,who);
 
-    kprintf("sig ret magic %x\n",*sp);
+    // kprintf("sig ret sp %x\n",sp);
 
-    sp += 1 + SIGFRAME_CODE_LEN;
+    sp += MESSAGE_LEN + 3 +SIGFRAME_CODE_LEN;
+    // kprintf("sig sp %x\n",sp);
 
-    memcpy(current_proc,sp,PROCESS_STATE_LEN);
+    memcpy(who,sp,PROCESS_STATE_LEN);
 }

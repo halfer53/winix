@@ -78,7 +78,7 @@ void system_main() {
 				break;
 
 			case SYSCALL_SBRK:
-				m.p1 = do_sbrk(caller,m.l1);
+				m.p1 = do_sbrk(caller,m.i1);
 				winix_send(who, &m);
 				break;
 
@@ -99,12 +99,16 @@ void system_main() {
 				kprintf_vm(&ptr,&ptr2,caller->rbase);
 				break;
 
+			case SYSCALL_ALARM:
+				sys_alarm(caller,m.i1);
+				break;
+
 			case SYSCALL_SIGNAL:
-				set_signal(caller,m.i1,(sighandler_t)m.p1);
+				set_signal(caller,m.i1,m.s1);
 				break;
 				
 			case SYSCALL_SIGRET:
-				do_sigreturn(m.i1);
+				do_sigreturn(caller,m.i1);
 				break;
 			
 			default:

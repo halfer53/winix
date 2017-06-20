@@ -590,7 +590,7 @@ int wini_receive(message_t *m) {
 	return 0;
 }
 /**
- * send a message to the destination, but only attempt once
+ * non-block send
  *
  * Parameters:
  *   m				Pointer to write the message to.
@@ -599,7 +599,7 @@ int wini_receive(message_t *m) {
  *   0 on success
  *   -1 if destination is invalid
  **/
-int wini_sendonce(int dest, message_t *m) {
+int wini_notify(int dest, message_t *m) {
 	proc_t *pDest;
 
 	current_proc->message = m; //save for later
@@ -619,7 +619,8 @@ int wini_sendonce(int dest, message_t *m) {
 			//if the destination rejects any message it receives,
 			//do not deliver the message, but add it to the scheduling queue
 		} else {
-			enqueue_tail(ready_q[current_proc->priority], current_proc);
+			//TODO
+			// enqueue_tail(ready_q[current_proc->priority], current_proc);
 		}
 
 		//do nothing if it's not waiting

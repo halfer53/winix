@@ -68,12 +68,6 @@ load_reg_1:
 	jr $ra
 
 
-.global get_curr_addr
-get_curr_addr:
-	sw $ra, 0($sp)
-	jr $ra
-
-
 .global _ctx_start
 _ctx_start:
 	lw $1, 0($sp)
