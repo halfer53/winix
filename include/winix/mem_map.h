@@ -17,8 +17,8 @@ extern unsigned long mem_map[MEM_MAP_LEN];
 #define is_addr_in_same_page(a,b)	((((int)a)/1024) == (((int)b)/1024))
 #define is_addr_in_consecutive_page(a,b)	((((int)a)/1024) == ((((int)b)/1024)-1))
 
-#define get_physical_addr(va,proc)	(((int *)va)+(int)proc->rbase)
-#define get_virtual_addr(pa,proc)	(((int *)pa)-(int)proc->rbase)
+#define get_physical_addr(va,proc)	(((unsigned long *)va)+(int)proc->rbase)
+#define get_virtual_addr(pa,proc)	(((unsigned long *)pa)-(int)proc->rbase)
 
 #define get_page_index(pa)	( ((int)pa) / 1024 )
 #define physical_len_to_page_len(pa_len)	( (align1k((int)pa_len)) / 1024 )

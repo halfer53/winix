@@ -28,6 +28,8 @@
 #define SYSCALL_READ		14
 #define SYSCALL_WRITE		15
 #define SYSCALL_CLOSE		16
+#define SYSCALL_SIGNAL		17
+#define SYSCALL_SIGRET      18
 
 //TODO: create a sensible allocation scheme for system call numbers
 

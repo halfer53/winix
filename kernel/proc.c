@@ -372,7 +372,7 @@ proc_t* create_init(size_t *lines, size_t length, size_t entry) {
 		ptr_base = kset_proc(p, (void (*)())entry, USER_PRIORITY, "INIT");
 		memcpy(ptr_base, lines, length);
 		p->rbase = ptr_base;
-		p->sp = (size_t *)get_virtual_addr(p->sp, p);
+		p->sp = get_virtual_addr(p->sp, p);
 		// bitmap_set_bit(p->ptable,PROTECTION_TABLE_LEN,get_page_index(p->rbase));
 		//set protection table TODOK
 		add_to_scheduling_queue(p);

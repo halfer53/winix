@@ -21,6 +21,7 @@ typedef struct {
 	unsigned long l1;
 } message_t;
 
+#define MESSAGE_LEN	9
 
 
 /**

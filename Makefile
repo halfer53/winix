@@ -11,6 +11,7 @@ clean:
 	$(MAKE) -C kernel clean
 	$(MAKE) -C lib clean
 	$(MAKE) -C user clean
+	$(MAKE) -C winix clean
 	rm winix.srec
 
 stat:
@@ -31,8 +32,8 @@ shell:
 	rm shell.c
 	rm shell.o
 	rm shell.s
-	gcc gen_bin_code.c
-	./a.out shell.srec > include/shell_codes.c
+	gcc gen_bin_code.c -o gen_bin_code
+	./gen_bin_code shell.srec > include/shell_codes.c
 	rm shell.srec
 	$(MAKE) all
 

@@ -40,7 +40,8 @@ struct cmd commands[] = {
 	{ "shutdown", shutdown },
 	{ "exit", exit },
 	{ "ps", ps },
-	{ "test", testmalloc},
+	{ "testmalloc", testmalloc},
+	{ "testsignal", test_signal},
 	{ NULL, generic }
 };
 //TODO: ps/uptime/shutdown should be moved to separate programs.
@@ -53,6 +54,9 @@ int isPrintable(int c) {
 }
 
 
+int test_signal(int argc, char **argv){
+	
+}
 
 ucontext_t fcontext,mcontext;
 int x = 0;
@@ -67,44 +71,33 @@ void func(int arg) {
 
 }
 
+int test_fiber(int argc, char **argv){
+	int  value = 3;
+	getcontext(&fcontext);
+	if ((fcontext.ss_sp = (uint32_t *) malloc(1000)) != NULL) {
+		fcontext.ss_sp += 1000;
+		fcontext.ss_size = 1000;
+		fcontext.ss_flags = 0;
+		makecontext(&fcontext,func,1,value);
+	}
+	else {
+		printf("not enough storage for stack");
+	}
+	printf("context has been built\n");
+	swapcontext(&mcontext,&fcontext);
+	if (!x) {
+		printf("incorrect return from swapcontext");
+	}
+	else {
+		printf("returned from function\n");
+	}
+}
+
 
 int testmalloc(int argc, char **argv){
-	int  value = 3;
-  getcontext(&fcontext);
-  if ((fcontext.ss_sp = (uint32_t *) malloc(1000)) != NULL) {
-  	fcontext.ss_sp += 1000;
-    fcontext.ss_size = 1000;
-    fcontext.ss_flags = 0;
-    makecontext(&fcontext,func,1,value);
-  }
-  else {
-    printf("not enough storage for stack");
-  }
-  printf("context has been built\n");
-  swapcontext(&mcontext,&fcontext);
-  if (!x) {
-    printf("incorrect return from swapcontext");
-  }
-  else {
-    printf("returned from function\n");
-  }
+	
 
-  // context.uc_link = 0;
-  // if ((ptr = (char *) malloc(1000)) != NULL) {
-  // 	context.ss_sp = ptr+ 1000 -1;
-  //   context.ss_size = 1000;
-  //   context.ss_flags = 0;
-  //   makecontext(cp,func,1,value);
-  //   printf("func %x, struct %x \n",&func,context.pc);
-  //   printf(" struct sp reg 1 %d 2 %d\n",*context.sp,*(context.sp+1));
-  // }
-  // else {
-  //   printf("not enough storage for stack");
-  // }
-  // printf("context has been built\n");
-  // setcontext(cp);
-  // printf("returned from setcontext");
-  // abort();
+  
   return 0;
 }
 

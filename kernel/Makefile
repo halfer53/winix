@@ -18,6 +18,5 @@ depend:
 
 clean:
 	-rm $(compile) $(assemble)
-	$(MAKE) -C winix clean
 
 .DELETE_ON_ERROR:

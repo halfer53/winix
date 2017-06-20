@@ -1,16 +1,20 @@
 # Individual Study Report
 
-## Introduction
+## Report
 
 In this Individual Study, I plan to implement addtional components for my Operating System Project, namely, I plan to implement Memory Allocation (Malloc, Free), A Fiber Library, And a File System.
 
-## Rewriting the kernel
+## Rewriting Memory Allocation
 
-Before I started writing this project, the kernel's memory management is very trivial. So in my original implementation, there is a 
+Memory Allocation is an imoprtant part of the modern operating system, without it, nothing could be done.
 
+Before I started writing this project, the kernel's memory management is very trivial. So in my original implementation, there is a global variable called ```GLOBAL_MEM_START```, so whenever a new memory is needed, ```GLOBAL_MEM_START``` is incremented to fit the needs. However, this simple scheme has several downsides:
 
-## Memory Allocation
-Memory Allocation is an imoprtant part of the modern operating system, providing library functions allows the programmers to manually allocate memories. In this individual study, I implemented ```malloc```, ```free```, and ```kmalloc``` and ```kfree```
+1. memories cannot be reused
+2. memories are not page-aligned, so memory protection cannot be done
+3. It's hard to keep track of used memory by each process
+
+So this individual study, I implemented ```malloc```, ```free```, and ```kmalloc``` and ```kfree```
 
 In my operating system, each process has its own virtual space dynamically translated into physical address. And the virtual space is divided into several parts, one of which is the heap. Each process has its heap area that can be dynamically extended through ```sbrk() brk()```. sbrk() and brk() both extends the heap segment and allows processes to manage memories through the heap
 

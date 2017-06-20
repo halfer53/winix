@@ -17,17 +17,16 @@
 #include <stdbool.h>
 #include <ucontext.h>
 
-#include "winix/kqueue.h"
-#include "winix/slab.h"
-#include "winix/mem_map.h"
-#include "winix/bitmap.h"
-#include "winix/kwramp.h"
-#include "winix/mem_alloc.h"
-#include "winix/sys_stdio.h"
-#include "winix/rex.h"
+#include <winix/kqueue.h>
+#include <winix/slab.h>
+#include <winix/mem_map.h>
+#include <winix/bitmap.h>
+#include <winix/kwramp.h>
+#include <winix/mem_alloc.h>
+#include <winix/sys_stdio.h>
+#include <winix/rex.h>
+#include <winix/proc.h>
 
-
-#include "proc.h"
 #include "exception.h"
 #include "system.h"
 #include "idle.h"
@@ -38,7 +37,7 @@
 //Major and minor version numbers for WINIX.
 #define MAJOR_VERSION 2
 #define MINOR_VERSION 0
-extern int debug;
+// extern int DEBUG = 0;
 /**
  * Print an error message and lock up the OS... the "Blue Screen of Death"
  *

@@ -9,6 +9,9 @@
 #ifndef _PROC_H_
 #define _PROC_H_
 
+#include <signal.h>
+#include <winix/kwramp.h>
+
 //Process & Scheduling
 #define PROC_NAME_LEN			20
 #define NUM_PROCS				20
@@ -91,6 +94,8 @@ typedef struct proc {
 	int parent_proc_index;
 
 	void *heap_break;
+
+	struct sigaction sig_table[_NSIG];
 } proc_t;
 
 extern proc_t proc_table[NUM_PROCS];

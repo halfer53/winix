@@ -8,6 +8,7 @@
 
 #include "winix.h"
 #include <sys/syscall.h>
+#include <signal.h>
 
 /**
  * Entry point for system task.
@@ -29,8 +30,6 @@ void system_main() {
 		proc_t *caller, *pcurr;
 		int response = 0;
 		void *ptr = NULL, *ptr2 = NULL;
-		ucontext_t context;
-		ucontext_t *ucp;
 
 		//Get a message
 		winix_receive(&m);
@@ -100,8 +99,13 @@ void system_main() {
 				kprintf_vm(&ptr,&ptr2,caller->rbase);
 				break;
 
-			case SYSCALL_OPEN:
+			case SYSCALL_SIGNAL:
+				set_signal(caller,m.i1,(sighandler_t)m.p1);
+				break;
 				
+			case SYSCALL_SIGRET:
+				do_sigreturn(m.i1);
+				break;
 			
 			default:
 				kprintf("\r\n[SYSTEM] Process \"%s (%d)\" performed unknown system call %d\r\n", caller->name, caller->proc_index, m.type);

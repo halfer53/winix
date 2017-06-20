@@ -10,6 +10,7 @@
 #include <sys/syscall.h>
 #include <sys/types.h>
 #include <ucontext.h>
+#include <signal.h>
 
 /**
  * Get the system uptime.
@@ -118,23 +119,13 @@ int printf(const char *format, ...) {
 	return 0;
 }
 
-// int getcontext(ucontext_t *ucp){
-// 	int response = 0;
-// 	message_t m;
-
-// 	m.type = SYSCALL_GETCONTEXT;
-// 	m.p1 = ucp;
-// 	response = winix_send(SYSTEM_TASK,&m);
-// 	return 0;
-// }
-
-
-// int setcontext(const ucontext_t *ucp){
-// 	int response = 0;
-// 	message_t m;
-
-// 	m.type = SYSCALL_SETCONTEXT;
-// 	m.p1 = (void *)ucp;
-// 	response = winix_send(SYSTEM_TASK,&m);
-// 	return 0;
-// }
+sighandler_t signal(int signum, sighandler_t handler){
+	int response = 0;
+	message_t m;
+	
+	m.type = SYSCALL_SIGNAL;
+	m.i1 = signum;
+	m.p1 = (void *)handler;
+	response = winix_send(SYSTEM_TASK,&m);
+	return SIG_DFL;
+}
