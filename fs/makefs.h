@@ -7,5 +7,5 @@
 #define totalsize   (16*1024*1024)
 extern char disk[totalsize+1];
 
-void makefs();
+int makefs();
 #endif

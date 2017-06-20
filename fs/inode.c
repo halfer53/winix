@@ -14,10 +14,12 @@ inode_t* read_inode(int num){
         if(inode->i_num == 0)
             break;
     }
-
+    
     if(inode == NIL_INODE)
         return NIL_INODE;
 
+    printf("free inode found\n");
+    
     buffer = get_block(blocknr);
     ino_buf = (int *)inode;
     for(start = &buffer->block[offset]; start < &buffer->block[offset] + sb->s_inode_size; start+=8, ino_buf++  ){
@@ -34,6 +36,7 @@ inode_t* get_inode(int num){
         if(rep->i_num == num)
             return rep;
     }
+    printf("not found\n");
     
     imap = get_imap();
     if(imap->block[num/32]  & (0x80000000 >> (num%32))){ //if it is a inode
@@ -129,4 +132,11 @@ inode_t* alloc_inode(){
 
 void free_inode(inode_t *inode){
     
+}
+
+void init_inode(){
+    register inode_t* rep;
+    for(rep = &inode_table[0]; rep < &inode_table[NR_INODES]; rep++ ){
+        rep->i_num = 0;
+    }
 }

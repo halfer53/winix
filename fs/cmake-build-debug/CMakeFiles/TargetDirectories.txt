@@ -1,0 +1,3 @@
+/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/cmake-build-debug/CMakeFiles/edit_cache.dir
+/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/cmake-build-debug/CMakeFiles/fs.dir

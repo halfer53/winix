@@ -3,7 +3,8 @@
 
 #define NULL ((void*)0)
 
-#include <string.h>
+#include <stdio.h>
+#include "string.h"
 #include "const.h"
 #include "inode.h"
 #include "cache.h"
@@ -12,11 +13,10 @@
 #include "path.h"
 #include "filp.h"
 #include "makefs.h"
-#include <errno.h>
 
 #include "proc.h"
 #include "super.h"
-#include <stdio.h>
+
 
 
 #ifndef EOF
@@ -49,7 +49,10 @@ struct direct {
 };
 
 #endif /* _DIR_H */
+#define S_IFDIR 0x004000  	/* directory */
 
+extern proc_t *current_proc;
+extern struct super_block *sb;
 
 int hexstr2int(char *a, int len);
 void int2hexstr(char *buffer,int n, int bytenr);

@@ -8,11 +8,15 @@ In this Individual Study, I plan to implement addtional components for my Operat
 
 Memory Allocation is an imoprtant part of the modern operating system, without it, nothing could be done.
 
-Before I started writing this project, the kernel's memory management is very trivial. So in my original implementation, there is a global variable called ```GLOBAL_MEM_START```, so whenever a new memory is needed, ```GLOBAL_MEM_START``` is incremented to fit the needs. However, this simple scheme has several downsides:
+Before I started writing this project, the kernel's memory management is very trivial. So in my original implementation, there is a global variable called ```GLOBAL_MEM_START```, indicating where the next free memory region begins. So whenever a new memory is needed, ```GLOBAL_MEM_START``` is incremented to fit the needs. However, this simple scheme has several downsides:
 
 1. memories cannot be reused
 2. memories are not page-aligned, so memory protection cannot be done
 3. It's hard to keep track of used memory by each process
+
+So instead of having a global variable called ```GLOBAL_MEM_START``` to manage memories, ```mem_map``` is used instead. mem_map is a bitmap that indicates all the free pages inside the memory. 1 indicates it is being used, 0 indicates it is free. Whenver free pages are requested by either the kernle or the user process, ```bitmap_search``` is called to search continugous free pages. Bitmap can also be to free up pages using ```bitmap_nset```. 
+
+With the help of bitmap, fork() can be achieved using COPY On WRITE. 
 
 So this individual study, I implemented ```malloc```, ```free```, and ```kmalloc``` and ```kfree```
 

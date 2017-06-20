@@ -83,7 +83,7 @@ inode_t *last_dir(char *path, char string[DIRSIZ]){
 
     /* If dir has been removed or path is empty, return ENOENT. */
     if (rip->i_nlinks == 0 || *path == '\0') {
-        err_code = ENOENT;
+        // err_code = ENOENT;
         return(NIL_INODE);
     }
 
@@ -95,7 +95,7 @@ inode_t *last_dir(char *path, char string[DIRSIZ]){
         }
 
         if(component_name == '\0'){
-            if(rip->i_mode & I_DIRECTORY)
+            if(rip->i_mode & S_IFDIR)
                 return rip;
             else{
                 return NIL_INODE; //bad parsing

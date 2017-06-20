@@ -1,7 +1,6 @@
 #ifndef _FS_SUPER_H_
 #define _FS_SUPER_H_
 
-extern struct super_block *sb;
 struct super_block {
     int magic;
     char s_name[32];
