@@ -25,6 +25,6 @@ set(SOURCE_FILES
         proc.h
         read.c
         super.h
-        util.c string.c.c string.h)
+        util.c string.c string.h read.h open.h close.h)
 
 add_executable(fs ${SOURCE_FILES})

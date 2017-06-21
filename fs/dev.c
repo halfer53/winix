@@ -5,8 +5,8 @@
 
 int dev_io(char *buf, block_t blocknr,mode_t mode){
     int i = blocknr * BLOCK_SIZE;
-    char *disk_buf = disk;
-    i = align_sector(i);
+    char *disk_buf = &disk[i];
+//    i = align_sector(i);
     char *limit = buf + BLOCK_SIZE;
     if(mode == DEV_READ){
         for(; buf < limit; buf++, disk_buf++){

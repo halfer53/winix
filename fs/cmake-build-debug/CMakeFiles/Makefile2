@@ -45,19 +45,19 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = /cygdrive/c/Users/Bruce/.CLion2017.1/system/cygwin_cmake/bin/cmake.exe
+CMAKE_COMMAND = /opt/clion-2017.1.3/bin/cmake/bin/cmake
 
 # The command to remove a file.
-RM = /cygdrive/c/Users/Bruce/.CLion2017.1/system/cygwin_cmake/bin/cmake.exe -E remove -f
+RM = /opt/clion-2017.1.3/bin/cmake/bin/cmake -E remove -f
 
 # Escaping for special characters.
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs
+CMAKE_SOURCE_DIR = /home/bruce/github/winix2/fs
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/cmake-build-debug
+CMAKE_BINARY_DIR = /home/bruce/github/winix2/fs/cmake-build-debug
 
 #=============================================================================
 # Target rules for target CMakeFiles/fs.dir
@@ -66,7 +66,7 @@ CMAKE_BINARY_DIR = /cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/cmake-buil
 CMakeFiles/fs.dir/all:
 	$(MAKE) -f CMakeFiles/fs.dir/build.make CMakeFiles/fs.dir/depend
 	$(MAKE) -f CMakeFiles/fs.dir/build.make CMakeFiles/fs.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/cmake-build-debug/CMakeFiles --progress-num=1,2,3,4,5,6,7,8,9,10,11,12,13 "Built target fs"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/bruce/github/winix2/fs/cmake-build-debug/CMakeFiles --progress-num=1,2,3,4,5,6,7,8,9,10,11,12,13 "Built target fs"
 .PHONY : CMakeFiles/fs.dir/all
 
 # Include target in all.
@@ -76,9 +76,9 @@ all: CMakeFiles/fs.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/fs.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/cmake-build-debug/CMakeFiles 13
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/bruce/github/winix2/fs/cmake-build-debug/CMakeFiles 13
 	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/fs.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/cmake-build-debug/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/bruce/github/winix2/fs/cmake-build-debug/CMakeFiles 0
 .PHONY : CMakeFiles/fs.dir/rule
 
 # Convenience name for target.

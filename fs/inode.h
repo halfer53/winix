@@ -39,5 +39,6 @@ inode_t* read_inode(int num);
 inode_t* get_inode(int num);
 int put_inode(inode_t *inode);
 inode_t* alloc_inode();
+void init_inode();
 
 #endif

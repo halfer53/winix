@@ -48,7 +48,7 @@ int makefs()
 				sprintf(pdisk,"%08x", 0);
 				pdisk += 8;
 			}
-			printf("first free %d\n",first_free_block);
+			printf("first free %d\n",first_free_block+1);
 			sprintf(pdisk, "%08x",first_free_block);
 			pdisk+=8;
 			for( int j=0; j< 7; j++){ //remaining zones

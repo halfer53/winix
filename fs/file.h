@@ -13,6 +13,8 @@ typedef struct _filp {
 
   /* following are for fd-type-specific select() */
   // int filp_pipe_select_ops;
+
+    int filp_table_index;
 }filp_t;
 
 #define NIL_FILP (filp_t *) 0	/* indicates absence of a filp slot */

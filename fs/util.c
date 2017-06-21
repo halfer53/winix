@@ -15,6 +15,10 @@ int hexstr2int(char *a, int len)
     return val;
 }
 
+char hexstr2char(char A){
+	return (char)(A > '9')? (A &~ 0x20) - 'A' + 10: (A - '0');
+}
+
 //bytenr number of bytes in n
 void int2hexstr(char *buffer,int n, int bytenr) {
 	int i;

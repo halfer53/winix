@@ -1,6 +1,6 @@
 #include "fs.h"
 
-int rw_file(int fd, void *buf, size_t count, int flag){
+int rw_file(int fd, char *buf, size_t count, int flag){
     // char *pbuf = get_physical_addr(buf);
     int ret, r;
     int open_slot, pos;
@@ -10,11 +10,9 @@ int rw_file(int fd, void *buf, size_t count, int flag){
     block_t blocknr, endblocknr;
     inode_t *ino;
     char c;
-    ret = get_fd(current_proc, 0, &open_slot, &filp);
+    int j;
 
-    ino = filp->filp_ino;
-    if(ret != 0)
-        return ENFILE;
+    filp = current_proc->fp_filp[fd];
 
     blocknr = filp->filp_pos / BLOCK_SIZE;
     off = filp->filp_pos % BLOCK_SIZE;
@@ -23,22 +21,33 @@ int rw_file(int fd, void *buf, size_t count, int flag){
 
     for( ; blocknr <= endblocknr; blocknr++){
         buffer = get_block(blocknr);
-        len = BLOCK_SIZE - off;
+        len = BLOCK_SIZE - off > count ? count : BLOCK_SIZE - off;
         c = buffer->block[off];
         /* Read or write 'chunk' bytes. */
 		// r = rw_chunk(ino,  off, blocknr, endblocknr- blocknr, falgs);
-
-		if (r != OK) break;	/* EOF reached */
+        if(flag & READING){
+            for( j=off; j< off+len; j++,buf++){
+                c = buffer->block[j];
+                *buf = buffer->block[j];
+            }
+        }else{
+            for( j=off; j< off+len; j++,buf++){
+                buffer->block[j] = *buf;
+            }
+        }
+        filp->filp_pos = off + len;
+//		if (r != OK) break;	/* EOF reached */
         off = 0;
     }
     return 0;
 }
 
-int do_read(int fd, void *buf, size_t count){
+int sys_read(int fd, void *buf, int count){
     rw_file(fd, buf,count, READING);
 }
 
-int do_write(int fd, void *buf, size_t count){
+int sys_write(int fd, void *buf, int count){
     rw_file(fd, buf, count, WRITING);
 }
+
 

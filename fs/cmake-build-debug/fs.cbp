@@ -8,151 +8,164 @@
 		<Option virtualFolders="CMake Files\;"/>
 		<Build>
 			<Target title="all">
-				<Option working_dir="/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/cmake-build-debug"/>
+				<Option working_dir="/home/bruce/github/winix2/fs/cmake-build-debug"/>
 				<Option type="4"/>
 				<MakeCommands>
-					<Build command="/usr/bin/make.exe -j4 -f &quot;/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/cmake-build-debug/Makefile&quot;  VERBOSE=1 all"/>
-					<CompileFile command="/usr/bin/make.exe -j4 -f &quot;/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="/usr/bin/make.exe -j4 -f &quot;/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="/usr/bin/make.exe -j4 -f &quot;/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/bruce/github/winix2/fs/cmake-build-debug/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/bruce/github/winix2/fs/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/bruce/github/winix2/fs/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/bruce/github/winix2/fs/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 			<Target title="rebuild_cache">
-				<Option working_dir="/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/cmake-build-debug"/>
+				<Option working_dir="/home/bruce/github/winix2/fs/cmake-build-debug"/>
 				<Option type="4"/>
 				<MakeCommands>
-					<Build command="/usr/bin/make.exe -j4 -f &quot;/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/cmake-build-debug/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
-					<CompileFile command="/usr/bin/make.exe -j4 -f &quot;/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="/usr/bin/make.exe -j4 -f &quot;/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="/usr/bin/make.exe -j4 -f &quot;/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/bruce/github/winix2/fs/cmake-build-debug/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/bruce/github/winix2/fs/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/bruce/github/winix2/fs/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/bruce/github/winix2/fs/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 			<Target title="edit_cache">
-				<Option working_dir="/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/cmake-build-debug"/>
+				<Option working_dir="/home/bruce/github/winix2/fs/cmake-build-debug"/>
 				<Option type="4"/>
 				<MakeCommands>
-					<Build command="/usr/bin/make.exe -j4 -f &quot;/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/cmake-build-debug/Makefile&quot;  VERBOSE=1 edit_cache"/>
-					<CompileFile command="/usr/bin/make.exe -j4 -f &quot;/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="/usr/bin/make.exe -j4 -f &quot;/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="/usr/bin/make.exe -j4 -f &quot;/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/bruce/github/winix2/fs/cmake-build-debug/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/bruce/github/winix2/fs/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/bruce/github/winix2/fs/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/bruce/github/winix2/fs/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 			<Target title="fs">
-				<Option output="/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/cmake-build-debug/fs.exe" prefix_auto="0" extension_auto="0"/>
-				<Option working_dir="/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/cmake-build-debug"/>
+				<Option output="/home/bruce/github/winix2/fs/cmake-build-debug/fs" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/bruce/github/winix2/fs/cmake-build-debug"/>
 				<Option object_output="./"/>
 				<Option type="1"/>
 				<Option compiler="gcc"/>
 				<Compiler>
-					<Add directory="/usr/lib/gcc/x86_64-pc-cygwin/5.4.0/include/c++"/>
-					<Add directory="/usr/lib/gcc/x86_64-pc-cygwin/5.4.0/include/c++/x86_64-pc-cygwin"/>
-					<Add directory="/usr/lib/gcc/x86_64-pc-cygwin/5.4.0/include/c++/backward"/>
-					<Add directory="/usr/lib/gcc/x86_64-pc-cygwin/5.4.0/include"/>
+					<Add directory="/usr/include/c++/5"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/5"/>
+					<Add directory="/usr/include/c++/5/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
 					<Add directory="/usr/include"/>
-					<Add directory="/usr/lib/gcc/x86_64-pc-cygwin/5.4.0/../../../../lib/../include/w32api"/>
 				</Compiler>
 				<MakeCommands>
-					<Build command="/usr/bin/make.exe -j4 -f &quot;/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/cmake-build-debug/Makefile&quot;  VERBOSE=1 fs"/>
-					<CompileFile command="/usr/bin/make.exe -j4 -f &quot;/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="/usr/bin/make.exe -j4 -f &quot;/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="/usr/bin/make.exe -j4 -f &quot;/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/bruce/github/winix2/fs/cmake-build-debug/Makefile&quot;  VERBOSE=1 fs"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/bruce/github/winix2/fs/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/bruce/github/winix2/fs/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/bruce/github/winix2/fs/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 			<Target title="fs/fast">
-				<Option output="/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/cmake-build-debug/fs.exe" prefix_auto="0" extension_auto="0"/>
-				<Option working_dir="/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/cmake-build-debug"/>
+				<Option output="/home/bruce/github/winix2/fs/cmake-build-debug/fs" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/bruce/github/winix2/fs/cmake-build-debug"/>
 				<Option object_output="./"/>
 				<Option type="1"/>
 				<Option compiler="gcc"/>
 				<Compiler>
-					<Add directory="/usr/lib/gcc/x86_64-pc-cygwin/5.4.0/include/c++"/>
-					<Add directory="/usr/lib/gcc/x86_64-pc-cygwin/5.4.0/include/c++/x86_64-pc-cygwin"/>
-					<Add directory="/usr/lib/gcc/x86_64-pc-cygwin/5.4.0/include/c++/backward"/>
-					<Add directory="/usr/lib/gcc/x86_64-pc-cygwin/5.4.0/include"/>
+					<Add directory="/usr/include/c++/5"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/5"/>
+					<Add directory="/usr/include/c++/5/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
 					<Add directory="/usr/include"/>
-					<Add directory="/usr/lib/gcc/x86_64-pc-cygwin/5.4.0/../../../../lib/../include/w32api"/>
 				</Compiler>
 				<MakeCommands>
-					<Build command="/usr/bin/make.exe -j4 -f &quot;/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/cmake-build-debug/Makefile&quot;  VERBOSE=1 fs/fast"/>
-					<CompileFile command="/usr/bin/make.exe -j4 -f &quot;/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="/usr/bin/make.exe -j4 -f &quot;/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="/usr/bin/make.exe -j4 -f &quot;/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/bruce/github/winix2/fs/cmake-build-debug/Makefile&quot;  VERBOSE=1 fs/fast"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/bruce/github/winix2/fs/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/bruce/github/winix2/fs/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/bruce/github/winix2/fs/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 		</Build>
-		<Unit filename="/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/cache.c">
+		<Unit filename="/home/bruce/github/winix2/fs/cache.c">
 			<Option target="fs"/>
 		</Unit>
-		<Unit filename="/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/cache.h">
+		<Unit filename="/home/bruce/github/winix2/fs/cache.h">
 			<Option target="fs"/>
 		</Unit>
-		<Unit filename="/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/close.c">
+		<Unit filename="/home/bruce/github/winix2/fs/close.c">
 			<Option target="fs"/>
 		</Unit>
-		<Unit filename="/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/const.h">
+		<Unit filename="/home/bruce/github/winix2/fs/close.h">
 			<Option target="fs"/>
 		</Unit>
-		<Unit filename="/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/dev.c">
+		<Unit filename="/home/bruce/github/winix2/fs/const.h">
 			<Option target="fs"/>
 		</Unit>
-		<Unit filename="/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/dev.h">
+		<Unit filename="/home/bruce/github/winix2/fs/dev.c">
 			<Option target="fs"/>
 		</Unit>
-		<Unit filename="/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/file.h">
+		<Unit filename="/home/bruce/github/winix2/fs/dev.h">
 			<Option target="fs"/>
 		</Unit>
-		<Unit filename="/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/filp.c">
+		<Unit filename="/home/bruce/github/winix2/fs/file.h">
 			<Option target="fs"/>
 		</Unit>
-		<Unit filename="/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/filp.h">
+		<Unit filename="/home/bruce/github/winix2/fs/filp.c">
 			<Option target="fs"/>
 		</Unit>
-		<Unit filename="/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/fs.h">
+		<Unit filename="/home/bruce/github/winix2/fs/filp.h">
 			<Option target="fs"/>
 		</Unit>
-		<Unit filename="/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/fs_main.c">
+		<Unit filename="/home/bruce/github/winix2/fs/fs.h">
 			<Option target="fs"/>
 		</Unit>
-		<Unit filename="/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/inode.c">
+		<Unit filename="/home/bruce/github/winix2/fs/fs_main.c">
 			<Option target="fs"/>
 		</Unit>
-		<Unit filename="/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/inode.h">
+		<Unit filename="/home/bruce/github/winix2/fs/inode.c">
 			<Option target="fs"/>
 		</Unit>
-		<Unit filename="/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/makefs.c">
+		<Unit filename="/home/bruce/github/winix2/fs/inode.h">
 			<Option target="fs"/>
 		</Unit>
-		<Unit filename="/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/makefs.h">
+		<Unit filename="/home/bruce/github/winix2/fs/makefs.c">
 			<Option target="fs"/>
 		</Unit>
-		<Unit filename="/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/open.c">
+		<Unit filename="/home/bruce/github/winix2/fs/makefs.h">
 			<Option target="fs"/>
 		</Unit>
-		<Unit filename="/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/path.c">
+		<Unit filename="/home/bruce/github/winix2/fs/open.c">
 			<Option target="fs"/>
 		</Unit>
-		<Unit filename="/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/path.h">
+		<Unit filename="/home/bruce/github/winix2/fs/open.h">
 			<Option target="fs"/>
 		</Unit>
-		<Unit filename="/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/proc.h">
+		<Unit filename="/home/bruce/github/winix2/fs/path.c">
 			<Option target="fs"/>
 		</Unit>
-		<Unit filename="/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/read.c">
+		<Unit filename="/home/bruce/github/winix2/fs/path.h">
 			<Option target="fs"/>
 		</Unit>
-		<Unit filename="/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/string.c.c">
+		<Unit filename="/home/bruce/github/winix2/fs/proc.h">
 			<Option target="fs"/>
 		</Unit>
-		<Unit filename="/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/string.h">
+		<Unit filename="/home/bruce/github/winix2/fs/read.c">
 			<Option target="fs"/>
 		</Unit>
-		<Unit filename="/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/super.h">
+		<Unit filename="/home/bruce/github/winix2/fs/read.h">
 			<Option target="fs"/>
 		</Unit>
-		<Unit filename="/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/util.c">
+		<Unit filename="/home/bruce/github/winix2/fs/string.c">
 			<Option target="fs"/>
 		</Unit>
-		<Unit filename="/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/CMakeLists.txt">
+		<Unit filename="/home/bruce/github/winix2/fs/string.h">
+			<Option target="fs"/>
+		</Unit>
+		<Unit filename="/home/bruce/github/winix2/fs/super.h">
+			<Option target="fs"/>
+		</Unit>
+		<Unit filename="/home/bruce/github/winix2/fs/util.c">
+			<Option target="fs"/>
+		</Unit>
+		<Unit filename="/home/bruce/github/winix2/fs/CMakeLists.txt">
 			<Option virtualFolder="CMake Files\"/>
 		</Unit>
 	</Project>

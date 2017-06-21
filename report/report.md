@@ -1,24 +1,26 @@
-# Individual Study Report
+# Report
 
-## Report
+Bruce Tan
 
 In this Individual Study, I plan to implement addtional components for my Operating System Project, namely, I plan to implement Memory Allocation (Malloc, Free), A Fiber Library, And a File System.
 
-## Rewriting Memory Allocation
+## Rewriting Memory Allocation Module
+
+refer to ```kernel/proc.c kernel/sys_memory.c winix/bit_map.c winix/slab.c winix/mem_alloc.c winix/mem_map.c lib/stdlib.c```
 
 Memory Allocation is an imoprtant part of the modern operating system, without it, nothing could be done.
 
-Before I started writing this project, the kernel's memory management is very trivial. So in my original implementation, there is a global variable called ```GLOBAL_MEM_START```, indicating where the next free memory region begins. So whenever a new memory is needed, ```GLOBAL_MEM_START``` is incremented to fit the needs. However, this simple scheme has several downsides:
+Before I started writing this project, the kernel's memory management is very trivial. So in my original implementation, there is a global variable called ```GLOBAL_MEM_START```, indicating where the next free memory region begins. So whenever a new memory is needed, ```GLOBAL_MEM_START``` is incremented. However, this simple scheme has several downsides:
 
 1. memories cannot be reused
-2. memories are not page-aligned, so memory protection cannot be done
+2. memories are not page-aligned, so memory protection are not plausible
 3. It's hard to keep track of used memory by each process
 
-So instead of having a global variable called ```GLOBAL_MEM_START``` to manage memories, ```mem_map``` is used instead. mem_map is a bitmap that indicates all the free pages inside the memory. 1 indicates it is being used, 0 indicates it is free. Whenver free pages are requested by either the kernle or the user process, ```bitmap_search``` is called to search continugous free pages. Bitmap can also be to free up pages using ```bitmap_nset```. 
+So instead of having a global variable to manage memories, I used ```mem_map``` instead. mem_map is a bitmap that indicates all the free pages inside the memory. 1 indicates it is being used, 0 indicates it is free. Whenver free pages are requested by either the kernle or the user process, ```bitmap_search``` is called to search continugous free pages, and set by ```bitmap_set```. Bitmap can also be to free up pages using ```bitmap_reset``` to set bits to 0. 
 
-With the help of bitmap, fork() can be achieved using COPY On WRITE. 
+With the help of bitmap, fork() can be achieved using COPY On WRITE mechanism. In my OS, when a fork is called, a bit pattern of the original process is created. e.g. 111001, which means the process occupies the first three pages, and 6th pages. When a child process is to be created,  a backtracking search is done to search the system memory bitmap to find the correct match. A backtracking search is more efficient than search contiguous free pages, because some used pages can overlap with the bit pattern. For instance, say we found a match place with the bitmap, 000110, then our original bitmap, 111001, can overlap with the bitmap. This help the system to save space, make the most use of memory.
 
-So this individual study, I implemented ```malloc```, ```free```, and ```kmalloc``` and ```kfree```
+So this individual study, I also implemented ```malloc```, ```free```, and ```kmalloc``` and ```kfree```
 
 In my operating system, each process has its own virtual space dynamically translated into physical address. And the virtual space is divided into several parts, one of which is the heap. Each process has its heap area that can be dynamically extended through ```sbrk() brk()```. sbrk() and brk() both extends the heap segment and allows processes to manage memories through the heap
 
@@ -101,7 +103,9 @@ However, when requests get larger and larger, the heap segment may become scatte
 For ```kmalloc free```, they are pretty much the same with malloc except one tiny difference. When no free and large enough memory blocks can be found, it calls ```get_free_page``` to request new pages. If the request size is smaller than the size of a page, then the rest of the page will be initialised with a new free memory segment.
 
 
-### Fiber Library
+## Fiber Library
+
+refer to ```lib/ucontext.s lib/makecontext.c```
 
 In my fiber library, ```ucontext.h``` is used to implement the fiber.
 ucontext is one of the C library for context control, It allows more advanced control flow patterns in C like iterator, fiber, and coroutines. 
@@ -233,5 +237,73 @@ int spawnFiber( void (*func)(void) )
 	return LF_NOERROR;
 }
 ```
+
+## Signal Handling
+
+refer to ```kernel/signal.c```
+
+In my OS, signal handling is slightly complicated. Whenever a signal is to be delivered, a signal context is built on the user process's stack as follows
+
+```
+	signum
+	sigreturn syscall parameters
+	sigreturn syscall message_t
+	sigreturn syscall assembly code
+	old_context
+```
+signum is stored on top of the stack, so that when signal handler is called, signum can be popped. 
+
+When signal handler is called, PC is set to the entry point of the OS, and RA is set to the start of sigreturn syscall assembly code. So when signal handler is finished, PC will call the sigreturn assembly code.
+
+ ```
+    sigreturn syscall parameters
+	sigreturn syscall message_t
+	sigreturn syscall assembly code
+``` 
+
+All of the above are necessary to initialise a systemcall, including the parameters of syscall, the message_t passed to the kernel, and and assembly code to triger the system call.
+
+Once the control is transferred to the kernel, kernel will restore the context by copying the ```old_context``` on the stack to the PCB, and then reschedule all the processes.
+
+Since the signal delivery uses quite a lot of stack, a check is made to see if the stack is large enough to hold the signal delivery, before the signal is delivered.
+
+## Alarm and timer
+
+refer to ```kernel/clock.c```
+
+Even though the architecture my OS is running on, has only one timer interrupt, multiple timer can be achieved by using a FIFO linkedlist of timers. 
+
+Whenever a timer interrupt is generated, it checks the front of the queue, see if there is any immediate timer to be triggered. If yes, that timer is dequeued and freeed, and a SIGALRM signal is delivered to the corresponding process.
+
+## FILE SYSTEM
+
+refer to ```fs/```
+
+The file system is fairly complicated. Due to compatiblity reasons, the File System is not integrated as part of the kernel. But it can still can be compiled by gcc for testing purposes.
+
+The file system is divided into several components, ```dev, filp, path, inode, open, read_write, close```
+
+dev is for the lower level drivers to read and write files.
+
+filp is the data structure for file descriptors. When a file is opened, the one entry in the file table of the calling process will be referred to the filp entry in the kernel. It contains information about corresponding inode, file position, and so forth.
+
+path responsible for parsing the path string. ```eat_path``` will return the last inode in the path string, or null if nothing can be found. ```last_dir, advance and get_name``` does the actual work of parsing the file name. 
+
+inode contains several methods including ```get_inode, put_inode, read_inode, alloc_inode```. get_inode takes the inode number, and return the corresponding inode structure, or NULL if inode does not exist. put_inode saves the inode information and write it to the device driver. read_inode parses the raw data from the driver to the inode structure. alloc_inode allocate a new inode from the current file system.
+
+LRU is also used to speed up lookup. It would be a waste of time to read and write every time a file is written or read. Corresponding blocks can be saved in memory temporarily before it is written to the file. LRU stores the most recently used block cache in the front, and least recently used block cache in the rear. When new block is read, it is moved to the front of the queue. The rear of the queue is disposed. Before the rear is disposed, the file system checks if it is dirty, if it is, the content is written to the driver. Throughout the time, LRU will always contain the most recently used blocks at the front. 
+
+LRU also uses hashtable to speedup looking. When a block is requested, rather than looping through all the LRU blocks, a hashtable is checked to see if the block is already in the cache. if not, a new block is read from the driver and added to the front of the LRU.
+
+open, read, write, and close all deals with the actual file. They all deal with file descriptor. When open is called, a file descriptor is created in the kernel fd table for the corresponding inode. Read and write all deals directly with this file descriptor. close deleted the entry of the corresponding file descriptor.
+
+
+
+
+
+
+
+
+
 
 

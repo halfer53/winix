@@ -14,7 +14,7 @@ int get_fd(proc_t *curr,int start, int *k, filp_t **fpt){
     }
 
     if(i==-1)
-        return EMFILE;
+        return -1;
 
      for (f = &fd_table[0]; f < &fd_table[NR_FILPS]; f++) {
         if (f->filp_count == 0) {
@@ -25,7 +25,7 @@ int get_fd(proc_t *curr,int start, int *k, filp_t **fpt){
             return(OK);
         }
     }
-    return(ENFILE);
+    return -1;
 }
 
 
@@ -41,4 +41,23 @@ filp_t *find_filp(inode_t *inode){
         }
     }
     return NULL;
+}
+
+filp_t *get_free_filp(){
+    register filp_t* rep;
+    for(rep = &fd_table[0]; rep < &fd_table[NR_FILPS]; rep++ ){
+        if(rep->filp_ino = NIL_INODE){
+            return rep;
+        }
+    }
+}
+
+void init_filp(){
+    register filp_t* rep;
+    int i;
+    for(rep = &fd_table[0]; rep < &fd_table[NR_FILPS]; rep++ ){
+        rep->filp_ino = NIL_INODE;
+        rep->filp_table_index = i;
+        i++;
+    }
 }

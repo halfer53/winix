@@ -1,4 +1,6 @@
 #include "fs.h"
+#include "inode.h"
+
 inode_t inode_table[NR_INODES];
 
 
@@ -32,15 +34,17 @@ inode_t* get_inode(int num){
     register inode_t* rep;
     register int i=0;
     buf_t *imap;
+    char val;
     for(rep = &inode_table[0]; rep < &inode_table[NR_INODES]; rep++ ){
         if(rep->i_num == num)
             return rep;
     }
-    printf("not found\n");
     
     imap = get_imap();
-    if(imap->block[num/32]  & (0x80000000 >> (num%32))){ //if it is a inode
+    val = imap->block[num/32];
+    if((0x80000000 >> (num%32))){ //if it is a inode
         rep = read_inode(num);
+        rep->i_num = num;
         return rep;
     }
     

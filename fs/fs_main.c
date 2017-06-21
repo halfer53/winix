@@ -1,5 +1,6 @@
 #include "fs.h"
 #include "makefs.h"
+#include "inode.h"
 #include <stdio.h>
 
 proc_t pcurrent_proc;
@@ -19,42 +20,58 @@ struct super_block superblock = {
         2, //inode bitmap block index
         3, //inode table block index
         2, //first free inode number
-        66, //first free block number
+        67, //first free block number
         8, //inode per block
         NULL
     };
 
+// struct super_block {
+//     int magic;
+//     char s_name[32];
+//     int s_block_inuse;
+//     int s_inode_inuse;
+//     int s_free_blocks;
+//     int s_free_inodes;
+//     int s_block_size;
+//     size_t s_inode_size;
+//     int s_rootnr;
+
+//     block_t s_blockmapnr; //block map sector index
+//     block_t s_inodemapnr; //inode map sector index
+//     block_t s_inode_tablenr; //inode map sector index
+//     int s_ninode; //first free inode number
+//     int s_nblock; //first free block number
+
+//     int s_inode_per_block;
+//     inode_t *s_iroot;
+// };
+
 int main(){
     int ret = makefs();
-    printf("Fs done\n");
-    
-    // struct super_block {
-    //     int magic;
-    //     char s_name[32];
-    //     int s_block_inuse;
-    //     int s_inode_inuse;
-    //     int s_free_blocks;
-    //     int s_free_inodes;
-    //     int s_block_size;
-    //     size_t s_inode_size;
-    //     int s_rootnr;    
-        
-    //     block_t s_blockmapnr; //block map sector index
-    //     block_t s_inodemapnr; //inode map sector index
-    //     block_t s_inode_tablenr; //inode map sector index
-    //     int s_ninode; //first free inode number
-    //     int s_nblock; //first free block number
-
-    //     int s_inode_per_block;
-    //     inode_t *s_iroot;
-    // };
-    
+    inode_t *rootinode;
     sb = &superblock;
     init_buf();
-    pcurrent_proc.fp_rootdir = pcurrent_proc.fp_workdir = sb->s_iroot;
-    current_proc = &pcurrent_proc;
-
+    init_inode();
+    init_filp();
     sb->s_iroot = get_inode(1);
+    sb->s_iroot->i_nlinks += 1;
 
-    printf("%d",sb->s_iroot->i_zone[0]);
+    current_proc = &pcurrent_proc;
+    current_proc->fp_rootdir = sb->s_iroot;
+    current_proc->fp_workdir = sb->s_iroot;
+
+    printf("begin\n");
+    printf("root dir %d \n",current_proc->fp_rootdir->i_num);
+
+    int fd = sys_open("/abc.txt",O_CREAT);
+    sys_write(fd,"abc",4);
+    sys_close(fd);
+
+    char buf[4];
+    fd = sys_open("/abc.txt",O_RDONLY);
+    sys_read(fd,buf,4);
+    sys_close(fd);
+
+    printf("Got %s\n",buf);
+
 }

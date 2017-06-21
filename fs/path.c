@@ -1,5 +1,6 @@
 #include "fs.h"
 #include "proc.h"
+#include "inode.h"
 
 char dot1[2] = ".";	/* used for search_dir to bypass the access */
 char dot2[3] = "..";	/* permissions for . and ..		    */
@@ -109,4 +110,12 @@ inode_t *last_dir(char *path, char string[DIRSIZ]){
         rip = new_rip;
         path = component_name;
     }
+}
+
+inode_t* eat_path(char *path){
+    inode_t *inode;
+    char string[DIRSIZ];
+
+    inode = last_dir(path,string);
+    return inode;
 }

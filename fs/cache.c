@@ -14,16 +14,8 @@ buf_t *get_imap(){
     return &imap;
 }
 
-int put_imap(){
-    return dev_io(imap.block,imap.b_blocknr,DEV_WRITE);
-}
-
 buf_t *get_bmap(){
     return &bmap;
-}
-
-int put_bmap(){
-    return dev_io(bmap.block,bmap.b_blocknr,DEV_WRITE);
 }
 
 static void detach_buf(buf_t *buffer){
@@ -38,7 +30,6 @@ static void detach_buf(buf_t *buffer){
     
     if(lru_cache[FRONT] == buffer)
         lru_cache[FRONT] = buffer->prev;
-    
 }
 
 static void buf_move_to_front(buf_t *buffer){
@@ -125,9 +116,19 @@ void enqueue_buf(register buf_t *tbuf){
     hash_buf[(tbuf->b_blocknr)] = tbuf;
 }
 
+
+int put_imap(){
+//    return dev_io(imap.block,imap.b_blocknr,DEV_WRITE);
+}
+
+int put_bmap(){
+//    return dev_io(bmap.block,bmap.b_blocknr,DEV_WRITE);
+}
+
 void init_buf(){
     int i=0;
     register buf_t *tbuf = NULL, *prevbuf = NULL;
+    register char *val;
     for(tbuf = &buf_table[0];tbuf< &buf_table[LRU_LEN];tbuf++){
         if(prevbuf == NULL){
             lru_cache[FRONT] = lru_cache[REAR] = tbuf;
@@ -145,9 +146,18 @@ void init_buf(){
     }
     imap.b_blocknr = sb->s_inodemapnr;
     imap.b_dirt = 0;
+    dev_io(imap.block,imap.b_blocknr,DEV_READ);
+    for(val = &imap.block[0]; val < &imap.block[BLOCK_SIZE]; val++){
+        *val = hexstr2char(*val);
+    }
+    printf("imap %d\n",imap.block[0]);
 
     bmap.b_blocknr = sb->s_blockmapnr;
     bmap.b_dirt = 0;
+    dev_io(bmap.block,bmap.b_blocknr,DEV_READ);
+    for(val = &bmap.block[0]; val < &bmap.block[BLOCK_SIZE]; val++){
+        *val = hexstr2char(*val);
+    }
 }
 
 

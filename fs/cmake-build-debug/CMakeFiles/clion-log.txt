@@ -1,4 +1,4 @@
-C:\Users\Bruce\.CLion2017.1\system\cygwin_cmake\bin\cmake.exe -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs
+/opt/clion-2017.1.3/bin/cmake/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /home/bruce/github/winix2/fs
 -- Configuring done
 -- Generating done
--- Build files have been written to: /cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/cmake-build-debug
+-- Build files have been written to: /home/bruce/github/winix2/fs/cmake-build-debug

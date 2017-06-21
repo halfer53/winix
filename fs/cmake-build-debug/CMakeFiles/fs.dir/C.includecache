@@ -6,119 +6,139 @@
 
 #IncludeRegexTransform: 
 
-/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/cache.c
+/home/bruce/github/winix2/fs/cache.c
 fs.h
-/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/fs.h
+/home/bruce/github/winix2/fs/fs.h
 
-/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/cache.h
+/home/bruce/github/winix2/fs/cache.h
 
-/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/close.c
+/home/bruce/github/winix2/fs/close.c
 fs.h
-/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/fs.h
+/home/bruce/github/winix2/fs/fs.h
 
-/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/const.h
+/home/bruce/github/winix2/fs/close.h
 
-/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/dev.c
+/home/bruce/github/winix2/fs/const.h
+
+/home/bruce/github/winix2/fs/dev.c
 dev.h
-/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/dev.h
+/home/bruce/github/winix2/fs/dev.h
 makefs.h
-/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/makefs.h
+/home/bruce/github/winix2/fs/makefs.h
 fs.h
-/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/fs.h
+/home/bruce/github/winix2/fs/fs.h
 
-/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/dev.h
+/home/bruce/github/winix2/fs/dev.h
 const.h
-/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/const.h
+/home/bruce/github/winix2/fs/const.h
 
-/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/file.h
+/home/bruce/github/winix2/fs/file.h
 
-/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/filp.c
+/home/bruce/github/winix2/fs/filp.c
 fs.h
-/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/fs.h
+/home/bruce/github/winix2/fs/fs.h
 
-/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/filp.h
+/home/bruce/github/winix2/fs/filp.h
 proc.h
-/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/proc.h
+/home/bruce/github/winix2/fs/proc.h
 file.h
-/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/file.h
+/home/bruce/github/winix2/fs/file.h
 
-/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/fs.h
+/home/bruce/github/winix2/fs/fs.h
 stdio.h
 -
 string.h
-/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/string.h
+/home/bruce/github/winix2/fs/string.h
 const.h
-/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/const.h
+/home/bruce/github/winix2/fs/const.h
 inode.h
-/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/inode.h
+/home/bruce/github/winix2/fs/inode.h
 cache.h
-/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/cache.h
+/home/bruce/github/winix2/fs/cache.h
 file.h
-/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/file.h
+/home/bruce/github/winix2/fs/file.h
 dev.h
-/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/dev.h
+/home/bruce/github/winix2/fs/dev.h
 path.h
-/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/path.h
+/home/bruce/github/winix2/fs/path.h
 filp.h
-/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/filp.h
+/home/bruce/github/winix2/fs/filp.h
 makefs.h
-/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/makefs.h
+/home/bruce/github/winix2/fs/makefs.h
 proc.h
-/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/proc.h
+/home/bruce/github/winix2/fs/proc.h
 super.h
-/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/super.h
+/home/bruce/github/winix2/fs/super.h
+open.h
+/home/bruce/github/winix2/fs/open.h
+read.h
+/home/bruce/github/winix2/fs/read.h
+close.h
+/home/bruce/github/winix2/fs/close.h
 
-/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/fs_main.c
+/home/bruce/github/winix2/fs/fs_main.c
 fs.h
-/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/fs.h
+/home/bruce/github/winix2/fs/fs.h
 makefs.h
-/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/makefs.h
+/home/bruce/github/winix2/fs/makefs.h
+inode.h
+/home/bruce/github/winix2/fs/inode.h
 stdio.h
 -
 
-/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/inode.c
+/home/bruce/github/winix2/fs/inode.c
 fs.h
-/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/fs.h
+/home/bruce/github/winix2/fs/fs.h
+inode.h
+/home/bruce/github/winix2/fs/inode.h
 
-/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/inode.h
+/home/bruce/github/winix2/fs/inode.h
 const.h
-/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/const.h
+/home/bruce/github/winix2/fs/const.h
 
-/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/makefs.c
+/home/bruce/github/winix2/fs/makefs.c
 stdio.h
 -
 string.h
 -
 makefs.h
-/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/makefs.h
+/home/bruce/github/winix2/fs/makefs.h
 
-/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/makefs.h
+/home/bruce/github/winix2/fs/makefs.h
 
-/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/open.c
+/home/bruce/github/winix2/fs/open.c
 fs.h
-/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/fs.h
+/home/bruce/github/winix2/fs/fs.h
 
-/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/path.c
+/home/bruce/github/winix2/fs/open.h
 fs.h
-/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/fs.h
+/home/bruce/github/winix2/fs/fs.h
+
+/home/bruce/github/winix2/fs/path.c
+fs.h
+/home/bruce/github/winix2/fs/fs.h
 proc.h
-/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/proc.h
+/home/bruce/github/winix2/fs/proc.h
+inode.h
+/home/bruce/github/winix2/fs/inode.h
 
-/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/path.h
+/home/bruce/github/winix2/fs/path.h
 
-/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/proc.h
+/home/bruce/github/winix2/fs/proc.h
 
-/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/read.c
+/home/bruce/github/winix2/fs/read.c
 fs.h
-/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/fs.h
+/home/bruce/github/winix2/fs/fs.h
 
-/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/string.c.c
+/home/bruce/github/winix2/fs/read.h
+
+/home/bruce/github/winix2/fs/string.c
 string.h
-/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/string.h
+/home/bruce/github/winix2/fs/string.h
 
-/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/string.h
+/home/bruce/github/winix2/fs/string.h
 
-/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/super.h
+/home/bruce/github/winix2/fs/super.h
 
-/cygdrive/c/Users/Bruce/Documents/GitHub/winix2/fs/util.c
+/home/bruce/github/winix2/fs/util.c
 

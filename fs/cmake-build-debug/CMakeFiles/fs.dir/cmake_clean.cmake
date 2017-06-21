@@ -10,10 +10,9 @@ file(REMOVE_RECURSE
   "CMakeFiles/fs.dir/path.c.o"
   "CMakeFiles/fs.dir/read.c.o"
   "CMakeFiles/fs.dir/util.c.o"
-  "CMakeFiles/fs.dir/string.c.c.o"
+  "CMakeFiles/fs.dir/string.c.o"
   "fs.pdb"
-  "fs.exe"
-  "libfs.dll.a"
+  "fs"
 )
 
 # Per-language clean rules from dependency scanning.

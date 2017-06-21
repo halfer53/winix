@@ -34,15 +34,15 @@ int strcmp(const char *s1, const char *s2) {
 /**
  * Calculates the length of a string.
  **/
-int strlen(const char *s) {
-    int len = 0;
-
-    while (*s++) {
-        len++;
-    }
-
-    return len;
-}
+//int strlen(const char *s) {
+//    int len = 0;
+//
+//    while (*s++) {
+//        len++;
+//    }
+//
+//    return len;
+//}
 
 /**
  * copy the src into the destination string, the destination should be large enough to hold the src
