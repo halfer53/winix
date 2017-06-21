@@ -4,7 +4,7 @@
 /*
 
  */
-void *memcpy(void *s1, const void *s2, register int n)
+void *memcpy(void *s1, const void *s2, register size_t n)
 {
 	register char *p1 = s1;
 	register const char *p2 = s2;

@@ -45,6 +45,7 @@ struct cmd commands[] = {
 	{ "ps", ps },
 	{ "testmalloc", testmalloc},
 	{ "testsignal", test_signal},
+	{ "testfiber", test_fiber},
 	{ NULL, generic }
 };
 //TODO: ps/uptime/shutdown should be moved to separate programs.
@@ -81,7 +82,7 @@ int test_signal(int argc, char **argv){
 	return 0;
 }
 
-ucontext_t fcontext,mcontext;
+ucontext_t mcontext,fcontext,econtext;
 int x = 0;
 
 
