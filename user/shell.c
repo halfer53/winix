@@ -59,14 +59,15 @@ int isPrintable(int c) {
 
 void sighandler(int signum){
 	
-	printf("\nSignal received, 1 second elapsed \n");
+	printf("\nSignal received, 2 second elapsed \n");
+	alarm(2);
 }
 
 int test_signal(int argc, char **argv){
 	int i;
 	if(!fork()){
 		signal(SIGALRM,sighandler);
-		alarm(1);
+		alarm(2);
 		i = 10000;
 		while(1){
 			while(i--){
@@ -85,14 +86,12 @@ int test_signal(int argc, char **argv){
 ucontext_t mcontext,fcontext,econtext;
 int x = 0;
 
-
 void func(int arg) {
 
-  printf("function called with value %d\n",arg);
+  printf("Fiber %d\n",arg);
   x++;
-  printf("function returning to main\n");
+  printf("Fiber %d returning to main\n",arg);
   setcontext(&mcontext);
-
 }
 
 int test_fiber(int argc, char **argv){
@@ -102,13 +101,19 @@ int test_fiber(int argc, char **argv){
 		fcontext.ss_sp += 1000;
 		fcontext.ss_size = 1000;
 		fcontext.ss_flags = 0;
-		makecontext(&fcontext,func,1,value);
+		makecontext(&fcontext,func,1,1);
 	}
-	else {
-		printf("not enough storage for stack");
+
+	if ((econtext.ss_sp = (uint32_t *) malloc(1000)) != NULL) {
+		econtext.ss_sp += 1000;
+		econtext.ss_size = 1000;
+		econtext.ss_flags = 0;
+		makecontext(&econtext,func,1,2);
 	}
+
 	printf("context has been built\n");
 	swapcontext(&mcontext,&fcontext);
+	swapcontext(&mcontext,&econtext);
 	if (!x) {
 		printf("incorrect return from swapcontext");
 	}
@@ -121,7 +126,22 @@ int test_fiber(int argc, char **argv){
 
 int testmalloc(int argc, char **argv){
 	
-
+	void *p0 = malloc(512);
+	  void *p1 = malloc(512);
+	  void *p2 = malloc(1024);
+	  void *p3 = malloc(512);
+	  void *p4 = malloc(1024);
+	  void *p5 = malloc(2048);
+	  void *p6 = malloc(512);
+	  void *p7 = malloc(1024);
+	  void *p8 = malloc(512);
+	  void *p9 = malloc(1024);
+	  block_overview();
+	  free(p5);
+	  free(p6);
+	  free(p2);
+	  free(p8);
+	  block_overview();
   
   return 0;
 }

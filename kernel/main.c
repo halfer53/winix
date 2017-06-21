@@ -129,7 +129,7 @@ void main() {
 
 	p = exec_new_proc(shell_code,shell_code_length,shell_pc, USER_PRIORITY,"Shell");
 	assert(p != NULL, "Create Shell task");
-	p->quantum = 10;
+	p->quantum = 2;
 
 	//Rocks game
 	/*p = new_proc(rocks_main, USER_PRIORITY, "Rocks");

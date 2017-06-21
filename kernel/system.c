@@ -66,9 +66,8 @@ void system_main() {
 				pcurr = do_fork(caller);
 				m.i1 = pcurr->proc_index;
 				winix_send(who, &m);
+				
 				//send 0 to child
-				//NOTE that the forked child should
-
 				m.i1 = 0;
 				winix_send(pcurr->proc_index,&m);
 				break;
@@ -94,9 +93,9 @@ void system_main() {
 			case SYSCALL_PRINTF:
 				//p1: str pointer
 				//p2: args pointer
-				ptr = ((int *)m.p1) + (int)caller->rbase;
-				ptr2 = ((int *)m.p2) + (int)caller->rbase;
-				kprintf_vm(&ptr,&ptr2,caller->rbase);
+				ptr = get_physical_addr(m.p1,caller);
+				ptr2 = get_physical_addr(m.p2,caller);
+				kprintf_vm(ptr,ptr2,caller->rbase);
 				break;
 
 			case SYSCALL_ALARM:

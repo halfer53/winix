@@ -17,6 +17,7 @@ test
 *.c~
 testing.c
 static.c
+gen_bin_code
 *.out
 *.exe
 *.sublime-workspace

@@ -10,8 +10,10 @@
 #define _WINIX_H_
 
 #include <sys/ipc.h>
+#include <signal.h>
 #include <stddef.h>
 #include <sys/types.h>
+#include <sys/syscall.h>
 #include <util.h>
 #include <size.h>
 #include <stdbool.h>
@@ -27,12 +29,12 @@
 #include <winix/rex.h>
 #include <winix/proc.h>
 
-#include "exception.h"
-#include "system.h"
-#include "idle.h"
-#include "exec.h"
-#include "sys_memory.h"
-#include "clock.h"
+#include <winix/exception.h>
+#include <winix/system.h>
+#include <winix/idle.h>
+#include <winix/exec.h>
+#include <winix/sys_memory.h>
+#include <winix/clock.h>
 
 
 //Major and minor version numbers for WINIX.

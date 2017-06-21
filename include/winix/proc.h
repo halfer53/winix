@@ -11,6 +11,7 @@
 
 #include <signal.h>
 #include <winix/kwramp.h>
+#include <sys/ipc.h>
 
 //Process & Scheduling
 #define PROC_NAME_LEN			20

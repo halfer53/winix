@@ -5,10 +5,7 @@
  *  2016-09-19		Paul Monigatti			Original
  *  2016-11-20		Bruce Tan			Modified
  **/
-
 #include "winix.h"
-#include <sys/syscall.h>
-#include "clock.h"
 
 //Number of exception sources
 #define NUM_HANDLERS 16

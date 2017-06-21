@@ -6,7 +6,7 @@
  *  2016-11-20		Bruce Tan			Modified
  **/
  
-#include "winix/rex.h"
+#include <winix/rex.h>
 
 #define DELAY 20000
 

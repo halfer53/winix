@@ -79,9 +79,7 @@ static void kputs(const char *s) {
 }
 
 
-void kprintf_vm(const char **s_pptr, void **arg_pptr, void *caller_rbase){
-	const char *format = *s_pptr;
-	void *arg = *arg_pptr;
+void kprintf_vm(const char *format, void *arg, void *caller_rbase){
 	char c = *format;
 
 	//TODO: proper formats
@@ -128,7 +126,7 @@ void kprintf(const char *format, ...) {
 	void *arg = &format;
 	arg = ((char*)arg) + 1;
 
-	kprintf_vm(&format,&arg,0);
+	kprintf_vm(format,arg,0);
 }
 
 

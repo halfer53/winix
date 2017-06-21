@@ -2,7 +2,12 @@
 
 Bruce Tan
 
-In this Individual Study, I plan to implement addtional components for my Operating System Project, namely, I plan to implement Memory Allocation (Malloc, Free), A Fiber Library, And a File System.
+In this Individual Study, I proposed to implement addtional components for my Operating System Project, namely, I planned to implement 
+
+1. Memory Allocation (sbrk() brk() malloc() free() calloc() realloc() kmalloc() kfree()), 
+2. A thread library
+3. Handling Signals
+4. A File System
 
 ## Rewriting Memory Allocation Module
 
@@ -207,36 +212,7 @@ void makecontext(ucontext_t *ucp, void (* func)(), int argc, ...){
 
 Make context sets up the alternative stack, and point the next control flow to _ctx_start(), _ctx_start will then call func(), and pass the parameters. On successful completion, _ctx_end() is called. _ctx_end checks if the next ucontext is present, if yes, it transfers the control to the next ucontext. otherwise exit() is called.
 
-With the help of ucontext, then fiber library can be implemented.
-
-```
-int spawnFiber( void (*func)(void) )
-{
-	if ( numFibers == MAX_FIBERS ) return LF_MAXFIBERS;
-	
-	/* Add the new function to the end of the fiber list */
-	getcontext( &fiberList[numFibers].context );
-
-	/* Set the context to a newly allocated stack */
-	fiberList[numFibers].context.uc_link = 0;
-	fiberList[numFibers].stack = malloc( FIBER_STACK );
-	fiberList[numFibers].context.uc_stack.ss_sp = fiberList[numFibers].stack;
-	fiberList[numFibers].context.uc_stack.ss_size = FIBER_STACK;
-	fiberList[numFibers].context.uc_stack.ss_flags = 0;
-	
-	if ( fiberList[numFibers].stack == 0 )
-	{
-		LF_DEBUG_OUT( "Error: Could not allocate stack." );
-		return LF_MALLOCERROR;
-	}
-	
-	/* Create the context. The context calls fiberStart( func ). */
-	makecontext( &fiberList[ numFibers ].context, (void (*)(void)) &fiberStart, 1, func );
-	++ numFibers;
-	
-	return LF_NOERROR;
-}
-```
+With the help of ucontext, a custom fiber can be built. refer to ```user/shell.c```
 
 ## Signal Handling
 
@@ -298,11 +274,191 @@ LRU also uses hashtable to speedup looking. When a block is requested, rather th
 open, read, write, and close all deals with the actual file. They all deal with file descriptor. When open is called, a file descriptor is created in the kernel fd table for the corresponding inode. Read and write all deals directly with this file descriptor. close deleted the entry of the corresponding file descriptor.
 
 
+# How to Test
 
+Open ```RexSimulator```
 
+![](1.png)
 
+Click ```Quick Load```
+Select ```winix.srec```
 
+## test fiber
 
+type ```testfiber```
+
+![](4.png)
+
+```
+ucontext_t mcontext,fcontext,econtext;
+int x = 0;
+
+void func(int arg) {
+
+  printf("Fiber %d\n",arg);
+  x++;
+  printf("Fiber %d returning to main\n",arg);
+  setcontext(&mcontext);
+}
+
+int test_fiber(int argc, char **argv){
+	int  value = 3;
+	getcontext(&fcontext);
+	if ((fcontext.ss_sp = (uint32_t *) malloc(1000)) != NULL) {
+		fcontext.ss_sp += 1000;
+		fcontext.ss_size = 1000;
+		fcontext.ss_flags = 0;
+		makecontext(&fcontext,func,1,1);
+	}
+
+	if ((econtext.ss_sp = (uint32_t *) malloc(1000)) != NULL) {
+		econtext.ss_sp += 1000;
+		econtext.ss_size = 1000;
+		econtext.ss_flags = 0;
+		makecontext(&econtext,func,1,2);
+	}
+
+	printf("context has been built\n");
+	swapcontext(&mcontext,&fcontext);
+	swapcontext(&mcontext,&econtext);
+	if (!x) {
+		printf("incorrect return from swapcontext");
+	}
+	else {
+		printf("returned from function\n");
+	}
+	return 0;
+}
+
+```
+
+## test malloc
+
+type ```testmalloc```
+
+```
+	  void *p0 = malloc(512);
+	  void *p1 = malloc(512);
+	  void *p2 = malloc(1024);
+	  void *p3 = malloc(512);
+	  void *p4 = malloc(1024);
+	  void *p5 = malloc(2048);
+	  void *p6 = malloc(512);
+	  void *p7 = malloc(1024);
+	  void *p8 = malloc(512);
+	  void *p9 = malloc(1024);
+	  block_overview();
+	  free(p5);
+	  free(p6);
+	  free(p2);
+	  free(p8);
+	  block_overview();
+```
+The result should be as follow
+
+![](2.png)
+
+## test fork
+
+type ```fork```
+
+The result should be as follow
+
+![](3.png)
+
+```
+			int forkid = 0;
+			forkid = fork();
+			if (forkid != 0)
+			{
+				printf("I am parent\n");
+			}else{
+				printf("I am child\n");
+			}
+			return 0;
+
+```
+
+## test signal
+
+Since there are two shell programs running at the same time, so it would be impossible to continue testing
+
+press the ```red button``` indicated below to stop the program
+
+![](5.png)
+
+then
+Click ```Quick Load```
+Select ```winix.srec```
+
+type ```testsignal```
+
+the signal should be delivered 1 second after, shown as below
+
+![](6.png)
+
+What happended is that the parent shell fork itself, then the parent shell exit. The child shell set up the signal and alarm, then wait for the signal to be delivered.
+
+```
+void sighandler(int signum){
+	
+	printf("\nSignal received, 1 second elapsed \n");
+}
+
+int test_signal(int argc, char **argv){
+	int i;
+	if(!fork()){
+		signal(SIGALRM,sighandler);
+		alarm(1);
+		i = 10000;
+		while(1){
+			while(i--){
+				
+			}
+			putc('!');
+			i = 10000;
+		}
+	}else{
+		printf("Parent exit");
+		sys_exit(0);
+	}
+	return 0;
+}
+```
+
+## test file system
+
+```cd fs```
+```gcc *.c```
+```./a.out```
+
+The result should be as follows
+
+![](7.png)
+
+```
+	int fd = sys_open("/abc.txt",O_CREAT);
+    sys_write(fd,"abc",4);
+    sys_close(fd);
+
+    char buf[4];
+    fd = sys_open("/abc.txt",O_RDONLY);
+    sys_read(fd,buf,4);
+    sys_close(fd);
+
+    printf("Got %s\n",buf);
+
+```
+
+## side notes
+
+You can also play around with the shell by typing the folloing commands
+
+```uptime```
+
+```ps```
+
+```exit```
 
 
 

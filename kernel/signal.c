@@ -1,13 +1,10 @@
+#include "winix.h"
 #include <signal.h>
-#include <sys/ipc.h>
-#include <sys/syscall.h>
-#include <winix/proc.h>
-#include <winix/mem_map.h>
 
 #define SIGFRAME_CODE_LEN   2
 
 static unsigned long sigframe_code[] = {0x1ee10001,0x200d0000};
-//addui $sp, $sp, 1
+//addui sp,sp,sp, 1
 //syscall
 
 void set_signal(proc_t *caller, int signum, sighandler_t handler){

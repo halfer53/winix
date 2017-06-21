@@ -1,10 +1,5 @@
-#include <winix/kqueue.h>
-#include <winix/sys_stdio.h>
-#include <sys/ipc.h>
-#include <winix/proc.h>
-#include <stddef.h>
-#include "exception.h"
-#include "clock.h"
+
+#include "winix.h"
 
 alarm_t alarm_table[_NTIMERS];
 alarm_t *pending_alarm[2];
