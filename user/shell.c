@@ -59,7 +59,7 @@ int isPrintable(int c) {
 
 void sighandler(int signum){
 	
-	printf("\nSignal received, 1 second elapsed\n Child exit \n");
+	printf("\nSignal received, 1 second elapsed\nChild exit \n");
 	sys_exit(0);
 }
 
@@ -81,8 +81,7 @@ int test_signal(int argc, char **argv){
 	}else{
 		printf("parent waiting for child %d\n",fr);
 		pid = wait(NULL);
-		printf("ok\n");
-		printf("parent awaken\n");
+		printf("parent awaken by child %d\n",pid);
 		
 	}
 	return 0;
@@ -226,7 +225,6 @@ void main() {
 	char *c;
 	struct cmd *handler = NULL;
 	
-	test_signal(0,NULL);
 	while(1) {
 		printf("WINIX> ");
 

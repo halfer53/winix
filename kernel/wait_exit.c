@@ -43,7 +43,7 @@ void do_exit(proc_t *caller, message_t *mesg){
     proc_t *parent_mp;
     int parent_pi;
 
-    kprintf("\r\n[SYSTEM] Process \"%s (%d)\" exited with code %d\r\n", caller->name, caller->proc_index, mesg->i1);
+    // kprintf("\r\n[SYSTEM] Process \"%s (%d)\" exited with code %d\r\n", caller->name, caller->proc_index, mesg->i1);
     parent_pi = caller->parent_proc_index;
     parent_mp = get_proc(parent_pi);
     

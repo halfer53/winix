@@ -6,5 +6,8 @@ Since the compiler for this project is not open source (not yet), you may not co
 
 But you can stil run the compiled code on the [Simulator](https://sourceforge.net/projects/rexsimulator/). Once the simulator is run, open up Serial Port 1, and type ```load```, then drag ```winix.srec``` on the the serial port 1. Wait for a minute until the OS is loaded, then type ```run```
 
+# TODO
+- [ ] fix bugs for sbrk() and brk() after fork()
+
 # Credits
 [Paul Monigatti](https://nz.linkedin.com/in/paulmonigatti)
