@@ -42,7 +42,8 @@ void system_main() {
 			//Gets the system uptime.
 			case SYSCALL_GETC:
 				m.i1 = kgetc();
-				winix_send(who,&m);
+				if(caller->state == RUNNABLE)
+					winix_send(who,&m);
 				break;
 
 			case SYSCALL_UPTIME:
@@ -93,6 +94,7 @@ void system_main() {
 				ptr = get_physical_addr(m.p1,caller);
 				ptr2 = get_physical_addr(m.p2,caller);
 				kprintf_vm(ptr,ptr2,caller->rbase);
+				// process_overview();
 				break;
 
 			case SYSCALL_ALARM:

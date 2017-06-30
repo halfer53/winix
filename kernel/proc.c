@@ -99,7 +99,7 @@ static proc_t *dequeue(proc_t **q) {
 }
 
 //return -1 if nothing found
-static int delete_proc(proc_t **q, proc_t *h) {
+int delete_proc(proc_t **q, proc_t *h) {
 	proc_t *curr = q[HEAD];
 	proc_t *prev = NULL;
 
@@ -114,7 +114,10 @@ static int delete_proc(proc_t **q, proc_t *h) {
 	}
 	if (curr != NULL) {
 		if (prev == NULL) {
-			q[HEAD] = q[TAIL] = NULL;
+			q[HEAD] = curr->next;
+			if(curr->next == NULL){
+				q[TAIL] = curr->next;
+			}
 		} else {
 			prev->next = curr->next;
 		}
@@ -399,13 +402,16 @@ proc_t* create_init(size_t *lines, size_t length, size_t entry) {
 void end_process(proc_t *p) {
 	int i,ret;
 	p->state = DEAD;
+	// process_overview();
 	for(i=0; i< NUM_QUEUES; i++){
-		ret = delete_proc(ready_q[i], p);
-		if(ret == 0){
-			break;
+		if(ready_q[i] != NULL){
+			ret = delete_proc(ready_q[i], p);
+			if(ret == 0){
+				break;
+			}
 		}
 	}
-	
+	// process_overview();
 	enqueue_tail(free_proc, p);
 }
 
@@ -433,29 +439,30 @@ int process_overview() {
 
 //print the process state given
 void printProceInfo(proc_t* curr) {
-	kprintf("%s %d rbase %x pc %x, sp %x, heap %x, ptable %x\r\n",
+	kprintf("%s %d rbase %x pc %x, sp %x, heap %x, pt %x next %d\r\n",
 	        curr->name,
 	        curr->proc_index,
 	        curr->rbase,
 	        curr->pc,
 	        curr->sp,
 	        curr->heap_break,
-	        curr->ptable[0]);
+	        curr->ptable[0],
+			curr->next->proc_index);
 }
 
 //return the strign value of state name give proc_state_t state
 char* getStateName(proc_state_t state) {
 	switch (state) {
-	case DEAD: return "DEAD";
-	case INITIALISING: return "INITIALISING";
-	case RUNNABLE: return "RUNNABLE";
-	case ZOMBIE: return "ZOMBIE";
-	default: return "none";
+		case DEAD: return "DEAD";
+		case INITIALISING: return "INITIALISING";
+		case RUNNABLE: return "RUNNABLE";
+		case ZOMBIE: return "ZOMBIE";
+		default: return "none";
 	}
 }
 
 proc_t *get_idle(){
-	static proc_t *idle = NULL;
+	static proc_t *idle;
 	kprintf("get idle\n");
 	if(idle == NULL){
 		idle = new_proc(idle_main, IDLE_PRIORITY, "IDLE");
@@ -496,10 +503,9 @@ void sched() {
 
 	//Get the next task
 	current_proc = pick_proc();
-	// if(debug){
-	// 	kprintf("sched ");
-	// 	printProceInfo(get_proc(1));
-	// 	debug = debug == 0 ? 0 : debug -1;
+	
+	// if(current_proc != NULL && current_proc->proc_index != 0){
+	// 	kprintf(" pick %d|",current_proc->proc_index);
 	// }
 
 	if(current_proc == NULL){

@@ -63,6 +63,8 @@ void send_signal(proc_t *who, int signum){
 			enqueue_tail(ready_q[current_proc->priority], current_proc);
 		}
     }
+    delete_proc(ready_q[who->priority],who);
+    // process_overview();
     current_proc = who;
 
     current_proc->ticks_left = current_proc->quantum;

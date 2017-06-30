@@ -145,7 +145,7 @@ unsigned long alarm(unsigned long seconds){
 	message_t m;
 	
 	m.type = SYSCALL_ALARM;
-	m.i1 = seconds * 60;
+	m.i1 = seconds;
 	response = winix_send(SYSTEM_TASK,&m);
 	return 0;
 }

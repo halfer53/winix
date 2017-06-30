@@ -25,6 +25,7 @@ int exit(int argc, char **argv);
 int testmalloc(int argc, char **argv);
 int test_signal(int argc, char **argv);
 int test_fiber(int argc, char **argv);
+int test_alarm(int argc, char **argv);
 int generic(int argc, char **argv);
 
 //Input buffer & tokeniser
@@ -46,6 +47,7 @@ struct cmd commands[] = {
 	{ "testmalloc", testmalloc},
 	{ "testsignal", test_signal},
 	{ "testfiber", test_fiber},
+	{ "testalarm", test_alarm},
 	{ NULL, generic }
 };
 //TODO: ps/uptime/shutdown should be moved to separate programs.
@@ -55,6 +57,15 @@ struct cmd commands[] = {
  **/
 int isPrintable(int c) {
 	return ('!' <= c && c <= '~');
+}
+
+void alarm_handler(int signum){
+	printf("\nalarm timer received\n");
+	printf("WINIX>%s",buf);
+}
+
+int test_alarm(int argc, char **argv){
+	alarm(2);
 }
 
 void sighandler(int signum){
@@ -69,7 +80,6 @@ int test_signal(int argc, char **argv){
 	pid_t fr;
 
 	if((fr = fork()) == 0){
-
 		signal(SIGALRM,sighandler);
 		alarm(1);
 		i = 10000;
@@ -82,7 +92,6 @@ int test_signal(int argc, char **argv){
 		printf("parent waiting for child %d\n",fr);
 		pid = wait(NULL);
 		printf("parent awaken by child %d\n",pid);
-		
 	}
 	return 0;
 }
@@ -225,6 +234,7 @@ void main() {
 	char *c;
 	struct cmd *handler = NULL;
 	
+	test_alarm(0,NULL);
 	while(1) {
 		printf("WINIX> ");
 
