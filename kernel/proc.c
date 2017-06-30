@@ -99,7 +99,7 @@ static proc_t *dequeue(proc_t **q) {
 }
 
 //return -1 if nothing found
-static int delete(proc_t **q, proc_t *h) {
+static int delete_proc(proc_t **q, proc_t *h) {
 	proc_t *curr = q[HEAD];
 	proc_t *prev = NULL;
 
@@ -214,7 +214,7 @@ proc_t* do_fork(proc_t *original) {
 	int len = 0;
 	int nstart = 0;
 	int pbak,index,j;
-	message_t *mbak;
+	unsigned long *sp;
 	uint32_t *src, *dest;
 	pattern_t ptn;
 
@@ -226,11 +226,8 @@ proc_t* do_fork(proc_t *original) {
 
 	if (p = get_free_proc()) {
 		pbak = p->proc_index;
-		mbak = p->message;
 		*p = *original;
 		p->proc_index = pbak;
-		p->message = mbak;
-
 		p->ptable = p->protection_table;
 
 		if(extract_pattern(p->ptable, MEM_MAP_LEN, (int)p->heap_break, &ptn) != 0){
@@ -245,6 +242,9 @@ proc_t* do_fork(proc_t *original) {
 
 		ptr_base = (void *)(index * 1024);
 		p->rbase = ptr_base;
+
+		sp = (size_t *)((size_t)(original->sp) + (size_t)(original->rbase));
+		p->message = (message_t *)(*(sp+ 2) + (size_t)p->rbase);
 
 		for( src = (uint32_t *)original->rbase, dest = (uint32_t *)p->rbase, j=0; j < ptn.size ; src+=1024,dest+=1024, j++){
 			if((0x80000000 >> j) & ptn.pattern){
@@ -397,8 +397,15 @@ proc_t* create_init(size_t *lines, size_t length, size_t entry) {
  *   Process state is set to DEAD, and is returned to the free_proc list.
  **/
 void end_process(proc_t *p) {
-
+	int i,ret;
 	p->state = DEAD;
+	for(i=0; i< NUM_QUEUES; i++){
+		ret = delete_proc(ready_q[i], p);
+		if(ret == 0){
+			break;
+		}
+	}
+	
 	enqueue_tail(free_proc, p);
 }
 
@@ -447,6 +454,15 @@ char* getStateName(proc_state_t state) {
 	}
 }
 
+proc_t *get_idle(){
+	static proc_t *idle = NULL;
+	kprintf("get idle\n");
+	if(idle == NULL){
+		idle = new_proc(idle_main, IDLE_PRIORITY, "IDLE");
+	}
+	return idle;
+}
+
 
 /**
  * The Scheduler.
@@ -486,7 +502,10 @@ void sched() {
 	// 	debug = debug == 0 ? 0 : debug -1;
 	// }
 
-	assert(current_proc != NULL, "sched: current_proc null");
+	if(current_proc == NULL){
+		current_proc = get_idle();
+	}
+	
 	//Reset quantum if needed
 	if (current_proc->ticks_left <= 0) {
 		current_proc->ticks_left = current_proc->quantum;
@@ -542,8 +561,8 @@ int wini_send(int dest, message_t *m) {
 			//Unblock receiver
 			pDest->flags &= ~RECEIVING;
 			enqueue_head(ready_q[pDest->priority], pDest);
-			// if (debug)
-			// 	kprintf("$at send %d enqueued curr %d type %d | ", dest, current_proc->proc_index, m->type );
+			// if(pDest->proc_index == 0)
+				// kprintf(" | send t %d %x| ",m->type,m);
 		}
 
 		else {
@@ -551,8 +570,7 @@ int wini_send(int dest, message_t *m) {
 			current_proc->flags |= SENDING;
 			current_proc->next_sender = pDest->sender_q;
 			pDest->sender_q = current_proc;
-			// if (debug)
-			// 	kprintf("$at send dest %d sender_q set curr %d type %d | ", dest, current_proc->proc_index, m->type);
+			// kprintf(" | send t %d nexts %d senderh %d| ",m->type,current_proc->next_sender->proc_index,current_proc->sender_q->proc_index);
 		}
 
 		return 0;

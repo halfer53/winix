@@ -81,7 +81,9 @@ int test_signal(int argc, char **argv){
 	}else{
 		printf("parent waiting for child %d\n",fr);
 		pid = wait(NULL);
+		printf("ok\n");
 		printf("parent awaken\n");
+		
 	}
 	return 0;
 }
@@ -223,7 +225,8 @@ void main() {
 	int argc;
 	char *c;
 	struct cmd *handler = NULL;
-
+	
+	test_signal(0,NULL);
 	while(1) {
 		printf("WINIX> ");
 

@@ -113,10 +113,6 @@ void main() {
 
 	//Idle Task
 
-	p = new_proc(idle_main, IDLE_PRIORITY, "IDLE");
-	assert(p != NULL, "Create idle task");
-
-
 	p = exec_new_proc(init_code,2,0, USER_PRIORITY,"init");
 	p->quantum = 1;
 
