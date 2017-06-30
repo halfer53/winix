@@ -140,6 +140,17 @@ void add_to_scheduling_queue(proc_t* p) {
 	enqueue_tail(ready_q[p->priority], p);
 }
 
+
+proc_t *get_idle(){
+	static proc_t *idle;
+	kprintf("get idle\n");
+	if(idle == NULL){
+		idle = new_proc(idle_main, IDLE_PRIORITY, "IDLE");
+	}
+	return idle;
+}
+
+
 proc_t *get_free_proc() {
 	int i;
 	proc_t *p = dequeue(free_proc);
@@ -208,7 +219,7 @@ proc_t *pick_proc() {
 		}
 	}
 
-	return NULL;
+	return get_idle();
 }
 
 /**
@@ -448,7 +459,7 @@ int process_overview() {
 
 //print the process state given
 void printProceInfo(proc_t* curr) {
-	kprintf("%s %d rbase %x pc %x, sp %x, heap %x, pt %x flag %x\r\n",
+	kprintf("%s %d rbase %x pc %x, sp %x, heap %x, pt %x pri %d\r\n",
 	        curr->name,
 	        curr->proc_index,
 	        curr->rbase,
@@ -456,7 +467,7 @@ void printProceInfo(proc_t* curr) {
 	        curr->sp,
 	        curr->heap_break,
 	        curr->ptable[0],
-			curr->flags);
+			curr->priority);
 }
 
 //return the strign value of state name give proc_state_t state
@@ -468,15 +479,6 @@ char* getStateName(proc_state_t state) {
 		case ZOMBIE: return "ZOMBIE";
 		default: return "none";
 	}
-}
-
-proc_t *get_idle(){
-	static proc_t *idle;
-	kprintf("get idle\n");
-	if(idle == NULL){
-		idle = new_proc(idle_main, IDLE_PRIORITY, "IDLE");
-	}
-	return idle;
 }
 
 
@@ -496,10 +498,19 @@ void sched() {
 
 	proc_t *curr = ready_q[3][HEAD];
 	int nextpick = 0;
-	int count = 0;
+	static int count = 0;
+
+	if(current_proc->exit_status == 1234){
+		count = 10;
+		printProceInfo(current_proc);
+	}
+
+	if(count && current_proc->proc_index == 2)
+		kprintf("pri %d %d %d|",current_proc->priority,current_proc->ticks_left,current_proc->flags);
+
+	
 	if (current_proc != NULL && !current_proc->flags) {
 		//Accounting
-
 		current_proc->time_used++;
 
 		if (--current_proc->ticks_left) {
@@ -507,18 +518,23 @@ void sched() {
 		}
 		else { //Re-insert process at the tail of its priority queue
 			enqueue_tail(ready_q[current_proc->priority], current_proc);
+			if(count)
+				kprintf("enqueue tail");
+		}
+	}
+	if(current_proc->proc_index == 2){
+		if(ready_q[0][HEAD] != NULL){
+			kprintf("TOP %d|",ready_q[0][HEAD]->proc_index);
+		}else{
+			kprintf("NO |");
 		}
 	}
 
-	//Get the next task
 	current_proc = pick_proc();
-	
-	// if(current_proc != NULL && current_proc->proc_index != 0){
-	// 	kprintf(" pick %d|",current_proc->proc_index);
-	// }
 
-	if(current_proc == NULL){
-		current_proc = get_idle();
+	if(count--){
+		current_proc->exit_status = 0;
+		kprintf("pick %d|",current_proc->proc_index);
 	}
 	
 	//Reset quantum if needed
@@ -659,7 +675,7 @@ int wini_notify(int dest, message_t *m) {
 			//do not deliver the message, but add it to the scheduling queue
 		} else {
 			//TODO
-			// enqueue_tail(ready_q[current_proc->priority], current_proc);
+			enqueue_tail(ready_q[current_proc->priority], current_proc);
 		}
 
 		//do nothing if it's not waiting

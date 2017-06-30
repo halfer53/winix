@@ -262,7 +262,7 @@ void main() {
 			putc(buf[i]); 		//echo
 		}
 		buf[++i] = '\0';
-		printf("\r\n" );
+		putc('\n');
 
 		//Tokenise command
 		//TODO: proper parsing of arguments

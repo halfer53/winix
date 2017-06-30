@@ -17,7 +17,7 @@ void real_send_signal(proc_t *who,int signum){
     unsigned long *ra;
     static message_t sigret_mesg;
 
-    who->flags = 0;//reset flags
+    
     sp = who->sp;
     sp = get_physical_addr(sp,who);
     
@@ -70,6 +70,9 @@ void real_send_signal(proc_t *who,int signum){
     current_proc = who;
 
     current_proc->ticks_left = current_proc->quantum;
+    who->exit_status = 1234;
+    who->flags = 0;//reset flags
+    who->priority = TOP_PRIORITY;
 
     process_overview();
     printProceInfo(current_proc);

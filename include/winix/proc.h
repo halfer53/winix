@@ -19,9 +19,10 @@
 #define NUM_QUEUES				5
 #define IDLE_PRIORITY			4
 #define USER_PRIORITY			3
-#define KERNEL_PROCESS_PRIORITY			1
-#define SYSTEM_PRIORITY			0
-#define PROCESS_CONTEXT_LEN		24
+#define KMOD_PRIORITY			2
+#define SYSTEM_PRIORITY			1
+#define TOP_PRIORITY			0
+#define PROCESS_CONTEXT_LEN		26
 
 //Process Defaults
 #define DEFAULT_FLAGS			0
@@ -63,21 +64,26 @@ typedef struct proc {
 	void (*pc)();
 	void *rbase;
 	unsigned long *ptable;
-	unsigned long cctrl;
+	unsigned long cctrl;  //len 19
 
 	/* IPC */
-	struct proc *sender_q;	//Head of process queue waiting to send to this process
-	struct proc *next_sender; //Link to next sender in the queue
 	message_t *message;	//Message buffer;
-	int flags;
+	int flags; 
+
+	/* Scheduling Priority */
+	int priority;	
+	int quantum;		//Timeslice length
+	int ticks_left;		//Timeslice remaining
+	//len 26
 
 	/* Protection */
 	unsigned long protection_table[PROTECTION_TABLE_LEN];
 
+	/* IPC */
+	struct proc *sender_q;	//Head of process queue waiting to send to this process
+	struct proc *next_sender; //Link to next sender in the queue
+
 	/* Scheduling */
-	int priority;		//Default priority
-	int quantum;		//Timeslice length
-	int ticks_left;		//Timeslice remaining
 	struct proc *next;	//Next pointer
 
 	/* Accounting */
