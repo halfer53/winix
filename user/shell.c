@@ -60,12 +60,16 @@ int isPrintable(int c) {
 }
 
 void alarm_handler(int signum){
+	int *ni = 0;
+	*ni = 0x123456;
 	printf("\nalarm timer received\n");
 	printf("WINIX>%s",buf);
 }
 
 int test_alarm(int argc, char **argv){
-	alarm(2);
+	signal(SIGALRM,alarm_handler);
+	alarm(1);
+	return 0;
 }
 
 void sighandler(int signum){
@@ -234,6 +238,7 @@ void main() {
 	char *c;
 	struct cmd *handler = NULL;
 	
+	// alarm_handler(0);
 	test_alarm(0,NULL);
 	while(1) {
 		printf("WINIX> ");

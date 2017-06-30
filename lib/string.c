@@ -72,6 +72,19 @@ char *strcat(char *dest, const char *src) {
 	return dest;
 }
 
+
+void *memset(void *dst, int c, size_t n)
+{
+    if (n) {
+         char *d = dst;
+ 
+         do {
+             *d++ = c;
+         } while (--n);
+     }
+     return dst;
+}
+
 /**
  * return the length of substring of the original string, starting at start_index, and has specified length
  **/

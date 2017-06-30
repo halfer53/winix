@@ -33,6 +33,14 @@ size_t FREE_MEM_BEGIN = 0;
 size_t FREE_MEM_END = 0;
 
 
+
+size_t sizeof_proc_t() {
+	hole_t arr[2];
+	int size = (char*)&arr[1] - (char*)&arr[0];
+	return size;
+}
+
+
 /**
  * Adds a proc to the tail of a list.
  *
@@ -158,7 +166,6 @@ void proc_set_default(proc_t *p) {
 	p->ptable = DEFAULT_PTABLE;
 	p->cctrl = DEFAULT_CCTRL;
 
-	p->priority = 0;
 	p->quantum = DEFAULT_QUANTUM;
 	p->ticks_left = 0;
 	p->time_used = 0;
@@ -176,6 +183,8 @@ void proc_set_default(proc_t *p) {
 
 	p->ptable = p->protection_table;
 	bitmap_clear(p->ptable, PROTECTION_TABLE_LEN);
+
+	memset(p->sig_table,0,_NSIG * 3); //3: sizeof struct sigaction
 }
 
 
@@ -439,7 +448,7 @@ int process_overview() {
 
 //print the process state given
 void printProceInfo(proc_t* curr) {
-	kprintf("%s %d rbase %x pc %x, sp %x, heap %x, pt %x next %d\r\n",
+	kprintf("%s %d rbase %x pc %x, sp %x, heap %x, pt %x flag %x\r\n",
 	        curr->name,
 	        curr->proc_index,
 	        curr->rbase,
@@ -447,7 +456,7 @@ void printProceInfo(proc_t* curr) {
 	        curr->sp,
 	        curr->heap_break,
 	        curr->ptable[0],
-			curr->next->proc_index);
+			curr->flags);
 }
 
 //return the strign value of state name give proc_state_t state
@@ -694,8 +703,3 @@ void init_proc() {
 	current_proc = NULL;
 }
 
-int sizeof_proc_t() {
-	hole_t arr[2];
-	int size = (char*)&arr[1] - (char*)&arr[0];
-	return size;
-}

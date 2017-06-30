@@ -11,11 +11,13 @@ void set_signal(proc_t *caller, int signum, sighandler_t handler){
     caller->sig_table[signum].sa_handler = handler;
 }
 
-void send_signal(proc_t *who, int signum){
+
+void real_send_signal(proc_t *who,int signum){
     unsigned long *sp;
     unsigned long *ra;
     static message_t sigret_mesg;
 
+    who->flags = 0;//reset flags
     sp = who->sp;
     sp = get_physical_addr(sp,who);
     
@@ -68,7 +70,19 @@ void send_signal(proc_t *who, int signum){
     current_proc = who;
 
     current_proc->ticks_left = current_proc->quantum;
+
+    process_overview();
+    printProceInfo(current_proc);
     wramp_load_context();
+}
+
+void send_signal(proc_t *who, int signum){
+    if(who->sig_table[signum].sa_handler == SIG_DFL){
+        kprintf("Taking Default Action: kill %s [%d]",who->name,who->proc_index);
+        end_process(who);
+        return;
+    }
+    real_send_signal(who,signum);
 }
 
 

@@ -50,13 +50,9 @@ static proc_t *exec_proc(proc_t *p,size_t *lines, size_t length, size_t entry, i
 		len = physical_len_to_page_len(overall_length);
 		nstart = bitmap_search(mem_map,MEM_MAP_LEN,len);
 
-		kprintf("%d nstart %d mem %x\n",len,nstart, mem_map[0]);
-
 		bitmap_clear(p->ptable,PROTECTION_TABLE_LEN);
 		bitmap_set_nbits(p->ptable,PROTECTION_TABLE_LEN, nstart,len);
 		bitmap_set_nbits(mem_map,MEM_MAP_LEN, nstart,len);
-
-		kprintf("after %d nstart %d mem %x ptable %x\n",len,nstart, mem_map[0], p->ptable[0]);
 
 		// kprintf("%x start %d len %d\n",mem_map[0],nstart,len);
 
