@@ -16,6 +16,9 @@ proc_t proc_table[NUM_PROCS];
 //Scheduling queues
 proc_t *ready_q[NUM_QUEUES][2];
 
+//blocking queues
+proc_t *block_q[2];
+
 //Entries in the process table that are not in use
 static proc_t *free_proc[2];
 
@@ -246,10 +249,11 @@ proc_t* do_fork(proc_t *original) {
 			}
 		}
 		p->parent_proc_index = original->proc_index;
+		p->state = RUNNABLE;
 	}
-	// process_overview();
-	// printProceInfo(original);
-	// printProceInfo(p);
+	process_overview();
+	printProceInfo(original);
+	printProceInfo(p);
 	assert(p != NULL, "Fork");
 	return p;
 }
@@ -419,11 +423,10 @@ int process_overview() {
 
 //print the process state given
 void printProceInfo(proc_t* curr) {
-	kprintf("%s %d rbase %x cctrl %x pc %x, sp %x, heap %x, ptable %x\r\n",
+	kprintf("%s %d rbase %x pc %x, sp %x, heap %x, ptable %x\r\n",
 	        curr->name,
 	        curr->proc_index,
 	        curr->rbase,
-	        curr->cctrl,
 	        curr->pc,
 	        curr->sp,
 	        curr->heap_break,

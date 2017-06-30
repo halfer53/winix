@@ -1,4 +1,6 @@
 objs = winix/*.o kernel/*.o lib/ipc.o lib/string.o lib/util.o lib/wramp_syscall.o
+REFORMAT = tools/reformat_srec
+GEN_BIN = tools/gen_bin_code
 
 all:
 	$(MAKE) -C lib
@@ -12,7 +14,7 @@ clean:
 	$(MAKE) -C lib clean
 	$(MAKE) -C user clean
 	$(MAKE) -C winix clean
-	rm winix.srec
+	-rm -f winix.srec
 
 stat:
 	@echo "C Lines: "
@@ -23,25 +25,20 @@ stat:
 	@find . -name "*.s" -exec cat {} \; | wc -l
 
 shell:
+	$(MAKE) clean
 	$(MAKE) -C lib
-	cp user/shell.c .
-	wcc -S shell.c
+	wcc -S user/shell.c
 	wasm shell.s
 	wlink -o shell.srec shell.o lib/*.o
+	[ ! -f reformat_srec.class ] && javac tools/reformat_srec.java || :
 	java reformat_srec shell.srec
-	rm shell.c
-	rm shell.o
-	rm shell.s
-	gcc gen_bin_code.c -o gen_bin_code
+	[ ! -f gen_bin_code ] && gcc tools/gen_bin_code.c || :
 	./gen_bin_code shell.srec > include/shell_codes.c
-	rm shell.srec
 	$(MAKE) all
 
 test:
-	wcc -S test.c
-	wasm test.s
-	wlink -o test.srec test.o lib/stdio.o lib/ucontext.o
-	rm test.o
-	rm test.s
+	test -f myApp && echo File does exist
 
 .DELETE_ON_ERROR:
+
+

@@ -62,7 +62,6 @@ static proc_t *exec_proc(proc_t *p,size_t *lines, size_t length, size_t entry, i
 
 		ptr_base = (void *)(nstart * 1024);
 		p->heap_break = (int *)ptr_base + length + DEFAULT_STACK_SIZE;
-		assert(ptr_base != NULL,"memory is full\n");
 		memcpy(ptr_base, lines,length_bak);
 
 		p->sp = (size_t *)(length + DEFAULT_STACK_SIZE-1); 

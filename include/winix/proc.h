@@ -42,7 +42,7 @@
 //Process Flags
 #define SENDING					0x0001
 #define RECEIVING				0x0002
-#define REJECT				0x0003
+#define WAITING					0x0004
 
 /**
  * State of a process.
@@ -93,6 +93,7 @@ typedef struct proc {
 	unsigned long length;
 
 	int parent_proc_index;
+	int exit_status;
 
 	void *heap_break;
 
@@ -101,8 +102,9 @@ typedef struct proc {
 
 extern proc_t proc_table[NUM_PROCS];
 extern proc_t *ready_q[NUM_QUEUES][2];
-// void enqueue_tail(proc_t **q, proc_t *proc);
-//  void enqueue_head(proc_t **q, proc_t *proc);
+extern proc_t *block_q[2];
+void enqueue_tail(proc_t **q, proc_t *proc);
+ void enqueue_head(proc_t **q, proc_t *proc);
 /**
  * Initialises the process table and scheduling queues.
  **/

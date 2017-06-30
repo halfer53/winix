@@ -52,9 +52,7 @@ void system_main() {
 
 			//Exits the current process.
 			case SYSCALL_EXIT:
-				kprintf("\r\n[SYSTEM] Process \"%s (%d)\" exited with code %d\r\n", caller->name, caller->proc_index, m.i1);
-				//TODO: keep process in zombie state until parent calls wait, so the exit value can be retrieved
-				end_process(caller);
+				do_exit(caller,&m);
 				break;
 
 			case SYSCALL_PS:
@@ -62,7 +60,6 @@ void system_main() {
 				break;
 
 			case SYSCALL_FORK:
-				//fork the calling process
 				pcurr = do_fork(caller);
 				m.i1 = pcurr->proc_index;
 				winix_send(who, &m);
@@ -108,6 +105,15 @@ void system_main() {
 				
 			case SYSCALL_SIGRET:
 				do_sigreturn(caller,m.i1);
+				break;
+			
+			case SYSCALL_WAIT:
+				do_wait(caller,&m);
+				break;
+
+			case SYSCALL_GETPID:
+				m.i1 = who;
+				winix_send(who,&m);
 				break;
 			
 			default:

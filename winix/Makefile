@@ -17,6 +17,6 @@ depend:
 	makedepend $(sources)
 
 clean:
-	-rm $(compile) $(assemble)
+	-rm -f $(compile) $(assemble)
 
 .DELETE_ON_ERROR:

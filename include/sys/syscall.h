@@ -17,20 +17,23 @@
 #define SYSCALL_EXIT		3
 #define SYSCALL_PS			4
 #define SYSCALL_FORK		5
-#define SYSCALL_EXEC		6
-#define SYSCALL_SBRK    	7
-#define SYSCALL_BRK    		8
-#define SYSCALL_PUTC    	9
-#define SYSCALL_PRINTF    	10
-#define SYSCALL_LOAD_SREC	11
-#define SYSCALL_CREATE		12
-#define SYSCALL_OPEN		13
-#define SYSCALL_READ		14
-#define SYSCALL_WRITE		15
-#define SYSCALL_CLOSE		16
-#define SYSCALL_ALARM       17
-#define SYSCALL_SIGNAL		18
-#define SYSCALL_SIGRET      19
+#define SYSCALL_VFORK		6
+#define SYSCALL_EXEC		7
+#define SYSCALL_SBRK    	8
+#define SYSCALL_BRK    		9
+#define SYSCALL_PUTC    	10
+#define SYSCALL_PRINTF    	11
+#define SYSCALL_LOAD_SREC	12
+#define SYSCALL_CREATE		13
+#define SYSCALL_OPEN		14
+#define SYSCALL_READ		15
+#define SYSCALL_WRITE		16
+#define SYSCALL_CLOSE		17
+#define SYSCALL_ALARM       18
+#define SYSCALL_SIGNAL		19
+#define SYSCALL_SIGRET      20
+#define SYSCALL_WAIT        21
+#define SYSCALL_GETPID      22
 
 //TODO: create a sensible allocation scheme for system call numbers
 

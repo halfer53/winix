@@ -53,7 +53,6 @@ int fork(){
 
 	m.type = SYSCALL_FORK;
 	response = winix_sendrec(SYSTEM_TASK, &m); //TODO: error checking
-	response = m.i1;
 	return m.i1;
 }
 
@@ -149,4 +148,23 @@ unsigned long alarm(unsigned long seconds){
 	m.i1 = seconds * 60;
 	response = winix_send(SYSTEM_TASK,&m);
 	return 0;
+}
+
+pid_t wait(int *wstatus){
+	int response = 0;
+	message_t m;
+	
+	m.type = SYSCALL_WAIT;
+	m.p1 = wstatus;
+	response = winix_sendrec(SYSTEM_TASK,&m);
+	return (pid_t)m.i1;
+}
+
+pid_t getpid(){
+	int response = 0;
+	message_t m;
+	
+	m.type = SYSCALL_GETPID;
+	response = winix_sendrec(SYSTEM_TASK,&m);
+	return (pid_t)m.i1;
 }
