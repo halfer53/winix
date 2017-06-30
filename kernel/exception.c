@@ -160,14 +160,9 @@ static void syscall_handler() {
 	//cast two variables to to size_t to allow addition of two pointer, and then cast back to pointer
 	sp = (size_t *)((size_t)(current_proc->sp) + (size_t)(current_proc->rbase));
 
-	//printProceInfo(current_proc);
-	if (((size_t)current_proc->rbase) != 0) {
-		*(sp+2) += (size_t)current_proc->rbase;
-	}
-
 	operation = *(sp);				//Operation is the first parameter on the stack
 	dest = *(sp+1);				//Destination is second parameter on the stack
-	m = *(message_t **)(sp+ 2);	//Message pointer is the third parameter on the stack
+	m = (message_t *)(*(sp+ 2) + (size_t)current_proc->rbase);	//Message pointer is the third parameter on the stack
 	m->src = current_proc->proc_index;			//Don't trust the caller to specify their own source process number
 
 	retval = (int*)&current_proc->regs[0];		//Result is returned in register $1

@@ -21,7 +21,7 @@
 #define USER_PRIORITY			3
 #define KERNEL_PROCESS_PRIORITY			1
 #define SYSTEM_PRIORITY			0
-#define PROCESS_STATE_LEN		18
+#define PROCESS_CONTEXT_LEN		23
 
 //Process Defaults
 #define DEFAULT_FLAGS			0
@@ -65,6 +65,11 @@ typedef struct proc {
 	unsigned long *ptable;
 	unsigned long cctrl;
 
+	/* IPC */
+	struct proc *sender_q;	//Head of process queue waiting to send to this process
+	struct proc *next_sender; //Link to next sender in the queue
+	message_t *message;	//Message buffer;
+
 	/* Protection */
 	unsigned long protection_table[PROTECTION_TABLE_LEN];
 
@@ -73,11 +78,6 @@ typedef struct proc {
 	int quantum;		//Timeslice length
 	int ticks_left;		//Timeslice remaining
 	struct proc *next;	//Next pointer
-
-	/* IPC */
-	struct proc *sender_q;	//Head of process queue waiting to send to this process
-	struct proc *next_sender; //Link to next sender in the queue
-	message_t *message;	//Message buffer;
 
 	/* Accounting */
 	int time_used;		//CPU time used

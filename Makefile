@@ -32,7 +32,7 @@ shell:
 	wlink -o shell.srec shell.o lib/*.o
 	[ ! -f reformat_srec.class ] && javac tools/reformat_srec.java || :
 	java reformat_srec shell.srec
-	[ ! -f gen_bin_code ] && gcc tools/gen_bin_code.c || :
+	[ ! -f gen_bin_code ] && gcc tools/gen_bin_code.c -o gen_bin_code || :
 	./gen_bin_code shell.srec > include/shell_codes.c
 	$(MAKE) all
 

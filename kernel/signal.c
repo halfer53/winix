@@ -21,8 +21,8 @@ void send_signal(proc_t *who, int signum){
     
     //restoring the context after sigreturn
     //space for saving the old context
-    sp -= PROCESS_STATE_LEN;
-    memcpy(sp,who,PROCESS_STATE_LEN );
+    sp -= PROCESS_CONTEXT_LEN;
+    memcpy(sp,who,PROCESS_CONTEXT_LEN );
 
     //assembly code for invoking sigreturn
     sp -= SIGFRAME_CODE_LEN;
@@ -80,5 +80,5 @@ void do_sigreturn(proc_t *who,int signum){
     sp += MESSAGE_LEN + 3 +SIGFRAME_CODE_LEN;
     // kprintf("sig sp %x\n",sp);
 
-    memcpy(who,sp,PROCESS_STATE_LEN);
+    memcpy(who,sp,PROCESS_CONTEXT_LEN);
 }

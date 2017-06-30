@@ -47,13 +47,13 @@ int sys_process_overview(){
 	return 0;
 }
 
-int fork(){
+pid_t fork(){
 	int response = 0;
 	message_t m;
 
 	m.type = SYSCALL_FORK;
 	response = winix_sendrec(SYSTEM_TASK, &m); //TODO: error checking
-	return m.i1;
+	return (pid_t)m.i1;
 }
 
 

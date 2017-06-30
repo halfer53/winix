@@ -59,7 +59,7 @@ int isPrintable(int c) {
 
 void sighandler(int signum){
 	
-	printf("\nSignal received, 5 second elapsed\n");
+	printf("\nSignal received, 1 second elapsed\n Child exit \n");
 	sys_exit(0);
 }
 
@@ -69,24 +69,18 @@ int test_signal(int argc, char **argv){
 	pid_t fr;
 
 	if((fr = fork()) == 0){
-		printf("child %d\n",fr);
-		pid = getpid();
-		printf("child executing %d\n",pid);
+
 		signal(SIGALRM,sighandler);
-		alarm(5);
+		alarm(1);
 		i = 10000;
 		while(1){
-			while(i--){
-				
-			}
+			while(i--);
 			putc('!');
 			i = 10000;
 		}
 	}else{
-		printf("parent child pid %d\n",fr);
-		pid = getpid();
-		printf("parent waiting %d\n",pid);
-		wait(NULL);
+		printf("parent waiting for child %d\n",fr);
+		pid = wait(NULL);
 		printf("parent awaken\n");
 	}
 	return 0;

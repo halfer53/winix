@@ -50,6 +50,7 @@ void do_exit(proc_t *caller, message_t *mesg){
     //if parent is waiting
     if(parent_pi != 0 && parent_mp && parent_mp->flags & WAITING){
         //TODO parse i1 in proper format
+        mesg->i1 = caller->proc_index;
         end_process(caller);
         parent_mp->flags &= ~WAITING;
         winix_send(parent_pi,mesg);

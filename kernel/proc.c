@@ -214,6 +214,7 @@ proc_t* do_fork(proc_t *original) {
 	int len = 0;
 	int nstart = 0;
 	int pbak,index,j;
+	message_t *mbak;
 	uint32_t *src, *dest;
 	pattern_t ptn;
 
@@ -225,8 +226,10 @@ proc_t* do_fork(proc_t *original) {
 
 	if (p = get_free_proc()) {
 		pbak = p->proc_index;
+		mbak = p->message;
 		*p = *original;
 		p->proc_index = pbak;
+		p->message = mbak;
 
 		p->ptable = p->protection_table;
 
@@ -251,9 +254,9 @@ proc_t* do_fork(proc_t *original) {
 		p->parent_proc_index = original->proc_index;
 		p->state = RUNNABLE;
 	}
-	process_overview();
-	printProceInfo(original);
-	printProceInfo(p);
+	// process_overview();
+	// printProceInfo(original);
+	// printProceInfo(p);
 	assert(p != NULL, "Fork");
 	return p;
 }
