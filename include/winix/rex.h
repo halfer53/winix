@@ -6,8 +6,8 @@
  *  2016-11-20		Bruce Tan			Modified
  **/
  
-#ifndef _REX_H_
-#define _REX_H_
+#ifndef _W_REX_H_
+#define _W_REX_H_
 
 /**
  * REX Serial Ports

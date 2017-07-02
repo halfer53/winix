@@ -9,6 +9,7 @@ But you can stil run the compiled code on the [Simulator](https://sourceforge.ne
 # TODO
 - [ ] fix bugs for sbrk() and brk() after fork()
 - [ ] sigreturn() is blocked by previous getc()
+- [ ] release memory after end_process()
 
 # Credits
 [Paul Monigatti](https://nz.linkedin.com/in/paulmonigatti)

@@ -1,5 +1,5 @@
-#ifndef	_K_MEM_MAP_H_
-#define _K_MEM_MAP_H_
+#ifndef	_W_MEM_MAP_H_
+#define _W_MEM_MAP_H_
 
 void *get_free_pages(int num);
 void free_page(void* ptr);

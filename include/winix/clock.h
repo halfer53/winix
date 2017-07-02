@@ -1,5 +1,5 @@
-#ifndef _TIMERS_H_
-#define _TIMERS_H_
+#ifndef _W_CLOCK_H_
+#define _W_CLOCK_H_
 
 #define _NTIMERS	10
 

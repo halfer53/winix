@@ -6,8 +6,8 @@
  *  2016-11-20		Bruce Tan			Modified
  **/
 
-#ifndef _PROC_H_
-#define _PROC_H_
+#ifndef _W_PROC_H_
+#define _W_PROC_H_
 
 #include <signal.h>
 #include <winix/kwramp.h>
@@ -22,7 +22,9 @@
 #define KMOD_PRIORITY			2
 #define SYSTEM_PRIORITY			1
 #define TOP_PRIORITY			0
-#define PROCESS_CONTEXT_LEN		26
+
+//Signal Context
+#define PROCESS_CONTEXT_LEN		21
 
 //Process Defaults
 #define DEFAULT_FLAGS			0

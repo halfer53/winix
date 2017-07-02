@@ -1,5 +1,5 @@
-#ifndef _MESSAGE_QUEUE_H_
-#define _MESSAGE_QUEUE_H_
+#ifndef _W_MESSAGE_QUEUE_H_
+#define _W_MESSAGE_QUEUE_H_
 
 #include <sys/ipc.h>
 

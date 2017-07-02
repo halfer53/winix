@@ -1,4 +1,3 @@
-
 #include "winix.h"
 
 alarm_t alarm_table[_NTIMERS];

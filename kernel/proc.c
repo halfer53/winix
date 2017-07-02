@@ -500,15 +500,6 @@ void sched() {
 	int nextpick = 0;
 	static int count = 0;
 
-	if(current_proc->exit_status == 1234){
-		count = 10;
-		printProceInfo(current_proc);
-	}
-
-	if(count && current_proc->proc_index == 2)
-		kprintf("pri %d %d %d|",current_proc->priority,current_proc->ticks_left,current_proc->flags);
-
-	
 	if (current_proc != NULL && !current_proc->flags) {
 		//Accounting
 		current_proc->time_used++;
@@ -518,24 +509,10 @@ void sched() {
 		}
 		else { //Re-insert process at the tail of its priority queue
 			enqueue_tail(ready_q[current_proc->priority], current_proc);
-			if(count)
-				kprintf("enqueue tail");
-		}
-	}
-	if(current_proc->proc_index == 2){
-		if(ready_q[0][HEAD] != NULL){
-			kprintf("TOP %d|",ready_q[0][HEAD]->proc_index);
-		}else{
-			kprintf("NO |");
 		}
 	}
 
 	current_proc = pick_proc();
-
-	if(count--){
-		current_proc->exit_status = 0;
-		kprintf("pick %d|",current_proc->proc_index);
-	}
 	
 	//Reset quantum if needed
 	if (current_proc->ticks_left <= 0) {

@@ -57,15 +57,15 @@ void testkmalloc(){
 	  void *p7 = kmalloc(1024);
 	  void *p8 = kmalloc(512);
 	  void *p9 = kmalloc(1024);
-	  block_overview();
+	  kblock_overview();
 	  kfree(p5);
 	  kfree(p6);
 	  kfree(p2);
 	  kfree(p8);
-	  block_overview();
+	  kblock_overview();
 	  p0 = krealloc(p0,900);
 	  p9 = krealloc(p9,3000);
-	  block_overview();
+	  kblock_overview();
 }
 
 /**
@@ -97,7 +97,6 @@ void main() {
 	//scan memory, initialise FREE_MEM_BEGIN
 	Scan_FREE_MEM_BEGIN();
 
-	init_holes();
 	init_bitmap();
 	init_alarm();
 	init_mem_table(FREE_MEM_BEGIN);
@@ -111,38 +110,20 @@ void main() {
 	assert(p != NULL, "Create sys task");
 	p->quantum = 64;
 
-	//Idle Task
-
 	p = exec_new_proc(init_code,2,0, USER_PRIORITY,"init");
 	p->quantum = 1;
-
-	// pid = fork_proc(p);
-	// p = do_fork(p);
-
-	// p = new_proc(shell_main, USER_PRIORITY, "Shell");
-	// assert(p != NULL, "Create Shell task");
-	// p->quantum = 4;
 
 	p = exec_new_proc(shell_code,shell_code_length,shell_pc, USER_PRIORITY,"Shell");
 	assert(p != NULL, "Create Shell task");
 	p->quantum = 2;
 
-	//Rocks game
-	/*p = new_proc(rocks_main, USER_PRIORITY, "Rocks");
-	assert(p != NULL, "Create rocks task");
-	p->quantum = 4;*/
-
-	//Parallel test program
-	// p = new_proc(parallel_main, USER_PRIORITY, "Parallel");
-	// assert(p != NULL, "Create parallel task");
-	// p->quantum = 1;
-	//###########################################
-
 	//Initialise exceptions
 	init_exceptions();
 
-	//Kick off first task. Note: never returns
+	//Initialise slab layer
+	init_slab(shell_code,shell_code_length);
 
+	//Kick off first task. Note: never returns
 	//process_overview();
 	sched();
 }

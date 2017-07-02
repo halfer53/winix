@@ -1,6 +1,6 @@
 objs = winix/*.o kernel/*.o lib/ipc.o lib/string.o lib/util.o lib/wramp_syscall.o
-REFORMAT = tools/reformat_srec
-GEN_BIN = tools/gen_bin_code
+REFORMAT = reformat_srec
+GEN_BIN = gen_bin_code
 
 all:
 	$(MAKE) -C lib
@@ -8,6 +8,21 @@ all:
 	$(MAKE) -C kernel
 	$(MAKE) -C user
 	wlink -o winix.srec kernel/util/limits_head.o $(objs) kernel/util/limits_tail.o
+
+debug:
+	$(MAKE) clean
+	$(MAKE) -C lib
+	$(MAKE) shell
+	$(MAKE) -C winix
+	$(MAKE) -C kernel
+	$(MAKE) -C user
+	wlink -o winix.srec kernel/util/limits_head.o $(objs) kernel/util/limits_tail.o
+
+install:
+	$(MAKE) clean
+	$(MAKE) -C lib
+	$(MAKE) shell
+	$(MAKE) all
 
 clean:
 	$(MAKE) -C kernel clean
@@ -25,16 +40,13 @@ stat:
 	@find . -name "*.s" -exec cat {} \; | wc -l
 
 shell:
-	$(MAKE) clean
-	$(MAKE) -C lib
 	wcc -S user/shell.c
 	wasm shell.s
 	wlink -o shell.srec shell.o lib/*.o
-	[ ! -f reformat_srec.class ] && javac tools/reformat_srec.java || :
-	java reformat_srec shell.srec
-	[ ! -f gen_bin_code ] && gcc tools/gen_bin_code.c -o gen_bin_code || :
-	./gen_bin_code shell.srec > include/shell_codes.c
-	$(MAKE) all
+	[ ! -f $(REFORMAT).class ] && javac tools/$(REFORMAT).java || :
+	java $(REFORMAT) shell.srec
+	[ ! -f $(GEN_BIN) ] && gcc tools/$(GEN_BIN).c -o $(GEN_BIN) || :
+	./$(GEN_BIN) shell.srec > include/shell_codes.c
 
 test:
 	test -f myApp && echo File does exist

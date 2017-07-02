@@ -2,6 +2,14 @@
 #include <winix/kqueue.h>
 #include <stddef.h>
 
+/**
+
+IMPORTANT:
+This file is not included during compilation
+This file is depreciated, use slab.c instead
+
+**/
+
 hole_t hole_table[NUM_HOLES];
 
 //Entries to the list of unallocated memory space in RAM

@@ -1,5 +1,5 @@
-#ifndef _WINIX_SIGNAL_H_
-#define _WINIX_SIGNAL_H_
+#ifndef _W_SIGNAL_H_
+#define _W_SIGNAL_H_
 
 #include <signal.h>
 

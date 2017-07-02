@@ -2,6 +2,7 @@
 #include <stddef.h>
 #include <winix/slab.h>
 #include <winix/mem_map.h>
+#include <const.h>
 /**
  * block structure
  */
@@ -19,17 +20,24 @@ typedef struct s_block {
 
 
 
-static void *base = NULL;
-static void *end = NULL;
+static block_t *base = NULL;
+static block_t *end = NULL;
 
 #define BLOCK_SIZE 5
 
-void printblock(block_t *b) {
-	int i = (int)b / 1024;
-	kprintf("%d %x size %d next %x prev %x kfree %d data %x\n",i, b, b->size, b->next , b->prev, b->free, b->data);
+void init_slab(void *addr,int size){
+	base = (block_t *)addr;
+	base->size = size;
+	base->free = 1;
+	base->ptr = base->data;
+	base->next = base->prev = NULL;
 }
 
-void block_overview() {
+PRIVATE void kprintblock(block_t *b) {
+	kprintf("%x size %d next %x prev %x free %d data %x\n",b, b->size, b->next , b->prev, b->free, b->data);
+}
+
+void kblock_overview() {
 	int kfrees = 0;
 	block_t *b = base;
 	
@@ -40,14 +48,14 @@ void block_overview() {
 	while (b) {
 		if(b->free)
 			kfrees += b->size;
-		printblock(b);
+		kprintblock(b);
 		b = b->next;
 	}
 	kprintf("total kfrees %d\n", kfrees);
 }
 
 
-block_t *find_block(block_t **last , size_t size) {
+PRIVATE block_t *find_block(block_t **last , size_t size) {
 	block_t *b = base;
 	while (b && !(b->free && b->size >= size)) {
 		*last = b;
@@ -59,7 +67,7 @@ block_t *find_block(block_t **last , size_t size) {
 
 /* Split block according to size. */
 /* The b block must exist. */
-void split_block(block_t *b, size_t s)
+PRIVATE void split_block(block_t *b, size_t s)
 {
 	block_t *new;
 	// kprintf("data %x new %x\n", b->data,new);
@@ -77,7 +85,7 @@ void split_block(block_t *b, size_t s)
 }
 
 
-void alloc_page_rest(block_t *last, int end){
+PRIVATE void alloc_page_rest(block_t *last, int end){
 	block_t *b = (block_t*)((int)(last->ptr) + last->size);
 	b->size = (end - (int)b - BLOCK_SIZE);
 	b->prev = last;
@@ -86,12 +94,11 @@ void alloc_page_rest(block_t *last, int end){
 	b->ptr = b->data;
 
 	last->next = b;
-
 }
 
 /* Add a new block at the of heap */
 /* return NULL if things go wrong */
-block_t *alloc_page(block_t *last , size_t s)
+PRIVATE block_t *alloc_page(block_t *last , size_t s)
 {
 	//if last is null, get new free page, pre allocate
 	//else if last is not null
@@ -149,13 +156,13 @@ void *kmalloc(size_t size) {
 			return (NULL);
 		base = b;
 	}
-	// printblock(b);
+	// kprintblock(b);
 	return (b->data);
 }
 
 
 /* Copy data from block to block */
-void copy_block(block_t *src, block_t *dst)
+PRIVATE void copy_block(block_t *src, block_t *dst)
 {
 	int *sdata , *ddata;
 	size_t i;
@@ -167,7 +174,7 @@ void copy_block(block_t *src, block_t *dst)
 
 
 
-block_t *fusion(block_t *b) {
+PRIVATE block_t *fusion(block_t *b) {
 	block_t* next = b->next;
 	if (next && next->free && ((int)(b->ptr) + b->size == (int)next)) {
 		b->size += BLOCK_SIZE + next->size;
@@ -181,17 +188,17 @@ block_t *fusion(block_t *b) {
 
 
 /* Get the block from and addr */
-block_t *get_block(void *p){
+PRIVATE block_t *get_block(void *p){
 	return (void *)((int *)p - BLOCK_SIZE);
 }
 
 /* Valid addr for kfree */
-int valid_addr(void *p)
+PRIVATE int valid_addr(void *p)
 {
 	block_t *b;
 	if (base)
 	{
-		if ( p > base )
+		if ( p > (void *)base )
 		{
 			return (p == (get_block(p))->ptr);
 		}
