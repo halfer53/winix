@@ -12,13 +12,7 @@
 #include <winix/kernel.h>
 
 #include <winix/slab.h>
-#include <winix/mm.h>
-#include <winix/bitmap.h>
 #include <winix/kwramp.h>
-#include <winix/mem_alloc.h>
-#include <winix/sys_stdio.h>
-#include <winix/rex.h>
-#include <winix/proc.h>
 
 #include <winix/exception.h>
 #include <winix/system.h>

@@ -35,7 +35,7 @@ size_t FREE_MEM_END = 0;
 
 
 size_t sizeof_proc_t() {
-	hole_t arr[2];
+	proc_t arr[2];
 	int size = (char*)&arr[1] - (char*)&arr[0];
 	return size;
 }
@@ -88,7 +88,7 @@ void enqueue_head(proc_t **q, proc_t *proc) {
  *   The proc struct that was removed from the head of the list
  *   NULL if the list is empty.
  **/
-static proc_t *dequeue(proc_t **q) {
+proc_t *dequeue(proc_t **q) {
 	proc_t *p = q[HEAD];
 
 	if (p == NULL) { //Empty list
@@ -141,15 +141,6 @@ void add_to_scheduling_queue(proc_t* p) {
 }
 
 
-proc_t *get_idle(){
-	static proc_t *idle;
-	kprintf("get idle\n");
-	if(idle == NULL){
-		idle = new_proc(idle_main, IDLE_PRIORITY, "IDLE");
-	}
-	return idle;
-}
-
 
 proc_t *get_free_proc() {
 	int i;
@@ -199,28 +190,7 @@ void proc_set_default(proc_t *p) {
 }
 
 
-/**
- * Chooses a process to run.
- *
- * Returns:
- *   The process that is runnable with the highest priority.
- *   NULL if no processes are runnable (should never happen).
- *
- * Side Effects:
- *   A proc is removed from a ready_q.
- **/
-proc_t *pick_proc() {
-	int i;
 
-	//Find the highest-priority non-empty queue
-	for (i = 0; i < NUM_QUEUES; i++) {
-		if (ready_q[i][HEAD] != NULL) {
-			return dequeue(ready_q[i]);
-		}
-	}
-
-	return get_idle();
-}
 
 /**
  * fork the calling process
@@ -482,47 +452,6 @@ char* getStateName(proc_state_t state) {
 	}
 }
 
-
-/**
- * The Scheduler.
- *
- * Notes:
- *   Context of current_proc must already be saved.
- *   If successful, this function does not return.
- *
- * Side Effects:
- *   current_proc has its accounting fields updated, and is reinserted to ready_q.
- *   current_proc is updated to point to the next runnable process.
- *   Context of the new proc is loaded.
- **/
-void sched() {
-
-	proc_t *curr = ready_q[3][HEAD];
-	int nextpick = 0;
-	static int count = 0;
-
-	if (current_proc != NULL && !current_proc->flags) {
-		//Accounting
-		current_proc->time_used++;
-
-		if (--current_proc->ticks_left) {
-			enqueue_head(ready_q[current_proc->priority], current_proc);
-		}
-		else { //Re-insert process at the tail of its priority queue
-			enqueue_tail(ready_q[current_proc->priority], current_proc);
-		}
-	}
-
-	current_proc = pick_proc();
-	
-	//Reset quantum if needed
-	if (current_proc->ticks_left <= 0) {
-		current_proc->ticks_left = current_proc->quantum;
-	}
-
-	//Load context and run
-	wramp_load_context();
-}
 
 /**
  * Gets a pointer to a process.

@@ -1,6 +1,6 @@
-sources = slab.c mm.c bitmap.c sys_stdio.c w_ipc.c
-compile = slab.s mm.s bitmap.s sys_stdio.s w_ipc.s
-assemble = slab.o mm.o bitmap.o kwramp.o sys_stdio.o w_ipc.o
+sources = slab.c mm.c bitmap.c sys_stdio.c wini_ipc.c
+compile = slab.s mm.s bitmap.s sys_stdio.s wini_ipc.s
+assemble = slab.o mm.o bitmap.o kwramp.o sys_stdio.o wini_ipc.o
 
 all: $(assemble)
 

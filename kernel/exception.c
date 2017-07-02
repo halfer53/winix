@@ -6,6 +6,7 @@
  *  2016-11-20		Bruce Tan			Modified
  **/
 #include "winix.h"
+#include <winix/rex.h>
 
 //Number of exception sources
 #define NUM_HANDLERS 16

@@ -12,7 +12,7 @@
 #include <winix/kwramp.h>
 #include <signal.h>
 #include <sys/ipc.h>
-#include <winix/w_ipc.h>
+#include <winix/wini_ipc.h>
 
 //Process & Scheduling
 #define PROC_NAME_LEN			20
@@ -114,6 +114,7 @@ extern proc_t *ready_q[NUM_QUEUES][2];
 extern proc_t *block_q[2];
 void enqueue_tail(proc_t **q, proc_t *proc);
  void enqueue_head(proc_t **q, proc_t *proc);
+ proc_t *dequeue(proc_t **q);
 /**
  * Initialises the process table and scheduling queues.
  **/

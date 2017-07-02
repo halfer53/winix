@@ -7,6 +7,7 @@
  **/
 
 #include "winix.h"
+#include <winix/rex.h>
 #include <init_codes.c>
 #include <shell_codes.c>
 
