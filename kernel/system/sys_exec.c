@@ -1,4 +1,4 @@
-#include "winix.h"
+#include "../winix.h"
 
 //dynamically allocate a new memory space in the memory, and
 //write mem values in lines to that space
@@ -404,3 +404,4 @@ static size_t winix_load_srec_mem_val(char *line,size_t *memory_values,int start
 				}
 		return wordsLoaded;
 }
+

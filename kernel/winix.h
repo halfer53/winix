@@ -12,8 +12,8 @@
 #include <winix/kernel.h>
 
 #include <winix/slab.h>
-#include <winix/kwramp.h>
 
+#include <winix/signal.h>
 #include <winix/exception.h>
 #include <winix/system.h>
 #include <winix/idle.h>

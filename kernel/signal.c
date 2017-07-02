@@ -1,15 +1,8 @@
 #include "winix.h"
-#include <signal.h>
-
-#define SIGFRAME_CODE_LEN   2
 
 static unsigned long sigframe_code[] = {0x1ee10001,0x200d0000};
 //addui sp,sp, 1
 //syscall
-
-void set_signal(proc_t *caller, int signum, sighandler_t handler){
-    caller->sig_table[signum].sa_handler = handler;
-}
 
 
 void real_send_signal(proc_t *who,int signum){
@@ -87,16 +80,3 @@ void send_signal(proc_t *who, int signum){
     real_send_signal(who,signum);
 }
 
-
-void do_sigreturn(proc_t *who,int signum){
-    unsigned long *sp;
-
-    sp = get_physical_addr(who->sp,who);
-
-    // kprintf("sig ret sp %x\n",sp);
-
-    sp += MESSAGE_LEN + 3 +SIGFRAME_CODE_LEN;
-    kprintf("sigret ");
-    printProceInfo(who);
-    memcpy(who,sp,PROCESS_CONTEXT_LEN);
-}

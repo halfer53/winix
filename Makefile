@@ -1,4 +1,4 @@
-objs = winix/*.o kernel/*.o lib/ipc.o lib/string.o lib/util.o lib/wramp_syscall.o
+objs = winix/*.o kernel/*.o kernel/system/*.o lib/ipc.o lib/string.o lib/util.o lib/wramp_syscall.o
 REFORMAT = reformat_srec
 GEN_BIN = gen_bin_code
 

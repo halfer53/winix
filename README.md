@@ -9,7 +9,10 @@ But you can stil run the compiled code on the [Simulator](https://sourceforge.ne
 # TODO
 - [ ] fix bugs for sbrk() and brk() after fork()
 - [ ] sigreturn() is blocked by previous getc()
-- [ ] release memory after end_process()
+- [ ] release memory and unprocessed messages after end_process()
+
 
 # Credits
 [Paul Monigatti](https://nz.linkedin.com/in/paulmonigatti)
+
+[re](https://svn.code.sf.net/p/quake/svn/quake3/trunk/lcc/lib/)

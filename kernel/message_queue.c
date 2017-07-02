@@ -1,6 +1,11 @@
 #include "winix.h"
 
+/**
 
+Depreciated, this file is no longer included during compilation
+
+
+**/
 mqueue_t message_table[MESSAGE_Q_NUM];
 
 mqueue_t *unused_messages[2];

@@ -9,8 +9,15 @@ typedef struct alarm{
 	struct alarm *next;
 }alarm_t;
 
+
+extern alarm_t *pending_alarm[2];
+extern alarm_t *free_alarm[2];
+
+
 void clock_handler();
 void init_alarm();
+void enqueue_alarm(alarm_t **q, alarm_t *new_alarm);
+alarm_t* dequeue_alarm(alarm_t **q);
 void sys_alarm(proc_t *caller, clock_t time);
 
 // extern alarm_t alarm_table[_NTIMERS];

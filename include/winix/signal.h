@@ -3,9 +3,9 @@
 
 #include <signal.h>
 
+#define SIGFRAME_CODE_LEN   2
+
 void send_signal(proc_t *who, int signum);
 void set_signal(proc_t *caller, int signum, sighandler_t handler);
-void do_sigreturn(int signum);
-
 
 #endif

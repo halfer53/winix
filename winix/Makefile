@@ -7,9 +7,6 @@ all: $(assemble)
 $(compile): %.s: %.c
 	wcc -S -I../include -o $@ $<
 
-$(debug): %.s: %.c
-	wcc -b -S -I../../include -o $@ $<
-
 $(assemble): %.o: %.s
 	wasm $< -o $@
 
