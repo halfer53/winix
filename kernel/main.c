@@ -11,6 +11,8 @@
 #include <init_codes.c>
 #include <shell_codes.c>
 
+int DEBUG = 0;
+
 /**
  * Print an error message and lock up the OS... the "Blue Screen of Death"
  *

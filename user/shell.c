@@ -239,7 +239,7 @@ void main() {
 	struct cmd *handler = NULL;
 	
 	// alarm_handler(0);
-	// test_alarm(0,NULL);
+	test_signal(0,NULL);
 	while(1) {
 		printf("WINIX> ");
 

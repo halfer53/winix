@@ -17,19 +17,11 @@ int wini_send(int dest, message_t *m) {
 
 	//Is the destination valid?
 	if (pDest = get_proc(dest)) {
-		// if (debug)
-		// 	kprintf("%d ", pDest->proc_index);
-		//If destination is waiting, deliver message immediately.
 		if (pDest->flags & RECEIVING) {
-			// if (debug)
-			// 	kprintf("| data sent from %d\n", current_proc->proc_index);
-			//Copy message to destination
 			*(pDest->message) = *m;
 			//Unblock receiver
 			pDest->flags &= ~RECEIVING;
 			enqueue_head(ready_q[pDest->priority], pDest);
-			// if(pDest->proc_index == 0)
-				// kprintf(" | send t %d %x| ",m->type,m);
 		}
 
 		else {
@@ -41,11 +33,7 @@ int wini_send(int dest, message_t *m) {
 		}
 
 		return 0;
-	} else {
-		// if (debug)
-		// 	kprintf("pid %d not found from %d\n", dest, current_proc->proc_index);
 	}
-
 	return -1;
 }
 

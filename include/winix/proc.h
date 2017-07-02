@@ -10,9 +10,6 @@
 #define _W_PROC_H_
 
 #include <winix/kwramp.h>
-#include <signal.h>
-#include <sys/ipc.h>
-#include <winix/wini_ipc.h>
 
 //Process & Scheduling
 #define PROC_NAME_LEN			20
@@ -69,25 +66,22 @@ typedef struct proc {
 	unsigned long *ptable;
 	unsigned long cctrl;  //len 19
 
-	/* IPC */
+	/* IPC messages */
 	message_t *message;	//Message buffer;
 	int flags; 
-
-	/* Scheduling Priority */
-	int priority;	
-	int quantum;		//Timeslice length
-	int ticks_left;		//Timeslice remaining
-	//len 26
 
 	/* Protection */
 	unsigned long protection_table[PROTECTION_TABLE_LEN];
 
-	/* IPC */
+	/* IPC queue */
 	struct proc *sender_q;	//Head of process queue waiting to send to this process
 	struct proc *next_sender; //Link to next sender in the queue
 
 	/* Scheduling */
 	struct proc *next;	//Next pointer
+	int priority;	
+	int quantum;		//Timeslice length
+	int ticks_left;		//Timeslice remaining
 
 	/* Accounting */
 	int time_used;		//CPU time used
@@ -98,8 +92,9 @@ typedef struct proc {
 
 	/* Process Table Index */
 	int proc_index;		//Index in the process table
+	int IN_USE;
 
-	unsigned long length;
+	unsigned long length; //length is depreciated, do not use it
 
 	int parent_proc_index;
 	int exit_status;
@@ -112,6 +107,8 @@ typedef struct proc {
 extern proc_t proc_table[NUM_PROCS];
 extern proc_t *ready_q[NUM_QUEUES][2];
 extern proc_t *block_q[2];
+
+
 void enqueue_tail(proc_t **q, proc_t *proc);
  void enqueue_head(proc_t **q, proc_t *proc);
  proc_t *dequeue(proc_t **q);

@@ -148,7 +148,7 @@ proc_t *get_free_proc() {
 	size_t *sp = NULL;
 
 	if (p) {
-
+		p->IN_USE = 1;
 		proc_set_default(p);
 		//malloced_sp
 	}
@@ -402,6 +402,7 @@ void end_process(proc_t *p) {
 			}
 		}
 	}
+	p->IN_USE = 0;
 	// process_overview();
 	enqueue_tail(free_proc, p);
 }
@@ -430,7 +431,7 @@ int process_overview() {
 
 //print the process state given
 void printProceInfo(proc_t* curr) {
-	kprintf("%s %d rbase %x pc %x, sp %x, heap %x, pt %x pri %d\r\n",
+	kprintf("%s %d rbase %x pc %x, sp %x, heap %x, pt %x flags %d\n",
 	        curr->name,
 	        curr->proc_index,
 	        curr->rbase,
@@ -438,7 +439,7 @@ void printProceInfo(proc_t* curr) {
 	        curr->sp,
 	        curr->heap_break,
 	        curr->ptable[0],
-			curr->priority);
+			curr->flags);
 }
 
 //return the strign value of state name give proc_state_t state
@@ -483,9 +484,6 @@ proc_t *get_proc(int proc_nr) {
 void init_proc() {
 	int i;
 	//Initialise queues
-	// proc_t arr[2];
-	// int size = (char*)&arr[1] - (char*)&arr[0];
-	// kprintf("sizeof proc_t %d\n",size );
 
 	for (i = 0; i < NUM_QUEUES; i++) {
 		ready_q[i][HEAD] = NULL;

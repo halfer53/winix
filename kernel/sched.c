@@ -66,6 +66,11 @@ void sched() {
 	}
 
 	current_proc = pick_proc();
+	if(DEBUG){
+		kprintf("pick %d t %d f %d |",current_proc->proc_index, current_proc->ticks_left, current_proc->flags);
+		DEBUG--;
+	}
+		
 	
 	//Reset quantum if needed
 	if (current_proc->ticks_left <= 0) {

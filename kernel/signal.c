@@ -66,16 +66,15 @@ void real_send_signal(proc_t *who,int signum){
 		}
     }
     delete_proc(ready_q[who->priority],who);
-    // process_overview();
+    
     current_proc = who;
 
     current_proc->ticks_left = current_proc->quantum;
     who->exit_status = 1234;
     who->flags = 0;//reset flags
     who->priority = TOP_PRIORITY;
-
-    process_overview();
-    printProceInfo(current_proc);
+    kprintf("sendsig ");
+    printProceInfo(who);
     wramp_load_context();
 }
 
@@ -97,7 +96,7 @@ void do_sigreturn(proc_t *who,int signum){
     // kprintf("sig ret sp %x\n",sp);
 
     sp += MESSAGE_LEN + 3 +SIGFRAME_CODE_LEN;
-    // kprintf("sig sp %x\n",sp);
-
+    kprintf("sigret ");
+    printProceInfo(who);
     memcpy(who,sp,PROCESS_CONTEXT_LEN);
 }
