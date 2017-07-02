@@ -1,3 +1,0 @@
-/home/bruce/github/winix2/fs/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/home/bruce/github/winix2/fs/cmake-build-debug/CMakeFiles/edit_cache.dir
-/home/bruce/github/winix2/fs/cmake-build-debug/CMakeFiles/fs.dir
