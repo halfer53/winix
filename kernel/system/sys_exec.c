@@ -30,7 +30,7 @@ proc_t *exec_replace_existing_proc(proc_t *p,size_t *lines, size_t length, size_
  * malloc a new memory and write the values of lines into that address
  * the process is updated
  **/
-static proc_t *exec_proc(proc_t *p,size_t *lines, size_t length, size_t entry, int priority, char *name){
+proc_t *exec_proc(proc_t *p,size_t *lines, size_t length, size_t entry, int priority, char *name){
 	void *ptr_base = NULL;
 	size_t length_bak, overall_length;
 	int nstart,len;
@@ -164,7 +164,7 @@ int exec_read_srec(proc_t *p){
 
 //load S6 srec type, and return the size of memory words
 //return 0 if checksum failed
-static int winix_load_srec_words_length(char *line){
+int winix_load_srec_words_length(char *line){
   int i=0;
 
   int index = 0;
@@ -238,7 +238,7 @@ static int winix_load_srec_words_length(char *line){
 
 //read the Srec line, and return the number of words loaded
 //lines is appended with the new words read from the srec file
-static int winix_load_srec_mem_val(char *line,size_t *memory_values,int start_index,int memvalLength){
+int winix_load_srec_mem_val(char *line,size_t *memory_values,int start_index,int memvalLength){
 	int wordsLoaded = 0;
 	int index = 0;
 	int checksum = 0;
