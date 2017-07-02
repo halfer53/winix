@@ -1,4 +1,4 @@
-#include <winix/mem_map.h>
+#include <winix/mm.h>
 #include <stddef.h>
 
 unsigned long mem_map[MEM_MAP_LEN];
@@ -13,11 +13,21 @@ void init_mem_table(int free_mem_begin) {
 	kprintf("Free %x len %d map %x\n",free_mem_begin,len,mem_map[0]);
 }
 
-void *get_free_pages(int num) {
+void *get_free_pages(int num, int flags) {
 	int nstart = bitmap_search(mem_map, MEM_MAP_LEN, num);
 	if (nstart != 0)
 	{
 		bitmap_set_nbits(mem_map, MEM_MAP_LEN, nstart, num);
+		return (void *)(nstart*1024);
+	}
+	return NULL;
+}
+
+void *get_free_page(int flags) {
+	int nstart = bitmap_search(mem_map, MEM_MAP_LEN, 1);
+	if (nstart != 0)
+	{
+		bitmap_set_bit(mem_map, MEM_MAP_LEN, nstart);
 		return (void *)(nstart*1024);
 	}
 	return NULL;

@@ -1,7 +1,7 @@
 #include <winix/bitmap.h>
 #include <winix/slab.h>
 #include <stddef.h>
-#include <winix/mem_map.h>
+#include <winix/mm.h>
 
 static unsigned long mask[BITMASK_NR];
 

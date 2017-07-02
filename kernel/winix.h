@@ -21,7 +21,7 @@
 
 #include <winix/kqueue.h>
 #include <winix/slab.h>
-#include <winix/mem_map.h>
+#include <winix/mm.h>
 #include <winix/bitmap.h>
 #include <winix/kwramp.h>
 #include <winix/mem_alloc.h>

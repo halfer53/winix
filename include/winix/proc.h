@@ -153,8 +153,8 @@ proc_t *get_proc(int proc_nr);
 //to the original process, except stack pointer.
 proc_t* do_fork(proc_t *p);
 proc_t *kexecp(proc_t *p,void (*entry)(), int priority, const char *name);
-proc_t *create_system(void (*entry)(), int priority, const char *name);
-proc_t* create_init(size_t *lines, size_t length, size_t entry);
+proc_t *start_system(void (*entry)(), int priority, const char *name);
+proc_t* start_init(size_t *lines, size_t length, size_t entry);
 
 
 int process_overview();

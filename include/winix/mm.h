@@ -1,7 +1,10 @@
 #ifndef	_W_MEM_MAP_H_
 #define _W_MEM_MAP_H_
 
-void *get_free_pages(int num);
+#include <winix/gfp.h>
+
+void *get_free_pages(int num, int flags);
+void *get_free_page(int flags);
 void free_page(void* ptr);
 void print_mem_map(int i);
 

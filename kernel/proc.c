@@ -298,7 +298,7 @@ void *kset_proc(proc_t *p, void (*entry)(), int priority, const char *name) {
 	// p->ptable = p->protection_table;
 
 	// ptr = proc_malloc(DEFAULT_STACK_SIZE);
-	ptr = get_free_pages(len);
+	ptr = get_free_pages(len,__GFP_NORM);
 	i = get_page_index(ptr);
 	bitmap_set_nbits(p->ptable, PROTECTION_TABLE_LEN, i, len);
 	bitmap_set_nbits(mem_map, PROTECTION_TABLE_LEN, i, len);
@@ -368,7 +368,7 @@ proc_t *kexecp(proc_t *p, void (*entry)(), int priority, const char *name) {
 	return p;
 }
 
-proc_t *create_system(void (*entry)(), int priority, const char *name) {
+proc_t *start_system(void (*entry)(), int priority, const char *name) {
 	proc_t *p = NULL;
 	int stack_size = 1024 * 1;
 	int *ptr = NULL;
@@ -381,9 +381,10 @@ proc_t *create_system(void (*entry)(), int priority, const char *name) {
 		// p->ptable = p->protection_table;
 
 		// ptr = proc_malloc(DEFAULT_STACK_SIZE);
-		ptr = get_free_pages(stack_size / 1024);
+		ptr = get_free_pages(stack_size / 1024,__GFP_NORM);
 
 		p->sp = (size_t *)ptr + stack_size - 128;
+		//TODO: init heap_break using slab
 		p->heap_break = p->sp + 1;
 		p->length = stack_size * 10;
 		//Set the process to runnable, remember to enqueue it after you call this method
@@ -394,7 +395,7 @@ proc_t *create_system(void (*entry)(), int priority, const char *name) {
 	return p;
 }
 
-proc_t* create_init(size_t *lines, size_t length, size_t entry) {
+proc_t* start_init(size_t *lines, size_t length, size_t entry) {
 	void *ptr_base;
 	int size = 1024, nstart = 0;
 	proc_t *p = NULL;
