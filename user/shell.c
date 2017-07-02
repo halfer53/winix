@@ -69,7 +69,7 @@ void alarm_handler(int signum){
 int test_alarm(int argc, char **argv){
 	signal(SIGALRM,alarm_handler);
 	alarm(1);
-	return OK;
+	return 0;
 }
 
 void sighandler(int signum){
@@ -97,7 +97,7 @@ int test_signal(int argc, char **argv){
 		pid = wait(NULL);
 		printf("parent awaken by child %d\n",pid);
 	}
-	return OK;
+	return 0;
 }
 
 ucontext_t mcontext,fcontext,econtext;
@@ -137,7 +137,7 @@ int test_fiber(int argc, char **argv){
 	else {
 		printf("returned from function\n");
 	}
-	return OK;
+	return 0;
 }
 
 
@@ -160,7 +160,7 @@ int testmalloc(int argc, char **argv){
 	  free(p8);
 	  block_overview();
   
-  return OK;
+  return 0;
 }
 
 int ps(int argc, char **argv){
@@ -185,7 +185,7 @@ int uptime(int argc, char **argv) {
 	// ticks %= 100;
 
 	printf("Uptime is %dd %dh %dm %d.%ds, total ticks: %d\r\n", days, hours, minutes, seconds, ticks%100, ticks);
-	return OK;
+	return 0;
 }
 
 /**
@@ -193,7 +193,7 @@ int uptime(int argc, char **argv) {
  **/
 int shutdown(int argc, char **argv) {
 	printf("Placeholder for SHUTDOWN\r\n");
-	return OK;
+	return 0;
 }
 
 /**
@@ -210,7 +210,7 @@ int exit(int argc, char **argv) {
 int generic(int argc, char **argv) {
 	//Quietly ignore empty file paths
 	if(argc == 0)
-		return OK;
+		return 0;
 
 		if (strcmp("exec",argv[0]) == 0) {
 			printf("please drag the srec file onto this windows\n" );
@@ -224,10 +224,10 @@ int generic(int argc, char **argv) {
 			}else{
 				printf("I am child\n");
 			}
-			return OK;
+			return 0;
 		}
 	printf("Unknown command '%s'\r\n", argv[0]);
-	return ERR;
+	return -1;
 }
 
 
