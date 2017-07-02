@@ -8,6 +8,7 @@
 *.srec
 *.sublime-workspace
 
+tmp.txt
 a.out
 
 .vscode/
