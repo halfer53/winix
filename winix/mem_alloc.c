@@ -218,11 +218,11 @@ int merge_holes(hole_t **merging_holes_list, hole_t *h) {
 //so we simply add h to the pending_holes list
 	if (curr != NULL) {
 		hole_enqueue_head(pending_holes, h);
-		return 1;
+		return ERR;
 	} else {
 		//if curr is null, that means it can't merge with any holes
 		hole_enqueue_head(unused_holes, h);
-		return 0;
+		return OK;
 	}
 }
 

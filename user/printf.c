@@ -9,5 +9,5 @@ int main(int argc, char const *argv[]) {
 		printf("I'm loaded");
 	}
 	
-  return 0;
+  return OK;
 }

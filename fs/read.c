@@ -39,7 +39,7 @@ int rw_file(int fd, char *buf, size_t count, int flag){
 //		if (r != OK) break;	/* EOF reached */
         off = 0;
     }
-    return 0;
+    return OK;
 }
 
 int sys_read(int fd, void *buf, int count){

@@ -52,7 +52,7 @@ int test_fiber(int argc, char **argv){
 	else {
 		printf("returned from function\n");
 	}
-	return 0;
+	return OK;
 }
 
 ```
@@ -117,7 +117,7 @@ int test_signal(int argc, char **argv){
 		pid = wait(NULL);
 		printf("parent awaken\n");
 	}
-	return 0;
+	return OK;
 }
 ```
 

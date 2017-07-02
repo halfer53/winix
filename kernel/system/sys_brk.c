@@ -11,7 +11,7 @@ int do_brk(proc_t *caller, void *addr){
 	addr = get_physical_addr(addr,caller);
 	if(is_addr_in_same_page(caller->heap_break, addr)){
 		caller->heap_break = addr;
-		return 0;
+		return OK;
 	}
 	if(addr < caller->heap_break){
 		i = get_page_index(caller->heap_break);
@@ -21,7 +21,7 @@ int do_brk(proc_t *caller, void *addr){
 			bitmap_reset_bit(caller->ptable,MEM_MAP_LEN,i);
 		}
 		caller->heap_break = addr;
-		return 0;
+		return OK;
 	}
-	return 1;
+	return ERR;
 }

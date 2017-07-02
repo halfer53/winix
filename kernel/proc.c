@@ -106,14 +106,14 @@ proc_t *dequeue(proc_t **q) {
 	return p;
 }
 
-//return -1 if nothing found
+//return ERR if nothing found
 int delete_proc(proc_t **q, proc_t *h) {
 	proc_t *curr = q[HEAD];
 	proc_t *prev = NULL;
 
 	if (curr == NULL) { //Empty list
 		assert(q[TAIL] == NULL, "delete: tail not null");
-		return -1;
+		return ERR;
 	}
 
 	while (curr != h && curr != NULL) {
@@ -129,9 +129,9 @@ int delete_proc(proc_t **q, proc_t *h) {
 		} else {
 			prev->next = curr->next;
 		}
-		return 1;
+		return ERR;
 	} else {
-		return -1;
+		return ERR;
 	}
 
 }
@@ -344,7 +344,7 @@ void end_process(proc_t *p) {
 
 //print out the list of processes currently in the ready_q
 //and the currently running process
-//return 0;
+//return OK;
 
 int process_overview() {
 	int i = 0;
@@ -361,7 +361,7 @@ int process_overview() {
 		}
 	}
 	//kprintf("||\n" );
-	return 0;
+	return OK;
 }
 
 //print the process state given

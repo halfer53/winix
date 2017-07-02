@@ -8,5 +8,5 @@
      filp->filp_pos = 0;
 
      current_proc->fp_filp[fd] = 0;
-     return 0;
+     return OK;
  }

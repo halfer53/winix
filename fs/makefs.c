@@ -96,6 +96,6 @@ int makefs()
 	printf("data block 0x%x - 0x%lx, free blocks %ld\n",curr, curr+remaining, remaining/1024 );
 	curr += remaining;
 	
-	return 0;
+	return OK;
 	// return disk;
 }

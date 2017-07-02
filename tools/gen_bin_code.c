@@ -54,7 +54,7 @@ int main(int argc, char const *argv[]) {
 							continue;
 						}
 						if (temp != wordsLoaded) {
-							return 0;
+							return OK;
 						}
 						break;
 					} else {
@@ -67,7 +67,7 @@ int main(int argc, char const *argv[]) {
 
 	printf("int %s_code_length =  %d;\n",filename, wordslength);
 
-	return 0;
+	return OK;
 
 }
 void assert(int expression, const char *message) {
@@ -136,7 +136,7 @@ int winix_load_srec_words_length(char *line) {
 	if (recordType != 6) {
 		printf("recordType %d\n", recordType );
 		printf("format is incorrect\n" );
-		return 0;
+		return OK;
 	}
 	tempBufferCount = Substring(buffer, line, index, 2);
 	//printf("record value %s, value in base 10: %d,length %d\r\n",buffer,hex2int(buffer,tempBufferCount),tempBufferCount);
@@ -170,7 +170,7 @@ int winix_load_srec_words_length(char *line) {
 	//printf("checksum %d\r\n",byteCheckSum );
 	if (readChecksum != byteCheckSum) {
 		printf("failed checksum\r\n" );
-		return 0;
+		return OK;
 	}
 	return data;
 }
@@ -237,7 +237,7 @@ int winix_load_srec_mem_val(char *line, size_t *memory_values, int start_index, 
 
 	default:
 		printf("unknown record type\n");
-		return 0;
+		return OK;
 	}
 	tempBufferCount = Substring(buffer, line, index, 2);
 	//printf("record value %s, value in base 10: %d,length %d\r\n",buffer,hex2int(buffer,tempBufferCount),tempBufferCount);
@@ -299,7 +299,7 @@ int winix_load_srec_mem_val(char *line, size_t *memory_values, int start_index, 
 	//printf("checksum %d\r\n",byteCheckSum );
 	if (readChecksum != byteCheckSum) {
 		printf("failed checksum\r\n" );
-		return 0;
+		return OK;
 	}
 
 	//Put in memory
@@ -336,5 +336,5 @@ int winix_load_srec_mem_val(char *line, size_t *memory_values, int start_index, 
 		break;
 	}
 
-	return 1;
+	return ERR;
 }

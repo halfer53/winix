@@ -13,6 +13,7 @@ extern int DEBUG;
 #include <stdbool.h>
 #include <signal.h>
 #include <stdbool.h>
+#include <curses.h>
 
 #include <winix/bitmap.h>
 #include <winix/mm.h>

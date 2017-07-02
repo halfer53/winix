@@ -14,7 +14,7 @@ int get_fd(proc_t *curr,int start, int *k, filp_t **fpt){
     }
 
     if(i==-1)
-        return -1;
+        return ERR;
 
      for (f = &fd_table[0]; f < &fd_table[NR_FILPS]; f++) {
         if (f->filp_count == 0) {
@@ -25,7 +25,7 @@ int get_fd(proc_t *curr,int start, int *k, filp_t **fpt){
             return(OK);
         }
     }
-    return -1;
+    return ERR;
 }
 
 

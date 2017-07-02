@@ -4,6 +4,7 @@ static unsigned long sigframe_code[] = {0x1ee10001,0x200d0000};
 //addui sp,sp, 1
 //syscall
 
+//TODO: set sigcode and len together
 
 void real_send_signal(proc_t *who,int signum){
     unsigned long *sp;

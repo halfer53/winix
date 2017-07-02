@@ -44,7 +44,7 @@ int sys_process_overview(){
 
 	m.type = SYSCALL_PS;
 	response = winix_send(SYSTEM_TASK, &m); //TODO: error checking
-	return 0;
+	return OK;
 }
 
 pid_t fork(){
@@ -63,7 +63,7 @@ int exec(){
 
 	m.type = SYSCALL_EXEC;
 	response = winix_send(SYSTEM_TASK, &m); //TODO: error checking
-	return 0;
+	return OK;
 }
 
 void *sbrk(size_t size){
@@ -116,7 +116,7 @@ int printf(const char *format, ...) {
 	m.p1 = (void *)format;
 	m.p2 = (void *)((int *)&format+1);
 	response = winix_send(SYSTEM_TASK,&m);
-	return 0;
+	return OK;
 }
 
 sighandler_t signal(int signum, sighandler_t handler){
@@ -147,7 +147,7 @@ unsigned long alarm(unsigned long seconds){
 	m.type = SYSCALL_ALARM;
 	m.i1 = seconds;
 	response = winix_send(SYSTEM_TASK,&m);
-	return 0;
+	return OK;
 }
 
 pid_t wait(int *wstatus){

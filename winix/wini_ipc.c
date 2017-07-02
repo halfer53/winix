@@ -32,9 +32,9 @@ int wini_send(int dest, message_t *m) {
 			// kprintf(" | send t %d nexts %d senderh %d| ",m->type,current_proc->next_sender->proc_index,current_proc->sender_q->proc_index);
 		}
 
-		return 0;
+		return OK;
 	}
-	return -1;
+	return ERR;
 }
 
 /**
@@ -66,7 +66,7 @@ int wini_receive(message_t *m) {
 		current_proc->message = m;
 		current_proc->flags |= RECEIVING;
 	}
-	return 0;
+	return OK;
 }
 /**
  * non-block send
@@ -103,7 +103,7 @@ int wini_notify(int dest, message_t *m) {
 		}
 
 		//do nothing if it's not waiting
-		return 0;
+		return OK;
 	}
-	return -1;
+	return ERR;
 }
