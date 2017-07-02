@@ -238,7 +238,7 @@ static int winix_load_srec_words_length(char *line){
 
 //read the Srec line, and return the number of words loaded
 //lines is appended with the new words read from the srec file
-static size_t winix_load_srec_mem_val(char *line,size_t *memory_values,int start_index,int memvalLength){
+static int winix_load_srec_mem_val(char *line,size_t *memory_values,int start_index,int memvalLength){
 	int wordsLoaded = 0;
 	int index = 0;
 	int checksum = 0;
@@ -400,7 +400,7 @@ static size_t winix_load_srec_mem_val(char *line,size_t *memory_values,int start
 
 
 						case 7: //entry point for the program.
-								return (size_t)address;
+								return address;
 								break;
 				}
 		return wordsLoaded;

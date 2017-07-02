@@ -10,6 +10,7 @@
 #include <sys/syscall.h>
 #include <sys/types.h>
 #include <ucontext.h>
+#include <curses.h>
 #include <signal.h>
 #include <debug.h>
 
