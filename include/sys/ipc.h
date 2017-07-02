@@ -45,7 +45,7 @@ typedef struct {
  * Sends a message to the destination process
  **/
 int winix_send(int dest, message_t *m);
-int winix_sendonce(int dest, message_t *m);
+int winix_notify(int dest, message_t *m);
 
 /**
  * Receives a message.

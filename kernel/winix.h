@@ -9,17 +9,8 @@
 #ifndef _WINIX_H_
 #define _WINIX_H_
 
-#include <sys/ipc.h>
-#include <signal.h>
-#include <stddef.h>
-#include <sys/types.h>
-#include <sys/syscall.h>
-#include <util.h>
-#include <size.h>
-#include <stdbool.h>
-#include <ucontext.h>
+#include <winix/kernel.h>
 
-#include <winix/kqueue.h>
 #include <winix/slab.h>
 #include <winix/mm.h>
 #include <winix/bitmap.h>

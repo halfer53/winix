@@ -1,6 +1,13 @@
 #ifndef _MEM_ALLOC_H_
 #define _MEM_ALLOC_H_
 
+/**
+
+IMPORTANT:
+depreciated, use slab.c instead
+
+**/
+
 #ifndef _TYPE_H_
 #include <sys/types.h>
 #endif

@@ -1,8 +1,5 @@
-#include <sys/types.h>
-#include <stddef.h>
+#include <winix/kernel.h>
 #include <winix/slab.h>
-#include <winix/mm.h>
-#include <const.h>
 /**
  * block structure
  */

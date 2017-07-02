@@ -9,9 +9,10 @@
 #ifndef _W_PROC_H_
 #define _W_PROC_H_
 
-#include <signal.h>
 #include <winix/kwramp.h>
+#include <signal.h>
 #include <sys/ipc.h>
+#include <winix/w_ipc.h>
 
 //Process & Scheduling
 #define PROC_NAME_LEN			20
@@ -161,29 +162,6 @@ int process_overview();
 void printProceInfo(proc_t* curr);
 char* getStateName(proc_state_t state);
 proc_t *pick_proc();
-
-/**
- * Receives a message.
- *
- * Parameters:
- *   m				Pointer to write the message to.
- *
- * Returns:
- *   0 on success
- *   -1 if destination is invalid
- **/
-int wini_send(int dest, message_t *m);
-int wini_sendonce(int dest, message_t *m);
-
-/**
- * Receives a message.
- *
- * Parameters:
- *   m				Pointer to write the message to.
- *
- * Returns:			0
- **/
-int wini_receive(message_t *m);
 
 
 /**

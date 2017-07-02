@@ -1,9 +1,6 @@
-#include <winix/bitmap.h>
-#include <winix/slab.h>
-#include <stddef.h>
-#include <winix/mm.h>
+#include <winix/kernel.h>
 
-static unsigned long mask[BITMASK_NR];
+unsigned long mask[BITMASK_NR];
 
 void init_bitmap(){
 	register int i;
@@ -63,6 +60,27 @@ int bitmap_search_from(unsigned long *map, int map_len, int start, int num){
 
 int bitmap_search(unsigned long *map, int map_len, int num){
 	return bitmap_search_from(map,map_len,0,num);
+}
+
+int bitmap_search_reverse(unsigned long *map, int map_len, int num){
+	register int i,j;
+	int count = 0;
+
+	if(num >= map_len * 32 )	return -1;
+
+	for (i = map_len -1; i >= 0; i--){
+		for (j = BITMASK_NR -1; j >= 0; j--) {
+            if ((map[i] & mask[j]) == 0) {
+                count++;
+                if (count == num) {
+                    return (i*32 + j - count+1);
+                }
+            }else{
+                count = 0;
+            }
+        }
+	}
+	return -1;
 }
 
 void bitmap_set_bit(unsigned long *map, int map_len,int start){

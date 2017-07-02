@@ -1,6 +1,4 @@
-#include <winix/mem_alloc.h>
-#include <winix/kqueue.h>
-#include <stddef.h>
+#include <winix/kernel.h>
 
 /**
 
