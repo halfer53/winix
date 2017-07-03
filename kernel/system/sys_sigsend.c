@@ -87,7 +87,7 @@ void real_send_signal(proc_t *who,int signum){
     }
     delete_proc(ready_q[who->priority],who);
 
-    if(who->flags & RECEIVING && who->proc_index == curr_mesg()->src){
+    if(who->flags & RECEIVING && who->pid == curr_mesg()->src){
 		get_proc(SYSTEM_TASK)->pc = &intr_syscall;
 	}
 
@@ -100,7 +100,7 @@ void real_send_signal(proc_t *who,int signum){
 
 void send_signal(proc_t *who, int signum){
     if(who->sig_table[signum].sa_handler == SIG_DFL){
-        kprintf("Taking Default Action: kill %s [%d]",who->name,who->proc_index);
+        kprintf("Taking Default Action: kill %s [%d]",who->name,who->pid);
         end_process(who);
         return;
     }

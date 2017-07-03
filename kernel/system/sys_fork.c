@@ -4,7 +4,7 @@
  * fork the calling process
  *
  * Returns:
- *   proc_index of the newly forked process
+ *   pid of the newly forked process
  *
  * Side Effects:
  *   a new process forked onto the a new memory space, but not yet added to the scheduling queue
@@ -19,16 +19,14 @@ proc_t* do_fork(proc_t *parent) {
 	uint32_t *src, *dest;
 	pattern_t ptn;
 
-	if (parent->length == 0 || (size_t)(parent->rbase) == 0) {
-		//we can't fork p1 if it's a system task
-		kprintf("%s can't be forked\n", parent->name );
+	if(!isokprocn(parent->proc_index))
 		return NULL;
-	}
 
 	if (p = get_free_proc()) {
 		pbak = p->proc_index;
 		*p = *parent;
 		p->proc_index = pbak;
+		p->pid = p->proc_index;
 		p->ptable = p->protection_table;
 
 		if(extract_pattern(p->ptable, MEM_MAP_LEN, (int)p->heap_break, &ptn) != 0){
@@ -52,11 +50,10 @@ proc_t* do_fork(proc_t *parent) {
 				memcpy(dest,src,1024);
 			}
 		}
-		p->parent_proc_index = parent->proc_index;
+		p->parent = parent->proc_index;
 	}
 	// process_overview();
 	// printProceInfo(parent);
 	// printProceInfo(p);
-	assert(p != NULL, "Fork");
 	return p;
 }

@@ -14,7 +14,7 @@ int wini_send(int dest, message_t *m) {
 	proc_t *pDest;
 
 	current_proc->message = m; //save for later
-	// kprintf("to %d from %d type %d| ",dest,current_proc->proc_index,m->type);
+	// kprintf("to %d from %d type %d| ",dest,current_proc->pid,m->type);
 	//Is the destination valid?
 	if (pDest = get_proc(dest)) {
 		if(pDest->state == ZOMBIE || pDest->state == DEAD)
@@ -31,7 +31,7 @@ int wini_send(int dest, message_t *m) {
 			current_proc->flags |= SENDING;
 			current_proc->next_sender = pDest->sender_q;
 			pDest->sender_q = current_proc;
-			// kprintf(" | send t %d nexts %d senderh %d| ",m->type,current_proc->next_sender->proc_index,current_proc->sender_q->proc_index);
+			// kprintf(" | send t %d nexts %d senderh %d| ",m->type,current_proc->next_sender->pid,current_proc->sender_q->pid);
 		}
 
 		return OK;
@@ -62,7 +62,7 @@ int wini_receive(message_t *m) {
 		//Unblock sender
 		p->flags &= ~SENDING;
 		enqueue_head(ready_q[p->priority], p);
-		//kprintf("$at receive sender %d enqueued || ",p->proc_index);
+		//kprintf("$at receive sender %d enqueued || ",p->pid);
 	}
 	else {
 		current_proc->message = m;

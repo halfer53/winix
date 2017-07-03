@@ -19,7 +19,7 @@ ucontext_t syscall_ctx;
 void send_err(proc_t *to){
 	message_t tmesg;
 	memset(&tmesg,-1,MESSAGE_LEN);
-	winix_send(to->proc_index,&tmesg);
+	winix_send(to->pid,&tmesg);
 }
 
 void resume_syscall(proc_t *to){
@@ -62,9 +62,9 @@ void system_main() {
 		who_pid = m.src;
 		who = &proc_table[who_pid];
 
-		// kprintf("from %d op %d",who->proc_index,m.type );
-		// if(get_proc(0)->sender_q->proc_index < NUM_PROCS)
-		// 	kprintf(" next %d op %d ",get_proc(0)->sender_q->proc_index,get_proc(0)->sender_q->message);
+		// kprintf("from %d op %d",who->pid,m.type );
+		// if(get_proc(0)->sender_q->pid < NUM_PROCS)
+		// 	kprintf(" next %d op %d ",get_proc(0)->sender_q->pid,get_proc(0)->sender_q->message);
 		// kputc('\n');
 
 		//Do the work
@@ -92,12 +92,12 @@ void system_main() {
 
 			case SYSCALL_FORK:
 				pcurr = do_fork(who);
-				m.i1 = pcurr->proc_index;
+				m.i1 = pcurr->pid;
 				winix_send(who_pid, &m);
 				
 				//send 0 to child
 				m.i1 = 0;
-				winix_send(pcurr->proc_index,&m);
+				winix_send(pcurr->pid,&m);
 				break;
 
 			case SYSCALL_EXEC:
@@ -149,7 +149,7 @@ void system_main() {
 				break;
 			
 			default:
-				kprintf("\r\n[SYSTEM] Process \"%s (%d)\" performed unknown system call %d\r\n", who->name, who->proc_index, m.type);
+				kprintf("\r\n[SYSTEM] Process \"%s (%d)\" performed unknown system call %d\r\n", who->name, who->pid, m.type);
 				end_process(who);
 				break;
 		}

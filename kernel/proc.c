@@ -149,9 +149,11 @@ proc_t *get_free_proc() {
 
 	if (p) {
 		proc_set_default(p);
+		p->pid = p->proc_index;
 		p->IN_USE = 1;
+		return p;
 	}
-	return p;
+	return NULL;
 }
 
 void proc_set_default(proc_t *p) {
@@ -179,7 +181,7 @@ void proc_set_default(proc_t *p) {
 	p->message = NULL;
 
 	p->length = 0;
-	p->parent_proc_index = 0;
+	p->parent = 0;
 	p->heap_break = NULL;
 
 	p->ptable = p->protection_table;
@@ -364,7 +366,7 @@ void process_overview() {
 void printProceInfo(proc_t* curr) {
 	kprintf("%s %d rbase %x pc %x, sp %x, heap %x, pt %x flags %d\n",
 	        curr->name,
-	        curr->proc_index,
+	        curr->pid,
 	        curr->rbase,
 	        curr->pc,
 	        curr->sp,

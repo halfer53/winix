@@ -12,6 +12,6 @@ typedef unsigned int gid_t;
 typedef unsigned long off_t;
 typedef unsigned long time_t;
 typedef unsigned int nlink_t;
-typedef unsigned int pid_t;
+typedef int pid_t;
 
 #endif

@@ -17,9 +17,10 @@
 #define NUM_QUEUES				5
 #define IDLE_PRIORITY			4
 #define USER_PRIORITY			3
-#define KMOD_PRIORITY			2
-#define SYSTEM_PRIORITY			1
-#define TOP_PRIORITY			0
+#define SYSTEM_PRIORITY			0
+
+#define USER_PRIORITY_MAX		1
+#define USER_PRIORITY_MIN		4
 
 //Signal Context
 #define PROCESS_REGS_LEN		16
@@ -71,6 +72,10 @@ typedef struct proc {
 	message_t *message;	//Message buffer;
 	int flags; 
 
+	/* Heap */
+	void *heap_break;
+	unsigned long length; //length is depreciated, do not use it
+
 	/* Protection */
 	unsigned long protection_table[PROTECTION_TABLE_LEN];
 
@@ -90,19 +95,21 @@ typedef struct proc {
 	/* Metadata */
 	char name[PROC_NAME_LEN];		//Process name
 	proc_state_t state;	//Current process state
+	int exit_status;	//Storage for status when process exits
+	int sigstatus;		//Storage for siginal status when process exits
+	pid_t pid;			//Process id
+	pid_t procgrp;		//Pid of the process group (used for signals)
+	pid_t wpid;			//pid this process is waiting for
+	int parent;			//proc_index of parent
 
 	/* Process Table Index */
 	int proc_index;		//Index in the process table
-	int IN_USE;
+	int IN_USE;			//Whether the current slot is in use
 
-	unsigned long length; //length is depreciated, do not use it
-
-	int parent_proc_index;
-	int exit_status;
-
-	void *heap_break;
-
+	/* Signal Information */
 	struct sigaction sig_table[_NSIG];
+
+
 } proc_t;
 
 
@@ -114,8 +121,8 @@ extern proc_t *block_q[2];
 
 
 void enqueue_tail(proc_t **q, proc_t *proc);
- void enqueue_head(proc_t **q, proc_t *proc);
- proc_t *dequeue(proc_t **q);
+void enqueue_head(proc_t **q, proc_t *proc);
+proc_t *dequeue(proc_t **q);
 /**
  * Initialises the process table and scheduling queues.
  **/
@@ -151,7 +158,7 @@ void end_process(proc_t *p);
 proc_t *get_proc(int proc_nr);
 
 
-//fork the next process in the ready_q, return the new proc_index of the forked process
+//fork the next process in the ready_q, return the new pid of the forked process
 //side effect: the head of the free_proc is dequeued, and added to the ready_q with all relevant values equal
 //to the original process, except stack pointer.
 proc_t* do_fork(proc_t *p);

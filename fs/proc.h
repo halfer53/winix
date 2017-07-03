@@ -86,11 +86,11 @@ typedef struct proc {
 	int flags;
 
 	/* Process Table Index */
-	int proc_index;		//Index in the process table
+	int pid;		//Index in the process table
 
 	unsigned long length;
 
-	int parent_proc_index;
+	int parent_pid;
 
 	void *heap_break;
 

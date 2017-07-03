@@ -9,31 +9,29 @@ void do_wait(proc_t *parent, message_t *mesg){
 
     for (i=0; i<NUM_PROCS; i++) {
         child = &proc_table[i];
-        if(child->IN_USE && child->parent_proc_index == parent->proc_index){
+        if(child->IN_USE && child->parent == parent->proc_index){
             if(child->state == ZOMBIE){
-                kprintf("find zomebie child immed\n");
                 //TODO: set wstatus in proper format
                 if(mesg->p1 != NULL){
                     wstatus = get_physical_addr(mesg->p1,parent);
                     *wstatus = child->exit_status;
                 }
                 end_process(child);
-                mesg->i1 = child->proc_index;
-                winix_send(parent->proc_index,mesg);
+                mesg->i1 = child->pid;
+                winix_send(parent->pid,mesg);
                 return;
             }
+            parent->wpid = child->pid;
             children++;
         }
     }
 	
-
+    //Proc has no children
     if(children == 0){
-        //TODO: set error status on wstatus
-        kprintf("This proc has no children\n");
-        winix_send(parent->proc_index,mesg);
+        mesg->i1 = -1;
+        winix_send(parent->pid,mesg);
         return;
     }
-
     //block the process
     parent->flags |= WAITING;
 }

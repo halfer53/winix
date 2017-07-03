@@ -29,7 +29,7 @@ void clear_receiving_mesg(proc_t *who){
         xp = who->sender_q;
         memset(&m,-1,MESSAGE_LEN);
         while(xp){
-            winix_notify(xp->proc_index,&m);
+            winix_notify(xp->pid,&m);
             xp = xp->next_sender;
         }
     }
@@ -43,31 +43,34 @@ void clear_proc(proc_t *who){
 
 
 void do_exit(proc_t *who, message_t *mesg){
-    proc_t *parent_mp;
-    int parent_pi;
+    proc_t *mp;
+    int i, children;
 
-    kprintf("\r\n[SYSTEM] Process \"%s (%d)\" exited with code %d\r\n", who->name, who->proc_index, mesg->i1);
-    parent_pi = who->parent_proc_index;
-    parent_mp = get_proc(parent_pi);
+    kprintf("\r\n[SYSTEM] Process \"%s (%d)\" exited with code %d\r\n", who->name, who->pid, mesg->i1);
 
     clear_proc(who);
     end_process(who);
 
     // process_overview();
-
     //if parent is waiting
-    if(parent_mp && parent_mp->flags & WAITING){
-        //TODO: modify wstatus
-        
-        mesg->i1 = who->proc_index;
-        parent_mp->flags &= ~WAITING;
 
-        winix_send(parent_pi,mesg);
-    }else{ //if parent is not waiting
-        who->state = ZOMBIE;
-        who->exit_status = mesg->i1;
-        //block the current process
+    for( i=0; i< NUM_PROCS; i++){
+        mp = &proc_table[i];
+        if(mp->IN_USE && mp->flags & WAITING && mp->wpid == who->pid){
+            //TODO: modify wstatus
+            
+            mesg->i1 = who->pid;
+            mp->flags &= ~WAITING;
+
+            winix_send(mp->pid,mesg);
+        }
     }
+
+    //if parent is not waiting
+    //block the current process
+    who->state = ZOMBIE;
+    who->exit_status = mesg->i1;
+    
 }
 
 
