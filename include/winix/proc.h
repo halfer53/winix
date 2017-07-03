@@ -22,7 +22,8 @@
 #define TOP_PRIORITY			0
 
 //Signal Context
-#define PROCESS_CONTEXT_LEN		22
+#define PROCESS_REGS_LEN		16
+#define PROCESS_CONTEXT_LEN		21
 
 //Process Defaults
 #define DEFAULT_FLAGS			0
@@ -70,9 +71,6 @@ typedef struct proc {
 	message_t *message;	//Message buffer;
 	int flags; 
 
-	/* Scheduling */
-	int priority;	
-
 	/* Protection */
 	unsigned long protection_table[PROTECTION_TABLE_LEN];
 
@@ -82,6 +80,7 @@ typedef struct proc {
 
 	/* Scheduling */
 	struct proc *next;	//Next pointer
+	int priority;	
 	int quantum;		//Timeslice length
 	int ticks_left;		//Timeslice remaining
 
@@ -105,6 +104,9 @@ typedef struct proc {
 
 	struct sigaction sig_table[_NSIG];
 } proc_t;
+
+
+#define isokprocn(i)	(i>= 0 && i < NUM_PROCS)
 
 extern proc_t proc_table[NUM_PROCS];
 extern proc_t *ready_q[NUM_QUEUES][2];

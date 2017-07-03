@@ -124,6 +124,8 @@ static void serial2_handler() {
 static void gpf_handler() {
 	int i=0;
 	proc_t *system = get_proc(0);
+	if(!isokprocn(current_proc->proc_index))
+		panic("invalid proc");
 	//Current process has performed an illegal operation and will be shut down.
 	kprintf("\r\n[SYSTEM] Process \"%s (%d)\" Rbase=%x GPF: PC=%x SP=%x.\r\n",
 		current_proc->name,

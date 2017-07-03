@@ -59,16 +59,24 @@ int isPrintable(int c) {
 	return ('!' <= c && c <= '~');
 }
 
+int cont;
+
 void alarm_handler(int signum){
-	int *ni = 0;
-	*ni = 0x123456;
-	printf("\nalarm timer received\n");
-	printf("WINIX>%s",buf);
+	printf("alarm timer received, 2 seconds elapsed\n");
+	cont = 0;
 }
 
 int test_alarm(int argc, char **argv){
+	int i;
+	cont = 1;
+	
 	signal(SIGALRM,alarm_handler);
-	alarm(1);
+	alarm(2);
+	while(cont){
+		while(i--);
+		putc('!');
+		i = 10000;
+	}
 	return 0;
 }
 
@@ -239,8 +247,6 @@ void main() {
 	char *c;
 	struct cmd *handler = NULL;
 	
-	// alarm_handler(0);
-	// test_alarm(0,NULL);
 	while(1) {
 		printf("WINIX> ");
 		i=0;
@@ -250,12 +256,11 @@ void main() {
 			ret = getc(); 	//read
 			
 			if(ret == -1)
-				break;
+				continue;
 
 			if(ret == '\r')  //test for end
 				break;
-				
-			buf[i] = ret;
+
 			if ((int)ret == 8) { //backspace
 
 				if (i != 0) {
@@ -264,10 +269,10 @@ void main() {
 				}
 				continue;
 			}
-			i++;
+			buf[i++] = ret;
 			putc(ret); 		//echo
 		}
-		buf[++i] = '\0';
+		buf[i] = '\0';
 		putc('\n');
 
 		//Tokenise command

@@ -24,7 +24,7 @@ PRIVATE void build_user_stack(proc_t *who, void *src, size_t len){
 void real_send_signal(proc_t *who,int signum){
     unsigned long *sp;
     unsigned long *ra;
-    proc_t *task;
+    proc_t *systask;
     static message_t sigret_mesg;
     static sigframe_t sigframe;
 
@@ -86,19 +86,15 @@ void real_send_signal(proc_t *who,int signum){
         enqueue_tail(ready_q[current_proc->priority], current_proc);
     }
     delete_proc(ready_q[who->priority],who);
-    
-    current_proc = who;
 
-    current_proc->ticks_left = current_proc->quantum;
-    who->flags = 0;//reset flags
-    who->priority = TOP_PRIORITY;
-
-    kprintf("%d %d %d\n",who->flags,who->proc_index,curr_mesg()->src);
     if(who->flags & RECEIVING && who->proc_index == curr_mesg()->src){
 		get_proc(SYSTEM_TASK)->pc = &intr_syscall;
-        kprintf("interrupt syscall\n");
 	}
-    process_overview();
+
+    current_proc = who;
+    current_proc->ticks_left = current_proc->quantum;
+    who->flags = 0;//reset flags
+
     wramp_load_context();
 }
 

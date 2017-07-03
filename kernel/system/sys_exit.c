@@ -53,7 +53,7 @@ void do_exit(proc_t *who, message_t *mesg){
     clear_proc(who);
     end_process(who);
 
-    process_overview();
+    // process_overview();
 
     //if parent is waiting
     if(parent_mp && parent_mp->flags & WAITING){

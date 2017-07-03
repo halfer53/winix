@@ -10,6 +10,7 @@
 #define _WINIX_H_
 
 #include <winix/kernel.h>
+#include <ucontext.h>
 
 #include <winix/slab.h>
 
@@ -43,6 +44,8 @@ void assert(int expression, const char *message);
 
 extern message_t *curr_mesg();
 extern void intr_syscall();
+extern ucontext_t syscall_ctx;
+extern ucontext_t recv_ctx;
 
 //Memory limits
 extern unsigned long TEXT_BEGIN, DATA_BEGIN, BSS_BEGIN;
@@ -56,3 +59,4 @@ extern unsigned long FREE_MEM_BEGIN, FREE_MEM_END; //calculated at runtime
 // void shell_main();
 
 #endif
+

@@ -8,21 +8,28 @@
 
 #include "winix.h"
 #include <ucontext.h>
-#include <sys/syscall.h>
-#include <signal.h>
 
 message_t m;
 int who_pid;
 proc_t *who;
 
-ucontext_t main_ctx;
+ucontext_t recv_ctx;
+ucontext_t syscall_ctx;
+
+void send_err(proc_t *to){
+	message_t tmesg;
+	memset(&tmesg,-1,MESSAGE_LEN);
+	winix_send(to->proc_index,&tmesg);
+}
+
+void resume_syscall(proc_t *to){
+	if(to->flags & RECEIVING)
+		send_err(to);
+	// setcontext(&syscall_ctx);
+}
 
 void intr_syscall(){
-	kprintf("interrupt syscall\n");
-	memset(&m,-1,MESSAGE_LEN);
-	winix_notify(who_pid,&m);
-
-	setcontext(&main_ctx);
+	setcontext(&recv_ctx);
 }
 
 message_t *curr_mesg(){
@@ -48,22 +55,25 @@ void system_main() {
 		int response = 0;
 		void *ptr = NULL, *ptr2 = NULL;
 
-		getcontext(&main_ctx);
+		getcontext(&recv_ctx);
 
-		// kprintf("Main ctx\n");
-		//Get a message
+		//get a messa1ge
 		winix_receive(&m);
 		who_pid = m.src;
 		who = &proc_table[who_pid];
-		//kprintf("received from %s, call id %d, operation %d\n",p->name,p->proc_index,m.type );
+
+		// kprintf("from %d op %d",who->proc_index,m.type );
+		// if(get_proc(0)->sender_q->proc_index < NUM_PROCS)
+		// 	kprintf(" next %d op %d ",get_proc(0)->sender_q->proc_index,get_proc(0)->sender_q->message);
+		// kputc('\n');
+
 		//Do the work
 		switch(m.type) {
 
 			//Gets the system uptime.
 			case SYSCALL_GETC:
 				m.i1 = kgetc();
-				if(who->state == RUNNABLE)
-					winix_send(who_pid,&m);
+				winix_send(who_pid,&m);
 				break;
 
 			case SYSCALL_UPTIME:

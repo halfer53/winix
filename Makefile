@@ -47,6 +47,7 @@ shell:
 	java $(REFORMAT) shell.srec
 	[ ! -f $(GEN_BIN) ] && gcc tools/$(GEN_BIN).c -o $(GEN_BIN) || :
 	./$(GEN_BIN) shell.srec > include/shell_codes.c
+	rm shell.srec
 
 .DELETE_ON_ERROR:
 
