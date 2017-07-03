@@ -22,7 +22,7 @@
 #define TOP_PRIORITY			0
 
 //Signal Context
-#define PROCESS_CONTEXT_LEN		21
+#define PROCESS_CONTEXT_LEN		22
 
 //Process Defaults
 #define DEFAULT_FLAGS			0
@@ -70,6 +70,9 @@ typedef struct proc {
 	message_t *message;	//Message buffer;
 	int flags; 
 
+	/* Scheduling */
+	int priority;	
+
 	/* Protection */
 	unsigned long protection_table[PROTECTION_TABLE_LEN];
 
@@ -79,7 +82,6 @@ typedef struct proc {
 
 	/* Scheduling */
 	struct proc *next;	//Next pointer
-	int priority;	
 	int quantum;		//Timeslice length
 	int ticks_left;		//Timeslice remaining
 
@@ -156,7 +158,7 @@ proc_t *start_system(void (*entry)(), int priority, const char *name);
 proc_t* start_init(size_t *lines, size_t length, size_t entry);
 
 
-int process_overview();
+void process_overview();
 void printProceInfo(proc_t* curr);
 char* getStateName(proc_state_t state);
 proc_t *pick_proc();

@@ -18,7 +18,7 @@ void clock_handler();
 void init_alarm();
 void enqueue_alarm(alarm_t **q, alarm_t *new_alarm);
 alarm_t* dequeue_alarm(alarm_t **q);
-void sys_alarm(proc_t *caller, clock_t time);
+void sys_alarm(proc_t *who, clock_t time);
 
 // extern alarm_t alarm_table[_NTIMERS];
 // extern alarm_t *pending_alarm[2];

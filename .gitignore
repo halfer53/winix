@@ -13,6 +13,7 @@ a.out
 
 .vscode/
 fs/cmake-build-debug/
+expri/
 gen_bin_code
 reformat_srec
 

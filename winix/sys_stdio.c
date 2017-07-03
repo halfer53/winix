@@ -66,9 +66,9 @@ static void kputd(int n) {
 	}
 }
 
-static void kputs_vm(char *s, void *caller_rbase) {
+static void kputs_vm(char *s, void *who_rbase) {
 	char *sp = s;
-	sp += (int)caller_rbase;
+	sp += (int)who_rbase;
 	while(*sp)
 		kputc(*sp++);
 }
@@ -79,7 +79,7 @@ static void kputs(const char *s) {
 }
 
 
-void kprintf_vm(const char *format, void *arg, void *caller_rbase){
+void kprintf_vm(const char *format, void *arg, void *who_rbase){
 	char c = *format;
 
 	//TODO: proper formats
@@ -101,7 +101,7 @@ void kprintf_vm(const char *format, void *arg, void *caller_rbase){
 					break;
 
 				case 's':
-					kputs_vm(*(char **)arg,caller_rbase);
+					kputs_vm(*(char **)arg,who_rbase);
 					arg = ((char *)arg) + 1;
 					format++;
 					break;

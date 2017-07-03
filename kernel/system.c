@@ -7,9 +7,27 @@
  **/
 
 #include "winix.h"
+#include <ucontext.h>
 #include <sys/syscall.h>
 #include <signal.h>
 
+message_t m;
+int who_pid;
+proc_t *who;
+
+ucontext_t main_ctx;
+
+void intr_syscall(){
+	kprintf("interrupt syscall\n");
+	memset(&m,-1,MESSAGE_LEN);
+	winix_notify(who_pid,&m);
+
+	setcontext(&main_ctx);
+}
+
+message_t *curr_mesg(){
+	return &m;
+}
 /**
  * Entry point for system task.
  **/
@@ -25,16 +43,18 @@ void system_main() {
 	kprintf("%d kWords Free\r\n", ((unsigned long)(FREE_MEM_END - FREE_MEM_BEGIN)) / 1024);
 	//Receive message, do work, repeat.
 	while(1) {
-		message_t m;
-		int who;
-		proc_t *caller, *pcurr;
+		
+		proc_t *pcurr;
 		int response = 0;
 		void *ptr = NULL, *ptr2 = NULL;
 
+		getcontext(&main_ctx);
+
+		// kprintf("Main ctx\n");
 		//Get a message
 		winix_receive(&m);
-		who = m.src;
-		caller = &proc_table[who];
+		who_pid = m.src;
+		who = &proc_table[who_pid];
 		//kprintf("received from %s, call id %d, operation %d\n",p->name,p->proc_index,m.type );
 		//Do the work
 		switch(m.type) {
@@ -42,28 +62,28 @@ void system_main() {
 			//Gets the system uptime.
 			case SYSCALL_GETC:
 				m.i1 = kgetc();
-				if(caller->state == RUNNABLE)
-					winix_send(who,&m);
+				if(who->state == RUNNABLE)
+					winix_send(who_pid,&m);
 				break;
 
 			case SYSCALL_UPTIME:
 				m.i1 = system_uptime;
-				winix_send(who, &m);
+				winix_send(who_pid, &m);
 				break;
 
 			//Exits the current process.
 			case SYSCALL_EXIT:
-				do_exit(caller,&m);
+				do_exit(who,&m);
 				break;
 
 			case SYSCALL_PS:
-				response = process_overview();
+				process_overview();
 				break;
 
 			case SYSCALL_FORK:
-				pcurr = do_fork(caller);
+				pcurr = do_fork(who);
 				m.i1 = pcurr->proc_index;
-				winix_send(who, &m);
+				winix_send(who_pid, &m);
 				
 				//send 0 to child
 				m.i1 = 0;
@@ -71,17 +91,17 @@ void system_main() {
 				break;
 
 			case SYSCALL_EXEC:
-				response = exec_read_srec(get_proc(who));
+				response = exec_read_srec(get_proc(who_pid));
 				break;
 
 			case SYSCALL_SBRK:
-				m.p1 = do_sbrk(caller,m.i1);
-				winix_send(who, &m);
+				m.p1 = do_sbrk(who,m.i1);
+				winix_send(who_pid, &m);
 				break;
 
 			case SYSCALL_BRK:
-				m.i1 = do_brk(caller,m.p1);
-				winix_send(who, &m);
+				m.i1 = do_brk(who,m.p1);
+				winix_send(who_pid, &m);
 				break;
 
 			case SYSCALL_PUTC:
@@ -91,37 +111,38 @@ void system_main() {
 			case SYSCALL_PRINTF:
 				//p1: str pointer
 				//p2: args pointer
-				ptr = get_physical_addr(m.p1,caller);
-				ptr2 = get_physical_addr(m.p2,caller);
-				kprintf_vm(ptr,ptr2,caller->rbase);
+				ptr = get_physical_addr(m.p1,who);
+				ptr2 = get_physical_addr(m.p2,who);
+				kprintf_vm(ptr,ptr2,who->rbase);
 				// process_overview();
 				break;
 
 			case SYSCALL_ALARM:
-				sys_alarm(caller,m.i1);
+				sys_alarm(who,m.i1);
 				break;
 
 			case SYSCALL_SIGNAL:
-				set_signal(caller,m.i1,m.s1);
+				set_signal(who,m.i1,m.s1);
 				break;
 				
 			case SYSCALL_SIGRET:
-				do_sigreturn(caller,m.i1);
+				do_sigreturn(who,m.i1);
 				break;
 			
 			case SYSCALL_WAIT:
-				do_wait(caller,&m);
+				do_wait(who,&m);
 				break;
 
 			case SYSCALL_GETPID:
-				m.i1 = who;
-				winix_send(who,&m);
+				m.i1 = who_pid;
+				winix_send(who_pid,&m);
 				break;
 			
 			default:
-				kprintf("\r\n[SYSTEM] Process \"%s (%d)\" performed unknown system call %d\r\n", caller->name, caller->proc_index, m.type);
-				end_process(caller);
+				kprintf("\r\n[SYSTEM] Process \"%s (%d)\" performed unknown system call %d\r\n", who->name, who->proc_index, m.type);
+				end_process(who);
 				break;
 		}
 	}
 }
+

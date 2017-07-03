@@ -1,6 +1,7 @@
 #include <ucontext.h>
 #include <stddef.h>
 #include <string.h>
+#include <sys/syscall.h>
 #include <sys/types.h>
 
 void _ctx_end(ucontext_t *ucp){
@@ -21,6 +22,7 @@ void makecontext(ucontext_t *ucp, void (* func)(), int argc, ...){
 		return;
 
 	ucp->pc = (void (*)())&_ctx_start;
+	ucp->regs[11] = (unsigned long)&_ctx_end;
 
 	//allocate stack for the ucp context
 	spp = (!ucp->ss_flags) ? &ucp->ss_sp : &ucp->sp;

@@ -1,58 +1,74 @@
 #include "../winix.h"
 
-
-void clear_proc(proc_t *caller){
+void clear_sending_mesg(proc_t *who){
     register proc_t *rp; //iterate over the process table
-    register proc_t *xp; //iterate over the process's queue
-    register proc_t *prev_xp;
+    register proc_t **xp; //iterate over the process's queue
     int i;
-    /**TODO: release memory
-            release messages that curr proc is waiting for
-            release messages from which other procs are waiting for
-    **/
-
 
     for(i = 0; i < NUM_PROCS; i++){
         rp = &proc_table[i];
-        if(rp->IN_USE && rp->sender_q != NULL){
-            xp = rp->sender_q;
-            do{
-                if(xp == caller){
+        if(rp->IN_USE && (xp = &(rp->sender_q)) != NULL){
 
-                }
-            }while(xp != NULL);
+            //walk through the message queues
+            while(*xp && *xp != who)
+                xp = &(*xp)->next_sender;
+            
+            //remove it
+            if(*xp)
+                *xp = (*xp)->next_sender;
         }
     }
 }
 
 
-void do_exit(proc_t *caller, message_t *mesg){
+void clear_receiving_mesg(proc_t *who){
+    register proc_t *xp;
+    message_t m;
+
+    if(who->flags & WAITING){
+        xp = who->sender_q;
+        memset(&m,-1,MESSAGE_LEN);
+        while(xp){
+            winix_notify(xp->proc_index,&m);
+            xp = xp->next_sender;
+        }
+    }
+}
+
+void clear_proc(proc_t *who){
+    release_proc_mem(who);
+    clear_receiving_mesg(who);
+    clear_sending_mesg(who);
+}
+
+
+void do_exit(proc_t *who, message_t *mesg){
     proc_t *parent_mp;
     int parent_pi;
 
-    kprintf("\r\n[SYSTEM] Process \"%s (%d)\" exited with code %d\r\n", caller->name, caller->proc_index, mesg->i1);
-    parent_pi = caller->parent_proc_index;
+    kprintf("\r\n[SYSTEM] Process \"%s (%d)\" exited with code %d\r\n", who->name, who->proc_index, mesg->i1);
+    parent_pi = who->parent_proc_index;
     parent_mp = get_proc(parent_pi);
 
-    kprintf("do_exit ");
-    printProceInfo(caller);
-    printProceInfo(get_proc(2));
+    clear_proc(who);
+    end_process(who);
 
-    end_process(caller);
+    process_overview();
+
     //if parent is waiting
     if(parent_mp && parent_mp->flags & WAITING){
-        //TODO: parse i1 in proper format
+        //TODO: modify wstatus
         
-        mesg->i1 = caller->proc_index;
+        mesg->i1 = who->proc_index;
         parent_mp->flags &= ~WAITING;
 
         winix_send(parent_pi,mesg);
     }else{ //if parent is not waiting
-        caller->state = ZOMBIE;
-        caller->exit_status = mesg->i1;
+        who->state = ZOMBIE;
+        who->exit_status = mesg->i1;
         //block the current process
     }
-    
-
-    DEBUG = 10;
 }
+
+
+

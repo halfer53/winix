@@ -9,7 +9,7 @@
  * Side Effects:
  *   a new process forked onto the a new memory space, but not yet added to the scheduling queue
  **/
-proc_t* do_fork(proc_t *original) {
+proc_t* do_fork(proc_t *parent) {
 	proc_t *p = NULL;
 	void *ptr_base = NULL;
 	int len = 0;
@@ -19,15 +19,15 @@ proc_t* do_fork(proc_t *original) {
 	uint32_t *src, *dest;
 	pattern_t ptn;
 
-	if (original->length == 0 || (size_t)(original->rbase) == 0) {
+	if (parent->length == 0 || (size_t)(parent->rbase) == 0) {
 		//we can't fork p1 if it's a system task
-		kprintf("%s can't be forked\n", original->name );
+		kprintf("%s can't be forked\n", parent->name );
 		return NULL;
 	}
 
 	if (p = get_free_proc()) {
 		pbak = p->proc_index;
-		*p = *original;
+		*p = *parent;
 		p->proc_index = pbak;
 		p->ptable = p->protection_table;
 
@@ -44,19 +44,18 @@ proc_t* do_fork(proc_t *original) {
 		ptr_base = (void *)(index * 1024);
 		p->rbase = ptr_base;
 
-		sp = (size_t *)((size_t)(original->sp) + (size_t)(original->rbase));
+		sp = (size_t *)((size_t)(parent->sp) + (size_t)(parent->rbase));
 		p->message = (message_t *)(*(sp+ 2) + (size_t)p->rbase);
 
-		for( src = (uint32_t *)original->rbase, dest = (uint32_t *)p->rbase, j=0; j < ptn.size ; src+=1024,dest+=1024, j++){
+		for( src = (uint32_t *)parent->rbase, dest = (uint32_t *)p->rbase, j=0; j < ptn.size ; src+=1024,dest+=1024, j++){
 			if((0x80000000 >> j) & ptn.pattern){
 				memcpy(dest,src,1024);
 			}
 		}
-		p->parent_proc_index = original->proc_index;
-		p->state = RUNNABLE;
+		p->parent_proc_index = parent->proc_index;
 	}
 	// process_overview();
-	// printProceInfo(original);
+	// printProceInfo(parent);
 	// printProceInfo(p);
 	assert(p != NULL, "Fork");
 	return p;

@@ -148,9 +148,8 @@ proc_t *get_free_proc() {
 	size_t *sp = NULL;
 
 	if (p) {
-		p->IN_USE = 1;
 		proc_set_default(p);
-		//malloced_sp
+		p->IN_USE = 1;
 	}
 	return p;
 }
@@ -189,6 +188,10 @@ void proc_set_default(proc_t *p) {
 	memset(p->sig_table,0,_NSIG * 3); //3: sizeof struct sigaction
 }
 
+
+void release_proc_mem(proc_t *who){
+    bitmap_xor(mem_map,who->ptable,MEM_MAP_LEN);
+}
 
 
 void *kset_proc(proc_t *p, void (*entry)(), int priority, const char *name) {
@@ -346,22 +349,15 @@ void end_process(proc_t *p) {
 //and the currently running process
 //return OK;
 
-int process_overview() {
-	int i = 0;
-	proc_t *curr = NULL;
+void process_overview() {
+	int i;
+	proc_t *curr;
 	//kprintf("|| PS %s ",current_proc->name );
-	for (i = 0; i < NUM_QUEUES; i++) {
-		if (ready_q[i][HEAD] != NULL) {
-			curr = ready_q[i][HEAD];
-			while (curr != NULL) {
-				printProceInfo(curr);
-				//kprintf("%s ",curr->name);
-				curr = curr->next;
-			}
-		}
+	for (i = 0; i < NUM_PROCS; i++) {
+		curr = &proc_table[i];
+		if(curr->IN_USE)
+			printProceInfo(curr);
 	}
-	//kprintf("||\n" );
-	return OK;
 }
 
 //print the process state given
@@ -430,7 +426,7 @@ void init_proc() {
 	for (i = 0; i < NUM_PROCS; i++) {
 		proc_t *p = &proc_table[i];
 		p->state = DEAD;
-
+		p->IN_USE = 0;
 		enqueue_tail(free_proc, p);
 		proc_table[i].proc_index = i;
 	}

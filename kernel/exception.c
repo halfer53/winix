@@ -164,7 +164,7 @@ static void syscall_handler() {
 	operation = *(sp);				//Operation is the first parameter on the stack
 	dest = *(sp+1);				//Destination is second parameter on the stack
 	m = (message_t *)(*(sp+ 2) + (size_t)current_proc->rbase);	//Message pointer is the third parameter on the stack
-	m->src = current_proc->proc_index;			//Don't trust the caller to specify their own source process number
+	m->src = current_proc->proc_index;			//Don't trust the who to specify their own source process number
 
 	retval = (int*)&current_proc->regs[0];		//Result is returned in register $1
 	//Default return value is an error code

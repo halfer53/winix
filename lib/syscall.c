@@ -169,3 +169,7 @@ pid_t getpid(){
 	response = winix_sendrec(SYSTEM_TASK,&m);
 	return (pid_t)m.i1;
 }
+
+
+
+

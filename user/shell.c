@@ -235,11 +235,12 @@ int generic(int argc, char **argv) {
 void main() {
 	int i, j;
 	int argc;
+	char ret;
 	char *c;
 	struct cmd *handler = NULL;
 	
 	// alarm_handler(0);
-	test_signal(0,NULL);
+	// test_alarm(0,NULL);
 	while(1) {
 		printf("WINIX> ");
 

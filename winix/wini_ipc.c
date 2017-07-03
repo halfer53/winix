@@ -22,9 +22,8 @@ int wini_send(int dest, message_t *m) {
 			//Unblock receiver
 			pDest->flags &= ~RECEIVING;
 			enqueue_head(ready_q[pDest->priority], pDest);
-		}
-
-		else {
+		}else {
+			
 			//Otherwise, block current process and add it to head of sending queue of the destination.
 			current_proc->flags |= SENDING;
 			current_proc->next_sender = pDest->sender_q;
@@ -98,12 +97,17 @@ int wini_notify(int dest, message_t *m) {
 			//if the destination rejects any message it receives,
 			//do not deliver the message, but add it to the scheduling queue
 		} else {
-			//TODO
-			enqueue_tail(ready_q[current_proc->priority], current_proc);
+			//do nothing
 		}
 
 		//do nothing if it's not waiting
 		return OK;
 	}
 	return ERR;
+}
+
+
+int winix_send_err(int dest, message_t *m){
+	memset(m,-1,MESSAGE_LEN);
+	winix_send(dest,m);
 }

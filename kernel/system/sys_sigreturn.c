@@ -10,6 +10,6 @@ void do_sigreturn(proc_t *who,int signum){
 
     sp += MESSAGE_LEN + 3 +SIGFRAME_CODE_LEN;
     kprintf("sigret ");
-    printProceInfo(who);
+    process_overview();
     memcpy(who,sp,PROCESS_CONTEXT_LEN);
 }

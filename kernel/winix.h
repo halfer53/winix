@@ -41,6 +41,9 @@ void panic(const char *message);
  */
 void assert(int expression, const char *message);
 
+extern message_t *curr_mesg();
+extern void intr_syscall();
+
 //Memory limits
 extern unsigned long TEXT_BEGIN, DATA_BEGIN, BSS_BEGIN;
 extern unsigned long TEXT_END, DATA_END, BSS_END;
