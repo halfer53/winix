@@ -9,7 +9,7 @@ void do_wait(proc_t *parent, message_t *mesg){
 
     for (i=0; i<NUM_PROCS; i++) {
         child = &proc_table[i];
-        if(child->parent_proc_index == parent->proc_index){
+        if(child->IN_USE && child->parent_proc_index == parent->proc_index){
             if(child->state == ZOMBIE){
                 kprintf("find zomebie child immed\n");
                 //TODO: set wstatus in proper format
