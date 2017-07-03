@@ -80,6 +80,10 @@ void enqueue_head(proc_t **q, proc_t *proc) {
 
 /**
  * Removes the head of a list.
+ * Note that Zombie process reside inside the free_proc list. So if All 
+ * of the free_proc are occupied by Zombie processes, so if you dequeue
+ * one of them, then its exit status will be no longer be able to be retrieved
+ * by the parent
  *
  * Parameters:
  *   q		An array containing a head and tail pointer of a linked list.

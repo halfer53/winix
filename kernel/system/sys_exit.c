@@ -47,9 +47,9 @@ void do_exit(proc_t *who, message_t *mesg){
     int i, children;
 
     kprintf("\r\n[SYSTEM] Process \"%s (%d)\" exited with code %d\r\n", who->name, who->pid, mesg->i1);
-
-    clear_proc(who);
+    
     end_process(who);
+    clear_proc(who);
 
     // process_overview();
     //if parent is waiting
@@ -63,13 +63,18 @@ void do_exit(proc_t *who, message_t *mesg){
             mp->flags &= ~WAITING;
 
             winix_send(mp->pid,mesg);
+            children++;
         }
     }
 
+    if(children)
+        return;
+    
     //if parent is not waiting
     //block the current process
     who->state = ZOMBIE;
     who->exit_status = mesg->i1;
+    who->IN_USE = 1;
     
 }
 
