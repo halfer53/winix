@@ -243,24 +243,29 @@ void main() {
 	// test_alarm(0,NULL);
 	while(1) {
 		printf("WINIX> ");
-
+		i=0;
 		//Read line from terminal
-		for(i = 0; i < BUF_LEN - 1; i++) {
+		while( i < BUF_LEN - 2) {
 
-			buf[i] = getc(); 	//read
-			if(buf[i] == '\r') { //test for end
+			ret = getc(); 	//read
+			
+			if(ret == -1)
 				break;
-			}
-			if ((int)buf[i] == 8) { //backspace
+
+			if(ret == '\r')  //test for end
+				break;
+				
+			buf[i] = ret;
+			if ((int)ret == 8) { //backspace
 
 				if (i != 0) {
-					putc(buf[i]);
+					putc(ret);
 					i--;
 				}
-				i--;
 				continue;
 			}
-			putc(buf[i]); 		//echo
+			i++;
+			putc(ret); 		//echo
 		}
 		buf[++i] = '\0';
 		putc('\n');
