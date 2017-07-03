@@ -48,9 +48,6 @@ shell:
 	[ ! -f $(GEN_BIN) ] && gcc tools/$(GEN_BIN).c -o $(GEN_BIN) || :
 	./$(GEN_BIN) shell.srec > include/shell_codes.c
 
-test:
-	test -f myApp && echo File does exist
-
 .DELETE_ON_ERROR:
 
 
