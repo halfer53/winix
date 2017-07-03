@@ -29,7 +29,7 @@ proc_t* do_fork(proc_t *parent) {
 		p->pid = p->proc_index;
 		p->ptable = p->protection_table;
 
-		if(extract_pattern(p->ptable, MEM_MAP_LEN, (int)p->heap_break, &ptn) != 0){
+		if(bitmap_extract_pattern(p->ptable, MEM_MAP_LEN, (int)p->heap_break, &ptn) != 0){
 			kprintf("pat search failed");
 		}
 

@@ -134,11 +134,11 @@ static void gpf_handler() {
 		current_proc->pc,
 		current_proc->sp,current_proc);
 	kprintf("ptable: %x %x %x\n",current_proc->ptable[0],current_proc->ptable[1],current_proc->ptable[2]);
-	kprintf("$1: %x, $2, %x, $3, %x\n",current_proc->regs[0],current_proc->regs[1],current_proc->regs[2]);
-	kprintf("$4: %x, $5, %x, $6, %x\n",current_proc->regs[3],current_proc->regs[4],current_proc->regs[5]);
-	kprintf("$7: %x, $8, %x, $9, %x\n",current_proc->regs[6],current_proc->regs[7],current_proc->regs[8]);
-	kprintf("$10: %x, $11, %x, $12, %x\n",current_proc->regs[9],current_proc->regs[10],current_proc->regs[11]);
-	kprintf("$13: %x, $sp, %x, $ra, %x\n",current_proc->regs[12],current_proc->regs[13],current_proc->regs[14]);
+	// kprintf("$1: %x, $2, %x, $3, %x\n",current_proc->regs[0],current_proc->regs[1],current_proc->regs[2]);
+	// kprintf("$4: %x, $5, %x, $6, %x\n",current_proc->regs[3],current_proc->regs[4],current_proc->regs[5]);
+	// kprintf("$7: %x, $8, %x, $9, %x\n",current_proc->regs[6],current_proc->regs[7],current_proc->regs[8]);
+	// kprintf("$10: %x, $11, %x, $12, %x\n",current_proc->regs[9],current_proc->regs[10],current_proc->regs[11]);
+	// kprintf("$13: %x, $sp, %x, $ra, %x\n",current_proc->regs[12],current_proc->regs[13],current_proc->regs[14]);
 
 	//Kill process and call scheduler.
 	end_process(current_proc);

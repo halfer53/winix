@@ -25,7 +25,7 @@ void bitmap_xor(unsigned long *map1, unsigned long *map2, int size_len);
 
 int bitmap_search_pattern(unsigned long *map, int map_len, int start,unsigned long pattern, int pattern_len);
 void bitmap_set_pattern(unsigned long *map, int map_len, int index, unsigned long pattern, int pattern_len);
-int extract_pattern(unsigned long *map, int map_len, int heap_break, pattern_t* ptn);
+int bitmap_extract_pattern(unsigned long *map, int map_len, int heap_break, pattern_t* ptn);
 
 #endif
 

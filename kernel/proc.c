@@ -172,7 +172,7 @@ void proc_set_default(proc_t *p) {
 	p->quantum = DEFAULT_QUANTUM;
 	p->ticks_left = 0;
 	p->time_used = 0;
-	//strcpy(p->name,"Unkonwn Name");
+	//strcpy(p->name,"Unkonwn");
 	p->state = INITIALISING;
 	p->flags = DEFAULT_FLAGS;
 
@@ -373,17 +373,6 @@ void printProceInfo(proc_t* curr) {
 	        curr->heap_break,
 	        curr->ptable[0],
 			curr->flags);
-}
-
-//return the strign value of state name give proc_state_t state
-char* getStateName(proc_state_t state) {
-	switch (state) {
-		case DEAD: return "DEAD";
-		case INITIALISING: return "INITIALISING";
-		case RUNNABLE: return "RUNNABLE";
-		case ZOMBIE: return "ZOMBIE";
-		default: return "none";
-	}
 }
 
 

@@ -42,7 +42,7 @@ void testbitmap(){
 	// tmap[0] = 0x0000f145;
 	// tmap[1] = 0x10000000;
 	
-	// ptn = extract_pattern(tmap,32,35*1024);
+	// ptn = bitmap_extract_pattern(tmap,32,35*1024);
 	// index = bitmap_search_pattern(map,32,ptn->pattern,ptn->size);
 	// kprintf("pattern %d %x %d\n",index, ptn->pattern,ptn->size);
 	// bitmap_set_pattern(map,32,index,ptn->pattern,ptn->size);

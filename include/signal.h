@@ -45,7 +45,6 @@ typedef void (*sighandler_t)(int);
 #define SIG_IGN	   ((sighandler_t)  1)	/* ignore signal */
 #define SIG_HOLD   ((sighandler_t)  2)	/* block signal */
 #define SIG_CATCH  ((sighandler_t)  3)	/* catch signal */
-#define SIG_MESS   ((sighandler_t)  4)	/* pass as message (MINIX) */
 
 
 struct sigaction {

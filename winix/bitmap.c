@@ -177,7 +177,7 @@ unsigned long createMask(unsigned long a, unsigned long b)
    return r;
 }
 
-int extract_pattern(unsigned long *map, int map_len, int heap_break, pattern_t *p){
+int bitmap_extract_pattern(unsigned long *map, int map_len, int heap_break, pattern_t *p){
     int i,j,start = 0;
     unsigned long result = 0;
     int end = (align1k(heap_break) / 1024);

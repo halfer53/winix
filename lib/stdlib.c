@@ -37,7 +37,6 @@ void block_overview() {
 	block_t *b = base;
 	
 	if(!b){
-		printf("no heap mems\n");
 		return;
 	}
 	while (b) {
