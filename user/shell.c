@@ -6,14 +6,10 @@
  *  2016-11-20		Bruce Tan			Modified
  **/
 
-#include <sys/syscall.h>
+#include <unistd.h>
 #include <stdio.h>
-#include <stddef.h>
-#include <sys/types.h>
-#include <size.h>
-#include <stdlib.h>
 #include <ucontext.h>
-#include <signal.h>
+
 
 #define BUF_LEN		100
 
@@ -24,7 +20,7 @@ int shutdown(int argc, char **argv);
 int exit(int argc, char **argv);
 int testmalloc(int argc, char **argv);
 int test_signal(int argc, char **argv);
-int test_fiber(int argc, char **argv);
+int test_thread(int argc, char **argv);
 int test_alarm(int argc, char **argv);
 int generic(int argc, char **argv);
 
@@ -46,7 +42,7 @@ struct cmd commands[] = {
 	{ "ps", ps },
 	{ "testmalloc", testmalloc},
 	{ "testsignal", test_signal},
-	{ "testfiber", test_fiber},
+	{ "testthread", test_thread},
 	{ "testalarm", test_alarm},
 	{ NULL, generic }
 };
@@ -67,16 +63,11 @@ void alarm_handler(int signum){
 }
 
 int test_alarm(int argc, char **argv){
-	int i;
+	int i = 10000;
 	cont = 1;
 	
 	signal(SIGALRM,alarm_handler);
 	alarm(2);
-	while(cont){
-		while(i--);
-		putc('!');
-		i = 10000;
-	}
 	return 0;
 }
 
@@ -113,13 +104,13 @@ int x = 0;
 
 void func(int arg) {
 
-  printf("Fiber %d\n",arg);
+  printf("Thread %d\n",arg);
   x++;
-  printf("Fiber %d returning to main\n",arg);
+  printf("Thread %d returning to main\n",arg);
   setcontext(&mcontext);
 }
 
-int test_fiber(int argc, char **argv){
+int test_thread(int argc, char **argv){
 	int  value = 3;
 	getcontext(&fcontext);
 	if ((fcontext.ss_sp = (uint32_t *) malloc(1000)) != NULL) {
@@ -247,6 +238,7 @@ void main() {
 	char *c;
 	struct cmd *handler = NULL;
 	
+	test_alarm(0,NULL);
 	while(1) {
 		printf("WINIX> ");
 		i=0;
@@ -255,8 +247,11 @@ void main() {
 
 			ret = getc(); 	//read
 			
-			if(ret == -1)
+			if(ret == -1){
+				printf("err ");
 				continue;
+			}
+				
 
 			if(ret == '\r')  //test for end
 				break;

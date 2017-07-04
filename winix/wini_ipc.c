@@ -14,24 +14,27 @@ int wini_send(int dest, message_t *m) {
 	proc_t *pDest;
 
 	current_proc->message = m; //save for later
-	// kprintf("to %d from %d type %d| ",dest,current_proc->pid,m->type);
+	
 	//Is the destination valid?
 	if (pDest = get_proc(dest)) {
-		if(pDest->state == ZOMBIE || pDest->state == DEAD)
-			return ERR;
+
+		if(DEBUG_IPC){
+			kprintf("\nSEND %d flags %d from %d t %d| ",dest, pDest->flags, current_proc->pid,m->type);
+			DEBUG_IPC--;
+		}
 
 		if (pDest->flags & RECEIVING) {
 			*(pDest->message) = *m;
 			//Unblock receiver
 			pDest->flags &= ~RECEIVING;
 			enqueue_head(ready_q[pDest->priority], pDest);
+			
 		}else {
 			
 			//Otherwise, block current process and add it to head of sending queue of the destination.
 			current_proc->flags |= SENDING;
 			current_proc->next_sender = pDest->sender_q;
 			pDest->sender_q = current_proc;
-			// kprintf(" | send t %d nexts %d senderh %d| ",m->type,current_proc->next_sender->pid,current_proc->sender_q->pid);
 		}
 
 		return OK;
@@ -53,6 +56,10 @@ int wini_receive(message_t *m) {
 	//If a process is waiting to send to this process, deliver it immediately.
 	if (p != NULL) {
 
+		if(DEBUG_IPC){
+			kprintf("\nREC from %d t %d| ",p->pid ,m->type);
+			DEBUG_IPC--;
+		}
 		//Dequeue head node
 		current_proc->sender_q = p->next_sender;
 
@@ -87,6 +94,11 @@ int wini_notify(int dest, message_t *m) {
 
 	//Is the destination valid?
 	if (pDest = get_proc(dest)) {
+
+		if(DEBUG_IPC){
+			kprintf("\nNOTIFY %d flags %d from %d t %d| ",dest, pDest->flags, current_proc->pid,m->type);
+			DEBUG_IPC--;
+		}
 
 		//If destination is waiting, deliver message immediately.
 		if (pDest->flags & RECEIVING) {

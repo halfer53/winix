@@ -1,8 +1,6 @@
 #ifndef _W_KERNEL_H_
 #define _W_KERNEL_H_
 
-extern int DEBUG;
-
 #include <sys/ipc.h>
 #include <sys/types.h>
 #include <sys/syscall.h>
@@ -15,6 +13,7 @@ extern int DEBUG;
 #include <stdbool.h>
 #include <curses.h>
 
+#include <winix/kdebug.h>
 #include <winix/bitmap.h>
 #include <winix/mm.h>
 #include <winix/sys_stdio.h>

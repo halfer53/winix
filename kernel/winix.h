@@ -26,7 +26,7 @@
 //Major and minor version numbers for WINIX.
 #define MAJOR_VERSION 2
 #define MINOR_VERSION 0
-// extern int DEBUG = 0;
+
 /**
  * Print an error message and lock up the OS... the "Blue Screen of Death"
  *

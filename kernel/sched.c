@@ -66,9 +66,9 @@ void sched() {
 	}
 
 	current_proc = pick_proc();
-	if(DEBUG){
-		kprintf("pick %d t %d f %d |",current_proc->pid, current_proc->ticks_left, current_proc->flags);
-		DEBUG--;
+	if(DEBUG_SCHED){
+		kprintf("| %d |",current_proc->pid);
+		DEBUG_SCHED--;
 	}
 		
 	
