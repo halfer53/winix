@@ -14,7 +14,7 @@ int who_pid;
 proc_t *who;
 
 ucontext_t recv_ctx;
-ucontext_t syscall_ctx;
+syscallctx_t syscall_ctx;
 
 void send_err(proc_t *to){
 	message_t tmesg;
@@ -23,12 +23,19 @@ void send_err(proc_t *to){
 }
 
 void resume_syscall(proc_t *to){
-	if(to->flags & RECEIVING)
+	if(syscall_ctx.who->pid == to->pid && to->flags & RECEIVING)
 		send_err(to);
 	// setcontext(&syscall_ctx);
 }
 
 void intr_syscall(){
+	//if the system is executing a system call, save the system call context
+	//and restart the System as if it has finished executing the current syscall
+	if(!get_proc(SYSTEM_TASK)->flags){
+		syscall_ctx.m = m;
+		syscall_ctx.who = who;
+		syscall_ctx.interruptted = 1;
+	}
 	setcontext(&recv_ctx);
 }
 
@@ -40,6 +47,10 @@ message_t *curr_mesg(){
  **/
 void system_main() {
 	int counter = 0;
+	proc_t *pcurr;
+	int response = 0;
+	void *ptr = NULL, *ptr2 = NULL;
+
 	FREE_MEM_END = 0x1ffff;
 	
 	//Print Memory Map
@@ -49,14 +60,9 @@ void system_main() {
 	kprintf("Unallocated:  %x - %x\r\n", FREE_MEM_BEGIN, FREE_MEM_END);
 	kprintf("%d kWords Free\r\n", ((unsigned long)(FREE_MEM_END - FREE_MEM_BEGIN)) / 1024);
 	//Receive message, do work, repeat.
+
+	getcontext(&recv_ctx);
 	while(1) {
-		
-		proc_t *pcurr;
-		int response = 0;
-		void *ptr = NULL, *ptr2 = NULL;
-
-		getcontext(&recv_ctx);
-
 		//get a messa1ge
 		winix_receive(&m);
 		who_pid = m.src;

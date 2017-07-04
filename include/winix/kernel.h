@@ -19,5 +19,6 @@
 #include <winix/sys_stdio.h>
 #include <winix/wini_ipc.h>
 #include <winix/proc.h>
+#include <winix/syscall_ctx.h>
 
 #endif

@@ -44,7 +44,7 @@ void assert(int expression, const char *message);
 
 extern message_t *curr_mesg();
 extern void intr_syscall();
-extern ucontext_t syscall_ctx;
+extern syscallctx_t syscall_ctx;
 extern ucontext_t recv_ctx;
 
 //Memory limits
