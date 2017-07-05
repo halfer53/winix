@@ -18,7 +18,7 @@ int ps(int argc, char **argv);
 int uptime(int argc, char **argv);
 int shutdown(int argc, char **argv);
 int exit(int argc, char **argv);
-int testmalloc(int argc, char **argv);
+int test_malloc(int argc, char **argv);
 int test_signal(int argc, char **argv);
 int test_thread(int argc, char **argv);
 int test_alarm(int argc, char **argv);
@@ -40,10 +40,10 @@ struct cmd commands[] = {
 	{ "shutdown", shutdown },
 	{ "exit", exit },
 	{ "ps", ps },
-	{ "testmalloc", testmalloc},
-	{ "testsignal", test_signal},
-	{ "testthread", test_thread},
-	{ "testalarm", test_alarm},
+	{ "malloc", test_malloc},
+	{ "signal", test_signal},
+	{ "thread", test_thread},
+	{ "alarm", test_alarm},
 	{ NULL, generic }
 };
 //TODO: ps/uptime/shutdown should be moved to separate programs.
@@ -58,7 +58,7 @@ int isPrintable(int c) {
 int cont;
 
 void alarm_handler(int signum){
-	printf("alarm timer received, 2 seconds elapsed\n");
+	printf("alarm timer received, 1 seconds elapsed\n");
 	cont = 0;
 }
 
@@ -67,7 +67,7 @@ int test_alarm(int argc, char **argv){
 	cont = 1;
 	
 	signal(SIGALRM,alarm_handler);
-	alarm(2);
+	alarm(1);
 	return 0;
 }
 
@@ -140,7 +140,7 @@ int test_thread(int argc, char **argv){
 }
 
 
-int testmalloc(int argc, char **argv){
+int test_malloc(int argc, char **argv){
 	
 	void *p0 = malloc(512);
 	  void *p1 = malloc(512);
@@ -237,6 +237,9 @@ void main() {
 	char ret;
 	char *c;
 	struct cmd *handler = NULL;
+	// test_malloc(0,NULL);
+	test_alarm(0,NULL);
+	// test_signal(0,NULL);
 	while(1) {
 		printf("WINIX> ");
 		i=0;

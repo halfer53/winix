@@ -15,7 +15,7 @@ void do_sigreturn(proc_t *who,int signum){
     if(who->flags){
         delete_proc(ready_q[who->priority],who);
     }
-
+    kprintf("after send pc %x sp %x ra %x m %x\n",who->pc,who->sp,who->ra,who->message);
     resume_syscall(who);
 }
 

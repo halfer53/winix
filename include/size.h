@@ -1,5 +1,5 @@
 #ifndef _SIZE_H_
-#define _SIZE_H_
+#define _SIZE_H_ 1
 
 #define CHAR_SIZE 1
 #define SIZE_T_SIZE 1

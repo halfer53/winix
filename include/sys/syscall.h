@@ -7,7 +7,7 @@
  **/
 
 #ifndef _SYSCALL_H_
-#define _SYSCALL_H_
+#define _SYSCALL_H_ 1
 
 /**
  * System Call Numbers

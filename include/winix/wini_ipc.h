@@ -1,5 +1,5 @@
 #ifndef _W_IPC_H_
-#define _W_IPC_H_
+#define _W_IPC_H_ 1
 
 
 /**

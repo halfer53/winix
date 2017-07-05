@@ -1,5 +1,5 @@
 #ifndef _FS_CONST_H_
-#define _FS_CONST_H_
+#define _FS_CONST_H_ 1
 
 
 typedef unsigned int block_t;

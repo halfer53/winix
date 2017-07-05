@@ -7,7 +7,7 @@
  **/
  
 #ifndef _W_REX_H_
-#define _W_REX_H_
+#define _W_REX_H_ 1
 
 /**
  * REX Serial Ports

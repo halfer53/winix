@@ -7,7 +7,7 @@
  **/
 
 #ifndef _WINIX_IPC_H_
-#define _WINIX_IPC_H_
+#define _WINIX_IPC_H_ 1
 
 #include <signal.h>
 

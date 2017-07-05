@@ -1,5 +1,5 @@
 #ifndef _W_SIGNAL_H_
-#define _W_SIGNAL_H_
+#define _W_SIGNAL_H_ 1
 
 #include <signal.h>
 

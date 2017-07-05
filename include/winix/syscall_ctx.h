@@ -1,5 +1,5 @@
 #ifndef _W_SYSCALL_CTX_H_
-#define _W_SYSCALL_CTX_H_
+#define _W_SYSCALL_CTX_H_ 1
 
 #include <ucontext.h>
 

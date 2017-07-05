@@ -1,5 +1,5 @@
 #ifndef _W_SLAB_H_
-#define _W_SLAB_H_
+#define _W_SLAB_H_ 1
 
 #include <winix/gfp.h>
 

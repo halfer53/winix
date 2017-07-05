@@ -7,7 +7,7 @@
  **/
 
 #ifndef _WINIX_H_
-#define _WINIX_H_
+#define _WINIX_H_ 1
 
 #include <winix/kernel.h>
 #include <ucontext.h>
@@ -16,11 +16,11 @@
 #include <winix/slab.h>
 #include <winix/signal.h>
 
+#include <kernel/clock.h>
 #include <kernel/exception.h>
 #include <kernel/system.h>
 #include <kernel/idle.h>
 #include <kernel/sys_memory.h>
-#include <kernel/clock.h>
 
 
 //Major and minor version numbers for WINIX.

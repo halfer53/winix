@@ -1,5 +1,5 @@
 #ifndef _FS_FS_H_
-#define _FS_FS_H_
+#define _FS_FS_H_ 1
 
 #define NULL ((void*)0)
 
@@ -33,7 +33,7 @@
 #endif
 
 #ifndef _DIR_H_
-#define _DIR_H_
+#define _DIR_H_ 1
 
 #define	DIRBLKSIZ	1024	/* size of directory block */
 

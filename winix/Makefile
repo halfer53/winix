@@ -1,5 +1,5 @@
 CC = wcc
-PROGS = slab mm bitmap sys_stdio wini_ipc kdebug
+PROGS = slab mm bitmap sys_stdio wini_ipc kdebug timer
 SOURCES = $(PROGS:=.c)
 ASSEMBLY = $(PROGS:=.s)
 OBJECT = $(PROGS:=.o) kwramp.o

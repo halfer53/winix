@@ -6,7 +6,7 @@
  **/
 
 #ifndef _WRAMP_H_
-#define _WRAMP_H_
+#define _WRAMP_H_ 1
 
 #define NUM_REGS 13
 

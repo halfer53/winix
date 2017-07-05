@@ -1,5 +1,5 @@
 #ifndef _FS_SUPER_H_
-#define _FS_SUPER_H_
+#define _FS_SUPER_H_ 1
 
 struct super_block {
     int magic;

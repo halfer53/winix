@@ -18,7 +18,7 @@
  */
 
 #ifndef _ERRNO_H_		/* check if <errno.h> is already included */
-#define _ERRNO_H_		/* it is not included; note that fact */
+#define _ERRNO_H_ 1		/* it is not included; note that fact */
 
 /* Now define _SIGN as "" or "-" depending on _SYSTEM. */
 #ifdef _SYSTEM

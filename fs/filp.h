@@ -1,5 +1,5 @@
 #ifndef _FS_FILP_H_
-#define _FS_FILP_H_
+#define _FS_FILP_H_ 1
 
 #include "proc.h"
 #include "file.h"

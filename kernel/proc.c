@@ -191,7 +191,10 @@ void proc_set_default(proc_t *p) {
 	p->ptable = p->protection_table;
 	bitmap_clear(p->ptable, PROTECTION_TABLE_LEN);
 
-	memset(p->sig_table,0,_NSIG * 3); //3: sizeof struct sigaction
+	p->alarm.timer = 0;
+	p->alarm.next = NULL;
+
+	memset(&p->sig_table,0,_NSIG * 3); //3: sizeof struct sigaction
 }
 
 
@@ -337,7 +340,7 @@ proc_t* start_init(size_t *lines, size_t length, size_t entry) {
 void end_process(proc_t *p) {
 	int i,ret;
 	p->state = DEAD;
-	// process_overview();
+	release_proc_mem(p);
 	for(i=0; i< NUM_QUEUES; i++){
 		if(ready_q[i] != NULL){
 			ret = delete_proc(ready_q[i], p);

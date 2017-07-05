@@ -1,5 +1,5 @@
 #ifndef _FS_FILE_H_
-#define _FS_FILE_H_
+#define _FS_FILE_H_ 1
 
 #define OPEN_MAX  8
 

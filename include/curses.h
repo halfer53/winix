@@ -1,5 +1,5 @@
 #ifndef _CURSES_H_
-#define _CURSES_H_
+#define _CURSES_H_ 1
 
 
 #ifndef ERR

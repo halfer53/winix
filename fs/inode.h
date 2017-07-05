@@ -1,5 +1,5 @@
 #ifndef _FS_INODE_H_
-#define _FS_INODE_H_
+#define _FS_INODE_H_ 1
 
 #include "const.h"
 

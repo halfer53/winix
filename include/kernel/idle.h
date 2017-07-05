@@ -6,8 +6,8 @@
  *  2016-11-20		Bruce Tan			Modified
  **/
 
-#ifndef _IDLE_H_
-#define _IDLE_H_
+#ifndef _K_IDLE_H_
+#define _K_IDLE_H_ 1
 
 /**
  * Entry point for the IDLE task.

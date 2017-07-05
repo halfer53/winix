@@ -99,7 +99,6 @@ void main() {
 	Scan_FREE_MEM_BEGIN();
 
 	init_bitmap();
-	init_alarm();
 	init_mem_table(FREE_MEM_BEGIN);
 
 	//Set up process table

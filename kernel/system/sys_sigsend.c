@@ -1,7 +1,5 @@
 #include "../winix.h"
 
-
-
 static unsigned long sigframe_code[] = {0x1ee10001,0x200d0000};
 //addui sp,sp, 1
 //syscall
@@ -12,15 +10,14 @@ PRIVATE size_t sizeof_sigframe(){
 	return size;
 }
 
-PRIVATE void build_user_stack(proc_t *who, void *src, size_t len){
+PRIVATE void* build_user_stack(proc_t *who, void *src, size_t len){
     unsigned long *sp = get_physical_addr(who->sp,who);
     sp -= len;
     memcpy(sp,src,len );
-    who->sp = get_virtual_addr(sp,who);
+    return get_virtual_addr(sp,who);
 }
 
 //TODO: set sigcode and len together
-
 void real_send_signal(proc_t *who,int signum){
     unsigned long *sp;
     unsigned long *ra;
@@ -28,50 +25,23 @@ void real_send_signal(proc_t *who,int signum){
     static message_t sigret_mesg;
     static sigframe_t sigframe;
 
+    kprintf("before send pc %x sp %x ra %x m %x\n",who->pc,who->sp,who->ra,who->message);
     sp = who->sp;
     sp = get_physical_addr(sp,who);
     
-    build_user_stack(who,who,PROCESS_CONTEXT_LEN);
-    build_user_stack(who,sigframe_code,SIGFRAME_CODE_LEN);
+    who->sp = build_user_stack(who,who,PROCESS_CONTEXT_LEN);
+    who->sp = build_user_stack(who,sigframe_code,SIGFRAME_CODE_LEN);
 
     ra = who->sp;
     sigret_mesg.type = SYSCALL_SIGRET;
     sigret_mesg.i1 = signum;
-    build_user_stack(who,&sigret_mesg,MESSAGE_LEN);
+    who->sp = build_user_stack(who,&sigret_mesg,MESSAGE_LEN);
 
     sigframe.signum = signum;
     sigframe.operation = WINIX_SEND;
     sigframe.dest = SYSTEM_TASK;
     sigframe.pm = (message_t *)who->sp;
-    build_user_stack(who,&sigframe,sizeof_sigframe());
-
-    //restoring the context after sigreturn
-    //space for saving the old context
-    // sp -= PROCESS_CONTEXT_LEN;
-    // memcpy(sp,who,PROCESS_CONTEXT_LEN );
-    
-
-    //assembly code for invoking sigreturn
-    // sp -= SIGFRAME_CODE_LEN;
-    // memcpy(sp,sigframe_code,SIGFRAME_CODE_LEN);
-    
-
-    //message_t for sigreturn system call
-    
-    // sp-= MESSAGE_LEN;
-    // memcpy(sp,&sigret_mesg,MESSAGE_LEN);
-
-    // size = sizeof_sigframe();
-    // sp-= size;
-    // memcpy(sp,&sigframe,size);
-
-    //operating and dest for syscall
-    //see exception.c
-    // sp--;
-    // *sp = (unsigned long)get_virtual_addr(sp+1,who);
-    // *--sp = SYSTEM_TASK;
-    // *--sp = WINIX_SEND;
-    // *--sp = signum;
+    who->sp = build_user_stack(who,&sigframe,sizeof_sigframe());
 
     who->pc = (void (*)())who->sig_table[signum].sa_handler;
     who->ra = ra;
@@ -101,7 +71,7 @@ void real_send_signal(proc_t *who,int signum){
 void send_signal(proc_t *who, int signum){
     if(who->sig_table[signum].sa_handler == SIG_DFL){
         kprintf("Taking Default Action: kill %s [%d]",who->name,who->pid);
-        end_process(who);
+        do_exit(who, 1);
         return;
     }
     real_send_signal(who,signum);

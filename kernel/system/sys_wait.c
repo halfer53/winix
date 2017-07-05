@@ -17,7 +17,7 @@ void do_wait(proc_t *parent, message_t *mesg){
                     wstatus = get_physical_addr(mesg->p1,parent);
                     *wstatus = child->exit_status;
                 }
-                end_process(child);
+                do_exit(child, 1);
                 mesg->i1 = child->pid;
                 winix_send(parent->pid,mesg);
                 return;

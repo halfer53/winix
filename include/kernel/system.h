@@ -6,8 +6,8 @@
  *  2016-11-20		Bruce Tan			Modified
  **/
 
-#ifndef _W_SYSTEM_H_
-#define _W_SYSTEM_H_
+#ifndef _K_SYSTEM_H_
+#define _K_SYSTEM_H_ 1
 
 /**
  * Entry point for the system task.

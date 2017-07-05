@@ -9,7 +9,7 @@ But you can stil run the compiled code on the [Simulator](https://sourceforge.ne
 # TODO
 - [ ] fix bugs for sbrk() and brk() after fork()
 - [ ] sigreturn() is blocked by previous getc()
-- [ ] release memory and unprocessed messages after end_process()
+- [ ] release memory and unprocessed messages after do_exit(, EXIT_FAILURE)
 
 
 # Credits

@@ -1,5 +1,5 @@
 #ifndef _MAKEFS_H_
-#define _MAKEFS_H_
+#define _MAKEFS_H_ 1
 
 //16 MB
 // #define totalsize (16*1024*1024)

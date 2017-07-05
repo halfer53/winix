@@ -1,8 +1,8 @@
 #ifndef _UNISTD_H_
-#define _UNISTD_H_
+#define _UNISTD_H_ 1
 
 #ifndef _POSIX_SOURCE
-#define _POSIX_SOURCE
+#define _POSIX_ 1SOURCE
 #endif
 
 #include <sys/types.h>

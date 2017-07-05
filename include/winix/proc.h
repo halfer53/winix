@@ -7,7 +7,7 @@
  **/
 
 #ifndef _W_PROC_H_
-#define _W_PROC_H_
+#define _W_PROC_H_ 1
 
 #include <winix/kwramp.h>
 
@@ -107,9 +107,11 @@ typedef struct proc {
 	int IN_USE;			//Whether the current slot is in use
 
 	/* Signal Information */
+	sigset_t pending_sigs;
 	struct sigaction sig_table[_NSIG];
 
-
+	/* Alarm */
+	timer_t alarm;
 } proc_t;
 
 

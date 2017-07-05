@@ -6,8 +6,8 @@
  *  2016-11-20		Bruce Tan			Modified
  **/
 
-#ifndef _W_EXCEPTION_H_
-#define _W_EXCEPTION_H_
+#ifndef _K_EXCEPTION_H_
+#define _K_EXCEPTION_H_ 1
 
 //System uptime, in ticks.
 extern int system_uptime;

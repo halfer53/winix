@@ -13,8 +13,8 @@
  *				+---------------------+
  */
 
-#ifndef _WAIT_H
-#define _WAIT_H
+#ifndef _WAIT_H_
+#define _WAIT_H_ 1
 
 #ifndef _TYPES_H
 #include <sys/types.h>

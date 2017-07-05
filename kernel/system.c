@@ -87,11 +87,11 @@ void system_main() {
 			case SYSCALL_SIGNAL:	syscall_sigaction(who,&m);	break;	
 			case SYSCALL_SIGRET:	syscall_sigreturn(who,&m);	break;
 			case SYSCALL_WAIT:		syscall_wait(who,&m);		break;
-			case SYSCALL_GETPID:	syscall_getpid(who,&m)		break;
+			case SYSCALL_GETPID:	syscall_getpid(who,&m);		break;
 			
 			default:
 				kprintf("\r\n[SYSTEM] Process \"%s (%d)\" performed unknown system call %d\r\n", who->name, who->pid, m.type);
-				end_process(who);
+				do_exit(who, 1);
 				break;
 		}	
 	}

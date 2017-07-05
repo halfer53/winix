@@ -1,5 +1,5 @@
 #ifndef _BITMAP_H_
-#define _BITMAP_H_
+#define _BITMAP_H_ 1
 
 #define BITMASK_NR	32
 

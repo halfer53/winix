@@ -1,5 +1,5 @@
 #ifndef _TYPE_H_
-#define _TYPE_H_
+#define _TYPE_H_ 1
 
 typedef unsigned long size_t;
 typedef unsigned char byte;

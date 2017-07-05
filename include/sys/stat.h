@@ -4,7 +4,7 @@
  */
 
 #ifndef _STAT_H_
-#define _STAT_H_
+#define _STAT_H_ 1
 
 #ifndef _TYPES_H_
 #include <sys/types.h>

@@ -7,7 +7,7 @@
  **/
 
 #ifndef _PROC_H_
-#define _PROC_H_
+#define _PROC_H_ 1
 
 //Process & Scheduling
 #define PROC_NAME_LEN			20

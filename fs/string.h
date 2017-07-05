@@ -6,7 +6,7 @@
  *  2016-11-20		Bruce Tan			Modified
  **/
 #ifndef _STRING_H_
-#define _STRING_H_
+#define _STRING_H_ 1
 
 //void *memcpy(void *s1, const void *s2, register int n);
 int strcmp(const char *s1, const char *s2);

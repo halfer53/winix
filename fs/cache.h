@@ -1,5 +1,5 @@
 #ifndef _FS_LRU_H_
-#define _FS_LRU_H_
+#define _FS_LRU_H_ 1
 
 typedef struct _buf
 {

@@ -1,5 +1,5 @@
-#ifndef _SIGNAL_H
-#define _SIGNAL_H
+#ifndef _SIGNAL_H_
+#define _SIGNAL_H_ 1
 
 
 #include <sys/types.h>
@@ -9,7 +9,7 @@ typedef int sig_atomic_t;
 
 #ifdef _POSIX_SOURCE
 #ifndef _SIGSET_T
-#define _SIGSET_T
+#define _SIGSET_ 1T
 typedef unsigned long sigset_t;
 #endif
 #endif
