@@ -24,6 +24,7 @@ int testmalloc(int argc, char **argv);
 int test_signal(int argc, char **argv);
 int test_thread(int argc, char **argv);
 int test_alarm(int argc, char **argv);
+int test_fork(int argc, char **argv);
 int generic(int argc, char **argv);
 
 //Input buffer & tokeniser
@@ -54,6 +55,7 @@ struct cmd commands[] = {
 	{ test_signal, "signal"},
 	{ test_thread, "thread"},
 	{ test_alarm, "alarm"},
+	{ test_fork, "fork"},
 	{ generic, NULL }
 };
 //TODO: ps/uptime/shutdown should be moved to separate programs.
@@ -247,6 +249,18 @@ int exit(int argc, char **argv) {
 	return sys_exit(status);
 }
 
+
+int test_fork(int argc, char **argv){
+	pid_t pid;
+	if(fork()){
+		printf("parent shell waiting\n");
+		wait(NULL);
+		printf("parent shell awaken\n");
+	}else{
+		printf("Child shell:\n");
+	}
+	return 0;
+}
 /**
  * Handles any unknown command.
  **/
@@ -255,20 +269,10 @@ int generic(int argc, char **argv) {
 	if(argc == 0)
 		return 0;
 
-		if (strcmp("exec",argv[0]) == 0) {
-			printf("please drag the srec file onto this windows\n" );
-			return exec();
-		}else if (strcmp("fork",argv[0]) == 0) {
-			int forkid = 0;
-			forkid = fork();
-			if (forkid != 0)
-			{
-				printf("I am parent\n");
-			}else{
-				printf("I am child\n");
-			}
-			return 0;
-		}
+	if (strcmp("exec",argv[0]) == 0) {
+		printf("please drag the srec file onto this windows\n" );
+		return exec();
+	}
 	printf("Unknown command '%s'\r\n", argv[0]);
 	return -1;
 }

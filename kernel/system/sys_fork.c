@@ -61,13 +61,13 @@ proc_t* do_fork(proc_t *parent) {
 void syscall_fork(proc_t *who, message_t *m){
 	proc_t *child;
 	child = do_fork(who);
-	
-	m->i1 = child->pid;
-	winix_send(who->pid, m);
 
 	//send 0 to child
 	m->i1 = 0;
 	winix_send(child->pid,m);
+
+	m->i1 = child->pid;
+	winix_send(who->pid, m);
 }
 
 
