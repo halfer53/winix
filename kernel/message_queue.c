@@ -59,7 +59,6 @@ void add_receving_message(message_t *m) {
 void message_queue_main(){
 	message_t m;
 	init_message_queue();
-	kprintf("MES");
 	while(1){
 		
 		if (sending_queue[HEAD] != 0){

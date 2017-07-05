@@ -25,7 +25,6 @@ void real_send_signal(proc_t *who,int signum){
     static message_t sigret_mesg;
     static sigframe_t sigframe;
 
-    kprintf("before send pc %x sp %x ra %x m %x\n",who->pc,who->sp,who->ra,who->message);
     sp = who->sp;
     sp = get_physical_addr(sp,who);
     

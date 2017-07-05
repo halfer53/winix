@@ -1,7 +1,6 @@
 #include "winix.h"
 
 void deliver_alarm(pid_t pid, clock_t time){
-    kprintf("send to %d\n",get_proc(pid)->pid);
     send_signal(get_proc(pid),SIGALRM);
 }
 

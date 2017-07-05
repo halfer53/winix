@@ -37,6 +37,7 @@ stat:
 	@find . -name "*.s" -exec cat {} \; | wc -l
 
 shell:
+	$(MAKE) -C lib clean
 	$(MAKE) -C lib
 	rm -f $(KERNEL_MAIN)
 	wcc -S user/shell.c
@@ -46,7 +47,8 @@ shell:
 	java $(REFORMAT) shell.srec
 	[ ! -f $(GEN_BIN) ] && gcc tools/$(GEN_BIN).c -o $(GEN_BIN) || :
 	./$(GEN_BIN) shell.srec > include/shell_codes.c
-	# rm shell.srec
+	rm shell.srec
+	$(MAKE) all
 
 .DELETE_ON_ERROR:
 

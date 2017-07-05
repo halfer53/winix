@@ -9,7 +9,6 @@ void init_mem_table(int free_mem_begin) {
 		mem_map[i] = 0;
 	}
 	bitmap_set_nbits(mem_map, MEM_MAP_LEN, 0, len);
-	kprintf("Free %x len %d map %x\n",free_mem_begin,len,mem_map[0]);
 }
 
 void *get_free_pages(int num, int flags) {

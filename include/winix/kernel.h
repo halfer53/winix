@@ -6,7 +6,6 @@
 #include <sys/syscall.h>
 #include <stddef.h>
 #include <util.h>
-#include <size.h>
 #include <const.h>
 #include <stdbool.h>
 #include <signal.h>

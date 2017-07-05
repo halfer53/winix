@@ -112,7 +112,7 @@ int exec_read_srec(proc_t *p){
 	//assuming the first line of the srec is of type S6, so we can read the length of the words to be loaded
   if ((wordslength = winix_load_srec_words_length(buf))) {
 		//allocate a new array for storing temporary text
-    memory_values = (size_t *)kmalloc(wordslength * LONG_SIZE);
+    memory_values = (size_t *)kmalloc(wordslength);
     while(1){
 			//read line
       for(i = 0; i < BUF_LEN - 1; i++) {

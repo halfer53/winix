@@ -3,7 +3,7 @@
 # assemble = stdio.o string.o syscall.o wramp_syscall.o ipc.o util.o stdlib.o ucontext.o makecontext.o debug.o
 
 CC = wcc
-PROGS = stdio string syscall ipc util stdlib makecontext
+PROGS = stdio string syscall ipc util stdlib makecontext atoi
 SOURCES = $(PROGS:=.c)
 ASSEMBLY = $(PROGS:=.s)
 OBJECT = $(PROGS:=.o) wramp_syscall.o ucontext.o debug.o

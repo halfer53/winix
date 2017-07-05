@@ -13,6 +13,4 @@ void syscall_alarm(proc_t *who, message_t *m){
     m->i1 = 0;
     winix_send(who->pid, m);
     
-    DEBUG_IPC = 20;
-    DEBUG_SCHED = 50;
 }
