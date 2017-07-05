@@ -44,7 +44,7 @@ void clear_proc(proc_t *who){
 
 void do_exit(proc_t *who, message_t *mesg){
     proc_t *mp;
-    int i, children;
+    int i, children = 0;
 
     kprintf("\r\n[SYSTEM] Process \"%s (%d)\" exited with code %d\r\n", who->name, who->pid, mesg->i1);
     
@@ -76,6 +76,10 @@ void do_exit(proc_t *who, message_t *mesg){
     who->exit_status = mesg->i1;
     who->IN_USE = 1;
     
+}
+
+void syscall_do_exit(proc_t *who, message_t *m){
+	do_exit(who,m);
 }
 
 

@@ -18,3 +18,10 @@ void do_sigreturn(proc_t *who,int signum){
 
     resume_syscall(who);
 }
+
+
+void syscall_sigreturn(proc_t *who, message_t *m){
+    do_sigreturn(who,m->i1);
+    m->i1 = 0;
+    // winix_send(who->pid,m);
+}

@@ -1,27 +1,25 @@
-WINIXO = winix/*.o
-sources = main.c proc.c system.c exception.c idle.c sys_memory.c clock.c sched.c
-compile = main.s proc.s system.s exception.s idle.s sys_memory.s clock.s sched.s
-assemble = main.o proc.o system.o exception.o idle.o sys_memory.o clock.o sched.o util/limits_head.o util/limits_tail.o
+CC = wcc
+PROGS = main proc system exception idle clock sched sys_memory
+SOURCES = $(PROGS:=.c)
+ASSEMBLY = $(PROGS:=.s)
+OBJECT = $(PROGS:=.o)
 
 all:
 	$(MAKE) -C system
-	$(MAKE)	compile
+	$(MAKE)	wramp
 
-compile: $(assemble)
-$(compile): %.s: %.c
-	wcc -S -I../include -o $@ $<
+wramp: $(OBJECT)
+$(ASSEMBLY): %.s: %.c
+	$(CC) -S -I../include -o $@ $<
 
-$(assemble): %.o: %.s
+$(OBJECT): %.o: %.s
 	wasm $< -o $@
-
-$(link): $(assemble)
-	wlink -o $(link) $(assemble)
 
 depend:
 	makedepend $(sources)
 
 clean:
 	$(MAKE) -C system clean
-	-rm -f $(compile) $(assemble)
+	-rm -f $(OBJECT) $(ASSEMBLY)
 
 .DELETE_ON_ERROR:

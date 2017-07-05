@@ -1,11 +1,11 @@
 #include "winix.h"
 
-alarm_t alarm_table[_NTIMERS];
-alarm_t *pending_alarm[2];
-alarm_t *free_alarm[2];
+timer_t timer_table[_NTIMERS];
+timer_t *pending_alarm[2];
+timer_t *free_alarm[2];
 
 
-void enqueue_alarm(alarm_t **q, alarm_t *new_alarm){
+void enqueue_alarm(timer_t **q, timer_t *new_alarm){
 	if(q[HEAD] == NULL) {
 		new_alarm->next = NULL;
 		q[HEAD] = q[TAIL] = new_alarm;
@@ -16,8 +16,8 @@ void enqueue_alarm(alarm_t **q, alarm_t *new_alarm){
 	}
 }
 
-alarm_t* dequeue_alarm(alarm_t **q){
-    alarm_t *mq = q[HEAD];
+timer_t* dequeue_alarm(timer_t **q){
+    timer_t *mq = q[HEAD];
 
 	if(mq == NULL)
 		return NULL;
@@ -38,9 +38,9 @@ void init_alarm(){
     free_alarm[HEAD] = free_alarm[TAIL] = NULL;
 
     for(i =0; i<_NTIMERS; i++){
-        alarm_table[i].who = NULL;
-        alarm_table[i].timer = 0;
-        enqueue_alarm(free_alarm, &alarm_table[i]);
+        timer_table[i].who = NULL;
+        timer_table[i].timer = 0;
+        enqueue_alarm(free_alarm, &timer_table[i]);
     }
     pending_alarm[HEAD] = pending_alarm[TAIL] = NULL;
 
@@ -49,7 +49,7 @@ void init_alarm(){
 
 
 void deliver_alarm(){
-    alarm_t *talarm;
+    timer_t *talarm;
 
     talarm = dequeue_alarm(pending_alarm);
     enqueue_alarm(free_alarm,talarm);

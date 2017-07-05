@@ -25,3 +25,9 @@ int do_brk(proc_t *who, void *addr){
 	}
 	return ERR;
 }
+
+
+void syscall_brk(proc_t *who, message_t *m){
+	m->i1 = do_brk(who,m->p1);
+	winix_send(who->pid,m);
+}

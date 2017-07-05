@@ -1,24 +1,19 @@
-objs = winix/*.o kernel/*.o kernel/system/*.o lib/ipc.o lib/string.o lib/util.o lib/wramp_syscall.o lib/ucontext.o
-KERNEL_MAIN = kernel/main.s kernel/main.o
+
+OBJS = winix/*.o kernel/*.o kernel/system/*.o lib/ipc.o \
+		lib/string.o lib/util.o lib/wramp_syscall.o lib/ucontext.o
+
+WRAMP_LIMITS_OBJS = kernel/util/limits_head.o kernel/util/limits_tail.o
+KERNEL_MAIN = kernel/main.s kernel/main.o 
+
 REFORMAT = reformat_srec
 GEN_BIN = gen_bin_code
 
 all:
 	$(MAKE) -C lib
-	$(MAKE) shell
 	$(MAKE) -C winix
 	$(MAKE) -C kernel
 	$(MAKE) -C user
-	wlink -o winix.srec kernel/util/limits_head.o $(objs) kernel/util/limits_tail.o
-
-debug:
-	$(MAKE) clean
-	$(MAKE) -C lib
-	$(MAKE) shell
-	$(MAKE) -C winix
-	$(MAKE) -C kernel
-	$(MAKE) -C user
-	wlink -o winix.srec kernel/util/limits_head.o $(objs) kernel/util/limits_tail.o
+	wlink -o winix.srec $(OBJS) $(WRAMP_LIMITS_OBJS)
 
 install:
 	$(MAKE) clean

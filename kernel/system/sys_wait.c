@@ -5,7 +5,7 @@ void do_wait(proc_t *parent, message_t *mesg){
     register proc_t *child = NULL;
     
     unsigned long *wstatus;
-    int children,i;
+    int children = 0,i;
 
     for (i=0; i<NUM_PROCS; i++) {
         child = &proc_table[i];
@@ -29,11 +29,18 @@ void do_wait(proc_t *parent, message_t *mesg){
 	
     //Proc has no children
     if(children == 0){
-        kprintf("no children");
+        kprintf("no children\n");
         mesg->i1 = -1;
         winix_send(parent->pid,mesg);
         return;
     }
     //block the process
     parent->flags |= WAITING;
+}
+
+
+void syscall_wait(proc_t *who, message_t *m){
+    do_wait(who,m);
+	m->i1 = 0;
+    // winix_send(who->pid,m);
 }

@@ -7,22 +7,22 @@ typedef struct alarm{
 	proc_t *who;
 	clock_t timer;
 	struct alarm *next;
-}alarm_t;
+}timer_t;
 
 
-extern alarm_t *pending_alarm[2];
-extern alarm_t *free_alarm[2];
+extern timer_t *pending_alarm[2];
+extern timer_t *free_alarm[2];
 
 
 void clock_handler();
 void init_alarm();
-void enqueue_alarm(alarm_t **q, alarm_t *new_alarm);
-alarm_t* dequeue_alarm(alarm_t **q);
-void sys_alarm(proc_t *who, clock_t time);
+void enqueue_alarm(timer_t **q, timer_t *new_alarm);
+timer_t* dequeue_alarm(timer_t **q);
+void sys_alarm(proc_t *who, message_t *m);
 
-// extern alarm_t alarm_table[_NTIMERS];
-// extern alarm_t *pending_alarm[2];
-// extern alarm_t *free_alarm[2];
+// extern timer_t timer_table[_NTIMERS];
+// extern timer_t *pending_alarm[2];
+// extern timer_t *free_alarm[2];
 #endif
 
 

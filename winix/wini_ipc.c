@@ -69,7 +69,6 @@ int wini_receive(message_t *m) {
 		//Unblock sender
 		p->flags &= ~SENDING;
 		enqueue_head(ready_q[p->priority], p);
-		//kprintf("$at receive sender %d enqueued || ",p->pid);
 	}
 	else {
 		current_proc->message = m;
@@ -111,8 +110,6 @@ int wini_notify(int dest, message_t *m) {
 			enqueue_head(ready_q[pDest->priority], pDest);
 			//if the destination rejects any message it receives,
 			//do not deliver the message, but add it to the scheduling queue
-		} else {
-			//do nothing
 		}
 
 		//do nothing if it's not waiting
@@ -122,7 +119,8 @@ int wini_notify(int dest, message_t *m) {
 }
 
 
-int winix_send_err(int dest, message_t *m){
-	memset(m,-1,MESSAGE_LEN);
-	winix_send(dest,m);
+int winix_senderr(int dest){
+	message_t m;
+	memset(&m,-1,MESSAGE_LEN);
+	return winix_send(dest,&m);
 }

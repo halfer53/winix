@@ -1,5 +1,10 @@
 #include "../winix.h"
 
+void syscall_exec(proc_t *who, message_t *m){
+		m->i1 = exec_read_srec(who);
+		winix_send(who->pid,m);
+}
+
 //dynamically allocate a new memory space in the memory, and
 //write mem values in lines to that space
 proc_t *exec_new_proc(size_t *lines, size_t length, size_t entry, int priority, char *name){

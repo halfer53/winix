@@ -1,13 +1,14 @@
-sources = slab.c mm.c bitmap.c sys_stdio.c wini_ipc.c kdebug.c
-compile = slab.s mm.s bitmap.s sys_stdio.s wini_ipc.s kdebug.s
-assemble = slab.o mm.o bitmap.o kwramp.o sys_stdio.o wini_ipc.o kdebug.o
+CC = wcc
+PROGS = slab mm bitmap sys_stdio wini_ipc kdebug
+SOURCES = $(PROGS:=.c)
+ASSEMBLY = $(PROGS:=.s)
+OBJECT = $(PROGS:=.o) kwramp.o
 
-all: $(assemble)
+wramp: $(OBJECT)
+$(ASSEMBLY): %.s: %.c
+	$(CC) -S -I../include -o $@ $<
 
-$(compile): %.s: %.c
-	wcc -S -I../include -o $@ $<
-
-$(assemble): %.o: %.s
+$(OBJECT): %.o: %.s
 	wasm $< -o $@
 
 $(link): $(assemble)
@@ -17,6 +18,6 @@ depend:
 	makedepend $(sources)
 
 clean:
-	-rm -f $(compile) $(assemble)
+	-rm -f $(OBJECT) $(ASSEMBLY)
 
 .DELETE_ON_ERROR:

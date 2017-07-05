@@ -1,19 +1,20 @@
-sources = 
-compile = 
-assemble = 
+CC = wcc
+PROGS = 
+SOURCES = $(PROGS:=.c)
+ASSEMBLY = $(PROGS:=.s)
+OBJECT = $(PROGS:=.o)
 
-all: $(assemble)
+wramp: $(OBJECT)
+$(ASSEMBLY): %.s: %.c
+	$(CC) -S -I../include -o $@ $<
 
-$(compile): %.s: %.c
-	wcc -S -I../include -o $@ $<
-
-$(assemble): %.o: %.s
+$(OBJECT): %.o: %.s
 	wasm $< -o $@
 
 depend:
 	makedepend $(sources)
 
 clean:
-	-rm -f $(compile) $(assemble)
+	-rm -f $(OBJECT) $(ASSEMBLY)
 
 .DELETE_ON_ERROR:
