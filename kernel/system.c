@@ -69,32 +69,28 @@ void system_main() {
 		who_pid = m.src;
 		who = get_proc(who_pid);
 
-		// kprintf("from %d op %d",who->pid,m.type );
-		// if(get_proc(0)->sender_q->pid < NUM_PROCS)
-		// 	kprintf(" next %d op %d ",get_proc(0)->sender_q->pid,get_proc(0)->sender_q->message);
-		// kputc('\n');
-
 		//Do the work
 		switch(m.type) {
 
 			//Gets the system uptime.
 			case SYSCALL_GETC:
 				m.i1 = kgetc();
-				winix_send(who_pid,&m);
+				// winix_send(who_pid,&m);
 				break;
 
 			case SYSCALL_UPTIME:
 				m.i1 = system_uptime;
-				winix_send(who_pid, &m);
+				// winix_send(who_pid, &m);
 				break;
 
 			//Exits the current process.
 			case SYSCALL_EXIT:
-				do_exit(who,&m);
+				m.i1 = do_exit(who,&m);
 				break;
 
 			case SYSCALL_PS:
 				process_overview();
+				m.i1 = 0;
 				break;
 
 			case SYSCALL_FORK:
@@ -105,24 +101,28 @@ void system_main() {
 				//send 0 to child
 				m.i1 = 0;
 				winix_send(pcurr->pid,&m);
+
+				// m.i1 = pcurr->pid;
 				break;
 
 			case SYSCALL_EXEC:
-				response = exec_read_srec(get_proc(who_pid));
+				m.i1 = exec_read_srec(get_proc(who_pid));
 				break;
 
 			case SYSCALL_SBRK:
 				m.p1 = do_sbrk(who,m.i1);
-				winix_send(who_pid, &m);
+				m.i1 = m.p1 == NULL ? -1 : 0;
+				// winix_send(who_pid, &m);
 				break;
 
 			case SYSCALL_BRK:
 				m.i1 = do_brk(who,m.p1);
-				winix_send(who_pid, &m);
+				// winix_send(who_pid, &m);
 				break;
 
 			case SYSCALL_PUTC:
 				kputc(m.i1);
+				m.i1 = 0;
 				break;
 
 			case SYSCALL_PRINTF:
@@ -131,29 +131,35 @@ void system_main() {
 				ptr = get_physical_addr(m.p1,who);
 				ptr2 = get_physical_addr(m.p2,who);
 				kprintf_vm(ptr,ptr2,who->rbase);
+				m.i1 = 0;
 				break;
 
 			case SYSCALL_ALARM:
-				// DEBUG_IPC = 10;
-				// DEBUG_SCHED = 20;
+				DEBUG_IPC = 10;
+				DEBUG_SCHED = 20;
 				sys_alarm(who,m.i1);
+				m.i1 = 0;
 				break;
 
 			case SYSCALL_SIGNAL:
 				set_signal(who,m.i1,m.s1);
+				m.i1 = 0;
 				break;
 				
 			case SYSCALL_SIGRET:
 				do_sigreturn(who,m.i1);
+				m.i1 = 0;
 				break;
 			
 			case SYSCALL_WAIT:
 				do_wait(who,&m);
+				m.i1 = 0;
 				break;
 
 			case SYSCALL_GETPID:
 				m.i1 = who_pid;
 				winix_send(who_pid,&m);
+				m.i1 = 0;
 				break;
 			
 			default:
@@ -161,6 +167,8 @@ void system_main() {
 				end_process(who);
 				break;
 		}
+		if(m.type != SYSCALL_EXIT && m.type != SYSCALL_FORK && m.type != SYSCALL_WAIT && m.type != SYSCALL_SIGRET)
+			response = winix_send(who_pid, &m);
 	}
 }
 

@@ -38,30 +38,14 @@
 
 #define PRINT_TOKEN(token) printf(#token " is %d", token)
 
-#define DeclareSort(prefix, type) \
-static int \
-_DeclareSort_ ## prefix ## _Compare(const void *a, const void *b) \
-{ \
-    const type *aa; const type *bb; \
-    aa = a; bb = b; \
-    if(aa < bb) return -1; \
-    else if(bb < aa) return 1; \
-    else return 0; \
-} \
-\
-void \
-prefix ## _sort(type *a, int n)\
-{ \
-    qsort(a, sizeof(type), n, _DeclareSort_ ## prefix ## _Compare); \
-}
-
+#define SYSCALL_DEFAULT_RETURN  m.i1
 #define DECLARE_SYSCALL(function, params, syscall_num, passing_codes, ipc, return_m)\
 function params{\
     message_t m;\
     int __ret;\
     m.type = syscall_num;\
     passing_codes;\
-    __ret = winix_##ipc(SYSTEM_TASK,&m);\
+    __ret = winix_sendrec(SYSTEM_TASK,&m);\
     return return_m;\
 }\
 
@@ -91,7 +75,7 @@ int sys_process_overview();
 void *sbrk(unsigned long size);
 
 int getc();
-void putc(int i);
+int putc(int i);
 int printf(const char *format, ...);
 
 #endif

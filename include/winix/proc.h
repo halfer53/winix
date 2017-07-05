@@ -156,6 +156,7 @@ void end_process(proc_t *p);
  * Returns:			The relevant process, or NULL if it does not exist.
  **/
 proc_t *get_proc(int proc_nr);
+proc_t *get_runproc(int proc_nr);
 
 
 //fork the next process in the ready_q, return the new pid of the forked process

@@ -30,7 +30,7 @@ DECLARE_SYSCALL(int sys_uptime, (),
 	SYSCALL_UPTIME,
 	,
 	sendrec,
-	m.i1)
+	SYSCALL_DEFAULT_RETURN)
 
 /**
  * Exits the current process.
@@ -49,7 +49,7 @@ DECLARE_SYSCALL(int sys_exit, (int status),
 	SYSCALL_EXIT,
 	m.i1 = status,
 	sendrec,
-	m.i1)
+	SYSCALL_DEFAULT_RETURN)
 
 // int sys_process_overview(){
 // 	int response = 0;
@@ -57,14 +57,14 @@ DECLARE_SYSCALL(int sys_exit, (int status),
 
 // 	m.type = SYSCALL_PS;
 // 	response = winix_send(SYSTEM_TASK, &m); //TODO: error checking
-// 	return OK;
+// 	return m.i1;
 // }
 
 DECLARE_SYSCALL(int sys_process_overview, (), 
 	SYSCALL_PS,
 	,
 	send,
-	OK)
+	SYSCALL_DEFAULT_RETURN)
 
 // pid_t fork(){
 // 	int response = 0;
@@ -86,13 +86,13 @@ DECLARE_SYSCALL(pid_t fork, (),
 
 // 	m.type = SYSCALL_EXEC;
 // 	response = winix_send(SYSTEM_TASK, &m); //TODO: error checking
-// 	return OK;
+// 	return m.i1;
 // }
 DECLARE_SYSCALL(int exec, (), 
 	SYSCALL_EXEC,
 	,
 	send,
-	OK)
+	SYSCALL_DEFAULT_RETURN)
 
 // void *sbrk(size_t size){
 // 	int response = 0;
@@ -123,7 +123,7 @@ DECLARE_SYSCALL(int brk, (void *addr),
 	SYSCALL_BRK,
 	m.p1 = addr,
 	sendrec,
-	m.i1)
+	SYSCALL_DEFAULT_RETURN)
 
 
 // int getc(){
@@ -138,7 +138,7 @@ DECLARE_SYSCALL(int getc, (),
 	SYSCALL_GETC,
 	,
 	sendrec,
-	m.i1)
+	SYSCALL_DEFAULT_RETURN)
 
 // void putc(int i){
 // 	int response = 0;
@@ -151,11 +151,11 @@ DECLARE_SYSCALL(int getc, (),
 // 	return;
 // }
 
-DECLARE_SYSCALL(void putc, (int i), 
+DECLARE_SYSCALL(int putc, (int i), 
 	SYSCALL_PUTC,
 	m.i1 = i,
 	send,
-	 )
+	SYSCALL_DEFAULT_RETURN)
 
 // int printf(const char *format, ...) {
 // 	int response = 0;
@@ -165,14 +165,14 @@ DECLARE_SYSCALL(void putc, (int i),
 // 	m.p1 = (void *)format;
 // 	m.p2 = (void *)((int *)&format+1);
 // 	response = winix_send(SYSTEM_TASK,&m);
-// 	return OK;
+// 	return m.i1;
 // }
 
 DECLARE_SYSCALL(int printf, (const char *format, ...), 
 	SYSCALL_PRINTF,
 	m.p1 = (void *)format; m.p2 = (void *)((int *)&format+1);,
 	send,
-	OK )
+	SYSCALL_DEFAULT_RETURN)
 
 // sighandler_t signal(int signum, sighandler_t handler){
 // 	int response = 0;
@@ -199,11 +199,11 @@ DECLARE_SYSCALL(sighandler_t signal, (int signum, sighandler_t handler),
 // 	m.i1 = signum;
 // 	response = winix_send(SYSTEM_TASK,&m);
 // }
-DECLARE_SYSCALL(void sigreturn, (int signum), 
+DECLARE_SYSCALL(int sigreturn, (int signum), 
 	SYSCALL_SIGRET, 
 	m.i1 = signum, 
 	send,
-	)
+	SYSCALL_DEFAULT_RETURN)
 
 // unsigned int alarm(unsigned int seconds){
 // 	int response = 0;
@@ -212,14 +212,14 @@ DECLARE_SYSCALL(void sigreturn, (int signum),
 // 	m.type = SYSCALL_ALARM;
 // 	m.i1 = seconds;
 // 	response = winix_send(SYSTEM_TASK,&m);
-// 	return OK;
+// 	return m.i1;
 // }
 
 DECLARE_SYSCALL(unsigned int alarm, (unsigned int seconds), 
 	SYSCALL_ALARM, 
 	m.i1 = seconds, 
 	send,
-	OK)
+	SYSCALL_DEFAULT_RETURN)
 
 // pid_t wait(int *wstatus){
 // 	int response = 0;
@@ -254,7 +254,7 @@ DECLARE_SYSCALL(int kill, (pid_t pid, int sig),
 	SYSCALL_KILL, 
 	m.i1 = pid; m.i2 = sig , 
 	sendrec,
-	m.i1)
+	SYSCALL_DEFAULT_RETURN)
 
 
 

@@ -389,11 +389,15 @@ void printProceInfo(proc_t* curr) {
  * Returns:			The relevant process, or NULL if it does not exist.
  **/
 proc_t *get_proc(int proc_nr) {
-	if (isokprocn(proc_nr)) {
-		proc_t *p = &proc_table[proc_nr];
-		if (p->state != DEAD)
-			return p;
-	}
+	if (isokprocn(proc_nr))
+		return &proc_table[proc_nr];
+	return NULL;
+}
+
+proc_t *get_runproc(int proc_nr){
+	proc_t *p = get_proc(proc_nr);
+	if(p && p->state != ZOMBIE && p->state != DEAD)
+		return p;
 	return NULL;
 }
 
