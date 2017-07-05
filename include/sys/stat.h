@@ -76,3 +76,4 @@ struct stat {
 // _PROTOTYPE( int lstat, (const char *_path, struct stat *_buf)		);
 
 #endif /* _STAT_H */
+

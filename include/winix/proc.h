@@ -13,7 +13,7 @@
 
 //Process & Scheduling
 #define PROC_NAME_LEN			20
-#define NUM_PROCS				20
+#define NUM_PROCS				13
 #define NUM_QUEUES				5
 #define IDLE_PRIORITY			4
 #define USER_PRIORITY			3

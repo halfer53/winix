@@ -1,9 +1,11 @@
 objs = winix/*.o kernel/*.o kernel/system/*.o lib/ipc.o lib/string.o lib/util.o lib/wramp_syscall.o lib/ucontext.o
+KERNEL_MAIN = kernel/main.s kernel/main.o
 REFORMAT = reformat_srec
 GEN_BIN = gen_bin_code
 
 all:
 	$(MAKE) -C lib
+	$(MAKE) shell
 	$(MAKE) -C winix
 	$(MAKE) -C kernel
 	$(MAKE) -C user
@@ -40,6 +42,8 @@ stat:
 	@find . -name "*.s" -exec cat {} \; | wc -l
 
 shell:
+	$(MAKE) -C lib
+	rm -f $(KERNEL_MAIN)
 	wcc -S user/shell.c
 	wasm shell.s
 	wlink -o shell.srec shell.o lib/*.o

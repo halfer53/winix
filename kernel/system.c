@@ -7,7 +7,6 @@
  **/
 
 #include "winix.h"
-#include <ucontext.h>
 
 message_t m;
 int who_pid;
@@ -23,8 +22,10 @@ void send_err(proc_t *to){
 }
 
 void resume_syscall(proc_t *to){
-	if(syscall_ctx.who->pid == to->pid && to->flags & RECEIVING)
+	if(syscall_ctx.who->pid == to->pid && to->flags & RECEIVING && syscall_ctx.interruptted)
 		send_err(to);
+
+	syscall_ctx.interruptted = 0;
 	// setcontext(&syscall_ctx);
 }
 
@@ -66,7 +67,7 @@ void system_main() {
 		//get a messa1ge
 		winix_receive(&m);
 		who_pid = m.src;
-		who = &proc_table[who_pid];
+		who = get_proc(who_pid);
 
 		// kprintf("from %d op %d",who->pid,m.type );
 		// if(get_proc(0)->sender_q->pid < NUM_PROCS)
@@ -130,10 +131,11 @@ void system_main() {
 				ptr = get_physical_addr(m.p1,who);
 				ptr2 = get_physical_addr(m.p2,who);
 				kprintf_vm(ptr,ptr2,who->rbase);
-				// process_overview();
 				break;
 
 			case SYSCALL_ALARM:
+				// DEBUG_IPC = 10;
+				// DEBUG_SCHED = 20;
 				sys_alarm(who,m.i1);
 				break;
 

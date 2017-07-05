@@ -33,7 +33,47 @@
 #define SYSCALL_SIGNAL		19
 #define SYSCALL_SIGRET      20
 #define SYSCALL_WAIT        21
-#define SYSCALL_GETPID      22
+#define SYSCALL_KILL        22
+#define SYSCALL_GETPID      23
+
+#define PRINT_TOKEN(token) printf(#token " is %d", token)
+
+#define DeclareSort(prefix, type) \
+static int \
+_DeclareSort_ ## prefix ## _Compare(const void *a, const void *b) \
+{ \
+    const type *aa; const type *bb; \
+    aa = a; bb = b; \
+    if(aa < bb) return -1; \
+    else if(bb < aa) return 1; \
+    else return 0; \
+} \
+\
+void \
+prefix ## _sort(type *a, int n)\
+{ \
+    qsort(a, sizeof(type), n, _DeclareSort_ ## prefix ## _Compare); \
+}
+
+#define DECLARE_SYSCALL(function, params, syscall_num, passing_codes, ipc, return_m)\
+function params{\
+    message_t m;\
+    int __ret;\
+    m.type = syscall_num;\
+    passing_codes;\
+    __ret = winix_##ipc(SYSTEM_TASK,&m);\
+    return return_m;\
+}\
+
+
+// #define DECLARE_SYSCALL(name, parameters, passing_codes,return_codes)\       
+//     name(parameters){\
+//         message_t __m;
+//         int __response = 0;
+//         passing_codes
+//         __response = winix_send(SYSTEM_TASK,&__m);
+//         return_codes
+//     }\
 
 //TODO: create a sensible allocation scheme for system call numbers
 

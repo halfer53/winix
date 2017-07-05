@@ -8,8 +8,8 @@
 
 #include <unistd.h>
 #include <stdio.h>
+#include <string.h>
 #include <ucontext.h>
-
 
 #define BUF_LEN		100
 
@@ -237,8 +237,6 @@ void main() {
 	char ret;
 	char *c;
 	struct cmd *handler = NULL;
-	
-	test_alarm(0,NULL);
 	while(1) {
 		printf("WINIX> ");
 		i=0;
@@ -247,18 +245,14 @@ void main() {
 
 			ret = getc(); 	//read
 			
-			if(ret == -1){
-				printf("err ");
+			if(ret == -1)
 				continue;
-			}
-				
-
+			
 			if(ret == '\r')  //test for end
 				break;
 
 			if ((int)ret == 8) { //backspace
-
-				if (i != 0) {
+				if (i > 0) {
 					putc(ret);
 					i--;
 				}
