@@ -1,9 +1,10 @@
 #include "../winix.h"
 
 
-void do_sigreturn(proc_t *who,int signum){
+int do_sigreturn(proc_t *who, message_t *m){
     unsigned long *sp;
     proc_t *systask;
+    int signum = m->i1;
 
     sp = get_physical_addr(who->sp,who);
 
@@ -19,11 +20,7 @@ void do_sigreturn(proc_t *who,int signum){
     //reset the signal to default
     who->sig_table[signum].sa_handler = SIG_DFL;
     resume_syscall(who);
-}
 
-
-void syscall_sigreturn(proc_t *who, message_t *m){
-    do_sigreturn(who,m->i1);
-    m->i1 = 0;
     // winix_send(who->pid,m);
+    return DONOTHING;
 }

@@ -41,7 +41,7 @@ void clear_proc(proc_t *who){
 }
 
 
-void do_exit(proc_t *who, int status){
+void exit_proc(proc_t *who, int status){
     message_t mesg;
     proc_t *mp;
     int i, children = 0;
@@ -83,9 +83,10 @@ void do_exit(proc_t *who, int status){
     
 }
 
-void syscall_exit(proc_t *who, message_t *m){
+int do_exit(proc_t *who, message_t *m){
     kprintf("\r\n[SYSTEM] Process \"%s (%d)\" exited with code %d\r\n", who->name, who->pid, m->i1);
-	do_exit(who,m->i1);
+	exit_proc(who,m->i1);
+    return SUSPEND;
 }
 
 

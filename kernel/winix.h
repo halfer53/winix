@@ -20,7 +20,6 @@
 #include <kernel/exception.h>
 #include <kernel/system.h>
 #include <kernel/idle.h>
-#include <kernel/sys_memory.h>
 
 
 //Major and minor version numbers for WINIX.

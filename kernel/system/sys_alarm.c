@@ -1,6 +1,6 @@
 #include "../winix.h"
 
-void syscall_alarm(proc_t *who, message_t *m){
+int do_alarm(proc_t *who, message_t *m){
     clock_t seconds;
     timer_t *alarm;
 
@@ -20,5 +20,5 @@ void syscall_alarm(proc_t *who, message_t *m){
         alarm->handler = &deliver_alarm;
         insert_timer(alarm);
     }
-    winix_send(who->pid, m);
+    return OK;
 }

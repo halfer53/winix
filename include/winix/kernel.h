@@ -15,6 +15,7 @@
 #include <stdbool.h>
 #include <curses.h>
 
+#include <winix/comm.h>
 #include <winix/kdebug.h>
 #include <winix/bitmap.h>
 #include <winix/mm.h>

@@ -78,7 +78,7 @@ int cmd_kill(int argc, char **argv){
 	}else{
 		pid = atoi(argv[1]);
 	}
-	kill(pid,signum);
+	return kill(pid,signum);
 }
 
 int seconds;
@@ -132,14 +132,12 @@ int test_thread(int argc, char **argv){
 	if(argc > 1)
 		num = atoi(argv[1]);
 
-	printf("num %d\n",num);
 	//ucontext represents the context for each thread
 	threads = malloc(sizeof(ucontext_t) * num);
 	//thread_stack_op saves the original pointer returned by malloc
 	//so later we can use it to free the malloced memory
 	thread_stack_op = malloc(sizeof(int) * num);
 	cthread = threads;
-	printf("num %d\n",num);
 
 	//Allocate stack for each thread
 	for( i = 0; i < num; i++){
@@ -261,6 +259,10 @@ int generic(int argc, char **argv) {
 	if (strcmp("exec",argv[0]) == 0) {
 		printf("please drag the srec file onto this windows\n" );
 		return exec();
+	}
+	if(strcmp("id",argv[0]) == 0){
+		printf("%d\n",getpid());
+		return 0;
 	}
 	printf("Unknown command '%s'\r\n", argv[0]);
 	return -1;

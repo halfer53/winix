@@ -2,7 +2,7 @@
 
 
 
-void syscall_kill(proc_t *who, message_t *m){
+int do_kill(proc_t *who, message_t *m){
     proc_t *to = get_proc(m->i1);
 
     if(!to){
@@ -12,5 +12,6 @@ void syscall_kill(proc_t *who, message_t *m){
     }
 
     cause_sig(to,m->i2);
-    winix_send(who->pid,m);
+    // winix_send(who->pid,m);
+    return OK;
 }

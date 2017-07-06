@@ -1,7 +1,7 @@
 #include <winix/kernel.h>
 
-#define SCHED_DEBUG_LEN 30
-#define IPC_DEBUG_LEN   10
+#define SCHED_DEBUG_LEN 200
+#define IPC_DEBUG_LEN   50
 
 int DEBUG_SCHED = 0;
 int DEBUG_IPC = 0;

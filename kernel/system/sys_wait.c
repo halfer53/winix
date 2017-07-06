@@ -1,7 +1,7 @@
 #include "../winix.h"
 #include <sys/wait.h>
 
-void do_wait(proc_t *parent, message_t *mesg){
+int do_wait(proc_t *parent, message_t *mesg){
     register proc_t *child = NULL;
     
     unsigned long *wstatus;
@@ -20,7 +20,7 @@ void do_wait(proc_t *parent, message_t *mesg){
                 free_slot(child);
                 mesg->i1 = child->pid;
                 winix_send(parent->pid,mesg);
-                return;
+                return OK;
             }
             parent->wpid = child->pid;
             children++;
@@ -31,16 +31,10 @@ void do_wait(proc_t *parent, message_t *mesg){
     if(children == 0){
         kprintf("no children\n");
         mesg->i1 = -1;
-        winix_send(parent->pid,mesg);
-        return;
+        // winix_send(parent->pid,mesg);
+        return ECHILD;
     }
     //block the process
     parent->flags |= WAITING;
-}
-
-
-void syscall_wait(proc_t *who, message_t *m){
-    do_wait(who,m);
-	m->i1 = 0;
-    // winix_send(who->pid,m);
+    return SUSPEND;
 }

@@ -62,8 +62,8 @@ void real_send_signal(proc_t *who,int signum){
 
 void cause_sig(proc_t *who,int signum){
     if(who->sig_table[signum].sa_handler == SIG_DFL){
-        kprintf("Signal %d: kill %s [%d]",signum,who->name,who->pid);
-        do_exit(who, 1);
+        kprintf("Signal %d: kill %s [%d]\n",signum,who->name,who->pid);
+        exit_proc(who, 1);
         return;
     }
     //if it's ignored

@@ -129,7 +129,7 @@ static void gpf_handler() {
 	kprintf("$13: %x, $sp, %x, $ra, %x\n",current_proc->regs[12],current_proc->regs[13],current_proc->regs[14]);
 
 	//Kill process and call scheduler.
-	do_exit(current_proc,1);
+	exit_proc(current_proc,1);
 	current_proc = NULL;
 	sched();
 }
@@ -202,7 +202,7 @@ static void break_handler() {
  **/
 static void arith_handler() {
 	kprintf("\r\n[SYSTEM] Process \"%s (%d)\" ARITH: PC=%x.\r\n", current_proc->name, current_proc->pid, current_proc->pc);
-	do_exit(current_proc,1);
+	exit_proc(current_proc,1);
 	current_proc = NULL;
 	sched();
 }

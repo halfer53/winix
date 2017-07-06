@@ -54,7 +54,7 @@ int main(int argc, char const *argv[]) {
 							continue;
 						}
 						if (temp != wordsLoaded) {
-							return OK;
+							return 0;
 						}
 						break;
 					} else {
@@ -67,7 +67,7 @@ int main(int argc, char const *argv[]) {
 
 	printf("int %s_code_length =  %d;\n",filename, wordslength);
 
-	return OK;
+	return 0;
 
 }
 void assert(int expression, const char *message) {
@@ -136,7 +136,7 @@ int winix_load_srec_words_length(char *line) {
 	if (recordType != 6) {
 		printf("recordType %d\n", recordType );
 		printf("format is incorrect\n" );
-		return OK;
+		return 0;
 	}
 	tempBufferCount = Substring(buffer, line, index, 2);
 	//printf("record value %s, value in base 10: %d,length %d\r\n",buffer,hex2int(buffer,tempBufferCount),tempBufferCount);
@@ -170,7 +170,7 @@ int winix_load_srec_words_length(char *line) {
 	//printf("checksum %d\r\n",byteCheckSum );
 	if (readChecksum != byteCheckSum) {
 		printf("failed checksum\r\n" );
-		return OK;
+		return 0;
 	}
 	return data;
 }
@@ -193,6 +193,7 @@ int winix_load_srec_mem_val(char *line, size_t *memory_values, int start_index, 
 	size_t memVal = 0;
 	int i = 0;
 	int j = 0;
+	static int debug = 1;
 
 	//printf("%s\r\n",line);
 	//printf("loop %d\n",linecount );
@@ -237,7 +238,7 @@ int winix_load_srec_mem_val(char *line, size_t *memory_values, int start_index, 
 
 	default:
 		printf("unknown record type\n");
-		return OK;
+		return 0;
 	}
 	tempBufferCount = Substring(buffer, line, index, 2);
 	//printf("record value %s, value in base 10: %d,length %d\r\n",buffer,hex2int(buffer,tempBufferCount),tempBufferCount);
@@ -290,16 +291,16 @@ int winix_load_srec_mem_val(char *line, size_t *memory_values, int start_index, 
 	//readChecksum = (byte)Convert.ToInt32(line.Substring(index, 2), 16);
 
 	tempBufferCount = Substring(buffer, line, index, 2);
-	//printf("read checksum value %s, value in base 10: %d,length %d\r\n",buffer,hex2int(buffer,tempBufferCount),tempBufferCount);
+	// printf("read checksum value %s, value in base 10: %d,length %d\r\n",buffer,hex2int(buffer,tempBufferCount),tempBufferCount);
 	readChecksum = hex2int(buffer, tempBufferCount);
-	//printf("checksum %d\r\n",checksum );
+	// printf("checksum %d\r\n",checksum );
 	byteCheckSum = (byte)(checksum & 0xFF);
-	//printf("checksum %d\r\n",byteCheckSum );
+	// printf("checksum %d\r\n",byteCheckSum );
 	byteCheckSum = ~byteCheckSum;
-	//printf("checksum %d\r\n",byteCheckSum );
+	// printf("checksum %d\r\n",byteCheckSum );
 	if (readChecksum != byteCheckSum) {
 		printf("failed checksum\r\n" );
-		return OK;
+		return 0;
 	}
 
 	//Put in memory
@@ -326,7 +327,7 @@ int winix_load_srec_mem_val(char *line, size_t *memory_values, int start_index, 
 
 			wordsLoaded++;
 			//memory_values[start_index + wordsLoaded] = memVal;
-			printf("0x%08x,", (unsigned int)memVal );
+			printf("0x%08x,\n", (unsigned int)memVal );
 		}
 		break;
 
@@ -336,5 +337,5 @@ int winix_load_srec_mem_val(char *line, size_t *memory_values, int start_index, 
 		break;
 	}
 
-	return ERR;
+	return -1;
 }

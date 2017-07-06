@@ -1,9 +1,6 @@
 #include "../winix.h"
 
-void do_abort(proc_t *who){
+int do_abort(proc_t *who, message_t *m){
     cause_sig(who,SIGABRT);
-}
-
-void sys_abort(proc_t *who, message_t *m){
-    do_abort(who);
+    return OK;
 }

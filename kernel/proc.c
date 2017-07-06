@@ -359,7 +359,7 @@ void process_overview() {
 	//kprintf("|| PS %s ",current_proc->name );
 	for (i = 0; i < NUM_PROCS; i++) {
 		curr = &proc_table[i];
-		if(curr->IN_USE)
+		if(curr->IN_USE && curr->state != ZOMBIE)
 			printProceInfo(curr);
 	}
 }

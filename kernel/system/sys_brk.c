@@ -6,9 +6,10 @@
  * @param  addr   set the end of data segment specified by the addr, note that this is virtual memory
  * @return        status of result, 0 if success
  */
-int do_brk(proc_t *who, void *addr){
+int do_brk(proc_t *who, message_t *m){
 	int i,paddr;
-	addr = get_physical_addr(addr,who);
+	void *addr;
+	addr = get_physical_addr(m->p1,who);
 	if(is_addr_in_same_page(who->heap_break, addr)){
 		who->heap_break = addr;
 		return OK;
@@ -24,10 +25,4 @@ int do_brk(proc_t *who, void *addr){
 		return OK;
 	}
 	return ERR;
-}
-
-
-void syscall_brk(proc_t *who, message_t *m){
-	m->i1 = do_brk(who,m->p1);
-	winix_send(who->pid,m);
 }

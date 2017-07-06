@@ -64,29 +64,35 @@ void system_main() {
 		//Do the work
 		switch(m.type) {
 
-			case SYSCALL_GETC:		syscall_getc(who,&m);		break;
-			case SYSCALL_UPTIME:	syscall_time(who,&m);		break;
-			case SYSCALL_EXIT:		syscall_exit(who,&m);		break;
-			case SYSCALL_PS:		syscall_ps(who,&m);			break;
-			case SYSCALL_FORK:		syscall_fork(who,&m);		break;
-			case SYSCALL_EXEC:		syscall_exec(who,&m);		break;
-			case SYSCALL_SBRK:		syscall_sbrk(who,&m);		break;
-			case SYSCALL_BRK:		syscall_brk(who,&m);		break;
-			case SYSCALL_PUTC:		syscall_putc(who,&m);		break;
-			case SYSCALL_PRINTF:	syscall_printf(who,&m);		break;
-			case SYSCALL_ALARM:		syscall_alarm(who,&m);		break;
-			case SYSCALL_SIGNAL:	syscall_sigaction(who,&m);	break;	
-			case SYSCALL_SIGRET:	syscall_sigreturn(who,&m);	break;
-			case SYSCALL_WAIT:		syscall_wait(who,&m);		break;
-			case SYSCALL_KILL: 		syscall_kill(who,&m);		break;
-			case SYSCALL_GETPID:	syscall_getpid(who,&m);		break;
+			case SYSCALL_GETC:		errno = do_getc(who,&m);		break;
+			case SYSCALL_UPTIME:	errno = do_time(who,&m);		break;
+			case SYSCALL_EXIT:		errno = do_exit(who,&m);		break;
+			case SYSCALL_PS:		errno = do_ps(who,&m);			break;
+			case SYSCALL_FORK:		errno = do_fork(who,&m);		break;
+			case SYSCALL_EXEC:		errno = do_exec(who,&m);		break;
+			case SYSCALL_SBRK:		errno = do_sbrk(who,&m);		break;
+			case SYSCALL_BRK:		errno = do_brk(who,&m);		break;
+			case SYSCALL_PUTC:		errno = do_putc(who,&m);		break;
+			case SYSCALL_PRINTF:	errno = do_printf(who,&m);		break;
+			case SYSCALL_ALARM:		errno = do_alarm(who,&m);		break;
+			case SYSCALL_SIGNAL:	errno = do_sigaction(who,&m);	break;
+			case SYSCALL_SIGRET:	errno = do_sigreturn(who,&m);	break;
+			case SYSCALL_WAIT:		errno = do_wait(who,&m);		break;
+			case SYSCALL_KILL: 		errno = do_kill(who,&m);		break;
+			case SYSCALL_GETPID:	errno = do_getpid(who,&m);		break;
 			
 			
 			default:
 				kprintf("\r\n[SYSTEM] Process \"%s (%d)\" performed unknown system call %d\r\n", who->name, who->pid, m.type);
 				do_exit(who, 1);
 				break;
-		}	
+		}
+		if(errno != SUSPEND && errno != DONOTHING){
+			if(errno < 0){
+				//set errno in user space
+			}
+			winix_send(who_pid,&m);
+		}
 	}
 }
 

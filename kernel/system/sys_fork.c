@@ -9,7 +9,7 @@
  * Side Effects:
  *   a new process forked onto the a new memory space, but not yet added to the scheduling queue
  **/
-proc_t* do_fork(proc_t *parent) {
+proc_t* _fork(proc_t *parent) {
 	proc_t *p = NULL;
 	void *ptr_base = NULL;
 	int len = 0;
@@ -58,16 +58,17 @@ proc_t* do_fork(proc_t *parent) {
 	return p;
 }
 
-void syscall_fork(proc_t *who, message_t *m){
+int do_fork(proc_t *who, message_t *m){
 	proc_t *child;
-	child = do_fork(who);
+	child = _fork(who);
 
 	//send 0 to child
 	m->i1 = 0;
 	winix_send(child->pid,m);
 
 	m->i1 = child->pid;
-	winix_send(who->pid, m);
+	// winix_send(who->pid, m);
+	return OK;
 }
 
 

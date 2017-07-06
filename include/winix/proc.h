@@ -164,7 +164,7 @@ proc_t *get_runproc(int proc_nr);
 //fork the next process in the ready_q, return the new pid of the forked process
 //side effect: the head of the free_proc is dequeued, and added to the ready_q with all relevant values equal
 //to the original process, except stack pointer.
-proc_t* do_fork(proc_t *p);
+
 proc_t *kexecp(proc_t *p,void (*entry)(), int priority, const char *name);
 proc_t *start_system(void (*entry)(), int priority, const char *name);
 proc_t* start_init(size_t *lines, size_t length, size_t entry);

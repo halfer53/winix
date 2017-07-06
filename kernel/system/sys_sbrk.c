@@ -1,7 +1,7 @@
 #include "../winix.h"
 
 
-void *do_sbrk( proc_t *who, size_t size) {
+void *_sbrk( proc_t *who, size_t size) {
 
 	unsigned long *ptable;
 	int nstart,len;
@@ -53,8 +53,9 @@ void *do_sbrk( proc_t *who, size_t size) {
 
 }
 
-void syscall_sbrk(proc_t *who, message_t *m){
-    m->p1 = do_sbrk(who,m->i1);
-	m->i1 = m->p1 == NULL ? -1 : 0;
-	winix_send(who->pid, m);
+int do_sbrk(proc_t *who, message_t *m){
+    m->p1 = _sbrk(who,m->i1);
+	m->i1 = m->p1 == NULL ? ERR : OK;
+	// winix_send(who->pid, m);
+	return OK;
 }
