@@ -24,6 +24,7 @@ RexSimulatorGui.exe
 !kernel/winix/kwramp.s
 !lib/ucontext.s
 !lib/wramp_syscall.s
+!lib/__errno.s
 !kernel/util/limits_head.s
 !kernel/util/limits_tail.s
 !.gitignore
