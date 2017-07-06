@@ -25,10 +25,10 @@ void clear_receiving_mesg(proc_t *who){
     register proc_t *xp;
     message_t m;
 
-    if(who->flags & WAITING){
+    if(who->flags & RECEIVING){
         xp = who->sender_q;
-        memset(&m,-1,MESSAGE_LEN);
         while(xp){
+            memset(&m,-1,MESSAGE_LEN);
             winix_notify(xp->pid,&m);
             xp = xp->next_sender;
         }
@@ -36,7 +36,7 @@ void clear_receiving_mesg(proc_t *who){
 }
 
 void clear_proc(proc_t *who){
-    clear_receiving_mesg(who);
+    // clear_receiving_mesg(who);
     clear_sending_mesg(who);
 }
 
@@ -46,7 +46,7 @@ void do_exit(proc_t *who, int status){
     proc_t *mp;
     int i, children = 0;
     
-    end_process(who);
+    unseched(who);
     clear_proc(who);
 
     // process_overview();
@@ -54,20 +54,27 @@ void do_exit(proc_t *who, int status){
 
     for( i=0; i< NUM_PROCS; i++){
         mp = &proc_table[i];
-        if(mp->IN_USE && mp->flags & WAITING && mp->wpid == who->pid){
-            //TODO: modify wstatus
+        if(mp->IN_USE){
+            if(mp->flags & WAITING && mp->wpid == who->pid){
+                //TODO: modify wstatus
             
-            mesg.i1 = who->pid;
-            mp->flags &= ~WAITING;
+                mesg.i1 = who->pid;
+                mp->flags &= ~WAITING;
 
-            winix_send(mp->pid,&mesg);
-            children++;
+                winix_send(mp->pid,&mesg);
+                children++;
+            }else if(mp->parent == who->proc_index){
+                //Change the child process's parent to init
+                mp->parent = 1;
+            }
         }
     }
 
-    if(children)
+    if(children){
+        free_slot(who);
         return;
-    
+    }
+        
     //if parent is not waiting
     //block the current process
     who->state = ZOMBIE;

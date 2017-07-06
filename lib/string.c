@@ -1,5 +1,4 @@
-#include <sys/types.h>
-#include <string.h>
+#include <lib.h>
 
 /*
 

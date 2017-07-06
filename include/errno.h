@@ -23,12 +23,12 @@
 /* Now define _SIGN as "" or "-" depending on _SYSTEM. */
 #ifdef _SYSTEM
 #   define _SIGN         -
-#   define OK            0
 #else
 #   define _SIGN         
 #endif
 
-extern int errno;		  /* place where the error numbers go */
+extern int __errno;		  /* place where the error numbers go */
+#define errno   (__errno)
 
 /* Here are the numerical values of the error numbers. */
 #define _NERROR               70  /* number of errors */  

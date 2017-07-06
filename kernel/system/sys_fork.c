@@ -4,7 +4,7 @@
  * fork the calling process
  *
  * Returns:
- *   pid of the newly forked process
+ *   proc of the child process
  *
  * Side Effects:
  *   a new process forked onto the a new memory space, but not yet added to the scheduling queue
@@ -29,7 +29,7 @@ proc_t* do_fork(proc_t *parent) {
 		p->pid = p->proc_index;
 		p->ptable = p->protection_table;
 
-		if(bitmap_extract_pattern(p->ptable, MEM_MAP_LEN, (int)p->heap_break, &ptn) != 0){
+		if(bitmap_extract_pattern(parent->ptable, MEM_MAP_LEN, (int)p->heap_break, &ptn) != 0){
 			kprintf("pat search failed");
 		}
 

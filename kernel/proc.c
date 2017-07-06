@@ -25,9 +25,6 @@ static proc_t *free_proc[2];
 //The currently-running process
 proc_t *current_proc;
 
-//OLD Process Stacks
-//static size_t proc_stacks[NUM_PROCS][DEFAULT_STACK_SIZE];
-
 //Limits for memory allocation
 size_t FREE_MEM_BEGIN = 0;
 size_t FREE_MEM_END = 0;
@@ -80,10 +77,6 @@ void enqueue_head(proc_t **q, proc_t *proc) {
 
 /**
  * Removes the head of a list.
- * Note that Zombie process reside inside the free_proc list. So if All 
- * of the free_proc are occupied by Zombie processes, so if you dequeue
- * one of them, then its exit status will be no longer be able to be retrieved
- * by the parent
  *
  * Parameters:
  *   q		An array containing a head and tail pointer of a linked list.
@@ -144,8 +137,6 @@ void add_to_scheduling_queue(proc_t* p) {
 	enqueue_tail(ready_q[p->priority], p);
 }
 
-
-
 proc_t *get_free_proc() {
 	int i;
 	proc_t *p = dequeue(free_proc);
@@ -153,12 +144,12 @@ proc_t *get_free_proc() {
 
 	if (p) {
 		proc_set_default(p);
-		p->pid = p->proc_index;
 		p->IN_USE = 1;
 		return p;
 	}
 	return NULL;
 }
+
 
 void proc_set_default(proc_t *p) {
 	int i = 0;
@@ -187,12 +178,15 @@ void proc_set_default(proc_t *p) {
 	p->length = 0;
 	p->parent = 0;
 	p->heap_break = NULL;
+	p->pid = p->proc_index;
 
 	p->ptable = p->protection_table;
 	bitmap_clear(p->ptable, PROTECTION_TABLE_LEN);
 
-	p->alarm.timer = 0;
+	p->alarm.time_out = 0;
 	p->alarm.next = NULL;
+	p->alarm.flags = 0;
+	p->alarm.pid = p->pid;
 
 	memset(&p->sig_table,0,_NSIG * 3); //3: sizeof struct sigaction
 }
@@ -328,6 +322,18 @@ proc_t* start_init(size_t *lines, size_t length, size_t entry) {
 	return p;
 }
 
+
+void unseched(proc_t *p){
+	release_proc_mem(p);
+	delete_proc(ready_q[p->priority], p);
+}
+
+void free_slot(proc_t *p){
+	p->state = DEAD;
+	p->IN_USE = 0;
+	enqueue_tail(free_proc, p);
+}
+
 /**
  * Exits a process, and frees its slot in the process table.
  *
@@ -339,19 +345,8 @@ proc_t* start_init(size_t *lines, size_t length, size_t entry) {
  **/
 void end_process(proc_t *p) {
 	int i,ret;
-	p->state = DEAD;
-	release_proc_mem(p);
-	for(i=0; i< NUM_QUEUES; i++){
-		if(ready_q[i] != NULL){
-			ret = delete_proc(ready_q[i], p);
-			if(ret == 0){
-				break;
-			}
-		}
-	}
-	p->IN_USE = 0;
-	// process_overview();
-	enqueue_tail(free_proc, p);
+	unseched(p);
+	free_slot(p);
 }
 
 //print out the list of processes currently in the ready_q

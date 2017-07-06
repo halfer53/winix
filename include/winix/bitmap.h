@@ -27,5 +27,6 @@ int bitmap_search_pattern(unsigned long *map, int map_len, int start,unsigned lo
 void bitmap_set_pattern(unsigned long *map, int map_len, int index, unsigned long pattern, int pattern_len);
 int bitmap_extract_pattern(unsigned long *map, int map_len, int heap_break, pattern_t* ptn);
 
+
 #endif
 

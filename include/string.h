@@ -16,5 +16,4 @@ char *strcat(char *dest, const char *src);
 void *memset(void *dst, int c, size_t n);
 int Substring(char* buffer,char* original,int start_index,int length);
 
-
 #endif

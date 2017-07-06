@@ -96,7 +96,7 @@ typedef struct proc {
 	char name[PROC_NAME_LEN];		//Process name
 	proc_state_t state;	//Current process state
 	int exit_status;	//Storage for status when process exits
-	int sigstatus;		//Storage for siginal status when process exits
+	int sig_status;		//Storage for siginal status when process exits
 	pid_t pid;			//Process id
 	pid_t procgrp;		//Pid of the process group (used for signals)
 	pid_t wpid;			//pid this process is waiting for
@@ -180,5 +180,6 @@ proc_t *pick_proc();
  * Pointer to the current process.
  **/
 extern proc_t *current_proc;
+
 
 #endif

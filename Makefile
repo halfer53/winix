@@ -1,6 +1,8 @@
 
-OBJS = winix/*.o kernel/*.o kernel/system/*.o lib/ipc.o \
-		lib/string.o lib/util.o lib/wramp_syscall.o lib/ucontext.o
+KERNEL_OBJS = winix/*.o kernel/*.o kernel/system/*.o
+
+USER_LIB = ipc string util wramp_syscall ucontext atoi _sigset errno
+USER_LIB_OBJS = $(addprefix lib/, $(USER_LIB:=.o))
 
 WRAMP_LIMITS_OBJS = kernel/util/limits_head.o kernel/util/limits_tail.o
 KERNEL_MAIN = kernel/main.s kernel/main.o 
@@ -9,16 +11,16 @@ REFORMAT = reformat_srec
 GEN_BIN = gen_bin_code
 
 all:
+	-rm -f winix.srec
 	$(MAKE) -C lib
+	$(MAKE) shell
 	$(MAKE) -C winix
 	$(MAKE) -C kernel
 	$(MAKE) -C user
-	wlink -o winix.srec $(OBJS) $(WRAMP_LIMITS_OBJS)
+	wlink -o winix.srec $(KERNEL_OBJS) $(WRAMP_LIMITS_OBJS) $(USER_LIB_OBJS)
 
 install:
 	$(MAKE) clean
-	$(MAKE) -C lib
-	$(MAKE) shell
 	$(MAKE) all
 
 clean:
@@ -37,8 +39,6 @@ stat:
 	@find . -name "*.s" -exec cat {} \; | wc -l
 
 shell:
-	$(MAKE) -C lib clean
-	$(MAKE) -C lib
 	rm -f $(KERNEL_MAIN)
 	wcc -S user/shell.c
 	wasm shell.s
@@ -48,7 +48,6 @@ shell:
 	[ ! -f $(GEN_BIN) ] && gcc tools/$(GEN_BIN).c -o $(GEN_BIN) || :
 	./$(GEN_BIN) shell.srec > include/shell_codes.c
 	rm shell.srec
-	$(MAKE) all
 
 .DELETE_ON_ERROR:
 

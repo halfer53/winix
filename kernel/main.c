@@ -11,6 +11,7 @@
 #include <init_codes.c>
 #include <shell_codes.c>
 
+
 /**
  * Print an error message and lock up the OS... the "Blue Screen of Death"
  *
@@ -28,45 +29,16 @@ void panic(const char* message) {
 	}
 }
 
-void testbitmap(){
-	// static unsigned long map[32];
-	// static unsigned long tmap[32];
+//scan the FREE_MEM_BEGIN
+void Scan_FREE_MEM_BEGIN() {
+	//TODO start kmalloc here
+	FREE_MEM_BEGIN = (size_t)&BSS_END;
 
-	// int index = 0, len = 0;
-	// pattern_t *ptn = NULL;
-	// int retval = 0;
-	//  map[0] = 0xfffff100;
-	//  map[1] = 0x00000000;
-	// tmap[0] = 0x0000f145;
-	// tmap[1] = 0x10000000;
-	
-	// ptn = bitmap_extract_pattern(tmap,32,35*1024);
-	// index = bitmap_search_pattern(map,32,ptn->pattern,ptn->size);
-	// kprintf("pattern %d %x %d\n",index, ptn->pattern,ptn->size);
-	// bitmap_set_pattern(map,32,index,ptn->pattern,ptn->size);
-	// kprintf("%x %x %x\n",ptn->pattern,map[0],map[1]);
-}
+	//Round up to the next 1k boundary
+	FREE_MEM_BEGIN |= 0x03ff;
+	FREE_MEM_BEGIN++;
 
-void testkmalloc(){
-	void *p0 = kmalloc(512);
-	  void *p1 = kmalloc(512);
-	  void *p2 = kmalloc(1024);
-	  void *p3 = kmalloc(512);
-	  void *p4 = kmalloc(1024);
-	  void *p5 = kmalloc(2048);
-	  void *p6 = kmalloc(512);
-	  void *p7 = kmalloc(1024);
-	  void *p8 = kmalloc(512);
-	  void *p9 = kmalloc(1024);
-	  kblock_overview();
-	  kfree(p5);
-	  kfree(p6);
-	  kfree(p2);
-	  kfree(p8);
-	  kblock_overview();
-	  p0 = krealloc(p0,900);
-	  p9 = krealloc(p9,3000);
-	  kblock_overview();
+	// kprintf("\r\nfree memory begin %x\r\n", FREE_MEM_BEGIN );
 }
 
 /**
@@ -79,6 +51,29 @@ void assert(int expression, const char *message) {
 		kprintf("\r\nAssertion Failed");
 		panic(message);
 	}
+}
+
+
+void testkmalloc(){
+	void *p0 = kmalloc(512);
+	void *p1 = kmalloc(512);
+	void *p2 = kmalloc(1024);
+	void *p3 = kmalloc(512);
+	void *p4 = kmalloc(1024);
+	void *p5 = kmalloc(2048);
+	void *p6 = kmalloc(512);
+	void *p7 = kmalloc(1024);
+	void *p8 = kmalloc(512);
+	void *p9 = kmalloc(1024);
+	kblock_overview();
+	kfree(p5);
+	kfree(p6);
+	kfree(p2);
+	kfree(p8);
+	kblock_overview();
+	p0 = krealloc(p0,900);
+	p9 = krealloc(p9,3000);
+	kblock_overview();
 }
 
 /**

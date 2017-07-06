@@ -35,6 +35,8 @@
 #define SYSCALL_WAIT        21
 #define SYSCALL_KILL        22
 #define SYSCALL_GETPID      23
+#define SYSCALL_ABORT       24
+#define SYSCALL_SLEEP       25
 
 #define PRINT_TOKEN(token) printf(#token " is %d", token)
 

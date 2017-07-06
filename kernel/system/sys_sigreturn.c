@@ -15,6 +15,9 @@ void do_sigreturn(proc_t *who,int signum){
     if(who->flags){
         delete_proc(ready_q[who->priority],who);
     }
+
+    //reset the signal to default
+    who->sig_table[signum].sa_handler = SIG_DFL;
     resume_syscall(who);
 }
 

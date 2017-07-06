@@ -18,8 +18,8 @@
 //Prototypes
 int ps(int argc, char **argv);
 int uptime(int argc, char **argv);
-int shutdown(int argc, char **argv);
 int exit(int argc, char **argv);
+int cmd_kill(int argc, char **argv);
 int testmalloc(int argc, char **argv);
 int test_signal(int argc, char **argv);
 int test_thread(int argc, char **argv);
@@ -30,29 +30,28 @@ int generic(int argc, char **argv);
 //Input buffer & tokeniser
 static char buf[BUF_LEN];
 
+struct cmdLine{
+	char buf[BUF_LEN];
+	int argc;
+	char cmdStart[MAX_COMMANDS];
+	int numCommands;
+	char *argv[MAX_ARGS];
+	int append;
+};
+
 //Maps strings to function pointers
 struct cmd {
 	int (*handle)(int argc, char **argv);
 	char *name;
 };
 
-struct cmdLine{
-	char buf[BUF_LEN];
-	int argc;
-	char cmdStart[6];
-	int numCommands;
-	char *argv[BUF_LEN / 2];
-	int append;
-};
-
 //Command handling
 struct cmd commands[] = {
 	{ uptime, "uptime" },
-	{ shutdown, "shutdown" },
 	{ exit, "exit" },
 	{ ps, "ps" },
+	{ cmd_kill, "kill"},
 	{ testmalloc, "malloc"},
-	{ test_signal, "signal"},
 	{ test_thread, "thread"},
 	{ test_alarm, "alarm"},
 	{ test_fork, "fork"},
@@ -67,36 +66,34 @@ int isPrintable(int c) {
 	return ('!' <= c && c <= '~');
 }
 
-int cont;
+int cmd_kill(int argc, char **argv){
+	pid_t pid;
+	int signum = SIGKILL;
+	if(argc < 2)
+		printf("kill [-n signum] pid\n");
 
-void alarm_handler(int signum){
-	printf("\nAlarm timer received\n");
-	cont = 0;
+	if(strcmp("-n",argv[1]) == 0){
+		signum = atoi(argv[2]);
+		pid = atoi(argv[3]);
+	}else{
+		pid = atoi(argv[1]);
+	}
+	kill(pid,signum);
 }
 
-int test_alarm(int argc, char **argv){
-	int i = 10000;
-	int seconds = 1;
-
-	if(argc > 1)
-		seconds = atoi(argv[1]);
-		
-	signal(SIGALRM,alarm_handler);
-	alarm(seconds);
-	return 0;
-}
+int seconds;
 
 void sighandler(int signum){
 	
-	printf("\nSignal received\nChild exit \n");
-	sys_exit(0);
+	printf("\nSignal received %d seconds elapsed\nChild exit \n",seconds);
+	sys_exit(EXIT_SUCCESS);
 }
 
-int test_signal(int argc, char **argv){
+int test_alarm(int argc, char **argv){
 	int i;
 	pid_t pid;
 	pid_t fr;
-	int seconds = 1;
+	seconds = 1;
 	if(argc > 1)
 		seconds = atoi(argv[1]);
 
@@ -121,8 +118,7 @@ ucontext_t mcontext;
 #define THREAD_STACK_SIZE	56
 
 void func(int arg) {
-  printf("Thread %d\n",arg);
-  printf("THread %d return to main\n");
+  printf("Hello World! I'm thread %d\n",arg);
   setcontext(&mcontext);
 }
 
@@ -158,14 +154,15 @@ int test_thread(int argc, char **argv){
 		}
 		cthread++;
 	}
-	block_overview();
+	// block_overview();
 
 	printf("context has been built\n");
 	
 	cthread = threads;
 	//scheduling the threads
-	//note that we are using user thread, so we have to manually schedule all the threads
-	//currently the scheduling algorithm is just simple a round robin
+	//note that we are using user thread library, 
+	//so we have to manually schedule all the threads.
+	//Currently the scheduling algorithm is just simple a round robin
 	for( i = 0; i < num; i++){
 		swapcontext(&mcontext,cthread);
 		cthread++;
@@ -178,7 +175,7 @@ int test_thread(int argc, char **argv){
 	free(thread_stack_op);
 	free(threads);
 
-	block_overview();
+	// block_overview();
 	return 0;
 }
 
@@ -227,14 +224,6 @@ int uptime(int argc, char **argv) {
 	// ticks %= 100;
 
 	printf("Uptime is %dd %dh %dm %d.%ds, total ticks: %d\r\n", days, hours, minutes, seconds, ticks%100, ticks);
-	return 0;
-}
-
-/**
- * Shuts down OS.
- **/
-int shutdown(int argc, char **argv) {
-	printf("Placeholder for SHUTDOWN\r\n");
 	return 0;
 }
 
@@ -375,5 +364,5 @@ void main() {
 		//Run it
 		handler->handle(sc.argc, sc.argv);
 	}
-	sys_exit(0);
+	sys_exit(EXIT_SUCCESS);
 }

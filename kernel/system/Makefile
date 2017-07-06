@@ -1,25 +1,31 @@
 CC = wcc
+INCLUDE_DIR = ../../include
+INCLUDES = $(wildcard $(INCLUDE_DIR)/*.h $(INCLUDE_DIR)/winix/*.h $(INCLUDE_DIR)/sys/*.h $(INCLUDE_DIR)/kernel/*.h)
+
+
 PROGS = sys_alarm sys_brk sys_exec sys_exit sys_fork sys_sbrk \
 		sys_sigaction sys_sigreturn sys_wait sys_sigsend sys_getc\
-		sys_time sys_ps sys_putc sys_printf sys_getpid
+		sys_time sys_ps sys_putc sys_printf sys_getpid sys_abort \
+		sys_kill sys_readsrec sys_sleep
+
 SOURCES = $(PROGS:=.c)
 ASSEMBLY = $(PROGS:=.s)
 OBJECT = $(PROGS:=.o)
 
+MAKEDEPEND = gcc -M $(CPPFLAGS) -o $*.Td $<
+
 wramp: $(OBJECT)
-$(ASSEMBLY): %.s: %.c
-	$(CC) -S -I../../include -o $@ $<
+$(ASSEMBLY): %.s: %.c $(INCLUDES)
+	$(CC) -S -I$(INCLUDE_DIR) -o $@ $<
 
 $(OBJECT): %.o: %.s
 	wasm $< -o $@
 
-# $(link): $(assemble)
-# 	wlink -o $(link) $(assemble)
-
 depend:
-	makedepend $(sources)
+	makedepend -I$(INCLUDE_DIR) $(SOURCES)
 
 clean:
 	-rm -f $(ASSEMBLY) $(OBJECT)
 
-.DELETE_ON_ERROR:
+.DELETE_ON_ERROR:# DO NOT DELETE
+

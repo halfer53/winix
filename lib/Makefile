@@ -1,22 +1,21 @@
-# sources = stdio.c string.c syscall.c ipc.c util.c stdlib.c makecontext.c
-# compile = stdio.s string.s syscall.s ipc.s util.s stdlib.s makecontext.s
-# assemble = stdio.o string.o syscall.o wramp_syscall.o ipc.o util.o stdlib.o ucontext.o makecontext.o debug.o
-
 CC = wcc
-PROGS = stdio string syscall ipc util stdlib makecontext atoi
+INCLUDE_DIR = ../include
+# INCLUDES = $(wildcard $(INCLUDE_DIR)/*.h $(INCLUDE_DIR)/sys/*.h)
+
+PROGS = stdio string syscall ipc util stdlib makecontext atoi _sigset errno
 SOURCES = $(PROGS:=.c)
 ASSEMBLY = $(PROGS:=.s)
-OBJECT = $(PROGS:=.o) wramp_syscall.o ucontext.o debug.o
+OBJECT = $(PROGS:=.o) wramp_syscall.o ucontext.o debug.o __errno.o
 
 wramp: $(OBJECT)
-$(ASSEMBLY): %.s: %.c
-	$(CC) -S -I../include -o $@ $<
+$(ASSEMBLY): %.s: %.c $(INCLUDES)
+	$(CC) -S -I$(INCLUDE_DIR) -o $@ $<
 
 $(OBJECT): %.o: %.s
 	wasm $< -o $@
 
 depend:
-	makedepend $(sources)
+	makedepend -I$(INCLUDE_DIR) $(SOURCES)
 
 clean:
 	-rm -f $(OBJECT) $(ASSEMBLY)

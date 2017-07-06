@@ -6,12 +6,10 @@
  *  2016-11-20		Bruce Tan			Modified
  **/
 
-#include <sys/ipc.h>
-#include <sys/syscall.h>
-#include <sys/types.h>
+#include <lib.h>
 #include <ucontext.h>
 #include <curses.h>
-#include <signal.h>
+
 #include <debug.h>
 
 /**
@@ -63,7 +61,7 @@ DECLARE_SYSCALL(int sys_exit, (int status),
 DECLARE_SYSCALL(int sys_process_overview, (), 
 	SYSCALL_PS,
 	,
-	send,
+	sendrec,
 	SYSCALL_DEFAULT_RETURN)
 
 // pid_t fork(){
@@ -91,7 +89,7 @@ DECLARE_SYSCALL(pid_t fork, (),
 DECLARE_SYSCALL(int exec, (), 
 	SYSCALL_EXEC,
 	,
-	send,
+	sendrec,
 	SYSCALL_DEFAULT_RETURN)
 
 // void *sbrk(size_t size){
@@ -154,7 +152,7 @@ DECLARE_SYSCALL(int getc, (),
 DECLARE_SYSCALL(int putc, (int i), 
 	SYSCALL_PUTC,
 	m.i1 = i,
-	send,
+	sendrec,
 	SYSCALL_DEFAULT_RETURN)
 
 // int printf(const char *format, ...) {
@@ -171,7 +169,7 @@ DECLARE_SYSCALL(int putc, (int i),
 DECLARE_SYSCALL(int printf, (const char *format, ...), 
 	SYSCALL_PRINTF,
 	m.p1 = (void *)format; m.p2 = (void *)((int *)&format+1);,
-	send,
+	sendrec,
 	SYSCALL_DEFAULT_RETURN)
 
 // sighandler_t signal(int signum, sighandler_t handler){
@@ -187,7 +185,7 @@ DECLARE_SYSCALL(int printf, (const char *format, ...),
 DECLARE_SYSCALL(sighandler_t signal, (int signum, sighandler_t handler), 
 	SYSCALL_SIGNAL,
 	m.i1 = signum; m.s1 = handler,
-	send,
+	sendrec,
 	SIG_DFL )
 
 // void sigreturn(int signum){
@@ -218,7 +216,7 @@ DECLARE_SYSCALL(int sigreturn, (int signum),
 DECLARE_SYSCALL(unsigned int alarm, (unsigned int seconds), 
 	SYSCALL_ALARM, 
 	m.i1 = seconds, 
-	send,
+	sendrec,
 	SYSCALL_DEFAULT_RETURN)
 
 // pid_t wait(int *wstatus){

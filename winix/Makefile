@@ -1,12 +1,15 @@
 CC = wcc
+INCLUDE_DIR = ../include
+INCLUDES = $(wildcard $(INCLUDE_DIR)/*.h $(INCLUDE_DIR)/winix/*.h $(INCLUDE_DIR)/sys/*.h $(INCLUDE_DIR)/kernel/*.h)
+
 PROGS = slab mm bitmap sys_stdio wini_ipc kdebug timer
 SOURCES = $(PROGS:=.c)
 ASSEMBLY = $(PROGS:=.s)
 OBJECT = $(PROGS:=.o) kwramp.o
 
 wramp: $(OBJECT)
-$(ASSEMBLY): %.s: %.c
-	$(CC) -S -I../include -o $@ $<
+$(ASSEMBLY): %.s: %.c $(INCLUDES)
+	$(CC) -S -I$(INCLUDE_DIR) -o $@ $<
 
 $(OBJECT): %.o: %.s
 	wasm $< -o $@
@@ -15,7 +18,7 @@ $(link): $(assemble)
 	wlink -o $(link) $(assemble)
 
 depend:
-	makedepend $(sources)
+	makedepend -I$(INCLUDE_DIR) $(SOURCES)
 
 clean:
 	-rm -f $(OBJECT) $(ASSEMBLY)

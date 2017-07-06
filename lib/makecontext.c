@@ -1,17 +1,15 @@
+#include <lib.h>
 #include <ucontext.h>
-#include <stddef.h>
-#include <string.h>
-#include <sys/syscall.h>
-#include <sys/types.h>
+
 
 void _ctx_end(ucontext_t *ucp){
 
 	if(ucp->uc_link == NULL)
-		sys_exit(0);
+		sys_exit(EXIT_SUCCESS);
 	setcontext(ucp->uc_link);
 
 	//should never get here
-	sys_exit(2);
+	sys_exit(EXIT_FAILURE);
 }
 
 void makecontext(ucontext_t *ucp, void (* func)(), int argc, ...){
@@ -41,8 +39,8 @@ void makecontext(ucontext_t *ucp, void (* func)(), int argc, ...){
 	 * 	_ctx_start will pop the top of the stack, which is func. After that, the Stack 
 	 * 	will be arranged such that all args are left on the top of the  stack. 
 	 * 	Then func() is called.
-	 * 	When func() returns, _ctx_start will pop ucp, then call and pass 
-	 * 	the parameter to _ctx_end
+	 * 	When func() returns, _ctx_start will load value from $12, which is the 
+	 *	address of the ctx_end , then call and pass the parameter to _ctx_end
 	**/
 	*sp++ = (int)func;
 	memcpy(sp,args,argc);

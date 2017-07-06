@@ -11,13 +11,13 @@ void do_wait(proc_t *parent, message_t *mesg){
         child = &proc_table[i];
         if(child->IN_USE && child->parent == parent->proc_index){
             if(child->state == ZOMBIE){
-
+                
                 //TODO: set wstatus in proper format
                 if(mesg->p1 != NULL){
                     wstatus = get_physical_addr(mesg->p1,parent);
                     *wstatus = child->exit_status;
                 }
-                do_exit(child, 1);
+                free_slot(child);
                 mesg->i1 = child->pid;
                 winix_send(parent->pid,mesg);
                 return;
@@ -29,6 +29,7 @@ void do_wait(proc_t *parent, message_t *mesg){
 	
     //Proc has no children
     if(children == 0){
+        kprintf("no children\n");
         mesg->i1 = -1;
         winix_send(parent->pid,mesg);
         return;

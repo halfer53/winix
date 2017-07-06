@@ -15,15 +15,9 @@ proc_t *who;
 ucontext_t recv_ctx;
 syscallctx_t syscall_ctx;
 
-void send_err(proc_t *to){
-	message_t tmesg;
-	memset(&tmesg,-1,MESSAGE_LEN);
-	winix_send(to->pid,&tmesg);
-}
-
 void resume_syscall(proc_t *to){
 	if(syscall_ctx.who->pid == to->pid && to->flags & RECEIVING && syscall_ctx.interruptted)
-		send_err(to);
+		winix_senderr(to->pid);
 
 	syscall_ctx.interruptted = 0;
 	// setcontext(&syscall_ctx);
@@ -31,7 +25,7 @@ void resume_syscall(proc_t *to){
 
 void intr_syscall(){
 	//if the system is executing a system call, save the system call context
-	//and restart the System as if it has finished executing the current syscall
+	//and interrupt the System as if it has finished executing the current syscall
 	if(!get_proc(SYSTEM_TASK)->flags){
 		syscall_ctx.m = m;
 		syscall_ctx.who = who;
@@ -47,10 +41,7 @@ message_t *curr_mesg(){
  * Entry point for system task.
  **/
 void system_main() {
-	int counter = 0;
-	proc_t *pcurr;
 	int response = 0;
-	void *ptr = NULL, *ptr2 = NULL;
 
 	FREE_MEM_END = 0x1ffff;
 	
@@ -87,7 +78,9 @@ void system_main() {
 			case SYSCALL_SIGNAL:	syscall_sigaction(who,&m);	break;	
 			case SYSCALL_SIGRET:	syscall_sigreturn(who,&m);	break;
 			case SYSCALL_WAIT:		syscall_wait(who,&m);		break;
+			case SYSCALL_KILL: 		syscall_kill(who,&m);		break;
 			case SYSCALL_GETPID:	syscall_getpid(who,&m);		break;
+			
 			
 			default:
 				kprintf("\r\n[SYSTEM] Process \"%s (%d)\" performed unknown system call %d\r\n", who->name, who->pid, m.type);

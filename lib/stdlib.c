@@ -1,7 +1,4 @@
-#include <sys/types.h>
-#include <stdlib.h>
-#include <stddef.h>
-#include <sys/syscall.h>
+#include <lib.h>
 
 /**
  * block structure
