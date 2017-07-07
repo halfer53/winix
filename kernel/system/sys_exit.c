@@ -84,7 +84,7 @@ void exit_proc(proc_t *who, int status){
 }
 
 int do_exit(proc_t *who, message_t *m){
-    kprintf("\r\n[SYSTEM] Process \"%s (%d)\" exited with code %d\r\n", who->name, who->pid, m->i1);
+    // kprintf("\r\n[SYSTEM] Process \"%s (%d)\" exited with code %d\r\n", who->name, who->pid, m->i1);
 	exit_proc(who,m->i1);
     return SUSPEND;
 }

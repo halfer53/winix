@@ -47,6 +47,7 @@ int signo;
   return 0;
 }
 
+// #define sigemptyset(set)  (*set = 0)
 int sigemptyset(set)
 sigset_t *set;
 {

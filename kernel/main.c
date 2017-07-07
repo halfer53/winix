@@ -38,7 +38,7 @@ void Scan_FREE_MEM_BEGIN() {
 	FREE_MEM_BEGIN |= 0x03ff;
 	FREE_MEM_BEGIN++;
 
-	// kprintf("\r\nfree memory begin %x\r\n", FREE_MEM_BEGIN );
+	// kprintf("\r\nfree memory begin 0x%08x\r\n", FREE_MEM_BEGIN );
 }
 
 /**
@@ -110,6 +110,7 @@ void main() {
 
 	p = exec_new_proc(shell_code,shell_code_length,shell_pc, USER_PRIORITY,"Shell");
 	assert(p != NULL, "Create Shell task");
+	p->parent = 1;//hack 
 	p->quantum = 2;
 
 	//Initialise exceptions

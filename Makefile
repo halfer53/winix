@@ -1,7 +1,7 @@
 CC = wcc
 KERNEL_OBJS = winix/*.o kernel/*.o kernel/system/*.o
 
-LIB = ipc string util wramp_syscall ucontext atoi _sigset errno
+LIB = ipc string util wramp_syscall ucontext atoi errno
 LIB_OBJS = $(addprefix lib/, $(LIB:=.o))
 
 KLIMITS = kernel/util/limits_head.o kernel/util/limits_tail.o

@@ -156,7 +156,7 @@ int bitmap_search_pattern(unsigned int *map, int map_len,int start, unsigned int
 			map_bit = (map[i] & mask[j]);
 			pattern_bit = (pattern >> j) & mask[j];
             result = map_bit & pattern_bit;
-            // kprintf("%d %x %x %x %x\n",j,(map[i]),map_bit, pattern_bit ,result);
+            // kprintf("%d 0x%08x 0x%08x 0x%08x 0x%08x\n",j,(map[i]),map_bit, pattern_bit ,result);
             if(result == 0){ 
                 if(pattern_len == 1)
                     return i*32+j;

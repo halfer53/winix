@@ -1,4 +1,5 @@
 #include <winix/rex.h>
+#include <stdbool.h>
 
 /**
  * Writes a character to serial port 1.
@@ -7,6 +8,7 @@ void kputc(const int c) {
 	while(!(RexSp1->Stat & 2));
 	RexSp1->Tx = c;
 }
+
 
 void kputc2(const int c) {
 	while(!(RexSp2->Stat & 2));
@@ -23,33 +25,48 @@ int kgetc() {
 	return RexSp1->Rx;
 }
 
-static void kputx(int n) {
+static void kputx_buf(int n,char *buf) {
 	int i;
-	kputc('0');
-	kputc('x');
+	int v = 0;
+
+	if(n == 0){
+		*buf++ = '0';
+		*buf = '\0';
+		return;
+	}
+	// kputc('0');
+	// kputc('x');
 	for(i = 28; i >= 0; i -= 4) {
 		int d = (n >> i) & 0xf;
+		if(d)
+			v = 1;
 		if(d < 10) {
-			kputc(d + '0');
+			if(v)
+				*buf++ = d + '0';
 		}
 		else {
-			kputc(d - 10 + 'A');
+			// kputc(d - 10 + 'A');
+			*buf++ = d - 10 + 'A';
 		}
 	}
+	*buf = '\0';
 }
 
-static void kputd(int n) {
+static void kputd_buf(int n, char *buf) {
 	int place = 1000000000;
 
 	//zero?
 	if(n == 0) {
-		kputc('0');
+		// kputc('0');
+		*buf++ = '0';
+		*buf = '\0';
 		return;
 	}
 
 	//negative?
 	if(n < 0) {
-		kputc('-');
+		// kputc('-');
+		*buf++ = '-';
 		n *= -1;
 	}
 
@@ -61,16 +78,21 @@ static void kputd(int n) {
 	//print the rest
 	while(place) {
 		int d = n / place;
-		kputc(d % 10 + '0');
+		// kputc(d % 10 + '0');
+		*buf++ = d % 10 + '0';
 		place /= 10;
 	}
+	*buf = '\0';
 }
 
-static void kputs_vm(char *s, void *who_rbase) {
+static void kputs_vm_buf(char *s, void *who_rbase, char *buf) {
 	char *sp = s;
 	sp += (int)who_rbase;
 	while(*sp)
-		kputc(*sp++);
+		*buf++ = *sp++;
+	
+	*buf = '\0';
+		// kputc(*sp++);
 }
 
 static void kputs(const char *s) {
@@ -78,36 +100,72 @@ static void kputs(const char *s) {
 		kputc(*s++);
 }
 
+#define SPACE	' '
+#define ZERO	'0'
+
+#define PUT_PADDING(_padding,_token)\
+	while(_padding--){	\
+		kputc(_token);		\
+	}					\
+
 
 void kprintf_vm(const char *format, void *arg, void *who_rbase){
 	char c = *format;
+	static char buffer[100];
+	char *buf = buffer;
+	int padding = 0;
+	bool right_padding;
 
 	//TODO: proper formats
 	while(*format) {
 		if(*format == '%') {
+			char prev;
+			char token = SPACE;
 			format++;
-
+			
+			if(*format == '-'){
+				format++;
+				right_padding = true;
+			}else{
+				right_padding = false;
+			}
+			
+			if(*format == '*'){
+				padding = atoi(*(int *)arg);
+				arg = ((int*)arg) + 1;
+			}else if(*format >= '0' && *format <= '9'){
+				buf = buffer;
+				*buf++ = *format++;
+				*buf++ = *format++;
+				*buf = '\0';
+				padding = atoi(buffer);
+				buf = buffer;
+			}
+			prev = *format;
 			switch(*format) {
 				case 'd':
-					kputd(*((int*)arg));
+					kputd_buf(*((int*)arg),buf);
 					arg = ((int*)arg) + 1;
 					format++;
 					break;
 
 				case 'x':
-					kputx(*((int*)arg));
+					kputx_buf(*((int*)arg),buf);
 					arg = ((int*)arg) + 1;
 					format++;
+					right_padding = false;
 					break;
 
 				case 's':
-					kputs_vm(*(char **)arg,who_rbase);
+					kputs_vm_buf(*(char **)arg,who_rbase,buf);
 					arg = ((char *)arg) + 1;
 					format++;
 					break;
 
 				case 'c':
-					kputc(*(int *)arg);
+					// kputc(*(int *)arg);
+					*buf++ = *(int *)arg;
+					*buf = '\0';
 					arg = ((char *)arg) + 1;
 					format++;
 					break;
@@ -115,6 +173,22 @@ void kprintf_vm(const char *format, void *arg, void *who_rbase){
 				default:
 					kputc(*format++);
 			}
+			if(padding != 0){
+				padding -= strlen(buf);
+				if(prev == 'x')
+					token = ZERO;
+				if(!right_padding && padding > 0){
+					
+					PUT_PADDING(padding,token);
+				}
+			}
+			kputs(buf);
+			if(right_padding && padding > 0){
+				PUT_PADDING(padding,token);
+				// while(padding--)
+				// 	kputc(' ');
+			}
+			padding = 0;
 		}
 		else {
 			kputc(*format++);

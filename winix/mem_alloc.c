@@ -232,7 +232,7 @@ void hole_list_overview() {
 		kprintf("unused hole empty\n" );
 	}
 	while (curr != NULL) {
-		kprintf("unused hole start %x, length %d\n", curr->start, curr->length );
+		kprintf("unused hole start 0x%08x, length %d\n", curr->start, curr->length );
 		curr = curr->next;
 	}
 
@@ -241,7 +241,7 @@ void hole_list_overview() {
 		kprintf("used holes empty\n" );
 	}
 	while (curr != NULL) {
-		kprintf("used hole start %x, length %d\n", curr->start, curr->length );
+		kprintf("used hole start 0x%08x, length %d\n", curr->start, curr->length );
 		curr = curr->next;
 	}
 

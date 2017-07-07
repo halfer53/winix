@@ -97,7 +97,7 @@ static void serial2_handler() {
 	if(stat & 1 == 1){
 		kprintf("Got %c\n",RexSp2->Rx);
 	}else{
-		kprintf("Error %x",RexSp2->Stat);
+		kprintf("Error 0x%08x",RexSp2->Stat);
 	}
 	RexSp2->Iack = 0;
 }
@@ -115,18 +115,18 @@ static void gpf_handler() {
 	if(!isokprocn(current_proc->pid))
 		panic("invalid proc");
 	//Current process has performed an illegal operation and will be shut down.
-	kprintf("\r\n[SYSTEM] Process \"%s (%d)\" Rbase=%x GPF: PC=%x SP=%x.\r\n",
+	kprintf("\r\n[SYSTEM] Process \"%s (%d)\" Rbase=0x%08x GPF: PC=0x%08x SP=0x%08x.\r\n",
 		current_proc->name,
 		current_proc->pid,
 		current_proc->rbase,
 		current_proc->pc,
 		current_proc->sp,current_proc);
-	kprintf("mIR: %x\n",*get_physical_addr(current_proc->pc,current_proc));
-	kprintf("$1: %x, $2, %x, $3, %x\n",current_proc->regs[0],current_proc->regs[1],current_proc->regs[2]);
-	kprintf("$4: %x, $5, %x, $6, %x\n",current_proc->regs[3],current_proc->regs[4],current_proc->regs[5]);
-	kprintf("$7: %x, $8, %x, $9, %x\n",current_proc->regs[6],current_proc->regs[7],current_proc->regs[8]);
-	kprintf("$10: %x, $11, %x, $12, %x\n",current_proc->regs[9],current_proc->regs[10],current_proc->regs[11]);
-	kprintf("$13: %x, $sp, %x, $ra, %x\n",current_proc->regs[12],current_proc->regs[13],current_proc->regs[14]);
+	kprintf("mIR: 0x%08x\n",*get_physical_addr(current_proc->pc,current_proc));
+	kprintf("$1: 0x%08x, $2, 0x%08x, $3, 0x%08x\n",current_proc->regs[0],current_proc->regs[1],current_proc->regs[2]);
+	kprintf("$4: 0x%08x, $5, 0x%08x, $6, 0x%08x\n",current_proc->regs[3],current_proc->regs[4],current_proc->regs[5]);
+	kprintf("$7: 0x%08x, $8, 0x%08x, $9, 0x%08x\n",current_proc->regs[6],current_proc->regs[7],current_proc->regs[8]);
+	kprintf("$10: 0x%08x, $11, 0x%08x, $12, 0x%08x\n",current_proc->regs[9],current_proc->regs[10],current_proc->regs[11]);
+	kprintf("$13: 0x%08x, $sp, 0x%08x, $ra, 0x%08x\n",current_proc->regs[12],current_proc->regs[13],current_proc->regs[14]);
 
 	//Kill process and call scheduler.
 	exit_proc(current_proc,1);
@@ -201,7 +201,7 @@ static void break_handler() {
  *   Current process is killed, and scheduler is called (i.e. this handler does not return).
  **/
 static void arith_handler() {
-	kprintf("\r\n[SYSTEM] Process \"%s (%d)\" ARITH: PC=%x.\r\n", current_proc->name, current_proc->pid, current_proc->pc);
+	kprintf("\r\n[SYSTEM] Process \"%s (%d)\" ARITH: PC=0x%08x.\r\n", current_proc->name, current_proc->pid, current_proc->pc);
 	exit_proc(current_proc,1);
 	current_proc = NULL;
 	sched();

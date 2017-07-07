@@ -212,8 +212,8 @@ void *kset_proc(proc_t *p, void (*entry)(), int priority, const char *name) {
 	i = get_free_pages(len,__GFP_NORM);
 	bitmap_set_nbits(p->ptable, PROTECTION_TABLE_LEN, i, len);
 	bitmap_set_nbits(mem_map, PROTECTION_TABLE_LEN, i, len);
-	// kprintf("kset %x\n",p->ptable[0]);
-	p->sp = (size_t *)ptr + DEFAULT_STACK_SIZE - 100;
+	// kprintf("kset 0x%08x\n",p->ptable[0]);
+	p->sp = (reg_t *)ptr + DEFAULT_STACK_SIZE - 100;
 	p->heap_break = p->sp + 1;
 
 	p->length = DEFAULT_STACK_SIZE;
@@ -271,7 +271,7 @@ proc_t *kexecp(proc_t *p, void (*entry)(), int priority, const char *name) {
 		bitmap_xor(mem_map, p->ptable, MEM_MAP_LEN);
 	}
 	ptr = kset_proc(p, entry, priority, name);
-	// kprintf("kset %x\n",mem_map[0]);
+	// kprintf("kset 0x%08x\n",mem_map[0]);
 	p->rbase = DEFAULT_RBASE;
 	bitmap_fill(p->ptable, PROTECTION_TABLE_LEN);
 	add_to_scheduling_queue(p);
@@ -294,7 +294,7 @@ proc_t *start_system(void (*entry)(), int priority, const char *name) {
 		// ptr = proc_malloc(DEFAULT_STACK_SIZE);
 		ptr = page_pa(get_free_pages(stack_size / 1024,__GFP_NORM));
 
-		p->sp = (size_t *)ptr + stack_size - 128;
+		p->sp = (reg_t *)ptr + stack_size - 128;
 		//TODO: init heap_break using slab
 		p->heap_break = p->sp + 1;
 		p->length = stack_size * 10;
@@ -356,7 +356,7 @@ void end_process(proc_t *p) {
 void process_overview() {
 	int i;
 	proc_t *curr;
-	//kprintf("|| PS %s ",current_proc->name );
+	kprintf("NAME     PID PPID RBASE      PC         STACK      HEAP       PROTECTION flags\n");
 	for (i = 0; i < NUM_PROCS; i++) {
 		curr = &proc_table[i];
 		if(curr->IN_USE && curr->state != ZOMBIE)
@@ -366,12 +366,13 @@ void process_overview() {
 
 //print the process state given
 void printProceInfo(proc_t* curr) {
-	kprintf("%s %d rbase %x pc %x, sp %x, heap %x, pt %x flags %d\n",
+	kprintf("%-08s %-03d %-04d 0x%08x 0x%08x 0x%08x 0x%08x 0x%08x %d\n",
 	        curr->name,
 	        curr->pid,
-	        curr->rbase,
-	        curr->pc,
-	        curr->sp,
+			curr->parent,
+	        get_physical_addr(curr->rbase,curr),
+	        get_physical_addr(curr->pc,curr),
+	        get_physical_addr(curr->sp,curr),
 	        curr->heap_break,
 	        curr->ptable[0],
 			curr->flags);

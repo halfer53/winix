@@ -22,7 +22,7 @@ proc_t *exec_replace_existing_proc(proc_t *p,size_t *lines, size_t length, size_
 	assert(p != NULL, "can't exec null process\n");
 	if(p->rbase == DEFAULT_RBASE){
 		// bitmap_set_bit(mem_map,MEM_MAP_LEN,get_page_index(p->sp));
-		// kprintf("Fork free stack %x %d\n",get_page_index(p->sp));
+		// kprintf("Fork free stack 0x%08x %d\n",get_page_index(p->sp));
 	}else{
 		// proc_free(p->rbase);
 		bitmap_xor(mem_map,p->ptable,MEM_MAP_LEN);
@@ -60,7 +60,7 @@ proc_t *exec_proc(proc_t *p,size_t *lines, size_t length, size_t entry, int prio
 		bitmap_set_nbits(p->ptable,PROTECTION_TABLE_LEN, nstart,len);
 		bitmap_set_nbits(mem_map,MEM_MAP_LEN, nstart,len);
 
-		// kprintf("%x start %d len %d\n",mem_map[0],nstart,len);
+		// kprintf("0x%08x start %d len %d\n",mem_map[0],nstart,len);
 
 		ptr_base = (ptr_t)(nstart * 1024);
 		p->heap_break = ptr_base + length + DEFAULT_STACK_SIZE;
@@ -134,7 +134,7 @@ int exec_read_srec(proc_t *p){
       if (buf[1] == '7') {
         temp = wordsLoaded;
         entry = winix_load_srec_mem_val(buf,memory_values,wordsLoaded,wordslength);
-				//kprintf("entry %x",entry);
+				//kprintf("entry 0x%08x",entry);
 				if (temp != wordsLoaded) {
           kprintf("wordsLoaded %d, previous wordsLoaded %d, last s7 is incorrect\n");
           return ERR;
@@ -400,7 +400,7 @@ int winix_load_srec_mem_val(char *line,size_t *memory_values,int start_index,int
 
                     memory_values[start_index + wordsLoaded] = memVal;
 										wordsLoaded++;
-										//kprintf("%x\n",memVal );
+										//kprintf("0x%08x\n",memVal );
 								}
 								break;
 

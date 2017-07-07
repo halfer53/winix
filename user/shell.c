@@ -82,23 +82,46 @@ int cmd_kill(int argc, char **argv){
 }
 
 int seconds;
+int cont;
 
-void sighandler(int signum){
-	
-	printf("\nSignal received %d seconds elapsed\nChild exit \n",seconds);
+void child_handler(int signum){
+	printf("\n%d seconds elapsed\n",seconds);
 	sys_exit(EXIT_SUCCESS);
 }
 
+void alarm_handler(int signum){
+	printf("\n%d seconds elapsed\n",seconds);
+	cont = 0;
+}
+
 int test_alarm(int argc, char **argv){
+	int i;
+	seconds = 1;
+	if(argc > 1)
+		seconds = atoi(argv[1]);
+
+	signal(SIGALRM,alarm_handler);
+	alarm(seconds);
+	cont = 1;
+	i = 10000;
+	while(cont){
+		putc('!');
+		while(i--);
+		i = 10000;
+	}
+		
+	return 0;
+}
+
+int test_signal(int argc, char **argv){
 	int i;
 	pid_t pid;
 	pid_t fr;
 	seconds = 1;
 	if(argc > 1)
 		seconds = atoi(argv[1]);
-
 	if((fr = fork()) == 0){
-		signal(SIGALRM,sighandler);
+		signal(SIGALRM,child_handler);
 		alarm(seconds);
 		i = 10000;
 		while(1){
@@ -107,9 +130,7 @@ int test_alarm(int argc, char **argv){
 			i = 10000;
 		}
 	}else{
-		printf("parent waiting for child %d\n",fr);
 		pid = wait(NULL);
-		printf("parent awakened by child %d\n",pid);
 	}
 	return 0;
 }
@@ -232,7 +253,8 @@ int exit(int argc, char **argv) {
 	int status = 0;
 	if(argc > 1)
 		status = atoi(argv[1]);
-	printf("Bye!\r\n");
+	printf("Bye!\n");
+	printf("Child %d [parent %d] exits\n",getpid(),getppid());
 	return sys_exit(status);
 }
 
@@ -246,7 +268,7 @@ int test_fork(int argc, char **argv){
 			printf("fork failed\n");
 			sys_exit(1);
 		}
-		printf("parent %d waiting child %d\n",mpid,cpid);
+		printf("parent %d waiting for child %d\n",mpid,cpid);
 		cpid = wait(NULL);
 		printf("parent %d awakened by child %d\n",mpid,cpid);
 	}else{

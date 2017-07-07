@@ -1,18 +1,38 @@
 # WINIX
-A UNIX-style Operating System for the Waikato RISC Architecture Microprocessor (WRAMP)[Paper](https://www.ncsu.edu/wcae/ISCA2002/submissions/pearson.pdf)
+A UNIX-style Operating System for the Waikato RISC Architecture Microprocessor (WRAMP)
 
-# Install
-Since the compiler for this project is not open source (not yet), you may not compile this on your own. 
+## How to Compile
+```cd Winix2```
 
-But you can stil run the compiled code on the [Simulator](https://sourceforge.net/projects/rexsimulator/). Once the simulator is run, open up Serial Port 1, and type ```load```, then drag ```winix.srec``` on the the serial port 1. Wait for a minute until the OS is loaded, then type ```run```
+```export PATH=`pwd`/tools/bin:$PATH```
 
-# TODO
-- [ ] fix bugs for sbrk() and brk() after fork()
-- [ ] sigreturn() is blocked by previous getc()
-- [ ] release memory and unprocessed messages after do_exit(, EXIT_FAILURE)
+```make```
 
+## How to Run
 
-# Credits
+Download the Rexsimulator from [Here](https://github.com/halfer53/rexsimulator/releases/tag/2.0.1)
+
+Run ```Rexsimulator.exe```
+
+Click ```Quick Load```, select ```winix.srec```
+
+## List of Commands
+
+alarm [ seconds ]: set the alarm in number of seconds, or 1 by default
+
+thread [ num ]: Spawn the number of user threads specified by the parameter num, or 2 by default
+
+malloc: test malloc function
+
+kill [ -n signum ] pid: send specified signum to specified process. If signum is not provided, SIGKIL is sent
+
+fork: fork off a child shell process, parent shell wait until child shell exits or killed.
+
+exit: exit the shell program
+
+uptime: shows the system uptime
+
+[Adventure on Winix](https://github.com/halfer53/Winix2/blob/master/docs/demo.md)
+
+## Credits
 [Paul Monigatti](https://nz.linkedin.com/in/paulmonigatti)
-
-[re](https://svn.code.sf.net/p/quake/svn/quake3/trunk/lcc/lib/)

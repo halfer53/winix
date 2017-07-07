@@ -46,10 +46,10 @@ void system_main() {
 	FREE_MEM_END = 0x1ffff;
 	
 	//Print Memory Map
-	kprintf("Text Segment: %x - %x\r\n", &TEXT_BEGIN, &TEXT_END);
-	kprintf("Data Segment: %x - %x\r\n", &DATA_BEGIN, &DATA_END);
-	kprintf("BSS Segment:  %x - %x\r\n", &BSS_BEGIN, &BSS_END);
-	kprintf("Unallocated:  %x - %x\r\n", FREE_MEM_BEGIN, FREE_MEM_END);
+	kprintf("Text Segment: 0x%08x - 0x%08x\r\n", &TEXT_BEGIN, &TEXT_END);
+	kprintf("Data Segment: 0x%08x - 0x%08x\r\n", &DATA_BEGIN, &DATA_END);
+	kprintf("BSS Segment:  0x%08x - 0x%08x\r\n", &BSS_BEGIN, &BSS_END);
+	kprintf("Unallocated:  0x%08x - 0x%08x\r\n", FREE_MEM_BEGIN, FREE_MEM_END);
 	kprintf("%d kWords Free\r\n", ((unsigned long)(FREE_MEM_END - FREE_MEM_BEGIN)) / 1024);
 	//Receive message, do work, repeat.
 

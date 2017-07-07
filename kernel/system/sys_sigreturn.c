@@ -8,7 +8,7 @@ int do_sigreturn(proc_t *who, message_t *m){
 
     sp = get_physical_addr(who->sp,who);
 
-    // kprintf("sig ret sp %x\n",sp);
+    // kprintf("sig ret sp 0x%08x\n",sp);
 
     sp += MESSAGE_LEN + 3 +SIGFRAME_CODE_LEN;
     memcpy(who,sp,PROCESS_CONTEXT_LEN);

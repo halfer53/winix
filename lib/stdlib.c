@@ -26,7 +26,7 @@ static void *end = NULL;
 
 void printblock(block_t *b) {
 	int i = (int)b / 1024;
-	printf("%d %x size %d next %x prev %x free %d data %x\n",i, b, b->size, b->next , b->prev, b->free, b->data);
+	printf("%d 0x%08x size %d next 0x%08x prev 0x%08x free %d data 0x%08x\n",i, b, b->size, b->next , b->prev, b->free, b->data);
 }
 
 void block_overview() {
@@ -61,7 +61,7 @@ block_t *find_block(block_t **last , size_t size) {
 void split_block(block_t *b, size_t s)
 {
 	block_t *new;
-	// printf("data %x new %x\n", b->data,new);
+	// printf("data 0x%08x new 0x%08x\n", b->data,new);
 	new = (block_t *)(b->data + s);
 	new->size = b->size - s - BLOCK_SIZE;
 	new->next = b->next;
@@ -69,7 +69,7 @@ void split_block(block_t *b, size_t s)
 	new->free = 1;
 	new->ptr = new->data;
 	b->size = s;
-	// printf("new %x size %d orisize %d\n", new,new->size,b->size);
+	// printf("new 0x%08x size %d orisize %d\n", new,new->size,b->size);
 	b->next = new;
 	if (new->next)
 		new->next ->prev = new;
@@ -90,12 +90,12 @@ block_t *extend_heap(block_t *last , size_t s)
 		page_end = align1k((int)b);
 		size_til_endof_page = page_end - (int)b - BLOCK_SIZE;
 
-		// printf("b %x siend %d\n",b,size_til_endof_page);
+		// printf("b 0x%08x siend %d\n",b,size_til_endof_page);
 
 		if(size_til_endof_page < s){
 			if(size_til_endof_page > 0){
 				sb = sbrk(BLOCK_SIZE + size_til_endof_page);
-				// printf("b %x sb %x siend %d\n",b,sb,size_til_endof_page);
+				// printf("b 0x%08x sb 0x%08x siend %d\n",b,sb,size_til_endof_page);
 				if ((int)sb < 0)
 					return (NULL);
 				if(size_til_endof_page < 4){
@@ -113,7 +113,7 @@ block_t *extend_heap(block_t *last , size_t s)
 			}
 
 			b2 = sbrk(BLOCK_SIZE+s);
-			// printf("nextpage b %x b2 %x \n",b,b2);
+			// printf("nextpage b 0x%08x b2 0x%08x \n",b,b2);
 			if ((int)b2 < 0)
 				return (NULL);
 			b2->size = s;
@@ -129,7 +129,7 @@ block_t *extend_heap(block_t *last , size_t s)
 	}
 	
 	sb = sbrk(BLOCK_SIZE+s);
-	// printf("extendingheap b %x sb %x \n",b,sb);
+	// printf("extendingheap b 0x%08x sb 0x%08x \n",b,sb);
 
 	if ((int)sb < 0)
 		return (NULL);
@@ -163,7 +163,7 @@ void *malloc(size_t size) {
 			b->free = 0;
 		} else {
 			/* No fitting block , extend the heap */
-			// printf(" Extend Heap %x\n",b);
+			// printf(" Extend Heap 0x%08x\n",b);
 			b = extend_heap(last , s);
 			
 			if (!b)
@@ -190,7 +190,6 @@ void copy_block(block_t *src, block_t *dst)
 	for (i = 0; i * 4 < src->size && i * 4 < dst->size; i++)
 		ddata[i] = sdata[i];
 }
-
 
 
 block_t *fusion(block_t *b) {

@@ -31,7 +31,7 @@ void init_slab(void *addr,int size){
 }
 
 PRIVATE void kprintblock(block_t *b) {
-	kprintf("%x size %d next %x prev %x free %d data %x\n",b, b->size, b->next , b->prev, b->free, b->data);
+	kprintf("0x%08x size %d next 0x%08x prev 0x%08x free %d data 0x%08x\n",b, b->size, b->next , b->prev, b->free, b->data);
 }
 
 void kblock_overview() {
@@ -67,7 +67,7 @@ PRIVATE block_t *find_block(block_t **last , size_t size) {
 PRIVATE void split_block(block_t *b, size_t s)
 {
 	block_t *new;
-	// kprintf("data %x new %x\n", b->data,new);
+	// kprintf("data 0x%08x new 0x%08x\n", b->data,new);
 	new = (block_t *)(b->data + s);
 	new->size = b->size - s - BLOCK_SIZE;
 	new->next = b->next;
@@ -75,7 +75,7 @@ PRIVATE void split_block(block_t *b, size_t s)
 	new->free = 1;
 	new->ptr = new->data;
 	b->size = s;
-	// kprintf("new %x size %d orisize %d\n", new,new->size,b->size);
+	// kprintf("new 0x%08x size %d orisize %d\n", new,new->size,b->size);
 	b->next = new;
 	if (new->next)
 		new->next ->prev = new;
@@ -144,7 +144,7 @@ void *kmalloc(size_t size) {
 			b->free = 0;
 		} else {
 			/* No fitting block , extend the heap */
-			// kprintf(" Extend Heap %x\n",b);
+			// kprintf(" Extend Heap 0x%08x\n",b);
 			b = alloc_page(last , s);
 			
 			if (!b)

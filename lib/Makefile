@@ -2,7 +2,7 @@ CC = wcc
 INCLUDE_DIR = ../include
 # INCLUDES = $(wildcard $(INCLUDE_DIR)/*.h $(INCLUDE_DIR)/sys/*.h)
 
-PROGS = stdio string syscall ipc util stdlib makecontext atoi _sigset errno
+PROGS = stdio string syscall ipc util stdlib makecontext atoi errno
 SOURCES = $(PROGS:=.c)
 ASSEMBLY = $(PROGS:=.s)
 OBJECT = $(PROGS:=.o) wramp_syscall.o ucontext.o debug.o __errno.o

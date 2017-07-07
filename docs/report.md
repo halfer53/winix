@@ -43,7 +43,7 @@ void *do_sbrk( proc_t *who, size_t size) {
 
 	if (is_addr_in_same_page( heap_break_bak, ( heap_break_bak + size)) ) {
 		who->heap_break = heap_break_bak + size;
-		// kprintf("ptr %x ptr+size %x heap_break %x %x\n", heap_break_bak,heap_break_bak + size, who->heap_break,mem_map[0]);
+		// kprintf("ptr 0x%08x ptr+size 0x%08x heap_break 0x%08x 0x%08x\n", heap_break_bak,heap_break_bak + size, who->heap_break,mem_map[0]);
 		return get_virtual_addr(heap_break_bak,who);
 	}
 	
@@ -60,21 +60,21 @@ void *do_sbrk( proc_t *who, size_t size) {
 		if (is_addr_in_consecutive_page( heap_break_bak, ptr_addr)){
 			
 			who->heap_break = heap_break_bak + size ;
-			// kprintf("ptr %x pt %x obrk %x brk %x\n", heap_break_bak, mem_map[0], heap_break_bak,who->heap_break);
+			// kprintf("ptr 0x%08x pt 0x%08x obrk 0x%08x brk 0x%08x\n", heap_break_bak, mem_map[0], heap_break_bak,who->heap_break);
 			return get_virtual_addr(heap_break_bak,who);
 		}
 		if((int *)ptr_addr > heap_break_bak)
 			who->heap_break = (int *)ptr_addr + size;
 
-		// kprintf("sbrk: optr %x ", ptr_addr);
+		// kprintf("sbrk: optr 0x%08x ", ptr_addr);
 		ptr_addr = get_virtual_addr(ptr_addr,who);
-		// kprintf("ptr %x pt %x obrk %x brk %x\n", ptr_addr, mem_map[0],  heap_break_bak, who->heap_break);
+		// kprintf("ptr 0x%08x pt 0x%08x obrk 0x%08x brk 0x%08x\n", ptr_addr, mem_map[0],  heap_break_bak, who->heap_break);
 		return ptr_addr;
 	}else{
 		kprintf("System out of memory\n");
 		for (nstart = 0; nstart < 32; ++nstart)
 		{
-			kprintf(" %x |",mem_map[nstart]);
+			kprintf(" 0x%08x |",mem_map[nstart]);
 		}
 		kprintf("\n");
 	}
