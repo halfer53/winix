@@ -50,7 +50,7 @@ ps
 
 what's the parent of the current shell? (HINT type ```id``` to get the pid of the current shell)
 
-Now what happens if you kill its parent? Think about it before you go forward
+Now what happens if you kill its parent? What's parent of the current shell gonna be if you kill its parent? Think about it before you go forward.
 
 ```
 kill 2
