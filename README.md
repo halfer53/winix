@@ -18,21 +18,21 @@ Click ```Quick Load```, select ```winix.srec```
 
 ## List of Commands
 
-alarm [ seconds ]: set the alarm in number of seconds, or 1 by default
+```alarm [ seconds ]```: set the alarm in number of seconds, or 1 by default
 
-thread [ num ]: Spawn the number of user threads specified by the parameter num, or 2 by default
+```thread [ num ]```: Spawn the number of user threads specified by the parameter num, or 2 by default
 
-malloc: test malloc function
+```malloc```: test malloc function
 
-kill [ -n signum ] pid: send specified signum to specified process. If signum is not provided, SIGKIL is sent
+```kill [ -n signum ] pid```: send specified signum to specified process. If signum is not provided, SIGKIL is sent
 
-fork: fork off a child shell process, parent shell wait until child shell exits or killed.
+```fork```: fork off a child shell process, parent shell wait until child shell exits or killed.
 
-exit: exit the shell program
+```exit```: exit the shell program
 
-uptime: shows the system uptime
+```uptime```: shows the system uptime
 
-signal [ seconds ]: similar to alarm, the only difference is that it forks a child to wait for the alarm signal
+```signal [ seconds ]```: similar to alarm, the only difference is that it forks a child to wait for the alarm signal
 
 ## Demo
 
