@@ -97,6 +97,8 @@ PRIVATE void alloc_page_rest(block_t *last, int end){
 /* return NULL if things go wrong */
 PRIVATE block_t *alloc_page(block_t *last , size_t s)
 {
+	int pg_idx;
+	block_t *p;
 	//if last is null, get new free page, pre allocate
 	//else if last is not null
 	//	if last is at the end of the heap
@@ -108,7 +110,8 @@ PRIVATE block_t *alloc_page(block_t *last , size_t s)
 	//	else
 	//		get new pages and return
 	
-	block_t *p = get_free_pages(physical_len_to_page_len(s),__GFP_NORM);
+	pg_idx = get_free_pages(physical_len_to_page_len(s),__GFP_NORM);
+	p = (block_t *)(long )(pg_idx * 1024);
 	p->size = s;
 	p->prev = last;
 	p->free = 0;

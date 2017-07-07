@@ -1,6 +1,6 @@
 #include <winix/kernel.h>
 
-unsigned long mask[BITMASK_NR];
+unsigned int mask[BITMASK_NR];
 
 void init_bitmap(){
 	register int i;
@@ -10,7 +10,7 @@ void init_bitmap(){
     }
 }
 
-void bitmap_clear(unsigned long *map, int map_len){
+void bitmap_clear(unsigned int *map, int map_len){
 	register int i;
 	for (i=0; i < map_len; ++i)
 	{
@@ -18,7 +18,7 @@ void bitmap_clear(unsigned long *map, int map_len){
 	}
 }
 
-void bitmap_fill(unsigned long *map, int map_len){
+void bitmap_fill(unsigned int *map, int map_len){
 	register int i;
 	for (i=0; i < map_len; ++i)
 	{
@@ -33,11 +33,12 @@ void bitmap_fill(unsigned long *map, int map_len){
  * @param  num     number of bits to search
  * @return         bit found
  */
-int bitmap_search_from(unsigned long *map, int map_len, int start, int num){
+int bitmap_search_from(unsigned int *map, int map_len, int start, int num){
 	register int i,j;
 	int count = 0;
 
-	if(num >= map_len * 32 || start >= map_len * 32)	return ERR;
+	if(num >= map_len * 32 || start >= map_len * 32)
+        return -1;
 
 	i = start / 32;
 	j = start % 32;
@@ -55,18 +56,19 @@ int bitmap_search_from(unsigned long *map, int map_len, int start, int num){
         }
         j=0;
 	}
-	return ERR;
+	return -1;
 }
 
-int bitmap_search(unsigned long *map, int map_len, int num){
+int bitmap_search(unsigned int *map, int map_len, int num){
 	return bitmap_search_from(map,map_len,0,num);
 }
 
-int bitmap_search_reverse(unsigned long *map, int map_len, int num){
+int bitmap_search_reverse(unsigned int *map, int map_len, int num){
 	register int i,j;
 	int count = 0;
 
-	if(num >= map_len * 32 )	return ERR;
+	if(num >= map_len * 32 )
+        return -1;
 
 	for (i = map_len -1; i >= 0; i--){
 		for (j = BITMASK_NR -1; j >= 0; j--) {
@@ -80,17 +82,17 @@ int bitmap_search_reverse(unsigned long *map, int map_len, int num){
             }
         }
 	}
-	return ERR;
+	return -1;
 }
 
-void bitmap_set_bit(unsigned long *map, int map_len,int start){
+void bitmap_set_bit(unsigned int *map, int map_len,int start){
 	int ibit = start/32;
 	if(start >= map_len * 32)	return;
     map[ibit] = map[ibit] | mask[start%32];
 }
 
 
-void bitmap_set_nbits(unsigned long *map, int map_len,int start, int len){
+void bitmap_set_nbits(unsigned int *map, int map_len,int start, int len){
 	register int i;
 	int inum;
 	if(start + len >= map_len * 32)	return;
@@ -100,7 +102,7 @@ void bitmap_set_nbits(unsigned long *map, int map_len,int start, int len){
 	}
 }
 
-void bitmap_reset_nbits(unsigned long *map, int map_len,int start, int len){
+void bitmap_reset_nbits(unsigned int *map, int map_len,int start, int len){
 	register int i;
 	int inum;
 	if(start + len >= map_len * 32)	return;
@@ -111,19 +113,19 @@ void bitmap_reset_nbits(unsigned long *map, int map_len,int start, int len){
 }
 
 
-void bitmap_reset_bit(unsigned long *map, int map_len,int start){
+void bitmap_reset_bit(unsigned int *map, int map_len,int start){
 	int ibit = start/32;
 	if(start >= map_len * 32)	return;
     map[ibit] = map[ibit] & (~mask[start%32]);
 }
 
-int search_backtrace(unsigned long *map, int region_len,unsigned long pattern, int pattern_len,int j){
+int search_backtrace(unsigned int *map, int region_len,unsigned int pattern, int pattern_len,int j){
     int i=0;
     int count = 1;
     int j_bak = j;
-	unsigned long map_bit, pattern_bit;
+	unsigned int map_bit, pattern_bit;
 	int result;
-    unsigned long curr_pattern = pattern >> (j-1);
+    unsigned int curr_pattern = pattern >> (j-1);
     for(;i<region_len;i++){
         for(;j<32;j++){
 			map_bit = map[i] & mask[j];
@@ -133,21 +135,21 @@ int search_backtrace(unsigned long *map, int region_len,unsigned long pattern, i
             if(result == 0){
                 count++;
                 if(count == pattern_len){
-                    return ERR;
+                    return -1;
                 }
             }else{
-                return OK;
+                return 0;
             }
         }
         j=0; 
         curr_pattern = pattern << count;
     }
-    return OK;
+    return 0;
 }
 
-int bitmap_search_pattern(unsigned long *map, int map_len,int start, unsigned long pattern, int pattern_len){
+int bitmap_search_pattern(unsigned int *map, int map_len,int start, unsigned int pattern, int pattern_len){
     int i=0, j = 0;
-    unsigned long map_bit, pattern_bit;
+    unsigned int map_bit, pattern_bit;
 	int result;
     for(i=0;i<map_len;i++){
         for(j=0;j<32;j++){
@@ -164,29 +166,30 @@ int bitmap_search_pattern(unsigned long *map, int map_len,int start, unsigned lo
             }
         }
     }
-    return OK;
+    return 0;
 }
 
-unsigned long createMask(unsigned long a, unsigned long b)
+unsigned int createMask(unsigned int a, unsigned int b)
 {
-   unsigned long r = 0;
-   unsigned long i;
+   unsigned int r = 0;
+   unsigned int i;
    for (i=a; i<=b; i++)
        r |= (0x80000000 >> i);
 
    return r;
 }
 
-int bitmap_extract_pattern(unsigned long *map, int map_len, int heap_break, pattern_t *p){
+int bitmap_extract_pattern(unsigned int *map, int map_len, int heap_break, pattern_t *p){
     int i,j,start = 0;
-    unsigned long result = 0;
+    unsigned int result = 0;
     int end = (align1k(heap_break) / 1024);
     int endi = end/32;
-    unsigned long tmask;
-    for(i=0;i <map_len;i++){
+    unsigned int tmask;
+    for(i=0;i < map_len;i++){
         for(j=0; j< 32; j++){
             if((map[i] & mask[j]) == mask[j]){
                 start = i*32 + j;
+                // kprintf(" i %d j %d\n",i,j);
                 goto then;
             }
         }
@@ -194,19 +197,20 @@ int bitmap_extract_pattern(unsigned long *map, int map_len, int heap_break, patt
     
     then:
     if(end - start > 32 || (i==31 && j==31)){
-        return ERR;
+        return -1;
     }
     result = map[i] << (j);
     if(i < map_len && i != endi){
         tmask = createMask(0,end%32);
         result |= (map[i+1] & tmask) >> (32 - j);
     }
+    // kprintf(" start %d end %d\n",start, end);
     p->pattern = result;
     p->size = end - start +1;
-    return OK;
+    return 0;
 }
 
-void bitmap_set_pattern(unsigned long *map, int map_len, int index, unsigned long pattern, int pattern_len){
+void bitmap_set_pattern(unsigned int *map, int map_len, int index, unsigned int pattern, int pattern_len){
     int i= index/32, j=index%32;
     map[i] |= (pattern >> j);
     if(i < map_len -1 && 32 - j < pattern_len){
@@ -215,7 +219,7 @@ void bitmap_set_pattern(unsigned long *map, int map_len, int index, unsigned lon
 }
 
 
-void bitmap_xor(unsigned long *map1, unsigned long *map2, int map_len){
+void bitmap_xor(unsigned int *map1, unsigned int *map2, int map_len){
     int i=0;
     for(i = 0; i< map_len; i++){
         map1[i] ^= map2[i];

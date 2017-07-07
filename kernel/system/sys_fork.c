@@ -9,7 +9,7 @@
  * Side Effects:
  *   a new process forked onto the a new memory space, but not yet added to the scheduling queue
  **/
-proc_t* _fork(proc_t *parent) {
+int _fork(proc_t *parent) {
 	proc_t *p = NULL;
 	void *ptr_base = NULL;
 	int len = 0;
@@ -20,7 +20,7 @@ proc_t* _fork(proc_t *parent) {
 	pattern_t ptn;
 
 	if(!isokprocn(parent->proc_index))
-		return NULL;
+		return ERR;
 
 	if (p = get_free_proc()) {
 		pbak = p->proc_index;
@@ -28,14 +28,14 @@ proc_t* _fork(proc_t *parent) {
 		p->proc_index = pbak;
 		p->pid = p->proc_index;
 		p->ptable = p->protection_table;
-
+		// kprintf("%d heap %x | start extract |",p->pid,p->heap_break);
 		if(bitmap_extract_pattern(parent->ptable, MEM_MAP_LEN, (int)p->heap_break, &ptn) != 0){
 			kprintf("pat search failed");
 		}
-
+		// kprintf("start searching |");
 		index = bitmap_search_pattern(mem_map, MEM_MAP_LEN, BSS_END / 1024, ptn.pattern, ptn.size);
 		bitmap_clear(p->ptable, PROTECTION_TABLE_LEN);
-
+		// kprintf("start set |");
 		bitmap_set_pattern(mem_map, 32, index, ptn.pattern, ptn.size);
 		bitmap_set_pattern(p->ptable, 32, index, ptn.pattern, ptn.size);
 
@@ -51,23 +51,29 @@ proc_t* _fork(proc_t *parent) {
 			}
 		}
 		p->parent = parent->proc_index;
+		p->heap_break = parent->heap_break - (unsigned int)parent->rbase + (unsigned int)p->rbase;
+		return p->proc_index;
 	}
 	// process_overview();
 	// printProceInfo(parent);
 	// printProceInfo(p);
-	return p;
+	return ERR;
 }
 
 int do_fork(proc_t *who, message_t *m){
-	proc_t *child;
-	child = _fork(who);
-
+	int child_pr;
+	child_pr = _fork(who);
+	
+	if(child_pr == ERR){
+		m->i1 = -1;
+		return EINVAL;
+	}
+		
 	//send 0 to child
 	m->i1 = 0;
-	winix_send(child->pid,m);
+	winix_send(child_pr,m);
 
-	m->i1 = child->pid;
-	// winix_send(who->pid, m);
+	m->i1 = child_pr;
 	return OK;
 }
 

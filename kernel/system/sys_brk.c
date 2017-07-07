@@ -8,7 +8,7 @@
  */
 int do_brk(proc_t *who, message_t *m){
 	int i,paddr;
-	void *addr;
+	ptr_t addr;
 	addr = get_physical_addr(m->p1,who);
 	if(is_addr_in_same_page(who->heap_break, addr)){
 		who->heap_break = addr;

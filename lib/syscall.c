@@ -9,7 +9,6 @@
 #include <lib.h>
 #include <ucontext.h>
 #include <curses.h>
-
 #include <debug.h>
 
 /**
@@ -27,7 +26,6 @@
 DECLARE_SYSCALL(int sys_uptime, (), 
 	SYSCALL_UPTIME,
 	,
-	sendrec,
 	SYSCALL_DEFAULT_RETURN)
 
 /**
@@ -46,7 +44,6 @@ DECLARE_SYSCALL(int sys_uptime, (),
 DECLARE_SYSCALL(int sys_exit, (int status), 
 	SYSCALL_EXIT,
 	m.i1 = status,
-	sendrec,
 	SYSCALL_DEFAULT_RETURN)
 
 // int sys_process_overview(){
@@ -61,7 +58,6 @@ DECLARE_SYSCALL(int sys_exit, (int status),
 DECLARE_SYSCALL(int sys_process_overview, (), 
 	SYSCALL_PS,
 	,
-	sendrec,
 	SYSCALL_DEFAULT_RETURN)
 
 // pid_t fork(){
@@ -75,7 +71,6 @@ DECLARE_SYSCALL(int sys_process_overview, (),
 DECLARE_SYSCALL(pid_t fork, (), 
 	SYSCALL_FORK,
 	,
-	sendrec,
 	(pid_t)m.i1)
 
 // int exec(){
@@ -89,7 +84,6 @@ DECLARE_SYSCALL(pid_t fork, (),
 DECLARE_SYSCALL(int exec, (), 
 	SYSCALL_EXEC,
 	,
-	sendrec,
 	SYSCALL_DEFAULT_RETURN)
 
 // void *sbrk(size_t size){
@@ -104,7 +98,6 @@ DECLARE_SYSCALL(int exec, (),
 DECLARE_SYSCALL(void *sbrk, (size_t size), 
 	SYSCALL_SBRK,
 	m.i1 = size,
-	sendrec,
 	m.p1)
 
 
@@ -120,7 +113,6 @@ DECLARE_SYSCALL(void *sbrk, (size_t size),
 DECLARE_SYSCALL(int brk, (void *addr), 
 	SYSCALL_BRK,
 	m.p1 = addr,
-	sendrec,
 	SYSCALL_DEFAULT_RETURN)
 
 
@@ -135,7 +127,6 @@ DECLARE_SYSCALL(int brk, (void *addr),
 DECLARE_SYSCALL(int getc, (), 
 	SYSCALL_GETC,
 	,
-	sendrec,
 	SYSCALL_DEFAULT_RETURN)
 
 // void putc(int i){
@@ -152,7 +143,6 @@ DECLARE_SYSCALL(int getc, (),
 DECLARE_SYSCALL(int putc, (int i), 
 	SYSCALL_PUTC,
 	m.i1 = i,
-	sendrec,
 	SYSCALL_DEFAULT_RETURN)
 
 // int printf(const char *format, ...) {
@@ -169,7 +159,6 @@ DECLARE_SYSCALL(int putc, (int i),
 DECLARE_SYSCALL(int printf, (const char *format, ...), 
 	SYSCALL_PRINTF,
 	m.p1 = (void *)format; m.p2 = (void *)((int *)&format+1);,
-	sendrec,
 	SYSCALL_DEFAULT_RETURN)
 
 // sighandler_t signal(int signum, sighandler_t handler){
@@ -185,7 +174,6 @@ DECLARE_SYSCALL(int printf, (const char *format, ...),
 DECLARE_SYSCALL(sighandler_t signal, (int signum, sighandler_t handler), 
 	SYSCALL_SIGNAL,
 	m.i1 = signum; m.s1 = handler,
-	sendrec,
 	SIG_DFL )
 
 // void sigreturn(int signum){
@@ -200,7 +188,6 @@ DECLARE_SYSCALL(sighandler_t signal, (int signum, sighandler_t handler),
 DECLARE_SYSCALL(int sigreturn, (int signum), 
 	SYSCALL_SIGRET, 
 	m.i1 = signum, 
-	send,
 	SYSCALL_DEFAULT_RETURN)
 
 // unsigned int alarm(unsigned int seconds){
@@ -216,7 +203,6 @@ DECLARE_SYSCALL(int sigreturn, (int signum),
 DECLARE_SYSCALL(unsigned int alarm, (unsigned int seconds), 
 	SYSCALL_ALARM, 
 	m.i1 = seconds, 
-	sendrec,
 	SYSCALL_DEFAULT_RETURN)
 
 // pid_t wait(int *wstatus){
@@ -231,7 +217,6 @@ DECLARE_SYSCALL(unsigned int alarm, (unsigned int seconds),
 DECLARE_SYSCALL(pid_t wait, (int *wstatus), 
 	SYSCALL_WAIT, 
 	m.p1 = wstatus, 
-	sendrec,
 	(pid_t)m.i1)
 
 // pid_t getpid(){
@@ -245,14 +230,19 @@ DECLARE_SYSCALL(pid_t wait, (int *wstatus),
 DECLARE_SYSCALL(pid_t getpid, (), 
 	SYSCALL_GETPID, 
 	, 
-	sendrec,
+	(pid_t)m.i1)
+
+DECLARE_SYSCALL(pid_t getppid, (), 
+	SYSCALL_GETPPID, 
+	, 
 	(pid_t)m.i1)
 
 DECLARE_SYSCALL(int kill, (pid_t pid, int sig), 
 	SYSCALL_KILL, 
 	m.i1 = pid; m.i2 = sig , 
-	sendrec,
 	SYSCALL_DEFAULT_RETURN)
+
+
 
 
 

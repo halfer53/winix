@@ -37,7 +37,7 @@ proc_t *exec_replace_existing_proc(proc_t *p,size_t *lines, size_t length, size_
  * the process is updated
  **/
 proc_t *exec_proc(proc_t *p,size_t *lines, size_t length, size_t entry, int priority, char *name){
-	void *ptr_base = NULL;
+	ptr_t ptr_base = NULL;
 	size_t length_bak, overall_length;
 	int nstart,len;
 
@@ -62,11 +62,11 @@ proc_t *exec_proc(proc_t *p,size_t *lines, size_t length, size_t entry, int prio
 
 		// kprintf("%x start %d len %d\n",mem_map[0],nstart,len);
 
-		ptr_base = (void *)(nstart * 1024);
-		p->heap_break = (int *)ptr_base + length + DEFAULT_STACK_SIZE;
+		ptr_base = (ptr_t)(nstart * 1024);
+		p->heap_break = ptr_base + length + DEFAULT_STACK_SIZE;
 		memcpy(ptr_base, lines,length_bak);
 
-		p->sp = (size_t *)(length + DEFAULT_STACK_SIZE-1); 
+		p->sp = (reg_t *)(length + DEFAULT_STACK_SIZE-1); 
 
 		p->priority = priority;
 		p->pc = (void (*)())entry; 

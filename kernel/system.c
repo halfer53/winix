@@ -80,6 +80,7 @@ void system_main() {
 			case SYSCALL_WAIT:			errno = do_wait(who,&m);		break;
 			case SYSCALL_KILL: 			errno = do_kill(who,&m);		break;
 			case SYSCALL_GETPID:		errno = do_getpid(who,&m);		break;
+			case SYSCALL_GETPPID:		errno = do_getppid(who,&m);		break;
 			
 			
 			default:

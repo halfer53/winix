@@ -3,6 +3,14 @@
 
 #define _SYSTEM 1
 
+#ifndef _POSIX_SOURCE
+#define _POSIX_SOURCE 1
+#endif
+
+#ifdef _GCC_DEBUG
+#define kprintf(...) printf(__VA_ARGS__)
+#endif
+
 #include <sys/ipc.h>
 #include <sys/types.h>
 #include <sys/syscall.h>
@@ -15,6 +23,7 @@
 #include <stdbool.h>
 #include <curses.h>
 
+#include <winix/type.h>
 #include <winix/comm.h>
 #include <winix/kdebug.h>
 #include <winix/bitmap.h>

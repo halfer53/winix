@@ -5,8 +5,8 @@ INCLUDES = $(wildcard $(INCLUDE_DIR)/*.h $(INCLUDE_DIR)/winix/*.h $(INCLUDE_DIR)
 
 PROGS = sys_alarm sys_brk sys_exec sys_exit sys_fork sys_sbrk \
 		sys_sigaction sys_sigreturn sys_wait sys_sigsend sys_getc\
-		sys_time sys_ps sys_putc sys_printf sys_getpid sys_abort \
-		sys_kill sys_readsrec sys_sleep
+		sys_time sys_ps sys_putc sys_printf sys_getpid sys_getppid\
+		sys_abort sys_kill sys_readsrec sys_sleep
 
 SOURCES = $(PROGS:=.c)
 ASSEMBLY = $(PROGS:=.s)

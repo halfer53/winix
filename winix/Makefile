@@ -14,9 +14,6 @@ $(ASSEMBLY): %.s: %.c $(INCLUDES)
 $(OBJECT): %.o: %.s
 	wasm $< -o $@
 
-$(link): $(assemble)
-	wlink -o $(link) $(assemble)
-
 depend:
 	makedepend -I$(INCLUDE_DIR) $(SOURCES)
 

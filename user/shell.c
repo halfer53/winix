@@ -11,9 +11,9 @@
 #include <string.h>
 #include <ucontext.h>
 
-#define BUF_LEN			64
+#define BUF_LEN			32
 #define MAX_COMMANDS	5
-#define MAX_ARGS		20
+#define MAX_ARGS		10
 
 //Prototypes
 int ps(int argc, char **argv);
@@ -109,7 +109,7 @@ int test_alarm(int argc, char **argv){
 	}else{
 		printf("parent waiting for child %d\n",fr);
 		pid = wait(NULL);
-		printf("parent awaken by child %d\n",pid);
+		printf("parent awakened by child %d\n",pid);
 	}
 	return 0;
 }
@@ -154,7 +154,7 @@ int test_thread(int argc, char **argv){
 	}
 	// block_overview();
 
-	printf("context has been built\n");
+	putc('\n');
 	
 	cthread = threads;
 	//scheduling the threads
@@ -221,7 +221,7 @@ int uptime(int argc, char **argv) {
 	hours %= 24;
 	// ticks %= 100;
 
-	printf("Uptime is %dd %dh %dm %d.%ds, total ticks: %d\r\n", days, hours, minutes, seconds, ticks%100, ticks);
+	printf("Uptime is %dd %dh %dm %d.%ds\n", days, hours, minutes, seconds, ticks%100);
 	return 0;
 }
 
@@ -238,13 +238,21 @@ int exit(int argc, char **argv) {
 
 
 int test_fork(int argc, char **argv){
-	pid_t pid;
-	if(fork()){
-		printf("parent shell waiting\n");
-		wait(NULL);
-		printf("parent shell awaken\n");
+	pid_t cpid;
+	pid_t mpid;
+	mpid = getpid();
+	if(cpid = fork()){
+		if(cpid == -1){
+			printf("fork failed\n");
+			sys_exit(1);
+		}
+		printf("parent %d waiting child %d\n",mpid,cpid);
+		cpid = wait(NULL);
+		printf("parent %d awakened by child %d\n",mpid,cpid);
 	}else{
-		printf("Child shell:\n");
+		cpid = getpid();
+		mpid = getppid();
+		printf("Child %d [parent %d] start:\n",mpid,cpid);
 	}
 	return 0;
 }
@@ -321,17 +329,19 @@ int parse(char *line, struct cmdLine *sc){
 }
 
 void main() {
-	int i,ret;
+	int ret;
 	char *c;
+	char *end_buf;
 	struct cmd *handler = NULL;
 	struct cmdLine sc;
 
+	c = buf;
+	end_buf = c + BUF_LEN -2;
 	while(1) {
 		printf("WINIX> ");
 		c = buf;
-		i = 0;
 		//Read line from terminal
-		while( i < BUF_LEN - 2) {
+		while( c < end_buf) {
 
 			ret = getc(); 	//read
 			
@@ -342,14 +352,13 @@ void main() {
 				break;	
 
 			if ((int)ret == 8) { //backspace
-				if (i > 0) {
+				if (c > buf) {
 					putc(ret);
-					c--;i--;
+					c--;
 				}
 				continue;
 			}
 			*c++ = ret;
-			i++;
 			putc(ret); 		//echo
 		}
 		*c = '\0';

@@ -3,10 +3,10 @@
 
 void *_sbrk( proc_t *who, size_t size) {
 
-	unsigned long *ptable;
+	unsigned int *ptable;
 	int nstart,len;
-	int *heap_break_bak;
-	void *ptr_addr;
+	ptr_t heap_break_bak;
+	ptr_t ptr_addr;
 	if (size == 0)
 		return get_virtual_addr(who->heap_break,who);
 	
@@ -34,8 +34,8 @@ void *_sbrk( proc_t *who, size_t size) {
 			// kprintf("ptr %x pt %x obrk %x brk %x\n", heap_break_bak, mem_map[0], heap_break_bak,who->heap_break);
 			return get_virtual_addr(heap_break_bak,who);
 		}
-		if((int *)ptr_addr > heap_break_bak)
-			who->heap_break = (int *)ptr_addr + size;
+		if(ptr_addr > heap_break_bak)
+			who->heap_break = ptr_addr + size;
 
 		// kprintf("sbrk: optr %x ", ptr_addr);
 		ptr_addr = get_virtual_addr(ptr_addr,who);

@@ -2,7 +2,7 @@
 
 
 int do_sigreturn(proc_t *who, message_t *m){
-    unsigned long *sp;
+    reg_t *sp;
     proc_t *systask;
     int signum = m->i1;
 

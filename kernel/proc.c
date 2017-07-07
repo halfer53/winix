@@ -209,8 +209,7 @@ void *kset_proc(proc_t *p, void (*entry)(), int priority, const char *name) {
 	// p->ptable = p->protection_table;
 
 	// ptr = proc_malloc(DEFAULT_STACK_SIZE);
-	ptr = get_free_pages(len,__GFP_NORM);
-	i = get_page_index(ptr);
+	i = get_free_pages(len,__GFP_NORM);
 	bitmap_set_nbits(p->ptable, PROTECTION_TABLE_LEN, i, len);
 	bitmap_set_nbits(mem_map, PROTECTION_TABLE_LEN, i, len);
 	// kprintf("kset %x\n",p->ptable[0]);
@@ -282,6 +281,7 @@ proc_t *kexecp(proc_t *p, void (*entry)(), int priority, const char *name) {
 proc_t *start_system(void (*entry)(), int priority, const char *name) {
 	proc_t *p = NULL;
 	int stack_size = 1024 * 1;
+	int pg_idx;
 	int *ptr = NULL;
 	if (p = get_free_proc()) {
 		p->priority = priority;
@@ -292,7 +292,7 @@ proc_t *start_system(void (*entry)(), int priority, const char *name) {
 		// p->ptable = p->protection_table;
 
 		// ptr = proc_malloc(DEFAULT_STACK_SIZE);
-		ptr = get_free_pages(stack_size / 1024,__GFP_NORM);
+		ptr = page_pa(get_free_pages(stack_size / 1024,__GFP_NORM));
 
 		p->sp = (size_t *)ptr + stack_size - 128;
 		//TODO: init heap_break using slab

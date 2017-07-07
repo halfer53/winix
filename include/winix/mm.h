@@ -3,15 +3,15 @@
 
 #include <winix/gfp.h>
 
-void *get_free_pages(int num, int flags);
-void *get_free_page(int flags);
+int get_free_pages(int num, int flags);
+int get_free_page(int flags);
 void free_page(void* ptr);
 void print_mem_map(int i);
 
 #define MEM_MAP_LEN	32
 void init_mem_table();
 
-extern unsigned long mem_map[MEM_MAP_LEN];
+extern unsigned int mem_map[MEM_MAP_LEN];
 
 #define align4(x) (((((x)-1)>>2)<<2)+4)
 #define align1k(x) (((((x)-1)>>10)<<10)+1024)
@@ -20,10 +20,11 @@ extern unsigned long mem_map[MEM_MAP_LEN];
 #define is_addr_in_same_page(a,b)	((((int)a)/1024) == (((int)b)/1024))
 #define is_addr_in_consecutive_page(a,b)	((((int)a)/1024) == ((((int)b)/1024)-1))
 
-#define get_physical_addr(va,proc)	(((unsigned long *)va)+(int)proc->rbase)
-#define get_virtual_addr(pa,proc)	(((unsigned long *)pa)-(int)proc->rbase)
+#define get_physical_addr(va,proc)	(((ptr_t)va)+(unsigned int)proc->rbase)
+#define get_virtual_addr(pa,proc)	(((ptr_t)pa)-(unsigned int)proc->rbase)
 
 #define get_page_index(pa)	( ((int)pa) / 1024 )
+#define page_pa(_index)   ((void *)(_index * 1024))
 #define physical_len_to_page_len(pa_len)	( (align1k((int)pa_len)) / 1024 )
 #define page_len_to_physical_len(p_len)	(p_len * 1024)
 

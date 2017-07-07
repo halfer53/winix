@@ -4,7 +4,7 @@
 int do_wait(proc_t *parent, message_t *mesg){
     register proc_t *child = NULL;
     
-    unsigned long *wstatus;
+    ptr_t wstatus;
     int children = 0,i;
 
     for (i=0; i<NUM_PROCS; i++) {
@@ -18,6 +18,7 @@ int do_wait(proc_t *parent, message_t *mesg){
                     *wstatus = child->exit_status;
                 }
                 free_slot(child);
+                kprintf("%d child %d\n",child->pid);
                 mesg->i1 = child->pid;
                 winix_send(parent->pid,mesg);
                 return OK;

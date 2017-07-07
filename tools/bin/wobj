@@ -1,0 +1,1 @@
+mono /home/comp200/bin/mono/WrampObj.exe "$1"

@@ -9,6 +9,7 @@
 *.sublime-workspace
 
 tmp.txt
+test.c
 a.out
 
 .vscode/

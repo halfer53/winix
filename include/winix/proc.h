@@ -60,24 +60,24 @@ typedef enum { DEAD, INITIALISING, RUNNABLE, ZOMBIE } proc_state_t;
  **/
 typedef struct proc {
 	/* Process State */
-	unsigned long regs[NUM_REGS];	//Register values
-	unsigned long *sp;
-	void *ra;
+	reg_t regs[NUM_REGS];	//Register values
+	reg_t *sp;
+	reg_t *ra;
 	void (*pc)();
-	void *rbase;
-	unsigned long *ptable;
-	unsigned long cctrl;  //len 19
+	reg_t *rbase;
+	reg_t *ptable;
+	reg_t cctrl;  //len 19
 
 	/* IPC messages */
 	message_t *message;	//Message buffer;
 	int flags; 
 
 	/* Heap */
-	void *heap_break;
-	unsigned long length; //length is depreciated, do not use it
+	ptr_t heap_break;
+	size_t length; //length is depreciated, do not use it
 
 	/* Protection */
-	unsigned long protection_table[PROTECTION_TABLE_LEN];
+	reg_t protection_table[PROTECTION_TABLE_LEN];
 
 	/* IPC queue */
 	struct proc *sender_q;	//Head of process queue waiting to send to this process

@@ -5,15 +5,15 @@ static unsigned long sigframe_code[] = {0x1ee10001,0x200d0000};
 //syscall
 
 PRIVATE void* build_user_stack(proc_t *who, void *src, size_t len){
-    unsigned long *sp = get_physical_addr(who->sp,who);
+    reg_t *sp = get_physical_addr(who->sp,who);
     sp -= len;
     memcpy(sp,src,len );
     return get_virtual_addr(sp,who);
 }
 
 PRIVATE void build_signal_ctx(proc_t *who, int signum){
-    unsigned long *sp;
-    unsigned long *ra;
+    reg_t *sp;
+    reg_t *ra;
     proc_t *systask;
     static message_t sigret_mesg;
     static sigframe_t sigframe;
@@ -41,6 +41,20 @@ PRIVATE void build_signal_ctx(proc_t *who, int signum){
     who->flags = 0;//reset flags
 }
 
+void cause_sig(proc_t *who,int signum){
+    if(who->sig_table[signum].sa_handler == SIG_DFL){
+        kprintf("Signal %d: kill %s [%d]\n",signum,who->name,who->pid);
+        exit_proc(who, 1);
+        return;
+    }
+    //if it's ignored
+    if(who->sig_table[signum].sa_handler == SIG_IGN){
+        kprintf("sig ignored\n");
+        who->pc = (void (*)())((int)who->pc+1);
+        return;
+    }
+    build_signal_ctx(who,signum);
+}
 
 //IMPORTANT should only be called during exception
 void real_send_signal(proc_t *who,int signum){
@@ -58,21 +72,6 @@ void real_send_signal(proc_t *who,int signum){
     current_proc->ticks_left = current_proc->quantum;
     
     wramp_load_context();
-}
-
-void cause_sig(proc_t *who,int signum){
-    if(who->sig_table[signum].sa_handler == SIG_DFL){
-        kprintf("Signal %d: kill %s [%d]\n",signum,who->name,who->pid);
-        exit_proc(who, 1);
-        return;
-    }
-    //if it's ignored
-    if(who->sig_table[signum].sa_handler == SIG_IGN){
-        kprintf("sig ignored\n");
-        who->pc = (void (*)())((int)who->pc+1);
-        return;
-    }
-    build_signal_ctx(who,signum);
 }
 
 //IMPORTANT should only be called during exception
