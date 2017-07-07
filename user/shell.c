@@ -54,6 +54,7 @@ struct cmd commands[] = {
 	{ testmalloc, "malloc"},
 	{ test_thread, "thread"},
 	{ test_alarm, "alarm"},
+	{ test_signal, "signal"},
 	{ test_fork, "fork"},
 	{ generic, NULL }
 };

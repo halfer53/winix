@@ -150,7 +150,7 @@ void init_buf(){
     for(val = &imap.block[0]; val < &imap.block[BLOCK_SIZE]; val++){
         *val = hexstr2char(*val);
     }
-    printf("imap %d\n",imap.block[0]);
+    // printf("imap %d\n",imap.block[0]);
 
     bmap.b_blocknr = sb->s_blockmapnr;
     bmap.b_dirt = 0;

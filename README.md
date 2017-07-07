@@ -32,7 +32,21 @@ exit: exit the shell program
 
 uptime: shows the system uptime
 
-[Adventure on Winix](https://github.com/halfer53/Winix2/blob/master/docs/demo.md)
+signal [ seconds ]: similar to alarm, the only difference is that it forks a child to wait for the alarm signal
+
+## Demo
+
+[Demo](https://github.com/halfer53/Winix2/blob/master/docs/demo.md)
+
+## Run File System
+
+Currently the file system is not integrated into the OS yet, but you can still test it as a standalone process
+
+```
+cd fs
+gcc *.c
+./a.out
+```
 
 ## Credits
 [Paul Monigatti](https://nz.linkedin.com/in/paulmonigatti)

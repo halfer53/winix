@@ -60,18 +60,26 @@ int main(){
     current_proc->fp_rootdir = sb->s_iroot;
     current_proc->fp_workdir = sb->s_iroot;
 
-    printf("begin\n");
-    printf("root dir %d \n",current_proc->fp_rootdir->i_num);
+    printf("\nNum of blocks in use %d\n",sb->s_block_inuse);
+    printf("First free block num: %d\n",sb->s_nblock);
+    printf("Block size %d\n inode size %d\n",sb->s_block_size, sb->s_inode_size);
+    printf("inode per block %d\n",sb->s_inode_per_block);
 
-    int fd = sys_open("/abc.txt",O_CREAT);
-    sys_write(fd,"abc",4);
+    // printf("begin\n");
+    // printf("root dir %d \n",current_proc->fp_rootdir->i_num);
+
+    int fd = sys_open("/foo.txt",O_CREAT);
+    printf("\nwrite \"bar\" into file foo.txt\n");
+    sys_write(fd,"bar",4);
     sys_close(fd);
 
     char buf[4];
-    fd = sys_open("/abc.txt",O_RDONLY);
+    printf("open foo.txt\n");
+    fd = sys_open("/foo.txt",O_RDONLY);
+    printf("read foo.txt\n");
     sys_read(fd,buf,4);
     sys_close(fd);
 
-    printf("Got %s\n",buf);
+    printf("Got \"%s\" from foo.txt\n",buf);
 
 }

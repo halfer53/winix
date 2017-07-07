@@ -48,7 +48,7 @@ int makefs()
 				sprintf(pdisk,"%08x", 0);
 				pdisk += 8;
 			}
-			printf("first free %d\n",first_free_block+1);
+			// printf("first free inode %d\n",first_free_block+1);
 			sprintf(pdisk, "%08x",first_free_block);
 			pdisk+=8;
 			for( int j=0; j< 7; j++){ //remaining zones
@@ -83,19 +83,18 @@ int makefs()
 		*pdisk++ = 0;
 	}
 	*pdisk = '\0';
-	printf("%lu, %d\n",pdisk - disk,totalsize);
+	// printf("%lu, %d\n",pdisk - disk,totalsize);
 	int curr = sb;
-	printf("\nsb 0 - 0x0x%08x\n", curr);
-	curr++;
-	printf("block map 0x0x%08x - 0x0x%08x\n",curr, curr+blockmap );
+	printf("\nsuper block 0 - 0x%08x\n", curr);
+	printf("block map 0x%08x - 0x%08x\n",curr, curr+blockmap );
 	curr += blockmap;
-	printf("inode map 0x0x%08x - 0x0x%08x\n",curr, curr+inodemap );
+	printf("inode map 0%08x - 0x%08x\n",curr, curr+inodemap );
 	curr += inodemap;
-	printf("inode table 0x0x%08x - 0x0x%08x\n",curr, curr+inode_tablesize );
+	printf("inode table 0x%08x - 0x%08x\n",curr, curr+inode_tablesize );
 	curr += inode_tablesize;
-	printf("data block 0x0x%08x - 0x%lx, free blocks %ld\n",curr, curr+remaining, remaining/1024 );
+	printf("data block 0x%08x - 0x%lx\n Number of free blocks %ld\n",curr, curr+remaining, remaining/1024 );
 	curr += remaining;
 	
-	return OK;
+	return 0;
 	// return disk;
 }

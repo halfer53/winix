@@ -20,7 +20,7 @@ inode_t* read_inode(int num){
     if(inode == NIL_INODE)
         return NIL_INODE;
 
-    printf("free inode found\n");
+    // printf("free inode found\n");
     
     buffer = get_block(blocknr);
     ino_buf = (int *)inode;
