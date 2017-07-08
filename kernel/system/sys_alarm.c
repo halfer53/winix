@@ -3,10 +3,11 @@
 int do_alarm(proc_t *who, message_t *m){
     clock_t seconds;
     timer_t *alarm;
+    clock_t prev_timeout;
 
     seconds = (clock_t )m->i1;
     alarm = &who->alarm;
-    m->i1 = alarm->time_out; //return previous alarm
+    prev_timeout = alarm->time_out; //return previous alarm
 
     if(alarm->flags & TIMER_INUSE){
         remove_timer(alarm);
@@ -20,5 +21,5 @@ int do_alarm(proc_t *who, message_t *m){
         alarm->handler = &deliver_alarm;
         insert_timer(alarm);
     }
-    return OK;
+    return prev_timeout;
 }

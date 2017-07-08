@@ -7,13 +7,13 @@ void get_curr_addr(int *addr);
 #define X_PRINT(token) printf( "%s: 0x%x\n", #token,token)
 #define S_PRINT(token) printf( "%s: %s\n", #token,token)
 
-#ifdef _DEBUG
-    #define XDEBUG(...) printf(__VA_ARGS__)
-    #define WHERE_LOG printf("[LOG]%s: %d\n",__FILE__,__LINE__);
-#else
-    #define XDEBUG(...)  /**/
-    #define WHERE_LOG(...)  /**/
-#endif
+// #ifdef _DEBUG
+//     #define XDEBUG(...) printf(__VA_ARGS__);
+// #else
+//     #define XDEBUG(...)
+// #endif
+
+#define WHERE_LOG printf("[LOG]%s: %d\n",__FILE__,__LINE__);
 
 
 #define CS106LAssert(expr) DoCS106LAssert(expr, #expr, __FILE__, __LINE__)

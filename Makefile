@@ -4,6 +4,8 @@ KERNEL_OBJS = winix/*.o kernel/system/*.o kernel/*.o
 LIB = ipc string util wramp_syscall ucontext atoi errno
 LIB_OBJS = $(addprefix lib/, $(LIB:=.o))
 
+TLIB = lib/*.o
+
 KLIMITS = kernel/util/limits_head.o kernel/util/limits_tail.o
 KMAIN = kernel/main.s kernel/main.o 
 

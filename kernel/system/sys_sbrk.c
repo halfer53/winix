@@ -50,12 +50,10 @@ void *_sbrk( proc_t *who, size_t size) {
 		kprintf("\n");
 	}
 	return NULL;
-
 }
 
 int do_sbrk(proc_t *who, message_t *m){
     m->p1 = _sbrk(who,m->i1);
-	m->i1 = m->p1 == NULL ? ERR : OK;
 	// winix_send(who->pid, m);
-	return OK;
+	return m->p1 == NULL ? ERR : OK;
 }

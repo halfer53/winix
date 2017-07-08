@@ -64,17 +64,14 @@ int do_fork(proc_t *who, message_t *m){
 	int child_pr;
 	child_pr = _fork(who);
 	
-	if(child_pr == ERR){
-		m->i1 = -1;
+	if(child_pr == ERR)
 		return EINVAL;
-	}
-		
-	//send 0 to child
+	
 	m->i1 = 0;
 	winix_send(child_pr,m);
 
-	m->i1 = child_pr;
-	return OK;
+	process_overview();
+	return child_pr;
 }
 
 

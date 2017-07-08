@@ -34,18 +34,19 @@ int winix_receive(message_t *m) {
 	return wramp_syscall(WINIX_RECEIVE, NULL, m);
 }
 
-int winix_notify(int dest, message_t *m) {
-	return wramp_syscall(WINIX_NOTIFY, NULL, m);
-}
-
 /**
  * Sends and receives a message to/from the destination process.
  *
  * Note: overwrites m with the reply message.
  **/
 int winix_sendrec(int dest, message_t *m) {
-	//int i = 0;
 	return wramp_syscall(WINIX_SENDREC, dest, m);
-	//printf("wramp syscall response %d\r\n",i );
-	//return i;
+}
+
+/**
+ * Non-blocking send
+ *
+ **/
+int winix_notify(int dest, message_t *m) {
+	return wramp_syscall(WINIX_NOTIFY, NULL, m);
 }

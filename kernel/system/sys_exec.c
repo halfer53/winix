@@ -1,9 +1,8 @@
 #include "../winix.h"
 
 int do_exec(proc_t *who, message_t *m){
-		m->i1 = exec_read_srec(who);
 		// winix_send(who->pid,m);
-		return OK;
+		return exec_read_srec(who);
 }
 
 //dynamically allocate a new memory space in the memory, and

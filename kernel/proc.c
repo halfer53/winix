@@ -371,7 +371,7 @@ void printProceInfo(proc_t* curr) {
 	        curr->name,
 	        curr->pid,
 			curr->parent,
-	        get_physical_addr(curr->rbase,curr),
+	        curr->rbase,
 	        get_physical_addr(curr->pc,curr),
 	        get_physical_addr(curr->sp,curr),
 	        curr->heap_break,
