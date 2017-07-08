@@ -356,7 +356,7 @@ void end_process(proc_t *p) {
 void process_overview() {
 	int i;
 	proc_t *curr;
-	kprintf("NAME     PID PPID RBASE      PC         STACK      HEAP       PROTECTION flags\n");
+	kprintf("NAME     PID PPID RBASE      PC         STACK      HEAP       PROTECTION   flags\n");
 	for (i = 0; i < NUM_PROCS; i++) {
 		curr = &proc_table[i];
 		if(curr->IN_USE && curr->state != ZOMBIE)
@@ -366,7 +366,8 @@ void process_overview() {
 
 //print the process state given
 void printProceInfo(proc_t* curr) {
-	kprintf("%-08s %-03d %-04d 0x%08x 0x%08x 0x%08x 0x%08x 0x%08x %d\n",
+	int ptable_idx = get_page_index(curr->rbase)/32;
+	kprintf("%-08s %-03d %-04d 0x%08x 0x%08x 0x%08x 0x%08x %d 0x%08x %d\n",
 	        curr->name,
 	        curr->pid,
 			curr->parent,
@@ -374,7 +375,8 @@ void printProceInfo(proc_t* curr) {
 	        get_physical_addr(curr->pc,curr),
 	        get_physical_addr(curr->sp,curr),
 	        curr->heap_break,
-	        curr->ptable[0],
+			ptable_idx,
+	        curr->ptable[ptable_idx],
 			curr->flags);
 }
 

@@ -1,5 +1,5 @@
 CC = wcc
-KERNEL_OBJS = winix/*.o kernel/*.o kernel/system/*.o
+KERNEL_OBJS = winix/*.o kernel/system/*.o kernel/*.o
 
 LIB = ipc string util wramp_syscall ucontext atoi errno
 LIB_OBJS = $(addprefix lib/, $(LIB:=.o))
@@ -20,6 +20,14 @@ endif
 	$(MAKE) -C winix
 	$(MAKE) -C kernel
 	$(MAKE) -C user
+	wlink -o winix.srec $(KLIMITS) $(KERNEL_OBJS) $(LIB_OBJS)
+
+debug:
+	$(MAKE) clean
+	$(MAKE) -C lib debug
+	$(MAKE) -C winix debug
+	$(MAKE) -C kernel debug
+	$(MAKE) -C user debug
 	wlink -o winix.srec $(KLIMITS) $(KERNEL_OBJS) $(LIB_OBJS)
 
 clean:

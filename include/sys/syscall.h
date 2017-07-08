@@ -39,8 +39,6 @@
 #define SYSCALL_ABORT       25
 #define SYSCALL_SLEEP       26
 
-#define PRINT_TOKEN(token) printf(#token " is %d", token)
-
 #define SYSCALL_DEFAULT_RETURN  m.i1
 #define DECLARE_SYSCALL(function, params, syscall_num, passing_codes, return_m)\
 function params{\

@@ -34,8 +34,6 @@ static void kputx_buf(int n,char *buf) {
 		*buf = '\0';
 		return;
 	}
-	// kputc('0');
-	// kputc('x');
 	for(i = 28; i >= 0; i -= 4) {
 		int d = (n >> i) & 0xf;
 		if(d)
@@ -173,22 +171,17 @@ void kprintf_vm(const char *format, void *arg, void *who_rbase){
 				default:
 					kputc(*format++);
 			}
-			if(padding != 0){
-				padding -= strlen(buf);
+			padding -= strlen(buf);
+			if(!right_padding && padding > 0){
 				if(prev == 'x')
 					token = ZERO;
-				if(!right_padding && padding > 0){
-					
-					PUT_PADDING(padding,token);
-				}
+				PUT_PADDING(padding,token);
 			}
 			kputs(buf);
 			if(right_padding && padding > 0){
 				PUT_PADDING(padding,token);
-				// while(padding--)
-				// 	kputc(' ');
 			}
-			padding = 0;
+			padding = 0;	
 		}
 		else {
 			kputc(*format++);

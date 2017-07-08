@@ -168,7 +168,8 @@ int test_thread(int argc, char **argv){
 			cthread->ss_size = THREAD_STACK_SIZE;
 			cthread->ss_flags = 0;
 			makecontext(cthread,func,1,count++);
-			putc('!');
+			if(i%10 == 0)
+				putc('!');
 		}else{
 			printf("malloc failed\n");
 		}
@@ -262,20 +263,20 @@ int exit(int argc, char **argv) {
 
 int test_fork(int argc, char **argv){
 	pid_t cpid;
-	pid_t mpid;
-	mpid = getpid();
+	pid_t ppid;
+	ppid = getpid();
 	if(cpid = fork()){
 		if(cpid == -1){
 			printf("fork failed\n");
 			sys_exit(1);
 		}
-		printf("parent %d waiting for child %d\n",mpid,cpid);
+		printf("parent %d waiting for child %d\n",ppid,cpid);
 		cpid = wait(NULL);
-		printf("parent %d awakened by child %d\n",mpid,cpid);
+		printf("parent %d awakened by child %d\n",ppid,cpid);
 	}else{
 		cpid = getpid();
-		mpid = getppid();
-		printf("Child %d [parent %d] start:\n",mpid,cpid);
+		ppid = getppid();
+		printf("Child %d [parent %d] start:\n",cpid,ppid);
 	}
 	return 0;
 }
