@@ -5,11 +5,11 @@
 void _ctx_end(ucontext_t *ucp){
 
 	if(ucp->uc_link == NULL)
-		sys_exit(EXIT_SUCCESS);
+		exit(EXIT_SUCCESS);
 	setcontext(ucp->uc_link);
 
 	//should never get here
-	sys_exit(EXIT_FAILURE);
+	exit(EXIT_FAILURE);
 }
 
 void makecontext(ucontext_t *ucp, void (* func)(), int argc, ...){

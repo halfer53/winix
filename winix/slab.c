@@ -20,7 +20,7 @@ typedef struct s_block {
 static block_t *base = NULL;
 static block_t *end = NULL;
 
-#define BLOCK_SIZE 5
+#define SLAB_BLOCK_SIZE 5
 
 void init_slab(void *addr,int size){
 	base = (block_t *)addr;
@@ -48,7 +48,7 @@ void kblock_overview() {
 		kprintblock(b);
 		b = b->next;
 	}
-	kprintf("total kfrees %d\n", kfrees);
+	kprintf("total frees %d\n", kfrees);
 }
 
 
@@ -69,7 +69,7 @@ PRIVATE void split_block(block_t *b, size_t s)
 	block_t *new;
 	// kprintf("data 0x%08x new 0x%08x\n", b->data,new);
 	new = (block_t *)(b->data + s);
-	new->size = b->size - s - BLOCK_SIZE;
+	new->size = b->size - s - SLAB_BLOCK_SIZE;
 	new->next = b->next;
 	new->prev = b;
 	new->free = 1;
@@ -84,7 +84,7 @@ PRIVATE void split_block(block_t *b, size_t s)
 
 PRIVATE void alloc_page_rest(block_t *last, int end){
 	block_t *b = (block_t*)((int)(last->ptr) + last->size);
-	b->size = (end - (int)b - BLOCK_SIZE);
+	b->size = (end - (int)b - SLAB_BLOCK_SIZE);
 	b->prev = last;
 	b->next = last->next;
 	b->free = 1;
@@ -139,7 +139,7 @@ void *kmalloc(size_t size) {
 		b = find_block(&last , s);
 		if (b) {
 			/* can we split */
-			if ((b->size - s) >= (BLOCK_SIZE + 4))
+			if ((b->size - s) >= (SLAB_BLOCK_SIZE + 4))
 				split_block(b, s);
 			b->free = 0;
 		} else {
@@ -177,7 +177,7 @@ PRIVATE void copy_block(block_t *src, block_t *dst)
 PRIVATE block_t *fusion(block_t *b) {
 	block_t* next = b->next;
 	if (next && next->free && ((int)(b->ptr) + b->size == (int)next)) {
-		b->size += BLOCK_SIZE + next->size;
+		b->size += SLAB_BLOCK_SIZE + next->size;
 		b->next = next->next;
 		if (next)
 			next->prev = b;
@@ -189,7 +189,7 @@ PRIVATE block_t *fusion(block_t *b) {
 
 /* Get the block from and addr */
 PRIVATE block_t *get_block(void *p){
-	return (void *)((int *)p - BLOCK_SIZE);
+	return (void *)((int *)p - SLAB_BLOCK_SIZE);
 }
 
 /* Valid addr for kfree */
@@ -259,7 +259,7 @@ void *krealloc(void *p, size_t size)
 		b = get_block(p);
 		if (b->size >= s)
 		{
-			if (b->size - s >= (BLOCK_SIZE + 4))
+			if (b->size - s >= (SLAB_BLOCK_SIZE + 4))
 				split_block(b, s);
 		}
 		else
@@ -268,10 +268,10 @@ void *krealloc(void *p, size_t size)
 			next = b->next;
 			if (next && next->free
 					&&	((int)(b->ptr) + b->size == (int)next)
-			        && (b->size + BLOCK_SIZE + next->size) >= s)
+			        && (b->size + SLAB_BLOCK_SIZE + next->size) >= s)
 			{
 				fusion(b);
-				if (b->size - s >= (BLOCK_SIZE + 4))
+				if (b->size - s >= (SLAB_BLOCK_SIZE + 4))
 					split_block(b, s);
 			}
 			else

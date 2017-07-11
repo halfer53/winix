@@ -178,7 +178,7 @@ void proc_set_default(proc_t *p) {
 	p->length = 0;
 	p->parent = 0;
 	p->heap_break = NULL;
-	p->pid = p->proc_index;
+	p->pid = p->proc_nr;
 
 	p->ptable = p->protection_table;
 	bitmap_clear(p->ptable, PROTECTION_TABLE_LEN);
@@ -390,15 +390,13 @@ void printProceInfo(proc_t* curr) {
  * Returns:			The relevant process, or NULL if it does not exist.
  **/
 proc_t *get_proc(int proc_nr) {
-	if (isokprocn(proc_nr))
-		return &proc_table[proc_nr];
-	return NULL;
-}
-
-proc_t *get_runproc(int proc_nr){
-	proc_t *p = get_proc(proc_nr);
-	if(p && p->state != ZOMBIE && p->state != DEAD)
+	proc_t *p;
+	if (isokprocn(proc_nr)){
+		p = &proc_table[proc_nr];
 		return p;
+		// if(p->state != ZOMBIE && p->state != DEAD)
+		// 	return p;
+	}
 	return NULL;
 }
 

@@ -7,11 +7,8 @@ SOURCES = $(PROGS:=.c)
 ASSEMBLY = $(PROGS:=.s)
 OBJECT = $(PROGS:=.o)
 
-all:
+wramp:$(OBJECT)
 	$(MAKE) -C system
-	$(MAKE)	wramp
-
-wramp: $(OBJECT)
 $(ASSEMBLY): %.s: %.c $(INCLUDES)
 	$(CC) -S -I$(INCLUDE_DIR) -o $@ $<
 

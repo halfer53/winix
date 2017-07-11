@@ -9,7 +9,7 @@ typedef int sig_atomic_t;
 
 #ifdef _POSIX_SOURCE
 #ifndef _SIGSET_T
-#define _SIGSET_ 1T
+#define _SIGSET_T 1
 typedef unsigned long sigset_t;
 #endif
 #endif

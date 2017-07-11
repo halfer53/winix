@@ -2,8 +2,8 @@
 #define _FS_FS_H_ 1
 
 #define NULL ((void*)0)
-
 #include <stdio.h>
+
 #include "string.h"
 #include "const.h"
 #include "inode.h"
@@ -19,8 +19,6 @@
 #include "open.h"
 #include "read.h"
 #include "close.h"
-
-
 
 #ifndef EOF
 # define EOF (-1)

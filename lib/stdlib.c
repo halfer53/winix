@@ -197,8 +197,10 @@ block_t *fusion(block_t *b) {
 	if (next && next->free && ((int)(b->ptr) + b->size == (int)next)) {
 		b->size += BLOCK_SIZE + next->size;
 		b->next = next->next;
-		if (next)
-			next->prev = b;
+		if (b->next)
+			b->next->prev = b;
+	}else{
+		
 	}
 	return (b);
 }
@@ -316,6 +318,13 @@ void *realloc(void *p, size_t size)
 		return (p);
 	}
 	return NULL;
+}
+
+
+int exit(int status){
+	_exit(status);
+	//should never get here
+	return EXIT_FAILURE;
 }
 
 

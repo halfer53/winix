@@ -59,8 +59,8 @@ int sys_uptime();
 /**
  * Exits the current process.
  **/
-int sys_exit(int status);
-int sys_process_overview();
+int _exit(int status);
+int sys_ps();
 
 void *sbrk(unsigned long size);
 

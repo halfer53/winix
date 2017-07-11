@@ -10,7 +10,7 @@ void kputc(const int c) {
 }
 
 
-void kputc2(const int c) {
+PRIVATE void kputc2(const int c) {
 	while(!(RexSp2->Stat & 2));
 	RexSp2->Tx = c;
 }
@@ -18,14 +18,14 @@ void kputc2(const int c) {
 /**
  * Reads a character from serial port 1.
  **/
-int kgetc() {
+PRIVATE int kgetc() {
 	//TODO: user interrupt-driven I/O
 	//Use thread
 	while(!(RexSp1->Stat & 1));
 	return RexSp1->Rx;
 }
 
-static void kputx_buf(int n,char *buf) {
+PRIVATE void kputx_buf(int n,char *buf) {
 	int i;
 	int v = 0;
 
@@ -50,7 +50,7 @@ static void kputx_buf(int n,char *buf) {
 	*buf = '\0';
 }
 
-static void kputd_buf(int n, char *buf) {
+PRIVATE void kputd_buf(int n, char *buf) {
 	int place = 1000000000;
 
 	//zero?
@@ -83,17 +83,16 @@ static void kputd_buf(int n, char *buf) {
 	*buf = '\0';
 }
 
-static void kputs_vm_buf(char *s, void *who_rbase, char *buf) {
+PRIVATE void kputs_vm_buf(char *s, void *who_rbase, char *buf) {
 	char *sp = s;
 	sp += (int)who_rbase;
 	while(*sp)
 		*buf++ = *sp++;
-	
 	*buf = '\0';
 		// kputc(*sp++);
 }
 
-static void kputs(const char *s) {
+PRIVATE void kputs(const char *s) {
 	while(*s)
 		kputc(*s++);
 }
@@ -107,9 +106,9 @@ static void kputs(const char *s) {
 	}					\
 
 
-void kprintf_vm(const char *format, void *arg, void *who_rbase){
+PRIVATE void kprintf_vm(const char *format, void *arg, void *who_rbase){
 	char c = *format;
-	static char buffer[100];
+	static char buffer[64];
 	char *buf = buffer;
 	int padding = 0;
 	bool right_padding;
@@ -172,7 +171,7 @@ void kprintf_vm(const char *format, void *arg, void *who_rbase){
 					kputc(*format++);
 			}
 			padding -= strlen(buf);
-			if(!right_padding && padding > 0){
+			if(!right_padding && padding > 0){ //left padding
 				if(prev == 'x')
 					token = ZERO;
 				PUT_PADDING(padding,token);

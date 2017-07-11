@@ -7,8 +7,11 @@
 *.s
 *.srec
 *.sublime-workspace
+*.obj
+*.log
 
 tmp.txt
+fs/Debug/
 test.c
 a.out
 

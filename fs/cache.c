@@ -10,6 +10,10 @@ static buf_t imap;//inode map is assumed to be 1 block in length
 
 static buf_t bmap; //block map is also assumed to be 1 block in length
 
+// The lru is illustrated as below
+// REAR -> next -> .... -> next -> FRONT
+// With the most recently used cache at the front, and least recently used block at the rear
+
 buf_t *get_imap(){
     return &imap;
 }
@@ -18,7 +22,7 @@ buf_t *get_bmap(){
     return &bmap;
 }
 
-static void detach_buf(buf_t *buffer){
+void rm_lru(buf_t *buffer){
     if(buffer->prev)
         buffer->prev->next = buffer->next;
 
@@ -32,32 +36,61 @@ static void detach_buf(buf_t *buffer){
         lru_cache[FRONT] = buffer->prev;
 }
 
-static void buf_move_to_front(buf_t *buffer){
+PRIVATE void buf_move_to_front(buf_t *buffer){
     if(lru_cache[FRONT] == buffer)
         return;
     
-    detach_buf(buffer);
+	rm_lru(buffer);
     enqueue_buf(buffer);
 }
 
-static void buf_move_to_rear(buf_t *buffer){
+buf_t* dequeue_buf() {
+	buf_t *rear = lru_cache[REAR];
+	if (!rear)
+		return NULL;
+
+	rear->next->prev = NULL;
+	lru_cache[REAR] = rear->next;
+
+	hash_buf[rear->b_blocknr] = NULL;
+
+	return rear;
+}
+
+void enqueue_buf(register buf_t *tbuf) {
+
+	if (lru_cache[FRONT] == NULL) {
+		tbuf = lru_cache[REAR] = lru_cache[FRONT] = &buf_table[0];
+		tbuf->next = tbuf->prev = NULL;
+		return;
+	}
+
+	lru_cache[FRONT]->next = tbuf;
+	tbuf->prev = lru_cache[REAR];
+	lru_cache[FRONT] = tbuf;
+
+	hash_buf[(tbuf->b_blocknr)] = tbuf;
+}
+
+PRIVATE void buf_move_to_rear(buf_t *buffer){
     if(lru_cache[REAR] == buffer)
         return;
 
-    detach_buf(buffer);
+	rm_lru(buffer);
     buffer->next = lru_cache[REAR];
     lru_cache[REAR] = buffer;
 }
 
 
-int put_block(buf_t *tbuf, mode_t mode){
-    if(mode & WRITE_IMMED && tbuf->b_dirt){
-        tbuf->b_dirt = 0;
-        buf_move_to_front(tbuf);
-        return dev_io(tbuf->block,tbuf->b_blocknr,DEV_WRITE);
-    }else{ //mode = ONE_SHOT
-        buf_move_to_rear(tbuf);
-    }
+int put_block(buf_t *tbuf, mode_t mode) {
+	if (mode & WRITE_IMMED && tbuf->b_dirt) {
+		tbuf->b_dirt = 0;
+		buf_move_to_front(tbuf);
+		return dev_io(tbuf->block, tbuf->b_blocknr, DEV_WRITE);
+	}
+	else { //mode = ONE_SHOT
+		buf_move_to_rear(tbuf);
+	}
 }
 
 buf_t *get_block(block_t blocknr){
@@ -80,40 +113,13 @@ buf_t *get_block(block_t blocknr){
     tbuf->b_dirt = 0;
     tbuf->b_count = 1;
 
-    ret = dev_io(tbuf->block,blocknr,DEV_READ);
+	if (!dev_io(tbuf->block, blocknr, DEV_READ)) {
+		return NULL;
+	}
+		
 
     enqueue_buf(tbuf);
     return tbuf;
-}
-
-
-
-buf_t* dequeue_buf(){
-    buf_t *rear = lru_cache[REAR];
-    if(!rear)
-        return NULL;
-
-    rear->next->prev = NULL;
-    lru_cache[REAR] = rear->next;
-
-    hash_buf[rear->b_blocknr] = NULL;
-    
-    return rear;
-}
-
-void enqueue_buf(register buf_t *tbuf){
-    
-    if(lru_cache[FRONT] == NULL){
-        tbuf = lru_cache[REAR] = lru_cache[FRONT] = &buf_table[0];
-        tbuf->next = tbuf->prev = NULL;
-        return;
-    }
-
-    lru_cache[FRONT]->next = tbuf;
-    tbuf->prev = lru_cache[REAR];
-    lru_cache[FRONT] = tbuf;
-
-    hash_buf[(tbuf->b_blocknr)] = tbuf;
 }
 
 

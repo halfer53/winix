@@ -18,7 +18,7 @@
 //Prototypes
 int ps(int argc, char **argv);
 int uptime(int argc, char **argv);
-int exit(int argc, char **argv);
+int shell_exit(int argc, char **argv);
 int cmd_kill(int argc, char **argv);
 int testmalloc(int argc, char **argv);
 int test_signal(int argc, char **argv);
@@ -48,7 +48,7 @@ struct cmd {
 //Command handling
 struct cmd commands[] = {
 	{ uptime, "uptime" },
-	{ exit, "exit" },
+	{ shell_exit, "exit" },
 	{ ps, "ps" },
 	{ cmd_kill, "kill"},
 	{ testmalloc, "malloc"},
@@ -87,7 +87,7 @@ int cont;
 
 void child_handler(int signum){
 	printf("\n%d seconds elapsed\n",seconds);
-	sys_exit(EXIT_SUCCESS);
+	exit(EXIT_SUCCESS);
 }
 
 void alarm_handler(int signum){
@@ -224,7 +224,7 @@ int testmalloc(int argc, char **argv){
 }
 
 int ps(int argc, char **argv){
-	return sys_process_overview();
+	return sys_ps();
 }
 
 /**
@@ -251,13 +251,13 @@ int uptime(int argc, char **argv) {
 /**
  * Exits the terminal.
  **/
-int exit(int argc, char **argv) {
+int shell_exit(int argc, char **argv) {
 	int status = 0;
 	if(argc > 1)
 		status = atoi(argv[1]);
 	printf("Bye!\n");
 	printf("Child %d [parent %d] exits\n",getpid(),getppid());
-	return sys_exit(status);
+	return exit(status);
 }
 
 
@@ -268,7 +268,7 @@ int test_fork(int argc, char **argv){
 	if(cpid = fork()){
 		if(cpid == -1){
 			printf("fork failed\n");
-			sys_exit(1);
+			exit(EXIT_FAILURE);
 		}
 		printf("parent %d waiting for child %d\n",ppid,cpid);
 		cpid = wait(NULL);
@@ -399,5 +399,5 @@ void main() {
 		//Run it
 		handler->handle(sc.argc, sc.argv);
 	}
-	sys_exit(EXIT_SUCCESS);
+	exit(EXIT_SUCCESS);
 }

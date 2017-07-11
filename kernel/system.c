@@ -9,7 +9,7 @@
 #include "winix.h"
 
 message_t m;
-int who_pid;
+int who_proc_nr;
 proc_t *who;
 
 ucontext_t recv_ctx;
@@ -59,8 +59,8 @@ void system_main() {
 		int syscall_ret;
 		//get a messa1ge
 		winix_receive(&m);
-		who_pid = m.src;
-		who = get_proc(who_pid);
+		who_proc_nr = m.src;
+		who = get_proc(who_proc_nr);
 
 		//Do the work
 		switch(m.type) {
@@ -89,7 +89,7 @@ void system_main() {
 
 		if(syscall_ret != SUSPEND && syscall_ret != DONOTHING){
 			m.i1 = syscall_ret;
-			winix_send(who_pid,&m);
+			winix_send(who_proc_nr,&m);
 		}
 	}
 }

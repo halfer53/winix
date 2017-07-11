@@ -54,7 +54,7 @@ filp_t *get_free_filp(){
 
 void init_filp(){
     register filp_t* rep;
-    int i;
+	int i = 0;
     for(rep = &fd_table[0]; rep < &fd_table[NR_FILPS]; rep++ ){
         rep->filp_ino = NIL_INODE;
         rep->filp_table_index = i;

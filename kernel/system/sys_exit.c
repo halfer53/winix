@@ -63,7 +63,7 @@ void exit_proc(proc_t *who, int status){
 
                 winix_send(mp->pid,&mesg);
                 children++;
-            }else if(mp->parent == who->proc_index){
+            }else if(mp->parent == who->proc_nr){
                 //Change the child process's parent to init
                 mp->parent = 1;
             }

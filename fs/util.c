@@ -33,3 +33,7 @@ void int2hexstr(char *buffer,int n, int bytenr) {
 	}
 }
 
+void assert(int expression) {
+	if (!expression)
+		abort();
+}

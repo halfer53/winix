@@ -22,7 +22,7 @@ struct super_block superblock = {
         2, //first free inode number
         67, //first free block number
         8, //inode per block
-        NULL
+        NULL, //root inode
     };
 
 // struct super_block {
@@ -46,40 +46,52 @@ struct super_block superblock = {
 //     inode_t *s_iroot;
 // };
 
+
+void init_fs() {
+
+	printf("\nNum of blocks in use %d\n", sb->s_block_inuse);
+	printf("First free block num: %d\n", sb->s_nblock);
+	printf("Block size %d\n inode size %d\n", sb->s_block_size, sb->s_inode_size);
+	printf("inode per block %d\n", sb->s_inode_per_block);
+}
+
 int main(){
+	
     int ret = makefs();
     inode_t *rootinode;
     sb = &superblock;
+	int i;
+
+	
     init_buf();
     init_inode();
     init_filp();
+
     sb->s_iroot = get_inode(1);
     sb->s_iroot->i_nlinks += 1;
+	current_proc = &pcurrent_proc;
+	current_proc->fp_workdir = current_proc->fp_rootdir = sb->s_iroot;
+	init_fs();
 
-    current_proc = &pcurrent_proc;
-    current_proc->fp_rootdir = sb->s_iroot;
-    current_proc->fp_workdir = sb->s_iroot;
 
-    printf("\nNum of blocks in use %d\n",sb->s_block_inuse);
-    printf("First free block num: %d\n",sb->s_nblock);
-    printf("Block size %d\n inode size %d\n",sb->s_block_size, sb->s_inode_size);
-    printf("inode per block %d\n",sb->s_inode_per_block);
+	char abc[] = "abcdefghijklmnopqrstuvwxyz";
+	char c = 'a';
+    int fd = sys_open(current_proc, "/foo.txt",O_CREAT);
+	for (i = 0; i < 2048; i++) {
+		sys_write(current_proc, fd, &c, 1);
+		c++;
+		if (c == 'z')
+			c = 'a';
+	}
+	sys_write(current_proc,fd, "a", 2);
+    sys_close(current_proc, fd);
 
-    // printf("begin\n");
-    // printf("root dir %d \n",current_proc->fp_rootdir->i_num);
+    char buf[1024];
+    fd = sys_open(current_proc, "/foo.txt",O_RDONLY);
+    sys_read(current_proc, fd,buf,2049);
+    sys_close(current_proc, fd);
 
-    int fd = sys_open("/foo.txt",O_CREAT);
-    printf("\nwrite \"bar\" into file foo.txt\n");
-    sys_write(fd,"bar",4);
-    sys_close(fd);
-
-    char buf[4];
-    printf("open foo.txt\n");
-    fd = sys_open("/foo.txt",O_RDONLY);
-    printf("read foo.txt\n");
-    sys_read(fd,buf,4);
-    sys_close(fd);
-
+	printf("\nread foo.txt\n");
     printf("Got \"%s\" from foo.txt\n",buf);
 
 }

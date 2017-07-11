@@ -19,14 +19,11 @@ int _fork(proc_t *parent) {
 	uint32_t *src, *dest;
 	pattern_t ptn;
 
-	if(!isokprocn(parent->proc_index))
-		return ERR;
-
 	if (p = get_free_proc()) {
-		pbak = p->proc_index;
+		pbak = p->proc_nr;
 		*p = *parent;
-		p->proc_index = pbak;
-		p->pid = p->proc_index;
+		p->proc_nr = pbak;
+		p->pid = p->proc_nr;
 		p->ptable = p->protection_table;
 		// kprintf("%d heap 0x%08x | start extract |",p->pid,p->heap_break);
 		if(bitmap_extract_pattern(parent->ptable, MEM_MAP_LEN, (int)p->heap_break, &ptn) != 0){
@@ -45,18 +42,16 @@ int _fork(proc_t *parent) {
 		sp = (size_t *)((size_t)(parent->sp) + (size_t)(parent->rbase));
 		p->message = (message_t *)(*(sp+ 2) + (size_t)p->rbase);
 
-		for( src = (uint32_t *)parent->rbase, dest = (uint32_t *)p->rbase, j=0; j < ptn.size ; src+=1024,dest+=1024, j++){
+		for( src = (uint32_t *)parent->rbase, dest = (uint32_t *)p->rbase, j=0; j < ptn.size ; src+= 1024,dest+=1024, j++){
 			if((0x80000000 >> j) & ptn.pattern){
 				memcpy(dest,src,1024);
 			}
 		}
-		p->parent = parent->proc_index;
+		p->parent = parent->proc_nr;
 		p->heap_break = parent->heap_break - (unsigned int)parent->rbase + (unsigned int)p->rbase;
-		return p->proc_index;
+		// process_overview();
+		return p->proc_nr;
 	}
-	// process_overview();
-	// printProceInfo(parent);
-	// printProceInfo(p);
 	return ERR;
 }
 
@@ -64,13 +59,12 @@ int do_fork(proc_t *who, message_t *m){
 	int child_pr;
 	child_pr = _fork(who);
 	
-	if(child_pr == ERR)
+	if(child_pr < 0)
 		return EINVAL;
 	
 	m->i1 = 0;
 	winix_send(child_pr,m);
 
-	process_overview();
 	return child_pr;
 }
 

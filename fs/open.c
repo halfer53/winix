@@ -1,6 +1,6 @@
 #include "fs.h"
 
-int sys_open(char *path, mode_t mode){
+int sys_open(proc_t *who, char *path, mode_t mode){
     filp_t *filp;
     int i,open_slot;
     int ret;
@@ -11,8 +11,8 @@ int sys_open(char *path, mode_t mode){
         inode = alloc_inode();
     }
 
-    ret = get_fd(current_proc, 0, &open_slot, &filp);
-    current_proc->fp_filp[open_slot] = filp;
+    ret = get_fd(who, 0, &open_slot, &filp);
+	who->fp_filp[open_slot] = filp;
 
     return open_slot;
 }

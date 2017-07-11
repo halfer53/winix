@@ -59,7 +59,7 @@ void parallel_main() {
 				break;
 			
 			case 3:
-				sys_exit(0);
+				exit(0);
 				return; //exit
 		}
 		

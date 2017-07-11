@@ -11,197 +11,117 @@
 #include <curses.h>
 #include <debug.h>
 
-void _seterrno(int ret){
-	if(ret < 0){
-		errno = ret;
-		ret = -1;
-	}else{
-		errno = 0;
+int _SYSCALL(int syscall_num, message_t *m){
+	m->type = syscall_num;
+	winix_sendrec(SYSTEM_TASK, m); 
+	if(m->i1 < 0){
+		__set_errno(m->i1);
+		return -1;
 	}
+	__set_errno(0);
+	return m->i1;
 }
 
 /**
  * Get the system uptime.
  **/
 int sys_uptime() {
-	int response = 0;
 	message_t m;
-
-	m.type = SYSCALL_UPTIME;
-	response = winix_sendrec(SYSTEM_TASK, &m); //TODO: error checking
-	_seterrno(m.i1);
-	return m.i1;
+	return _SYSCALL(SYSCALL_UPTIME,&m);
 }
 
 /**
  * Exits the current process.
  **/
-int sys_exit(int status) {
-	int response = 0;
+int _exit(int status) {
 	message_t m;
-
-	m.type = SYSCALL_EXIT;
 	m.i1 = status;
-	response = winix_sendrec(SYSTEM_TASK, &m); //TODO: error checking
-	_seterrno(m.i1);
-	return m.i1;
+	return _SYSCALL(SYSCALL_EXIT,&m);
 }
 
-int sys_process_overview(){
-	int response = 0;
+int sys_ps(){
 	message_t m;
-
-	m.type = SYSCALL_PS;
-	response = winix_sendrec(SYSTEM_TASK, &m); //TODO: error checking
-	_seterrno(m.i1);
-	return m.i1;
+	return _SYSCALL(SYSCALL_PS,&m);
 }
 
 pid_t fork(){
-	int response = 0;
 	message_t m;
-
-	m.type = SYSCALL_FORK;
-	response = winix_sendrec(SYSTEM_TASK, &m); //TODO: error checking
-	_seterrno(m.i1);
-	return (pid_t)m.i1;
+	return _SYSCALL(SYSCALL_FORK,&m);
 }
 
 void *sbrk(size_t size){
-	int response = 0;
 	message_t m;
-
-	m.type = SYSCALL_SBRK;
 	m.i1 = size;
-	response = winix_sendrec(SYSTEM_TASK, &m);
-	_seterrno(m.i1);
+	_SYSCALL(SYSCALL_SBRK,&m);
 	return m.p1;
 }
 
-
 int brk(void *addr){
-	int response = 0;
 	message_t m;
-
-	m.type = SYSCALL_BRK;
 	m.p1 = addr;
-	response = winix_sendrec(SYSTEM_TASK, &m);
-	_seterrno(m.i1);
-	return m.i1;
+	return _SYSCALL(SYSCALL_BRK,&m);
 }
 
 int exec(){
-	int response = 0;
 	message_t m;
-
-	m.type = SYSCALL_EXECVE;
-	response = winix_send(SYSTEM_TASK, &m); //TODO: error checking
-	return m.i1;
+	return _SYSCALL(SYSCALL_EXECVE,&m);
 }
 
 
 int getc(){
-	int response = 0;
 	message_t m;
-
-	m.type = SYSCALL_GETC;
-	response = winix_sendrec(SYSTEM_TASK, &m); //TODO: error checking
-	_seterrno(m.i1);
-	return m.i1;
+	return _SYSCALL(SYSCALL_GETC,&m);
 }
 
 int putc(int i){
-	int response = 0;
 	message_t m;
-
-	m.type = SYSCALL_PUTC;
 	m.i1 = i;
-	response = winix_sendrec(SYSTEM_TASK, &m); //TODO: error checking
-	_seterrno(m.i1);
-	return m.i1;
+	return _SYSCALL(SYSCALL_PUTC,&m);
 }
 
 int printf(const char *format, ...) {
-	int response = 0;
 	message_t m;
-	
-	m.type = SYSCALL_PRINTF;
 	m.p1 = (void *)format;
 	m.p2 = (void *)((int *)&format+1);
-	response = winix_sendrec(SYSTEM_TASK,&m);
-	_seterrno(m.i1);
-	return m.i1;
+	return _SYSCALL(SYSCALL_PRINTF,&m);
 }
 
 
 sighandler_t signal(int signum, sighandler_t handler){
-	int response = 0;
 	message_t m;
-	
-	m.type = SYSCALL_SIGNAL;
 	m.i1 = signum;
 	m.s1 = handler;
-	response = winix_sendrec(SYSTEM_TASK,&m);
-	_seterrno(m.i1);
-	return SIG_DFL;
+	_SYSCALL(SYSCALL_SIGNAL,&m);
+	return m.s1;
 }
 
 unsigned int alarm(unsigned int seconds){
-	int response = 0;
 	message_t m;
-	
-	m.type = SYSCALL_ALARM;
 	m.i1 = seconds;
-	response = winix_sendrec(SYSTEM_TASK,&m);
-	_seterrno(m.i1);
-	return m.i1;
+	return _SYSCALL(SYSCALL_ALARM,&m);
 }
 
 pid_t wait(int *wstatus){
-	int response = 0;
 	message_t m;
-	
-	m.type = SYSCALL_WAIT;
 	m.p1 = wstatus;
-	response = winix_sendrec(SYSTEM_TASK,&m);
-	_seterrno(m.i1);
-	return (pid_t)m.i1;
+	return _SYSCALL(SYSCALL_WAIT,&m);
 }
 
 pid_t getpid(){
-	int response = 0;
 	message_t m;
-	
-	m.type = SYSCALL_GETPID;
-	response = winix_sendrec(SYSTEM_TASK,&m);
-	_seterrno(m.i1);
-	return (pid_t)m.i1;
+	return _SYSCALL(SYSCALL_GETPID,&m);
 }
 
 pid_t getppid(){
-	int response = 0;
 	message_t m;
-	
-	m.type = SYSCALL_GETPPID;
-	response = winix_sendrec(SYSTEM_TASK,&m);
-	_seterrno(m.i1);
-	return (pid_t)m.i1;
+	return _SYSCALL(SYSCALL_GETPPID,&m);
 }
 
 int kill (pid_t pid, int sig){
-	int response = 0;
 	message_t m;
-	
-	m.type = SYSCALL_KILL;
 	m.i1 = pid; 
 	m.i2 = sig;
-	response = winix_sendrec(SYSTEM_TASK,&m);
-	_seterrno(m.i1);
-	return m.i1;
+	return _SYSCALL(SYSCALL_KILL,&m);
 }
-
-
-
-
 
 

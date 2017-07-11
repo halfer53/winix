@@ -5,7 +5,7 @@ INCLUDE_DIR = ../include
 PROGS = stdio string syscall ipc util stdlib makecontext atoi errno
 SOURCES = $(PROGS:=.c)
 ASSEMBLY = $(PROGS:=.s)
-OBJECT = $(PROGS:=.o) wramp_syscall.o ucontext.o debug.o __errno.o
+OBJECT = $(PROGS:=.o) wramp_syscall.o ucontext.o debug.o
 
 wramp: $(OBJECT)
 $(ASSEMBLY): %.s: %.c $(INCLUDES)
