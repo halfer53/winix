@@ -1,4 +1,4 @@
-#include <winix/kernel.h>
+#include <kernel/kernel.h>
 
 unsigned int mem_map[MEM_MAP_LEN];
 

@@ -412,6 +412,7 @@ proc_t *get_proc(int proc_nr) {
  **/
 void init_proc() {
 	int i;
+	proc_t *p;
 	//Initialise queues
 
 	for (i = 0; i < NUM_QUEUES; i++) {
@@ -421,15 +422,17 @@ void init_proc() {
 
 	free_proc[HEAD] = free_proc[TAIL] = NULL;
 	//Add all proc structs to the free list
-	for (i = 0; i < NUM_PROCS; i++) {
-		proc_t *p = &proc_table[i];
+	for ( i = 0; i < NUM_PROCS; i++) {
+		p = &proc_table[i];
 		p->state = DEAD;
 		p->IN_USE = 0;
+		p->proc_nr = i;
 		enqueue_tail(free_proc, p);
-		proc_table[i].proc_index = i;
 	}
 
 	//No current process yet.
 	current_proc = NULL;
 }
+
+
 

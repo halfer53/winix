@@ -1,24 +1,25 @@
-#include <winix/rex.h>
-#include <stdbool.h>
+#include <kernel/kernel.h>
 
 /**
  * Writes a character to serial port 1.
  **/
-void kputc(const int c) {
+int kputc(const int c) {
 	while(!(RexSp1->Stat & 2));
 	RexSp1->Tx = c;
+	return c;
 }
 
 
-PRIVATE void kputc2(const int c) {
+int kputc2(const int c) {
 	while(!(RexSp2->Stat & 2));
 	RexSp2->Tx = c;
+	return c;
 }
 
 /**
  * Reads a character from serial port 1.
  **/
-PRIVATE int kgetc() {
+int kgetc() {
 	//TODO: user interrupt-driven I/O
 	//Use thread
 	while(!(RexSp1->Stat & 1));
@@ -106,7 +107,7 @@ PRIVATE void kputs(const char *s) {
 	}					\
 
 
-PRIVATE void kprintf_vm(const char *format, void *arg, void *who_rbase){
+void kprintf_vm(const char *format, void *arg, void *who_rbase){
 	char c = *format;
 	static char buffer[64];
 	char *buf = buffer;

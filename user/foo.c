@@ -1,16 +1,16 @@
-#include <sys/types.h>
-#include <sys/syscall.h>
+#include <kernel/kernel.h>
 
-DECLARE_SYSCALL(int printf, (const char *format, ...), 
-	SYSCALL_SIGNAL,
-	m.p1 = (void *)format; m.p2 = (void *)((int *)&format+1);,
-	OK )
-
-	DECLARE_SYSCALL(int printf, (const char *format, ...), SYSCALL_SIGNAL, m.p1 = (void *)format; m.p2 = (void *)((int *)&format+1);, OK )
+proc_t ptable[5];
 
 int main(int argc, char const *argv[]) {
-	while(1){
-		printf("I'm loaded");
+	int i;
+	proc_t *p;
+	proc_t *end = &proc_table[0];
+	end += 5;
+
+
+	for(p = &proc_table[0]; p < end; p++){
+		p->proc_nr = 1;
 	}
 	
   return OK;

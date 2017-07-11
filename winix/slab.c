@@ -1,4 +1,4 @@
-#include <winix/kernel.h>
+#include <kernel/kernel.h>
 #include <winix/slab.h>
 /**
  * block structure

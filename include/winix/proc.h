@@ -103,7 +103,7 @@ typedef struct proc {
 	int parent;			//proc_index of parent
 
 	/* Process Table Index */
-	int proc_index;		//Index in the process table
+	int proc_nr;		//Index in the process table
 	int IN_USE;			//Whether the current slot is in use
 
 	/* Signal Information */

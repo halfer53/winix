@@ -1,4 +1,4 @@
-#include <winix/kernel.h>
+#include <kernel/kernel.h>
 
 unsigned int mask[BITMASK_NR];
 

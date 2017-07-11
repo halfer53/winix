@@ -9,7 +9,7 @@
 #ifndef _WINIX_H_
 #define _WINIX_H_ 1
 
-#include <winix/kernel.h>
+#include <kernel/kernel.h>
 #include <ucontext.h>
 
 #include <winix/exec.h>

@@ -4,7 +4,7 @@
 #ifndef _GCC_DEBUG
 int kputc(const int c);
 int kgetc();
-int kprintf(const char *format, ...);
+void kprintf(const char *format, ...);
 #endif
 
 #endif

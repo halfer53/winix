@@ -19,7 +19,7 @@ a.out
 fs/cmake-build-debug/
 expri/
 gen_bin_code
-reformat_srec
+reformat_srec.class
 shell.txt
 
 RexSimulator.dll
@@ -29,6 +29,8 @@ RexSimulatorGui.exe
 !lib/ucontext.s
 !lib/wramp_syscall.s
 !lib/__errno.s
+!lib/debug.s
+!winix/kwramp.s
 !kernel/util/limits_head.s
 !kernel/util/limits_tail.s
 !.gitignore

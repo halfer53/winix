@@ -1,4 +1,4 @@
-#include <winix/kernel.h>
+#include <kernel/kernel.h>
 
 timer_t *pending_timers = NULL;
 clock_t next_timeout;

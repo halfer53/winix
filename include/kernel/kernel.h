@@ -34,5 +34,6 @@
 #include <winix/proc.h>
 
 #include <winix/syscall_ctx.h>
+#include <winix/rex.h>
 
 #endif

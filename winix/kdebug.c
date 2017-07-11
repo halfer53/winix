@@ -1,4 +1,4 @@
-#include <winix/kernel.h>
+#include <kernel/kernel.h>
 
 #define SCHED_DEBUG_LEN 200
 #define IPC_DEBUG_LEN   50
