@@ -52,9 +52,7 @@ shell:
 	wcc -S user/shell.c
 	wasm shell.s
 	wlink -o shell.srec shell.o lib/*.o
-	[ ! -f $(REFORMAT).class ] && javac tools/$(REFORMAT).java || :
 	java $(REFORMAT) shell.srec
-	[ ! -f $(GEN_BIN) ] && gcc tools/$(GEN_BIN).c -o $(GEN_BIN) || :
 	./$(GEN_BIN) shell.srec > include/shell_codes.c
 	-rm -f shell.srec
 
