@@ -6,6 +6,8 @@ A UNIX-style Operating System for the Waikato RISC Architecture Microprocessor (
 
 ```export PATH=`pwd`/tools/bin:$PATH```
 
+```chmod +x tools/bin/*```
+
 ```make```
 
 ## How to Run
