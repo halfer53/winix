@@ -1,14 +1,19 @@
 CC = wcc
-PROGS = main proc system exception idle clock sched
 INCLUDE_DIR = ../include
-# INCLUDES = $(wildcard $(INCLUDE_DIR)/*.h $(INCLUDE_DIR)/winix/*.h $(INCLUDE_DIR)/sys/*.h $(INCLUDE_DIR)/kernel/*.h)
+INCLUDES = $(wildcard $(INCLUDE_DIR)/*.h $(INCLUDE_DIR)/winix/*.h $(INCLUDE_DIR)/sys/*.h $(INCLUDE_DIR)/kernel/*.h)
 
+LIMITS = util/limits_head.o util/limits_tail.o
+PROGS = main proc system exception idle clock sched
 SOURCES = $(PROGS:=.c)
 ASSEMBLY = $(PROGS:=.s)
 OBJECT = $(PROGS:=.o)
 
-wramp:$(OBJECT)
+wramp:$(OBJECT) $(INCLUDES) $(LIMITS)
 	$(MAKE) -C system
+
+$(LIMITS): %.o: %.s
+	wasm $< -o $@
+
 $(ASSEMBLY): %.s: %.c $(INCLUDES)
 	$(CC) -S -I$(INCLUDE_DIR) -o $@ $<
 
@@ -21,7 +26,7 @@ depend:
 
 clean:
 	$(MAKE) -C system clean
-	-rm -f $(OBJECT) $(ASSEMBLY)
+	-rm -f $(OBJECT) $(ASSEMBLY) $(LIMITS)
 
 .DELETE_ON_ERROR:# DO NOT DELETE
 
