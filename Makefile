@@ -16,7 +16,7 @@ all:
 ifeq (, $(shell which $(CC)))
 	$(error "Plz run: export PATH=`pwd`/tools/bin:$$PATH")
 endif
-	$(MAKE) tools
+	$(MAKE) -C tools
 	-rm -f winix.srec
 	$(MAKE) -C lib
 	$(MAKE) shell
@@ -34,6 +34,7 @@ debug:
 	wlink -o winix.srec $(KLIMITS) $(KERNEL_OBJS) $(LIB_OBJS)
 
 clean:
+	$(MAKE) -C tools clean
 	$(MAKE) -C kernel clean
 	$(MAKE) -C lib clean
 	$(MAKE) -C user clean
