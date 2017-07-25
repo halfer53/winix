@@ -36,9 +36,13 @@ Click ```Quick Load```, select ```winix.srec```
 
 ```signal [ seconds ]```: similar to alarm, the only difference is that it forks a child to wait for the alarm signal
 
+```ps```: shows the list of processes running in the system, with relevant info
+
+```id```: shows the current shell's pid
+
 ## Demo
 
-[Demo](https://github.com/halfer53/Winix2/blob/master/docs/demo.md)
+[Demo](https://github.com/halfer53/Winix2/blob/master/Documentations/demo.md)
 
 ## Run File System
 
