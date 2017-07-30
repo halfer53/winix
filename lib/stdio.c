@@ -3,5 +3,5 @@
 void perror(const char *s){
     if(s)
         printf("%s",s);
-    printf(" errno is: %d\n",errno);
+    printf(" errno val: %d\n",errno);
 }

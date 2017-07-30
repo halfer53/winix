@@ -11,6 +11,8 @@
 #include <curses.h>
 #include <debug.h>
 
+static pid_t __pid = 0;//pid cache
+
 int _SYSCALL(int syscall_num, message_t *m){
 	m->type = syscall_num;
 	winix_sendrec(SYSTEM_TASK, m); 
@@ -44,8 +46,12 @@ int sys_ps(){
 }
 
 pid_t fork(){
+	int result;
 	message_t m;
-	return _SYSCALL(SYSCALL_FORK,&m);
+	result = _SYSCALL(SYSCALL_FORK,&m);
+	if(result == 0)
+		__pid = 0; //reset pid cache
+	return result;
 }
 
 void *sbrk(size_t size){
@@ -108,7 +114,11 @@ pid_t wait(int *wstatus){
 
 pid_t getpid(){
 	message_t m;
-	return _SYSCALL(SYSCALL_GETPID,&m);
+	if(__pid != 0){
+		return __pid;
+	}
+	__pid = _SYSCALL(SYSCALL_GETPID,&m);
+	return __pid;
 }
 
 pid_t getppid(){
