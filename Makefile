@@ -1,16 +1,17 @@
-CC = wcc
-
-TLIB = lib/*.o
-
-KLIB = ipc string util wramp_syscall ucontext atoi errno
-KLIB_OBJS = $(addprefix lib/, $(KLIB:=.o))
-L_HEAD = kernel/util/limits_head.o
-L_TAIL = kernel/util/limits_tail.o
-KERNEL_OBJS = winix/*.o kernel/system/*.o kernel/*.o
-KMAIN = kernel/main.s kernel/main.o 
-
 REFORMAT = reformat_srec
 GEN_BIN = gen_bin_code
+CC = wcc
+C_DEF = -S
+export CC C_DEF
+
+LIBS_O = $(shell find lib -name "*.o")
+
+KLIB = ipc string util wramp_syscall ucontext stdlib/atoi stdlib/errno
+KLIB_O = $(addprefix lib/, $(KLIB:=.o))
+L_HEAD = kernel/util/limits_head.o
+L_TAIL = kernel/util/limits_tail.o
+KERNEL_O = winix/*.o kernel/system/*.o kernel/*.o
+KMAIN = kernel/main.s kernel/main.o 
 
 all:
 ifeq (, $(shell which $(CC)))
@@ -23,7 +24,7 @@ endif
 	$(MAKE) -C winix
 	$(MAKE) -C kernel
 	$(MAKE) -C user
-	wlink -o winix.srec $(L_HEAD) $(KERNEL_OBJS) $(KLIB_OBJS) $(L_TAIL)
+	wlink -o winix.srec $(L_HEAD) $(KERNEL_O) $(KLIB_O) $(L_TAIL)
 
 debug:
 	$(MAKE) clean
@@ -50,10 +51,11 @@ stat:
 	@find . -name "*.s" -exec cat {} \; | wc -l
 
 shell:
+	echo $(LIBS_O)
 	-rm -f $(KMAIN)
 	wcc -S user/shell.c
 	wasm shell.s
-	wlink -o shell.srec shell.o lib/*.o
+	wlink -o shell.srec shell.o $(LIBS_O)
 	java $(REFORMAT) shell.srec
 	./$(GEN_BIN) shell.srec > include/shell_codes.c
 	-rm -f shell.srec

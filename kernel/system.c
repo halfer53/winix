@@ -57,7 +57,6 @@ void system_main() {
 	//Receive message, do work, repeat.
 
 	getcontext(&recv_ctx);
-	DEBUG_IPC = 100;
 	while(1) {
 		//get a messa1ge
 		winix_receive(&m);

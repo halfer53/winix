@@ -11,7 +11,7 @@
 #include <curses.h>
 #include <debug.h>
 
-static pid_t __pid = 0;//pid cache
+static pid_t __pid_cache = 0;//pid cache
 
 int _SYSCALL(int syscall_num, message_t *m){
 	m->type = syscall_num;
@@ -50,7 +50,7 @@ pid_t fork(){
 	message_t m;
 	result = _SYSCALL(SYSCALL_FORK,&m);
 	if(result == 0)
-		__pid = 0; //reset pid cache
+		__pid_cache = 0; //reset pid cache
 	return result;
 }
 
@@ -114,11 +114,11 @@ pid_t wait(int *wstatus){
 
 pid_t getpid(){
 	message_t m;
-	if(__pid != 0){
-		return __pid;
+	if(__pid_cache != 0){
+		return __pid_cache;
 	}
-	__pid = _SYSCALL(SYSCALL_GETPID,&m);
-	return __pid;
+	__pid_cache = _SYSCALL(SYSCALL_GETPID,&m);
+	return __pid_cache;
 }
 
 pid_t getppid(){

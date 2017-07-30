@@ -1,4 +1,3 @@
-CC = wcc
 INCLUDE_DIR = ../../include
 INCLUDES = $(wildcard $(INCLUDE_DIR)/*.h $(INCLUDE_DIR)/winix/*.h $(INCLUDE_DIR)/sys/*.h $(INCLUDE_DIR)/kernel/*.h)
 
@@ -16,7 +15,7 @@ MAKEDEPEND = gcc -M $(CPPFLAGS) -o $*.Td $<
 
 wramp: $(OBJECT)
 $(ASSEMBLY): %.s: %.c $(INCLUDES)
-	$(CC) -S -I$(INCLUDE_DIR) -o $@ $<
+	$(CC) $(CFLAGS) $(C_DEF) -I$(INCLUDE_DIR) -o $@ $<
 
 $(OBJECT): %.o: %.s
 	wasm $< -o $@

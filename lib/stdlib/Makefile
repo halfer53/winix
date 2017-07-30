@@ -1,13 +1,14 @@
-INCLUDE_DIR = ../include
-# INCLUDES = $(wildcard $(INCLUDE_DIR)/*.h $(INCLUDE_DIR)/sys/*.h )
+INCLUDE_DIR = ../../include
+# INCLUDES = $(wildcard $(INCLUDE_DIR)/*.h $(INCLUDE_DIR)/sys/*.h)
 
-PROGS = 
+PROGS = atoi errno stdlib
 SOURCES = $(PROGS:=.c)
 ASSEMBLY = $(PROGS:=.s)
+
 OBJECT = $(PROGS:=.o)
 
 wramp: $(OBJECT)
-$(ASSEMBLY): %.s: %.c
+$(ASSEMBLY): %.s: %.c $(INCLUDES)
 	$(CC) $(CFLAGS) $(C_DEF) -I$(INCLUDE_DIR) -o $@ $<
 
 $(OBJECT): %.o: %.s
@@ -20,4 +21,3 @@ clean:
 	-rm -f $(OBJECT) $(ASSEMBLY)
 
 .DELETE_ON_ERROR:
-# DO NOT DELETE
