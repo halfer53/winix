@@ -1,7 +1,7 @@
 #include <kernel/kernel.h>
 
 #define SCHED_DEBUG_LEN 200
-#define IPC_DEBUG_LEN   50
+#define IPC_DEBUG_LEN   200
 
 int DEBUG_SCHED = 0;
 int DEBUG_IPC = 0;

@@ -5,7 +5,10 @@ int do_alarm(proc_t *who, message_t *m){
     timer_t *alarm;
     clock_t prev_timeout;
 
-    seconds = (clock_t )m->i1;
+    if(m->i1 < 0)
+        return EINVAL;
+
+    seconds = (clock_t )m->i1; 
     alarm = &who->alarm;
     prev_timeout = alarm->time_out; //return previous alarm
 

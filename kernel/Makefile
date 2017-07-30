@@ -15,7 +15,7 @@ $(LIMITS): %.o: %.s
 	wasm $< -o $@
 
 $(ASSEMBLY): %.s: %.c $(INCLUDES)
-	$(CC) $(CFLAGS) $(C_DEF) -I$(INCLUDE_DIR) -o $@ $<
+	wcc $(CFLAGS) -S -I$(INCLUDE_DIR) -o $@ $<
 
 $(OBJECT): %.o: %.s
 	wasm $< -o $@

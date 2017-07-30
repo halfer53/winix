@@ -14,7 +14,7 @@ KERNEL_O = winix/*.o kernel/system/*.o kernel/*.o
 KMAIN = kernel/main.s kernel/main.o 
 
 all:
-ifeq (, $(shell which $(CC)))
+ifeq (, $(shell which wcc))
 	$(error "Plz run: export PATH=`pwd`/tools/bin:$$PATH")
 endif
 	$(MAKE) -C tools
@@ -51,14 +51,13 @@ stat:
 	@find . -name "*.s" -exec cat {} \; | wc -l
 
 shell:
-	echo $(LIBS_O)
 	-rm -f $(KMAIN)
 	wcc -S user/shell.c
 	wasm shell.s
 	wlink -o shell.srec shell.o $(LIBS_O)
 	java $(REFORMAT) shell.srec
 	./$(GEN_BIN) shell.srec > include/shell_codes.c
-	-rm -f shell.srec
+	-rm -f shell.srec shell.s shell.o
 
 test:
 	gcc -D_GCC_DEBUG -I./include test.c winix/bitmap.c winix/mm.c
