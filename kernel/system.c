@@ -57,9 +57,8 @@ void system_main() {
 	//Receive message, do work, repeat.
 
 	getcontext(&recv_ctx);
-
+	DEBUG_IPC = 100;
 	while(1) {
-		int syscall_ret;
 		//get a messa1ge
 		winix_receive(&m);
 		who_proc_nr = m.src;
@@ -67,31 +66,31 @@ void system_main() {
 
 		//Do the work
 		switch(m.type) {
-			case SYSCALL_UPTIME:		syscall_ret = do_time(who,&m);		break;
-			case SYSCALL_EXIT:			syscall_ret = do_exit(who,&m);		break;
-			case SYSCALL_FORK:			syscall_ret = do_fork(who,&m);		break;
-			case SYSCALL_EXECVE:		syscall_ret = do_exec(who,&m);		break;
-			case SYSCALL_SBRK:			syscall_ret = do_sbrk(who,&m);		break;
-			case SYSCALL_BRK:			syscall_ret = do_brk(who,&m);			break;
-			case SYSCALL_ALARM:			syscall_ret = do_alarm(who,&m);		break;
-			case SYSCALL_SIGNAL:		syscall_ret = do_sigaction(who,&m);	break;
-			case SYSCALL_SIGRET:		syscall_ret = do_sigreturn(who,&m);	break;
-			case SYSCALL_WAIT:			syscall_ret = do_wait(who,&m);		break;
-			case SYSCALL_KILL: 			syscall_ret = do_kill(who,&m);		break;
-			case SYSCALL_GETPID:		syscall_ret = do_getpid(who,&m);		break;
-			case SYSCALL_GETPPID:		syscall_ret = do_getppid(who,&m);		break;
-			case SYSCALL_GETC:			syscall_ret = do_getc(who,&m);		break;
-			case SYSCALL_PS:			syscall_ret = do_ps(who,&m);			break;
-			case SYSCALL_PUTC:			syscall_ret = do_putc(who,&m);		break;
-			case SYSCALL_PRINTF:		syscall_ret = do_printf(who,&m);		break;
+			case SYSCALL_UPTIME:		m.i1 = do_time(who,&m);			break;
+			case SYSCALL_EXIT:			m.i1 = do_exit(who,&m);			break;
+			case SYSCALL_FORK:			m.i1 = do_fork(who,&m);			break;
+			case SYSCALL_EXECVE:		m.i1 = do_exec(who,&m);			break;
+			case SYSCALL_SBRK:			m.i1 = do_sbrk(who,&m);			break;
+			case SYSCALL_BRK:			m.i1 = do_brk(who,&m);			break;
+			case SYSCALL_ALARM:			m.i1 = do_alarm(who,&m);		break;
+			case SYSCALL_SIGNAL:		m.i1 = do_sigaction(who,&m);	break;
+			case SYSCALL_SIGRET:		m.i1 = do_sigreturn(who,&m);	break;
+			case SYSCALL_WAIT:			m.i1 = do_wait(who,&m);			break;
+			case SYSCALL_KILL: 			m.i1 = do_kill(who,&m);			break;
+			case SYSCALL_GETPID:		m.i1 = do_getpid(who,&m);		break;
+			case SYSCALL_GETPPID:		m.i1 = do_getppid(who,&m);		break;
+			case SYSCALL_GETC:			m.i1 = do_getc(who,&m);			break;
+			case SYSCALL_PS:			m.i1 = do_ps(who,&m);			break;
+			case SYSCALL_PUTC:			m.i1 = do_putc(who,&m);			break;
+			case SYSCALL_PRINTF:		m.i1 = do_printf(who,&m);		break;
 			default:
 				kprintf("\r\n[SYSTEM] Process \"%s (%d)\" performed unknown system call %d\r\n", who->name, who->pid, m.type);
-				exit_proc(who, 1);
+				// KILL_PROC(who, 1);
+				m.i1 = ENOSYS;
 				break;
 		}
 
-		if(syscall_ret != SUSPEND && syscall_ret != DONOTHING){
-			m.i1 = syscall_ret;
+		if(m.i1 != SUSPEND && m.i1 != DONOTHING){
 			winix_send(who_proc_nr,&m);
 		}
 	}

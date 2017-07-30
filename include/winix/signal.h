@@ -4,6 +4,9 @@
 #include <signal.h>
 
 #define SIGFRAME_CODE_LEN   2
+//By POSIX convention, if a process is killed by a signal, its exit status code is 128 + signum
+#define KILL_PROC(proc,sigcode) exit_proc(proc, 128+(sigcode));
+
 
 void send_sig(proc_t *who, int signum);
 void cause_sig(proc_t *who, int signum);
