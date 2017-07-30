@@ -2,5 +2,5 @@
 
 int do_abort(proc_t *who, message_t *m){
     cause_sig(who,SIGABRT);
-    return OK;
+    return DONOTHING;
 }

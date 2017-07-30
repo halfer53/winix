@@ -198,25 +198,17 @@ void release_proc_mem(proc_t *who){
 
 
 void *kset_proc(proc_t *p, void (*entry)(), int priority, const char *name) {
-	void *ptr = NULL;
-	int i = 0, len = 0;
+	ptr_t *ptr;
+	int pg_index;
 	p->priority = priority;
 	p->pc = entry;
 
-	len = DEFAULT_STACK_SIZE / 1024;
 	strcpy(p->name, name);
 
-	// p->ptable = p->protection_table;
+	ptr = get_free_page(__GFP_NORM);
+	p->sp = (reg_t *)(ptr) + PAGE_LEN - 1;
 
-	// ptr = proc_malloc(DEFAULT_STACK_SIZE);
-	i = get_free_pages(len,__GFP_NORM);
-	bitmap_set_nbits(p->ptable, PROTECTION_TABLE_LEN, i, len);
-	bitmap_set_nbits(mem_map, PROTECTION_TABLE_LEN, i, len);
-	// kprintf("kset 0x%08x\n",p->ptable[0]);
-	p->sp = (reg_t *)ptr + DEFAULT_STACK_SIZE - 100;
-	p->heap_break = p->sp + 1;
-
-	p->length = DEFAULT_STACK_SIZE;
+	p->length = DEFAULT_STACK_SIZE; //one page
 
 	//Set the process to runnable, remember to enqueue it after you call this method
 	p->state = RUNNABLE;
@@ -282,7 +274,7 @@ proc_t *start_system(void (*entry)(), int priority, const char *name) {
 	proc_t *p = NULL;
 	int stack_size = 1024 * 1;
 	int pg_idx;
-	int *ptr = NULL;
+	ptr_t *ptr;
 	if (p = get_free_proc()) {
 		p->priority = priority;
 		p->pc = entry;
@@ -292,7 +284,7 @@ proc_t *start_system(void (*entry)(), int priority, const char *name) {
 		// p->ptable = p->protection_table;
 
 		// ptr = proc_malloc(DEFAULT_STACK_SIZE);
-		ptr = page_pa(get_free_pages(stack_size / 1024,__GFP_NORM));
+		ptr = get_free_pages(stack_size / 1024,__GFP_NORM);
 
 		p->sp = (reg_t *)ptr + stack_size - 128;
 		//TODO: init heap_break using slab

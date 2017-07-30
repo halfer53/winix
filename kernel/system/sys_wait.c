@@ -4,7 +4,7 @@
 int do_wait(proc_t *parent, message_t *mesg){
     register proc_t *child = NULL;
     
-    ptr_t wstatus;
+    ptr_t* wstatus;
     int children = 0,i;
 
     for (i=0; i<NUM_PROCS; i++) {

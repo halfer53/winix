@@ -3,12 +3,18 @@
 
 #include <winix/gfp.h>
 
-int get_free_pages(int num, int flags);
-int get_free_page(int flags);
-void free_page(void* ptr);
+ptr_t* get_free_page(int flags);
+ptr_t* get_free_pages(int num, int flags);
+
+int get_free_page_index(int flags);
+int get_free_pages_index(int num, int flags);
+
+void free_page(ptr_t* ptr);
 void print_mem_map(int i);
 
 #define MEM_MAP_LEN	32
+#define PAGE_LEN    1024
+
 void init_mem_table();
 
 extern unsigned int mem_map[MEM_MAP_LEN];
@@ -20,8 +26,8 @@ extern unsigned int mem_map[MEM_MAP_LEN];
 #define is_addr_in_same_page(a,b)	((((int)a)/1024) == (((int)b)/1024))
 #define is_addr_in_consecutive_page(a,b)	((((int)a)/1024) == ((((int)b)/1024)-1))
 
-#define get_physical_addr(va,proc)	(((ptr_t)va)+(unsigned int)proc->rbase)
-#define get_virtual_addr(pa,proc)	(((ptr_t)pa)-(unsigned int)proc->rbase)
+#define get_physical_addr(va,proc)	(((ptr_t*)va)+(unsigned int)proc->rbase)
+#define get_virtual_addr(pa,proc)	(((ptr_t*)pa)-(unsigned int)proc->rbase)
 
 #define get_page_index(pa)	( ((int)pa) / 1024 )
 #define page_pa(_index)   ((void *)(_index * 1024))

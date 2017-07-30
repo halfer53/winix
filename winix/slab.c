@@ -110,8 +110,7 @@ PRIVATE block_t *alloc_page(block_t *last , size_t s)
 	//	else
 	//		get new pages and return
 	
-	pg_idx = get_free_pages(physical_len_to_page_len(s),__GFP_NORM);
-	p = (block_t *)(long )(pg_idx * 1024);
+	p = (block_t *)get_free_pages(physical_len_to_page_len(s),__GFP_NORM);
 	p->size = s;
 	p->prev = last;
 	p->free = 0;

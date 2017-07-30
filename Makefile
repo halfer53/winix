@@ -1,12 +1,12 @@
 CC = wcc
-KERNEL_OBJS = winix/*.o kernel/system/*.o kernel/*.o
-
-LIB = ipc string util wramp_syscall ucontext atoi errno
-LIB_OBJS = $(addprefix lib/, $(LIB:=.o))
 
 TLIB = lib/*.o
 
-KLIMITS = kernel/util/limits_head.o kernel/util/limits_tail.o
+KLIB = ipc string util wramp_syscall ucontext atoi errno
+KLIB_OBJS = $(addprefix lib/, $(KLIB:=.o))
+L_HEAD = kernel/util/limits_head.o
+L_TAIL = kernel/util/limits_tail.o
+KERNEL_OBJS = winix/*.o kernel/system/*.o kernel/*.o
 KMAIN = kernel/main.s kernel/main.o 
 
 REFORMAT = reformat_srec
@@ -23,7 +23,8 @@ endif
 	$(MAKE) -C winix
 	$(MAKE) -C kernel
 	$(MAKE) -C user
-	wlink -o winix.srec $(KLIMITS) $(KERNEL_OBJS) $(LIB_OBJS)
+	echo $(KLIB_OBJS)
+	wlink -o winix.srec $(L_HEAD) $(KERNEL_OBJS) $(KLIB_OBJS) $(L_TAIL)
 
 debug:
 	$(MAKE) clean

@@ -73,7 +73,7 @@ typedef struct proc {
 	int flags; 
 
 	/* Heap */
-	ptr_t heap_break;
+	ptr_t* heap_break;
 	size_t length; //length is depreciated, do not use it
 
 	/* Protection */

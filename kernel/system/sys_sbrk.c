@@ -5,8 +5,8 @@ void *_sbrk( proc_t *who, size_t size) {
 
 	unsigned int *ptable;
 	int nstart,len;
-	ptr_t heap_break_bak;
-	ptr_t ptr_addr;
+	ptr_t* heap_break_bak;
+	ptr_t* ptr_addr;
 	if (size == 0)
 		return get_virtual_addr(who->heap_break,who);
 	
@@ -55,5 +55,5 @@ void *_sbrk( proc_t *who, size_t size) {
 int do_sbrk(proc_t *who, message_t *m){
     m->p1 = _sbrk(who,m->i1);
 	// winix_send(who->pid, m);
-	return m->p1 == NULL ? ERR : OK;
+	return m->p1 == NULL ? EINVAL : OK;
 }
