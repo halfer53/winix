@@ -15,10 +15,9 @@ int _SYSCALL(int syscall_num, message_t *m){
 	m->type = syscall_num;
 	winix_sendrec(SYSTEM_TASK, m); 
 	if(m->i1 < 0){
-		__set_errno(m->i1);
+		__set_errno(-m->i1);
 		return -1;
 	}
-	__set_errno(0);
 	return m->i1;
 }
 

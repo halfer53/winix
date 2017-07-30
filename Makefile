@@ -23,7 +23,6 @@ endif
 	$(MAKE) -C winix
 	$(MAKE) -C kernel
 	$(MAKE) -C user
-	echo $(KLIB_OBJS)
 	wlink -o winix.srec $(L_HEAD) $(KERNEL_OBJS) $(KLIB_OBJS) $(L_TAIL)
 
 debug:
@@ -44,7 +43,7 @@ clean:
 
 stat:
 	@echo "C Lines: "
-	@find . -name "*.c" -exec cat {} \; | wc -l
+	@find . -type d -name "include" -prune -o -name "*.c"  -exec cat {} \; | wc -l
 	@echo "Header LoC: "
 	@find . -name "*.h" -exec cat {} \; | wc -l
 	@echo "Assembly LoC: "
@@ -60,7 +59,7 @@ shell:
 	-rm -f shell.srec
 
 test:
-	gcc -D _GCC_DEBUG -I./include test.c winix/bitmap.c winix/mm.c
+	gcc -D_GCC_DEBUG -I./include test.c winix/bitmap.c winix/mm.c
 
 .DELETE_ON_ERROR:
 

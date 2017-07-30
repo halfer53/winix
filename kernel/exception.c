@@ -12,20 +12,20 @@
 #define NUM_HANDLERS 16
 
 //Handler prototypes
-static void button_handler();
-static void timer_handler();
-static void parallel_handler();
-static void serial1_handler();
-static void serial2_handler();
-static void gpf_handler();
-static void syscall_handler();
-static void break_handler();
-static void arith_handler();
-static void no_handler();
+PRIVATE void button_handler();
+PRIVATE void timer_handler();
+PRIVATE void parallel_handler();
+PRIVATE void serial1_handler();
+PRIVATE void serial2_handler();
+PRIVATE void gpf_handler();
+PRIVATE void syscall_handler();
+PRIVATE void break_handler();
+PRIVATE void arith_handler();
+PRIVATE void no_handler();
 
 //Table of all handlers.
 //Position in the table corresponds to relevant bit of $estat
-static void (*handlers[])(void) = {
+PRIVATE void (*handlers[])(void) = {
 	no_handler, 		//Undefined
 	no_handler, 		//Undefined
 	no_handler, 		//Undefined
@@ -51,7 +51,7 @@ int system_uptime = 0;
 /**
  * User Interrupt Button (IRQ1)
  **/
-static void button_handler() {
+PRIVATE void button_handler() {
 	RexUserInt->Iack = 0;
 }
 
@@ -62,7 +62,7 @@ static void button_handler() {
  *   system_uptime is incremented
  *   scheduler is called (i.e. this handler does not return)
  **/
-static void timer_handler() {
+PRIVATE void timer_handler() {
 	RexTimer->Iack = 0;
 
 	//Increment uptime, and check if there is any alarm
@@ -76,14 +76,14 @@ static void timer_handler() {
 /**
  * Parallel Port (IRQ3)
  **/
-static void parallel_handler() {
+PRIVATE void parallel_handler() {
 	RexParallel->Iack = 0;
 }
 
 /**
  * Serial Port 1 (IRQ4)
  **/
-static void serial1_handler() {
+PRIVATE void serial1_handler() {
 
 	RexSp1->Iack = 0;
 	// run_message_queue();
@@ -92,7 +92,7 @@ static void serial1_handler() {
 /**
  * Serial Port 2 (IRQ5)
  **/
-static void serial2_handler() {
+PRIVATE void serial2_handler() {
 	int stat = RexSp2->Stat;
 	if(stat & 1 == 1){
 		kprintf("Got %c\n",RexSp2->Rx);
@@ -109,7 +109,7 @@ static void serial2_handler() {
  *   Current process is killed.
  *   Scheduler is called (i.e. this handler does not return).
  **/
-static void gpf_handler() {
+PRIVATE void gpf_handler() {
 	int i=0;
 	proc_t *system = get_proc(0);
 	if(!isokprocn(current_proc->pid))
@@ -138,22 +138,21 @@ static void gpf_handler() {
  * System Call.
  *
  **/
-static void syscall_handler() {
+PRIVATE void syscall_handler() {
 	int src, dest, operation;
 	message_t *m;
 	int *retval;
 	proc_t *p;
-	size_t *sp;
+	ptr_t *sp;
 	proc_t *curr = NULL;
-	char *op_name;
 	int counter = 0;
 
 	//cast two variables to to size_t to allow addition of two pointer, and then cast back to pointer
-	sp = (size_t *)((size_t)(current_proc->sp) + (size_t)(current_proc->rbase));
+	sp = (ptr_t *)((current_proc->sp) + (int)(current_proc->rbase));
 
 	operation = *(sp);				//Operation is the first parameter on the stack
 	dest = *(sp+1);				//Destination is second parameter on the stack
-	m = (message_t *)(*(sp+ 2) + (size_t)current_proc->rbase);	//Message pointer is the third parameter on the stack
+	m = (message_t *)(*(sp+ 2) + (int)current_proc->rbase);	//Message pointer is the third parameter on the stack
 	m->src = current_proc->pid;			//Don't trust the who to specify their own source process number
 
 	retval = (int*)&current_proc->regs[0];		//Result is returned in register $1
@@ -190,7 +189,7 @@ static void syscall_handler() {
 /**
  * Breakpoint.
  **/
-static void break_handler() {
+PRIVATE void break_handler() {
 	//TODO: implement handling of breakpoints
 }
 
@@ -200,7 +199,7 @@ static void break_handler() {
  * Side Effects:
  *   Current process is killed, and scheduler is called (i.e. this handler does not return).
  **/
-static void arith_handler() {
+PRIVATE void arith_handler() {
 	kprintf("\r\n[SYSTEM] Process \"%s (%d)\" ARITH: PC=0x%08x.\r\n", current_proc->name, current_proc->pid, current_proc->pc);
 	exit_proc(current_proc,1);
 	current_proc = NULL;
@@ -213,7 +212,7 @@ static void arith_handler() {
  * Side Effects:
  *   System Panic! Does not return.
  **/
-static void no_handler() {
+PRIVATE void no_handler() {
 	panic("Unhandled Exception");
 }
 
@@ -221,7 +220,7 @@ static void no_handler() {
  * The global exception handler.
  * All relevant exception handlers will be called.
  **/
-static void exception_handler(int estat) {
+PRIVATE void exception_handler(int estat) {
 	int i;
 
 	//Loop through $estat and call all relevant handlers.

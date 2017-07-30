@@ -85,9 +85,8 @@ int cmd_kill(int argc, char **argv){
 int seconds;
 int cont;
 
-void child_handler(int signum){
+void signal_handler(int signum){
 	printf("\n%d seconds elapsed\n",seconds);
-	exit(EXIT_SUCCESS);
 }
 
 void alarm_handler(int signum){
@@ -121,18 +120,8 @@ int test_signal(int argc, char **argv){
 	seconds = 1;
 	if(argc > 1)
 		seconds = atoi(argv[1]);
-	if((fr = fork()) == 0){
-		signal(SIGALRM,child_handler);
-		alarm(seconds);
-		i = 10000;
-		while(1){
-			while(i--);
-			putc('!');
-			i = 10000;
-		}
-	}else{
-		pid = wait(NULL);
-	}
+	signal(SIGALRM,signal_handler);
+	alarm(seconds);
 	return 0;
 }
 
@@ -369,8 +358,10 @@ void main() {
 
 			ret = getc(); 	//read
 			
-			if(ret == -1)
+			if(ret == -1){
+				perror("failed");
 				continue;
+			}
 			
 			if(ret == '\r')  //test for end
 				break;	

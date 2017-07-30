@@ -16,20 +16,23 @@ ucontext_t recv_ctx;
 syscallctx_t syscall_ctx;
 
 void resume_syscall(proc_t *to){
-	if(syscall_ctx.who->pid == to->pid && to->flags & RECEIVING && syscall_ctx.interruptted)
-		winix_senderr(to->pid);
-
+	if(syscall_ctx.who->pid == to->pid && to->flags & RECEIVING && syscall_ctx.interruptted){
+		winix_send(to->pid,&syscall_ctx.m);
+	}
 	syscall_ctx.interruptted = 0;
 	// setcontext(&syscall_ctx);
 }
 
 void intr_syscall(){
+	syscallctx_t *ctx = &syscall_ctx;
 	//if the system is executing a system call, save the system call context
 	//and interrupt the System as if it has finished executing the current syscall
 	if(!get_proc(SYSTEM_TASK)->flags){
-		syscall_ctx.m = m;
-		syscall_ctx.who = who;
-		syscall_ctx.interruptted = 1;
+		// kprintf("interrupt syscall %d\n",who->pid);
+		ctx->m = m;
+		ctx->m.i1 = EINTR;
+		ctx->who = who;
+		ctx->interruptted = 1;
 	}
 	setcontext(&recv_ctx);
 }

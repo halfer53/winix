@@ -2,6 +2,6 @@
 
 void perror(const char *s){
     if(s)
-        printf("s",s);
-    printf("Errno: %d\n",errno);
+        printf("%s",s);
+    printf(" errno is: %d\n",errno);
 }
