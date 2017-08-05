@@ -259,7 +259,7 @@ int test_fork(int argc, char **argv){
 	if(cpid = fork()){
 		if(cpid == -1){
 			printf("fork failed\n");
-			exit(EXIT_FAILURE);
+			return -1;
 		}
 		printf("parent %d waiting for child %d\n",ppid,cpid);
 		cpid = wait(NULL);
