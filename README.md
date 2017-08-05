@@ -1,7 +1,7 @@
 # WINIX
 A UNIX-style Operating System for the Waikato RISC Architecture Microprocessor (WRAMP)
 
-NB Due to bugs in the kernel, the feature of redirection and multiple pipes for Bourne Shell have been moved to a separate project ```https://github.com/halfer53/TBash```
+NB Due to bugs in the kernel, the feature of redirection and multiple pipes for Bourne Shell have been moved to a separate project [TBash](https://github.com/halfer53/TBash)
 
 ## How to Compile
 ```cd Winix2```
