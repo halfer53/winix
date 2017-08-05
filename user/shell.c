@@ -70,9 +70,11 @@ int isPrintable(int c) {
 int cmd_kill(int argc, char **argv){
 	pid_t pid;
 	int signum = SIGKILL;
-	if(argc < 2)
+	if(argc < 2){
 		printf("kill [-n signum] pid\n");
-
+		return -1;
+	}
+		
 	if(strcmp("-n",argv[1]) == 0){
 		signum = atoi(argv[2]);
 		pid = atoi(argv[3]);
@@ -263,9 +265,7 @@ int test_fork(int argc, char **argv){
 		cpid = wait(NULL);
 		printf("parent %d awakened by child %d\n",ppid,cpid);
 	}else{
-		cpid = getpid();
-		ppid = getppid();
-		printf("Child %d [parent %d] start:\n",cpid,ppid);
+		printf("Child %d [parent %d] start:\n",getpid(),getppid());
 	}
 	return 0;
 }

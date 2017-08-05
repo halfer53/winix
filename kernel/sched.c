@@ -2,8 +2,8 @@
 
 
 proc_t *get_idle(){
-	static proc_t *idle;
-	kprintf("get idle\n");
+	static proc_t *idle = NULL;
+	// kprintf("get idle\n");
 	if(idle == NULL){
 		idle = new_proc(idle_main, IDLE_PRIORITY, "IDLE");
 	}

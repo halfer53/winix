@@ -11,6 +11,8 @@
 //Number of exception sources
 #define NUM_HANDLERS 16
 
+static int _irq_count = 0;
+
 //Handler prototypes
 PRIVATE void button_handler();
 PRIVATE void timer_handler();
@@ -48,6 +50,9 @@ PRIVATE void (*handlers[])(void) = {
 int system_uptime = 0;
 
 
+int irq_count(){
+	return _irq_count;
+}
 /**
  * User Interrupt Button (IRQ1)
  **/
@@ -130,6 +135,7 @@ PRIVATE void gpf_handler() {
 
 	//Kill process and call scheduler.
 	KILL_PROC(current_proc,1);
+	send_sig(current_proc,SIGSEGV);
 	current_proc = NULL;
 	sched();
 }
@@ -201,7 +207,7 @@ PRIVATE void break_handler() {
  **/
 PRIVATE void arith_handler() {
 	kprintf("\r\n[SYSTEM] Process \"%s (%d)\" ARITH: PC=0x%08x.\r\n", current_proc->name, current_proc->pid, current_proc->pc);
-	KILL_PROC(current_proc,1);
+	send_sig(current_proc,SIGFPE);
 	current_proc = NULL;
 	sched();
 }
@@ -226,9 +232,11 @@ PRIVATE void exception_handler(int estat) {
 	//Loop through $estat and call all relevant handlers.
 	for(i = NUM_HANDLERS; i; i--) {
 		if(estat & (1 << i)) {
+			_irq_count++;
 			handlers[i]();
 		}
 	}
+	_irq_count = 0;
 }
 
 /**
