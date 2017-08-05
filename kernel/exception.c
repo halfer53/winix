@@ -134,7 +134,6 @@ PRIVATE void gpf_handler() {
 	kprintf("$13: 0x%08x, $sp, 0x%08x, $ra, 0x%08x\n",current_proc->regs[12],current_proc->regs[13],current_proc->regs[14]);
 
 	//Kill process and call scheduler.
-	KILL_PROC(current_proc,1);
 	send_sig(current_proc,SIGSEGV);
 	current_proc = NULL;
 	sched();

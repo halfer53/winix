@@ -84,7 +84,6 @@ void system_main() {
 			case SYSCALL_PRINTF:		m.i1 = do_printf(who,&m);		break;
 			default:
 				kprintf("\r\n[SYSTEM] Process \"%s (%d)\" performed unknown system call %d\r\n", who->name, who->pid, m.type);
-				// KILL_PROC(who, 1);
 				m.i1 = ENOSYS;
 				break;
 		}
