@@ -16,7 +16,7 @@ int wini_send(int dest, message_t *m) {
 	current_proc->message = m; //save for later
 	
 	//Is the destination valid?
-	if (pDest = get_proc(dest)) {
+	if (pDest = get_running_proc(dest)) {
 
 		if(DEBUG_IPC){
 			kprintf("\nSEND %d flags %d from %d t %d| ",dest, pDest->flags, current_proc->pid,m->type);
@@ -92,7 +92,7 @@ int wini_notify(int dest, message_t *m) {
 	current_proc->message = m; //save for later
 
 	//Is the destination valid?
-	if (pDest = get_proc(dest)) {
+	if (pDest = get_running_proc(dest)) {
 
 		if(DEBUG_IPC){
 			kprintf("\nNOTIFY %d flags %d from %d t %d| ",dest, pDest->flags, current_proc->pid,m->type);

@@ -15,8 +15,8 @@ PRIVATE void build_signal_ctx(proc_t *who, int signum){
     reg_t *sp;
     reg_t *ra;
     proc_t *systask;
-    static message_t sigret_mesg;
-    static sigframe_t sigframe;
+    message_t sigret_mesg;
+    sigframe_t sigframe;
 
     sp = who->sp;
     sp = get_physical_addr(sp,who);

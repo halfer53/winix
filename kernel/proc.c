@@ -30,14 +30,6 @@ size_t FREE_MEM_BEGIN = 0;
 size_t FREE_MEM_END = 0;
 
 
-
-size_t sizeof_proc_t() {
-	proc_t arr[2];
-	int size = (char*)&arr[1] - (char*)&arr[0];
-	return size;
-}
-
-
 /**
  * Adds a proc to the tail of a list.
  *
@@ -390,6 +382,13 @@ proc_t *get_proc(int proc_nr) {
 		// 	return p;
 	}
 	return NULL;
+}
+
+proc_t *get_running_proc(int proc_nr){
+	proc_t *p = get_proc(proc_nr);
+	if(p->state != RUNNABLE)
+		return NULL;
+	return p;
 }
 
 
