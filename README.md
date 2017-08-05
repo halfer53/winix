@@ -36,7 +36,7 @@ Click ```Quick Load```, select ```winix.srec```
 
 ```uptime```: shows the system uptime
 
-```signal [ seconds ]```: similar to alarm, the only difference is that it forks a child to wait for the alarm signal
+```signal [ seconds ]```: set an alarm after specified seconds. Any system calls that are currently executing are interrupted (kgetc()) 
 
 ```ps```: shows the list of processes running in the system, with relevant info
 

@@ -359,7 +359,8 @@ void main() {
 			ret = getc(); 	//read
 			
 			if(ret == -1){
-				perror("failed");
+				if(errno == EINTR)
+					perror("kgetc() interrupted");
 				continue;
 			}
 			
