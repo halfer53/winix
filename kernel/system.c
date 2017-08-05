@@ -58,6 +58,7 @@ void system_main() {
 	//Receive message, do work, repeat.
 
 	getcontext(&recv_ctx);
+	kprintf("%c",'A');
 	while(1) {
 		
 		//get a messa1ge
@@ -82,7 +83,6 @@ void system_main() {
 			case SYSCALL_GETPPID:		m.i1 = do_getppid(who,&m);		break;
 			case SYSCALL_GETC:			m.i1 = do_getc(who,&m);			break;
 			case SYSCALL_PS:			m.i1 = do_ps(who,&m);			break;
-			case SYSCALL_PUTC:			m.i1 = do_putc(who,&m);			break;
 			case SYSCALL_PRINTF:		m.i1 = do_printf(who,&m);		break;
 			default:
 				kprintf("\r\n[SYSTEM] Process \"%s (%d)\" performed unknown system call %d\r\n", who->name, who->pid, m.type);

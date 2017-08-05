@@ -78,11 +78,11 @@ int getc(){
 	return _SYSCALL(SYSCALL_GETC,&m);
 }
 
-int putc(int i){
-	message_t m;
-	m.i1 = i;
-	return _SYSCALL(SYSCALL_PUTC,&m);
-}
+// int putc(int i){
+// 	message_t m;
+// 	m.i1 = i;
+// 	return _SYSCALL(SYSCALL_PUTC,&m);
+// }
 
 int printf(const char *format, ...) {
 	message_t m;

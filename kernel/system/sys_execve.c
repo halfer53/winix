@@ -9,7 +9,7 @@ int do_exec(proc_t *who, message_t *m){
 //write mem values in lines to that space
 proc_t *exec_new_proc(size_t *lines, size_t length, size_t entry, int priority, char *name){
 	proc_t *p = NULL;
-	if(p = get_free_proc()) {
+	if(p = get_free_proc_slot()) {
 		p = exec_proc(p,lines,length,entry,priority,name);
 	}
   assert(p != NULL,"Exec failed\n");
@@ -125,7 +125,7 @@ int exec_read_srec(proc_t *p){
         }
       }
       if (i >= BUF_LEN) {
-        kprintf("incorrect srec file format: line too big\n");
+        // kprintf("incorrect srec file format: line too big\n");
         return ERR;
       }
 			//if the line is of type S7, then we are at the end of the srec file, the data returned, should
@@ -135,7 +135,7 @@ int exec_read_srec(proc_t *p){
         entry = winix_load_srec_mem_val(buf,memory_values,wordsLoaded,wordslength);
 				//kprintf("entry 0x%08x",entry);
 				if (temp != wordsLoaded) {
-          kprintf("wordsLoaded %d, previous wordsLoaded %d, last s7 is incorrect\n");
+          // kprintf("wordsLoaded %d, previous wordsLoaded %d, last s7 is incorrect\n");
           return ERR;
         }
         break;
@@ -145,12 +145,12 @@ int exec_read_srec(proc_t *p){
 				if ((temp = winix_load_srec_mem_val(buf,memory_values,wordsLoaded,wordslength))) {
 						wordsLoaded += temp;
 				}else{
-					kprintf("something went wrong\n");
+					// kprintf("something went wrong\n");
 					return ERR;
 				}
       }
       if (wordsLoaded > wordslength) {
-        kprintf("wordsLoaded %d exceed wordslength %d\n",wordsLoaded,wordslength);
+        // kprintf("wordsLoaded %d exceed wordslength %d\n",wordsLoaded,wordslength);
         return ERR;
       }
       if (wordsLoaded % 100 == 0) {
@@ -189,13 +189,13 @@ int winix_load_srec_words_length(char *line){
         //kprintf("loop %d\n",linecount );
 				//Start code, always 'S'
 				if (line[index++] != 'S') {
-          kprintf("Expect S, but input data is %d\n",line[index-1]);
+          // kprintf("Expect S, but input data is %d\n",line[index-1]);
         }
 
 				recordType = line[index++] - '0';
         if (recordType != 6) {
-          kprintf("recordType %d\n",recordType );
-          kprintf("format is incorrect\n" );
+          // kprintf("recordType %d\n",recordType );
+          // kprintf("format is incorrect\n" );
           return ERR;
         }
         tempBufferCount = Substring(buffer,line,index,2);
@@ -206,7 +206,7 @@ int winix_load_srec_words_length(char *line){
 						tempBufferCount = Substring(buffer,line,index,(byteCount-1)*2 );
 						//kprintf("temp byte value %s, value in base 10: %d,length %d\r\n",buffer,hex2int(buffer,tempBufferCount),tempBufferCount);
 						data = hex2int(buffer,tempBufferCount);
-            kprintf("data %d\n", data);
+            // kprintf("data %d\n", data);
             index += (byteCount-1)*2;
             checksum += data;
 
@@ -234,8 +234,8 @@ int winix_load_srec_words_length(char *line){
         }
 
 				if (readChecksum != byteCheckSum){
-					kprintf("checksum %d, readChecksum %d\r\n",byteCheckSum,readChecksum );
-					kprintf("failed checksum\r\n" );
+					// kprintf("checksum %d, readChecksum %d\r\n",byteCheckSum,readChecksum );
+					// kprintf("failed checksum\r\n" );
 					return ERR;
 				}
         return data;
@@ -265,7 +265,7 @@ int winix_load_srec_mem_val(char *line,size_t *memory_values,int start_index,int
         //kprintf("loop %d\n",linecount );
 				//Start code, always 'S'
         if (line[index++] != 'S') {
-          kprintf("Expect S, but input data is %d\n",line[index-1]);
+          // kprintf("Expect S, but input data is %d\n",line[index-1]);
 					return ERR;
         }
 
@@ -368,15 +368,15 @@ int winix_load_srec_mem_val(char *line,size_t *memory_values,int start_index,int
 				byteCheckSum &= 0x000000ff;
         //kprintf("checksum %d\r\n",byteCheckSum );
 				if (readChecksum != byteCheckSum){
-					kprintf("checksum %d, readChecksum %d\r\n",byteCheckSum,readChecksum );
-					kprintf("failed checksum\r\n" );
+					// kprintf("checksum %d, readChecksum %d\r\n",byteCheckSum,readChecksum );
+					// kprintf("failed checksum\r\n" );
 					return ERR;
 				}
 
 				//Put in memory
         if ((byteCount-1) % 4 != 0) {
-					kprintf("checksum %d, readChecksum %d\r\n",byteCheckSum,readChecksum );
-          kprintf("Data should only contain full 32-bit words.\n");
+					// kprintf("checksum %d, readChecksum %d\r\n",byteCheckSum,readChecksum );
+          // kprintf("Data should only contain full 32-bit words.\n");
 					return ERR;
         }
 

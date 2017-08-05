@@ -30,8 +30,7 @@
 #define SYSCALL_SLEEP       16
 #define SYSCALL_GETC        17
 #define SYSCALL_PS			18
-#define SYSCALL_PUTC    	19
-#define SYSCALL_PRINTF    	20
+#define SYSCALL_PRINTF    	19
 
 #define SYSCALL_DEFAULT_RETURN  m.i1
 
@@ -65,7 +64,6 @@ int sys_ps();
 void *sbrk(unsigned long size);
 
 int getc();
-int putc(int i);
 int printf(const char *format, ...);
 
 #endif

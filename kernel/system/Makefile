@@ -3,8 +3,8 @@ INCLUDES = $(wildcard $(INCLUDE_DIR)/*.h $(INCLUDE_DIR)/winix/*.h $(INCLUDE_DIR)
 
 
 PROGS = sys_alarm sys_brk sys_execve sys_exit sys_fork sys_sbrk \
-		sys_sigaction sys_sigreturn sys_wait sys_getc sys_kill\
-		sys_time sys_ps sys_putc sys_printf sys_getpid sys_getppid\
+		sys_sigaction sys_sigreturn sys_wait sys_kill sys_time\
+		sys_ps sys_printf sys_getc sys_getpid sys_getppid\
 		
 
 SOURCES = $(PROGS:=.c)

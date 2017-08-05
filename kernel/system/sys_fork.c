@@ -19,7 +19,7 @@ int _fork(proc_t *parent) {
 	uint32_t *src, *dest;
 	pattern_t ptn;
 
-	if (p = get_free_proc()) {
+	if (p = get_free_proc_slot()) {
 		pbak = p->proc_nr;
 		*p = *parent;
 		p->proc_nr = pbak;

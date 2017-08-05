@@ -147,7 +147,7 @@ PRIVATE void kputs(const char *s) {
 #define SPACE	' '
 #define ZERO	'0'
 
-#define PUT_padding_len(_padding_len,_token)\
+#define PUT_PADDING(_padding_len,_token)\
 	while(_padding_len--){	\
 		kputc(_token);		\
 	}					\
@@ -155,7 +155,7 @@ PRIVATE void kputs(const char *s) {
 
 int kprintf_vm(const char *format, void *arg, void *who_rbase){
 	char c = *format;
-	static char buffer[64];
+	char buffer[64];
 	char *buf = buffer;
 	int padding_len = 0;
 	bool right_padding_len;
@@ -190,28 +190,28 @@ int kprintf_vm(const char *format, void *arg, void *who_rbase){
 			switch(*format) {
 				
 				case 'd':
-					buf_len = kputd_buf(*((int*)arg),buf);
+					buf_len = kputd_buf(*((int*)arg),buffer);
 					arg = ((int*)arg) + 1;
 					format++;
 					break;
 
 				case 'x':
-					buf_len = kputx_buf(*((int*)arg),buf);
+					buf_len = kputx_buf(*((int*)arg),buffer);
 					arg = ((int*)arg) + 1;
 					format++;
 					right_padding_len = false;
 					break;
 
 				case 's':
-					buf_len = kputs_vm_buf(*(char **)arg,who_rbase,buf);
+					buf_len = kputs_vm_buf(*(char **)arg,who_rbase,buffer);
 					arg = ((char *)arg) + 1;
 					format++;
 					break;
 
 				case 'c':
 					// kputc(*(int *)arg);
-					*buf++ = *(int *)arg;
-					*buf = '\0';
+					buffer[0] = *(int *)arg;
+					buffer[1] = '\0';
 					buf_len = 1;
 					arg = ((char *)arg) + 1;
 					format++;
@@ -225,11 +225,11 @@ int kprintf_vm(const char *format, void *arg, void *who_rbase){
 			if(!right_padding_len && padding_len > 0){ //left padding_len
 				if(prev == 'x')
 					token = ZERO;
-				PUT_padding_len(padding_len,token);
+				PUT_PADDING(padding_len,token);
 			}
-			kputs(buf);
+			kputs(buffer);
 			if(right_padding_len && padding_len > 0){
-				PUT_padding_len(padding_len,token);
+				PUT_PADDING(padding_len,token);
 			}
 			padding_len = 0;	
 		}

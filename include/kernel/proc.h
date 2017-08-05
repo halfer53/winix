@@ -134,7 +134,7 @@ void proc_set_default(proc_t *p);
  * Creates a new process and adds it to the runnable queue.
  **/
 proc_t *new_proc(void (*entry)(), int priority, const char *name);
-proc_t *get_free_proc();
+proc_t *get_free_proc_slot();
 void add_to_scheduling_queue(proc_t* p);
 /**
  * WINIX Scheduler.

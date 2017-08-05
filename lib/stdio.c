@@ -5,3 +5,7 @@ void perror(const char *s){
         printf("%s",s);
     printf(" errno val: %d\n",errno);
 }
+
+int putc(const char c){
+    return printf("%c",c);
+}

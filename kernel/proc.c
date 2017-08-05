@@ -132,7 +132,7 @@ void add_to_scheduling_queue(proc_t* p) {
 	enqueue_tail(ready_q[p->priority], p);
 }
 
-proc_t *get_free_proc() {
+proc_t *get_free_proc_slot() {
 	int i;
 	proc_t *p = dequeue(free_proc);
 	size_t *sp = NULL;
@@ -237,7 +237,7 @@ proc_t *new_proc(void (*entry)(), int priority, const char *name) {
 	if (!(0 <= priority && priority < NUM_QUEUES)) {
 		return NULL;
 	}
-	if (p = get_free_proc()) {
+	if (p = get_free_proc_slot()) {
 		kset_proc(p, entry, priority, name);
 		bitmap_fill(p->ptable, PROTECTION_TABLE_LEN);
 		enqueue_tail(ready_q[priority], p);
@@ -270,7 +270,7 @@ proc_t *start_system(void (*entry)(), int priority, const char *name) {
 	int stack_size = 1024 * 1;
 	int pg_idx;
 	ptr_t *ptr;
-	if (p = get_free_proc()) {
+	if (p = get_free_proc_slot()) {
 		p->priority = priority;
 		p->pc = entry;
 
@@ -297,7 +297,7 @@ proc_t* start_init(size_t *lines, size_t length, size_t entry) {
 	void *ptr_base;
 	int size = 1024, nstart = 0;
 	proc_t *p = NULL;
-	if (p = get_free_proc()) {
+	if (p = get_free_proc_slot()) {
 		ptr_base = kset_proc(p, (void (*)())entry, USER_PRIORITY, "INIT");
 		memcpy(ptr_base, lines, length);
 		p->rbase = ptr_base;
