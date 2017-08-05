@@ -13,5 +13,7 @@
  * Entry point for the system task.
  **/
 void system_main();
+message_t *curr_mesg();
+void intr_syscall();
 
 #endif

@@ -16,5 +16,8 @@ extern int system_uptime;
  * Initialises Exception Handlers and configures timer.
  **/
 void init_exceptions();
+int irq_count();
+
+#define in_interrupt()  (irq_count())
 
 #endif

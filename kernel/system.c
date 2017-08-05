@@ -17,6 +17,7 @@ syscallctx_t syscall_ctx;
 
 void resume_syscall(proc_t *to){
 	if(syscall_ctx.who->pid == to->pid && to->flags & RECEIVING && syscall_ctx.interruptted){
+		// kprintf("resume syscall %d\n",who->pid);
 		winix_send(to->pid,&syscall_ctx.m);
 	}
 	syscall_ctx.interruptted = 0;
@@ -58,6 +59,7 @@ void system_main() {
 
 	getcontext(&recv_ctx);
 	while(1) {
+		
 		//get a messa1ge
 		winix_receive(&m);
 		who_proc_nr = m.src;

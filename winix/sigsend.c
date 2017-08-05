@@ -1,4 +1,7 @@
-#include "../winix.h"
+#include <kernel/kernel.h>
+#include <kernel/system.h>
+#include <kernel/exception.h>
+#include <winix/signal.h>
 
 static unsigned long sigframe_code[] = {0x1ee10001,0x200d0000};
 //addui sp,sp, 1
@@ -41,42 +44,48 @@ PRIVATE void build_signal_ctx(proc_t *who, int signum){
     who->flags = 0;//reset flags
 }
 
-void cause_sig(proc_t *who,int signum){
+int cause_sig(proc_t *who,int signum){
+    if(who->state != RUNNABLE)
+        return;
     if(who->sig_table[signum].sa_handler == SIG_DFL){
         kprintf("Signal %d: kill %s [%d]\n",signum,who->name,who->pid);
         KILL_PROC(who, signum);
-        return;
+        return ERR;
     }
     //if it's ignored
     if(who->sig_table[signum].sa_handler == SIG_IGN){
-        kprintf("sig ignored\n");
+        kprintf("sig %d ignored by %d\n",signum,who->pid);
         who->pc = (void (*)())((int)who->pc+1);
-        return;
+        return ERR;
     }
+
     build_signal_ctx(who,signum);
-}
-
-//IMPORTANT should only be called during exception
-void real_send_signal(proc_t *who,int signum){
-    
-    if(current_proc != who){
-        enqueue_tail(ready_q[current_proc->priority], current_proc);
+    //if in interrupt, let system task interrupt the current syscall
+    //and reschedule the proc
+    if(in_interrupt()){
+        if(who->pid == curr_mesg()->src){
+            get_proc(SYSTEM_TASK)->pc = &intr_syscall;
+        }
+        add_to_scheduling_queue(who);
     }
-    delete_proc(ready_q[who->priority],who);
-
-    if(who->pid == curr_mesg()->src){
-		get_proc(SYSTEM_TASK)->pc = &intr_syscall;
-	}
-
-    current_proc = who;
-    current_proc->ticks_left = current_proc->quantum;
-    
-    wramp_load_context();
+    return OK;
 }
 
+//send signal immediately
 //IMPORTANT should only be called during exception
-void send_sig(proc_t *who, int signum){
+int send_sig(proc_t *who, int signum){
     cause_sig(who,signum);
-    real_send_signal(who,signum);
+    if(in_interrupt()){
+        if(current_proc != who){
+            enqueue_tail(ready_q[current_proc->priority], current_proc);
+            remove_from_scheduling_queue(who);
+        }
+
+        current_proc = who;
+        current_proc->ticks_left = current_proc->quantum;
+        
+        wramp_load_context();
+    }
+    return OK;
 }
 

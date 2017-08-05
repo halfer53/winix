@@ -41,8 +41,6 @@ void panic(const char *message);
  */
 void assert(int expression, const char *message);
 
-extern message_t *curr_mesg();
-extern void intr_syscall();
 extern syscallctx_t syscall_ctx;
 extern ucontext_t recv_ctx;
 

@@ -96,9 +96,12 @@ proc_t *dequeue(proc_t **q) {
 }
 
 //return ERR if nothing found
-int delete_proc(proc_t **q, proc_t *h) {
-	proc_t *curr = q[HEAD];
+int remove_from_scheduling_queue( proc_t *h) {
+	proc_t *curr;
 	proc_t *prev = NULL;
+	proc_t ** q = ready_q[h->priority];
+
+	curr = q[HEAD];
 
 	if (curr == NULL) { //Empty list
 		assert(q[TAIL] == NULL, "delete: tail not null");
@@ -109,23 +112,23 @@ int delete_proc(proc_t **q, proc_t *h) {
 		prev = curr;
 		curr = curr->next;
 	}
-	if (curr != NULL) {
-		if (prev == NULL) {
-			q[HEAD] = curr->next;
-			if(curr->next == NULL){
-				q[TAIL] = curr->next;
-			}
-		} else {
-			prev->next = curr->next;
-		}
-		return ERR;
-	} else {
-		return ERR;
-	}
 
+	if (curr == NULL)
+		return ERR;
+
+	if (prev == NULL) {
+		q[HEAD] = curr->next;
+		if(curr->next == NULL){
+			q[TAIL] = curr->next;
+		}
+	} else {
+		prev->next = curr->next;
+	}
+	return OK;
 }
 
 void add_to_scheduling_queue(proc_t* p) {
+	remove_from_scheduling_queue(p);
 	enqueue_tail(ready_q[p->priority], p);
 }
 
@@ -309,7 +312,7 @@ proc_t* start_init(size_t *lines, size_t length, size_t entry) {
 
 void unseched(proc_t *p){
 	release_proc_mem(p);
-	delete_proc(ready_q[p->priority], p);
+	remove_from_scheduling_queue(p);
 }
 
 void free_slot(proc_t *p){

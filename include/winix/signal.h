@@ -8,8 +8,8 @@
 #define KILL_PROC(proc,sigcode) exit_proc(proc, 128+(sigcode));
 
 
-void send_sig(proc_t *who, int signum);
-void cause_sig(proc_t *who, int signum);
+int send_sig(proc_t *who, int signum);
+int cause_sig(proc_t *who, int signum);
 int set_signal(proc_t *who, int signum, sighandler_t handler);
 
 typedef struct{

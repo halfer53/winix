@@ -7,6 +7,7 @@
  **/
 #include "winix.h"
 #include <winix/rex.h>
+#include <kernel/clock.h>
 
 //Number of exception sources
 #define NUM_HANDLERS 16
@@ -15,7 +16,6 @@ static int _irq_count = 0;
 
 //Handler prototypes
 PRIVATE void button_handler();
-PRIVATE void timer_handler();
 PRIVATE void parallel_handler();
 PRIVATE void serial1_handler();
 PRIVATE void serial2_handler();
@@ -34,7 +34,7 @@ PRIVATE void (*handlers[])(void) = {
 	no_handler, 		//Undefined
 	no_handler, 		//IRQ0
 	button_handler, 	//IRQ1
-	timer_handler, 		//IRQ2
+	clock_handler, 		//IRQ2
 	parallel_handler, 	//IRQ3
 	serial1_handler, 	//IRQ4
 	serial2_handler, 	//IRQ5
@@ -60,23 +60,6 @@ PRIVATE void button_handler() {
 	RexUserInt->Iack = 0;
 }
 
-/**
- * Timer (IRQ2)
- *
- * Side Effects:
- *   system_uptime is incremented
- *   scheduler is called (i.e. this handler does not return)
- **/
-PRIVATE void timer_handler() {
-	RexTimer->Iack = 0;
-
-	//Increment uptime, and check if there is any alarm
-	system_uptime++;
-	if(next_timeout == system_uptime)
-		clock_handler();
-
-	sched();
-}
 
 /**
  * Parallel Port (IRQ3)
@@ -227,7 +210,7 @@ PRIVATE void no_handler() {
  **/
 PRIVATE void exception_handler(int estat) {
 	int i;
-
+	_irq_count = 0;
 	//Loop through $estat and call all relevant handlers.
 	for(i = NUM_HANDLERS; i; i--) {
 		if(estat & (1 << i)) {

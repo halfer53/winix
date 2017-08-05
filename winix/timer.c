@@ -44,7 +44,7 @@ void remove_timer(timer_t *timer){
     timer_t *curr = pending_timers;
     clock_t timeout = timer->time_out;
 
-    while(curr && curr->time_out != timeout){
+    while(curr && curr != timer){
         curr = curr->next;
         prev = curr;
     }

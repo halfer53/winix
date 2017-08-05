@@ -31,7 +31,7 @@
 #include <winix/sys_stdio.h>
 #include <winix/wini_ipc.h>
 #include <winix/timer.h>
-#include <winix/proc.h>
+#include <kernel/proc.h>
 
 #include <winix/syscall_ctx.h>
 #include <winix/rex.h>
