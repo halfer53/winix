@@ -3,18 +3,19 @@
 #include <kernel/exception.h>
 #include <winix/signal.h>
 
-static unsigned long sigframe_code[] = {0x1ee10001,0x200d0000};
+static unsigned long sigframe_code[2] = {0x1ee10001,0x200d0000};
 //addui sp,sp, 1
 //syscall
 
-PRIVATE void* build_user_stack(struct proc *who, void *src, size_t len){
+PRIVATE int build_user_stack(struct proc *who, void *src, size_t len){
     reg_t *sp = get_physical_addr(who->sp,who);
     sp -= len;
     memcpy(sp,src,len );
-    return get_virtual_addr(sp,who);
+    who->sp = get_virtual_addr(sp,who);
+    return 0;
 }
 
-PRIVATE void build_signal_ctx(struct proc *who, int signum){
+PRIVATE int build_signal_ctx(struct proc *who, int signum){
     reg_t *sp;
     reg_t *ra;
     struct proc *systask;
@@ -24,29 +25,31 @@ PRIVATE void build_signal_ctx(struct proc *who, int signum){
     sp = who->sp;
     sp = get_physical_addr(sp,who);
     
-    who->sp = build_user_stack(who,who,PROCESS_CONTEXT_LEN);
-    who->sp = build_user_stack(who,sigframe_code,SIGFRAME_CODE_LEN);
+    build_user_stack(who,who,PROCESS_CONTEXT_LEN);
+    build_user_stack(who,sigframe_code,SIGFRAME_CODE_LEN);
 
     ra = who->sp;
     sigret_mesg.type = SYSCALL_SIGRET;
     sigret_mesg.i1 = signum;
-    who->sp = build_user_stack(who,&sigret_mesg,MESSAGE_LEN);
+    build_user_stack(who,&sigret_mesg,MESSAGE_LEN);
 
     sigframe.signum = signum;
     sigframe.operation = WINIX_SEND;
     sigframe.dest = SYSTEM_TASK;
     sigframe.pm = (struct message *)who->sp;
-    who->sp = build_user_stack(who,&sigframe,sizeof(struct sigframe));
+    build_user_stack(who,&sigframe,sizeof(struct sigframe));
 
     who->pc = (void (*)())who->sig_table[signum].sa_handler;
     who->ra = ra;
 
     who->flags = 0;//reset flags
+    return OK;
 }
 
-int cause_sig(struct proc *who,int signum){
+PRIVATE int sigsend_comm(struct proc *who, int signum){
     if(who->state != RUNNABLE)
-        return;
+        return ERR;
+
     if(who->sig_table[signum].sa_handler == SIG_DFL){
         kprintf("Signal %d: kill %s [%d]\n",signum,who->name,who->proc_nr);
         KILL_PROC(who, signum);
@@ -59,13 +62,20 @@ int cause_sig(struct proc *who,int signum){
         return ERR;
     }
 
-    build_signal_ctx(who,signum);
+    return build_signal_ctx(who,signum);
+}
+
+int cause_sig(struct proc *who,int signum){
+    if(sigsend_comm(who,signum) != 0)
+        return OK;
+
     //if in interrupt, let system task interrupt the current syscall
     //and reschedule the proc
     if(in_interrupt()){
         if(who->proc_nr == curr_mesg()->src){
             get_proc(SYSTEM_TASK)->pc = &intr_syscall;
         }
+        remove_from_scheduling_queue(who);
         add_to_scheduling_queue(who);
     }
     return OK;
@@ -74,16 +84,21 @@ int cause_sig(struct proc *who,int signum){
 //send signal immediately
 //IMPORTANT should only be called during exception
 int send_sig(struct proc *who, int signum){
-    cause_sig(who,signum);
+    if(sigsend_comm(who,signum) != 0)
+        return OK;
+
     if(in_interrupt()){
         if(current_proc != who){
-            enqueue_tail(ready_q[current_proc->priority], current_proc);
+            add_to_scheduling_queue(current_proc);
             remove_from_scheduling_queue(who);
         }
 
         current_proc = who;
         current_proc->ticks_left = current_proc->quantum;
-        
+
+        if(who->proc_nr == curr_mesg()->src){
+            get_proc(SYSTEM_TASK)->pc = &intr_syscall;
+        }
         wramp_load_context();
     }
     return OK;
