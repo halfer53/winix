@@ -10,8 +10,8 @@
  *   -1 if destination is invalid
  **/
 
-int wini_send(int dest, message_t *m) {
-	proc_t *pDest;
+int wini_send(int dest, struct message *m) {
+	struct proc *pDest;
 
 	current_proc->message = m; //save for later
 	
@@ -50,8 +50,8 @@ int wini_send(int dest, message_t *m) {
  *
  * Returns:			0
  **/
-int wini_receive(message_t *m) {
-	proc_t *p = current_proc->sender_q;
+int wini_receive(struct message *m) {
+	struct proc *p = current_proc->sender_q;
 
 	//If a process is waiting to send to this process, deliver it immediately.
 	if (p != NULL) {
@@ -86,8 +86,8 @@ int wini_receive(message_t *m) {
  *   0 on success
  *   -1 if destination is invalid
  **/
-int wini_notify(int dest, message_t *m) {
-	proc_t *pDest;
+int wini_notify(int dest, struct message *m) {
+	struct proc *pDest;
 
 	current_proc->message = m; //save for later
 
@@ -120,7 +120,7 @@ int wini_notify(int dest, message_t *m) {
 
 
 int winix_senderr(int dest){
-	message_t m;
+	struct message m;
 	memset(&m,-1,MESSAGE_LEN);
 	return winix_send(dest,&m);
 }

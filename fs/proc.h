@@ -75,7 +75,7 @@ typedef struct proc {
 	/* IPC */
 	struct proc *sender_q;	//Head of process queue waiting to send to this process
 	struct proc *next_sender; //Link to next sender in the queue
-	// message_t *message;	//Message buffer;
+	// struct message *message;	//Message buffer;
 
 	/* Accounting */
 	int time_used;		//CPU time used
@@ -99,13 +99,13 @@ typedef struct proc {
 	inode_t *fp_workdir;
 } proc_t;
 
-extern proc_t proc_table[NUM_PROCS];
-extern proc_t *ready_q[NUM_QUEUES][2];
+extern struct proc proc_table[NUM_PROCS];
+extern struct proc *ready_q[NUM_QUEUES][2];
 
 
 /**
  * Pointer to the current process.
  **/
-extern proc_t *current_proc;
+extern struct proc *current_proc;
 
 #endif

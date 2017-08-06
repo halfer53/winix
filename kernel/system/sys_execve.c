@@ -1,14 +1,14 @@
 #include "../winix.h"
 
-int do_exec(proc_t *who, message_t *m){
+int do_exec(struct proc *who, struct message *m){
 		// winix_send(who->pid,m);
 		return exec_read_srec(who);
 }
 
 //dynamically allocate a new memory space in the memory, and
 //write mem values in lines to that space
-proc_t *exec_new_proc(size_t *lines, size_t length, size_t entry, int priority, char *name){
-	proc_t *p = NULL;
+struct proc *exec_new_proc(size_t *lines, size_t length, size_t entry, int priority, char *name){
+	struct proc *p = NULL;
 	if(p = get_free_proc_slot()) {
 		p = exec_proc(p,lines,length,entry,priority,name);
 	}
@@ -17,7 +17,7 @@ proc_t *exec_new_proc(size_t *lines, size_t length, size_t entry, int priority, 
 }
 
 //replace the currently running process with the new text, priority, and name provided
-proc_t *exec_replace_existing_proc(proc_t *p,size_t *lines, size_t length, size_t entry, int priority, char *name){
+struct proc *exec_replace_existing_proc(struct proc *p,size_t *lines, size_t length, size_t entry, int priority, char *name){
 	assert(p != NULL, "can't exec null process\n");
 	if(p->rbase == DEFAULT_RBASE){
 		// bitmap_set_bit(mem_map,MEM_MAP_LEN,get_page_index(p->sp));
@@ -35,7 +35,7 @@ proc_t *exec_replace_existing_proc(proc_t *p,size_t *lines, size_t length, size_
  * malloc a new memory and write the values of lines into that address
  * the process is updated
  **/
-proc_t *exec_proc(proc_t *p,size_t *lines, size_t length, size_t entry, int priority, char *name){
+struct proc *exec_proc(struct proc *p,size_t *lines, size_t length, size_t entry, int priority, char *name){
 	ptr_t* ptr_base = NULL;
 	size_t length_bak, overall_length;
 	int nstart,len;
@@ -89,7 +89,7 @@ proc_t *exec_proc(proc_t *p,size_t *lines, size_t length, size_t entry, int prio
 
 //sys method used by shell to read srec file from serial port 1
 //and replace the parameter process with the new dynamically loaded process
-int exec_read_srec(proc_t *p){
+int exec_read_srec(struct proc *p){
   char buf[BUF_LEN];
   size_t *memory_values = NULL;
   int wordslength = 0;

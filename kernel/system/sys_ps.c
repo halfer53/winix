@@ -1,6 +1,6 @@
 #include "../winix.h"
 
-int do_ps(proc_t *who, message_t *m){
+int do_ps(struct proc *who, struct message *m){
     process_overview();
     // m->i1 = 0;
 	// winix_send(who->pid, m);

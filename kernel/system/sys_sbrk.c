@@ -1,7 +1,7 @@
 #include "../winix.h"
 
 
-void *_sbrk( proc_t *who, size_t size) {
+void *_sbrk( struct proc *who, size_t size) {
 
 	unsigned int *ptable;
 	int nstart,len;
@@ -52,7 +52,7 @@ void *_sbrk( proc_t *who, size_t size) {
 	return NULL;
 }
 
-int do_sbrk(proc_t *who, message_t *m){
+int do_sbrk(struct proc *who, struct message *m){
     m->p1 = _sbrk(who,m->i1);
 	// winix_send(who->pid, m);
 	return m->p1 == NULL ? EINVAL : OK;

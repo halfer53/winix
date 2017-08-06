@@ -8,14 +8,14 @@
 
 #include "winix.h"
 
-message_t m;
+struct message m;
 int who_proc_nr;
-proc_t *who;
+struct proc *who;
 
 ucontext_t recv_ctx;
 syscallctx_t syscall_ctx;
 
-void resume_syscall(proc_t *to){
+void resume_syscall(struct proc *to){
 	if(syscall_ctx.who->pid == to->pid && to->flags & RECEIVING && syscall_ctx.interruptted){
 		// kprintf("resume syscall %d\n",who->pid);
 		winix_send(to->pid,&syscall_ctx.m);
@@ -38,7 +38,7 @@ void intr_syscall(){
 	setcontext(&recv_ctx);
 }
 
-message_t *curr_mesg(){
+struct message *curr_mesg(){
 	return &m;
 }
 

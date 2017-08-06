@@ -61,7 +61,7 @@ struct direct {
 #define	O_CREAT		0x0200		/* create if nonexistant */
 
 
-extern proc_t *current_proc;
+extern struct proc *current_proc;
 extern struct super_block *sb;
 
 int hexstr2int(char *a, int len);

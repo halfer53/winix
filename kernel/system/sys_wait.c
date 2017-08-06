@@ -1,8 +1,8 @@
 #include "../winix.h"
 #include <sys/wait.h>
 
-int do_wait(proc_t *parent, message_t *mesg){
-    register proc_t *child = NULL;
+int do_wait(struct proc *parent, struct message *mesg){
+    register struct proc *child = NULL;
     
     ptr_t* wstatus;
     int children = 0,i;

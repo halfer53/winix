@@ -11,19 +11,19 @@
 //Linked lists are defined by a head and tail pointer.
 
 //Process table
-proc_t proc_table[NUM_PROCS];
+struct proc proc_table[NUM_PROCS];
 
 //Scheduling queues
-proc_t *ready_q[NUM_QUEUES][2];
+struct proc *ready_q[NUM_QUEUES][2];
 
 //blocking queues
-proc_t *block_q[2];
+struct proc *block_q[2];
 
 //Entries in the process table that are not in use
-static proc_t *free_proc[2];
+static struct proc *free_proc[2];
 
 //The currently-running process
-proc_t *current_proc;
+struct proc *current_proc;
 
 
 /**
@@ -33,7 +33,7 @@ proc_t *current_proc;
  *   q		An array containing a head and tail pointer of a linked list.
  *   proc	The proc struct to add to the list.
  **/
-void enqueue_tail(proc_t **q, proc_t *proc) {
+void enqueue_tail(struct proc **q, struct proc *proc) {
 	if (q[HEAD] == NULL) {
 		q[HEAD] = q[TAIL] = proc;
 	}
@@ -51,8 +51,8 @@ void enqueue_tail(proc_t **q, proc_t *proc) {
  *   q		An array containing a head and tail pointer of a linked list.
  *   proc	The proc struct to add to the list.
  **/
-void enqueue_head(proc_t **q, proc_t *proc) {
-	proc_t *curr = NULL;
+void enqueue_head(struct proc **q, struct proc *proc) {
+	struct proc *curr = NULL;
 	if (q[HEAD] == NULL) {
 		proc->next = NULL;
 		q[HEAD] = q[TAIL] = proc;
@@ -73,8 +73,8 @@ void enqueue_head(proc_t **q, proc_t *proc) {
  *   The proc struct that was removed from the head of the list
  *   NULL if the list is empty.
  **/
-proc_t *dequeue(proc_t **q) {
-	proc_t *p = q[HEAD];
+struct proc *dequeue(struct proc **q) {
+	struct proc *p = q[HEAD];
 
 	if (p == NULL) { //Empty list
 		assert(q[TAIL] == NULL, "deq: tail not null");
@@ -92,10 +92,10 @@ proc_t *dequeue(proc_t **q) {
 }
 
 //return ERR if nothing found
-int remove_from_scheduling_queue( proc_t *h) {
-	proc_t *curr;
-	proc_t *prev = NULL;
-	proc_t ** q = ready_q[h->priority];
+int remove_from_scheduling_queue( struct proc *h) {
+	struct proc *curr;
+	struct proc *prev = NULL;
+	struct proc ** q = ready_q[h->priority];
 
 	curr = q[HEAD];
 
@@ -123,14 +123,14 @@ int remove_from_scheduling_queue( proc_t *h) {
 	return OK;
 }
 
-void add_to_scheduling_queue(proc_t* p) {
+void add_to_scheduling_queue(struct proc* p) {
 	remove_from_scheduling_queue(p);
 	enqueue_tail(ready_q[p->priority], p);
 }
 
-proc_t *get_free_proc_slot() {
+struct proc *get_free_proc_slot() {
 	int i;
-	proc_t *p = dequeue(free_proc);
+	struct proc *p = dequeue(free_proc);
 	size_t *sp = NULL;
 
 	if (p) {
@@ -142,7 +142,7 @@ proc_t *get_free_proc_slot() {
 }
 
 
-void proc_set_default(proc_t *p) {
+void proc_set_default(struct proc *p) {
 	int i = 0;
 	for (i = 0; i < NUM_REGS; i++) {
 		p->regs[i] = DEFAULT_REG_VALUE;
@@ -183,12 +183,12 @@ void proc_set_default(proc_t *p) {
 }
 
 
-void release_proc_mem(proc_t *who){
+void release_proc_mem(struct proc *who){
     bitmap_xor(mem_map,who->ptable,MEM_MAP_LEN);
 }
 
 
-void *kset_proc(proc_t *p, void (*entry)(), int priority, const char *name) {
+void *kset_proc(struct proc *p, void (*entry)(), int priority, const char *name) {
 	ptr_t *ptr;
 	int pg_index;
 	p->priority = priority;
@@ -222,8 +222,8 @@ void *kset_proc(proc_t *p, void (*entry)(), int priority, const char *name) {
  * Side Effects:
  *   A proc is removed from the free_proc list, reinitialised, and added to ready_q.
  */
-proc_t *new_proc(void (*entry)(), int priority, const char *name) {
-	proc_t *p = NULL;
+struct proc *new_proc(void (*entry)(), int priority, const char *name) {
+	struct proc *p = NULL;
 	int i;
 	size_t *ptr = NULL;
 	int n = 0;
@@ -245,7 +245,7 @@ proc_t *new_proc(void (*entry)(), int priority, const char *name) {
 
 
 
-proc_t *kexecp(proc_t *p, void (*entry)(), int priority, const char *name) {
+struct proc *kexecp(struct proc *p, void (*entry)(), int priority, const char *name) {
 	void *ptr = NULL;
 	int lower_bound = 0;
 	if (p->rbase == DEFAULT_RBASE) {
@@ -261,8 +261,8 @@ proc_t *kexecp(proc_t *p, void (*entry)(), int priority, const char *name) {
 	return p;
 }
 
-proc_t *start_system(void (*entry)(), int priority, const char *name) {
-	proc_t *p = NULL;
+struct proc *start_system(void (*entry)(), int priority, const char *name) {
+	struct proc *p = NULL;
 	int stack_size = 1024 * 1;
 	int pg_idx;
 	ptr_t *ptr;
@@ -289,10 +289,10 @@ proc_t *start_system(void (*entry)(), int priority, const char *name) {
 	return p;
 }
 
-proc_t* start_init(size_t *lines, size_t length, size_t entry) {
+struct proc* start_init(size_t *lines, size_t length, size_t entry) {
 	void *ptr_base;
 	int size = 1024, nstart = 0;
-	proc_t *p = NULL;
+	struct proc *p = NULL;
 	if (p = get_free_proc_slot()) {
 		ptr_base = kset_proc(p, (void (*)())entry, USER_PRIORITY, "INIT");
 		memcpy(ptr_base, lines, length);
@@ -306,12 +306,12 @@ proc_t* start_init(size_t *lines, size_t length, size_t entry) {
 }
 
 
-void unseched(proc_t *p){
+void unseched(struct proc *p){
 	release_proc_mem(p);
 	remove_from_scheduling_queue(p);
 }
 
-void free_slot(proc_t *p){
+void free_slot(struct proc *p){
 	p->state = DEAD;
 	p->IN_USE = 0;
 	enqueue_tail(free_proc, p);
@@ -326,7 +326,7 @@ void free_slot(proc_t *p){
  * Side Effects:
  *   Process state is set to DEAD, and is returned to the free_proc list.
  **/
-void end_process(proc_t *p) {
+void end_process(struct proc *p) {
 	int i,ret;
 	unseched(p);
 	free_slot(p);
@@ -338,7 +338,7 @@ void end_process(proc_t *p) {
 
 void process_overview() {
 	int i;
-	proc_t *curr;
+	struct proc *curr;
 	kprintf("NAME     PID PPID RBASE      PC         STACK      HEAP       PROTECTION   flags\n");
 	for (i = 0; i < NUM_PROCS; i++) {
 		curr = &proc_table[i];
@@ -348,7 +348,7 @@ void process_overview() {
 }
 
 //print the process state given
-void printProceInfo(proc_t* curr) {
+void printProceInfo(struct proc* curr) {
 	int ptable_idx = get_page_index(curr->rbase)/32;
 	kprintf("%-08s %-03d %-04d 0x%08x 0x%08x 0x%08x 0x%08x %d 0x%08x %d\n",
 	        curr->name,
@@ -372,8 +372,8 @@ void printProceInfo(proc_t* curr) {
  *
  * Returns:			The relevant process, or NULL if it does not exist.
  **/
-proc_t *get_proc(int proc_nr) {
-	proc_t *p;
+struct proc *get_proc(int proc_nr) {
+	struct proc *p;
 	if (isokprocn(proc_nr)){
 		p = &proc_table[proc_nr];
 		return p;
@@ -383,8 +383,8 @@ proc_t *get_proc(int proc_nr) {
 	return NULL;
 }
 
-proc_t *get_running_proc(int proc_nr){
-	proc_t *p = get_proc(proc_nr);
+struct proc *get_running_proc(int proc_nr){
+	struct proc *p = get_proc(proc_nr);
 	if(p->state != RUNNABLE)
 		return NULL;
 	return p;
@@ -402,7 +402,7 @@ proc_t *get_running_proc(int proc_nr){
  **/
 void init_proc() {
 	int i;
-	proc_t *p;
+	struct proc *p;
 	//Initialise queues
 
 	for (i = 0; i < NUM_QUEUES; i++) {

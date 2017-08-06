@@ -12,7 +12,7 @@
  *   0 on success
  *   -1 if destination is invalid
  **/
-int wini_send(int dest, message_t *m);
+int wini_send(int dest, struct message *m);
 
 /**
  * non-blocking send
@@ -24,7 +24,7 @@ int wini_send(int dest, message_t *m);
  *   0 on success
  *   -1 if destination is invalid
  **/
-int wini_notify(int dest, message_t *m);
+int wini_notify(int dest, struct message *m);
 
 /**
  * Receives a message.
@@ -34,7 +34,7 @@ int wini_notify(int dest, message_t *m);
  *
  * Returns:			0
  **/
-int wini_receive(message_t *m);
+int wini_receive(struct message *m);
 
 
 #endif

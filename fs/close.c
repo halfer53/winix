@@ -1,7 +1,7 @@
 #include "fs.h"
 
 
- int sys_close(proc_t *who,int fd){
+ int sys_close(struct proc *who,int fd){
 
      filp_t *filp = who->fp_filp[fd];
      filp->filp_ino = NIL_INODE;

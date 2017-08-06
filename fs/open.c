@@ -1,6 +1,6 @@
 #include "fs.h"
 
-int sys_open(proc_t *who, char *path, mode_t mode){
+int sys_open(struct proc *who, char *path, mode_t mode){
     filp_t *filp;
     int i,open_slot;
     int ret;

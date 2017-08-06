@@ -1,8 +1,8 @@
 #include "winix.h"
 
 
-proc_t *get_idle(){
-	static proc_t *idle = NULL;
+struct proc *get_idle(){
+	static struct proc *idle = NULL;
 	// kprintf("get idle\n");
 	if(idle == NULL){
 		idle = new_proc(idle_main, IDLE_PRIORITY, "IDLE");
@@ -21,7 +21,7 @@ proc_t *get_idle(){
  * Side Effects:
  *   A proc is removed from a ready_q.
  **/
-proc_t *pick_proc() {
+struct proc *pick_proc() {
 	int i;
 
 	//Find the highest-priority non-empty queue
@@ -49,7 +49,7 @@ proc_t *pick_proc() {
  **/
 void sched() {
 
-	proc_t *curr = ready_q[3][HEAD];
+	struct proc *curr = ready_q[3][HEAD];
 	int nextpick = 0;
 	static int count = 0;
 

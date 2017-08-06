@@ -1,6 +1,6 @@
 #include "../winix.h"
 
-int do_alarm(proc_t *who, message_t *m){
+int do_alarm(struct proc *who, struct message *m){
     clock_t seconds;
     timer_t *alarm;
     clock_t prev_timeout;

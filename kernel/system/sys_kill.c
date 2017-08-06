@@ -2,8 +2,8 @@
 
 
 
-int do_kill(proc_t *who, message_t *m){
-    proc_t *to = get_proc(m->i1);
+int do_kill(struct proc *who, struct message *m){
+    struct proc *to = get_proc(m->i1);
 
     if(!to)
         return EINVAL;

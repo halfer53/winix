@@ -49,11 +49,11 @@ int rw_file(filp_t *filp, char *buf, size_t count, int flag){
     return OK;
 }
 
-int sys_read(proc_t *who,int fd, void *buf, int count){
+int sys_read(struct proc *who,int fd, void *buf, int count){
     rw_file(who->fp_filp[fd], buf,count, READING);
 }
 
-int sys_write(proc_t *who,int fd, void *buf, int count){
+int sys_write(struct proc *who,int fd, void *buf, int count){
     rw_file(who->fp_filp[fd], buf, count, WRITING);
 }
 

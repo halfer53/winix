@@ -7,18 +7,18 @@ static unsigned long sigframe_code[] = {0x1ee10001,0x200d0000};
 //addui sp,sp, 1
 //syscall
 
-PRIVATE void* build_user_stack(proc_t *who, void *src, size_t len){
+PRIVATE void* build_user_stack(struct proc *who, void *src, size_t len){
     reg_t *sp = get_physical_addr(who->sp,who);
     sp -= len;
     memcpy(sp,src,len );
     return get_virtual_addr(sp,who);
 }
 
-PRIVATE void build_signal_ctx(proc_t *who, int signum){
+PRIVATE void build_signal_ctx(struct proc *who, int signum){
     reg_t *sp;
     reg_t *ra;
-    proc_t *systask;
-    message_t sigret_mesg;
+    struct proc *systask;
+    struct message sigret_mesg;
     sigframe_t sigframe;
 
     sp = who->sp;
@@ -35,7 +35,7 @@ PRIVATE void build_signal_ctx(proc_t *who, int signum){
     sigframe.signum = signum;
     sigframe.operation = WINIX_SEND;
     sigframe.dest = SYSTEM_TASK;
-    sigframe.pm = (message_t *)who->sp;
+    sigframe.pm = (struct message *)who->sp;
     who->sp = build_user_stack(who,&sigframe,sizeof(sigframe_t));
 
     who->pc = (void (*)())who->sig_table[signum].sa_handler;
@@ -44,7 +44,7 @@ PRIVATE void build_signal_ctx(proc_t *who, int signum){
     who->flags = 0;//reset flags
 }
 
-int cause_sig(proc_t *who,int signum){
+int cause_sig(struct proc *who,int signum){
     if(who->state != RUNNABLE)
         return;
     if(who->sig_table[signum].sa_handler == SIG_DFL){
@@ -73,7 +73,7 @@ int cause_sig(proc_t *who,int signum){
 
 //send signal immediately
 //IMPORTANT should only be called during exception
-int send_sig(proc_t *who, int signum){
+int send_sig(struct proc *who, int signum){
     cause_sig(who,signum);
     if(in_interrupt()){
         if(current_proc != who){

@@ -36,7 +36,7 @@
 
 #define DECLARE_SYSCALL(function, params, syscall_num, passing_codes)\
 function params{\
-    message_t m;\
+    struct message m;\
     int __ret;\
     m.type = syscall_num;\
     passing_codes;\

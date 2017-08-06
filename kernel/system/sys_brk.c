@@ -6,7 +6,7 @@
  * @param  addr   set the end of data segment specified by the addr, note that this is virtual memory
  * @return        status of result, 0 if success
  */
-int do_brk(proc_t *who, message_t *m){
+int do_brk(struct proc *who, struct message *m){
 	int i,paddr;
 	ptr_t* addr;
 	addr = get_physical_addr(m->p1,who);

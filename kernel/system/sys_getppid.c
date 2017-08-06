@@ -1,6 +1,6 @@
 #include "../winix.h"
 
-int do_getppid(proc_t *who, message_t *m){
+int do_getppid(struct proc *who, struct message *m){
     // m->i1 = get_proc(who->parent)->pid;
     return get_proc(who->parent)->pid;
 }

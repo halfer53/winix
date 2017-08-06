@@ -16,7 +16,7 @@ typedef struct {int m2i1, m2i2, m2i3; long m2l1;unsigned long m2ul1; void *m2p1;
 /**
  * The message structure for IPC
  **/
-typedef struct {
+typedef struct message{
 	int src;
 	int type;
 	int i1, i2, i3;
@@ -44,19 +44,19 @@ typedef struct {
 /**
  * Sends a message to the destination process
  **/
-int winix_send(int dest, message_t *m);
-int winix_notify(int dest, message_t *m);
+int winix_send(int dest, struct message *m);
+int winix_notify(int dest, struct message *m);
 
 /**
  * Receives a message.
  **/
-int winix_receive(message_t *m);
+int winix_receive(struct message *m);
 
 /**
  * Sends and receives a message to/from the destination process.
  *
  * Note: overwrites m with the reply message.
  **/
-int winix_sendrec(int dest, message_t *m);
+int winix_sendrec(int dest, struct message *m);
 
 #endif

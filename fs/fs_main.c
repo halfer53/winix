@@ -3,8 +3,8 @@
 #include "inode.h"
 #include <stdio.h>
 
-proc_t pcurrent_proc;
-proc_t *current_proc;
+struct proc pcurrent_proc;
+struct proc *current_proc;
 struct super_block *sb;
 struct super_block superblock = {
         0, //magic

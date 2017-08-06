@@ -1,9 +1,9 @@
 #include "../winix.h"
 
 
-int do_sigreturn(proc_t *who, message_t *m){
+int do_sigreturn(struct proc *who, struct message *m){
     reg_t *sp;
-    proc_t *systask;
+    struct proc *systask;
     int signum = m->i1;
 
     sp = get_physical_addr(who->sp,who);

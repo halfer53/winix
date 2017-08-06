@@ -30,7 +30,7 @@ So this individual study, I also implemented ```malloc```, ```free```, and ```km
 In my operating system, each process has its own virtual space dynamically translated into physical address. And the virtual space is divided into several parts, one of which is the heap. Each process has its heap area that can be dynamically extended through ```sbrk() brk()```. sbrk() and brk() both extends the heap segment and allows processes to manage memories through the heap
 
 ```
-void *do_sbrk( proc_t *who, size_t size) {
+void *do_sbrk( struct proc *who, size_t size) {
 
 	unsigned long *ptable;
 	int nstart,len;
@@ -223,7 +223,7 @@ In my OS, signal handling is slightly complicated. Whenever a signal is to be de
 ```
 	signum
 	sigreturn syscall parameters
-	sigreturn syscall message_t
+	sigreturn syscall struct message
 	sigreturn syscall assembly code
 	old_context
 ```
@@ -233,11 +233,11 @@ When signal handler is called, PC is set to the entry point of the OS, and RA is
 
  ```
     sigreturn syscall parameters
-	sigreturn syscall message_t
+	sigreturn syscall struct message
 	sigreturn syscall assembly code
 ``` 
 
-All of the above are necessary to initialise a systemcall, including the parameters of syscall, the message_t passed to the kernel, and and assembly code to triger the system call.
+All of the above are necessary to initialise a systemcall, including the parameters of syscall, the struct message passed to the kernel, and and assembly code to triger the system call.
 
 Once the control is transferred to the kernel, kernel will restore the context by copying the ```old_context``` on the stack to the PCB, and then reschedule all the processes.
 

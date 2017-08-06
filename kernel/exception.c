@@ -99,7 +99,7 @@ PRIVATE void serial2_handler() {
  **/
 PRIVATE void gpf_handler() {
 	int i=0;
-	proc_t *system = get_proc(0);
+	struct proc *system = get_proc(0);
 	if(!isokprocn(current_proc->pid))
 		panic("invalid proc");
 	//Current process has performed an illegal operation and will be shut down.
@@ -128,11 +128,11 @@ PRIVATE void gpf_handler() {
  **/
 PRIVATE void syscall_handler() {
 	int src, dest, operation;
-	message_t *m;
+	struct message *m;
 	int *retval;
-	proc_t *p;
+	struct proc *p;
 	ptr_t *sp;
-	proc_t *curr = NULL;
+	struct proc *curr = NULL;
 	int counter = 0;
 
 	//cast two variables to to size_t to allow addition of two pointer, and then cast back to pointer
@@ -140,7 +140,7 @@ PRIVATE void syscall_handler() {
 
 	operation = *(sp);				//Operation is the first parameter on the stack
 	dest = *(sp+1);				//Destination is second parameter on the stack
-	m = (message_t *)(*(sp+ 2) + (int)current_proc->rbase);	//Message pointer is the third parameter on the stack
+	m = (struct message *)(*(sp+ 2) + (int)current_proc->rbase);	//Message pointer is the third parameter on the stack
 	m->src = current_proc->pid;			//Don't trust the who to specify their own source process number
 
 	retval = (int*)&current_proc->regs[0];		//Result is returned in register $1

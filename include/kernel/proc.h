@@ -69,7 +69,7 @@ typedef struct proc {
 	reg_t cctrl;  //len 19
 
 	/* IPC messages */
-	message_t *message;	//Message buffer;
+	struct message *message;	//Message buffer;
 	int flags; 
 
 	/* Heap */
@@ -117,25 +117,25 @@ typedef struct proc {
 
 #define isokprocn(i)	(i>= 0 && i < NUM_PROCS)
 
-extern proc_t proc_table[NUM_PROCS];
-extern proc_t *ready_q[NUM_QUEUES][2];
-extern proc_t *block_q[2];
+extern struct proc proc_table[NUM_PROCS];
+extern struct proc *ready_q[NUM_QUEUES][2];
+extern struct proc *block_q[2];
 
 
-void enqueue_tail(proc_t **q, proc_t *proc);
-void enqueue_head(proc_t **q, proc_t *proc);
-proc_t *dequeue(proc_t **q);
+void enqueue_tail(struct proc **q, struct proc *proc);
+void enqueue_head(struct proc **q, struct proc *proc);
+struct proc *dequeue(struct proc **q);
 /**
  * Initialises the process table and scheduling queues.
  **/
 void init_proc();
-void proc_set_default(proc_t *p);
+void proc_set_default(struct proc *p);
 /**
  * Creates a new process and adds it to the runnable queue.
  **/
-proc_t *new_proc(void (*entry)(), int priority, const char *name);
-proc_t *get_free_proc_slot();
-void add_to_scheduling_queue(proc_t* p);
+struct proc *new_proc(void (*entry)(), int priority, const char *name);
+struct proc *get_free_proc_slot();
+void add_to_scheduling_queue(struct proc* p);
 /**
  * WINIX Scheduler.
  **/
@@ -147,7 +147,7 @@ void sched();
  * Parameters:
  *   p		The process to remove.
  **/
-void end_process(proc_t *p);
+void end_process(struct proc *p);
 
 /**
  * Gets a pointer to a process.
@@ -157,29 +157,29 @@ void end_process(proc_t *p);
  *
  * Returns:			The relevant process, or NULL if it does not exist.
  **/
-proc_t *get_proc(int proc_nr);
-proc_t *get_running_proc(int proc_nr);
+struct proc *get_proc(int proc_nr);
+struct proc *get_running_proc(int proc_nr);
 
 
 //fork the next process in the ready_q, return the new pid of the forked process
 //side effect: the head of the free_proc is dequeued, and added to the ready_q with all relevant values equal
 //to the original process, except stack pointer.
 
-proc_t *kexecp(proc_t *p,void (*entry)(), int priority, const char *name);
-proc_t *start_system(void (*entry)(), int priority, const char *name);
-proc_t* start_init(size_t *lines, size_t length, size_t entry);
+struct proc *kexecp(struct proc *p,void (*entry)(), int priority, const char *name);
+struct proc *start_system(void (*entry)(), int priority, const char *name);
+struct proc* start_init(size_t *lines, size_t length, size_t entry);
 
 
 void process_overview();
-void printProceInfo(proc_t* curr);
+void printProceInfo(struct proc* curr);
 char* getStateName(proc_state_t state);
-proc_t *pick_proc();
+struct proc *pick_proc();
 
 
 /**
  * Pointer to the current process.
  **/
-extern proc_t *current_proc;
+extern struct proc *current_proc;
 
 
 #endif

@@ -1,8 +1,8 @@
 #include "../winix.h"
 
-void clear_sending_mesg(proc_t *who){
-    register proc_t *rp; //iterate over the process table
-    register proc_t **xp; //iterate over the process's queue
+void clear_sending_mesg(struct proc *who){
+    register struct proc *rp; //iterate over the process table
+    register struct proc **xp; //iterate over the process's queue
     int i;
 
     for(i = 0; i < NUM_PROCS; i++){
@@ -21,9 +21,9 @@ void clear_sending_mesg(proc_t *who){
 }
 
 
-void clear_receiving_mesg(proc_t *who){
-    register proc_t *xp;
-    message_t m;
+void clear_receiving_mesg(struct proc *who){
+    register struct proc *xp;
+    struct message m;
 
     if(who->flags & RECEIVING){
         xp = who->sender_q;
@@ -35,15 +35,15 @@ void clear_receiving_mesg(proc_t *who){
     }
 }
 
-void clear_proc(proc_t *who){
+void clear_proc(struct proc *who){
     // clear_receiving_mesg(who);
     clear_sending_mesg(who);
 }
 
 
-void exit_proc(proc_t *who, int status){
-    message_t mesg;
-    proc_t *mp;
+void exit_proc(struct proc *who, int status){
+    struct message mesg;
+    struct proc *mp;
     int i, children = 0;
     
     unseched(who);
@@ -83,7 +83,7 @@ void exit_proc(proc_t *who, int status){
     
 }
 
-int do_exit(proc_t *who, message_t *m){
+int do_exit(struct proc *who, struct message *m){
     // kprintf("\r\n[SYSTEM] Process \"%s (%d)\" exited with code %d\r\n", who->name, who->pid, m->i1);
     exit_proc(who,m->i1);
     return SUSPEND;

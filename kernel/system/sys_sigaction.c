@@ -1,6 +1,6 @@
 #include "../winix.h"
 
-int do_sigaction(proc_t *who, message_t *m){
+int do_sigaction(struct proc *who, struct message *m){
     int signum;
     sighandler_t osig;
 

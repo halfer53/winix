@@ -2,7 +2,7 @@
 
 static filp_t fd_table[NR_FILPS];
 
-int get_fd(proc_t *curr,int start, int *k, filp_t **fpt){
+int get_fd(struct proc *curr,int start, int *k, filp_t **fpt){
     register int i = -1;
     register filp_t *f;
 
