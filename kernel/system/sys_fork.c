@@ -23,9 +23,9 @@ int _fork(struct proc *parent) {
 		pbak = p->proc_nr;
 		*p = *parent;
 		p->proc_nr = pbak;
-		p->pid = p->proc_nr;
+		p->proc_nr = p->proc_nr;
 		p->ptable = p->protection_table;
-		// kprintf("%d heap 0x%08x | start extract |",p->pid,p->heap_break);
+		// kprintf("%d heap 0x%08x | start extract |",p->proc_nr,p->heap_break);
 		if(bitmap_extract_pattern(parent->ptable, MEM_MAP_LEN, (int)p->heap_break, &ptn) != 0){
 			kprintf("pat search failed");
 		}

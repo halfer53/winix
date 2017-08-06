@@ -19,7 +19,7 @@ int wini_send(int dest, struct message *m) {
 	if (pDest = get_running_proc(dest)) {
 
 		if(DEBUG_IPC){
-			kprintf("\nSEND %d flags %d from %d t %d| ",dest, pDest->flags, current_proc->pid,m->type);
+			kprintf("\nSEND %d flags %d from %d t %d| ",dest, pDest->flags, current_proc->proc_nr,m->type);
 			DEBUG_IPC--;
 		}
 
@@ -57,7 +57,7 @@ int wini_receive(struct message *m) {
 	if (p != NULL) {
 
 		if(DEBUG_IPC){
-			kprintf("\nREC from %d t %d| ",p->pid ,m->type);
+			kprintf("\nREC from %d t %d| ",p->proc_nr ,m->type);
 			DEBUG_IPC--;
 		}
 		//Dequeue head node
@@ -95,7 +95,7 @@ int wini_notify(int dest, struct message *m) {
 	if (pDest = get_running_proc(dest)) {
 
 		if(DEBUG_IPC){
-			kprintf("\nNOTIFY %d flags %d from %d t %d| ",dest, pDest->flags, current_proc->pid,m->type);
+			kprintf("\nNOTIFY %d flags %d from %d t %d| ",dest, pDest->flags, current_proc->proc_nr,m->type);
 			DEBUG_IPC--;
 		}
 

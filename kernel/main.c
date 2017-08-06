@@ -72,7 +72,7 @@ void main() {
 	struct proc *p = NULL;
 	size_t *ptr = NULL;
 	void *addr_p = NULL;
-	int pid = 0;
+	int proc_nr = 0;
 	int i=0;
 
 	//Print boot message.

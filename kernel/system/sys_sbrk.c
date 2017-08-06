@@ -54,6 +54,6 @@ void *_sbrk( struct proc *who, size_t size) {
 
 int do_sbrk(struct proc *who, struct message *m){
     m->p1 = _sbrk(who,m->i1);
-	// winix_send(who->pid, m);
+	// winix_send(who->proc_nr, m);
 	return m->p1 == NULL ? EINVAL : OK;
 }

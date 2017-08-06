@@ -1,12 +1,12 @@
 #ifndef _W_TIMER_H_
 #define _W_TIMER_H_ 1
 
-typedef void (*timerhandler_t)(pid_t,clock_t);
+typedef void (*timerhandler_t)(int,clock_t);
 
 #define TIMER_INUSE	1
 
 struct timer{
-	pid_t pid;
+	int proc_nr;
 	clock_t time_out;
 	struct timer *next;
 	timerhandler_t handler;

@@ -1,15 +1,15 @@
 #include "winix.h"
 
-void deliver_alarm(pid_t pid, clock_t time){
-    cause_sig(get_proc(pid),SIGALRM);
+void deliver_alarm(int proc_nr, clock_t time){
+    cause_sig(get_proc(proc_nr),SIGALRM);
 }
 
 void handler_timer(struct timer *timer){
 
     if(timer != NULL && timer->time_out == system_uptime)
-        timer->handler(timer->pid,timer->time_out);
+        timer->handler(timer->proc_nr,timer->time_out);
     else
-        kprintf("Inconsis alarm %d %d from %d\n",system_uptime,next_timeout,timer->pid);
+        kprintf("Inconsis alarm %d %d from %d\n",system_uptime,next_timeout,timer->proc_nr);
 }
 
 /**

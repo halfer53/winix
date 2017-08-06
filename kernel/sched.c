@@ -67,7 +67,7 @@ void sched() {
 
 	current_proc = pick_proc();
 	if(DEBUG_SCHED){
-		kprintf("| %d |",current_proc->pid);
+		kprintf("| %d |",current_proc->proc_nr);
 		DEBUG_SCHED--;
 	}
 		

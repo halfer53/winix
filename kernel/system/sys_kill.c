@@ -9,6 +9,6 @@ int do_kill(struct proc *who, struct message *m){
         return EINVAL;
     
     cause_sig(to,m->i2);
-    // winix_send(who->pid,m);
+    // winix_send(who->proc_nr,m);
     return OK;
 }

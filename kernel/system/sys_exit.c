@@ -29,7 +29,7 @@ void clear_receiving_mesg(struct proc *who){
         xp = who->sender_q;
         while(xp){
             memset(&m,-1,MESSAGE_LEN);
-            winix_notify(xp->pid,&m);
+            winix_notify(xp->proc_nr,&m);
             xp = xp->next_sender;
         }
     }
@@ -55,13 +55,13 @@ void exit_proc(struct proc *who, int status){
     for( i=0; i< NUM_PROCS; i++){
         mp = &proc_table[i];
         if(mp->IN_USE){
-            if(mp->flags & WAITING && mp->wpid == who->pid){
+            if(mp->flags & WAITING && mp->wpid == who->proc_nr){
                 //TODO: modify wstatus
             
-                mesg.i1 = who->pid;
+                mesg.i1 = who->proc_nr;
                 mp->flags &= ~WAITING;
 
-                winix_send(mp->pid,&mesg);
+                winix_send(mp->proc_nr,&mesg);
                 children++;
             }else if(mp->parent == who->proc_nr){
                 //Change the child process's parent to init
@@ -84,7 +84,7 @@ void exit_proc(struct proc *who, int status){
 }
 
 int do_exit(struct proc *who, struct message *m){
-    // kprintf("\r\n[SYSTEM] Process \"%s (%d)\" exited with code %d\r\n", who->name, who->pid, m->i1);
+    // kprintf("\r\n[SYSTEM] Process \"%s (%d)\" exited with code %d\r\n", who->name, who->proc_nr, m->i1);
     exit_proc(who,m->i1);
     return SUSPEND;
 }

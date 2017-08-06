@@ -169,7 +169,7 @@ void proc_set_default(struct proc *p) {
 	p->length = 0;
 	p->parent = 0;
 	p->heap_break = NULL;
-	p->pid = p->proc_nr;
+	p->proc_nr = p->proc_nr;
 
 	p->ptable = p->protection_table;
 	bitmap_clear(p->ptable, PROTECTION_TABLE_LEN);
@@ -177,7 +177,7 @@ void proc_set_default(struct proc *p) {
 	p->alarm.time_out = 0;
 	p->alarm.next = NULL;
 	p->alarm.flags = 0;
-	p->alarm.pid = p->pid;
+	p->alarm.proc_nr = p->proc_nr;
 
 	memset(&p->sig_table,0,_NSIG * 3); //3: sizeof struct sigaction
 }
@@ -339,7 +339,7 @@ void end_process(struct proc *p) {
 void process_overview() {
 	int i;
 	struct proc *curr;
-	kprintf("NAME     PID PPID RBASE      PC         STACK      HEAP       PROTECTION   flags\n");
+	kprintf("NAME     proc_nr PPID RBASE      PC         STACK      HEAP       PROTECTION   flags\n");
 	for (i = 0; i < NUM_PROCS; i++) {
 		curr = &proc_table[i];
 		if(curr->IN_USE && curr->state != ZOMBIE)
@@ -352,7 +352,7 @@ void printProceInfo(struct proc* curr) {
 	int ptable_idx = get_page_index(curr->rbase)/32;
 	kprintf("%-08s %-03d %-04d 0x%08x 0x%08x 0x%08x 0x%08x %d 0x%08x %d\n",
 	        curr->name,
-	        curr->pid,
+	        curr->proc_nr,
 			curr->parent,
 	        curr->rbase,
 	        get_physical_addr(curr->pc,curr),

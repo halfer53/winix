@@ -16,9 +16,9 @@ ucontext_t recv_ctx;
 struct syscall_ctx syscall_ctx;
 
 void resume_syscall(struct proc *to){
-	if(syscall_ctx.who->pid == to->pid && to->flags & RECEIVING && syscall_ctx.interruptted){
-		// kprintf("resume syscall %d\n",who->pid);
-		winix_send(to->pid,&syscall_ctx.m);
+	if(syscall_ctx.who->proc_nr == to->proc_nr && to->flags & RECEIVING && syscall_ctx.interruptted){
+		// kprintf("resume syscall %d\n",who->proc_nr);
+		winix_send(to->proc_nr,&syscall_ctx.m);
 	}
 	syscall_ctx.interruptted = 0;
 	// setcontext(&syscall_ctx);
@@ -29,7 +29,7 @@ void intr_syscall(){
 	//if the system is executing a system call, save the system call context
 	//and interrupt the System as if it has finished executing the current syscall
 	if(!get_proc(SYSTEM_TASK)->flags){
-		// kprintf("interrupt syscall %d\n",who->pid);
+		// kprintf("interrupt syscall %d\n",who->proc_nr);
 		ctx->m = m;
 		ctx->m.i1 = EINTR;
 		ctx->who = who;
@@ -89,7 +89,7 @@ void system_main() {
 			case SYSCALL_PS:			m.i1 = do_ps(who,&m);			break;
 			case SYSCALL_PRINTF:		m.i1 = do_printf(who,&m);		break;
 			default:
-				kprintf("\r\n[SYSTEM] Process \"%s (%d)\" performed unknown system call %d\r\n", who->name, who->pid, m.type);
+				kprintf("\r\n[SYSTEM] Process \"%s (%d)\" performed unknown system call %d\r\n", who->name, who->proc_nr, m.type);
 				m.i1 = ENOSYS;
 				break;
 		}

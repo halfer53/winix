@@ -48,13 +48,13 @@ int cause_sig(struct proc *who,int signum){
     if(who->state != RUNNABLE)
         return;
     if(who->sig_table[signum].sa_handler == SIG_DFL){
-        kprintf("Signal %d: kill %s [%d]\n",signum,who->name,who->pid);
+        kprintf("Signal %d: kill %s [%d]\n",signum,who->name,who->proc_nr);
         KILL_PROC(who, signum);
         return ERR;
     }
     //if it's ignored
     if(who->sig_table[signum].sa_handler == SIG_IGN){
-        kprintf("sig %d ignored by %d\n",signum,who->pid);
+        kprintf("sig %d ignored by %d\n",signum,who->proc_nr);
         who->pc = (void (*)())((int)who->pc+1);
         return ERR;
     }
@@ -63,7 +63,7 @@ int cause_sig(struct proc *who,int signum){
     //if in interrupt, let system task interrupt the current syscall
     //and reschedule the proc
     if(in_interrupt()){
-        if(who->pid == curr_mesg()->src){
+        if(who->proc_nr == curr_mesg()->src){
             get_proc(SYSTEM_TASK)->pc = &intr_syscall;
         }
         add_to_scheduling_queue(who);

@@ -18,12 +18,12 @@ int do_wait(struct proc *parent, struct message *mesg){
                     *wstatus = child->exit_status;
                 }
                 free_slot(child);
-                kprintf("%d child %d\n",child->pid);
-                mesg->i1 = child->pid;
-                winix_send(parent->pid,mesg);
+                kprintf("%d child %d\n",child->proc_nr);
+                mesg->i1 = child->proc_nr;
+                winix_send(parent->proc_nr,mesg);
                 return OK;
             }
-            parent->wpid = child->pid;
+            parent->wpid = child->proc_nr;
             children++;
         }
     }
@@ -32,7 +32,7 @@ int do_wait(struct proc *parent, struct message *mesg){
     if(children == 0){
         kprintf("no children\n");
         mesg->i1 = -1;
-        // winix_send(parent->pid,mesg);
+        // winix_send(parent->proc_nr,mesg);
         return ECHILD;
     }
     //block the process

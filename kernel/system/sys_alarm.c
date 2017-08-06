@@ -21,7 +21,7 @@ int do_alarm(struct proc *who, struct message *m){
     
     //if seconds is 0, any pending alarm is canceled
     if(seconds != 0){
-        alarm->pid = who->pid;
+        alarm->proc_nr = who->proc_nr;
         alarm->time_out = system_uptime + seconds * 60;
         alarm->handler = &deliver_alarm;
         insert_timer(alarm);

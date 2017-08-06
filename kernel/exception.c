@@ -100,12 +100,12 @@ PRIVATE void serial2_handler() {
 PRIVATE void gpf_handler() {
 	int i=0;
 	struct proc *system = get_proc(0);
-	if(!isokprocn(current_proc->pid))
+	if(!isokprocn(current_proc->proc_nr))
 		panic("invalid proc");
 	//Current process has performed an illegal operation and will be shut down.
 	kprintf("\r\n[SYSTEM] Process \"%s (%d)\" Rbase=0x%08x GPF: PC=0x%08x SP=0x%08x.\r\n",
 		current_proc->name,
-		current_proc->pid,
+		current_proc->proc_nr,
 		current_proc->rbase,
 		current_proc->pc,
 		current_proc->sp,current_proc);
@@ -141,7 +141,7 @@ PRIVATE void syscall_handler() {
 	operation = *(sp);				//Operation is the first parameter on the stack
 	dest = *(sp+1);				//Destination is second parameter on the stack
 	m = (struct message *)(*(sp+ 2) + (int)current_proc->rbase);	//Message pointer is the third parameter on the stack
-	m->src = current_proc->pid;			//Don't trust the who to specify their own source process number
+	m->src = current_proc->proc_nr;			//Don't trust the who to specify their own source process number
 
 	retval = (int*)&current_proc->regs[0];		//Result is returned in register $1
 	//Default return value is an error code
@@ -188,7 +188,7 @@ PRIVATE void break_handler() {
  *   Current process is killed, and scheduler is called (i.e. this handler does not return).
  **/
 PRIVATE void arith_handler() {
-	kprintf("\r\n[SYSTEM] Process \"%s (%d)\" ARITH: PC=0x%08x.\r\n", current_proc->name, current_proc->pid, current_proc->pc);
+	kprintf("\r\n[SYSTEM] Process \"%s (%d)\" ARITH: PC=0x%08x.\r\n", current_proc->name, current_proc->proc_nr, current_proc->pc);
 	send_sig(current_proc,SIGFPE);
 	current_proc = NULL;
 	sched();
