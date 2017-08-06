@@ -3,6 +3,8 @@
 
 #include <winix/gfp.h>
 
+void init_mem_table();
+
 ptr_t* get_free_page(int flags);
 ptr_t* get_free_pages(int num, int flags);
 
@@ -11,13 +13,13 @@ int get_free_pages_index(int num, int flags);
 
 void free_page(ptr_t* ptr);
 void print_mem_map(int i);
+int next_free_page_index();
 
 #define MEM_MAP_LEN	32
 #define PAGE_LEN    1024
-
-void init_mem_table();
-
 extern unsigned int mem_map[MEM_MAP_LEN];
+
+
 
 #define align4(x) (((((x)-1)>>2)<<2)+4)
 #define align1k(x) (((((x)-1)>>10)<<10)+1024)

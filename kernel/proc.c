@@ -25,10 +25,6 @@ static proc_t *free_proc[2];
 //The currently-running process
 proc_t *current_proc;
 
-//Limits for memory allocation
-size_t FREE_MEM_BEGIN = 0;
-size_t FREE_MEM_END = 0;
-
 
 /**
  * Adds a proc to the tail of a list.

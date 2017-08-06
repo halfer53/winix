@@ -44,16 +44,5 @@ void assert(int expression, const char *message);
 extern syscallctx_t syscall_ctx;
 extern ucontext_t recv_ctx;
 
-//Memory limits
-extern unsigned long TEXT_BEGIN, DATA_BEGIN, BSS_BEGIN;
-extern unsigned long TEXT_END, DATA_END, BSS_END;
-extern unsigned long FREE_MEM_BEGIN, FREE_MEM_END; //calculated at runtime
-
-// //TODO: remove these prototypes
-// void rocks_main();
-// void serial_main();
-// void parallel_main();
-// void shell_main();
-
 #endif
 

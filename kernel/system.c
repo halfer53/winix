@@ -41,24 +41,28 @@ void intr_syscall(){
 message_t *curr_mesg(){
 	return &m;
 }
-/**
- * Entry point for system task.
- **/
-void system_main() {
-	int response = 0;
 
-	FREE_MEM_END = 0x1ffff;
-	
+
+void print_sysinfo(){
+	int free_mem_begin;
+
+	free_mem_begin = next_free_page_index() * PAGE_LEN;
 	//Print Memory Map
 	kprintf("Text Segment: 0x%08x - 0x%08x\r\n", &TEXT_BEGIN, &TEXT_END);
 	kprintf("Data Segment: 0x%08x - 0x%08x\r\n", &DATA_BEGIN, &DATA_END);
 	kprintf("BSS Segment:  0x%08x - 0x%08x\r\n", &BSS_BEGIN, &BSS_END);
-	kprintf("Unallocated:  0x%08x - 0x%08x\r\n", FREE_MEM_BEGIN, FREE_MEM_END);
-	kprintf("%d kWords Free\r\n", ((unsigned long)(FREE_MEM_END - FREE_MEM_BEGIN)) / 1024);
-	//Receive message, do work, repeat.
+	kprintf("Unallocated:  0x%08x - 0x%08x\r\n", free_mem_begin, FREE_MEM_END);
+	kprintf("%d kWords Free\r\n", ((unsigned long)(FREE_MEM_END - free_mem_begin)) / 1024);
+}
+/**
+ * Entry point for system task.
+ **/
+void system_main() {
 
+	print_sysinfo();
 	getcontext(&recv_ctx);
-	kprintf("%c",'A');
+
+	//Receive message, do work, repeat.
 	while(1) {
 		
 		//get a messa1ge

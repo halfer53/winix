@@ -29,18 +29,6 @@ void panic(const char* message) {
 	}
 }
 
-//scan the FREE_MEM_BEGIN
-void Scan_FREE_MEM_BEGIN() {
-	//TODO start kmalloc here
-	FREE_MEM_BEGIN = (size_t)&BSS_END;
-
-	//Round up to the next 1k boundary
-	FREE_MEM_BEGIN |= 0x03ff;
-	FREE_MEM_BEGIN++;
-
-	// kprintf("\r\nfree memory begin 0x%08x\r\n", FREE_MEM_BEGIN );
-}
-
 /**
  * Asserts that a condition is true.
  * If so, this function has no effect.
@@ -90,17 +78,11 @@ void main() {
 	//Print boot message.
 	kprintf("\r\nWINIX v%d.%d\r\n", MAJOR_VERSION, MINOR_VERSION);
 
-	//scan memory, initialise FREE_MEM_BEGIN
-	Scan_FREE_MEM_BEGIN();
-
 	init_bitmap();
-	init_mem_table(FREE_MEM_BEGIN);
-
-	//Set up process table
+	init_mem_table();
 	init_proc();
 
 	//Initialise the system task
-
 	p = new_proc(system_main, SYSTEM_PRIORITY, "SYSTEM");
 	assert(p != NULL, "Create sys task");
 	p->quantum = 64;

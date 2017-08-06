@@ -2,9 +2,15 @@
 
 unsigned int mem_map[MEM_MAP_LEN];
 
-void init_mem_table(int free_mem_begin) {
-	int len = free_mem_begin / 1024;
-	int i;
+void init_mem_table() {
+	int len, i;
+	uint32_t free_mem_begin;
+
+	free_mem_begin = (uint32_t)&BSS_END;
+	free_mem_begin |= 0x03ff;
+	free_mem_begin++;
+	len = free_mem_begin / PAGE_LEN;
+
 	for (i = 0; i < MEM_MAP_LEN; i++) {
 		mem_map[i] = 0;
 	}
@@ -45,6 +51,10 @@ ptr_t* get_free_pages(int num, int flags){
 		return (ptr_t *)(index * PAGE_LEN);
 	}
 	return NULL;
+}
+
+int next_free_page_index(){
+	return bitmap_search(mem_map, MEM_MAP_LEN, 1);
 }
 
 void free_page(ptr_t* ptr) {
