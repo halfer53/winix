@@ -19,7 +19,7 @@ PRIVATE void build_signal_ctx(struct proc *who, int signum){
     reg_t *ra;
     struct proc *systask;
     struct message sigret_mesg;
-    sigframe_t sigframe;
+    struct sigframe sigframe;
 
     sp = who->sp;
     sp = get_physical_addr(sp,who);
@@ -36,7 +36,7 @@ PRIVATE void build_signal_ctx(struct proc *who, int signum){
     sigframe.operation = WINIX_SEND;
     sigframe.dest = SYSTEM_TASK;
     sigframe.pm = (struct message *)who->sp;
-    who->sp = build_user_stack(who,&sigframe,sizeof(sigframe_t));
+    who->sp = build_user_stack(who,&sigframe,sizeof(struct sigframe));
 
     who->pc = (void (*)())who->sig_table[signum].sa_handler;
     who->ra = ra;

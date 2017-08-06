@@ -12,11 +12,11 @@ depreciated, use slab.c instead
 #include <sys/types.h>
 #endif
 
-typedef struct _hole{
+struct hole{
   size_t *start;
   unsigned long length;
-  struct _hole *next;
-}hole_t;
+  struct hole *next;
+};
 
 #define NUM_HOLES 100
 extern size_t SYS_BSS_START;

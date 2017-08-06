@@ -2,7 +2,7 @@
 
 int do_alarm(struct proc *who, struct message *m){
     clock_t seconds;
-    timer_t *alarm;
+    struct timer *alarm;
     clock_t prev_timeout;
 
     if(m->i1 < 0)

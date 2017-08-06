@@ -8,15 +8,15 @@ This file is depreciated, use slab.c instead
 
 **/
 
-hole_t hole_table[NUM_HOLES];
+struct hole hole_table[NUM_HOLES];
 
 //Entries to the list of unallocated memory space in RAM
-static hole_t *unused_holes[2];
+static struct hole *unused_holes[2];
 
 //ENtries in the holes that are not in use, but can be added to the holes list
-static hole_t *pending_holes[2];
+static struct hole *pending_holes[2];
 
-static hole_t *used_holes[2];
+static struct hole *used_holes[2];
 //Linked lists are defined by a head and tail pointer.
 
 size_t SYS_BSS_START = 0;
@@ -30,7 +30,7 @@ size_t SYS_BSS_START = 0;
  *   q		An array containing a head and tail pointer of a linked list.
  *   hole	The hole struct to add to the list.
  **/
-static void hole_enqueue_tail(hole_t **q, hole_t *hole) {
+static void hole_enqueue_tail(struct hole **q, struct hole *hole) {
 	if (q[HEAD] == NULL) {
 		q[HEAD] = q[TAIL] = hole;
 	}
@@ -48,7 +48,7 @@ static void hole_enqueue_tail(hole_t **q, hole_t *hole) {
  *   q		An array containing a head and tail pointer of a linked list.
  *   hole	The hole struct to add to the list.
  **/
-static void hole_enqueue_head(hole_t **q, hole_t *hole) {
+static void hole_enqueue_head(struct hole **q, struct hole *hole) {
 	if (q[HEAD] == NULL) {
 		hole->next = NULL;
 		q[HEAD] = q[TAIL] = hole;
@@ -69,8 +69,8 @@ static void hole_enqueue_head(hole_t **q, hole_t *hole) {
  *   The hole struct that was removed from the head of the list
  *   NULL if the list is empty.
  **/
-static hole_t *hole_dequeue(hole_t **q) {
-	hole_t *hole = q[HEAD];
+static struct hole *hole_dequeue(struct hole **q) {
+	struct hole *hole = q[HEAD];
 
 	if (hole == NULL) { //Empty list
 		assert(q[TAIL] == NULL, "deq: tail not null");
@@ -87,7 +87,7 @@ static hole_t *hole_dequeue(hole_t **q) {
 	return hole;
 }
 
-static void hole_delete2(hole_t **q, hole_t *prev, hole_t *curr) {
+static void hole_delete2(struct hole **q, struct hole *prev, struct hole *curr) {
 	if (curr != NULL) {
 		if (prev == NULL) {
 			if (q[HEAD] == q[TAIL]) {
@@ -101,9 +101,9 @@ static void hole_delete2(hole_t **q, hole_t *prev, hole_t *curr) {
 	}
 }
 
-static void hole_delete(hole_t **q, hole_t *h) {
-	register hole_t *curr = q[HEAD];
-	register hole_t *prev = NULL;
+static void hole_delete(struct hole **q, struct hole *h) {
+	register struct hole *curr = q[HEAD];
+	register struct hole *prev = NULL;
 
 	if (curr == NULL) { //Empty list
 		assert(q[TAIL] == NULL, "delete: tail not null");
@@ -123,8 +123,8 @@ static void hole_delete(hole_t **q, hole_t *h) {
 //a new used hole of given size is added to the used hole list
 //
 void *mem_alloc(size_t size) {
-	register hole_t *prev = NULL;
-	register hole_t *h = unused_holes[HEAD];
+	register struct hole *prev = NULL;
+	register struct hole *h = unused_holes[HEAD];
 	size_t *p_start_addr = NULL;
 	size_t *old_base = 0;
 
@@ -176,7 +176,7 @@ void *mem_alloc(size_t size) {
 //if it can't find any matching holes, it does nothing
 void mem_free(void *ptr_parameter) {
 	register size_t *p = (size_t *)ptr_parameter;
-	register hole_t *h = used_holes[HEAD];
+	register struct hole *h = used_holes[HEAD];
 	int i = 0;
 	size_t start = 0;
 	size_t hole_length = 0;
@@ -197,9 +197,9 @@ void mem_free(void *ptr_parameter) {
 }
 
 //TODO release big enough unused holes to free pages
-int merge_holes(hole_t **merging_holes_list, hole_t *h) {
+int merge_holes(struct hole **merging_holes_list, struct hole *h) {
 
-	register hole_t *curr = merging_holes_list[HEAD];
+	register struct hole *curr = merging_holes_list[HEAD];
 
 	while (curr != NULL) {
 		//if there is hole that is adjacent to the hole to be merged
@@ -227,7 +227,7 @@ int merge_holes(hole_t **merging_holes_list, hole_t *h) {
 }
 
 void hole_list_overview() {
-	hole_t *curr = unused_holes[HEAD];
+	struct hole *curr = unused_holes[HEAD];
 	if (curr == NULL) {
 		kprintf("unused hole empty\n" );
 	}
@@ -248,15 +248,8 @@ void hole_list_overview() {
 }
 
 
-int sizeof_hole_t() {
-	hole_t arr[2];
-	int size = (char*)&arr[1] - (char*)&arr[0];
-	return size;
-}
-
-
 void init_holes() {
-	hole_t *h = NULL;
+	struct hole *h = NULL;
 	int i = 0;
 	size_t *p = NULL;
 	unused_holes[HEAD] = unused_holes[TAIL] = NULL;

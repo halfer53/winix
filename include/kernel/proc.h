@@ -111,7 +111,7 @@ typedef struct proc {
 	struct sigaction sig_table[_NSIG];
 
 	/* Alarm */
-	timer_t alarm;
+	struct timer alarm;
 } proc_t;
 
 

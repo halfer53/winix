@@ -1,12 +1,12 @@
 #include <kernel/kernel.h>
 
-timer_t *pending_timers = NULL;
+struct timer *pending_timers = NULL;
 clock_t next_timeout;
 
 /*:TODO provide sort of lock mechanism to lock next_timeout before modifying it*/
 
-timer_t* dequeue_alarm(){
-    timer_t *mq = pending_timers;
+struct timer* dequeue_alarm(){
+    struct timer *mq = pending_timers;
 
     if(mq){
         pending_timers = mq->next;
@@ -19,9 +19,9 @@ timer_t* dequeue_alarm(){
     return mq;
 }
 
-void insert_timer(timer_t *timer){
-    timer_t *prev = NULL;
-    timer_t *curr = pending_timers;
+void insert_timer(struct timer *timer){
+    struct timer *prev = NULL;
+    struct timer *curr = pending_timers;
     clock_t new_timeout = timer->time_out;
 
     while(curr && curr->time_out < new_timeout){
@@ -39,9 +39,9 @@ void insert_timer(timer_t *timer){
     timer->flags &= TIMER_INUSE;
 }
 
-void remove_timer(timer_t *timer){
-    timer_t *prev = NULL;
-    timer_t *curr = pending_timers;
+void remove_timer(struct timer *timer){
+    struct timer *prev = NULL;
+    struct timer *curr = pending_timers;
     clock_t timeout = timer->time_out;
 
     while(curr && curr != timer){

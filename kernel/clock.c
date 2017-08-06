@@ -4,7 +4,7 @@ void deliver_alarm(pid_t pid, clock_t time){
     cause_sig(get_proc(pid),SIGALRM);
 }
 
-void handler_timer(timer_t *timer){
+void handler_timer(struct timer *timer){
 
     if(timer != NULL && timer->time_out == system_uptime)
         timer->handler(timer->pid,timer->time_out);

@@ -3,12 +3,12 @@
 
 #include <ucontext.h>
 
-typedef struct {
+struct syscall_ctx{
     struct message m;
     struct proc *who;
     ucontext_t ctx;
     int interruptted;
-}syscallctx_t;
+};
 
 #endif
 
