@@ -28,7 +28,7 @@
 
 //Process Defaults
 #define DEFAULT_FLAGS			0
-#define PTABLE_LEN	32
+#define PTABLE_LEN				32
 #define DEFAULT_STACK_SIZE		1024
 #define DEFAULT_HEAP_SIZE		1024
 #define DEFAULT_CCTRL			0xff9

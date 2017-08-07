@@ -75,7 +75,7 @@ int bitmap_search_reverse(unsigned int *map, int map_len, int num){
             if ((map[i] & mask[j]) == 0) {
                 count++;
                 if (count == num) {
-                    return (i*32 + j - count+1);
+                    return (i*32 + j);
                 }
             }else{
                 count = 0;

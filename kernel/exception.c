@@ -115,7 +115,8 @@ PRIVATE void gpf_handler() {
 	kprintf("$7: 0x%08x, $8, 0x%08x, $9, 0x%08x\n",current_proc->regs[6],current_proc->regs[7],current_proc->regs[8]);
 	kprintf("$10: 0x%08x, $11, 0x%08x, $12, 0x%08x\n",current_proc->regs[9],current_proc->regs[10],current_proc->regs[11]);
 	kprintf("$13: 0x%08x, $sp, 0x%08x, $ra, 0x%08x\n",current_proc->regs[12],current_proc->regs[13],current_proc->regs[14]);
-
+	print_sysmap();
+	print_ptable(current_proc->ptable, PTABLE_LEN);
 	//Kill process and call scheduler.
 	send_sig(current_proc,SIGSEGV);
 	current_proc = NULL;

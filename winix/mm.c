@@ -11,10 +11,9 @@ void init_mem_table() {
 	free_mem_begin++;
 	len = free_mem_begin / PAGE_LEN;
 
-	for (i = 0; i < MEM_MAP_LEN; i++) {
-		mem_map[i] = 0;
-	}
+	bitmap_clear(mem_map, MEM_MAP_LEN);
 	bitmap_set_nbits(mem_map, MEM_MAP_LEN, 0, len);
+	bitmap_set_bit(mem_map, MEM_MAP_LEN, FREE_MEM_END / PAGE_LEN);
 }
 
 int get_free_page(int flags) {
@@ -22,7 +21,11 @@ int get_free_page(int flags) {
 }
 
 int get_free_pages(int num, int flags) {
-	int nstart = bitmap_search(mem_map, MEM_MAP_LEN, num);
+	int nstart;
+	if(flags && __GFP_HIGH)
+		nstart =  bitmap_search_reverse(mem_map, MEM_MAP_LEN, num);
+	else
+		nstart =  bitmap_search(mem_map, MEM_MAP_LEN, num);
 	if (nstart != 0)
 	{
 		bitmap_set_nbits(mem_map, MEM_MAP_LEN, nstart, num);
@@ -50,6 +53,21 @@ int next_free_page_index(){
 void free_page(ptr_t* ptr) {
 	int nstart = (int)((long)ptr /1024);
 	bitmap_reset_bit(mem_map, MEM_MAP_LEN, nstart);
+}
+
+void print_ptable(unsigned int *p, int len){
+	int i;
+	for( i = 0; i < len; i++){
+		kprintf("0x%08x ",*p++);
+		if((i+1) % 8 == 0)
+			kprintf("\n");
+	}
+	kprintf("\n");
+}
+
+void print_sysmap(){
+	kprintf("sysmap: ");
+	print_ptable(mem_map, MEM_MAP_LEN);
 }
 
 

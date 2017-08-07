@@ -47,12 +47,14 @@ void print_sysinfo(){
 	int free_mem_begin;
 
 	free_mem_begin = next_free_page_index() * PAGE_LEN;
+	
 	//Print Memory Map
 	kprintf("Text Segment: 0x%08x - 0x%08x\r\n", &TEXT_BEGIN, &TEXT_END);
 	kprintf("Data Segment: 0x%08x - 0x%08x\r\n", &DATA_BEGIN, &DATA_END);
 	kprintf("BSS Segment:  0x%08x - 0x%08x\r\n", &BSS_BEGIN, &BSS_END);
 	kprintf("Unallocated:  0x%08x - 0x%08x\r\n", free_mem_begin, FREE_MEM_END);
 	kprintf("%d kWords Free\r\n", ((unsigned long)(FREE_MEM_END - free_mem_begin)) / 1024);
+	print_sysmap();
 }
 /**
  * Entry point for system task.

@@ -188,7 +188,7 @@ void release_proc_mem(struct proc *who){
 }
 
 
-void *kset_proc(struct proc *p, void (*entry)(), int priority, const char *name) {
+void *set_proc(struct proc *p, void (*entry)(), int priority, const char *name) {
 	ptr_t *ptr;
 	int pg_index;
 	p->priority = priority;
@@ -196,7 +196,7 @@ void *kset_proc(struct proc *p, void (*entry)(), int priority, const char *name)
 
 	strcpy(p->name, name);
 
-	ptr = get_free_page_addr(__GFP_NORM);
+	ptr = get_free_pages_addr(2,__GFP_HIGH);
 	p->sp = (reg_t *)(ptr) + PAGE_LEN - 1;
 
 	p->length = DEFAULT_STACK_SIZE; //one page
@@ -234,7 +234,7 @@ struct proc *new_proc(void (*entry)(), int priority, const char *name) {
 		return NULL;
 	}
 	if (p = get_free_proc_slot()) {
-		kset_proc(p, entry, priority, name);
+		set_proc(p, entry, priority, name);
 		bitmap_fill(p->ptable, PTABLE_LEN);
 		enqueue_tail(ready_q[priority], p);
 	}
@@ -253,7 +253,7 @@ struct proc *kexecp(struct proc *p, void (*entry)(), int priority, const char *n
 	} else {
 		bitmap_xor(mem_map, p->ptable, MEM_MAP_LEN);
 	}
-	ptr = kset_proc(p, entry, priority, name);
+	ptr = set_proc(p, entry, priority, name);
 	// kprintf("kset 0x%08x\n",mem_map[0]);
 	p->rbase = DEFAULT_RBASE;
 	bitmap_fill(p->ptable, PTABLE_LEN);
@@ -294,7 +294,7 @@ struct proc* start_init(size_t *lines, size_t length, size_t entry) {
 	int size = 1024, nstart = 0;
 	struct proc *p = NULL;
 	if (p = get_free_proc_slot()) {
-		ptr_base = kset_proc(p, (void (*)())entry, USER_PRIORITY, "INIT");
+		ptr_base = set_proc(p, (void (*)())entry, USER_PRIORITY, "INIT");
 		memcpy(ptr_base, lines, length);
 		p->rbase = ptr_base;
 		p->sp = get_virtual_addr(p->sp, p);

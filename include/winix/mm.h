@@ -12,10 +12,12 @@ int get_free_page(int flags);
 int get_free_pages(int num, int flags);
 
 void free_page(ptr_t* ptr);
-void print_mem_map(int i);
 int next_free_page_index();
 
-#define MEM_MAP_LEN	32
+void print_ptable(unsigned int *p, int len);
+void print_sysmap();
+
+#define MEM_MAP_LEN	4
 #define PAGE_LEN    1024
 extern unsigned int mem_map[MEM_MAP_LEN];
 
