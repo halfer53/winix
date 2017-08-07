@@ -25,7 +25,7 @@ void *_sbrk( struct proc *who, size_t size) {
 	if (nstart != -1) {
 		//set mem_map and who's ptable's corresponding bits to 1
 		bitmap_set_nbits(mem_map, MEM_MAP_LEN, nstart, len);
-		bitmap_set_nbits(ptable, PROTECTION_TABLE_LEN, nstart, len);
+		bitmap_set_nbits(ptable, PTABLE_LEN, nstart, len);
 		ptr_addr = (void *)(nstart * 1024);
 
 		if (is_addr_in_consecutive_page( heap_break_bak, ptr_addr)){

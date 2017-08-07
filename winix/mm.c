@@ -17,17 +17,11 @@ void init_mem_table() {
 	bitmap_set_nbits(mem_map, MEM_MAP_LEN, 0, len);
 }
 
-int get_free_page_index(int flags) {
-	int nstart = bitmap_search(mem_map, MEM_MAP_LEN, 1);
-	if (nstart != 0)
-	{
-		bitmap_set_bit(mem_map, MEM_MAP_LEN, nstart);
-		return nstart;
-	}
-	return ERR;
+int get_free_page(int flags) {
+	return get_free_pages(1,flags);
 }
 
-int get_free_pages_index(int num, int flags) {
+int get_free_pages(int num, int flags) {
 	int nstart = bitmap_search(mem_map, MEM_MAP_LEN, num);
 	if (nstart != 0)
 	{
@@ -37,17 +31,13 @@ int get_free_pages_index(int num, int flags) {
 	return ERR;
 }
 
-ptr_t* get_free_page(int flags){
-	int index;
-	if((index = get_free_page_index(flags)) != ERR){
-		return (ptr_t *)(index * PAGE_LEN);
-	}
-	return NULL;
+ptr_t* get_free_page_addr(int flags){
+	return get_free_pages_addr(1,flags);
 }
 
-ptr_t* get_free_pages(int num, int flags){
+ptr_t* get_free_pages_addr(int num, int flags){
 	int index;
-	if((index = get_free_pages_index(num,flags)) != ERR){
+	if((index = get_free_pages(num,flags)) != ERR){
 		return (ptr_t *)(index * PAGE_LEN);
 	}
 	return NULL;

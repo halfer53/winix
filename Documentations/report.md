@@ -54,7 +54,7 @@ void *do_sbrk( struct proc *who, size_t size) {
 	if (nstart != -1) {
 		//set mem_map and who's ptable's corresponding bits to 1
 		bitmap_set_nbits(mem_map, MEM_MAP_LEN, nstart, len);
-		bitmap_set_nbits(ptable, PROTECTION_TABLE_LEN, nstart, len);
+		bitmap_set_nbits(ptable, PTABLE_LEN, nstart, len);
 		ptr_addr = (void *)(nstart * 1024);
 
 		if (is_addr_in_consecutive_page( heap_break_bak, ptr_addr)){
@@ -105,7 +105,7 @@ when free is called, it looks at the header file, check if ptr points to the req
 
 However, when requests get larger and larger, the heap segment may become scattered around, there could be the case where there are several consecutive small free memory holes. Memory fragmentation slows the search time. These holes can be potentially merged into a single one to improve performance. 
 
-For ```kmalloc free```, they are pretty much the same with malloc except one tiny difference. When no free and large enough memory blocks can be found, it calls ```get_free_page``` to request new pages. If the request size is smaller than the size of a page, then the rest of the page will be initialised with a new free memory segment.
+For ```kmalloc free```, they are pretty much the same with malloc except one tiny difference. When no free and large enough memory blocks can be found, it calls ```get_free_page_addr``` to request new pages. If the request size is smaller than the size of a page, then the rest of the page will be initialised with a new free memory segment.
 
 
 ## Fiber Library

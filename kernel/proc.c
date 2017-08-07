@@ -172,7 +172,7 @@ void proc_set_default(struct proc *p) {
 	p->proc_nr = p->proc_nr;
 
 	p->ptable = p->protection_table;
-	bitmap_clear(p->ptable, PROTECTION_TABLE_LEN);
+	bitmap_clear(p->ptable, PTABLE_LEN);
 
 	p->alarm.time_out = 0;
 	p->alarm.next = NULL;
@@ -196,7 +196,7 @@ void *kset_proc(struct proc *p, void (*entry)(), int priority, const char *name)
 
 	strcpy(p->name, name);
 
-	ptr = get_free_page(__GFP_NORM);
+	ptr = get_free_page_addr(__GFP_NORM);
 	p->sp = (reg_t *)(ptr) + PAGE_LEN - 1;
 
 	p->length = DEFAULT_STACK_SIZE; //one page
@@ -235,7 +235,7 @@ struct proc *new_proc(void (*entry)(), int priority, const char *name) {
 	}
 	if (p = get_free_proc_slot()) {
 		kset_proc(p, entry, priority, name);
-		bitmap_fill(p->ptable, PROTECTION_TABLE_LEN);
+		bitmap_fill(p->ptable, PTABLE_LEN);
 		enqueue_tail(ready_q[priority], p);
 	}
 	return p;
@@ -256,7 +256,7 @@ struct proc *kexecp(struct proc *p, void (*entry)(), int priority, const char *n
 	ptr = kset_proc(p, entry, priority, name);
 	// kprintf("kset 0x%08x\n",mem_map[0]);
 	p->rbase = DEFAULT_RBASE;
-	bitmap_fill(p->ptable, PROTECTION_TABLE_LEN);
+	bitmap_fill(p->ptable, PTABLE_LEN);
 	add_to_scheduling_queue(p);
 	return p;
 }
@@ -275,7 +275,7 @@ struct proc *start_system(void (*entry)(), int priority, const char *name) {
 		// p->ptable = p->protection_table;
 
 		// ptr = proc_malloc(DEFAULT_STACK_SIZE);
-		ptr = get_free_pages(stack_size / 1024,__GFP_NORM);
+		ptr = get_free_pages_addr(stack_size / 1024,__GFP_NORM);
 
 		p->sp = (reg_t *)ptr + stack_size - 128;
 		//TODO: init heap_break using slab
@@ -284,7 +284,7 @@ struct proc *start_system(void (*entry)(), int priority, const char *name) {
 		//Set the process to runnable, remember to enqueue it after you call this method
 		p->state = RUNNABLE;
 	}
-	bitmap_fill(p->ptable, PROTECTION_TABLE_LEN);
+	bitmap_fill(p->ptable, PTABLE_LEN);
 	add_to_scheduling_queue(p);
 	return p;
 }
@@ -298,7 +298,7 @@ struct proc* start_init(size_t *lines, size_t length, size_t entry) {
 		memcpy(ptr_base, lines, length);
 		p->rbase = ptr_base;
 		p->sp = get_virtual_addr(p->sp, p);
-		// bitmap_set_bit(p->ptable,PROTECTION_TABLE_LEN,get_page_index(p->rbase));
+		// bitmap_set_bit(p->ptable,PTABLE_LEN,get_page_index(p->rbase));
 		//set protection table TODOK
 		add_to_scheduling_queue(p);
 	}

@@ -31,7 +31,7 @@ int _fork(struct proc *parent) {
 		}
 		// kprintf("start searching |");
 		index = bitmap_search_pattern(mem_map, MEM_MAP_LEN, BSS_END / 1024, ptn.pattern, ptn.size);
-		bitmap_clear(p->ptable, PROTECTION_TABLE_LEN);
+		bitmap_clear(p->ptable, PTABLE_LEN);
 		// kprintf("start set |");
 		bitmap_set_pattern(mem_map, 32, index, ptn.pattern, ptn.size);
 		bitmap_set_pattern(p->ptable, 32, index, ptn.pattern, ptn.size);

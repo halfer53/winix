@@ -50,13 +50,13 @@ struct proc *exec_proc(struct proc *p,size_t *lines, size_t length, size_t entry
 		overall_length = length + DEFAULT_STACK_SIZE + DEFAULT_HEAP_SIZE;
 
 		p->ptable = p->protection_table;
-		// bitmap_clear(p->ptable,PROTECTION_TABLE_LEN);
+		// bitmap_clear(p->ptable,PTABLE_LEN);
 
 		len = physical_len_to_page_len(overall_length);
 		nstart = bitmap_search(mem_map,MEM_MAP_LEN,len);
 
-		bitmap_clear(p->ptable,PROTECTION_TABLE_LEN);
-		bitmap_set_nbits(p->ptable,PROTECTION_TABLE_LEN, nstart,len);
+		bitmap_clear(p->ptable,PTABLE_LEN);
+		bitmap_set_nbits(p->ptable,PTABLE_LEN, nstart,len);
 		bitmap_set_nbits(mem_map,MEM_MAP_LEN, nstart,len);
 
 		// kprintf("0x%08x start %d len %d\n",mem_map[0],nstart,len);

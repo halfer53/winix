@@ -28,7 +28,7 @@
 
 //Process Defaults
 #define DEFAULT_FLAGS			0
-#define PROTECTION_TABLE_LEN	32
+#define PTABLE_LEN	32
 #define DEFAULT_STACK_SIZE		1024
 #define DEFAULT_HEAP_SIZE		1024
 #define DEFAULT_CCTRL			0xff9
@@ -77,7 +77,7 @@ typedef struct proc {
 	size_t length; //length is depreciated, do not use it
 
 	/* Protection */
-	reg_t protection_table[PROTECTION_TABLE_LEN];
+	reg_t protection_table[PTABLE_LEN];
 
 	/* IPC queue */
 	struct proc *sender_q;	//Head of process queue waiting to send to this process

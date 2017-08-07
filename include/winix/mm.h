@@ -5,11 +5,11 @@
 
 void init_mem_table();
 
-ptr_t* get_free_page(int flags);
-ptr_t* get_free_pages(int num, int flags);
+ptr_t* get_free_page_addr(int flags);
+ptr_t* get_free_pages_addr(int num, int flags);
 
-int get_free_page_index(int flags);
-int get_free_pages_index(int num, int flags);
+int get_free_page(int flags);
+int get_free_pages(int num, int flags);
 
 void free_page(ptr_t* ptr);
 void print_mem_map(int i);
