@@ -31,6 +31,8 @@
 #define PTABLE_LEN				32
 #define DEFAULT_STACK_SIZE		1024
 #define DEFAULT_HEAP_SIZE		1024
+#define KERNEL_STACK_PAGE_SIZE	2
+#define USER_STACK_PAGE_SIZE	1
 #define DEFAULT_CCTRL			0xff9
 #define DEFAULT_STACK_POINTER			0x00000
 #define USER_CCTRL			0x8 //OKU is set to 0
@@ -115,7 +117,10 @@ typedef struct proc {
 } proc_t;
 
 
-#define isokprocn(i)	(i>= 0 && i < NUM_PROCS)
+#define IS_PROCN_OK(i)	(i>= 0 && i < NUM_PROCS)
+#define IS_PRIORITY_OK(priority)	(0 <= priority && priority < NUM_QUEUES)
+#define IS_KERNEL_PROC(p)	(p->proc_nr == 0)
+#define IS_USER_PROC(p)		(p->proc_nr > 0)
 
 extern struct proc proc_table[NUM_PROCS];
 extern struct proc *ready_q[NUM_QUEUES][2];
@@ -125,38 +130,18 @@ extern struct proc *block_q[2];
 void enqueue_tail(struct proc **q, struct proc *proc);
 void enqueue_head(struct proc **q, struct proc *proc);
 struct proc *dequeue(struct proc **q);
-/**
- * Initialises the process table and scheduling queues.
- **/
 void init_proc();
 void proc_set_default(struct proc *p);
-/**
- * Creates a new process and adds it to the runnable queue.
- **/
-struct proc *new_proc(void (*entry)(), int priority, const char *name);
+reg_t* alloc_stack(struct proc *who);
+struct proc *start_kernel_proc(void (*entry)(), int priority, const char *name);
+struct proc *start_user_proc(size_t *lines, size_t length, size_t entry, int priority, char *name);
 struct proc *get_free_proc_slot();
 void add_to_scheduling_queue(struct proc* p);
 /**
  * WINIX Scheduler.
  **/
 void sched();
-
-/**
- * Frees up a process.
- *
- * Parameters:
- *   p		The process to remove.
- **/
 void end_process(struct proc *p);
-
-/**
- * Gets a pointer to a process.
- *
- * Parameters:
- *   proc_nr		The process to retrieve.
- *
- * Returns:			The relevant process, or NULL if it does not exist.
- **/
 struct proc *get_proc(int proc_nr);
 struct proc *get_running_proc(int proc_nr);
 
@@ -164,12 +149,6 @@ struct proc *get_running_proc(int proc_nr);
 //fork the next process in the ready_q, return the new pid of the forked process
 //side effect: the head of the free_proc is dequeued, and added to the ready_q with all relevant values equal
 //to the original process, except stack pointer.
-
-struct proc *kexecp(struct proc *p,void (*entry)(), int priority, const char *name);
-struct proc *start_system(void (*entry)(), int priority, const char *name);
-struct proc* start_init(size_t *lines, size_t length, size_t entry);
-
-
 void process_overview();
 void printProceInfo(struct proc* curr);
 char* getStateName(proc_state_t state);

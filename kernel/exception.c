@@ -100,7 +100,7 @@ PRIVATE void serial2_handler() {
 PRIVATE void gpf_handler() {
 	int i=0;
 	struct proc *system = get_proc(0);
-	if(!isokprocn(current_proc->proc_nr))
+	if(!IS_PROCN_OK(current_proc->proc_nr))
 		panic("invalid proc");
 	//Current process has performed an illegal operation and will be shut down.
 	kprintf("\r\n[SYSTEM] Process \"%s (%d)\" Rbase=0x%08x GPF: PC=0x%08x SP=0x%08x.\r\n",

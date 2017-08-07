@@ -5,7 +5,7 @@ struct proc *get_idle(){
 	static struct proc *idle = NULL;
 	// kprintf("get idle\n");
 	if(idle == NULL){
-		idle = new_proc(idle_main, IDLE_PRIORITY, "IDLE");
+		idle = start_kernel_proc(idle_main, IDLE_PRIORITY, "IDLE");
 	}
 	return idle;
 }

@@ -11,7 +11,8 @@ ptr_t* get_free_pages_addr(int num, int flags);
 int get_free_page(int flags);
 int get_free_pages(int num, int flags);
 
-void free_page(ptr_t* ptr);
+void free_page(int page);
+void free_pages(int page, int num);
 int next_free_page_index();
 
 void print_ptable(unsigned int *p, int len);
@@ -34,7 +35,7 @@ extern unsigned int mem_map[MEM_MAP_LEN];
 #define get_virtual_addr(pa,proc)	(((ptr_t*)pa)-(unsigned int)proc->rbase)
 
 #define get_page_index(pa)	( ((int)pa) / 1024 )
-#define page_pa(_index)   ((void *)(_index * 1024))
+#define PAGE_ADDR(_index)   ((ptr_t *)(_index * 1024))
 #define physical_len_to_page_len(pa_len)	( (align1k((int)pa_len)) / 1024 )
 #define page_len_to_physical_len(p_len)	(p_len * 1024)
 

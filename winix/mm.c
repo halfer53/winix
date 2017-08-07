@@ -50,9 +50,16 @@ int next_free_page_index(){
 	return bitmap_search(mem_map, MEM_MAP_LEN, 1);
 }
 
-void free_page(ptr_t* ptr) {
-	int nstart = (int)((long)ptr /1024);
-	bitmap_reset_bit(mem_map, MEM_MAP_LEN, nstart);
+void free_page(int page) {
+	bitmap_clear_bit(mem_map, MEM_MAP_LEN, page);
+}
+
+void free_pages(int page, int len){
+	bitmap_clear_nbits(mem_map, MEM_MAP_LEN, page, len);
+}
+
+void release_proc_mem(struct proc *who){
+    bitmap_xor(mem_map,who->ptable,MEM_MAP_LEN);
 }
 
 void print_ptable(unsigned int *p, int len){
@@ -63,6 +70,17 @@ void print_ptable(unsigned int *p, int len){
 			kprintf("\n");
 	}
 	kprintf("\n");
+}
+
+int user_get_free_pages(struct proc* who, int page_num, int flags){
+	int ret;
+	int index = get_free_pages(page_num,flags);
+	if(index == ERR)
+		return ERR;
+	ret = bitmap_set_nbits(who->ptable, PTABLE_LEN, index, page_num);
+	if(ret == ERR)
+		return ERR;
+	return index;
 }
 
 void print_sysmap(){

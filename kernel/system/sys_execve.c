@@ -5,17 +5,6 @@ int do_exec(struct proc *who, struct message *m){
 		return exec_read_srec(who);
 }
 
-//dynamically allocate a new memory space in the memory, and
-//write mem values in lines to that space
-struct proc *exec_new_proc(size_t *lines, size_t length, size_t entry, int priority, char *name){
-	struct proc *p = NULL;
-	if(p = get_free_proc_slot()) {
-		p = exec_proc(p,lines,length,entry,priority,name);
-	}
-  assert(p != NULL,"Exec failed\n");
-  return p;
-}
-
 //replace the currently running process with the new text, priority, and name provided
 struct proc *exec_replace_existing_proc(struct proc *p,size_t *lines, size_t length, size_t entry, int priority, char *name){
 	assert(p != NULL, "can't exec null process\n");
@@ -64,13 +53,13 @@ struct proc *exec_proc(struct proc *p,size_t *lines, size_t length, size_t entry
 		ptr_base = (ptr_t*)(nstart * 1024);
 		p->heap_break = ptr_base + length + DEFAULT_STACK_SIZE;
 		memcpy(ptr_base, lines,length_bak);
+		p->rbase = ptr_base;
 
-		p->sp = (reg_t *)(length + DEFAULT_STACK_SIZE-1); 
+		// p->sp = (reg_t *)(length + DEFAULT_STACK_SIZE-1); 
+		p->sp = alloc_stack(p);
 
 		p->priority = priority;
 		p->pc = (void (*)())entry; 
-
-		p->rbase = ptr_base;
 
 		strcpy(p->name,name);
 

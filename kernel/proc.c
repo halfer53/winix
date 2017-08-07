@@ -124,7 +124,6 @@ int remove_from_scheduling_queue( struct proc *h) {
 }
 
 void add_to_scheduling_queue(struct proc* p) {
-	remove_from_scheduling_queue(p);
 	enqueue_tail(ready_q[p->priority], p);
 }
 
@@ -182,28 +181,29 @@ void proc_set_default(struct proc *p) {
 	memset(&p->sig_table,0,_NSIG * 3); //3: sizeof struct sigaction
 }
 
+reg_t* alloc_stack(struct proc *who){
+	int page_size;
+	int index;
+	ptr_t *addr;
 
-void release_proc_mem(struct proc *who){
-    bitmap_xor(mem_map,who->ptable,MEM_MAP_LEN);
+	page_size = IS_USER_PROC(who) ? USER_STACK_PAGE_SIZE : KERNEL_STACK_PAGE_SIZE;
+	index = user_get_free_pages(who, page_size, __GFP_HIGH);
+	if(index == ERR)
+		return NULL;
+	bitmap_set_bit(who->ptable, PTABLE_LEN, index - 1); 
+	//set previous page to inaccessible, to prevent stack overflow from interfering other virtual address space
+	addr = PAGE_ADDR(index);
+	return get_virtual_addr(addr, who);
 }
 
 
-void *set_proc(struct proc *p, void (*entry)(), int priority, const char *name) {
-	ptr_t *ptr;
-	int pg_index;
+int set_proc(struct proc *p, void (*entry)(), int priority, const char *name) {
 	p->priority = priority;
 	p->pc = entry;
-
 	strcpy(p->name, name);
-
-	ptr = get_free_pages_addr(2,__GFP_HIGH);
-	p->sp = (reg_t *)(ptr) + PAGE_LEN - 1;
-
-	p->length = DEFAULT_STACK_SIZE; //one page
-
 	//Set the process to runnable, remember to enqueue it after you call this method
 	p->state = RUNNABLE;
-	return ptr;
+	return OK;
 }
 
 /**
@@ -222,85 +222,31 @@ void *set_proc(struct proc *p, void (*entry)(), int priority, const char *name) 
  * Side Effects:
  *   A proc is removed from the free_proc list, reinitialised, and added to ready_q.
  */
-struct proc *new_proc(void (*entry)(), int priority, const char *name) {
+struct proc *start_kernel_proc(void (*entry)(), int priority, const char *name) {
 	struct proc *p = NULL;
 	int i;
 	size_t *ptr = NULL;
 	int n = 0;
 	int temp = 0;
 
-	//Is the priority valid?
-	if (!(0 <= priority && priority < NUM_QUEUES)) {
+	if (!IS_PRIORITY_OK(priority)) 
 		return NULL;
-	}
-	if (p = get_free_proc_slot()) {
-		set_proc(p, entry, priority, name);
-		bitmap_fill(p->ptable, PTABLE_LEN);
-		enqueue_tail(ready_q[priority], p);
-	}
-	return p;
-}
-
-
-
-
-
-struct proc *kexecp(struct proc *p, void (*entry)(), int priority, const char *name) {
-	void *ptr = NULL;
-	int lower_bound = 0;
-	if (p->rbase == DEFAULT_RBASE) {
-		bitmap_set_bit(mem_map, MEM_MAP_LEN, get_page_index(p->sp));
-	} else {
-		bitmap_xor(mem_map, p->ptable, MEM_MAP_LEN);
-	}
-	ptr = set_proc(p, entry, priority, name);
-	// kprintf("kset 0x%08x\n",mem_map[0]);
-	p->rbase = DEFAULT_RBASE;
+	
+	if (!(p = get_free_proc_slot()))
+		return NULL;
+	
+	set_proc(p, entry, priority, name);
 	bitmap_fill(p->ptable, PTABLE_LEN);
-	add_to_scheduling_queue(p);
+	p->sp = alloc_stack(p);
+	enqueue_tail(ready_q[priority], p);
 	return p;
 }
 
-struct proc *start_system(void (*entry)(), int priority, const char *name) {
+
+struct proc *start_user_proc(size_t *lines, size_t length, size_t entry, int priority, char *name){
 	struct proc *p = NULL;
-	int stack_size = 1024 * 1;
-	int pg_idx;
-	ptr_t *ptr;
-	if (p = get_free_proc_slot()) {
-		p->priority = priority;
-		p->pc = entry;
-
-		strcpy(p->name, name);
-
-		// p->ptable = p->protection_table;
-
-		// ptr = proc_malloc(DEFAULT_STACK_SIZE);
-		ptr = get_free_pages_addr(stack_size / 1024,__GFP_NORM);
-
-		p->sp = (reg_t *)ptr + stack_size - 128;
-		//TODO: init heap_break using slab
-		p->heap_break = p->sp + 1;
-		p->length = stack_size * 10;
-		//Set the process to runnable, remember to enqueue it after you call this method
-		p->state = RUNNABLE;
-	}
-	bitmap_fill(p->ptable, PTABLE_LEN);
-	add_to_scheduling_queue(p);
-	return p;
-}
-
-struct proc* start_init(size_t *lines, size_t length, size_t entry) {
-	void *ptr_base;
-	int size = 1024, nstart = 0;
-	struct proc *p = NULL;
-	if (p = get_free_proc_slot()) {
-		ptr_base = set_proc(p, (void (*)())entry, USER_PRIORITY, "INIT");
-		memcpy(ptr_base, lines, length);
-		p->rbase = ptr_base;
-		p->sp = get_virtual_addr(p->sp, p);
-		// bitmap_set_bit(p->ptable,PTABLE_LEN,get_page_index(p->rbase));
-		//set protection table TODOK
-		add_to_scheduling_queue(p);
+	if(p = get_free_proc_slot()) {
+		p = exec_proc(p,lines,length,entry,priority,name);
 	}
 	return p;
 }
@@ -374,7 +320,7 @@ void printProceInfo(struct proc* curr) {
  **/
 struct proc *get_proc(int proc_nr) {
 	struct proc *p;
-	if (isokprocn(proc_nr)){
+	if (IS_PROCN_OK(proc_nr)){
 		p = &proc_table[proc_nr];
 		return p;
 		// if(p->state != ZOMBIE && p->state != DEAD)

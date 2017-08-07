@@ -18,8 +18,8 @@ int do_brk(struct proc *who, struct message *m){
 		i = get_page_index(who->heap_break);
 		paddr = get_page_index(addr);
 		for(; i> paddr; i--){
-			bitmap_reset_bit(mem_map,MEM_MAP_LEN,i);
-			bitmap_reset_bit(who->ptable,MEM_MAP_LEN,i);
+			bitmap_clear_bit(mem_map,MEM_MAP_LEN,i);
+			bitmap_clear_bit(who->ptable,MEM_MAP_LEN,i);
 		}
 		who->heap_break = addr;
 		return OK;

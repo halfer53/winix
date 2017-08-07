@@ -83,14 +83,14 @@ void main() {
 	init_proc();
 
 	//Initialise the system task
-	p = new_proc(system_main, SYSTEM_PRIORITY, "SYSTEM");
+	p = start_kernel_proc(system_main, SYSTEM_PRIORITY, "SYSTEM");
 	assert(p != NULL, "Create sys task");
 	p->quantum = 64;
 
-	p = exec_new_proc(init_code,2,0, USER_PRIORITY,"init");
+	p = start_user_proc(init_code,2,0, USER_PRIORITY,"init");
 	p->quantum = 1;
 
-	p = exec_new_proc(shell_code,shell_code_length,shell_pc, USER_PRIORITY,"Shell");
+	p = start_user_proc(shell_code,shell_code_length,shell_pc, USER_PRIORITY,"Shell");
 	assert(p != NULL, "Create Shell task");
 	p->parent = 1;//hack 
 	p->quantum = 2;
