@@ -92,7 +92,7 @@ struct proc *dequeue(struct proc **q) {
 }
 
 //return ERR if nothing found
-int remove_from_scheduling_queue( struct proc *h) {
+int dequeue_schedule( struct proc *h) {
 	struct proc *curr;
 	struct proc *prev = NULL;
 	struct proc ** q = ready_q[h->priority];
@@ -123,7 +123,7 @@ int remove_from_scheduling_queue( struct proc *h) {
 	return OK;
 }
 
-void add_to_scheduling_queue(struct proc* p) {
+void enqueue_schedule(struct proc* p) {
 	enqueue_tail(ready_q[p->priority], p);
 }
 
@@ -142,10 +142,11 @@ struct proc *get_free_proc_slot() {
 
 
 void proc_set_default(struct proc *p) {
-	int i = 0;
-	for (i = 0; i < NUM_REGS; i++) {
-		p->regs[i] = DEFAULT_REG_VALUE;
-	}
+	int pnr_bak = p->proc_nr;
+	memset(p,0, sizeof(struct proc));
+	p->proc_nr = pnr_bak;
+
+	memset(p->regs, DEFAULT_REG_VALUE, NUM_REGS);
 
 	p->sp = DEFAULT_STACK_POINTER;
 	p->ra = DEFAULT_RETURN_ADDR;
@@ -155,44 +156,25 @@ void proc_set_default(struct proc *p) {
 	p->cctrl = DEFAULT_CCTRL;
 
 	p->quantum = DEFAULT_QUANTUM;
-	p->ticks_left = 0;
-	p->time_used = 0;
-	//strcpy(p->name,"Unkonwn");
 	p->state = INITIALISING;
 	p->flags = DEFAULT_FLAGS;
 
-	p->sender_q = NULL;
-	p->next_sender = NULL;
-	p->message = NULL;
-
-	p->length = 0;
-	p->parent = 0;
-	p->heap_break = NULL;
-	p->proc_nr = p->proc_nr;
-
 	p->ptable = p->protection_table;
-	bitmap_clear(p->ptable, PTABLE_LEN);
 
-	p->alarm.time_out = 0;
-	p->alarm.next = NULL;
-	p->alarm.flags = 0;
 	p->alarm.proc_nr = p->proc_nr;
-
-	memset(&p->sig_table,0,_NSIG * 3); //3: sizeof struct sigaction
 }
 
-reg_t* alloc_stack(struct proc *who){
+reg_t* alloc_kstack(struct proc *who){
 	int page_size;
 	int index;
-	ptr_t *addr;
+	ptr_t *addr, *stack_top;
 
-	page_size = IS_USER_PROC(who) ? USER_STACK_PAGE_SIZE : KERNEL_STACK_PAGE_SIZE;
-	index = user_get_free_pages(who, page_size, __GFP_HIGH);
-	if(index == ERR)
-		return NULL;
-	bitmap_set_bit(who->ptable, PTABLE_LEN, index - 1); 
-	//set previous page to inaccessible, to prevent stack overflow from interfering other virtual address space
-	addr = PAGE_ADDR(index);
+	stack_top = user_get_free_pages(who, KERNEL_STACK_SIZE, GFP_HIGH);
+	if(stack_top == NULL)
+		panic("Can't allocate stack");
+	
+	addr = stack_top + KERNEL_STACK_SIZE - 1;
+	who->stack_top = stack_top;
 	return get_virtual_addr(addr, who);
 }
 
@@ -223,11 +205,7 @@ int set_proc(struct proc *p, void (*entry)(), int priority, const char *name) {
  *   A proc is removed from the free_proc list, reinitialised, and added to ready_q.
  */
 struct proc *start_kernel_proc(void (*entry)(), int priority, const char *name) {
-	struct proc *p = NULL;
-	int i;
-	size_t *ptr = NULL;
-	int n = 0;
-	int temp = 0;
+	struct proc *p;
 
 	if (!IS_PRIORITY_OK(priority)) 
 		return NULL;
@@ -237,14 +215,14 @@ struct proc *start_kernel_proc(void (*entry)(), int priority, const char *name) 
 	
 	set_proc(p, entry, priority, name);
 	bitmap_fill(p->ptable, PTABLE_LEN);
-	p->sp = alloc_stack(p);
-	enqueue_tail(ready_q[priority], p);
+	p->sp = alloc_kstack(p);
+	enqueue_schedule(p);
 	return p;
 }
 
 
-struct proc *start_user_proc(size_t *lines, size_t length, size_t entry, int priority, char *name){
-	struct proc *p = NULL;
+struct proc *start_user_proc(size_t *lines, size_t length, size_t entry, int priority, const char *name){
+	struct proc *p;
 	if(p = get_free_proc_slot()) {
 		p = exec_proc(p,lines,length,entry,priority,name);
 	}
@@ -254,7 +232,7 @@ struct proc *start_user_proc(size_t *lines, size_t length, size_t entry, int pri
 
 void unseched(struct proc *p){
 	release_proc_mem(p);
-	remove_from_scheduling_queue(p);
+	dequeue_schedule(p);
 }
 
 void free_slot(struct proc *p){
@@ -278,6 +256,55 @@ void end_process(struct proc *p) {
 	free_slot(p);
 }
 
+
+int proc_memctl(struct proc* who ,ptr_t* page_addr, int flags){
+	int paged = PADDR_TO_PAGED(page_addr);
+
+	if(flags == PROC_ACCESS){
+		return bitmap_set_bit(who->ptable, PTABLE_LEN, paged);
+	}else if(flags == PROC_NO_ACCESS){
+		return bitmap_clear_bit(who->ptable, PTABLE_LEN, paged);
+	}
+	return ERR;
+}
+
+
+int alloc_proc_mem(struct proc *who, int tdb_length, int stack_size, int heap_size, int flags){
+	int proc_page_len;
+	int proc_len;
+	ptr_t* rbase;
+	int stack_offset = 0;
+
+	if(flags & PROC_PVT_STACK_OV )
+		stack_offset = PAGE_LEN;
+
+	tdb_length = ALIGN_PAGE(tdb_length);
+	stack_size = ALIGN_PAGE(stack_size);
+	heap_size = ALIGN_PAGE(heap_size);
+	proc_len = tdb_length + stack_offset + stack_size + heap_size;
+	// proc_page_len = (tdb_length + stack_offset + stack_size + heap_size) / PAGE_LEN;
+
+	who->rbase = rbase = user_get_free_pages(who, proc_len, GFP_NORM);
+	if(rbase == NULL)
+		return ERR;
+
+	if(flags & PROC_PVT_STACK_OV)
+		proc_memctl(who, rbase + tdb_length, PROC_NO_ACCESS);
+
+	if(flags & PROC_SET_SP){
+		who->stack_top = rbase + tdb_length + stack_offset;
+		who->sp = get_virtual_addr(who->stack_top + stack_size - 1,who);
+	}
+
+	if(flags & PROC_SET_HEAP){
+		who->heap_break = get_physical_addr(who->sp,who) +1;
+	}
+	return OK;
+}
+
+
+
+
 //print out the list of processes currently in the ready_q
 //and the currently running process
 //return OK;
@@ -285,7 +312,7 @@ void end_process(struct proc *p) {
 void process_overview() {
 	int i;
 	struct proc *curr;
-	kprintf("NAME     proc_nr PPID RBASE      PC         STACK      HEAP       PROTECTION   flags\n");
+	kprintf("NAME     PID PPID RBASE      PC         STACK      HEAP       PROTECTION   flags\n");
 	for (i = 0; i < NUM_PROCS; i++) {
 		curr = &proc_table[i];
 		if(curr->IN_USE && curr->state != ZOMBIE)
@@ -295,7 +322,7 @@ void process_overview() {
 
 //print the process state given
 void printProceInfo(struct proc* curr) {
-	int ptable_idx = get_page_index(curr->rbase)/32;
+	int ptable_idx = PADDR_TO_PAGED(curr->rbase)/32;
 	kprintf("%-08s %-03d %-04d 0x%08x 0x%08x 0x%08x 0x%08x %d 0x%08x %d\n",
 	        curr->name,
 	        curr->proc_nr,

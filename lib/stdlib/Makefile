@@ -9,7 +9,7 @@ OBJECT = $(PROGS:=.o)
 
 wramp: $(OBJECT)
 $(ASSEMBLY): %.s: %.c $(INCLUDES)
-	wcc $(CFLAGS) -S -I$(INCLUDE_DIR) -o $@ $<
+	wcc $(CFLAGS) -S -N -I$(INCLUDE_DIR) -o $@ $<
 
 $(OBJECT): %.o: %.s
 	wasm $< -o $@

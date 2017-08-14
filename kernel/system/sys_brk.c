@@ -15,8 +15,8 @@ int do_brk(struct proc *who, struct message *m){
 		return OK;
 	}
 	if(addr < who->heap_break){
-		i = get_page_index(who->heap_break);
-		paddr = get_page_index(addr);
+		i = PADDR_TO_PAGED(who->heap_break);
+		paddr = PADDR_TO_PAGED(addr);
 		for(; i> paddr; i--){
 			bitmap_clear_bit(mem_map,MEM_MAP_LEN,i);
 			bitmap_clear_bit(who->ptable,MEM_MAP_LEN,i);

@@ -51,13 +51,13 @@ void exit_proc(struct proc *who, int status){
 
     // process_overview();
     //if parent is waiting
+    KDEBUG(("%s[%d] exit status %d \n",who->name, who->proc_nr, status));
 
     for( i=0; i< NUM_PROCS; i++){
         mp = &proc_table[i];
         if(mp->IN_USE){
             if(mp->flags & WAITING && mp->wpid == who->proc_nr){
                 //TODO: modify wstatus
-            
                 mesg.i1 = who->proc_nr;
                 mp->flags &= ~WAITING;
 

@@ -61,9 +61,9 @@ int bitmap_search_from(unsigned int *map, int map_len, int start, int num){
 	return ERR;
 }
 
-int bitmap_search(unsigned int *map, int map_len, int num){
-	return bitmap_search_from(map,map_len,0,num);
-}
+// int bitmap_search(unsigned int *map, int map_len, int num){
+// 	return bitmap_search_from(map,map_len, (BSS_END) / PAGE_LEN , num);
+// }
 
 int bitmap_search_reverse(unsigned int *map, int map_len, int num){
 	register int i,j;
@@ -157,7 +157,7 @@ int search_backtrace(unsigned int *map, int region_len,unsigned int pattern, int
     return OK;
 }
 
-int bitmap_search_pattern(unsigned int *map, int map_len,int start, unsigned int pattern, int pattern_len){
+int bitmap_search_pattern(unsigned int *map, int map_len, unsigned int pattern, int pattern_len){
     int i=0, j = 0;
     unsigned int map_bit, pattern_bit;
 	int result;
@@ -192,7 +192,7 @@ unsigned int createMask(unsigned int a, unsigned int b)
 int bitmap_extract_pattern(unsigned int *map, int map_len, int heap_break, pattern_t *p){
     int i,j,start = 0;
     unsigned int result = 0;
-    int end = (align1k(heap_break) / 1024);
+    int end = (ALIGN_PAGE(heap_break) / 1024);
     int endi = end/32;
     unsigned int tmask;
     for(i=0;i < map_len;i++){
@@ -229,6 +229,14 @@ int bitmap_set_pattern(unsigned int *map, int map_len, int index, unsigned int p
     return OK;
 }
 
+bool is_bit_on(unsigned int *map, int map_len, int bit){
+    int i= bit/32, j=bit%32;
+    if(bit > map_len * 32)
+        return false;
+    
+    return map[i] & mask[j];
+}
+
 
 int bitmap_xor(unsigned int *map1, unsigned int *map2, int map_len){
     int i=0;
@@ -236,4 +244,14 @@ int bitmap_xor(unsigned int *map1, unsigned int *map2, int map_len){
         map1[i] ^= map2[i];
     }
     return OK;
+}
+
+void print_bitmap(unsigned int *p, int len){
+	int i;
+	for( i = 0; i < len; i++){
+		kprintf("0x%08x ",*p++);
+		if((i+1) % 8 == 0)
+			kprintf("\n");
+	}
+	kprintf("\n");
 }

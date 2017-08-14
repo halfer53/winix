@@ -18,7 +18,6 @@ int do_wait(struct proc *parent, struct message *mesg){
                     *wstatus = child->exit_status;
                 }
                 free_slot(child);
-                kprintf("%d child %d\n",child->proc_nr);
                 mesg->i1 = child->proc_nr;
                 winix_send(parent->proc_nr,mesg);
                 return OK;

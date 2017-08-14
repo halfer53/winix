@@ -12,7 +12,7 @@
 #include <signal.h>
 
 typedef struct {int m1i1, m1i2, m1i3; void *m1p1, *m1p2, *m1p3;} mess_1;
-typedef struct {int m2i1, m2i2, m2i3; long m2l1;unsigned long m2ul1; void *m2p1; short m2s1;} mess_2;
+typedef struct {int m2i1, m2i2, m2i3; long m2l1;unsigned int m2ul1; void *m2p1; short m2s1;} mess_2;
 /**
  * The message structure for IPC
  **/

@@ -139,7 +139,7 @@ PRIVATE int kputs_vm_buf(char *s, void *who_rbase, char *buf) {
 		// kputc(*sp++);
 }
 
-PRIVATE void kputs(const char *s) {
+void kputs(const char *s) {
 	while(*s)
 		kputc(*s++);
 }
@@ -245,6 +245,14 @@ int kprintf(const char *format, ...) {
 	void *arg = &format;
 	arg = ((char*)arg) + 1;
 
+	return kprintf_vm(format,arg,0);
+}
+
+int dbg_kprintf(const char *format, ...){
+	void *arg = &format;
+	arg = ((char*)arg) + 1;
+
+	kprintf_vm("[SYSTEM] ",NULL,0);
 	return kprintf_vm(format,arg,0);
 }
 

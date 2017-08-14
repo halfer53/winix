@@ -22,7 +22,7 @@ static void *end = NULL;
 
 #define BLOCK_SIZE 5
 #define align4(x) (((((x)-1)>>2)<<2)+4)
-#define align1k(x) (((((x)-1)>>10)<<10)+1024)
+#define ALIGN1K(x) (((((x)-1)>>10)<<10)+1024)
 
 void printblock(block_t *b) {
 	int i = (int)b / 1024;
@@ -87,7 +87,7 @@ block_t *extend_heap(block_t *last , size_t s)
 	b = sbrk (0);
 	if (b != NULL)
 	{
-		page_end = align1k((int)b);
+		page_end = ALIGN1K((int)b);
 		size_til_endof_page = page_end - (int)b - BLOCK_SIZE;
 
 		// printf("b 0x%08x siend %d\n",b,size_til_endof_page);

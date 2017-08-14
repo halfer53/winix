@@ -14,7 +14,7 @@ depreciated, use slab.c instead
 
 struct hole{
   size_t *start;
-  unsigned long length;
+  unsigned int length;
   struct hole *next;
 };
 

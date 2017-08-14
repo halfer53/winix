@@ -55,16 +55,16 @@ typedef enum { DEAD, INITIALISING, RUNNABLE, ZOMBIE } proc_state_t;
  **/
 typedef struct proc {
 	/* Process State */
-	unsigned long regs[14];	//Register values
-	unsigned long *sp;
+	unsigned int regs[14];	//Register values
+	unsigned int *sp;
 	void *ra;
 	void (*pc)();
 	void *rbase;
-	unsigned long *ptable;
-	unsigned long cctrl;
+	unsigned int *ptable;
+	unsigned int cctrl;
 
 	/* Protection */
-	unsigned long protection_table[PTABLE_LEN];
+	unsigned int protection_table[PTABLE_LEN];
 
 	/* Scheduling */
 	int priority;		//Default priority
@@ -88,7 +88,7 @@ typedef struct proc {
 	/* Process Table Index */
 	int pid;		//Index in the process table
 
-	unsigned long length;
+	unsigned int length;
 
 	int parent_pid;
 

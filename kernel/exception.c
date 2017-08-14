@@ -53,6 +53,10 @@ int system_uptime = 0;
 int irq_count(){
 	return _irq_count;
 }
+
+void reset_irq_count(){
+	_irq_count = 0;
+}
 /**
  * User Interrupt Button (IRQ1)
  **/
@@ -98,25 +102,32 @@ PRIVATE void serial2_handler() {
  *   Scheduler is called (i.e. this handler does not return).
  **/
 PRIVATE void gpf_handler() {
-	int i=0;
-	struct proc *system = get_proc(0);
 	if(!IS_PROCN_OK(current_proc->proc_nr))
 		panic("invalid proc");
 	//Current process has performed an illegal operation and will be shut down.
-	kprintf("\r\n[SYSTEM] Process \"%s (%d)\" Rbase=0x%08x GPF: PC=0x%08x SP=0x%08x.\r\n",
+	
+	KDEBUG(("General Protection Fault: \"%s (%d)\" Rbase=0x%x vPC=0x%x vSP=0x%x.\r\n",
 		current_proc->name,
 		current_proc->proc_nr,
 		current_proc->rbase,
 		current_proc->pc,
-		current_proc->sp,current_proc);
-	kprintf("mIR: 0x%08x\n",*get_physical_addr(current_proc->pc,current_proc));
-	kprintf("$1: 0x%08x, $2, 0x%08x, $3, 0x%08x\n",current_proc->regs[0],current_proc->regs[1],current_proc->regs[2]);
-	kprintf("$4: 0x%08x, $5, 0x%08x, $6, 0x%08x\n",current_proc->regs[3],current_proc->regs[4],current_proc->regs[5]);
-	kprintf("$7: 0x%08x, $8, 0x%08x, $9, 0x%08x\n",current_proc->regs[6],current_proc->regs[7],current_proc->regs[8]);
-	kprintf("$10: 0x%08x, $11, 0x%08x, $12, 0x%08x\n",current_proc->regs[9],current_proc->regs[10],current_proc->regs[11]);
-	kprintf("$13: 0x%08x, $sp, 0x%08x, $ra, 0x%08x\n",current_proc->regs[12],current_proc->regs[13],current_proc->regs[14]);
-	print_sysmap();
-	print_ptable(current_proc->ptable, PTABLE_LEN);
+		current_proc->sp));
+
+	
+#ifdef _DEBUG
+	// kprintf("mIR: 0x%08x\n",*get_physical_addr(current_proc->pc,current_proc));
+	// kprintf("$1: 0x%08x, $2, 0x%08x, $3, 0x%08x\n",current_proc->regs[0],current_proc->regs[1],current_proc->regs[2]);
+	// kprintf("$4: 0x%08x, $5, 0x%08x, $6, 0x%08x\n",current_proc->regs[3],current_proc->regs[4],current_proc->regs[5]);
+	// kprintf("$7: 0x%08x, $8, 0x%08x, $9, 0x%08x\n",current_proc->regs[6],current_proc->regs[7],current_proc->regs[8]);
+	// kprintf("$10: 0x%08x, $11, 0x%08x, $12, 0x%08x\n",current_proc->regs[9],current_proc->regs[10],current_proc->regs[11]);
+	// kprintf("$13: 0x%08x, $sp, 0x%08x, $ra, 0x%08x\n",current_proc->regs[12],current_proc->regs[13],current_proc->regs[14]);
+	// print_ptable(current_proc);
+#endif
+
+	if(!is_addr_accessible(current_proc, current_proc->sp))
+		dbg_kprintf("Stack Overflow\n");
+	else
+		dbg_kprintf("Segmentation Fault\n");
 	//Kill process and call scheduler.
 	send_sig(current_proc,SIGSEGV);
 	current_proc = NULL;
@@ -128,13 +139,10 @@ PRIVATE void gpf_handler() {
  *
  **/
 PRIVATE void syscall_handler() {
-	int src, dest, operation;
+	int dest, operation;
 	struct message *m;
 	int *retval;
-	struct proc *p;
 	ptr_t *sp;
-	struct proc *curr = NULL;
-	int counter = 0;
 
 	//cast two variables to to size_t to allow addition of two pointer, and then cast back to pointer
 	sp = (ptr_t *)((current_proc->sp) + (int)(current_proc->rbase));
@@ -209,17 +217,16 @@ PRIVATE void no_handler() {
  * The global exception handler.
  * All relevant exception handlers will be called.
  **/
-PRIVATE void exception_handler(int estat) {
+void exception_handler(int estat) {
 	int i;
 	_irq_count = 0;
 	//Loop through $estat and call all relevant handlers.
-	for(i = NUM_HANDLERS; i; i--) {
+	for(i = NUM_HANDLERS; i >= 0; i--) {
 		if(estat & (1 << i)) {
 			_irq_count++;
 			handlers[i]();
 		}
 	}
-	_irq_count = 0;
 }
 
 /**
@@ -231,7 +238,6 @@ PRIVATE void exception_handler(int estat) {
  **/
 void init_exceptions() {
 	wramp_set_handler(exception_handler);
-
 	RexTimer->Load = 40; //60 Hz
 	RexTimer->Ctrl = 3; //Enabled, auto-restart
 }

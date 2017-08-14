@@ -4,6 +4,8 @@ CC = wcc
 C_DEF = -S
 export CC C_DEF
 
+DEBUG_FLAGS = "-D_DEBUG"
+
 LIBS_O = $(shell find lib -name "*.o")
 
 KLIB = ipc string util wramp_syscall ucontext stdlib/atoi stdlib/errno
@@ -24,18 +26,25 @@ endif
 	$(MAKE) -C winix
 	$(MAKE) -C kernel
 	$(MAKE) -C user
+	wlink $(LDFLAGS) -o winix.srec $(L_HEAD) $(KERNEL_O) $(KLIB_O) $(L_TAIL)
+
+debug: 
+	-rm -f winix.srec
+	export CFLAGS=$(DEBUG_FLAGS); \
+	$(MAKE) -C tools
+	export CFLAGS=$(DEBUG_FLAGS); \
+	$(MAKE) -C lib 
+	export CFLAGS=$(DEBUG_FLAGS); \
+	$(MAKE) shell 
+	export CFLAGS=$(DEBUG_FLAGS); \
+	$(MAKE) -C winix 
+	export CFLAGS=$(DEBUG_FLAGS); \
+	$(MAKE) -C kernel 
+	export CFLAGS=$(DEBUG_FLAGS); \
+	$(MAKE) -C user 
 	wlink -o winix.srec $(L_HEAD) $(KERNEL_O) $(KLIB_O) $(L_TAIL)
 
-debug:
-	$(MAKE) clean
-	$(MAKE) -C lib debug
-	$(MAKE) -C winix debug
-	$(MAKE) -C kernel debug
-	$(MAKE) -C user debug
-	wlink -o winix.srec $(KLIMITS) $(KERNEL_OBJS) $(LIB_OBJS)
-
 clean:
-	$(MAKE) -C tools clean
 	$(MAKE) -C kernel clean
 	$(MAKE) -C lib clean
 	$(MAKE) -C user clean

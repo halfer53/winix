@@ -1,6 +1,6 @@
 #include <util.h>
 
-const char *size_t_to_binary(unsigned long x)
+const char *size_t_to_binary(unsigned int x)
 {
     static char b[32];
     int z;

@@ -112,7 +112,7 @@ handler_address: .word 0
 
 .bss
 # Stack used while handling exceptions.
-	.space 200
+	.space 300
 exception_stack: 
 
 ### PROCESS CONTROL BLOCK DEFINITIONS ###

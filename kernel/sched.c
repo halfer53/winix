@@ -53,6 +53,7 @@ void sched() {
 	int nextpick = 0;
 	static int count = 0;
 
+	reset_irq_count();
 	if (current_proc != NULL && !current_proc->flags) {
 		//Accounting
 		current_proc->time_used++;

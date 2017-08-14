@@ -26,11 +26,9 @@
 #define SYSCALL_KILL        12
 #define SYSCALL_GETPID      13
 #define SYSCALL_GETPPID     14
-#define SYSCALL_ABORT       15
-#define SYSCALL_SLEEP       16
-#define SYSCALL_GETC        17
-#define SYSCALL_PS			18
-#define SYSCALL_PRINTF    	19
+#define SYSCALL_GETC        15
+#define SYSCALL_PS			16
+#define SYSCALL_PRINTF    	17
 
 #define SYSCALL_DEFAULT_RETURN  m.i1
 
@@ -61,7 +59,7 @@ int sys_uptime();
 int _exit(int status);
 int sys_ps();
 
-void *sbrk(unsigned long size);
+void *sbrk(unsigned int size);
 
 int getc();
 int printf(const char *format, ...);

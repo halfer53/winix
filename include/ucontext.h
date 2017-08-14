@@ -10,16 +10,16 @@
 #define SIGSET_LEN 5
 
 typedef struct _mcontext_t{
-	unsigned long regs[REGS_NR];	//Register values
-	unsigned long *sp;
+	unsigned int regs[REGS_NR];	//Register values
+	unsigned int *sp;
 	void *ra;
 	void (*pc)();
 	void *rbase;
-	unsigned long *ptable;
-	unsigned long cctrl;
+	unsigned int *ptable;
+	unsigned int cctrl;
 	// void *rbase;
-	// unsigned long *ptable;
-	// unsigned long cctrl;
+	// unsigned int *ptable;
+	// unsigned int cctrl;
 }mcontext_t;
 
 
@@ -36,13 +36,13 @@ typedef struct {
 typedef struct _ucontext_t{
 	
 	/* Process State */
-	unsigned long regs[REGS_NR];	//Register values
-	unsigned long *sp;
+	unsigned int regs[REGS_NR];	//Register values
+	unsigned int *sp;
 	void *ra;
 	void (*pc)();
 
 	// stack_t uc_stack;
-	unsigned long  *ss_sp;     /* address of stack */
+	unsigned int  *ss_sp;     /* address of stack */
 	int    ss_flags;  /* Flags */
 	size_t ss_size;   /* Number of bytes in stack */
 

@@ -5,10 +5,10 @@ assemble = dev.o
 all: $(assemble)
 
 $(compile): %.s: %.c
-	wcc -S -I../../include -o $@ $<
+	wcc -S -N -I../../include -o $@ $<
 
 $(debug): %.s: %.c
-	wcc -b -S -I../../include -o $@ $<
+	wcc -b -S -N -I../../include -o $@ $<
 
 $(assemble): %.o: %.s
 	wasm $< -o $@

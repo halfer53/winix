@@ -32,7 +32,7 @@ In my operating system, each process has its own virtual space dynamically trans
 ```
 void *do_sbrk( struct proc *who, size_t size) {
 
-	unsigned long *ptable;
+	unsigned int *ptable;
 	int nstart,len;
 	int *heap_break_bak;
 	void *ptr_addr;
@@ -49,7 +49,7 @@ void *do_sbrk( struct proc *who, size_t size) {
 	
 
 	ptable = who->protection_table;
-	len = physical_len_to_page_len(size);
+	len = PADDR_TO_NUM_PAGES(size);
 	nstart = bitmap_search(mem_map, MEM_MAP_LEN, len);
 	if (nstart != -1) {
 		//set mem_map and who's ptable's corresponding bits to 1
@@ -105,7 +105,7 @@ when free is called, it looks at the header file, check if ptr points to the req
 
 However, when requests get larger and larger, the heap segment may become scattered around, there could be the case where there are several consecutive small free memory holes. Memory fragmentation slows the search time. These holes can be potentially merged into a single one to improve performance. 
 
-For ```kmalloc free```, they are pretty much the same with malloc except one tiny difference. When no free and large enough memory blocks can be found, it calls ```get_free_page_addr``` to request new pages. If the request size is smaller than the size of a page, then the rest of the page will be initialised with a new free memory segment.
+For ```kmalloc free```, they are pretty much the same with malloc except one tiny difference. When no free and large enough memory blocks can be found, it calls ```get_free_PAGE_TO_ADDR``` to request new pages. If the request size is smaller than the size of a page, then the rest of the page will be initialised with a new free memory segment.
 
 
 ## Fiber Library
@@ -121,13 +121,13 @@ Because I am working on a special Architecture called WRAMP, which is a MIPS lik
 typedef struct _ucontext_t{
 	
 	/* Process State */
-	unsigned long regs[REGS_NR];	//Register values
-	unsigned long *sp;
+	unsigned int regs[REGS_NR];	//Register values
+	unsigned int *sp;
 	void *ra;
 	void (*pc)();
 
 	// stack_t uc_stack;
-	unsigned long  *ss_sp;     /* address of stack */
+	unsigned int  *ss_sp;     /* address of stack */
 	int    ss_flags;  /* Flags */
 	size_t ss_size;   /* Number of bytes in stack */
 

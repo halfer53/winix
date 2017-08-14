@@ -4,4 +4,11 @@
 extern int DEBUG_SCHED;
 extern int DEBUG_IPC;
 
+
+#ifdef _DEBUG
+    #define KDEBUG(token)   dbg_kprintf token
+#else
+    #define KDEBUG(token)
+#endif
+
 #endif

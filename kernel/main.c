@@ -11,7 +11,7 @@
 #include <init_codes.c>
 #include <shell_codes.c>
 
-
+void gpf_handler();
 /**
  * Print an error message and lock up the OS... the "Blue Screen of Death"
  *
@@ -39,29 +39,6 @@ void assert(int expression, const char *message) {
 		kprintf("\r\nAssertion Failed");
 		panic(message);
 	}
-}
-
-
-void testkmalloc(){
-	void *p0 = kmalloc(512);
-	void *p1 = kmalloc(512);
-	void *p2 = kmalloc(1024);
-	void *p3 = kmalloc(512);
-	void *p4 = kmalloc(1024);
-	void *p5 = kmalloc(2048);
-	void *p6 = kmalloc(512);
-	void *p7 = kmalloc(1024);
-	void *p8 = kmalloc(512);
-	void *p9 = kmalloc(1024);
-	kblock_overview();
-	kfree(p5);
-	kfree(p6);
-	kfree(p2);
-	kfree(p8);
-	kblock_overview();
-	p0 = krealloc(p0,900);
-	p9 = krealloc(p9,3000);
-	kblock_overview();
 }
 
 /**
@@ -102,7 +79,5 @@ void main() {
 	init_slab(shell_code,shell_code_length);
 
 	//Kick off first task. Note: never returns
-	//process_overview();
-
 	sched();
 }

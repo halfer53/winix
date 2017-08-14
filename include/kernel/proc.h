@@ -9,6 +9,7 @@
 #ifndef _W_PROC_H_
 #define _W_PROC_H_ 1
 
+#include <winix/timer.h>
 #include <winix/kwramp.h>
 
 //Process & Scheduling
@@ -30,9 +31,9 @@
 #define DEFAULT_FLAGS			0
 #define PTABLE_LEN				32
 #define DEFAULT_STACK_SIZE		1024
+#define KERNEL_STACK_SIZE		2048
 #define DEFAULT_HEAP_SIZE		1024
-#define KERNEL_STACK_PAGE_SIZE	2
-#define USER_STACK_PAGE_SIZE	1
+#define USER_HEAP_PAGE_SIZE		1
 #define DEFAULT_CCTRL			0xff9
 #define DEFAULT_STACK_POINTER			0x00000
 #define USER_CCTRL			0x8 //OKU is set to 0
@@ -48,6 +49,14 @@
 #define SENDING					0x0001
 #define RECEIVING				0x0002
 #define WAITING					0x0004
+
+//alloc_proc_mem flags
+#define PROC_SET_SP				1
+#define PROC_SET_HEAP			2
+#define PROC_PVT_STACK_OV		4
+
+#define PROC_ACCESS				1
+#define PROC_NO_ACCESS			0
 
 /**
  * State of a process.
@@ -74,8 +83,10 @@ typedef struct proc {
 	struct message *message;	//Message buffer;
 	int flags; 
 
-	/* Heap */
-	ptr_t* heap_break;
+	/* Heap and Stack*/
+	ptr_t* stack_top; //stack_top is the physical address
+	ptr_t* heap_break; //heap_break is also the physical address
+	ptr_t* heap_bottom; //
 	size_t length; //length is depreciated, do not use it
 
 	/* Protection */
@@ -122,6 +133,7 @@ typedef struct proc {
 #define IS_KERNEL_PROC(p)	(p->proc_nr == 0)
 #define IS_USER_PROC(p)		(p->proc_nr > 0)
 
+
 extern struct proc proc_table[NUM_PROCS];
 extern struct proc *ready_q[NUM_QUEUES][2];
 extern struct proc *block_q[2];
@@ -133,10 +145,13 @@ struct proc *dequeue(struct proc **q);
 void init_proc();
 void proc_set_default(struct proc *p);
 reg_t* alloc_stack(struct proc *who);
+int set_proc(struct proc *p, void (*entry)(), int priority, const char *name);
 struct proc *start_kernel_proc(void (*entry)(), int priority, const char *name);
-struct proc *start_user_proc(size_t *lines, size_t length, size_t entry, int priority, char *name);
+struct proc *start_user_proc(size_t *lines, size_t length, size_t entry, int priority, const char *name);
 struct proc *get_free_proc_slot();
-void add_to_scheduling_queue(struct proc* p);
+int alloc_proc_mem(struct proc *who, int tdb_length, int stack_size, int heap_size, int flags);
+void enqueue_schedule(struct proc* p);
+reg_t* alloc_kstack(struct proc *who);
 /**
  * WINIX Scheduler.
  **/

@@ -20,7 +20,7 @@ void *_sbrk( struct proc *who, size_t size) {
 	
 
 	ptable = who->protection_table;
-	len = physical_len_to_page_len(size);
+	len = PADDR_TO_NUM_PAGES(size);
 	nstart = bitmap_search(mem_map, MEM_MAP_LEN, len);
 	if (nstart != -1) {
 		//set mem_map and who's ptable's corresponding bits to 1

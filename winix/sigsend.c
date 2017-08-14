@@ -3,7 +3,7 @@
 #include <kernel/exception.h>
 #include <winix/signal.h>
 
-static unsigned long sigframe_code[2] = {0x1ee10001,0x200d0000};
+static unsigned int sigframe_code[2] = {0x1ee10001,0x200d0000};
 //addui sp,sp, 1
 //syscall
 
@@ -42,63 +42,79 @@ PRIVATE int build_signal_ctx(struct proc *who, int signum){
     who->pc = (void (*)())who->sig_table[signum].sa_handler;
     who->ra = ra;
 
+    //if the current process is blocked, unblock it temporarily during the signal handling
+    if(who->flags)
+        enqueue_schedule(who);
+
     who->flags = 0;//reset flags
     return OK;
+}
+
+PRIVATE bool sys_sig_handler(struct proc *who, int signum){
+    struct message m;
+    
+    if(who->sig_table[signum].sa_handler == SIG_DFL){
+        int exit_status = SIG_STATUS(signum);
+        KDEBUG(("Signal %d: kill %s [%d]\n",signum,who->name,who->proc_nr));
+        if(in_interrupt()){
+            m.type = SYSCALL_EXIT;
+            m.i1 = exit_status;
+            m.src = who->proc_nr;
+            wini_send(SYSTEM_TASK, &m);
+        }else{
+            exit_proc(who, exit_status);
+        }
+        return OK;
+    }
+    //if it's ignored
+    if(who->sig_table[signum].sa_handler == SIG_IGN){
+        KDEBUG(("Signal %d ignored by %d\n",signum,who->proc_nr));
+        who->pc = (void (*)())((int)who->pc+1);
+        return OK;
+    }
+    return ERR;
 }
 
 PRIVATE int sigsend_comm(struct proc *who, int signum){
     if(who->state != RUNNABLE)
         return ERR;
 
-    if(who->sig_table[signum].sa_handler == SIG_DFL){
-        kprintf("Signal %d: kill %s [%d]\n",signum,who->name,who->proc_nr);
-        KILL_PROC(who, signum);
+    if(build_signal_ctx(who,signum) != OK)
         return ERR;
-    }
-    //if it's ignored
-    if(who->sig_table[signum].sa_handler == SIG_IGN){
-        kprintf("sig %d ignored by %d\n",signum,who->proc_nr);
-        who->pc = (void (*)())((int)who->pc+1);
-        return ERR;
-    }
-
-    return build_signal_ctx(who,signum);
-}
-
-int cause_sig(struct proc *who,int signum){
-    if(sigsend_comm(who,signum) != 0)
-        return OK;
-
-    //if in interrupt, let system task interrupt the current syscall
-    //and reschedule the proc
+    
     if(in_interrupt()){
         if(who->proc_nr == curr_mesg()->src){
             get_proc(SYSTEM_TASK)->pc = &intr_syscall;
         }
-        remove_from_scheduling_queue(who);
-        add_to_scheduling_queue(who);
     }
     return OK;
+}
+
+int cause_sig(struct proc *who,int signum){
+    if(sys_sig_handler(who,signum) == OK)
+        return OK;
+
+    return sigsend_comm(who,signum);
 }
 
 //send signal immediately
 //IMPORTANT should only be called during exception
 int send_sig(struct proc *who, int signum){
-    if(sigsend_comm(who,signum) != 0)
+    if(sys_sig_handler(who,signum) == OK)
+        return OK;
+
+    if(sigsend_comm(who,signum) != OK)
         return OK;
 
     if(in_interrupt()){
         if(current_proc != who){
-            add_to_scheduling_queue(current_proc);
-            remove_from_scheduling_queue(who);
+            enqueue_schedule(current_proc);
+            dequeue_schedule(who);
         }
 
         current_proc = who;
         current_proc->ticks_left = current_proc->quantum;
 
-        if(who->proc_nr == curr_mesg()->src){
-            get_proc(SYSTEM_TASK)->pc = &intr_syscall;
-        }
         wramp_load_context();
     }
     return OK;

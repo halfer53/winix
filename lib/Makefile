@@ -10,8 +10,8 @@ OBJECT = $(PROGS:=.o) wramp_syscall.o ucontext.o debug.o
 wramp: $(OBJECT)
 	$(MAKE) -C stdlib
 $(ASSEMBLY): %.s: %.c $(INCLUDES)
-	wcc $(CFLAGS) -S -I$(INCLUDE_DIR) -o $@ $<
-
+	wcc $(CFLAGS) -S -N -I$(INCLUDE_DIR) -o $@ $<
+	
 $(OBJECT): %.o: %.s
 	wasm $< -o $@
 

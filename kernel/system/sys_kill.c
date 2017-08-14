@@ -3,7 +3,7 @@
 
 
 int do_kill(struct proc *who, struct message *m){
-    struct proc *to = get_proc(m->i1);
+    struct proc *to = get_running_proc(m->i1);
 
     if(!to)
         return EINVAL;
