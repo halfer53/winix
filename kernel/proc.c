@@ -155,7 +155,7 @@ void proc_set_default(struct proc *p) {
 	p->ptable = DEFAULT_PTABLE;
 	p->cctrl = DEFAULT_CCTRL;
 
-	p->quantum = DEFAULT_QUANTUM;
+	p->quantum = DEFAULT_USER_QUANTUM;
 	p->state = INITIALISING;
 	p->flags = DEFAULT_FLAGS;
 
@@ -217,15 +217,20 @@ struct proc *start_kernel_proc(void (*entry)(), int priority, const char *name) 
 	bitmap_fill(p->ptable, PTABLE_LEN);
 	p->sp = alloc_kstack(p);
 	enqueue_schedule(p);
+	p->quantum = DEFAULT_KERNEL_QUANTUM;
 	return p;
 }
 
 
 struct proc *start_user_proc(size_t *lines, size_t length, size_t entry, int priority, const char *name){
 	struct proc *p;
-	if(p = get_free_proc_slot()) {
-		p = exec_proc(p,lines,length,entry,priority,name);
-	}
+	if(!(p = get_free_proc_slot()))
+		return NULL;
+
+	
+	if(exec_proc(p,lines,length,entry,priority,name) == ERR)
+		return NULL;
+
 	return p;
 }
 
@@ -273,36 +278,38 @@ int alloc_proc_mem(struct proc *who, int tdb_length, int stack_size, int heap_si
 	int proc_page_len;
 	int proc_len;
 	ptr_t* rbase;
+	int tdb_aligned;
 	int stack_offset = 0;
 
-	if(flags & PROC_PVT_STACK_OV )
+	tdb_aligned = align_page(tdb_length);
+	stack_size = align_page(stack_size);
+	heap_size = align_page(heap_size);
+
+	if(tdb_aligned - tdb_length < MIN_BSS_SIZE)
 		stack_offset = PAGE_LEN;
 
-	tdb_length = ALIGN_PAGE(tdb_length);
-	stack_size = ALIGN_PAGE(stack_size);
-	heap_size = ALIGN_PAGE(heap_size);
-	proc_len = tdb_length + stack_offset + stack_size + heap_size;
-	// proc_page_len = (tdb_length + stack_offset + stack_size + heap_size) / PAGE_LEN;
+	proc_len = tdb_aligned + stack_offset + stack_size + heap_size;
+	// proc_page_len = (tdb_aligned + stack_offset + stack_size + heap_size) / PAGE_LEN;
 
 	who->rbase = rbase = user_get_free_pages(who, proc_len, GFP_NORM);
 	if(rbase == NULL)
 		return ERR;
 
-	if(flags & PROC_PVT_STACK_OV)
-		proc_memctl(who, rbase + tdb_length, PROC_NO_ACCESS);
+	// if(flags & PROC_PVT_STACK_OV)
+	// 	proc_memctl(who, rbase + tdb_aligned, PROC_NO_ACCESS);
 
 	if(flags & PROC_SET_SP){
-		who->stack_top = rbase + tdb_length + stack_offset;
+		who->stack_top = rbase + tdb_aligned + stack_offset;
 		who->sp = get_virtual_addr(who->stack_top + stack_size - 1,who);
+		*(who->stack_top) = STACK_MAGIC;
 	}
 
 	if(flags & PROC_SET_HEAP){
-		who->heap_break = get_physical_addr(who->sp,who) +1;
+		who->heap_break = get_physical_addr(who->sp,who) + 1;
+		who->heap_bottom = who->heap_break + heap_size - 1;
 	}
 	return OK;
 }
-
-
 
 
 //print out the list of processes currently in the ready_q

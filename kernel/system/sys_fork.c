@@ -66,11 +66,18 @@ int _fork(struct proc *parent) {
 
 	if (child = get_free_proc_slot()) {
 		copy_pcb(parent,child);
-		if(copy_mm(parent,child) != OK)
+		if(copy_mm(parent,child) == ERR)
 			return ERR;
 
 		copy_pregs(parent,child);
 		
+		//Divide the quantum size between the parent and child
+		//if quantum size is 1, quantum size is not changed
+		if(parent->quantum != 1){
+			child->quantum = (child->quantum + 1) / 2;
+			parent->quantum /= 2;
+		}
+
 		child->parent = parent->proc_nr;
 		return child->proc_nr;
 	}

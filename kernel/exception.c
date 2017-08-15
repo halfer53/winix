@@ -106,28 +106,26 @@ PRIVATE void gpf_handler() {
 		panic("invalid proc");
 	//Current process has performed an illegal operation and will be shut down.
 	
-	KDEBUG(("General Protection Fault: \"%s (%d)\" Rbase=0x%x vPC=0x%x vSP=0x%x.\r\n",
+	kprintf("General Protection Fault: \"%s (%d)\" Rbase=0x%x vPC=0x%x vSP=0x%x.\r\n",
 		current_proc->name,
 		current_proc->proc_nr,
 		current_proc->rbase,
 		current_proc->pc,
-		current_proc->sp));
+		current_proc->sp);
 
-	
+	if(!CHECK_STACK(current_proc))
+		dbg_kprintf("Stack Overflow\n");
+
 #ifdef _DEBUG
-	// kprintf("mIR: 0x%08x\n",*get_physical_addr(current_proc->pc,current_proc));
-	// kprintf("$1: 0x%08x, $2, 0x%08x, $3, 0x%08x\n",current_proc->regs[0],current_proc->regs[1],current_proc->regs[2]);
-	// kprintf("$4: 0x%08x, $5, 0x%08x, $6, 0x%08x\n",current_proc->regs[3],current_proc->regs[4],current_proc->regs[5]);
-	// kprintf("$7: 0x%08x, $8, 0x%08x, $9, 0x%08x\n",current_proc->regs[6],current_proc->regs[7],current_proc->regs[8]);
-	// kprintf("$10: 0x%08x, $11, 0x%08x, $12, 0x%08x\n",current_proc->regs[9],current_proc->regs[10],current_proc->regs[11]);
-	// kprintf("$13: 0x%08x, $sp, 0x%08x, $ra, 0x%08x\n",current_proc->regs[12],current_proc->regs[13],current_proc->regs[14]);
-	// print_ptable(current_proc);
+	kprintf("mIR: 0x%08x\n",*get_physical_addr(current_proc->pc,current_proc));
+	kprintf("$1: 0x%08x, $2, 0x%08x, $3, 0x%08x\n",current_proc->regs[0],current_proc->regs[1],current_proc->regs[2]);
+	kprintf("$4: 0x%08x, $5, 0x%08x, $6, 0x%08x\n",current_proc->regs[3],current_proc->regs[4],current_proc->regs[5]);
+	kprintf("$7: 0x%08x, $8, 0x%08x, $9, 0x%08x\n",current_proc->regs[6],current_proc->regs[7],current_proc->regs[8]);
+	kprintf("$10: 0x%08x, $11, 0x%08x, $12, 0x%08x\n",current_proc->regs[9],current_proc->regs[10],current_proc->regs[11]);
+	kprintf("$13: 0x%08x, $sp, 0x%08x, $ra, 0x%08x\n",current_proc->regs[12],current_proc->regs[13],current_proc->regs[14]);
+	print_ptable(current_proc);
 #endif
 
-	if(!is_addr_accessible(current_proc, current_proc->sp))
-		dbg_kprintf("Stack Overflow\n");
-	else
-		dbg_kprintf("Segmentation Fault\n");
 	//Kill process and call scheduler.
 	send_sig(current_proc,SIGSEGV);
 	current_proc = NULL;

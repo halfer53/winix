@@ -110,12 +110,12 @@ PRIVATE block_t *alloc_page(block_t *last , size_t s)
 	//	else
 	//		get new pages and return
 	
-	p = (block_t *)get_free_pages(ALIGN_PAGE(s),GFP_NORM);
+	p = (block_t *)get_free_pages(align_page(s),GFP_NORM);
 	p->size = s;
 	p->prev = last;
 	p->free = 0;
 	p->ptr = p->data;
-	alloc_page_rest(p,ALIGN_PAGE((int)p));
+	alloc_page_rest(p,align_page((int)p));
 
 	if(last)
 		last->next = p;

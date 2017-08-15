@@ -2,6 +2,33 @@
 
 unsigned int mem_map[MEM_MAP_LEN];
 
+
+bool is_addr_accessible(struct proc* who, ptr_t* addr){
+	int page;
+
+	addr = get_physical_addr(addr, who);
+	page = PADDR_TO_PAGED(addr);
+	return is_bit_on(who->ptable, PTABLE_LEN, page);
+}
+
+bool is_page_free(ptr_t* addr){
+	int paged = PADDR_TO_PAGED(addr);
+
+	return is_bit_on(mem_map, MEM_MAP_LEN, paged);
+}
+
+bool is_pages_free_from(ptr_t* addr, int size){
+	int i;
+	int paged = PADDR_TO_PAGED(addr);
+	int page_num = PADDR_TO_NUM_PAGES(size);
+
+	for(i = 0; i < page_num; i++){
+		if(!is_bit_on(mem_map, MEM_MAP_LEN, paged++))
+			return false;
+	}
+	return true;
+}
+
 ptr_t *get_free_pages(int length, int flags) {
 	int nstart;
 	int num = PADDR_TO_NUM_PAGES(length);
@@ -10,8 +37,7 @@ ptr_t *get_free_pages(int length, int flags) {
 	}else{
 		nstart =  bitmap_search(mem_map, MEM_MAP_LEN, num);
 	}
-	if (nstart != 0)
-	{
+	if (nstart != 0){
 		bitmap_set_nbits(mem_map, MEM_MAP_LEN, nstart, num);
 		return PAGE_TO_PADDR(nstart);
 	}
@@ -31,6 +57,35 @@ ptr_t* user_get_free_pages(struct proc* who, int length, int flags){
 	if(bitmap_set_nbits(who->ptable, PTABLE_LEN, index, page_num) == ERR)
 		return NULL;
 	return p;
+}
+
+int get_free_pages_from(ptr_t* addr, int size){
+	int paged, page_num;
+
+	if(!is_pages_free_from(addr, size))
+		return ERR;
+	
+	paged = PADDR_TO_PAGED(addr);
+	page_num = PADDR_TO_NUM_PAGES(size);
+	if(bitmap_set_nbits(mem_map, MEM_MAP_LEN, paged, page_num) == ERR)
+		return ERR;
+
+	return OK;
+}
+
+int user_get_free_pages_from(struct proc* who, ptr_t* addr, int size){
+	int index;
+	int ret;
+	int page_num;
+
+	ret = get_free_pages_from(addr,size);
+	if(ret == ERR)
+		return ERR;
+	index = PADDR_TO_PAGED(addr);
+	page_num = PADDR_TO_NUM_PAGES(size);
+	if(bitmap_set_nbits(who->ptable, PTABLE_LEN, index, page_num) == ERR)
+		return ERR;
+	return OK;
 }
 
 int next_free_page_index(){
@@ -53,13 +108,6 @@ int user_free_pages(struct proc* who, ptr_t* page, int len){
 	return bitmap_clear_nbits(who->ptable, PTABLE_LEN, index, len);
 }
 
-bool is_addr_accessible(struct proc* who, ptr_t* addr){
-	int page;
-
-	addr = get_physical_addr(addr, who);
-	page = PADDR_TO_PAGED(addr);
-	return is_bit_on(who->ptable, MEM_MAP_LEN, page);
-}
 
 void release_proc_mem(struct proc *who){
     bitmap_xor(mem_map,who->ptable,MEM_MAP_LEN);

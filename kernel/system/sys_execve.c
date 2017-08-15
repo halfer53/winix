@@ -5,26 +5,11 @@ int do_exec(struct proc *who, struct message *m){
 	return exec_read_srec(who);
 }
 
-	//replace the currently running process with the new text, priority, and name provided
-struct proc *exec_replace_existing_proc(struct proc *p,size_t *lines, size_t length, size_t entry, int priority, char *name){
-	assert(p != NULL, "can't exec null process\n");
-	if(p->rbase == DEFAULT_RBASE){
-		// bitmap_set_bit(mem_map,MEM_MAP_LEN,PADDR_TO_PAGED(p->sp));
-		// kprintf("Fork free stack 0x%08x %d\n",PADDR_TO_PAGED(p->sp));
-	}else{
-		// proc_free(p->rbase);
-		bitmap_xor(mem_map,p->ptable,MEM_MAP_LEN);
-	}
-	p = exec_proc(p,lines,length,entry,priority,name);
-	assert(p != NULL,"Exec failed\n");
-	return p;
-}
-
-	/**
-	* malloc a new memory and write the values of lines into that address
-	* the process is updated
-	**/
-struct proc *exec_proc(struct proc *p,size_t *lines, size_t length, size_t entry, int priority, const char *name){
+/**
+* malloc a new memory and write the values of lines into that address
+* the process is updated
+**/
+int exec_proc(struct proc *p,size_t *lines, size_t length, size_t entry, int priority, const char *name){
 	ptr_t* ptr_base = NULL;
 	size_t length_bak, stack_heap_len;
 	int page,page_len;
@@ -32,14 +17,15 @@ struct proc *exec_proc(struct proc *p,size_t *lines, size_t length, size_t entry
 	set_proc(p, (void (*)())entry, priority, name);
 	if(alloc_proc_mem(p, length, DEFAULT_STACK_SIZE , DEFAULT_HEAP_SIZE, 
 					     PROC_SET_SP | PROC_SET_HEAP | PROC_PVT_STACK_OV) != OK){
-		return NULL;
+		return ERR;
 	}
 
 	memcpy(p->rbase, lines , length);
 
 	p->length = length;
+	p->quantum = DEFAULT_USER_QUANTUM;
 	enqueue_schedule(p);
-	return p;
+	return OK;
 }
 
 
@@ -118,11 +104,11 @@ if ((wordslength = winix_load_srec_words_length(buf))) {
 	//kprintf("wordsLoaded %d wordslength %d\n",wordsLoaded,wordslength);
 
 
-p = exec_replace_existing_proc(p,memory_values,wordslength,entry,SYSTEM_PRIORITY,p->name);
-return OK;
-}else{
-	return ERR;
-}
+	// p = exec_replace_existing_proc(p,memory_values,wordslength,entry,SYSTEM_PRIORITY,p->name);
+	return OK;
+	}else{
+		return ERR;
+	}
 }
 
 	//load S6 srec type, and return the size of memory words

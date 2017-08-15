@@ -53,7 +53,6 @@ void main() {
 	int i=0;
 
 	//Print boot message.
-	kprintf("\r\nWINIX v%d.%d\r\n", MAJOR_VERSION, MINOR_VERSION);
 
 	init_bitmap();
 	init_mem_table();
@@ -62,7 +61,6 @@ void main() {
 	//Initialise the system task
 	p = start_kernel_proc(system_main, SYSTEM_PRIORITY, "SYSTEM");
 	assert(p != NULL, "Create sys task");
-	p->quantum = 64;
 
 	p = start_user_proc(init_code,2,0, USER_PRIORITY,"init");
 	p->quantum = 1;
@@ -70,14 +68,11 @@ void main() {
 	p = start_user_proc(shell_code,shell_code_length,shell_pc, USER_PRIORITY,"Shell");
 	assert(p != NULL, "Create Shell task");
 	p->parent = 1;//hack 
-	p->quantum = 2;
 
+	init_slab(shell_code,shell_code_length);
+	
 	//Initialise exceptions
 	init_exceptions();
-
-	//Initialise slab layer
-	init_slab(shell_code,shell_code_length);
-
 	//Kick off first task. Note: never returns
 	sched();
 }

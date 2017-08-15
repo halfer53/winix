@@ -103,8 +103,8 @@ int send_sig(struct proc *who, int signum){
     if(sys_sig_handler(who,signum) == OK)
         return OK;
 
-    if(sigsend_comm(who,signum) != OK)
-        return OK;
+    if(sigsend_comm(who,signum) == ERR)
+        return ERR;
 
     if(in_interrupt()){
         if(current_proc != who){
@@ -113,8 +113,6 @@ int send_sig(struct proc *who, int signum){
         }
 
         current_proc = who;
-        current_proc->ticks_left = current_proc->quantum;
-
         wramp_load_context();
     }
     return OK;

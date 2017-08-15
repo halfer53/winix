@@ -192,7 +192,7 @@ unsigned int createMask(unsigned int a, unsigned int b)
 int bitmap_extract_pattern(unsigned int *map, int map_len, int heap_break, pattern_t *p){
     int i,j,start = 0;
     unsigned int result = 0;
-    int end = (ALIGN_PAGE(heap_break) / 1024);
+    int end = (align_page(heap_break) / 1024);
     int endi = end/32;
     unsigned int tmask;
     for(i=0;i < map_len;i++){

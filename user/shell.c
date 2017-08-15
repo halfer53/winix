@@ -26,6 +26,7 @@ int test_thread(int argc, char **argv);
 int test_alarm(int argc, char **argv);
 int test_fork(int argc, char **argv);
 int test_so(int argc, char **argv);
+int test_general(int argc, char **argv);
 int generic(int argc, char **argv);
 
 //Input buffer & tokeniser
@@ -57,7 +58,8 @@ struct cmd commands[] = {
 	{ test_alarm, "alarm"},
 	{ test_signal, "signal"},
 	{ test_fork, "fork"},
-	{ test_so, "stack_overflow"},
+	{ test_so, "stackov"},
+	{ test_general, "test"},
 	{ generic, NULL }
 };
 //TODO: ps/uptime/shutdown should be moved to separate programs.
@@ -67,6 +69,14 @@ struct cmd commands[] = {
  **/
 int isPrintable(int c) {
 	return ('!' <= c && c <= '~');
+}
+
+int test_general(int argc, char **argv){
+	int* hb = sbrk(0);
+	printf("heap break %x\n",hb);
+	hb = sbrk(2000);
+	hb = sbrk(2000);
+	return 0;
 }
 
 void stack_overflow(int a){

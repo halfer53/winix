@@ -30,20 +30,25 @@
 //Process Defaults
 #define DEFAULT_FLAGS			0
 #define PTABLE_LEN				32
-#define DEFAULT_STACK_SIZE		1024
-#define KERNEL_STACK_SIZE		2048
-#define DEFAULT_HEAP_SIZE		1024
-#define USER_HEAP_PAGE_SIZE		1
 #define DEFAULT_CCTRL			0xff9
-#define DEFAULT_STACK_POINTER			0x00000
-#define USER_CCTRL			0x8 //OKU is set to 0
+#define DEFAULT_STACK_POINTER	0x00000
+#define USER_CCTRL				0x8 //OKU is set to 0
 #define DEFAULT_RBASE			0x00000
 #define DEFAULT_PTABLE			0x00000
-#define DEFAULT_QUANTUM			100
+#define DEFAULT_KERNEL_QUANTUM	64
+#define DEFAULT_USER_QUANTUM	2
 #define DEFAULT_REG_VALUE		0xffffffff
 #define DEFAULT_MEM_VALUE		0xffffffff
 #define DEFAULT_RETURN_ADDR		0x00000000
 #define DEFAULT_PROGRAM_COUNTER	0x00000000
+
+//stack
+#define STACK_MAGIC				0x12345678
+#define DEFAULT_STACK_SIZE		1024
+#define KERNEL_STACK_SIZE		2048
+
+//heap
+#define DEFAULT_HEAP_SIZE		2048
 
 //Process Flags
 #define SENDING					0x0001
@@ -53,10 +58,14 @@
 //alloc_proc_mem flags
 #define PROC_SET_SP				1
 #define PROC_SET_HEAP			2
-#define PROC_PVT_STACK_OV		4
+#define PROC_PVT_STACK_OV	4
 
+//proc_memctll flags
 #define PROC_ACCESS				1
 #define PROC_NO_ACCESS			0
+
+//min bss segment size
+#define MIN_BSS_SIZE			300
 
 /**
  * State of a process.
@@ -132,6 +141,7 @@ typedef struct proc {
 #define IS_PRIORITY_OK(priority)	(0 <= priority && priority < NUM_QUEUES)
 #define IS_KERNEL_PROC(p)	(p->proc_nr == 0)
 #define IS_USER_PROC(p)		(p->proc_nr > 0)
+#define CHECK_STACK(p)		(*(p->stack_top) == STACK_MAGIC)
 
 
 extern struct proc proc_table[NUM_PROCS];

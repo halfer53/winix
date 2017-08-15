@@ -1,11 +1,5 @@
 #include "../winix.h"
 
-/**
- * implementation of brk
- * @param  who who of this sys call
- * @param  addr   set the end of data segment specified by the addr, note that this is virtual memory
- * @return        status of result, 0 if success
- */
 int do_brk(struct proc *who, struct message *m){
 	int i,paddr;
 	ptr_t* addr;
