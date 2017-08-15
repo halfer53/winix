@@ -248,11 +248,11 @@ int kprintf(const char *format, ...) {
 	return kprintf_vm(format,arg,0);
 }
 
-int dbg_kprintf(const char *format, ...){
+int kmesg(const char *format, ...){
 	void *arg = &format;
 	arg = ((char*)arg) + 1;
 
-	kprintf_vm("[SYSTEM] ",NULL,0);
+	kputs("[SYSTEM] ");
 	return kprintf_vm(format,arg,0);
 }
 

@@ -1,7 +1,7 @@
 #include <stdio.h>
-#include <debug.h>
+#include <winix/util.h>
 
 int main(){
-	XDEBUG(("abc %d", 1));
+	ASSERT(1 == 1);
 	return 0;
 }

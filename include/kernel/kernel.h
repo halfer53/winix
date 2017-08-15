@@ -27,6 +27,7 @@
 #include <winix/type.h>
 #include <winix/page.h>
 #include <winix/comm.h>
+#include <winix/util.h>
 #include <winix/kdebug.h>
 #include <winix/bitmap.h>
 #include <winix/mm.h>

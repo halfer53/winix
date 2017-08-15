@@ -170,8 +170,10 @@ reg_t* alloc_kstack(struct proc *who){
 	ptr_t *addr, *stack_top;
 
 	stack_top = user_get_free_pages(who, KERNEL_STACK_SIZE, GFP_HIGH);
-	if(stack_top == NULL)
-		panic("Can't allocate stack");
+
+	ASSERT(stack_top != NULL);
+	// if(stack_top == NULL)
+	// 	panic("Can't allocate stack");
 	
 	addr = stack_top + KERNEL_STACK_SIZE - 1;
 	who->stack_top = stack_top;

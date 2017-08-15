@@ -102,11 +102,9 @@ PRIVATE void serial2_handler() {
  *   Scheduler is called (i.e. this handler does not return).
  **/
 PRIVATE void gpf_handler() {
-	if(!IS_PROCN_OK(current_proc->proc_nr))
-		panic("invalid proc");
-	//Current process has performed an illegal operation and will be shut down.
+	ASSERT(IS_PROCN_OK(current_proc->proc_nr));
 	
-	kprintf("General Protection Fault: \"%s (%d)\" Rbase=0x%x vPC=0x%x vSP=0x%x.\r\n",
+	kmesg("General Protection Fault: \"%s (%d)\" Rbase=0x%x vPC=0x%x vSP=0x%x.\r\n",
 		current_proc->name,
 		current_proc->proc_nr,
 		current_proc->rbase,
@@ -114,15 +112,15 @@ PRIVATE void gpf_handler() {
 		current_proc->sp);
 
 	if(!CHECK_STACK(current_proc))
-		dbg_kprintf("Stack Overflow\n");
+		kmesg("Stack Overflow\n");
 
 #ifdef _DEBUG
-	kprintf("mIR: 0x%08x\n",*get_physical_addr(current_proc->pc,current_proc));
-	kprintf("$1: 0x%08x, $2, 0x%08x, $3, 0x%08x\n",current_proc->regs[0],current_proc->regs[1],current_proc->regs[2]);
-	kprintf("$4: 0x%08x, $5, 0x%08x, $6, 0x%08x\n",current_proc->regs[3],current_proc->regs[4],current_proc->regs[5]);
-	kprintf("$7: 0x%08x, $8, 0x%08x, $9, 0x%08x\n",current_proc->regs[6],current_proc->regs[7],current_proc->regs[8]);
-	kprintf("$10: 0x%08x, $11, 0x%08x, $12, 0x%08x\n",current_proc->regs[9],current_proc->regs[10],current_proc->regs[11]);
-	kprintf("$13: 0x%08x, $sp, 0x%08x, $ra, 0x%08x\n",current_proc->regs[12],current_proc->regs[13],current_proc->regs[14]);
+	kmesg("Current Instruction: 0x%08x\n",*get_physical_addr(current_proc->pc,current_proc));
+	kmesg("$1: 0x%08x, $2, 0x%08x, $3, 0x%08x\n",current_proc->regs[0],current_proc->regs[1],current_proc->regs[2]);
+	kmesg("$4: 0x%08x, $5, 0x%08x, $6, 0x%08x\n",current_proc->regs[3],current_proc->regs[4],current_proc->regs[5]);
+	kmesg("$7: 0x%08x, $8, 0x%08x, $9, 0x%08x\n",current_proc->regs[6],current_proc->regs[7],current_proc->regs[8]);
+	kmesg("$10: 0x%08x, $11, 0x%08x, $12, 0x%08x\n",current_proc->regs[9],current_proc->regs[10],current_proc->regs[11]);
+	kmesg("$13: 0x%08x, $sp, 0x%08x, $ra, 0x%08x\n",current_proc->regs[12],current_proc->regs[13],current_proc->regs[14]);
 	print_ptable(current_proc);
 #endif
 
@@ -195,7 +193,7 @@ PRIVATE void break_handler() {
  *   Current process is killed, and scheduler is called (i.e. this handler does not return).
  **/
 PRIVATE void arith_handler() {
-	kprintf("\r\n[SYSTEM] Process \"%s (%d)\" ARITH: PC=0x%08x.\r\n", current_proc->name, current_proc->proc_nr, current_proc->pc);
+	kmesg("Arith Exception: \"%s (%d)\" PC=0x%08x.\r\n", current_proc->name, current_proc->proc_nr, current_proc->pc);
 	send_sig(current_proc,SIGFPE);
 	current_proc = NULL;
 	sched();
@@ -215,7 +213,7 @@ PRIVATE void no_handler() {
  * The global exception handler.
  * All relevant exception handlers will be called.
  **/
-void exception_handler(int estat) {
+PRIVATE void exception_handler(int estat) {
 	int i;
 	_irq_count = 0;
 	//Loop through $estat and call all relevant handlers.

@@ -137,10 +137,10 @@ typedef struct proc {
 } proc_t;
 
 
-#define IS_PROCN_OK(i)	(i>= 0 && i < NUM_PROCS)
-#define IS_PRIORITY_OK(priority)	(0 <= priority && priority < NUM_QUEUES)
-#define IS_KERNEL_PROC(p)	(p->proc_nr == 0)
-#define IS_USER_PROC(p)		(p->proc_nr > 0)
+#define IS_PROCN_OK(i)	((i)>= 0 && (i) < NUM_PROCS)
+#define IS_PRIORITY_OK(priority)	(0 <= (priority) && (priority) < NUM_QUEUES)
+#define IS_KERNEL_PROC(p)	((p->proc_nr) == 0)
+#define IS_USER_PROC(p)		((p->proc_nr) > 0)
 #define CHECK_STACK(p)		(*(p->stack_top) == STACK_MAGIC)
 
 

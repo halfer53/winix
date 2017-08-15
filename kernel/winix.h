@@ -26,21 +26,6 @@
 #define MAJOR_VERSION 2
 #define MINOR_VERSION 0
 
-/**
- * Print an error message and lock up the OS... the "Blue Screen of Death"
- *
- * Side Effects:
- *   OS locks up.
- **/
-void panic(const char *message);
-
-/**
- * Asserts that a condition is true.
- * If so, this function has no effect.
- * If not, panic is called with the appropriate message.
- */
-void assert(int expression, const char *message);
-
 extern struct syscall_ctx syscall_ctx;
 extern ucontext_t recv_ctx;
 
