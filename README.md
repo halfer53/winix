@@ -40,7 +40,9 @@ Click ```Quick Load```, select ```winix.srec```
 
 ```ps```: shows the list of processes running in the system, with relevant info
 
-```id```: shows the current shell's pid
+```meminfo```: shows the current system memory info
+
+```pid```: shows the current shell's pid
 
 ## Demo
 
