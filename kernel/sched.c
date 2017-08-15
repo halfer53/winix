@@ -3,7 +3,6 @@
 
 struct proc *get_idle(){
 	static struct proc *idle = NULL;
-	// kprintf("get idle\n");
 	if(idle == NULL){
 		idle = start_kernel_proc(idle_main, IDLE_PRIORITY, "IDLE");
 	}
@@ -48,11 +47,6 @@ struct proc *pick_proc() {
  *   Context of the new proc is loaded.
  **/
 void sched() {
-
-	struct proc *curr = ready_q[3][HEAD];
-	int nextpick = 0;
-	static int count = 0;
-
 	reset_irq_count();
 	if (current_proc != NULL && !current_proc->flags) {
 		//Accounting

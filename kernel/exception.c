@@ -140,17 +140,14 @@ PRIVATE void syscall_handler() {
 	int *retval;
 	ptr_t *sp;
 
-	//cast two variables to to size_t to allow addition of two pointer, and then cast back to pointer
-	sp = (ptr_t *)((current_proc->sp) + (int)(current_proc->rbase));
+	sp = get_physical_addr(current_proc->sp, current_proc);
 
 	operation = *(sp);				//Operation is the first parameter on the stack
 	dest = *(sp+1);				//Destination is second parameter on the stack
-	m = (struct message *)(*(sp+ 2) + (int)current_proc->rbase);	//Message pointer is the third parameter on the stack
+	m = (struct message *)get_physical_addr(*(sp+ 2), current_proc);
 	m->src = current_proc->proc_nr;			//Don't trust the who to specify their own source process number
 
 	retval = (int*)&current_proc->regs[0];		//Result is returned in register $1
-	//Default return value is an error code
-	*retval = -1;
 
 	//Decode operation
 	switch(operation) {
@@ -171,6 +168,7 @@ PRIVATE void syscall_handler() {
 			break;
 
 		default:
+			*retval = ERR;
 			break;
 	}
 

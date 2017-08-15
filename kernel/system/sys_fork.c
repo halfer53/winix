@@ -11,21 +11,13 @@ int copy_pcb(struct proc* parent, struct proc* child){
 }
 
 int copy_mm(struct proc* parent, struct proc* child){
-	uint32_t *src, *dest;
-	int j, index;
-	pattern_t ptn;
+	ptr_t *src, *dest;
+	struct bit_pattern ptn;
+	int j;
 
-	if(bitmap_extract_pattern(parent->ptable, MEM_MAP_LEN, (int)child->heap_break, &ptn) != OK)
+	child->rbase = dup_vm(parent,child, &ptn);
+	if(child->rbase == NULL)
 		return ERR;
-	
-	index = bitmap_search_pattern(mem_map, MEM_MAP_LEN, ptn.pattern, ptn.size);
-	if(index == ERR)
-		return ERR;
-
-	bitmap_set_pattern(mem_map, MEM_MAP_LEN, index, ptn.pattern, ptn.size);
-	bitmap_set_pattern(child->ptable, PTABLE_LEN, index, ptn.pattern, ptn.size);
-
-	child->rbase = PAGE_TO_PADDR(index);
 
 	src = (ptr_t *)parent->rbase;
 	dest = (ptr_t *)child->rbase;
@@ -66,8 +58,11 @@ int _fork(struct proc *parent) {
 
 	if (child = get_free_proc_slot()) {
 		copy_pcb(parent,child);
-		if(copy_mm(parent,child) == ERR)
+
+		if(copy_mm(parent,child) == ERR){
+			free_slot(child);
 			return ERR;
+		}
 
 		copy_pregs(parent,child);
 		

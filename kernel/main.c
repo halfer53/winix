@@ -31,13 +31,13 @@ void main() {
 
 	//Initialise the system task
 	p = start_kernel_proc(system_main, SYSTEM_PRIORITY, "SYSTEM");
-	assert(p != NULL, "Create sys task");
+	ASSERT(p != NULL);
 
 	p = start_user_proc(init_code,2,0, USER_PRIORITY,"init");
 	p->quantum = 1;
 
 	p = start_user_proc(shell_code,shell_code_length,shell_pc, USER_PRIORITY,"Shell");
-	assert(p != NULL, "Create Shell task");
+	ASSERT(p != NULL);
 	p->parent = 1;//hack 
 
 	init_slab(shell_code,shell_code_length);

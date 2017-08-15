@@ -1,7 +1,6 @@
 #include <kernel/kernel.h>
 
-unsigned int mem_map[MEM_MAP_LEN];
-
+PRIVATE unsigned int mem_map[MEM_MAP_LEN];
 
 bool is_addr_accessible(struct proc* who, ptr_t* addr){
 	int page;
@@ -106,6 +105,22 @@ int user_free_pages(struct proc* who, ptr_t* page, int len){
 		return ERR;
 	index = PADDR_TO_PAGED(page);
 	return bitmap_clear_nbits(who->ptable, PTABLE_LEN, index, len);
+}
+
+
+void* dup_vm(struct proc* parent, struct proc* child, struct bit_pattern* ptn){
+	int index;
+	if(bitmap_extract_pattern(parent->ptable, MEM_MAP_LEN, (int)child->heap_break, ptn) == ERR)
+		return NULL;
+	
+	index = bitmap_search_pattern(mem_map, MEM_MAP_LEN, ptn->pattern, ptn->size);
+	if(index == ERR)
+		return NULL;
+
+	bitmap_set_pattern(mem_map, MEM_MAP_LEN, index, ptn->pattern, ptn->size);
+	bitmap_set_pattern(child->ptable, PTABLE_LEN, index, ptn->pattern, ptn->size);
+
+	return PAGE_TO_PADDR(index);
 }
 
 

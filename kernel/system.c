@@ -59,6 +59,7 @@ void print_sysinfo(){
  * Entry point for system task.
  **/
 void system_main() {
+	unsigned int null_val = *((unsigned int*)0);
 
 	print_sysinfo();
 	getcontext(&recv_ctx);
@@ -98,6 +99,9 @@ void system_main() {
 		if(m.i1 != SUSPEND && m.i1 != DONOTHING){
 			winix_send(who_proc_nr,&m);
 		}
+
+		if(null_val != *(unsigned int*)0)
+			panic("Null pointer is dereferenced during syscall %d",m.type);
 	}
 }
 

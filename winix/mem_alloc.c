@@ -72,10 +72,8 @@ static void hole_enqueue_head(struct hole **q, struct hole *hole) {
 static struct hole *hole_dequeue(struct hole **q) {
 	struct hole *hole = q[HEAD];
 
-	if (hole == NULL) { //Empty list
-		assert(q[TAIL] == NULL, "deq: tail not null");
+	if (hole == NULL)
 		return NULL;
-	}
 
 	if (q[HEAD] == q[TAIL]) { //Last item
 		q[HEAD] = q[TAIL] = NULL;
@@ -105,9 +103,8 @@ static void hole_delete(struct hole **q, struct hole *h) {
 	register struct hole *curr = q[HEAD];
 	register struct hole *prev = NULL;
 
-	if (curr == NULL) { //Empty list
-		assert(q[TAIL] == NULL, "delete: tail not null");
-	}
+	if (curr == NULL) 
+		return NULL;
 
 	while (curr != h && curr != NULL) {
 		prev = curr;

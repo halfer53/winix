@@ -3,10 +3,10 @@
 
 #define BITMASK_NR	32
 
-typedef struct pattern_b{
+struct bit_pattern{
     unsigned int pattern;
     int size;
-}pattern_t;
+};
 
 extern unsigned int mask[BITMASK_NR];
 
@@ -25,7 +25,7 @@ int bitmap_xor(unsigned int *map1, unsigned int *map2, int size_len);
 
 int bitmap_search_pattern(unsigned int *map, int map_len, unsigned int pattern, int pattern_len);
 int bitmap_set_pattern(unsigned int *map, int map_len, int index, unsigned int pattern, int pattern_len);
-int bitmap_extract_pattern(unsigned int *map, int map_len, int heap_break, pattern_t* ptn);
+int bitmap_extract_pattern(unsigned int *map, int map_len, int heap_break, struct bit_pattern* ptn);
 
 void print_bitmap(unsigned int *p, int len);
 

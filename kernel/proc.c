@@ -76,10 +76,8 @@ void enqueue_head(struct proc **q, struct proc *proc) {
 struct proc *dequeue(struct proc **q) {
 	struct proc *p = q[HEAD];
 
-	if (p == NULL) { //Empty list
-		assert(q[TAIL] == NULL, "deq: tail not null");
+	if (p == NULL)
 		return NULL;
-	}
 
 	if (q[HEAD] == q[TAIL]) { //Last item
 		q[HEAD] = q[TAIL] = NULL;
@@ -99,10 +97,8 @@ int dequeue_schedule( struct proc *h) {
 
 	curr = q[HEAD];
 
-	if (curr == NULL) { //Empty list
-		assert(q[TAIL] == NULL, "delete: tail not null");
+	if (curr == NULL)
 		return ERR;
-	}
 
 	while (curr != h && curr != NULL) {
 		prev = curr;
@@ -172,8 +168,6 @@ reg_t* alloc_kstack(struct proc *who){
 	stack_top = user_get_free_pages(who, KERNEL_STACK_SIZE, GFP_HIGH);
 
 	ASSERT(stack_top != NULL);
-	// if(stack_top == NULL)
-	// 	panic("Can't allocate stack");
 	
 	addr = stack_top + KERNEL_STACK_SIZE - 1;
 	who->stack_top = stack_top;
