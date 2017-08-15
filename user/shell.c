@@ -28,6 +28,7 @@ int test_fork(int argc, char **argv);
 int test_so(int argc, char **argv);
 int test_general(int argc, char **argv);
 int print_pid(int argc, char **argv);
+int mem_info(int argc, char **argv);
 int generic(int argc, char **argv);
 
 //Input buffer & tokeniser
@@ -62,6 +63,7 @@ struct cmd commands[] = {
 	{ test_so, "stackov"},
 	{ test_general, "test"},
 	{ print_pid, "pid"},
+	{ mem_info, "meminfo"},
 	{ generic, NULL }
 };
 //TODO: ps/uptime/shutdown should be moved to separate programs.
@@ -71,6 +73,11 @@ struct cmd commands[] = {
  **/
 int isPrintable(int c) {
 	return ('!' <= c && c <= '~');
+}
+
+int mem_info(int argc, char** argv){
+	sys_meminfo();
+	return 0;
 }
 
 int print_pid(int argc, char **argv){
@@ -386,8 +393,10 @@ void main() {
 			ret = getc(); 	//read
 			
 			if(ret == -1){
-				if(errno == EINTR)
-					perror("kgetc() interrupted");
+				if(errno == EINTR){
+					perror("getc() interrupted");
+					printf("WINIX> ");
+				}
 				continue;
 			}
 			

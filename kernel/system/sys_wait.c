@@ -29,7 +29,6 @@ int do_wait(struct proc *parent, struct message *mesg){
 	
     //Proc has no children
     if(children == 0){
-        kprintf("no children\n");
         mesg->i1 = -1;
         // winix_send(parent->proc_nr,mesg);
         return ECHILD;

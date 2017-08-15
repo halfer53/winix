@@ -239,7 +239,7 @@ void unseched(struct proc *p){
 void free_slot(struct proc *p){
 	p->state = DEAD;
 	p->IN_USE = 0;
-	enqueue_tail(free_proc, p);
+	enqueue_head(free_proc, p);
 }
 
 /**
@@ -290,9 +290,6 @@ int alloc_proc_mem(struct proc *who, int tdb_length, int stack_size, int heap_si
 	who->rbase = rbase = user_get_free_pages(who, proc_len, GFP_NORM);
 	if(rbase == NULL)
 		return ERR;
-
-	// if(flags & PROC_PVT_STACK_OV)
-	// 	proc_memctl(who, rbase + tdb_aligned, PROC_NO_ACCESS);
 
 	if(flags & PROC_SET_SP){
 		who->stack_top = rbase + tdb_aligned + stack_offset;

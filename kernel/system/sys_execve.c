@@ -16,7 +16,7 @@ int exec_proc(struct proc *p,size_t *lines, size_t length, size_t entry, int pri
 
 	set_proc(p, (void (*)())entry, priority, name);
 	if(alloc_proc_mem(p, length, USER_STACK_SIZE , USER_HEAP_SIZE, 
-					     PROC_SET_SP | PROC_SET_HEAP | PROC_PVT_STACK_OV) != OK){
+					     PROC_SET_SP | PROC_SET_HEAP) != OK){
 		return ERR;
 	}
 

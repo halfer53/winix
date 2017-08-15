@@ -6,6 +6,10 @@ int do_winfo(struct proc *who, struct message *m){
             process_overview();
             break;
 
+        case WINFO_MEM:
+            kmesg("Sys Mem bitmap: ");
+            print_sysmap();
+            break;
         default:
             break;
     }

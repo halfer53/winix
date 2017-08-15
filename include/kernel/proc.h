@@ -58,7 +58,6 @@
 //alloc_proc_mem flags
 #define PROC_SET_SP				1
 #define PROC_SET_HEAP			2
-#define PROC_PVT_STACK_OV	4
 
 //proc_memctll flags
 #define PROC_ACCESS				1

@@ -16,7 +16,7 @@
 #ifndef _WAIT_H_
 #define _WAIT_H_ 1
 
-#ifndef _TYPES_H
+#ifndef _TYPES_H_
 #include <sys/types.h>
 #endif
 

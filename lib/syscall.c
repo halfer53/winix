@@ -47,6 +47,12 @@ int sys_ps(){
 	return _SYSCALL(SYSCALL_WINFO,&m);
 }
 
+int sys_meminfo(){
+	struct message m;
+	m.i1 = WINFO_MEM;
+	return _SYSCALL(SYSCALL_WINFO, &m);
+}
+
 pid_t fork(){
 	int result;
 	struct message m;

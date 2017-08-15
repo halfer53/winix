@@ -52,7 +52,7 @@ int copy_pregs(struct proc* parent, struct proc* child){
  * Side Effects:
  *   a new process forked onto the a new memory space, but not yet added to the scheduling queue
  **/
-int _fork(struct proc *parent) {
+int sys_fork(struct proc *parent) {
 	struct proc *child;
 	// int tdb_page_len, sp_heap_page_len, page;
 
@@ -81,7 +81,7 @@ int _fork(struct proc *parent) {
 
 int do_fork(struct proc *who, struct message *m){
 	int child_pr;
-	child_pr = _fork(who);
+	child_pr = sys_fork(who);
 	
 	if(child_pr == ERR)
 		return EINVAL;

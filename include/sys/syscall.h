@@ -49,7 +49,9 @@ function params{\
 
 
 #define WINFO_PS    1
-#define WINFO_SLAB  2
+#define WINFO_MEM   2
+#define WINFO_SLAB  4
+
 
 /**
  * Returns the current system uptime, specified as the number of ticks since boot.
