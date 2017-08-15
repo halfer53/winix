@@ -85,12 +85,21 @@ int print_pid(int argc, char **argv){
 	return 0;
 }
 
-int test_general(int argc, char **argv){
-	int* hb = sbrk(0);
-	int len = 10;
-	int i;
+#define TEST_LEN	35
 
-	malloc(1024);
+int test_general(int argc, char **argv){
+	int* hb[TEST_LEN];
+	
+	int i;
+	
+
+	for(i=0; i< TEST_LEN; i++){
+		hb[i] = malloc(56);
+	}
+	// for(i = 0 ; i<TEST_LEN; i++){
+	// 	free(hb[i]);
+	// }
+	// block_overview();
 	return 0;
 }
 
@@ -106,7 +115,6 @@ int test_so(int argc, char **argv){
 		wait(NULL);
 	}
 	return 0;
-	
 }
 
 int cmd_kill(int argc, char **argv){
@@ -173,8 +181,8 @@ ucontext_t mcontext;
 #define THREAD_STACK_SIZE	56
 
 void func(int arg) {
-  printf("Hello World! I'm thread %d\n",arg);
-  setcontext(&mcontext);
+  	printf("Hello World! I'm thread %d\n",arg);
+  	setcontext(&mcontext);
 }
 
 int test_thread(int argc, char **argv){
@@ -201,17 +209,16 @@ int test_thread(int argc, char **argv){
 			cthread->ss_size = THREAD_STACK_SIZE;
 			cthread->ss_flags = 0;
 			makecontext(cthread,func,1,count++);
-			if(i%10 == 0)
+			
+			if(i%50 == 0)
 				putc('!');
 		}else{
 			printf("malloc failed\n");
+			goto end;
 		}
 		cthread++;
 	}
-	// block_overview();
-
 	putc('\n');
-	
 	cthread = threads;
 	//scheduling the threads
 	//note that we are using user thread library, 
@@ -222,6 +229,7 @@ int test_thread(int argc, char **argv){
 		cthread++;
 	}
 	
+	end:
 	//free up the malloced memory
 	for( i = 0; i < num; i++){
 		free(thread_stack_op[i]);

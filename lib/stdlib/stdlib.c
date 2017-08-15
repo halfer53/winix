@@ -18,26 +18,34 @@ typedef struct s_block {
 
 
 static void *base = NULL;
-static void *end = NULL;
+static int count = 0;
 
 #define BLOCK_SIZE 5
 #define align4(x) (((((x)-1)>>2)<<2)+4)
 #define ALIGN1K(x) (((((x)-1)>>10)<<10)+1024)
 
 void printblock(block_t *b) {
-	int i = (int)b / 1024;
-	printf("%d 0x%08x size %d next 0x%08x prev 0x%08x free %d data 0x%08x\n",
-		i, 
+	printf("0x%x size %d next 0x%x prev 0x%x free %d data 0x%x ",
 		b, 
 		b->size, 
 		b->next , 
 		b->prev, 
 		b->free, 
 		b->data);
+	if(b->next){
+		if((int)b->data + b->size == (int)b->next)
+			printf("\n");
+		else
+			printf("Inconsistent \n");
+	}else{
+		printf("\n");
+	}
+		
 }
 
 void block_overview() {
 	int frees = 0;
+	int used = 0;
 	block_t *b = base;
 	
 	if(!b){
@@ -46,10 +54,12 @@ void block_overview() {
 	while (b) {
 		if(b->free)
 			frees += b->size;
+		else
+			used += b->size;
 		printblock(b);
 		b = b->next;
 	}
-	printf("total frees %d\n", frees);
+	printf("total free words %d, malloced words %d\n", frees, used);
 }
 
 
@@ -88,15 +98,12 @@ void split_block(block_t *b, size_t s)
 block_t *extend_heap(block_t *last , size_t s)
 {
 	int *sb;
-	int page_end;
 	block_t *b, *b2;
-	int size_til_endof_page;
 	
 	b = sbrk (0);
 	if (b != (void *)-1)
 	{
 		sb = sbrk(BLOCK_SIZE+s);
-		// printf("extendingheap b 0x%08x sb 0x%08x \n",b,sb);
 
 		if ((int)sb < 0)
 			return (NULL);
@@ -117,7 +124,7 @@ void *malloc(size_t size) {
 	block_t *b, *last;
 	size_t s;
 
-	// printf("got size %d\n", s);
+	count++;
 	s = align4(size);
 
 	if (base) {
@@ -132,9 +139,7 @@ void *malloc(size_t size) {
 			b->free = 0;
 		} else {
 			/* No fitting block , extend the heap */
-			// printf(" Extend Heap 0x%08x\n",b);
 			b = extend_heap(last , s);
-			
 			if (!b)
 				return (NULL);
 		}
@@ -147,34 +152,6 @@ void *malloc(size_t size) {
 	// printblock(b);
 	return (b->data);
 }
-
-
-/* Copy data from block to block */
-void copy_block(block_t *src, block_t *dst)
-{
-	int *sdata , *ddata;
-	size_t i;
-	sdata = src->ptr;
-	ddata = dst->ptr;
-	for (i = 0; i * 4 < src->size && i * 4 < dst->size; i++)
-		ddata[i] = sdata[i];
-}
-
-
-block_t *fusion(block_t *b) {
-	block_t* next = b->next;
-	if (next && next->free && ((int)(b->ptr) + b->size == (int)next)) {
-		b->size += BLOCK_SIZE + next->size;
-		b->next = next->next;
-		if (b->next)
-			b->next->prev = b;
-	}else{
-		
-	}
-	return (b);
-}
-
-
 
 /* Get the block from and addr */
 block_t *get_block(void *p){
@@ -195,6 +172,17 @@ int valid_addr(void *p)
 	return (0);
 }
 
+block_t *fusion(block_t *b) {
+	block_t* next = b->next;
+	if (next && next->free && ((int)(b->ptr) + b->size == (int)next)) {
+		b->size += BLOCK_SIZE + next->size;
+		b->next = next->next;
+		if (b->next)
+			b->next->prev = b;
+	}
+	return (b);
+}
+
 /* The free */
 /* See free(3) */
 void free(void *p)
@@ -203,24 +191,22 @@ void free(void *p)
 	if (valid_addr(p))
 	{
 		b = get_block(p);
+		if(count == 35)
+			printblock(b);
 		b->free = 1;
 		/* fusion with previous if possible */
-		if (b->prev && b->prev->free)
+		if (b->prev && b->prev->free){
+			// printf("fuse prev %x %x\n", b->prev, b);
 			b = fusion(b->prev);
+		}
+			
 		/* then fusion with next */
-		if (b->next){
+		if (b->next && b->next->free){
+			// printf("fuse next %x %x\n", b->next, b);
 			fusion(b);
-		}else{
-
-			/* free the end of the heap */
-			if (b->prev)
-				b->prev ->next = NULL;
-			else
-				/* No more block !*/
-				base = NULL;
-			brk(b);
 		}
 	}
+	// putc('\n');
 }
 
 void *calloc(size_t number , size_t size) {
@@ -236,7 +222,16 @@ void *calloc(size_t number , size_t size) {
 }
 
 
-
+/* Copy data from block to block */
+void copy_block(block_t *src, block_t *dst)
+{
+	int *sdata , *ddata;
+	size_t i;
+	sdata = src->ptr;
+	ddata = dst->ptr;
+	for (i = 0; i * 4 < src->size && i * 4 < dst->size; i++)
+		ddata[i] = sdata[i];
+}
 
 /* The realloc */
 /* See realloc(3) */

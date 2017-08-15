@@ -20,11 +20,12 @@ void makecontext(ucontext_t *ucp, void (* func)(), int argc, ...){
 		return;
 
 	ucp->pc = (void (*)())&_ctx_start;
-	ucp->regs[11] = (unsigned int)&_ctx_end;
+	ucp->regs[6] = (unsigned int)ucp;
+	ucp->regs[7] = (unsigned int)&_ctx_end;
 
 	//allocate stack for the ucp context
-	spp = (!ucp->ss_flags) ? &ucp->ss_sp : &ucp->sp;
-	*spp -= (argc + 2);
+	spp = (ucp->ss_flags == 0) ? &ucp->ss_sp : &ucp->sp;
+	*spp -= (argc + 1);
 	sp = *spp;
 
 	/**
@@ -33,7 +34,6 @@ void makecontext(ucontext_t *ucp, void (* func)(), int argc, ...){
 	 * 	arg1
 	 *  ...
 	 *  argn
-	 *  ucp
 	 *
 	 * 	The PC of the ucp will set to _ctx_start (refer to lib/ucontext.s)
 	 * 	_ctx_start will pop the top of the stack, which is func. After that, the Stack 
@@ -45,8 +45,6 @@ void makecontext(ucontext_t *ucp, void (* func)(), int argc, ...){
 	*sp++ = (int)func;
 	memcpy(sp,args,argc);
 	sp += argc;
-	*sp = (uint32_t)ucp;
-
 }
 
 

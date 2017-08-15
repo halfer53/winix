@@ -73,8 +73,8 @@ _ctx_start:
 	lw $1, 0($sp)
 	addui $sp, $sp, 1
 	jalr $1
-	sw $13, 0($sp)
-	jr $12
+	sw $7, 0($sp)
+	jr $8
 
 
 .global swapcontext

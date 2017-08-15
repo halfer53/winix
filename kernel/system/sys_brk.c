@@ -3,7 +3,7 @@
 void* sys_sbrk(struct proc *who, int size){
 	ptr_t* next_page;
 	void* oheap;
-	int residual;
+	int residual, request_size;
 
 	if(size == 0)
 		return get_virtual_addr(who->heap_break, who);
@@ -15,14 +15,15 @@ void* sys_sbrk(struct proc *who, int size){
 	}
 
 	next_page = who->heap_bottom + 1;
-	size -= residual;
-	if(user_get_free_pages_from(who,next_page, size ) == ERR)
+	request_size = size - residual;
+	if(user_get_free_pages_from(who,next_page, request_size ) == ERR)
 		return (void *)-1;
 
-	// kmesg("extending heap size %d\n", size);
+	// kmesg("extending heap size %d oheap %x newheap %x\n", size, get_virtual_addr(who->heap_break, who), 
+	// 														get_virtual_addr((who->heap_break + size), who));
 	
 	who->heap_break += size;
-	who->heap_bottom += align_page(size);
+	who->heap_bottom += align_page(request_size);
 	return get_virtual_addr(who->heap_break,who);
 }
 
