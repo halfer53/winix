@@ -22,8 +22,9 @@ bool is_pages_free_from(ptr_t* addr, int size){
 	int page_num = PADDR_TO_NUM_PAGES(size);
 
 	for(i = 0; i < page_num; i++){
-		if(!is_bit_on(mem_map, MEM_MAP_LEN, paged++))
+		if(!is_bit_on(mem_map, MEM_MAP_LEN, paged++)){
 			return false;
+		}
 	}
 	return true;
 }

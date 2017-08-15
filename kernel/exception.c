@@ -102,6 +102,7 @@ PRIVATE void serial2_handler() {
  *   Scheduler is called (i.e. this handler does not return).
  **/
 PRIVATE void gpf_handler() {
+	//is the current process a valid one?
 	ASSERT(IS_PROCN_OK(current_proc->proc_nr));
 	
 	kmesg("General Protection Fault: \"%s (%d)\" Rbase=0x%x vPC=0x%x vSP=0x%x.\r\n",

@@ -12,6 +12,7 @@
 #include <debug.h>
 
 static pid_t _pid = 0;//pid cache
+static char* _brk = NULL; //data segment break cache
 
 int _SYSCALL(int syscall_num, struct message *m){
 	m->type = syscall_num;
@@ -42,7 +43,8 @@ int _exit(int status) {
 
 int sys_ps(){
 	struct message m;
-	return _SYSCALL(SYSCALL_PS,&m);
+	m.i1 = WINFO_PS;
+	return _SYSCALL(SYSCALL_WINFO,&m);
 }
 
 pid_t fork(){
@@ -54,35 +56,44 @@ pid_t fork(){
 	return result;
 }
 
-void *sbrk(size_t size){
-	struct message m;
-	m.i1 = size;
-	_SYSCALL(SYSCALL_SBRK,&m);
-	return m.p1;
-}
-
 int brk(void *addr){
 	struct message m;
-	m.p1 = addr;
-	return _SYSCALL(SYSCALL_BRK,&m);
+	int ret = 0;
+	if(addr != _brk){
+		m.p1 = addr;
+		ret = _SYSCALL(SYSCALL_BRK,&m);
+		_brk = m.p1;
+	}
+	return ret;
 }
 
-int exec(){
+void *sbrk(int incr){
+	char *newsize, *oldsize;
+
+	if(_brk == NULL){
+		brk((void *)-1); //initialise _brk
+	}
+	oldsize = _brk;
+	newsize = _brk + incr;
+	if ((incr > 0 && newsize < oldsize) || (incr < 0 && newsize > oldsize)){
+		return( (void *) -1);
+	}
+		
+	if (brk(newsize) == 0)
+		return(oldsize);
+	else
+		return( (void *) -1);
+}
+
+int execve(){
 	struct message m;
 	return _SYSCALL(SYSCALL_EXECVE,&m);
 }
-
 
 int getc(){
 	struct message m;
 	return _SYSCALL(SYSCALL_GETC,&m);
 }
-
-// int putc(int i){
-// 	struct message m;
-// 	m.i1 = i;
-// 	return _SYSCALL(SYSCALL_PUTC,&m);
-// }
 
 int printf(const char *format, ...) {
 	struct message m;

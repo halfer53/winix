@@ -67,10 +67,11 @@ void system_main() {
 	//Receive message, do work, repeat.
 	while(1) {
 		
-		//get a messa1ge
+		//get a message
 		winix_receive(&m);
 		who_proc_nr = m.src;
 		who = get_proc(who_proc_nr);
+		ASSERT(who != NULL && who_proc_nr != 0);
 
 		//Do the work
 		switch(m.type) {
@@ -78,7 +79,6 @@ void system_main() {
 			case SYSCALL_EXIT:			m.i1 = do_exit(who,&m);			break;
 			case SYSCALL_FORK:			m.i1 = do_fork(who,&m);			break;
 			case SYSCALL_EXECVE:		m.i1 = do_exec(who,&m);			break;
-			case SYSCALL_SBRK:			m.i1 = do_sbrk(who,&m);			break;
 			case SYSCALL_BRK:			m.i1 = do_brk(who,&m);			break;
 			case SYSCALL_ALARM:			m.i1 = do_alarm(who,&m);		break;
 			case SYSCALL_SIGNAL:		m.i1 = do_sigaction(who,&m);	break;
@@ -88,7 +88,7 @@ void system_main() {
 			case SYSCALL_GETPID:		m.i1 = do_getpid(who,&m);		break;
 			case SYSCALL_GETPPID:		m.i1 = do_getppid(who,&m);		break;
 			case SYSCALL_GETC:			m.i1 = do_getc(who,&m);			break;
-			case SYSCALL_PS:			m.i1 = do_ps(who,&m);			break;
+			case SYSCALL_WINFO:			m.i1 = do_winfo(who,&m);		break;
 			case SYSCALL_PRINTF:		m.i1 = do_printf(who,&m);		break;
 			default:
 				kprintf("\r\n[SYSTEM] Process \"%s (%d)\" performed unknown system call %d\r\n", who->name, who->proc_nr, m.type);

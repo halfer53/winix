@@ -17,18 +17,17 @@
 #define SYSCALL_FORK		3
 #define SYSCALL_VFORK		4
 #define SYSCALL_EXECVE		5
-#define SYSCALL_SBRK    	6
-#define SYSCALL_BRK    		7
-#define SYSCALL_ALARM       8
-#define SYSCALL_SIGNAL		9
-#define SYSCALL_SIGRET      10
-#define SYSCALL_WAIT        11
-#define SYSCALL_KILL        12
-#define SYSCALL_GETPID      13
-#define SYSCALL_GETPPID     14
+#define SYSCALL_BRK    		6
+#define SYSCALL_ALARM       7
+#define SYSCALL_SIGNAL		8
+#define SYSCALL_SIGRET      9
+#define SYSCALL_WAIT        10
+#define SYSCALL_KILL        11
+#define SYSCALL_GETPID      12
+#define SYSCALL_GETPPID     13
+#define SYSCALL_WINFO		14
 #define SYSCALL_GETC        15
-#define SYSCALL_PS			16
-#define SYSCALL_PRINTF    	17
+#define SYSCALL_PRINTF    	16
 
 #define SYSCALL_DEFAULT_RETURN  m.i1
 
@@ -48,6 +47,10 @@ function params{\
     return m.i1;\
 }\
 
+
+#define WINFO_PS    1
+#define WINFO_SLAB  2
+
 /**
  * Returns the current system uptime, specified as the number of ticks since boot.
  **/
@@ -58,10 +61,16 @@ int sys_uptime();
  **/
 int _exit(int status);
 int sys_ps();
-
-void *sbrk(unsigned int size);
+pid_t fork();
+int brk(void *addr);
+void *sbrk(int incr);
 
 int getc();
 int printf(const char *format, ...);
+unsigned int alarm(unsigned int seconds);
+pid_t wait(int *wstatus);
+pid_t getpid();
+pid_t getppid();
+int kill (pid_t pid, int sig);
 
 #endif

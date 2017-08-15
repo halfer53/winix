@@ -26,7 +26,14 @@ static void *end = NULL;
 
 void printblock(block_t *b) {
 	int i = (int)b / 1024;
-	printf("%d 0x%08x size %d next 0x%08x prev 0x%08x free %d data 0x%08x\n",i, b, b->size, b->next , b->prev, b->free, b->data);
+	printf("%d 0x%08x size %d next 0x%08x prev 0x%08x free %d data 0x%08x\n",
+		i, 
+		b, 
+		b->size, 
+		b->next , 
+		b->prev, 
+		b->free, 
+		b->data);
 }
 
 void block_overview() {
@@ -75,6 +82,7 @@ void split_block(block_t *b, size_t s)
 		new->next ->prev = new;
 }
 
+
 /* Add a new block at the of heap */
 /* return NULL if things go wrong */
 block_t *extend_heap(block_t *last , size_t s)
@@ -85,62 +93,23 @@ block_t *extend_heap(block_t *last , size_t s)
 	int size_til_endof_page;
 	
 	b = sbrk (0);
-	if (b != NULL)
+	if (b != (void *)-1)
 	{
-		page_end = ALIGN1K((int)b);
-		size_til_endof_page = page_end - (int)b - BLOCK_SIZE;
+		sb = sbrk(BLOCK_SIZE+s);
+		// printf("extendingheap b 0x%08x sb 0x%08x \n",b,sb);
 
-		// printf("b 0x%08x siend %d\n",b,size_til_endof_page);
-
-		if(size_til_endof_page < s){
-			if(size_til_endof_page > 0){
-				sb = sbrk(BLOCK_SIZE + size_til_endof_page);
-				// printf("b 0x%08x sb 0x%08x siend %d\n",b,sb,size_til_endof_page);
-				if ((int)sb < 0)
-					return (NULL);
-				if(size_til_endof_page < 4){
-					last->size += size_til_endof_page + BLOCK_SIZE;
-				}else{
-					b->size = size_til_endof_page;
-					b->next = NULL;
-					b->prev = last;
-					b->ptr = b->data;
-					if (last)
-						last->next = b;
-					b->free = 1;
-					last = b;
-				}
-			}
-
-			b2 = sbrk(BLOCK_SIZE+s);
-			// printf("nextpage b 0x%08x b2 0x%08x \n",b,b2);
-			if ((int)b2 < 0)
-				return (NULL);
-			b2->size = s;
-			b2->next = NULL;
-			b2->prev = last;
-			b2->ptr = b2->data;
-			if (last)
-				last->next = b2;
-			b2->free = 0;
-			// printf("size %d\n", b2->size);
-			return b2;
-		}
+		if ((int)sb < 0)
+			return (NULL);
+		b->size = s;
+		b->next = NULL;
+		b->prev = last;
+		b->ptr = b->data;
+		if (last)
+			last->next = b;
+		b->free = 0;
+		return b;
 	}
-	
-	sb = sbrk(BLOCK_SIZE+s);
-	// printf("extendingheap b 0x%08x sb 0x%08x \n",b,sb);
-
-	if ((int)sb < 0)
-		return (NULL);
-	b->size = s;
-	b->next = NULL;
-	b->prev = last;
-	b->ptr = b->data;
-	if (last)
-		last->next = b;
-	b->free = 0;
-	return b;
+	return NULL;
 }
 
 void *malloc(size_t size) {

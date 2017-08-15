@@ -11,6 +11,7 @@ struct bit_pattern{
 extern unsigned int mask[BITMASK_NR];
 
 void init_bitmap();
+bool is_bit_on(unsigned int *map, int map_len, int bit);
 int bitmap_clear(unsigned int *map, int map_len);
 int bitmap_fill(unsigned int *map, int map_len);
 

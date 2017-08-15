@@ -27,6 +27,7 @@ int test_alarm(int argc, char **argv);
 int test_fork(int argc, char **argv);
 int test_so(int argc, char **argv);
 int test_general(int argc, char **argv);
+int print_pid(int argc, char **argv);
 int generic(int argc, char **argv);
 
 //Input buffer & tokeniser
@@ -60,6 +61,7 @@ struct cmd commands[] = {
 	{ test_fork, "fork"},
 	{ test_so, "stackov"},
 	{ test_general, "test"},
+	{ print_pid, "pid"},
 	{ generic, NULL }
 };
 //TODO: ps/uptime/shutdown should be moved to separate programs.
@@ -71,11 +73,17 @@ int isPrintable(int c) {
 	return ('!' <= c && c <= '~');
 }
 
+int print_pid(int argc, char **argv){
+	printf("%d\n",getpid());
+	return 0;
+}
+
 int test_general(int argc, char **argv){
 	int* hb = sbrk(0);
-	printf("heap break %x\n",hb);
-	hb = sbrk(2000);
-	hb = sbrk(2000);
+	int len = 10;
+	int i;
+
+	malloc(1024);
 	return 0;
 }
 
@@ -304,14 +312,6 @@ int generic(int argc, char **argv) {
 	if(argc == 0)
 		return 0;
 
-	if (strcmp("exec",argv[0]) == 0) {
-		printf("please drag the srec file onto this windows\n" );
-		return exec();
-	}
-	if(strcmp("id",argv[0]) == 0){
-		printf("%d\n",getpid());
-		return 0;
-	}
 	printf("Unknown command '%s'\r\n", argv[0]);
 	return -1;
 }

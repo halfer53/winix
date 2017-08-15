@@ -22,8 +22,8 @@
 //Process Defaults
 #define DEFAULT_FLAGS			0
 #define PTABLE_LEN	32
-#define DEFAULT_STACK_SIZE		1024
-#define DEFAULT_HEAP_SIZE		1024
+#define USER_STACK_SIZE		1024
+#define USER_HEAP_SIZE		1024
 #define DEFAULT_CCTRL			0xff9
 #define DEFAULT_STACK_POINTER			0x00000
 #define USER_CCTRL			0x8 //OKU is set to 0

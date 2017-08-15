@@ -24,6 +24,5 @@ void print_ptable(struct proc* who);
 void print_sysmap();
 
 #define MEM_MAP_LEN	4
-extern unsigned int mem_map[MEM_MAP_LEN];
 
 #endif

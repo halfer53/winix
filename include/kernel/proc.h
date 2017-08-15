@@ -44,11 +44,11 @@
 
 //stack
 #define STACK_MAGIC				0x12345678
-#define DEFAULT_STACK_SIZE		1024
+#define USER_STACK_SIZE		1024
 #define KERNEL_STACK_SIZE		2048
 
 //heap
-#define DEFAULT_HEAP_SIZE		2048
+#define USER_HEAP_SIZE		2048
 
 //Process Flags
 #define SENDING					0x0001
@@ -142,6 +142,7 @@ typedef struct proc {
 #define IS_KERNEL_PROC(p)	((p->proc_nr) == 0)
 #define IS_USER_PROC(p)		((p->proc_nr) > 0)
 #define CHECK_STACK(p)		(*(p->stack_top) == STACK_MAGIC)
+#define GET_DEF_STACK_SIZE(who)	(IS_USER_PROC(who) ? USER_STACK_SIZE : KERNEL_STACK_SIZE)
 
 
 extern struct proc proc_table[NUM_PROCS];
