@@ -10,7 +10,7 @@ int do_sigreturn(struct proc *who, struct message *m){
 
     // kprintf("sig ret sp 0x%08x\n",sp);
 
-    sp += MESSAGE_LEN + 3 +SIGFRAME_CODE_LEN;
+    sp += sizeof(struct sigframe);
     memcpy(who,sp,SIGNAL_CTX_LEN);
 
     //reset the signal to default

@@ -14,13 +14,13 @@ tmp.txt
 fs/Debug/
 test.c
 a.out
+include/*.c
 
 .vscode/
 fs/cmake-build-debug/
 expri/
 gen_bin_code
 reformat_srec.class
-include/shell_codes.c
 shell.txt
 
 RexSimulator.dll
