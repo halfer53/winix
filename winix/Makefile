@@ -5,9 +5,9 @@ PROGS = slab mm bitmap sys_stdio wini_ipc kdebug timer sigsend util
 FOO = *.c
 SOURCES = $(PROGS:=.c)
 ASSEMBLY = $(PROGS:=.s)
-OBJECT = $(PROGS:=.o) kwramp.o
-
+OBJECT = $(PROGS:=.o) kwramp.o limits/limits_head.o limits/limits_tail.o
 wramp: $(OBJECT)
+
 $(ASSEMBLY): %.s: %.c $(INCLUDES)
 	wcc $(CFLAGS) -S -N -I$(INCLUDE_DIR) -o $@ $<
 

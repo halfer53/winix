@@ -3,7 +3,7 @@
 #include <kernel/exception.h>
 #include <winix/signal.h>
 
-static unsigned int sigframe_code[2] = {0x1ee10001,0x200d0000};
+static unsigned int sigframe_code[] = {0x1ee10001,0x200d0000};
 //addui sp,sp, 1
 //syscall
 
@@ -25,13 +25,13 @@ PRIVATE int build_signal_ctx(struct proc *who, int signum){
     sp = who->sp;
     sp = get_physical_addr(sp,who);
     
-    build_user_stack(who,who,PROCESS_CONTEXT_LEN);
-    build_user_stack(who,sigframe_code,SIGFRAME_CODE_LEN);
+    build_user_stack(who,who,SIGNAL_CTX_LEN);
+    build_user_stack(who,sigframe_code,sizeof(sigframe_code));
 
     ra = who->sp;
     sigret_mesg.type = SYSCALL_SIGRET;
     sigret_mesg.i1 = signum;
-    build_user_stack(who,&sigret_mesg,MESSAGE_LEN);
+    build_user_stack(who,&sigret_mesg,sizeof(struct message));
 
     sigframe.signum = signum;
     sigframe.operation = WINIX_SEND;

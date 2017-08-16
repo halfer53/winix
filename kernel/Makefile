@@ -2,7 +2,6 @@
 INCLUDE_DIR = ../include
 INCLUDES = $(wildcard $(INCLUDE_DIR)/*.h $(INCLUDE_DIR)/winix/*.h $(INCLUDE_DIR)/sys/*.h $(INCLUDE_DIR)/kernel/*.h)
 
-LIMITS = util/limits_head.o util/limits_tail.o
 PROGS = main proc system exception idle clock sched
 SOURCES = $(PROGS:=.c)
 ASSEMBLY = $(PROGS:=.s)
@@ -10,9 +9,6 @@ OBJECT = $(PROGS:=.o)
 
 wramp:$(OBJECT) $(INCLUDES) $(LIMITS)
 	$(MAKE) -C system
-
-$(LIMITS): %.o: %.s
-	wasm $< -o $@
 
 $(ASSEMBLY): %.s: %.c $(INCLUDES)
 	wcc $(CFLAGS) -S -N -I$(INCLUDE_DIR) -o $@ $<

@@ -25,7 +25,7 @@
 
 //Signal Context
 #define PROCESS_REGS_LEN		16
-#define PROCESS_CONTEXT_LEN		21
+#define SIGNAL_CTX_LEN			21
 
 //Process Defaults
 #define DEFAULT_FLAGS			0

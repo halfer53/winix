@@ -2,16 +2,16 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define DATA_LEN    512
+#define BLOCK_LEN    1024
 
-typedef struct buf{
-    char data[512];
+struct bbuf{
+    char data[BLOCK_LEN];
     char *p;
     int count;
-    struct buf *next;
-}buf_t;
+    struct bbuf *next;
+};
 
-int winix_load_srec_mem_val(buf_t **buffer,char *line, int start_index);
+int winix_load_srec_mem_val(struct bbuf *buffer,char *line, int start_index);
 
 char *filename = NULL;
 
@@ -29,14 +29,14 @@ char *remove_extension(const char* mystr) {
     return retstr;
 }
 
-void init_buffer(buf_t *buffer){
+void init_buffer(struct bbuf *buffer){
     buffer->count = 0;
     buffer->next = NULL;
     buffer->p = buffer->data;
 }
 
-buf_t *new_buffer(buf_t *obuffer){
-    buf_t *buf = malloc(sizeof(buf_t));
+struct bbuf *new_buffer(struct bbuf *obuffer){
+    struct bbuf *buf = malloc(sizeof(struct bbuf));
     init_buffer(buf);
     obuffer->next = buf;
     return buf;
@@ -61,9 +61,9 @@ int main(int argc, char const *argv[]) {
 
     int wordscount = 0;
 
-    buf_t *obuffer = malloc(sizeof(buf_t));
-    buf_t *buffer = obuffer;
-    buf_t *prev_buffer = NULL;
+    struct bbuf *obuffer = malloc(sizeof(struct bbuf));
+    struct bbuf *buffer = obuffer;
+    struct bbuf *prev_buffer = NULL;
     char *p;
     int pcount = 0;
     int tmp;
@@ -80,7 +80,7 @@ int main(int argc, char const *argv[]) {
 
 
     while ((read = getline(&line, &len, fp)) != -1) {
-        tmp = winix_load_srec_mem_val(&buffer,line, wordsLoaded);
+        tmp = winix_load_srec_mem_val(buffer,line, wordsLoaded);
         if(tmp > 0)
             wordsLoaded += tmp;
         else
@@ -89,9 +89,10 @@ int main(int argc, char const *argv[]) {
 	
 
     buffer = obuffer;
+	pcount = 0;
     while(buffer != NULL){
         p = buffer->data;
-        while(pcount != buffer->count){
+        while(pcount < buffer->count){
             printf("0x%08x,\n", *p++ );
             pcount++;
         }
@@ -101,9 +102,8 @@ int main(int argc, char const *argv[]) {
         free(prev_buffer);
         pcount = 0;
     }
-     printf("\n};\nint %s_pc =  0x%08x;\n", filename,(unsigned int)address);
+    printf("\n};\nint %s_pc =  0x%08x;\n", filename,(unsigned int)address);
     printf("int %s_code_length =  %lu;\n",filename, wordsLoaded);
-    printf("buffer len %d\n",wordscount);
 	return 0;
 
 }
@@ -146,7 +146,7 @@ int Substring(char* buffer, char* original, int start_index, int length) {
 typedef unsigned char byte;
 
 
-int winix_load_srec_mem_val(buf_t **tbuffer,char *line, int start_index) {
+int winix_load_srec_mem_val(struct bbuf *buf,char *line, int start_index) {
 	int wordsLoaded = 0;
 	int index = 0;
 	int checksum = 0;
@@ -163,7 +163,6 @@ int winix_load_srec_mem_val(buf_t **tbuffer,char *line, int start_index) {
 	size_t memVal = 0;
 	int i = 0;
 	int j = 0;
-    buf_t *buf = *tbuffer;
     char *mem = buf->p;
     int bufo_count = buf->count;
     int last_buf_count = 0;
@@ -299,11 +298,12 @@ int winix_load_srec_mem_val(buf_t **tbuffer,char *line, int start_index) {
                 }
                 wordsLoaded++;
                 *mem++ = memVal;
-                if(wordsLoaded + bufo_count == DATA_LEN){
-                    buf->count = wordsLoaded + bufo_count;
-                    *tbuffer = new_buffer(buf);
+				
+                if(wordsLoaded + bufo_count == BLOCK_LEN){
+					
+                    buf->count += wordsLoaded;
+                    buf = new_buffer(buf);
                     
-                    buf = *tbuffer;
                     last_buf_count = wordsLoaded;
                     bufo_count = 0;
                     mem = buf->data;
@@ -312,11 +312,12 @@ int winix_load_srec_mem_val(buf_t **tbuffer,char *line, int start_index) {
                 // printf("0x%08x,\n", (unsigned int)memVal );
             }
             break;
+
         case 7: //entry point for the program.
             // printf("\n};\nint %s_pc =  0x%08x;\n", filename,(unsigned int)address);
             return -address;
 	}
     buf->count = bufo_count + wordsLoaded - last_buf_count;
-    buf->p = mem;
+	fprintf(stderr,"words loaded %d curr buf count %d\n",wordsLoaded, buf->count);
 	return wordsLoaded;
 }

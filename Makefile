@@ -10,8 +10,8 @@ LIBS_O = $(shell find lib -name "*.o")
 
 KLIB = ipc string util wramp_syscall ucontext stdlib/atoi stdlib/errno
 KLIB_O = $(addprefix lib/, $(KLIB:=.o))
-L_HEAD = kernel/util/limits_head.o
-L_TAIL = kernel/util/limits_tail.o
+L_HEAD = winix/limits/limits_head.o
+L_TAIL = winix/limits/limits_tail.o
 KERNEL_O = winix/*.o kernel/system/*.o kernel/*.o
 KMAIN = kernel/main.s kernel/main.o 
 
@@ -66,7 +66,7 @@ shell:
 	wlink -o shell.srec shell.o $(LIBS_O)
 	java $(REFORMAT) shell.srec
 	./$(GEN_BIN) shell.srec > include/shell_codes.c
-	-rm -f shell.srec shell.s shell.o
+	# -rm -f shell.srec shell.s shell.o
 
 test:
 	gcc -D_GCC_DEBUG -I./include test.c winix/bitmap.c winix/mm.c
