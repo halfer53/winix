@@ -31,7 +31,7 @@ int bitmap_fill(unsigned int *map, int map_len){
  * search from start
  * @param  map     memory map
  * @param  map_len memory map length
- * @param  start   starting bit to search from memory map, 0 <= start < 1024
+ * @param  start   starting bit to search from memory map, 0 <= start < map_len * 32
  * @param  num     number of bits to search
  * @return         bit found
  */
@@ -65,6 +65,7 @@ int bitmap_search_from(unsigned int *map, int map_len, int start, int num){
 // 	return bitmap_search_from(map,map_len, (BSS_END) / PAGE_LEN , num);
 // }
 
+//searching from reverse
 int bitmap_search_reverse(unsigned int *map, int map_len, int num){
 	register int i,j;
 	int count = 0;
@@ -87,6 +88,13 @@ int bitmap_search_reverse(unsigned int *map, int map_len, int num){
 	return ERR;
 }
 
+/**
+ * set one bit in the bitmap to 1
+ * @param  map     
+ * @param  map_len 
+ * @param  start   
+ * @return         
+ */
 int bitmap_set_bit(unsigned int *map, int map_len,int start){
 	int ibit = start/32;
 	if(start >= map_len * 32)	
@@ -95,7 +103,14 @@ int bitmap_set_bit(unsigned int *map, int map_len,int start){
     return OK;
 }
 
-
+/**
+ * set multiple bits to 1
+ * @param  map     
+ * @param  map_len 
+ * @param  start   
+ * @param  len     
+ * @return         
+ */
 int bitmap_set_nbits(unsigned int *map, int map_len,int start, int len){
 	register int i;
 	int inum;
@@ -107,6 +122,7 @@ int bitmap_set_nbits(unsigned int *map, int map_len,int start, int len){
 	}
     return OK;
 }
+
 
 int bitmap_clear_nbits(unsigned int *map, int map_len,int start, int len){
 	register int i;
@@ -128,6 +144,7 @@ int bitmap_clear_bit(unsigned int *map, int map_len,int start){
     map[ibit] = map[ibit] & (~mask[start%32]);
     return OK;
 }
+
 
 int search_backtrace(unsigned int *map, int region_len,unsigned int pattern, int pattern_len,int j){
     int i=0;
@@ -229,12 +246,37 @@ int bitmap_set_pattern(unsigned int *map, int map_len, int index, unsigned int p
     return OK;
 }
 
+
 bool is_bit_on(unsigned int *map, int map_len, int bit){
     int i= bit/32, j=bit%32;
     if(bit > map_len * 32)
         return false;
     
-    return map[i] ^ mask[j];
+    return (map[i] & mask[j]) == 0;
+}
+
+int count_bits(unsigned int *map, int map_len, int flags){
+    int i,j,curr_map_unit, count = 0;
+    bool and_mask;
+
+    if(flags == ONE_BITS)
+        and_mask = true;
+    else if(flags == ZERO_BITS)
+        and_mask = false;
+    else
+        return ERR;
+
+    for(i = 0; i < map_len; i++){
+        curr_map_unit = map[i];
+        for(j = 0; j < 32; j++){
+            if(and_mask && (mask[j] & curr_map_unit)){
+                count++;
+            }else if((!and_mask) && ((mask[j] & curr_map_unit) == 0)){
+                count++;
+            }
+        }
+    }
+    return count;
 }
 
 

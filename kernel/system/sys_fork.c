@@ -1,5 +1,11 @@
 #include "../winix.h"
 
+/**
+ * copy the pcb struct from parent to child
+ * @param  parent 
+ * @param  child  
+ * @return        
+ */
 int copy_pcb(struct proc* parent, struct proc* child){
 	int pbak;
 	pbak = child->proc_nr;
@@ -10,6 +16,13 @@ int copy_pcb(struct proc* parent, struct proc* child){
 	return OK;
 }
 
+/**
+ * allocate new virtual address space for chlid, and 
+ * copy the whole process image from parent to child
+ * @param  parent 
+ * @param  child  
+ * @return        
+ */
 int copy_mm(struct proc* parent, struct proc* child){
 	ptr_t *src, *dest;
 	struct bit_pattern ptn;
@@ -31,6 +44,15 @@ int copy_mm(struct proc* parent, struct proc* child){
 	return OK;
 }
 
+
+/**
+ * copy physical registers. Physical registers are internally used by the kernel
+ * Unlike virtual registers like $pc, $ra, some kernel space pointers point to the
+ * actually physical memory for fast access
+ * @param  parent 
+ * @param  child  
+ * @return        
+ */
 int copy_pregs(struct proc* parent, struct proc* child){
 	ptr_t *sp;
 	sp = get_physical_addr(parent->sp,parent);
@@ -44,14 +66,10 @@ int copy_pregs(struct proc* parent, struct proc* child){
 
 
 /**
- * fork the calling process
- *
- * Returns:
- *   proc of the child process
- *
- * Side Effects:
- *   a new process forked onto the a new memory space, but not yet added to the scheduling queue
- **/
+ * syscall for fork
+ * @param  parent 
+ * @return        pid of the child, or -1 if forking is failed
+ */
 int sys_fork(struct proc *parent) {
 	struct proc *child;
 	// int tdb_page_len, sp_heap_page_len, page;

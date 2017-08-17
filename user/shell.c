@@ -187,7 +187,7 @@ void func(int arg) {
 
 int test_thread(int argc, char **argv){
 	int num = 2;
-	int i;
+	int i,j;
 	int count = 1;
 	void **thread_stack_op;
 	ucontext_t *threads; 
@@ -197,9 +197,20 @@ int test_thread(int argc, char **argv){
 
 	//ucontext represents the context for each thread
 	threads = malloc(sizeof(ucontext_t) * num);
+	if(threads == NULL){
+		perror("malloc failed");
+		return -1;
+	}
+		
 	//thread_stack_op saves the original pointer returned by malloc
 	//so later we can use it to free the malloced memory
 	thread_stack_op = malloc(sizeof(int) * num);
+	if(threads == NULL){
+		free(threads);
+		perror("malloc failed");
+		return -1;
+	}
+		
 	cthread = threads;
 
 	//Allocate stack for each thread
@@ -213,7 +224,7 @@ int test_thread(int argc, char **argv){
 			if(i%50 == 0)
 				putc('!');
 		}else{
-			printf("malloc failed\n");
+			perror("malloc failed\n");
 			goto end;
 		}
 		cthread++;
@@ -231,12 +242,11 @@ int test_thread(int argc, char **argv){
 	
 	end:
 	//free up the malloced memory
-	for( i = 0; i < num; i++){
-		free(thread_stack_op[i]);
-	}
-	free(thread_stack_op);
 	free(threads);
-
+	free(thread_stack_op);
+	for( j = 0; j < i; j++){
+		free(thread_stack_op[j]);
+	}
 	// block_overview();
 	return 0;
 }

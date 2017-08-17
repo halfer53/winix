@@ -17,6 +17,7 @@ void handler_timer(struct timer *timer){
  *
  * Side Effects:
  *   system_uptime is incremented
+ *   if there is an immediate timer, relevant handler is called
  *   scheduler is called (i.e. this handler does not return)
  **/
 void clock_handler(){

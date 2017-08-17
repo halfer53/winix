@@ -1,6 +1,12 @@
 #include "../winix.h"
 #include <sys/wait.h>
 
+/**
+ * syscall for wait
+ * @param  parent 
+ * @param  mesg   
+ * @return        
+ */
 int do_wait(struct proc *parent, struct message *mesg){
     register struct proc *child = NULL;
     
@@ -9,6 +15,8 @@ int do_wait(struct proc *parent, struct message *mesg){
 
     for (i=0; i<NUM_PROCS; i++) {
         child = &proc_table[i];
+        
+        //if there is a child process that is zombie
         if(child->IN_USE && child->parent == parent->proc_nr){
             if(child->state == ZOMBIE){
                 

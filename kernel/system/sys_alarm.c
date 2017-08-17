@@ -1,5 +1,8 @@
 #include "../winix.h"
 
+//alarm syscall
+//input     m.i1    seconds
+//output    m.i1    previous timeout
 int do_alarm(struct proc *who, struct message *m){
     clock_t seconds;
     struct timer *alarm;

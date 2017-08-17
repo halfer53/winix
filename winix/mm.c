@@ -1,8 +1,20 @@
 #include <kernel/kernel.h>
 
+/**
+ * Memory allocation module
+ * This module internally has a bitmap that stores the status of all pages in the system memory
+ * pages are managed by bitmaps. 1 indicate this page is being used, otherwise its 0
+ */
+
 PRIVATE unsigned int mem_map[MEM_MAP_LEN];
 
-bool is_addr_accessible(struct proc* who, ptr_t* addr){
+/**
+ * is the address accessible by the proc
+ * @param  who  
+ * @param  addr 
+ * @return      
+ */
+bool is_addr_accessible(struct proc* who, vptr_t* addr){
 	int page;
 
 	addr = get_physical_addr(addr, who);
@@ -10,12 +22,25 @@ bool is_addr_accessible(struct proc* who, ptr_t* addr){
 	return is_bit_on(who->ptable, PTABLE_LEN, page);
 }
 
+/**
+ * is the given page address free
+ * @param  addr the starting address of the page
+ * @return      
+ */
 bool is_page_free(ptr_t* addr){
 	int paged = PADDR_TO_PAGED(addr);
 
 	return is_bit_on(mem_map, MEM_MAP_LEN, paged);
 }
 
+/**
+ * is page free from the address given
+ * for instance, given addr = 1024, size = 2048
+ * it means are the pages from 1024 to 3072 free?
+ * @param  addr physical address
+ * @param  size 
+ * @return      
+ */
 bool is_pages_free_from(ptr_t* addr, int size){
 	int i;
 	int paged = PADDR_TO_PAGED(addr);
@@ -29,6 +54,12 @@ bool is_pages_free_from(ptr_t* addr, int size){
 	return true;
 }
 
+/**
+ * get free pages from the system
+ * @param  length length in words
+ * @param  flags  High mem or Normal mem
+ * @return        pointer to the start of the page, or Null if failed
+ */
 ptr_t *get_free_pages(int length, int flags) {
 	int nstart;
 	int num = PADDR_TO_NUM_PAGES(length);
@@ -44,6 +75,15 @@ ptr_t *get_free_pages(int length, int flags) {
 	return NULL;
 }
 
+/**
+ * similar to get_free_pages(), the only diff is that this one sets bits on 
+ * corresponding the pages it got from get_free_pages(), so that the user can access these
+ * allocated pages
+ * @param  who    
+ * @param  length 
+ * @param  flags  
+ * @return        
+ */
 ptr_t* user_get_free_pages(struct proc* who, int length, int flags){
 	int index;
 	ptr_t* p;
@@ -59,6 +99,12 @@ ptr_t* user_get_free_pages(struct proc* who, int length, int flags){
 	return p;
 }
 
+/**
+ * get free pages starting froma addr, with size 
+ * @param  addr 
+ * @param  size 
+ * @return      
+ */
 int get_free_pages_from(ptr_t* addr, int size){
 	int paged, page_num;
 
@@ -73,6 +119,13 @@ int get_free_pages_from(ptr_t* addr, int size){
 	return OK;
 }
 
+/**
+ * user bits are on, so that user can access these
+ * @param  who  
+ * @param  addr 
+ * @param  size 
+ * @return      
+ */
 int user_get_free_pages_from(struct proc* who, ptr_t* addr, int size){
 	int index;
 	int ret;
@@ -88,10 +141,20 @@ int user_get_free_pages_from(struct proc* who, ptr_t* addr, int size){
 	return OK;
 }
 
+/**
+ * returns the next free page in the system
+ * @return 
+ */
 int next_free_page_index(){
 	return bitmap_search(mem_map, MEM_MAP_LEN, 1);
 }
 
+/**
+ * free the pages given, similar to free() you see in the user space
+ * @param  page 
+ * @param  len  
+ * @return      
+ */
 int free_pages(ptr_t* page, int len){
 	int page_index;
 	if((int)page % PAGE_LEN != 0)
@@ -108,7 +171,14 @@ int user_free_pages(struct proc* who, ptr_t* page, int len){
 	return bitmap_clear_nbits(who->ptable, PTABLE_LEN, index, len);
 }
 
-
+/**
+ * duplicate the virtual address from parent to child
+ * The process image are not copied though
+ * @param parent 
+ * @param child  
+ * @param ptn    
+ * return the new rbase of the child
+ */
 void* dup_vm(struct proc* parent, struct proc* child, struct bit_pattern* ptn){
 	int index;
 	if(bitmap_extract_pattern(parent->ptable, MEM_MAP_LEN, (int)child->heap_break, ptn) == ERR)
@@ -134,7 +204,19 @@ void print_ptable(struct proc* who){
 }
 
 void print_sysmap(){
+	static char free_str[] = "Free";
+	static char used_str[] = "Used";
+	int flags, pages, i;
+	char* str;
+	kprintf("Sys Mem bitmap: ");
 	print_bitmap(mem_map, MEM_MAP_LEN);
+
+	for(i = 0; i < 2; i++){
+		flags = i == 0 ? ZERO_BITS : ONE_BITS;
+		pages = count_bits(mem_map, MEM_MAP_LEN, flags);
+		str = i == 0 ? free_str : used_str;
+		kprintf("%s pages: %03d, %03dk words\n",str, pages, pages);
+	}
 }
 
 

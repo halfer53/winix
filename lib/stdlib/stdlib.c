@@ -15,17 +15,15 @@ typedef struct s_block {
 	//note that data is just put there, it lies directly in the memory block where malloc starts.
 }block_t;
 
-
-
 static void *base = NULL;
 static int count = 0;
 
-#define BLOCK_SIZE 5
+#define BLOCK_SIZE (sizeof(struct s_block) - 1)
 #define align4(x) (((((x)-1)>>2)<<2)+4)
 #define ALIGN1K(x) (((((x)-1)>>10)<<10)+1024)
 
 void printblock(block_t *b) {
-	printf("0x%x size %d next 0x%x prev 0x%x free %d data 0x%x ",
+	printf("0x%04x size %04d next 0x%04x prev 0x%04x free %d data 0x%04x ",
 		b, 
 		b->size, 
 		b->next , 
@@ -107,6 +105,7 @@ block_t *extend_heap(block_t *last , size_t s)
 
 		if ((int)sb < 0)
 			return (NULL);
+			
 		b->size = s;
 		b->next = NULL;
 		b->prev = last;

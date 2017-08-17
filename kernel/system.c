@@ -53,6 +53,8 @@ void print_sysinfo(){
 	kprintf("Unallocated:  0x%08x - 0x%08x\r\n", free_mem_begin, FREE_MEM_END);
 	kprintf("%d kWords Free\r\n", ((unsigned int)(FREE_MEM_END - free_mem_begin)) / 1024);
 }
+
+
 /**
  * Entry point for system task.
  **/

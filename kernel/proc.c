@@ -89,7 +89,11 @@ struct proc *dequeue(struct proc **q) {
 	return p;
 }
 
-//return ERR if nothing found
+/**
+ * remove the process from the scheduling queue
+ * @param  h process to be removed
+ * @return   0 on success, -1 if not
+ */
 int dequeue_schedule( struct proc *h) {
 	struct proc *curr;
 	struct proc *prev = NULL;
@@ -119,6 +123,10 @@ int dequeue_schedule( struct proc *h) {
 	return OK;
 }
 
+/**
+ * enqueue the process to the scheduling queue
+ * @param p 
+ */
 void enqueue_schedule(struct proc* p) {
 	enqueue_tail(ready_q[p->priority], p);
 }
@@ -136,7 +144,10 @@ struct proc *get_free_proc_slot() {
 	return NULL;
 }
 
-
+/**
+ * set the process struct to default
+ * @param p 
+ */
 void proc_set_default(struct proc *p) {
 	int pnr_bak = p->proc_nr;
 	memset(p,0, sizeof(struct proc));
@@ -160,6 +171,12 @@ void proc_set_default(struct proc *p) {
 	p->alarm.proc_nr = p->proc_nr;
 }
 
+/**
+ * allocate stack for kernel processes, stack size is defined by KERNEL_STACK_SIZE
+ * this method can be used for creating kernel process or kernel threads'  stack
+ * @param  who 
+ * @return     virtual address of the stack
+ */
 reg_t* alloc_kstack(struct proc *who){
 	int page_size;
 	int index;
@@ -174,7 +191,9 @@ reg_t* alloc_kstack(struct proc *who){
 	return get_virtual_addr(addr, who);
 }
 
-
+/**
+ * set proc struct property
+ */
 int set_proc(struct proc *p, void (*entry)(), int priority, const char *name) {
 	p->priority = priority;
 	p->pc = entry;
@@ -217,7 +236,15 @@ struct proc *start_kernel_proc(void (*entry)(), int priority, const char *name) 
 	return p;
 }
 
-
+/**
+ * start a new user process
+ * @param  lines    array containing the binary image of the process
+ * @param  length   length of the lines
+ * @param  entry    entry point of the process
+ * @param  priority 
+ * @param  name     
+ * @return          
+ */
 struct proc *start_user_proc(size_t *lines, size_t length, size_t entry, int priority, const char *name){
 	struct proc *p;
 	if(!(p = get_free_proc_slot()))
@@ -257,9 +284,15 @@ void end_process(struct proc *p) {
 	free_slot(p);
 }
 
-
-int proc_memctl(struct proc* who ,ptr_t* page_addr, int flags){
-	int paged = PADDR_TO_PAGED(page_addr);
+/**
+ * process memory control, 
+ * @param  who       
+ * @param  page_addr the virtual address memory
+ * @param  flags     PROC_ACCESS OR PROC_NO_ACCESS
+ * @return           
+ */
+int proc_memctl(struct proc* who ,vptr_t* page_addr, int flags){
+	int paged = PADDR_TO_PAGED(get_physical_addr(page_addr,who)); //get page descriptor
 
 	if(flags == PROC_ACCESS){
 		return bitmap_set_bit(who->ptable, PTABLE_LEN, paged);
@@ -269,7 +302,15 @@ int proc_memctl(struct proc* who ,ptr_t* page_addr, int flags){
 	return ERR;
 }
 
-
+/**
+ * allocate memory for the given process
+ * @param  who        
+ * @param  tdb_length total of text and data size
+ * @param  stack_size 
+ * @param  heap_size  
+ * @param  flags      PROC_SET_SP or/and PROC_SET_HEAP	
+ * @return            
+ */
 int alloc_proc_mem(struct proc *who, int tdb_length, int stack_size, int heap_size, int flags){
 	int proc_page_len;
 	int proc_len;
@@ -277,6 +318,7 @@ int alloc_proc_mem(struct proc *who, int tdb_length, int stack_size, int heap_si
 	int tdb_aligned;
 	int stack_offset = 0;
 
+	//make sizes page aligned
 	tdb_aligned = align_page(tdb_length);
 	stack_size = align_page(stack_size);
 	heap_size = align_page(heap_size);
@@ -291,6 +333,7 @@ int alloc_proc_mem(struct proc *who, int tdb_length, int stack_size, int heap_si
 	if(rbase == NULL)
 		return ERR;
 
+	//for how process memory are structured, look at the first line of this file
 	if(flags & PROC_SET_SP){
 		who->stack_top = rbase + tdb_aligned + stack_offset;
 		who->sp = get_virtual_addr(who->stack_top + stack_size - 1,who);
@@ -356,6 +399,12 @@ struct proc *get_proc(int proc_nr) {
 	return NULL;
 }
 
+/**
+ * similar to get_proc(), but this one makes sure the 
+ * returning proc is runnable
+ * @param  proc_nr 
+ * @return         
+ */
 struct proc *get_running_proc(int proc_nr){
 	struct proc *p = get_proc(proc_nr);
 	if(p->state != RUNNABLE)

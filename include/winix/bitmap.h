@@ -28,10 +28,14 @@ int bitmap_search_pattern(unsigned int *map, int map_len, unsigned int pattern, 
 int bitmap_set_pattern(unsigned int *map, int map_len, int index, unsigned int pattern, int pattern_len);
 int bitmap_extract_pattern(unsigned int *map, int map_len, int heap_break, struct bit_pattern* ptn);
 
+int count_bits(unsigned int *map, int map_len, int flags);
 void print_bitmap(unsigned int *p, int len);
 
 
-#define bitmap_search(map,map_len,num)  bitmap_search_from((map),(map_len), ((int)(&BSS_END) / PAGE_LEN) , (num))
+#define bitmap_search(map,map_len,num)  bitmap_search_from((map),(map_len), 0 , (num))
+
+#define ZERO_BITS   1
+#define ONE_BITS    2
 
 #endif
 

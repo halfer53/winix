@@ -1,6 +1,9 @@
 #include "winix.h"
 
-
+/**
+ * return the idle proc
+ * @return 
+ */
 struct proc *get_idle(){
 	static struct proc *idle = NULL;
 	if(idle == NULL){

@@ -118,7 +118,11 @@ int wini_notify(int dest, struct message *m) {
 	return ERR;
 }
 
-
+/**
+ * send err to the destination
+ * @param  dest 
+ * @return      
+ */
 int winix_senderr(int dest){
 	struct message m;
 	memset(&m,-1,MESSAGE_LEN);

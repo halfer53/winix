@@ -142,6 +142,7 @@ typedef struct proc {
 #define IS_USER_PROC(p)		((p->proc_nr) > 0)
 #define CHECK_STACK(p)		(*(p->stack_top) == STACK_MAGIC)
 #define GET_DEF_STACK_SIZE(who)	(IS_USER_PROC(who) ? USER_STACK_SIZE : KERNEL_STACK_SIZE)
+#define GET_HEAP_TOP(who)	((who)->stack_top + GET_DEF_STACK_SIZE(who))
 
 
 extern struct proc proc_table[NUM_PROCS];
@@ -162,6 +163,7 @@ struct proc *get_free_proc_slot();
 int alloc_proc_mem(struct proc *who, int tdb_length, int stack_size, int heap_size, int flags);
 void enqueue_schedule(struct proc* p);
 reg_t* alloc_kstack(struct proc *who);
+int proc_memctl(struct proc* who ,vptr_t* page_addr, int flags);
 /**
  * WINIX Scheduler.
  **/

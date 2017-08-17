@@ -3,5 +3,6 @@
 
 typedef unsigned int reg_t;
 typedef unsigned int ptr_t;
+typedef unsigned int vptr_t;
 
 #endif

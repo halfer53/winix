@@ -69,6 +69,8 @@ int brk(void *addr){
 		m.p1 = addr;
 		ret = _SYSCALL(SYSCALL_BRK,&m);
 		_brk = m.p1;
+		if(m.i1 != 0)
+			return -1;
 	}
 	return ret;
 }
@@ -81,14 +83,14 @@ void *sbrk(int incr){
 	}
 	oldsize = _brk;
 	newsize = _brk + incr;
-	if ((incr > 0 && newsize < oldsize) || (incr < 0 && newsize > oldsize)){
+	if ((incr > 0 && newsize < oldsize) || (incr < 0 && newsize > oldsize))
 		return( (void *) -1);
-	}
 		
 	if (brk(newsize) == 0)
 		return(oldsize);
 	else
 		return( (void *) -1);
+		
 }
 
 int execve(){

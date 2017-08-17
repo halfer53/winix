@@ -12,8 +12,6 @@
 //Number of exception sources
 #define NUM_HANDLERS 16
 
-static int _irq_count = 0;
-
 //Handler prototypes
 PRIVATE void button_handler();
 PRIVATE void parallel_handler();
@@ -49,6 +47,8 @@ PRIVATE void (*handlers[])(void) = {
 //System uptime, stored as number of timer interrupts since boot
 int system_uptime = 0;
 
+// counts the number of irqs during exception
+PRIVATE int _irq_count = 0;
 
 int irq_count(){
 	return _irq_count;
@@ -122,6 +122,7 @@ PRIVATE void gpf_handler() {
 	kmesg("$7: 0x%08x, $8, 0x%08x, $9, 0x%08x\n",current_proc->regs[6],current_proc->regs[7],current_proc->regs[8]);
 	kmesg("$10: 0x%08x, $11, 0x%08x, $12, 0x%08x\n",current_proc->regs[9],current_proc->regs[10],current_proc->regs[11]);
 	kmesg("$13: 0x%08x, $sp, 0x%08x, $ra, 0x%08x\n",current_proc->regs[12],current_proc->regs[13],current_proc->regs[14]);
+	
 	print_ptable(current_proc);
 #endif
 
@@ -145,7 +146,7 @@ PRIVATE void syscall_handler() {
 
 	operation = *(sp);				//Operation is the first parameter on the stack
 	dest = *(sp+1);				//Destination is second parameter on the stack
-	m = (struct message *)get_physical_addr(*(sp+ 2), current_proc);
+	m = (struct message *)get_physical_addr(*(sp+ 2), current_proc);  //Message is the third parameter
 	m->src = current_proc->proc_nr;			//Don't trust the who to specify their own source process number
 
 	retval = (int*)&current_proc->regs[0];		//Result is returned in register $1

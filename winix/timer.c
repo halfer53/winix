@@ -1,10 +1,15 @@
 #include <kernel/kernel.h>
 
-struct timer *pending_timers = NULL;
+//a linked list of pending timers to be alarmed
+PRIVATE struct timer *pending_timers = NULL;
 clock_t next_timeout;
 
 /*:TODO provide sort of lock mechanism to lock next_timeout before modifying it*/
 
+/**
+ * get the most recent alarm in the linkedlist
+ * @return 
+ */
 struct timer* dequeue_alarm(){
     struct timer *mq = pending_timers;
 
@@ -19,6 +24,11 @@ struct timer* dequeue_alarm(){
     return mq;
 }
 
+/**
+ * insert a new timer into the system, 
+ * insertion sort is used to sort the timers
+ * @param timer 
+ */
 void insert_timer(struct timer *timer){
     struct timer *prev = NULL;
     struct timer *curr = pending_timers;
@@ -39,6 +49,10 @@ void insert_timer(struct timer *timer){
     timer->flags &= TIMER_INUSE;
 }
 
+/**
+ * remove timer from the pending_timers
+ * @param timer 
+ */
 void remove_timer(struct timer *timer){
     struct timer *prev = NULL;
     struct timer *curr = pending_timers;

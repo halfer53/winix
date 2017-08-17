@@ -56,39 +56,6 @@ PRIVATE int kputx_buf(int n,char *buf) {
 	return count;
 }
 
-
-// PRIVATE int kputd(int n) {
-// 	int place = 1000000000;
-// 	int count = 0;
-// 	//zero?
-// 	if(n == 0) {
-// 		kputc('0');
-// 		return 1;
-// 	}
-
-// 	//negative?
-// 	if(n < 0) {
-// 		kputc('-');
-// 		count++;
-// 		n *= -1;
-// 	}
-
-// 	//find first digit of number
-// 	while(place > n) {
-// 		place /= 10;
-// 	}
-
-// 	//print the rest
-// 	while(place) {
-// 		int d = n / place;
-// 		kputc(d % 10 + '0');
-// 		// *buf++ = d % 10 + '0';
-// 		place /= 10;
-// 		count++;
-// 	}
-// 	return count;
-// }
-
 PRIVATE int kputd_buf(int n, char *buf) {
 	int place = 1000000000;
 	int count = 0;
@@ -153,7 +120,7 @@ void kputs(const char *s) {
 	}					\
 
 
-int kprintf_vm(const char *format, void *arg, void *who_rbase){
+int kprintf_vm(const char *format, void *arg, ptr_t *who_rbase){
 	char c = *format;
 	char buffer[64];
 	char *buf = buffer;
@@ -167,6 +134,7 @@ int kprintf_vm(const char *format, void *arg, void *who_rbase){
 			char prev;
 			char token = SPACE;
 			format++;
+			buf = buffer;
 			
 			if(*format == '-'){
 				format++;
@@ -179,31 +147,33 @@ int kprintf_vm(const char *format, void *arg, void *who_rbase){
 				padding_len = atoi(*(int *)arg);
 				arg = ((int*)arg) + 1;
 			}else if(*format >= '0' && *format <= '9'){
-				buf = buffer;
 				*buf++ = *format++;
 				*buf++ = *format++;
 				*buf = '\0';
 				padding_len = atoi(buffer);
 				buf = buffer;
 			}
+
 			prev = *format;
 			switch(*format) {
 				
 				case 'd':
-					buf_len = kputd_buf(*((int*)arg),buffer);
+					buf_len = kputd_buf(*((int*)arg),buf);
 					arg = ((int*)arg) + 1;
 					format++;
 					break;
 
 				case 'x':
-					buf_len = kputx_buf(*((int*)arg),buffer);
+					buf_len = kputx_buf(*((int*)arg),buf);
 					arg = ((int*)arg) + 1;
 					format++;
 					right_padding_len = false;
 					break;
 
 				case 's':
-					buf_len = kputs_vm_buf(*(char **)arg,who_rbase,buffer);
+					// buf_len = kputs_vm_buf(*(char **)arg,who_rbase,buffer);
+					buf = (*(char **)arg)+ (int)who_rbase;
+					buf_len = strlen(buf);
 					arg = ((char *)arg) + 1;
 					format++;
 					break;
@@ -223,11 +193,11 @@ int kprintf_vm(const char *format, void *arg, void *who_rbase){
 			padding_len -= buf_len;
 			count += buf_len;
 			if(!right_padding_len && padding_len > 0){ //left padding_len
-				if(prev == 'x')
+				if(prev == 'x' || prev == 'd')
 					token = ZERO;
 				PUT_PADDING(padding_len,token);
 			}
-			kputs(buffer);
+			kputs(buf);
 			if(right_padding_len && padding_len > 0){
 				PUT_PADDING(padding_len,token);
 			}
