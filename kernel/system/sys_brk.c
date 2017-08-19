@@ -64,7 +64,7 @@ int do_brk(struct proc *who, struct message *m){
 	if(addr < who->heap_break){
 		heap_top = GET_HEAP_TOP(who);
 		if(addr < heap_top)
-			return ERR;
+			return EINVAL;
 		
 		who->heap_break = addr;
 		return OK;
