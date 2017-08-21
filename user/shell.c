@@ -11,25 +11,11 @@
 #include <string.h>
 #include <ucontext.h>
 
+#define CMD_PROTOTYPE(name)	int name(int argc, char**argv)
+
 #define BUF_LEN			32
 #define MAX_COMMANDS	5
 #define MAX_ARGS		10
-
-//Prototypes
-int ps(int argc, char **argv);
-int uptime(int argc, char **argv);
-int shell_exit(int argc, char **argv);
-int cmd_kill(int argc, char **argv);
-int testmalloc(int argc, char **argv);
-int test_signal(int argc, char **argv);
-int test_thread(int argc, char **argv);
-int test_alarm(int argc, char **argv);
-int test_fork(int argc, char **argv);
-int test_so(int argc, char **argv);
-int test_general(int argc, char **argv);
-int print_pid(int argc, char **argv);
-int mem_info(int argc, char **argv);
-int generic(int argc, char **argv);
 
 //Input buffer & tokeniser
 static char buf[BUF_LEN];
@@ -49,6 +35,24 @@ struct cmd {
 	char *name;
 };
 
+
+//Prototypes
+CMD_PROTOTYPE(ps);
+CMD_PROTOTYPE(uptime);
+CMD_PROTOTYPE(shell_exit);
+CMD_PROTOTYPE(cmd_kill);
+CMD_PROTOTYPE(testmalloc);
+CMD_PROTOTYPE(test_signal);
+CMD_PROTOTYPE(test_thread);
+CMD_PROTOTYPE(test_alarm);
+CMD_PROTOTYPE(test_fork);
+CMD_PROTOTYPE(test_so);
+CMD_PROTOTYPE(test_general);
+CMD_PROTOTYPE(print_pid);
+CMD_PROTOTYPE(mem_info);
+CMD_PROTOTYPE(mall_info);
+CMD_PROTOTYPE(generic);
+
 //Command handling
 struct cmd commands[] = {
 	{ uptime, "uptime" },
@@ -64,15 +68,20 @@ struct cmd commands[] = {
 	{ test_general, "test"},
 	{ print_pid, "pid"},
 	{ mem_info, "meminfo"},
+	{ mall_info, "mallinfo"},
 	{ generic, NULL }
 };
-//TODO: ps/uptime/shutdown should be moved to separate programs.
 
 /**
  * Returns true if c is a printable character.
  **/
 int isPrintable(int c) {
 	return ('!' <= c && c <= '~');
+}
+
+int mall_info(int argc, char** argv){
+	block_overview();
+	return 0;
 }
 
 int mem_info(int argc, char** argv){
@@ -205,7 +214,7 @@ int test_thread(int argc, char **argv){
 	//thread_stack_op saves the original pointer returned by malloc
 	//so later we can use it to free the malloced memory
 	thread_stack_op = malloc(sizeof(int) * num);
-	if(threads == NULL){
+	if(thread_stack_op == NULL){
 		free(threads);
 		perror("malloc failed");
 		return -1;
@@ -243,10 +252,10 @@ int test_thread(int argc, char **argv){
 	end:
 	//free up the malloced memory
 	free(threads);
-	free(thread_stack_op);
 	for( j = 0; j < i; j++){
 		free(thread_stack_op[j]);
 	}
+	free(thread_stack_op);
 	// block_overview();
 	return 0;
 }
