@@ -19,16 +19,9 @@ int do_wait(struct proc *parent, struct message *mesg){
         //if there is a child process that is zombie
         if(child->IN_USE && child->parent == parent->proc_nr){
             if(child->state == ZOMBIE){
-                
-                //TODO: set wstatus in proper format
-                if(mesg->p1 != NULL){
-                    wstatus = get_physical_addr(mesg->p1,parent);
-                    *wstatus = child->exit_status;
-                }
                 free_slot(child);
-                mesg->i1 = child->proc_nr;
-                winix_send(parent->proc_nr,mesg);
-                return OK;
+                mesg->i2 = (child->exit_status << 8) | (child->sig_status & 0377);
+                return child->proc_nr;
             }
             parent->wpid = child->proc_nr;
             children++;

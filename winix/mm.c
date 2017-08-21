@@ -7,6 +7,7 @@
  */
 
 PRIVATE unsigned int mem_map[MEM_MAP_LEN];
+PRIVATE int bss_page_end;
 
 /**
  * is the address accessible by the proc
@@ -66,7 +67,7 @@ ptr_t *get_free_pages(int length, int flags) {
 	if(flags & GFP_HIGH){
 		nstart =  bitmap_search_reverse(mem_map, MEM_MAP_LEN, num);
 	}else{
-		nstart =  bitmap_search(mem_map, MEM_MAP_LEN, num);
+		nstart =  bitmap_search_from(mem_map, MEM_MAP_LEN, bss_page_end, num);
 	}
 	if (nstart != 0){
 		bitmap_set_nbits(mem_map, MEM_MAP_LEN, nstart, num);
@@ -145,8 +146,12 @@ int user_get_free_pages_from(struct proc* who, ptr_t* addr, int size){
  * returns the next free page in the system
  * @return 
  */
-int next_free_page_index(){
-	return bitmap_search(mem_map, MEM_MAP_LEN, 1);
+int peek_next_free_page(){
+	return bitmap_search_from(mem_map, MEM_MAP_LEN, bss_page_end,  1);
+}
+
+int peek_last_free_page(){
+	return bitmap_search_reverse(mem_map, MEM_MAP_LEN, 1);
 }
 
 /**
@@ -232,6 +237,7 @@ void init_mem_table() {
 	bitmap_clear(mem_map, MEM_MAP_LEN);
 	bitmap_set_nbits(mem_map, MEM_MAP_LEN, 0, len);
 	bitmap_set_bit(mem_map, MEM_MAP_LEN, FREE_MEM_END / PAGE_LEN);
+	bss_page_end = PADDR_TO_PAGED(free_mem_begin);
 }
 
 
