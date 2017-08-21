@@ -56,9 +56,11 @@ int copy_mm(struct proc* parent, struct proc* child){
 int copy_pregs(struct proc* parent, struct proc* child){
 	ptr_t *sp;
 	sp = get_physical_addr(parent->sp,parent);
-	child->message = (struct message *)(*(sp+ 2) + (reg_t)child->rbase);
-	child->heap_break = parent->heap_break - (unsigned int)parent->rbase + (unsigned int)child->rbase;
-	child->stack_top = parent->stack_top - (unsigned int)parent->rbase + (unsigned int) child->rbase;
+	// child->message = (struct message *)(*(sp+ 2) + (reg_t)child->rbase);
+	child->message = (struct message *)get_physical_addr(*( sp + 2 ), child);
+	child->heap_break = get_physical_addr(get_virtual_addr(parent->heap_break, parent), child);
+	child->heap_bottom = get_physical_addr(get_virtual_addr(parent->heap_bottom, parent), child);
+	child->stack_top = get_physical_addr(get_virtual_addr(parent->stack_top, parent), child);
 	return OK;
 }
 
