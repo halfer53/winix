@@ -87,7 +87,6 @@ void system_main() {
 			case SYSCALL_WAIT:			m.i1 = do_wait(who,&m);			break;
 			case SYSCALL_KILL: 			m.i1 = do_kill(who,&m);			break;
 			case SYSCALL_GETPID:		m.i1 = do_getpid(who,&m);		break;
-			case SYSCALL_GETPPID:		m.i1 = do_getppid(who,&m);		break;
 			case SYSCALL_GETC:			m.i1 = do_getc(who,&m);			break;
 			case SYSCALL_WINFO:			m.i1 = do_winfo(who,&m);		break;
 			case SYSCALL_PRINTF:		m.i1 = do_printf(who,&m);		break;

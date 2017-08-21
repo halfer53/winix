@@ -146,7 +146,8 @@ pid_t getpid(){
 
 pid_t getppid(){
 	struct message m;
-	return _SYSCALL(SYSCALL_GETPPID,&m);
+	_SYSCALL(SYSCALL_GETPID,&m);
+	return m.i2;
 }
 
 int kill (pid_t pid, int sig){

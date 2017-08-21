@@ -24,10 +24,9 @@
 #define SYSCALL_WAIT        10
 #define SYSCALL_KILL        11
 #define SYSCALL_GETPID      12
-#define SYSCALL_GETPPID     13
-#define SYSCALL_WINFO		14
-#define SYSCALL_GETC        15
-#define SYSCALL_PRINTF    	16
+#define SYSCALL_WINFO		13
+#define SYSCALL_GETC        14
+#define SYSCALL_PRINTF    	15
 
 #define SYSCALL_DEFAULT_RETURN  m.i1
 
