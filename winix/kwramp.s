@@ -24,6 +24,7 @@ wramp_set_handler:
 ##
 .global wramp_load_context
 wramp_load_context:
+	
 	lw $13, current_proc($0)
 
 	lw $1, pcb_reg13($13)
@@ -94,8 +95,8 @@ handler:
 	sw $1, pcb_cctrl($13)
 	
 	#Switch to exception stack and call C handler
-	la $sp, exception_stack
-	subui $sp, $sp, 1
+	jal get_exception_bottom
+	addui $sp, $1, 0
 	
 	movsg $13, $estat
 	sw $13, 0($sp)
@@ -109,11 +110,12 @@ handler:
 .data
 # Function pointer for the main exception handler
 handler_address: .word 0
+stack_ov_mesg:	.ascii "Exception stack overflow"
 
-.bss
-# Stack used while handling exceptions.
-	.space 300
-exception_stack: 
+# .bss
+# # Stack used while handling exceptions.
+# 	.space 300
+# exception_stack: 
 
 ### PROCESS CONTROL BLOCK DEFINITIONS ###
 ### Note: strongly tied to format of proc_t ###

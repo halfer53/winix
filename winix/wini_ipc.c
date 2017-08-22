@@ -18,21 +18,24 @@ int wini_send(int dest, struct message *m) {
 	//Is the destination valid?
 	if (pDest = get_running_proc(dest)) {
 
-		if(DEBUG_IPC){
-			kprintf("\nSEND %d flags %d from %d t %d| ",dest, pDest->flags, current_proc->proc_nr,m->type);
-			DEBUG_IPC--;
+		if(get_debug_ipc_count()){
+			if(dest == SYSTEM_TASK){
+				kprintf("\nSyscall %d from %d|", m->type, m->src);
+			}else if(current_proc->proc_nr != SYSTEM_TASK){
+				kprintf("\nSEND %d flags %d from %d t %d| ",dest, pDest->s_flags, current_proc->proc_nr,m->type);
+			}
 		}
-
-		if (pDest->flags & RECEIVING) {
+		
+		if (pDest->s_flags & RECEIVING) {
 			*(pDest->message) = *m;
 			//Unblock receiver
-			pDest->flags &= ~RECEIVING;
+			pDest->s_flags &= ~RECEIVING;
 			enqueue_head(ready_q[pDest->priority], pDest);
 			
 		}else {
 			
 			//Otherwise, block current process and add it to head of sending queue of the destination.
-			current_proc->flags |= SENDING;
+			current_proc->s_flags |= SENDING;
 			current_proc->next_sender = pDest->sender_q;
 			pDest->sender_q = current_proc;
 		}
@@ -56,10 +59,14 @@ int wini_receive(struct message *m) {
 	//If a process is waiting to send to this process, deliver it immediately.
 	if (p != NULL) {
 
-		if(DEBUG_IPC){
-			kprintf("\nREC from %d t %d| ",p->proc_nr ,m->type);
-			DEBUG_IPC--;
+		if(get_debug_ipc_count()){
+			if(current_proc->proc_nr == SYSTEM_TASK)
+				kprintf("\nSyscall %d from %d|", m->type, m->src);
+			else
+				kprintf("\nREC from %d t %d| ",p->proc_nr ,m->type);
 		}
+			
+		
 		//Dequeue head node
 		current_proc->sender_q = p->next_sender;
 
@@ -67,12 +74,12 @@ int wini_receive(struct message *m) {
 		*m = *(p->message);
 
 		//Unblock sender
-		p->flags &= ~SENDING;
+		p->s_flags &= ~SENDING;
 		enqueue_head(ready_q[p->priority], p);
 	}
 	else {
 		current_proc->message = m;
-		current_proc->flags |= RECEIVING;
+		current_proc->s_flags |= RECEIVING;
 	}
 	return OK;
 }
@@ -94,19 +101,17 @@ int wini_notify(int dest, struct message *m) {
 	//Is the destination valid?
 	if (pDest = get_running_proc(dest)) {
 
-		if(DEBUG_IPC){
-			kprintf("\nNOTIFY %d flags %d from %d t %d| ",dest, pDest->flags, current_proc->proc_nr,m->type);
-			DEBUG_IPC--;
-		}
-
+		if(get_debug_ipc_count())
+				kprintf("\nNOTIFY %d flags %d from %d t %d| ",dest, pDest->s_flags, current_proc->proc_nr,m->type);
+			
 		//If destination is waiting, deliver message immediately.
-		if (pDest->flags & RECEIVING) {
+		if (pDest->s_flags & RECEIVING) {
 
 			//Copy message to destination
 			*(pDest->message) = *m;
 
 			//Unblock receiver
-			pDest->flags &= ~RECEIVING;
+			pDest->s_flags &= ~RECEIVING;
 			enqueue_head(ready_q[pDest->priority], pDest);
 			//if the destination rejects any message it receives,
 			//do not deliver the message, but add it to the scheduling queue

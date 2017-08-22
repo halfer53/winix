@@ -66,6 +66,10 @@
 //min bss segment size
 #define MIN_BSS_SIZE			300
 
+//i_flags
+#define PROC_IN_USE				1
+
+
 /**
  * State of a process.
  **/
@@ -89,13 +93,14 @@ typedef struct proc {
 
 	/* IPC messages */
 	struct message *message;	//Message buffer;
-	int flags; 
+	int s_flags; 		//schedling s_flags, NB this is different
+								//from i_flags which is for information
 
 	/* Heap and Stack*/
 	ptr_t* stack_top; //stack_top is the physical address
 	ptr_t* heap_break; //heap_break is also the physical address
 	ptr_t* heap_bottom; //
-	size_t length; //length is depreciated, do not use it
+	size_t length; //length is the total of text + data segment
 
 	/* Protection */
 	reg_t protection_table[PTABLE_LEN];
@@ -122,10 +127,11 @@ typedef struct proc {
 	pid_t procgrp;		//Pid of the process group (used for signals)
 	pid_t wpid;			//pid this process is waiting for
 	int parent;			//proc_index of parent
+	int i_flags;	//information flags, contains various information
+							//about this proc
 
 	/* Process Table Index */
 	int proc_nr;		//Index in the process table
-	int IN_USE;			//Whether the current slot is in use
 
 	/* Signal Information */
 	sigset_t pending_sigs;
@@ -135,6 +141,10 @@ typedef struct proc {
 	struct timer alarm;
 } proc_t;
 
+/**
+ * Pointer to the current process.
+ **/
+ extern struct proc *current_proc;
 
 #define IS_PROCN_OK(i)	((i)>= 0 && (i) < NUM_PROCS)
 #define IS_PRIORITY_OK(priority)	(0 <= (priority) && (priority) < NUM_QUEUES)
@@ -144,11 +154,9 @@ typedef struct proc {
 #define GET_DEF_STACK_SIZE(who)	(IS_USER_PROC(who) ? USER_STACK_SIZE : KERNEL_STACK_SIZE)
 #define GET_HEAP_TOP(who)	((who)->stack_top + GET_DEF_STACK_SIZE(who))
 
-
 extern struct proc proc_table[NUM_PROCS];
 extern struct proc *ready_q[NUM_QUEUES][2];
 extern struct proc *block_q[2];
-
 
 void enqueue_tail(struct proc **q, struct proc *proc);
 void enqueue_head(struct proc **q, struct proc *proc);
@@ -180,12 +188,6 @@ void process_overview();
 void printProceInfo(struct proc* curr);
 char* getStateName(proc_state_t state);
 struct proc *pick_proc();
-
-
-/**
- * Pointer to the current process.
- **/
-extern struct proc *current_proc;
 
 
 #endif

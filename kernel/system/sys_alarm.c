@@ -11,8 +11,6 @@ int do_alarm(struct proc *who, struct message *m){
     if(m->i1 < 0)
         return EINVAL;
 
-    // DEBUG_IPC = 100;
-    // DEBUG_SCHED = 20;
     seconds = (clock_t )m->i1; 
     alarm = &who->alarm;
     prev_timeout = alarm->time_out; //return previous alarm

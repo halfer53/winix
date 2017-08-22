@@ -12,12 +12,12 @@ struct message m;
 int who_proc_nr;
 struct proc *who;
 
-ucontext_t recv_ctx;
-struct syscall_ctx syscall_ctx;
+PRIVATE ucontext_t recv_ctx;
+PRIVATE struct syscall_ctx syscall_ctx;
 
 void resume_syscall(struct proc *to){
 	if(syscall_ctx.who->proc_nr == to->proc_nr &&
-		 				to->flags & RECEIVING &&
+		 				to->s_flags & RECEIVING &&
 		  				syscall_ctx.interruptted){
 		winix_send(to->proc_nr,&syscall_ctx.m);
 	}
@@ -29,7 +29,7 @@ void intr_syscall(){
 	struct syscall_ctx *ctx = &syscall_ctx;
 	//if the system is executing a system call, save the system call context
 	//and interrupt the System as if it has finished executing the current syscall
-	if(!get_proc(SYSTEM_TASK)->flags){
+	if(!get_proc(SYSTEM_TASK)->s_flags){
 		// kprintf("interrupt syscall %d\n",who->proc_nr);
 		ctx->m = m;
 		ctx->m.i1 = EINTR;

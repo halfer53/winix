@@ -19,9 +19,6 @@ void add_receving_message(struct message *m);
 mqueue_t* mq_dequeue(mqueue_t **q);
 void mq_enqueue_head(mqueue_t **q, mqueue_t *mq);
 
-extern mqueue_t *receiving_queue[2];
-extern mqueue_t *sending_queue[2];
-
 
 #endif
 

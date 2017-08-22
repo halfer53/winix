@@ -2,7 +2,7 @@
 
 //a linked list of pending timers to be alarmed
 PRIVATE struct timer *pending_timers = NULL;
-clock_t next_timeout;
+clock_t next_timeout = 0;
 
 /*:TODO provide sort of lock mechanism to lock next_timeout before modifying it*/
 

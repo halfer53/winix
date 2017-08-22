@@ -5,6 +5,7 @@
 #include <signal.h>
 #include <sys/ucontext.h>
 
+void _ctx_start();
 int  getcontext(ucontext_t *);
 int  setcontext(const ucontext_t *);
 void makecontext(ucontext_t *, void (* func)(), int argc, ...);

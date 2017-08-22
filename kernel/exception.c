@@ -9,6 +9,9 @@
 #include <winix/rex.h>
 #include <kernel/clock.h>
 
+PRIVATE int _exception_stack[EXCEPTION_STACK_SIZE];
+int* exception_stack;
+
 //Number of exception sources
 #define NUM_HANDLERS 16
 
@@ -56,6 +59,14 @@ int irq_count(){
 
 void reset_irq_count(){
 	_irq_count = 0;
+}
+
+int* get_exception_top(){
+	return _exception_stack;
+}
+
+int* get_exception_bottom(){
+	return exception_stack;
 }
 
 /**
@@ -123,7 +134,6 @@ PRIVATE void gpf_handler() {
 	kinfo("$10: 0x%08x, $11, 0x%08x, $12, 0x%08x\n",current_proc->regs[9],current_proc->regs[10],current_proc->regs[11]);
 	kinfo("$13: 0x%08x, $sp, 0x%08x, $ra, 0x%08x\n",current_proc->regs[12],current_proc->regs[13],current_proc->regs[14]);
 #endif
-
 	//Kill process and call scheduler.
 	send_sig(current_proc,SIGSEGV);
 	sched();
@@ -151,7 +161,7 @@ PRIVATE void syscall_handler() {
 	//Decode operation
 	switch(operation) {
 		case WINIX_SENDREC:
-			current_proc->flags |= RECEIVING;
+			current_proc->s_flags |= RECEIVING;
 			//fall through to send
 
 		case WINIX_SEND:
@@ -229,6 +239,10 @@ PRIVATE void exception_handler(int estat) {
  *   Timer is configured to generate regular interrupts.
  **/
 void init_exceptions() {
+	exception_stack = _exception_stack;
+	*exception_stack = STACK_MAGIC;
+	exception_stack += EXCEPTION_STACK_SIZE - 1;
+
 	wramp_set_handler(exception_handler);
 	RexTimer->Load = 40; //60 Hz
 	RexTimer->Ctrl = 3; //Enabled, auto-restart

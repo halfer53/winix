@@ -51,7 +51,11 @@ struct proc *pick_proc() {
  **/
 void sched() {
 	reset_irq_count();
-	if (current_proc != NULL && !current_proc->flags) {
+
+	if(*(get_exception_top()) != STACK_MAGIC)
+		panic("Exception stack overflow\n");
+
+	if (current_proc != NULL && !current_proc->s_flags) {
 		//Accounting
 		current_proc->time_used++;
 
@@ -64,12 +68,9 @@ void sched() {
 	}
 
 	current_proc = pick_proc();
-	if(DEBUG_SCHED){
+	if(get_debug_sched_count())
 		kprintf("| %d |",current_proc->proc_nr);
-		DEBUG_SCHED--;
-	}
-		
-	
+
 	//Reset quantum if needed
 	if (current_proc->ticks_left <= 0) {
 		current_proc->ticks_left = current_proc->quantum;

@@ -10,6 +10,10 @@ void init_bitmap(){
     }
 }
 
+int get_mask(int i){
+    return mask[i];
+}
+
 int bitmap_clear(unsigned int *map, int map_len){
 	register int i;
 	for (i=0; i < map_len; ++i)

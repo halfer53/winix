@@ -19,7 +19,6 @@ struct hole{
 };
 
 #define NUM_HOLES 100
-extern size_t SYS_BSS_START;
 
 void hole_list_overview();
 

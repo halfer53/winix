@@ -26,8 +26,5 @@
 #define MAJOR_VERSION 2
 #define MINOR_VERSION 0
 
-extern struct syscall_ctx syscall_ctx;
-extern ucontext_t recv_ctx;
-
 #endif
 

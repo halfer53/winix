@@ -17,7 +17,10 @@ extern int system_uptime;
  **/
 void init_exceptions();
 int irq_count();
+int* get_exception_top();
+int* get_exception_bottom();
 
 #define in_interrupt()  (irq_count())
+#define EXCEPTION_STACK_SIZE    300
 
 #endif

@@ -21,49 +21,68 @@ CMD_PROTOTYPE(print_pid);
 CMD_PROTOTYPE(mem_info);
 CMD_PROTOTYPE(mall_info);
 CMD_PROTOTYPE(generic);
+CMD_PROTOTYPE(help);
 
 //Command handling
 struct cmd builtin_commands[] = {
+	{ test_general, "test"},
 	{ uptime, "uptime" },
 	{ shell_exit, "exit" },
 	{ ps, "ps" },
 	{ cmd_kill, "kill"},
-	{ test_general, "test"},
 	{ print_pid, "pid"},
 	{ mem_info, "free"},
 	{ mall_info, "mallinfo"},
+	{ help, "?"},
 	{ generic, NULL }
 };
 
 
 int test_general(int argc, char **argv){
+	static int testoptions_num = 7;
+	const char *strs[] = {
+		"malloc", 
+		"stack",
+		"float",
+		"fork",
+		"thread",
+		"alarm",
+		"signal",
+	};
+	int i;
 
-	if(strcmp("malloc", argv[1]) == 0)
+	if(strcmp(strs[0], argv[1]) == 0)
 		return test_malloc();
 
-	if(strcmp("stack_overflow", argv[1]) == 0)
+	if(strcmp(strs[1], argv[1]) == 0)
 		return test_so();
 	
-	if(strcmp("float", argv[1]) == 0)
+	if(strcmp(strs[2], argv[1]) == 0)
 		return test_float();
 	
-	if(strcmp("fork", argv[1]) == 0)
+	if(strcmp(strs[3], argv[1]) == 0)
 		return test_fork();
 
-	if(strcmp("thread", argv[1]) == 0){
+	if(strcmp(strs[4], argv[1]) == 0){
 		int num = argc > 2 ? atoi(argv[2]) : 2;
 		return test_thread(num);
 	}
 
-	if(strcmp("alarm", argv[1]) == 0){
+	if(strcmp(strs[5], argv[1]) == 0){
 		int num = argc > 2 ? atoi(argv[2]) : 1;
 		return test_alarm(num);
 	}
 
-	if(strcmp("signal", argv[1]) == 0){
+	if(strcmp(strs[6], argv[1]) == 0){
 		int num = argc > 2 ? atoi(argv[2]) : 1;
 		return test_signal(num);
 	}
+
+	printf("Test Available Options\n");
+	for( i = 0; i < 7; i++){
+		printf(" * %s\n", strs[i]);
+	}
+	printf("e.g. \"test thread 100\"\n");
 	return 0;
 }
 
@@ -82,6 +101,18 @@ int cmd_kill(int argc, char **argv){
 		pid = atoi(argv[1]);
 	}
 	return kill(pid,signum);
+}
+
+int help(int argc, char** argv){
+	struct cmd* handler;
+	handler = builtin_commands;
+	printf("Available Commands\n");
+	while(handler->name != NULL) {
+		printf(" * %s\n",handler->name);
+		handler++;
+	}
+	test_general(0, NULL);
+	return 0;
 }
 
 int mall_info(int argc, char** argv){

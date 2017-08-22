@@ -38,10 +38,10 @@ PRIVATE int build_signal_ctx(struct proc *who, int signum){
 
     who->pc = (void (*)())who->sig_table[signum].sa_handler;
 
-    if(who->flags)
+    if(who->s_flags)
         enqueue_schedule(who);
 
-    who->flags = 0;//reset flags
+    who->s_flags = 0;//reset flags
     return OK;
 }
 

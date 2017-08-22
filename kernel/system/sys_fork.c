@@ -35,7 +35,7 @@ int copy_mm(struct proc* parent, struct proc* child){
 	src = (ptr_t *)parent->rbase;
 	dest = (ptr_t *)child->rbase;
 	for( j=0; j < ptn.size ;j++ ){
-		if(mask[j] & ptn.pattern){
+		if(get_mask(j) & ptn.pattern){
 			copy_page(dest, src);
 		}
 		src += PAGE_LEN;

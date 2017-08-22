@@ -8,9 +8,8 @@ struct bit_pattern{
     int size;
 };
 
-extern unsigned int mask[BITMASK_NR];
-
 void init_bitmap();
+int get_mask(int i);
 bool is_bit_on(unsigned int *map, int map_len, int bit);
 int bitmap_clear(unsigned int *map, int map_len);
 int bitmap_fill(unsigned int *map, int map_len);

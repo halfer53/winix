@@ -7,7 +7,7 @@ void clear_sending_mesg(struct proc *who){
 
     for(i = 0; i < NUM_PROCS; i++){
         rp = &proc_table[i];
-        if(rp->IN_USE && (xp = &(rp->sender_q)) != NULL){
+        if(rp->i_flags & PROC_IN_USE && (xp = &(rp->sender_q)) != NULL){
 
             //walk through the message queues
             while(*xp && *xp != who)
@@ -25,7 +25,7 @@ void clear_receiving_mesg(struct proc *who){
     register struct proc *xp;
     struct message m;
 
-    if(who->flags & RECEIVING){
+    if(who->s_flags & RECEIVING){
         xp = who->sender_q;
         while(xp){
             memset(&m,-1,MESSAGE_LEN);
@@ -55,11 +55,11 @@ void exit_proc(struct proc *who, int status){
 
     for( i=0; i< NUM_PROCS; i++){
         mp = &proc_table[i];
-        if(mp->IN_USE){
-            if(mp->flags & WAITING && mp->wpid == who->proc_nr){
+        if(mp->i_flags & PROC_IN_USE){
+            if(mp->s_flags & WAITING && mp->wpid == who->proc_nr){
                 //TODO: modify wstatus
                 mesg.i1 = who->proc_nr;
-                mp->flags &= ~WAITING;
+                mp->s_flags &= ~WAITING;
 
                 winix_send(mp->proc_nr,&mesg);
                 children++;
@@ -79,8 +79,7 @@ void exit_proc(struct proc *who, int status){
     //block the current process
     who->state = ZOMBIE;
     who->exit_status = status;
-    who->IN_USE = 1;
-    
+    who->i_flags |= PROC_IN_USE;
 }
 
 int do_exit(struct proc *who, struct message *m){

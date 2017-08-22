@@ -138,7 +138,7 @@ struct proc *get_free_proc_slot() {
 
 	if (p) {
 		proc_set_default(p);
-		p->IN_USE = 1;
+		p->i_flags |= PROC_IN_USE;
 		return p;
 	}
 	return NULL;
@@ -150,7 +150,7 @@ struct proc *get_free_proc_slot() {
  */
 void proc_set_default(struct proc *p) {
 	int pnr_bak = p->proc_nr;
-	memset(p,0, sizeof(struct proc));
+	memset(p, 0, sizeof(struct proc));
 	p->proc_nr = pnr_bak;
 
 	memset(p->regs, DEFAULT_REG_VALUE, NUM_REGS);
@@ -164,7 +164,7 @@ void proc_set_default(struct proc *p) {
 
 	p->quantum = DEFAULT_USER_QUANTUM;
 	p->state = INITIALISING;
-	p->flags = DEFAULT_FLAGS;
+	p->s_flags = DEFAULT_FLAGS;
 
 	p->ptable = p->protection_table;
 
@@ -265,7 +265,7 @@ void unseched(struct proc *p){
 
 void free_slot(struct proc *p){
 	p->state = DEAD;
-	p->IN_USE = 0;
+	p->i_flags &= ~PROC_IN_USE;
 	enqueue_head(free_proc, p);
 }
 
@@ -361,7 +361,7 @@ void process_overview() {
 	kprintf("NAME     PID PPID RBASE      PC         STACK      HEAP       PROTECTION   flags\n");
 	for (i = 0; i < NUM_PROCS; i++) {
 		curr = &proc_table[i];
-		if(curr->IN_USE && curr->state != ZOMBIE)
+		if(curr->i_flags & PROC_IN_USE && curr->state != ZOMBIE)
 			printProceInfo(curr);
 	}
 }
@@ -379,7 +379,7 @@ void printProceInfo(struct proc* curr) {
 	        curr->heap_break,
 			ptable_idx,
 	        curr->ptable[ptable_idx],
-			curr->flags);
+			curr->s_flags);
 }
 
 
@@ -439,8 +439,8 @@ void init_proc() {
 	//Add all proc structs to the free list
 	for ( i = 0; i < NUM_PROCS; i++) {
 		p = &proc_table[i];
+		proc_set_default(p);
 		p->state = DEAD;
-		p->IN_USE = 0;
 		p->proc_nr = i;
 		enqueue_tail(free_proc, p);
 	}

@@ -1,25 +1,38 @@
 #include <kernel/kernel.h>
 
-#define SCHED_DEBUG_LEN 200
-#define IPC_DEBUG_LEN   200
+PRIVATE int _debug_sched = 0;
+PRIVATE int _debug_ipc = 0;
 
-int DEBUG_SCHED = 0;
-int DEBUG_IPC = 0;
-
-void sched_debug(){
-    DEBUG_SCHED = SCHED_DEBUG_LEN;
+int get_debug_sched_count(){
+    if(_debug_sched > 0)
+        return _debug_sched--;
+    return 0;
 }
 
-void stop_sched_debug(){
-    DEBUG_SCHED = 0;
+int get_debug_ipc_count(){
+    if(_debug_ipc > 0)
+        return _debug_ipc--;
+    return 0;
 }
 
-void ipc_debug(){
-    DEBUG_IPC = IPC_DEBUG_LEN;
+void debug_scheduling(int val){
+    _debug_sched = val;
 }
 
-void stop_ipc_debug(){
-    DEBUG_IPC = 0;
+void debug_ipc(){
+    _debug_ipc = INT_MAX;
+}
+
+void debug_syscall(){
+    _debug_ipc = INT_MAX;
+}
+
+void stop_debug_scheduling(){
+    _debug_sched = 0;
+}
+
+void stop_debug_ipc(){
+    _debug_ipc = 0;
 }
 
 
