@@ -42,7 +42,7 @@ void* sys_sbrk(struct proc *who, int size){
 	if(user_get_free_pages_from(who,next_page, request_size ) == ERR)
 		return (void *)-1;
 
-	// kmesg("extending heap size %d oheap %x newheap %x\n", size, get_virtual_addr(who->heap_break, who), 
+	// kinfo("extending heap size %d oheap %x newheap %x\n", size, get_virtual_addr(who->heap_break, who), 
 															// get_virtual_addr((who->heap_break + size), who));
 	
 	who->heap_break += size;

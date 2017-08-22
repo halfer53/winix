@@ -218,7 +218,7 @@ int kprintf(const char *format, ...) {
 	return kprintf_vm(format,arg,0);
 }
 
-int kmesg(const char *format, ...){
+int kinfo(const char *format, ...){
 	void *arg = &format;
 	arg = ((char*)arg) + 1;
 

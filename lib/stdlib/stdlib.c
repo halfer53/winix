@@ -28,7 +28,7 @@ void printblock(block_t *b) {
 		b->size, 
 		b->prev, 
 		b->next, 
-		b->free ? "free" : "in use");
+		b->free ? "is free" : "in use");
 	if(b->next){
 		if((int)b->data + b->size == (int)b->next)
 			printf("\n");
@@ -39,7 +39,7 @@ void printblock(block_t *b) {
 	}
 }
 
-void block_overview() {
+void print_mallinfo() {
 	int frees = 0;
 	int used = 0;
 	block_t *b = base;
@@ -166,6 +166,8 @@ int valid_addr(void *p)
 			return (p == (get_block(p))->ptr);
 		}
 	}
+	// printf("invalid addr %x base %x sbrk %x\n",p, base, sbrk(0));
+	// printblock(p);
 	return (0);
 }
 
@@ -188,8 +190,6 @@ void free(void *p)
 	if (valid_addr(p))
 	{
 		b = get_block(p);
-		if(count == 35)
-			printblock(b);
 		b->free = 1;
 		/* fusion with previous if possible */
 		if (b->prev && b->prev->free){
@@ -207,27 +207,19 @@ void free(void *p)
 }
 
 void *calloc(size_t number , size_t size) {
-	size_t *new;
+	size_t *ptr;
 	size_t s4, i;
-	new = malloc(number * size);
-	if (new) {
-		s4 = number * size;
-		for (i = 0; i < s4 ; i++)
-			new[i] = 0;
-	}
-	return (new);
+	ptr = malloc(number * size);
+	if(ptr)
+		memset(ptr, 0, size);
+	return ptr;
 }
 
 
 /* Copy data from block to block */
 void copy_block(block_t *src, block_t *dst)
 {
-	int *sdata , *ddata;
-	size_t i;
-	sdata = src->ptr;
-	ddata = dst->ptr;
-	for (i = 0; i * 4 < src->size && i * 4 < dst->size; i++)
-		ddata[i] = sdata[i];
+	memcpy(dst->ptr, src->ptr, src->size);
 }
 
 /* The realloc */

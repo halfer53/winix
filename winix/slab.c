@@ -34,7 +34,7 @@ PRIVATE void kprintblock(block_t *b) {
 	kprintf("0x%08x size %d next 0x%08x prev 0x%08x free %d data 0x%08x\n",b, b->size, b->next , b->prev, b->free, b->data);
 }
 
-void kblock_overview() {
+void kprint_mallinfo() {
 	int kfrees = 0;
 	block_t *b = base;
 	

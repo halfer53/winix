@@ -1,7 +1,7 @@
 INCLUDE_DIR = ../include
 # INCLUDES = $(wildcard $(INCLUDE_DIR)/*.h $(INCLUDE_DIR)/sys/*.h)
 
-PROGS = stdio string syscall ipc util makecontext
+PROGS = stdio string syscall ipc util makecontext ansi
 SOURCES = $(PROGS:=.c)
 ASSEMBLY = $(PROGS:=.s)
 

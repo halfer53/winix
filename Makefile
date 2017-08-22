@@ -1,15 +1,12 @@
 REFORMAT = reformat_srec
 GEN_BIN = gen_bin_code
-CC = wcc
-C_DEF = -S
-export CC C_DEF
 
 export CFLAGS = "-D_DEBUG"
 RELEASE_FLAGS = ""
 
 LIBS_O = $(shell find lib -name "*.o")
 
-KLIB = ipc string util wramp_syscall ucontext stdlib/atoi stdlib/errno
+KLIB = ipc string util wramp_syscall ucontext stdlib/atoi
 KLIB_O = $(addprefix lib/, $(KLIB:=.o))
 L_HEAD = winix/limits/limits_head.o
 L_TAIL = winix/limits/limits_tail.o
@@ -17,9 +14,6 @@ KERNEL_O = winix/*.o kernel/system/*.o kernel/*.o
 KMAIN = kernel/main.s kernel/main.o 
 
 all:
-ifeq (, $(shell which wcc))
-	$(error "Plz run: export PATH=`pwd`/tools/bin:$$PATH")
-endif
 	$(MAKE) -C tools
 	-rm -f winix.srec
 	$(MAKE) -C lib
@@ -29,8 +23,8 @@ endif
 	wlink $(LDFLAGS) -o winix.srec $(L_HEAD) $(KERNEL_O) $(KLIB_O) $(L_TAIL)
 
 release: 
-	export CFLAGS = $(RELEASE_FLAGS)\
-	$(MAKE) all
+	$(MAKE) clean
+	$(MAKE) all CFLAGS=""
 
 clean:
 	$(MAKE) -C kernel clean

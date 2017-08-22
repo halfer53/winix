@@ -58,7 +58,6 @@ ucontext_t mcontext;
 
 void func(int arg) {
   	printf("Hello World! I'm thread %d\n",arg);
-  	setcontext(&mcontext);
 }
 
 int test_thread(int num){
@@ -70,46 +69,40 @@ int test_thread(int num){
 
 	//ucontext represents the context for each thread
 	threads = malloc(sizeof(ucontext_t) * num);
-	if(threads == NULL){
-		perror("malloc failed");
-		return -1;
-	}
-		
+	if(threads == NULL)
+		goto end;
+	
 	//thread_stack_op saves the original pointer returned by malloc
 	//so later we can use it to free the malloced memory
 	thread_stack_op = malloc(sizeof(int) * num);
-	if(thread_stack_op == NULL){
-		perror("malloc failed");
+	if(thread_stack_op == NULL)
 		goto end_free_threads;
-	}
 		
 	cthread = threads;
-
 	//Allocate stack for each thread
 	for( i = 0; i < num; i++){
 		if ((thread_stack_op[i] =  malloc(THREAD_STACK_SIZE)) != NULL) {
-			cthread->ss_sp = (uint32_t *)thread_stack_op[i] + THREAD_STACK_SIZE -1;
-			cthread->ss_size = THREAD_STACK_SIZE;
-			cthread->ss_flags = 0;
+			cthread->uc_stack.ss_sp = thread_stack_op[i];
+			cthread->uc_stack.ss_size = THREAD_STACK_SIZE;
+			cthread->uc_link = &mcontext;
 			makecontext(cthread,func,1,count++);
 			
 			if(i%50 == 0)
 				putc('!');
 		}else{
-			perror("malloc failed\n");
 			goto end_free_all;
 		}
 		cthread++;
 	}
 	putc('\n');
+	
 	cthread = threads;
 	//scheduling the threads
 	//note that we are using user thread library, 
 	//so we have to manually schedule all the threads.
 	//Currently the scheduling algorithm is just simple a round robin
 	for( i = 0; i < num; i++){
-		swapcontext(&mcontext,cthread);
-		cthread++;
+		swapcontext(&mcontext,cthread++);
 	}
 	
 	end_free_all:
@@ -119,6 +112,9 @@ int test_thread(int num){
 		free(thread_stack_op);
 	end_free_threads:
 		free(threads);
+	end:
+		if(errno == ENOMEM)
+			perror("malloc failed");
 	return 0;
 }
 
@@ -135,12 +131,12 @@ int test_malloc(){
 	void *p7 = malloc(1024);
 	void *p8 = malloc(512);
 	void *p9 = malloc(1024);
-	block_overview();
+	print_mallinfo();
 	free(p5);
 	free(p6);
 	free(p2);
 	free(p8);
-	block_overview();
+	print_mallinfo();
   
   return 0;
 }

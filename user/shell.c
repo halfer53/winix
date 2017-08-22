@@ -35,9 +35,8 @@ struct cmd builtin_commands[] = {
 	{ generic, NULL }
 };
 
+
 int test_general(int argc, char **argv){
-	if(argc <= 1)
-		return 0;
 
 	if(strcmp("malloc", argv[1]) == 0)
 		return test_malloc();
@@ -62,7 +61,6 @@ int test_general(int argc, char **argv){
 		int num = argc > 2 ? atoi(argv[2]) : 1;
 		return test_signal(num);
 	}
-
 	return 0;
 }
 
@@ -85,7 +83,7 @@ int cmd_kill(int argc, char **argv){
 }
 
 int mall_info(int argc, char** argv){
-	block_overview();
+	print_mallinfo();
 	return 0;
 }
 

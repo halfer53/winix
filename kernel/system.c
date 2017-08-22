@@ -93,7 +93,7 @@ void system_main() {
 			case SYSCALL_WINFO:			m.i1 = do_winfo(who,&m);		break;
 			case SYSCALL_PRINTF:		m.i1 = do_printf(who,&m);		break;
 			default:
-				kmesg("Process \"%s (%d)\" performed unknown system call %d\r\n", 
+				kinfo("Process \"%s (%d)\" performed unknown system call %d\r\n", 
 												who->name, who->proc_nr, m.type);
 				m.i1 = ENOSYS;
 				break;

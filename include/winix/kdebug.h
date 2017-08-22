@@ -6,7 +6,7 @@ extern int DEBUG_IPC;
 
 
 #ifdef _DEBUG
-    #define KDEBUG(token)   kmesg token
+    #define KDEBUG(token)   kinfo token
 #else
     #define KDEBUG(token)
 #endif

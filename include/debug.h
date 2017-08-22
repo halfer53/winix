@@ -1,7 +1,8 @@
 #ifndef _DEBUG_H_
 #define _DEBUG_H_ 1
 
-void get_curr_addr(int *addr);
+void* get_pc();
+void* get_sp();
 
 #define D_PRINT(token) printf( "%s: %d\n", #token,token)
 #define X_PRINT(token) printf( "%s: 0x%x\n", #token,token)

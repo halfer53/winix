@@ -11,7 +11,7 @@ getcontext:
 	#save reguster 1
 	sw $2, ucontext_reg1($1)
 	#load register 2
-	lw $2,1($sp)
+	lw $2, 1($sp)
 	sw $2, ucontext_reg2($1)
 	sw $3, ucontext_reg3($1)
 	sw $4, ucontext_reg4($1)
@@ -38,7 +38,7 @@ getcontext:
 setcontext:
 	#13: pointer to ucp
 	lw $13, 0($sp)
-
+	lw $1, ucontext_reg1($13)
 	lw $2, ucontext_reg2($13)
 	lw $3, ucontext_reg3($13)
 	lw $4, ucontext_reg4($13)
@@ -53,27 +53,26 @@ setcontext:
 	
 	#load return address as the pc
 	lw $ra, ucontext_pc($13)
-
-	lw $1, ucontext_ss_flags($13)
-	beqz $1, setcontext_alternative_stack
-
 	lw $sp, ucontext_sp($13)
-	j load_reg_1
-setcontext_alternative_stack:
-	lw $sp, ucontext_ss_sp($13)
-load_reg_1:
 
-	lw $1, ucontext_reg1($13)
+	# restore reg 13 from the stack
 	lw $13, ucontext_reg13($13)
 	jr $ra
 
 
 .global _ctx_start
 _ctx_start:
-	lw $1, 0($sp)
-	addui $sp, $sp, 1
-	jalr $1
-	sw $7, 0($sp)
+	# Load func set by makecontext
+	lw $2, 0($sp)
+	# Load argc set by makecontext
+	lw $3, 1($sp)
+	addui $sp, $sp, 2
+	# call the user context function
+	jalr $2
+	# after popping the stack, now ucp is sitting 
+	# at the top of the stack
+	addu $sp, $sp, $3
+	# call _ctx_end
 	jr $8
 
 
@@ -85,10 +84,10 @@ swapcontext:
 	lw $1, 1($sp)
 	#save register 2
 	sw $2, ucontext_reg2($1)
-	#load register 1
+	#load register 1's value into reg 2
 	lw $2, 0($sp)
-	#save reguster 1
-	sw $2, ucontext_reg2($1)
+	#save reguster 1's value to ucontext struct
+	sw $2, ucontext_reg1($1)
 	sw $3, ucontext_reg3($1)
 	sw $4, ucontext_reg4($1)
 	sw $5, ucontext_reg5($1)
@@ -107,7 +106,6 @@ swapcontext:
 
 	addui $sp, $sp, 1
 	j setcontext
-
 
 .equ ucontext_reg1, 0
 .equ ucontext_reg2, 1
