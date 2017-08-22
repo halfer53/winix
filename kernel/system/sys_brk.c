@@ -41,9 +41,8 @@ void* sys_sbrk(struct proc *who, int size){
 	request_size = size - residual; 
 	if(user_get_free_pages_from(who,next_page, request_size ) == ERR)
 		return (void *)-1;
-
-	// kinfo("extending heap size %d oheap %x newheap %x\n", size, get_virtual_addr(who->heap_break, who), 
-															// get_virtual_addr((who->heap_break + size), who));
+	// kinfo("extending heap size %d oheap %x newheap %x\n", size, who->heap_break, 
+	// 														(who->heap_break + size));
 	
 	who->heap_break += size;
 	who->heap_bottom += align_page(request_size);
@@ -61,6 +60,7 @@ int do_brk(struct proc *who, struct message *m){
 	ptr_t* heap_top;
 
 	m->p1 = get_virtual_addr(who->heap_break, who);
+
 	if(addr < who->heap_break){
 		heap_top = GET_HEAP_TOP(who);
 		if(addr < heap_top)

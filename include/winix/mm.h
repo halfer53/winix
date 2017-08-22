@@ -19,7 +19,7 @@ ptr_t* user_get_free_pages(struct proc* who, int length, int flags);
 
 int next_free_page_index();
 
-void* dup_vm(struct proc* parent, struct proc* child, struct bit_pattern* ptn);
+void* dup_vm(struct proc* parent, struct proc* child);
 void print_ptable(struct proc* who);
 void print_sysmap();
 

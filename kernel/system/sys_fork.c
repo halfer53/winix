@@ -25,19 +25,16 @@ int copy_pcb(struct proc* parent, struct proc* child){
  */
 int copy_mm(struct proc* parent, struct proc* child){
 	ptr_t *src, *dest;
-	struct bit_pattern ptn;
 	int j;
 
-	child->rbase = dup_vm(parent,child, &ptn);
+	child->rbase = dup_vm(parent,child);
 	if(child->rbase == NULL)
 		return ERR;
 
 	src = (ptr_t *)parent->rbase;
 	dest = (ptr_t *)child->rbase;
-	for( j=0; j < ptn.size ;j++ ){
-		if(get_mask(j) & ptn.pattern){
-			copy_page(dest, src);
-		}
+	while(src < parent->heap_bottom){
+		copy_page(dest, src);
 		src += PAGE_LEN;
 		dest += PAGE_LEN;
 	}

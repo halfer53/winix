@@ -184,19 +184,24 @@ int user_free_pages(struct proc* who, ptr_t* page, int len){
  * @param ptn    
  * return the new rbase of the child
  */
-void* dup_vm(struct proc* parent, struct proc* child, struct bit_pattern* ptn){
-	int index;
-	if(bitmap_extract_pattern(parent->ptable, MEM_MAP_LEN, (int)child->heap_break, ptn) == ERR)
-		return NULL;
+void* dup_vm(struct proc* parent, struct proc* child){
+	int len;
+
+	len = parent->heap_bottom + 1 - parent->rbase;
 	
-	index = bitmap_search_pattern(mem_map, MEM_MAP_LEN, ptn->pattern, ptn->size);
-	if(index == ERR)
-		return NULL;
+	return user_get_free_pages(child, len, GFP_NORM);
+	// int index;
+	// if(bitmap_extract_pattern(parent->ptable, MEM_MAP_LEN, (int)child->heap_break, ptn) == ERR)
+	// 	return NULL;
+	
+	// index = bitmap_search_pattern(mem_map, MEM_MAP_LEN, ptn->pattern, ptn->size);
+	// if(index == ERR)
+	// 	return NULL;
 
-	bitmap_set_pattern(mem_map, MEM_MAP_LEN, index, ptn->pattern, ptn->size);
-	bitmap_set_pattern(child->ptable, PTABLE_LEN, index, ptn->pattern, ptn->size);
+	// bitmap_set_pattern(mem_map, MEM_MAP_LEN, index, ptn->pattern, ptn->size);
+	// bitmap_set_pattern(child->ptable, PTABLE_LEN, index, ptn->pattern, ptn->size);
 
-	return PAGE_TO_PADDR(index);
+	// return PAGE_TO_PADDR(index);
 }
 
 
