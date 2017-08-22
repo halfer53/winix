@@ -41,8 +41,11 @@ int test_general(int argc, char **argv){
 	if(strcmp("malloc", argv[1]) == 0)
 		return test_malloc();
 
-	if(strcmp("stack_ov", argv[1]) == 0)
+	if(strcmp("stack_overflow", argv[1]) == 0)
 		return test_so();
+	
+	if(strcmp("float", argv[1]) == 0)
+		return test_float();
 	
 	if(strcmp("fork", argv[1]) == 0)
 		return test_fork();
@@ -63,7 +66,6 @@ int test_general(int argc, char **argv){
 	}
 	return 0;
 }
-
 
 int cmd_kill(int argc, char **argv){
 	pid_t pid;
@@ -161,9 +163,9 @@ void main() {
 		//Read line from terminal
 		while( c < end_buf) {
 
-			ret = getc(); 	//read
+			ret = getchar(); 	//read
 			
-			if(ret == -1){
+			if(ret == EOF){
 				if(errno == EINTR){
 					perror("getc() is interrupted");
 					printf("WINIX> ");
@@ -176,16 +178,16 @@ void main() {
 
 			if ((int)ret == 8) { //backspace
 				if (c > buf) {
-					putc(ret);
+					putchar(ret);
 					c--;
 				}
 				continue;
 			}
 			*c++ = ret;
-			putc(ret); 		//echo
+			putchar(ret); 		//echo
 		}
 		*c = '\0';
-		putc('\n');
+		putchar('\n');
 		ret = parse(buf,&sc);
 
 		

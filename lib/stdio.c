@@ -6,6 +6,8 @@ void perror(const char *s){
     printf(" errno val: %d\n",errno);
 }
 
-int putc(const char c){
-    return printf("%c",c);
+int putchar(const char c){
+    if(printf("%c",c))
+        return c;
+    return EOF;
 }

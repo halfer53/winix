@@ -203,7 +203,7 @@ void free(void *p)
 			fusion(b);
 		}
 	}
-	// putc('\n');
+	// putchar('\n');
 }
 
 void *calloc(size_t number , size_t size) {

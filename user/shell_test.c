@@ -1,5 +1,13 @@
 #include "shell.h"
 
+
+int test_float(){
+	int foo;
+	signal(SIGFPE, SIG_IGN);
+	foo = 1 / 0;
+	return 0;
+}
+
 void stack_overflow(int a){
 	stack_overflow(a);
 }
@@ -35,7 +43,7 @@ int test_alarm(int input){
 	cont = 1;
 	i = 10000;
 	while(cont){
-		putc('!');
+		putchar('!');
 		while(i--);
 		i = 10000;
 	}
@@ -70,13 +78,13 @@ int test_thread(int num){
 	//ucontext represents the context for each thread
 	threads = malloc(sizeof(ucontext_t) * num);
 	if(threads == NULL)
-		goto end;
+		goto err;
 	
 	//thread_stack_op saves the original pointer returned by malloc
 	//so later we can use it to free the malloced memory
 	thread_stack_op = malloc(sizeof(int) * num);
 	if(thread_stack_op == NULL)
-		goto end_free_threads;
+		goto err_free_threads;
 		
 	cthread = threads;
 	//Allocate stack for each thread
@@ -86,15 +94,15 @@ int test_thread(int num){
 			cthread->uc_stack.ss_size = THREAD_STACK_SIZE;
 			cthread->uc_link = &mcontext;
 			makecontext(cthread,func,1,count++);
-			
+			cthread++;
+
 			if(i%50 == 0)
-				putc('!');
+				putchar('!');
 		}else{
-			goto end_free_all;
+			goto err_free_all;
 		}
-		cthread++;
 	}
-	putc('\n');
+	putchar('\n');
 	
 	cthread = threads;
 	//scheduling the threads
@@ -105,14 +113,14 @@ int test_thread(int num){
 		swapcontext(&mcontext,cthread++);
 	}
 	
-	end_free_all:
+	err_free_all:
 		for( j = 0; j < i; j++){
 			free(thread_stack_op[j]);
 		}
 		free(thread_stack_op);
-	end_free_threads:
+	err_free_threads:
 		free(threads);
-	end:
+	err:
 		if(errno == ENOMEM)
 			perror("malloc failed");
 	return 0;

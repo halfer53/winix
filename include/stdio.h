@@ -9,6 +9,10 @@
 #ifndef _STDIO_H_
 #define _STDIO_H_ 1
 
-int putc(const char c);
+#define	BUFSIZ		1024
+#define	EOF		(-1)
+
+int putcharhar(const char c);
+int getchar();
 
 #endif

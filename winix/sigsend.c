@@ -56,6 +56,8 @@ PRIVATE bool sys_sig_handler(struct proc *who, int signum){
             m.i1 = exit_status;
             m.src = who->proc_nr;
             wini_send(SYSTEM_TASK, &m);
+            if(current_proc == who)
+                current_proc = NULL;
         }else{
             exit_proc(who, exit_status);
         }
@@ -63,7 +65,7 @@ PRIVATE bool sys_sig_handler(struct proc *who, int signum){
     }
     //if it's ignored
     if(who->sig_table[signum].sa_handler == SIG_IGN){
-        KDEBUG(("Signal %d ignored by %d\n",signum,who->proc_nr));
+        KDEBUG(("Signal %d ignored by process \"%s [%d]\"\n",signum,who->name,who->proc_nr));
         who->pc = (void (*)())((int)who->pc+1);
         return OK;
     }

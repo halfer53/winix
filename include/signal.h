@@ -54,6 +54,11 @@ struct sigaction {
   int sa_flags;			/* special flags */
 };
 
+typedef struct stack{
+  void  *ss_sp;     /* address of stack */
+  int    ss_flags;  /* Flags */
+  size_t ss_size;   /* Number of bytes in stack */
+} stack_t;
 
 //define signal
 void (*signal(int sig, void (*func)(int)))(int);

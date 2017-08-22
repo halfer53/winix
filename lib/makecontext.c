@@ -29,7 +29,7 @@ void makecontext(ucontext_t *ucp, void (* func)(), int argc, ...){
 	ucp->uc_mcontext.sp = sp;
 
 	/**
-	 * Arrange the stack as follows:
+	 * 	Arrange the stack as follows:
 	 * 	func
 	 *  argc
 	 * 	arg1
@@ -51,8 +51,6 @@ void makecontext(ucontext_t *ucp, void (* func)(), int argc, ...){
 	memcpy(sp,args,argc);
 	sp += argc;
 	*sp = (unsigned int)ucp;
-
-	sp = ucp->uc_mcontext.sp;
 }
 
 

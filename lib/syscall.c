@@ -98,7 +98,7 @@ int execve(){
 	return _SYSCALL(SYSCALL_EXECVE,&m);
 }
 
-int getc(){
+int getchar(){
 	struct message m;
 	return _SYSCALL(SYSCALL_GETC,&m);
 }

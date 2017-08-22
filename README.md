@@ -44,7 +44,9 @@ Click ```Quick Load```, select ```winix.srec```
 
 ```test fork```: fork off a child shell process, parent shell wait until child shell exits or killed.
 
-```test stack_ov```: test stack overflow
+```test stack_overflow```: test stack overflow
+
+```test float```: test floating point exception
 
 ```alarm [ seconds ]```: set the alarm in number of seconds, or 1 by default
 
