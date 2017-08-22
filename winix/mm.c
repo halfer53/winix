@@ -17,9 +17,10 @@ PRIVATE int bss_page_end;
  */
 bool is_addr_accessible(struct proc* who, vptr_t* addr){
 	int page;
+	ptr_t* paddr;
 
-	addr = get_physical_addr(addr, who);
-	page = PADDR_TO_PAGED(addr);
+	paddr = get_physical_addr(addr, who);
+	page = PADDR_TO_PAGED(paddr);
 	return is_bit_on(who->ptable, PTABLE_LEN, page);
 }
 
@@ -69,7 +70,7 @@ ptr_t *get_free_pages(int length, int flags) {
 	}else{
 		nstart =  bitmap_search_from(mem_map, MEM_MAP_LEN, bss_page_end, num);
 	}
-	if (nstart != 0){
+	if (nstart >= 0){
 		bitmap_set_nbits(mem_map, MEM_MAP_LEN, nstart, num);
 		return PAGE_TO_PADDR(nstart);
 	}

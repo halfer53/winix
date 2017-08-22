@@ -23,20 +23,12 @@ static int count = 0;
 #define ALIGN1K(x) (((((x)-1)>>10)<<10)+1024)
 
 void printblock(block_t *b) {
-	printf("0x%04x size %04d prev 0x%04x next 0x%04x %s ",
+	printf("0x%04x size %04d prev 0x%04x next 0x%04x %s\n",
 		b, 
 		b->size, 
 		b->prev, 
 		b->next, 
 		b->free ? "is free" : "in use");
-	if(b->next){
-		if((int)b->data + b->size == (int)b->next)
-			printf("\n");
-		else
-			printf("Inconsistent \n");
-	}else{
-		printf("\n");
-	}
 }
 
 void print_mallinfo() {
@@ -45,6 +37,7 @@ void print_mallinfo() {
 	block_t *b = base;
 	
 	if(!b){
+		printf("Heap is empty\n");
 		return;
 	}
 	while (b) {
