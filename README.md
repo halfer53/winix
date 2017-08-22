@@ -22,27 +22,33 @@ Click ```Quick Load```, select ```winix.srec```
 
 ## List of Commands
 
-```alarm [ seconds ]```: set the alarm in number of seconds, or 1 by default
+### Built_in commands
 
-```thread [ num ]```: Spawn the number of user threads specified by the parameter num, or 2 by default
+```ps```: shows the list of processes running in the system, with relevant info
 
-```malloc```: test malloc function
+```free```: shows the current system memory info
 
-```kill [ -n signum ] pid```: send specified signum to specified process. If signum is not provided, SIGKIL is sent
-
-```fork```: fork off a child shell process, parent shell wait until child shell exits or killed.
+```pid```: shows the current shell's pid
 
 ```exit```: exit the shell program
 
 ```uptime```: shows the system uptime
 
+```kill [ -n signum ] pid```: send specified signum to specified process. If signum is not provided, SIGKIL is sent
+
+### Testing commands
+
+```thread [ num ]```: Spawn the number of user threads specified by the parameter num, or 2 by default
+
+```test malloc```: test malloc function
+
+```test fork```: fork off a child shell process, parent shell wait until child shell exits or killed.
+
+```test stack_ov```: test stack overflow
+
+```alarm [ seconds ]```: set the alarm in number of seconds, or 1 by default
+
 ```signal [ seconds ]```: set an alarm after specified seconds. Any system calls that are currently executing are interrupted (kgetc()) 
-
-```ps```: shows the list of processes running in the system, with relevant info
-
-```meminfo```: shows the current system memory info
-
-```pid```: shows the current shell's pid
 
 ## Demo
 
