@@ -16,8 +16,9 @@ ucontext_t recv_ctx;
 struct syscall_ctx syscall_ctx;
 
 void resume_syscall(struct proc *to){
-	if(syscall_ctx.who->proc_nr == to->proc_nr && to->flags & RECEIVING && syscall_ctx.interruptted){
-		// kprintf("resume syscall %d\n",who->proc_nr);
+	if(syscall_ctx.who->proc_nr == to->proc_nr &&
+		 				to->flags & RECEIVING &&
+		  				syscall_ctx.interruptted){
 		winix_send(to->proc_nr,&syscall_ctx.m);
 	}
 	syscall_ctx.interruptted = 0;
@@ -66,13 +67,14 @@ void system_main() {
 	getcontext(&recv_ctx);
 
 	//Receive message, do work, repeat.
-	while(1) {
+	while(true) {
 		
 		//get a message
 		winix_receive(&m);
 		who_proc_nr = m.src;
 		who = get_proc(who_proc_nr);
-		ASSERT(who != NULL && who_proc_nr != 0);
+		ASSERT(who != NULL && IS_USER_PROC(who)); 
+		//assuming this is monolithic kernel, and all system calls are from user space
 
 		//Do the work
 		switch(m.type) {
@@ -91,7 +93,8 @@ void system_main() {
 			case SYSCALL_WINFO:			m.i1 = do_winfo(who,&m);		break;
 			case SYSCALL_PRINTF:		m.i1 = do_printf(who,&m);		break;
 			default:
-				kprintf("\r\n[SYSTEM] Process \"%s (%d)\" performed unknown system call %d\r\n", who->name, who->proc_nr, m.type);
+				kmesg("Process \"%s (%d)\" performed unknown system call %d\r\n", 
+												who->name, who->proc_nr, m.type);
 				m.i1 = ENOSYS;
 				break;
 		}
@@ -101,7 +104,7 @@ void system_main() {
 		}
 
 		if(null_val != *(unsigned int*)0)
-			panic("Null pointer is dereferenced during syscall %d",m.type);
+			panic("Null pointer is dereferenced during syscall %d\n",m.type);
 	}
 }
 

@@ -305,43 +305,46 @@ int proc_memctl(struct proc* who ,vptr_t* page_addr, int flags){
 /**
  * allocate memory for the given process
  * @param  who        
- * @param  tdb_length total of text and data size
+ * @param  text_data_length total of text and data size
  * @param  stack_size 
  * @param  heap_size  
  * @param  flags      PROC_SET_SP or/and PROC_SET_HEAP	
  * @return            
  */
-int alloc_proc_mem(struct proc *who, int tdb_length, int stack_size, int heap_size, int flags){
-	int proc_page_len;
+int alloc_proc_mem(struct proc *who, int text_data_length, int stack_size, int heap_size, int flags){
 	int proc_len;
-	ptr_t* rbase;
-	int tdb_aligned;
-	int stack_offset = 0;
+	int td_aligned;
+	ptr_t *bss_start;
+	int bss_size;
 
 	//make sizes page aligned
-	tdb_aligned = align_page(tdb_length);
+	td_aligned = align_page(text_data_length);
+	bss_size = td_aligned - text_data_length;
+
 	stack_size = align_page(stack_size);
 	heap_size = align_page(heap_size);
+	
+	if(bss_size < MIN_BSS_SIZE)
+		bss_size += PAGE_LEN;
 
-	if(tdb_aligned - tdb_length < MIN_BSS_SIZE)
-		stack_offset = PAGE_LEN;
-
-	proc_len = tdb_aligned + stack_offset + stack_size + heap_size;
-	// proc_page_len = (tdb_aligned + stack_offset + stack_size + heap_size) / PAGE_LEN;
-
-	who->rbase = rbase = user_get_free_pages(who, proc_len, GFP_NORM);
-	if(rbase == NULL)
+	proc_len = text_data_length + bss_size + stack_size + heap_size;
+	who->rbase = user_get_free_pages(who, proc_len, GFP_NORM);
+	if(who->rbase == NULL)
 		return ERR;
+
+	//set bss segment to 0
+	bss_start = who->rbase + text_data_length;
+	memset(bss_start, 0, bss_size);
 
 	//for how process memory are structured, look at the first line of this file
 	if(flags & PROC_SET_SP){
-		who->stack_top = rbase + tdb_aligned + stack_offset;
+		who->stack_top = who->rbase + text_data_length + bss_size;
 		who->sp = get_virtual_addr(who->stack_top + stack_size - 1,who);
 		*(who->stack_top) = STACK_MAGIC;
 	}
 
 	if(flags & PROC_SET_HEAP){
-		who->heap_break = get_physical_addr(who->sp,who) + 1;
+		who->heap_break = who->rbase + text_data_length + bss_size + stack_size;
 		who->heap_bottom = who->heap_break + heap_size - 1;
 	}
 	return OK;

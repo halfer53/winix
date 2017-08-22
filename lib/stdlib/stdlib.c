@@ -23,13 +23,12 @@ static int count = 0;
 #define ALIGN1K(x) (((((x)-1)>>10)<<10)+1024)
 
 void printblock(block_t *b) {
-	printf("0x%04x size %04d next 0x%04x prev 0x%04x free %d data 0x%04x ",
+	printf("0x%04x size %04d prev 0x%04x next 0x%04x %s ",
 		b, 
 		b->size, 
-		b->next , 
 		b->prev, 
-		b->free, 
-		b->data);
+		b->next, 
+		b->free ? "free" : "in use");
 	if(b->next){
 		if((int)b->data + b->size == (int)b->next)
 			printf("\n");
@@ -38,7 +37,6 @@ void printblock(block_t *b) {
 	}else{
 		printf("\n");
 	}
-		
 }
 
 void block_overview() {
@@ -57,7 +55,7 @@ void block_overview() {
 		printblock(b);
 		b = b->next;
 	}
-	printf("total free words %d, malloced words %d\n", frees, used);
+	printf("Total free words: %d\nTotal words in use: %d\n", frees, used);
 }
 
 

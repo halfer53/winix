@@ -4,7 +4,8 @@ CC = wcc
 C_DEF = -S
 export CC C_DEF
 
-DEBUG_FLAGS = "-D_DEBUG"
+export CFLAGS = "-D_DEBUG"
+RELEASE_FLAGS = ""
 
 LIBS_O = $(shell find lib -name "*.o")
 
@@ -25,30 +26,17 @@ endif
 	$(MAKE) shell
 	$(MAKE) -C winix
 	$(MAKE) -C kernel
-	$(MAKE) -C user
 	wlink $(LDFLAGS) -o winix.srec $(L_HEAD) $(KERNEL_O) $(KLIB_O) $(L_TAIL)
 
-debug: 
-	-rm -f winix.srec
-	export CFLAGS=$(DEBUG_FLAGS); \
-	$(MAKE) -C tools
-	export CFLAGS=$(DEBUG_FLAGS); \
-	$(MAKE) -C lib 
-	export CFLAGS=$(DEBUG_FLAGS); \
-	$(MAKE) shell 
-	export CFLAGS=$(DEBUG_FLAGS); \
-	$(MAKE) -C winix 
-	export CFLAGS=$(DEBUG_FLAGS); \
-	$(MAKE) -C kernel 
-	export CFLAGS=$(DEBUG_FLAGS); \
-	$(MAKE) -C user 
-	wlink -o winix.srec $(L_HEAD) $(KERNEL_O) $(KLIB_O) $(L_TAIL)
+release: 
+	export CFLAGS = $(RELEASE_FLAGS)\
+	$(MAKE) all
 
 clean:
 	$(MAKE) -C kernel clean
 	$(MAKE) -C lib clean
-	$(MAKE) -C user clean
 	$(MAKE) -C winix clean
+	-rm *.o *.s
 	-rm -f winix.srec
 
 stat:
@@ -61,12 +49,16 @@ stat:
 
 shell:
 	-rm -f $(KMAIN)
+	wcc -S user/shell_parse.c
+	wcc -S user/shell_test.c
 	wcc -S user/shell.c
 	wasm shell.s
-	wlink -o shell.srec shell.o $(LIBS_O)
+	wasm shell_test.s
+	wasm shell_parse.s
+	wlink -o shell.srec shell.o shell_test.o shell_parse.o $(LIBS_O)
 	java $(REFORMAT) shell.srec
 	./$(GEN_BIN) shell.srec > include/shell_codes.c
-	# -rm -f shell.srec shell.s shell.o
+	-rm -f shell.srec shell.s shell.o
 
 test:
 	gcc -D_GCC_DEBUG -I./include test.c winix/bitmap.c winix/mm.c
