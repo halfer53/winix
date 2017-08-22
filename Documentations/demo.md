@@ -8,10 +8,10 @@ alarm 3
 Type the following commands to create 4 child shell process
 
 ```
-fork
-fork
-fork
-fork
+test fork
+test fork
+test fork
+test fork
 ```
 
 Now type 
@@ -34,17 +34,17 @@ Read wait(2) and fork() to understand what's going on
 
 Now let's test malloc
 ```
-malloc
+test malloc
 ```
 
 You can also spawn 100 threads
 ```
-thread 100
+test thread 100
 ```
 
 now 
 ```
-fork
+test fork
 ps
 ```
 
@@ -58,7 +58,7 @@ kill 2
 
 You can also test signal
 ```
-signal 2
+test signal 2
 ```
 
 
