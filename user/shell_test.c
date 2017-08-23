@@ -14,7 +14,6 @@ void stack_overflow(int a){
 
 int test_so(){
 	if(!fork()){
-		printf("child recursively calling itself\n");
 		stack_overflow(1);
 	}else{
 		wait(NULL);

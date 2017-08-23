@@ -10,7 +10,7 @@
 #include <kernel/clock.h>
 
 PRIVATE int _exception_stack[EXCEPTION_STACK_SIZE];
-int* exception_stack;
+PRIVATE int* exception_stack;
 
 //Number of exception sources
 #define NUM_HANDLERS 16
@@ -28,7 +28,7 @@ PRIVATE void no_handler();
 
 //Table of all handlers.
 //Position in the table corresponds to relevant bit of $estat
-PRIVATE void (*handlers[])(void) = {
+PRIVATE expt_handler_t handlers[NUM_HANDLERS] = {
 	no_handler, 		//Undefined
 	no_handler, 		//Undefined
 	no_handler, 		//Undefined
@@ -61,11 +61,11 @@ void reset_irq_count(){
 	_irq_count = 0;
 }
 
-int* get_exception_top(){
+int* get_exception_stack_top(){
 	return _exception_stack;
 }
 
-int* get_exception_bottom(){
+int* get_exception_stack_bottom(){
 	return exception_stack;
 }
 

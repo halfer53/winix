@@ -1,6 +1,16 @@
 #include "../winix.h"
 
 /**
+ * Syscall in this file: fork
+ * Input:	
+ *
+ * Return: 	i1: child's pid to parent,
+ * 				and 0 to child
+ * 
+ */
+
+
+/**
  * copy the pcb struct from parent to child
  * @param  parent 
  * @param  child  

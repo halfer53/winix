@@ -2,10 +2,14 @@
 #include <sys/wait.h>
 
 /**
- * syscall for wait
- * @param  parent 
- * @param  mesg   
- * @return        
+ * Syscall in this file: wait
+ * Input:   
+ *
+ * Return:  i1: pid of the child process
+ *          i2: wstatus value
+ *
+ *          if no child is found, this process is blocked
+ * 
  */
 int do_wait(struct proc *parent, struct message *mesg){
     register struct proc *child = NULL;

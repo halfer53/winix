@@ -184,7 +184,7 @@ struct proc *get_running_proc(int proc_nr);
 //fork the next process in the ready_q, return the new pid of the forked process
 //side effect: the head of the free_proc is dequeued, and added to the ready_q with all relevant values equal
 //to the original process, except stack pointer.
-void process_overview();
+void print_runnable_procs();
 void printProceInfo(struct proc* curr);
 char* getStateName(proc_state_t state);
 struct proc *pick_proc();

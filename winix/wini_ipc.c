@@ -130,6 +130,6 @@ int wini_notify(int dest, struct message *m) {
  */
 int winix_senderr(int dest){
 	struct message m;
-	memset(&m,-1,MESSAGE_LEN);
+	memset(&m,-1,sizeof( struct message));
 	return winix_send(dest,&m);
 }

@@ -1,5 +1,13 @@
 #include "../winix.h"
 
+/**
+ * Syscall in this file: alarm
+ * Input:   i1: seconds
+ *
+ * Return: i1: previous timer seconds
+ * 
+ */
+
 //alarm syscall
 //input     m.i1    seconds
 //output    m.i1    previous timeout

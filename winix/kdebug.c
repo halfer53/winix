@@ -3,6 +3,15 @@
 PRIVATE int _debug_sched = 0;
 PRIVATE int _debug_ipc = 0;
 
+/**
+ * Testing functions for debugging purpoess
+ * NB that debugging scheduling can be tricky because the screen
+ * could be flood with scheduling information when the system runs, 
+ * but we onlyl want to see how scheduling algorithms work at a given
+ * period. Those counter is introduced for debugging scheduling and ipc.
+ * Counter is decremented for each debugging information it displays
+ */
+
 int get_debug_sched_count(){
     if(_debug_sched > 0)
         return _debug_sched--;

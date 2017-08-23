@@ -1,5 +1,13 @@
 #include "../winix.h"
 
+/**
+ * Syscall in this file: sigaction
+ * Input:	
+ *
+ * Return: 	i1: syscall status
+ * 
+ */
+
 int do_sigaction(struct proc *who, struct message *m){
     int signum;
     sighandler_t osig;

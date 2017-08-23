@@ -50,9 +50,12 @@ struct proc *pick_proc() {
  *   Context of the new proc is loaded.
  **/
 void sched() {
+	//irq count is increased for each exception being called, and cleared on exiting
+	//exception
 	reset_irq_count();
 
-	if(*(get_exception_top()) != STACK_MAGIC)
+	//Check exception stack
+	if(*(get_exception_stack_top()) != STACK_MAGIC)
 		panic("Exception stack overflow\n");
 
 	if (current_proc != NULL && !current_proc->s_flags) {

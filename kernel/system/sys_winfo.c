@@ -1,15 +1,17 @@
 #include "../winix.h"
 
 /**
- * winix specific syscall for displaying system information
- * @param  who 
- * @param  m   
- * @return     
+ * Syscall in this file: winfo
+ * NB this is a winix specific system call
+ * Input:   i1: type of information to be displayed
+ *
+ * Return:  i1: OK
+ * 
  */
 int do_winfo(struct proc *who, struct message *m){
     switch(m->i1){
         case WINFO_PS:
-            process_overview();
+            print_runnable_procs();
             break;
 
         case WINFO_MEM:

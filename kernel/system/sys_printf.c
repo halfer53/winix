@@ -1,9 +1,20 @@
 #include "../winix.h"
 
 /**
+ * Syscall in this file: printf
+ * Input:	p1: string parameter
+ * 			p2: options parameter
+ *
+ * Return: 	i1: number of bytes being printed
+ * 
+ */
+
+
+/**
  * printf in winix is a system call, I know it seems rediculous, but let me explain
  * printf is usually a user space function that internally uses write() syscall.
- * while having printf() in the user space increases security, printf() usually uses 
+ * Stdout is line buffered to avoid making expensive system calls. While having 
+ * printf() in the user space increases security and performance, printf() usually uses 
  * extensive amount of codes, that makes user process text size much more bigger. 
  * In addition, it's pointless for each user process to have the same printf() in the user space
  * It's just redundant code! Linux addresses this by mapping all processes' user space printf() to a 

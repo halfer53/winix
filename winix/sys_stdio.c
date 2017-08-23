@@ -26,6 +26,13 @@ int kgetc() {
 	return RexSp1->Rx;
 }
 
+/**
+ * print value of n in hexadecimal string format
+ * into the buffer
+ * @param  n   
+ * @param  buf 
+ * @return     OK
+ */
 PRIVATE int kputx_buf(int n,char *buf) {
 	int i;
 	int v = 0, count = 0;
@@ -56,6 +63,12 @@ PRIVATE int kputx_buf(int n,char *buf) {
 	return count;
 }
 
+/**
+ * print the number in decimal string format to buf
+ * @param  n   
+ * @param  buf 
+ * @return     
+ */
 PRIVATE int kputd_buf(int n, char *buf) {
 	int place = 1000000000;
 	int count = 0;
@@ -106,6 +119,10 @@ PRIVATE int kputs_vm_buf(char *s, void *who_rbase, char *buf) {
 		// kputc(*sp++);
 }
 
+/**
+ * print the string to serial port 1
+ * @param s 
+ */
 void kputs(const char *s) {
 	while(*s)
 		kputc(*s++);
@@ -120,9 +137,16 @@ void kputs(const char *s) {
 	}					\
 
 
+/**
+ * virtual memory printf, this function is used by both kernel and user process
+ * @param  format    
+ * @param  arg       
+ * @param  who_rbase rbase of the calling process
+ * @return           number of bytes being printed
+ */
 int kprintf_vm(const char *format, void *arg, ptr_t *who_rbase){
 	char c = *format;
-	char buffer[64];
+	static char buffer[64];
 	char *buf = buffer;
 	int padding_len = 0;
 	bool right_padding_len;
@@ -136,6 +160,7 @@ int kprintf_vm(const char *format, void *arg, ptr_t *who_rbase){
 			format++;
 			buf = buffer;
 			
+			//decode padding options
 			if(*format == '-'){
 				format++;
 				right_padding_len = true;
@@ -190,20 +215,26 @@ int kprintf_vm(const char *format, void *arg, ptr_t *who_rbase){
 				default:
 					kputc(*format++);
 			}
+
 			padding_len -= buf_len;
 			count += buf_len;
-			if(!right_padding_len && padding_len > 0){ //left padding_len
+
+			//left padding
+			if(!right_padding_len && padding_len > 0){ 
 				if(prev == 'x' || prev == 'd')
 					token = ZERO;
 				PUT_PADDING(padding_len,token);
 			}
 			kputs(buf);
+			//right padding
 			if(right_padding_len && padding_len > 0){
 				PUT_PADDING(padding_len,token);
 			}
 			padding_len = 0;	
 		}
 		else {
+			//if this is a normal character, simply print it to 
+			//serial port 1
 			kputc(*format++);
 			count++;
 		}

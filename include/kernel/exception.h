@@ -12,13 +12,15 @@
 //System uptime, in ticks.
 extern int system_uptime;
 
+typedef void (*expt_handler_t)( void );
+
 /**
  * Initialises Exception Handlers and configures timer.
  **/
 void init_exceptions();
 int irq_count();
-int* get_exception_top();
-int* get_exception_bottom();
+int* get_exception_stack_top();
+int* get_exception_stack_bottom();
 
 #define in_interrupt()  (irq_count())
 #define EXCEPTION_STACK_SIZE    300

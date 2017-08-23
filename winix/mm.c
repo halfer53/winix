@@ -2,8 +2,18 @@
 
 /**
  * Memory allocation module
- * This module internally has a bitmap that stores the status of all pages in the system memory
- * pages are managed by bitmaps. 1 indicate this page is being used, otherwise its 0
+ * This is an abstraction layer of the system bitmap. System memories
+ * are allocated using bitmap mem_map records the the page information
+ * of in the system wise. If one page is being used, 1 is set on the 
+ * corresponding bit, and vice versa. 
+ *
+ * mm is an abstraction of the bitmap, its public interface takes physical
+ * address of the page, and calculate the corresponding
+ * page descriptor to do processing in the system bitmap. All mm takes 
+ * physical address as the page, and calculate the length of page by words
+ *
+ * Internally mm uses bitmap utilities to search, set, unset bits and pages
+ * in the system bitmap.
  */
 
 PRIVATE unsigned int mem_map[MEM_MAP_LEN];
@@ -205,7 +215,10 @@ void* dup_vm(struct proc* parent, struct proc* child){
 	// return PAGE_TO_PADDR(index);
 }
 
-
+/**
+ * release process memory
+ * @param who 
+ */
 void release_proc_mem(struct proc *who){
     bitmap_xor(mem_map,who->ptable,MEM_MAP_LEN);
 }

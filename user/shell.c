@@ -37,17 +37,17 @@ struct cmd builtin_commands[] = {
 	{ generic, NULL }
 };
 
+#define testoptions_num 7
 
 int test_general(int argc, char **argv){
-	static int testoptions_num = 7;
-	const char *strs[] = {
+	static const char *strs[testoptions_num] = {
 		"malloc", 
 		"stack",
 		"float",
 		"fork",
 		"thread",
 		"alarm",
-		"signal",
+		"signal"
 	};
 	int i;
 
@@ -79,7 +79,7 @@ int test_general(int argc, char **argv){
 	}
 
 	printf("Test Available Options\n");
-	for( i = 0; i < 7; i++){
+	for( i = 0; i < testoptions_num; i++){
 		printf(" * %s\n", strs[i]);
 	}
 	printf("e.g. \"test thread 100\"\n");

@@ -4,7 +4,7 @@ void deliver_alarm(int proc_nr, clock_t time){
     cause_sig(get_proc(proc_nr),SIGALRM);
 }
 
-void handler_timer(struct timer *timer){
+void handle_timer(struct timer *timer){
 
     if(timer != NULL && timer->time_out == system_uptime)
         timer->handler(timer->proc_nr,timer->time_out);
@@ -26,7 +26,7 @@ void clock_handler(){
 	//Increment uptime, and check if there is any alarm
 	system_uptime++;
 	if(next_timeout == system_uptime)
-		handler_timer(dequeue_alarm());
+		handle_timer(dequeue_alarm());
 
 	sched();
 }

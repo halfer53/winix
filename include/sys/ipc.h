@@ -24,8 +24,6 @@ typedef struct message{
 	sighandler_t s1;
 } message_t;
 
-#define MESSAGE_LEN	9
-
 
 /**
  * Magic Numbers for send/receive

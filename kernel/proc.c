@@ -27,6 +27,100 @@ struct proc *current_proc;
 
 
 /**
+ * How is the process image aligned?
+ *
+ * Each process image is aligned as shown below
+ *
+ * Text segment
+ * Data segment
+ * Bss segment
+ * Stack
+ * Heap
+ *
+ * In the struct proc, rbase points to the beggining of 
+ * the process image.
+ *
+ * stack_top is the physical pointer that points to the 
+ * physical address of the beginning of the stack. Stack
+ * cannot be extended
+ *
+ * heap_break points to the physical address of the current
+ * user heap break
+ *
+ * heap_bottom, points to the end of the
+ * process image. Heap can be extended by extending heap_bottom.
+ *
+ * Note that all those segments are continous, so whenever a fork
+ * is called, we can simply compute the number of pages this process
+ * is occuping by doing heap_bottom + 1 - rbase. NB heap_bottom points
+ * to the end of the page.
+ * 
+ */
+
+
+
+//print out the list of processes currently in the ready_q
+//and the currently running process
+void print_runnable_procs() {
+	int i;
+	struct proc *curr;
+	kprintf("NAME     PID PPID RBASE      PC         STACK      HEAP       PROTECTION   FLAGS\n");
+	for (i = 0; i < NUM_PROCS; i++) {
+		curr = &proc_table[i];
+		if(curr->i_flags & PROC_IN_USE && curr->state != ZOMBIE)
+			printProceInfo(curr);
+	}
+}
+
+//print the process state
+void printProceInfo(struct proc* curr) {
+	int ptable_idx = PADDR_TO_PAGED(curr->rbase)/32;
+	kprintf("%-08s %-03d %-04d 0x%08x 0x%08x 0x%08x 0x%08x %d 0x%08x %d\n",
+	        curr->name,
+	        curr->proc_nr,
+			curr->parent,
+	        curr->rbase,
+	        get_physical_addr(curr->pc,curr),
+	        get_physical_addr(curr->sp,curr),
+	        curr->heap_break,
+			ptable_idx,
+	        curr->ptable[ptable_idx],
+			curr->s_flags);
+}
+
+/**
+ * Gets a pointer to a process.
+ *
+ * Parameters:
+ *   proc_nr		The process to retrieve.
+ *
+ * Returns:			The relevant process, or NULL if it does not exist.
+ **/
+struct proc *get_proc(int proc_nr) {
+	struct proc *p;
+	if (IS_PROCN_OK(proc_nr)){
+		p = &proc_table[proc_nr];
+		return p;
+		// if(p->state != ZOMBIE && p->state != DEAD)
+		// 	return p;
+	}
+	return NULL;
+}
+
+/**
+ * similar to get_proc(), but this one makes sure the 
+ * returning proc is runnable
+ * @param  proc_nr 
+ * @return         
+ */
+struct proc *get_running_proc(int proc_nr){
+	struct proc *p = get_proc(proc_nr);
+	if(p->state != RUNNABLE)
+		return NULL;
+	return p;
+}
+
+/**
  * Adds a proc to the tail of a list.
  *
  * Parameters:
@@ -125,12 +219,54 @@ int dequeue_schedule( struct proc *h) {
 
 /**
  * enqueue the process to the scheduling queue
+ * according to its priority
  * @param p 
  */
 void enqueue_schedule(struct proc* p) {
+	p->state = RUNNABLE;
 	enqueue_tail(ready_q[p->priority], p);
 }
 
+/**
+ * unsched the process, the process will be removed from the
+ * ready_q, and memory will be released by the system
+ * @param p 
+ */
+void unseched(struct proc *p){
+	release_proc_mem(p);
+	dequeue_schedule(p);
+}
+
+/**
+ * add this struct to the free_proc list. This method should
+ * only be called when a zombie process is released
+ * @param p 
+ */
+void free_slot(struct proc *p){
+	p->state = DEAD;
+	p->i_flags &= ~PROC_IN_USE;
+	enqueue_head(free_proc, p);
+}
+
+/**
+ * Exits a process, release memory, unschedule the process
+ * and frees its slot in the process table.
+ *
+ * Note:
+ *   The process must not currently belong to any linked list.
+ *
+ * Side Effects:
+ *   Process state is set to DEAD, and is returned to the free_proc list.
+ **/
+void end_process(struct proc *p) {
+	unseched(p);
+	free_slot(p);
+}
+
+/**
+ * get a free struct proc from the system proc table
+ * @return pointer to the free slot, or NULL
+ */
 struct proc *get_free_proc_slot() {
 	int i;
 	struct proc *p = dequeue(free_proc);
@@ -145,7 +281,7 @@ struct proc *get_free_proc_slot() {
 }
 
 /**
- * set the process struct to default
+ * set the process struct to default values
  * @param p 
  */
 void proc_set_default(struct proc *p) {
@@ -154,26 +290,19 @@ void proc_set_default(struct proc *p) {
 	p->proc_nr = pnr_bak;
 
 	memset(p->regs, DEFAULT_REG_VALUE, NUM_REGS);
-
-	p->sp = DEFAULT_STACK_POINTER;
-	p->ra = DEFAULT_RETURN_ADDR;
-	p->pc = DEFAULT_PROGRAM_COUNTER;
-	p->rbase = DEFAULT_RBASE;
-	p->ptable = DEFAULT_PTABLE;
 	p->cctrl = DEFAULT_CCTRL;
 
 	p->quantum = DEFAULT_USER_QUANTUM;
 	p->state = INITIALISING;
-	p->s_flags = DEFAULT_FLAGS;
-
 	p->ptable = p->protection_table;
-
 	p->alarm.proc_nr = p->proc_nr;
 }
 
 /**
- * allocate stack for kernel processes, stack size is defined by KERNEL_STACK_SIZE
- * this method can be used for creating kernel process or kernel threads'  stack
+ * allocate stack for kernel processes or kernel thread
+ * stack size is defined by KERNEL_STACK_SIZE
+ * this method can be used for creating kernel process 
+ * or kernel threads'  stack
  * @param  who 
  * @return     virtual address of the stack
  */
@@ -192,19 +321,19 @@ reg_t* alloc_kstack(struct proc *who){
 }
 
 /**
- * set proc struct property
+ * set corressponding fields of struct pro
  */
 int set_proc(struct proc *p, void (*entry)(), int priority, const char *name) {
 	p->priority = priority;
 	p->pc = entry;
+
+	//NB: this may result in buffer overflow
 	strcpy(p->name, name);
-	//Set the process to runnable, remember to enqueue it after you call this method
-	p->state = RUNNABLE;
 	return OK;
 }
 
 /**
- * Creates a new process and adds it to the runnable queue
+ * Creates a new kernel process and adds it to the runnable queue
  *
  * Parameters:
  *   entry		A pointer to the entry point of the new process.
@@ -257,33 +386,6 @@ struct proc *start_user_proc(size_t *lines, size_t length, size_t entry, int pri
 	return p;
 }
 
-
-void unseched(struct proc *p){
-	release_proc_mem(p);
-	dequeue_schedule(p);
-}
-
-void free_slot(struct proc *p){
-	p->state = DEAD;
-	p->i_flags &= ~PROC_IN_USE;
-	enqueue_head(free_proc, p);
-}
-
-/**
- * Exits a process, and frees its slot in the process table.
- *
- * Note:
- *   The process must not currently belong to any linked list.
- *
- * Side Effects:
- *   Process state is set to DEAD, and is returned to the free_proc list.
- **/
-void end_process(struct proc *p) {
-	int i,ret;
-	unseched(p);
-	free_slot(p);
-}
-
 /**
  * process memory control, 
  * @param  who       
@@ -318,12 +420,20 @@ int alloc_proc_mem(struct proc *who, int text_data_length, int stack_size, int h
 	int bss_size;
 
 	//make sizes page aligned
+	//text_Data_length is the length of text plus data.
+	//Since srec file does not include the size of bss segment by
+	//default, so we have to manually set it. By default, bss segment
+	//extends from the end of the data segment. So the initial bss 
+	//size is simply aligned size minus exact size
 	td_aligned = align_page(text_data_length);
 	bss_size = td_aligned - text_data_length;
 
 	stack_size = align_page(stack_size);
 	heap_size = align_page(heap_size);
 	
+	//give bss an extra page if its not enough. not that if bss size 
+	//is not enough, it could extend to the stack segment, which could
+	//potentially corrupt the stack 
 	if(bss_size < MIN_BSS_SIZE)
 		bss_size += PAGE_LEN;
 
@@ -336,7 +446,8 @@ int alloc_proc_mem(struct proc *who, int text_data_length, int stack_size, int h
 	bss_start = who->rbase + text_data_length;
 	memset(bss_start, 0, bss_size);
 
-	//for how process memory are structured, look at the first line of this file
+	//for information on how process memory are structured, 
+	//look at the first line of this file
 	if(flags & PROC_SET_SP){
 		who->stack_top = who->rbase + text_data_length + bss_size;
 		who->sp = get_virtual_addr(who->stack_top + stack_size - 1,who);
@@ -348,71 +459,6 @@ int alloc_proc_mem(struct proc *who, int text_data_length, int stack_size, int h
 		who->heap_bottom = who->heap_break + heap_size - 1;
 	}
 	return OK;
-}
-
-
-//print out the list of processes currently in the ready_q
-//and the currently running process
-//return OK;
-
-void process_overview() {
-	int i;
-	struct proc *curr;
-	kprintf("NAME     PID PPID RBASE      PC         STACK      HEAP       PROTECTION   flags\n");
-	for (i = 0; i < NUM_PROCS; i++) {
-		curr = &proc_table[i];
-		if(curr->i_flags & PROC_IN_USE && curr->state != ZOMBIE)
-			printProceInfo(curr);
-	}
-}
-
-//print the process state given
-void printProceInfo(struct proc* curr) {
-	int ptable_idx = PADDR_TO_PAGED(curr->rbase)/32;
-	kprintf("%-08s %-03d %-04d 0x%08x 0x%08x 0x%08x 0x%08x %d 0x%08x %d\n",
-	        curr->name,
-	        curr->proc_nr,
-			curr->parent,
-	        curr->rbase,
-	        get_physical_addr(curr->pc,curr),
-	        get_physical_addr(curr->sp,curr),
-	        curr->heap_break,
-			ptable_idx,
-	        curr->ptable[ptable_idx],
-			curr->s_flags);
-}
-
-
-/**
- * Gets a pointer to a process.
- *
- * Parameters:
- *   proc_nr		The process to retrieve.
- *
- * Returns:			The relevant process, or NULL if it does not exist.
- **/
-struct proc *get_proc(int proc_nr) {
-	struct proc *p;
-	if (IS_PROCN_OK(proc_nr)){
-		p = &proc_table[proc_nr];
-		return p;
-		// if(p->state != ZOMBIE && p->state != DEAD)
-		// 	return p;
-	}
-	return NULL;
-}
-
-/**
- * similar to get_proc(), but this one makes sure the 
- * returning proc is runnable
- * @param  proc_nr 
- * @return         
- */
-struct proc *get_running_proc(int proc_nr){
-	struct proc *p = get_proc(proc_nr);
-	if(p->state != RUNNABLE)
-		return NULL;
-	return p;
 }
 
 

@@ -15,6 +15,12 @@ struct proc *who;
 PRIVATE ucontext_t recv_ctx;
 PRIVATE struct syscall_ctx syscall_ctx;
 
+/**
+ * This method resume the system call if it was previously interruppted
+ * currently, it just simply return -1 to the user space, and set errno 
+ * to EINTR to indicate failure
+ * @param to user process to which we send err to
+ */
 void resume_syscall(struct proc *to){
 	if(syscall_ctx.who->proc_nr == to->proc_nr &&
 		 				to->s_flags & RECEIVING &&
@@ -25,6 +31,11 @@ void resume_syscall(struct proc *to){
 	// setcontext(&syscall_ctx);
 }
 
+/**
+ * interrupt the current executing system call
+ * it saves the current syscall context into struct syscall_ctx
+ * and start receiving syscalls again
+ */
 void intr_syscall(){
 	struct syscall_ctx *ctx = &syscall_ctx;
 	//if the system is executing a system call, save the system call context
@@ -39,11 +50,17 @@ void intr_syscall(){
 	setcontext(&recv_ctx);
 }
 
+/**
+ * public get method for current syscall message
+ * @return [description]
+ */
 struct message *curr_mesg(){
 	return &m;
 }
 
-
+/**
+ * print sys info of text, data and bss segment size
+ */
 void print_sysinfo(){
 	int free_mem_begin, mem_end;
 	free_mem_begin = peek_next_free_page() * PAGE_LEN;
@@ -53,7 +70,8 @@ void print_sysinfo(){
 	kprintf("Data Segment: 0x%08x - 0x%08x\r\n", &DATA_BEGIN, &DATA_END);
 	kprintf("BSS Segment:  0x%08x - 0x%08x\r\n", &BSS_BEGIN, &BSS_END);
 	kprintf("Unallocated:  0x%08x - 0x%08x\r\n", free_mem_begin, mem_end);
-	kprintf("%d kWords Free\r\n", ((unsigned int)(mem_end - free_mem_begin + PAGE_LEN)) / PAGE_LEN); //inclusive
+	kprintf("%d kWords Free\r\n", 
+	((unsigned int)(mem_end - free_mem_begin + PAGE_LEN)) / PAGE_LEN); //inclusive
 }
 
 
@@ -73,8 +91,11 @@ void system_main() {
 		winix_receive(&m);
 		who_proc_nr = m.src;
 		who = get_proc(who_proc_nr);
-		ASSERT(who != NULL && IS_USER_PROC(who)); 
+
 		//assuming this is monolithic kernel, and all system calls are from user space
+		//If you plan to change it to micro kernel in the future, you may want to remove
+		//this 
+		ASSERT(who != NULL && IS_USER_PROC(who)); 
 
 		//Do the work
 		switch(m.type) {

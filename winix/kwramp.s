@@ -95,7 +95,7 @@ handler:
 	sw $1, pcb_cctrl($13)
 	
 	#Switch to exception stack and call C handler
-	jal get_exception_bottom
+	jal get_exception_stack_bottom
 	addui $sp, $1, 0
 	
 	movsg $13, $estat

@@ -1,5 +1,14 @@
 #include "../winix.h"
 
+/**
+ * Syscall in this file: exit
+ * Input:   i1: exit status
+ */
+
+/**
+ * Clear all the messages this process is sending
+ * @param who 
+ */
 void clear_sending_mesg(struct proc *who){
     register struct proc *rp; //iterate over the process table
     register struct proc **xp; //iterate over the process's queue
@@ -20,7 +29,13 @@ void clear_sending_mesg(struct proc *who){
     }
 }
 
-
+/**
+ * return error to all the process who are waiting for messages 
+ * for the current process
+ * This is not triggered since this is really a user space problem
+ * But we just keep it here for future use
+ * @param who 
+ */
 void clear_receiving_mesg(struct proc *who){
     register struct proc *xp;
     struct message m;
@@ -28,7 +43,7 @@ void clear_receiving_mesg(struct proc *who){
     if(who->s_flags & RECEIVING){
         xp = who->sender_q;
         while(xp){
-            memset(&m,-1,MESSAGE_LEN);
+            memset(&m,-1,sizeof( struct message));
             winix_notify(xp->proc_nr,&m);
             xp = xp->next_sender;
         }
@@ -49,7 +64,7 @@ void exit_proc(struct proc *who, int status){
     unseched(who);
     clear_proc(who);
 
-    // process_overview();
+    // print_runnable_procs();
     //if parent is waiting
     KDEBUG(("%s[%d] exit status %d \n",who->name, who->proc_nr, status));
 
@@ -57,8 +72,7 @@ void exit_proc(struct proc *who, int status){
         mp = &proc_table[i];
         if(mp->i_flags & PROC_IN_USE){
             if(mp->s_flags & WAITING && mp->wpid == who->proc_nr){
-                //TODO: modify wstatus
-                mesg.i1 = who->proc_nr;
+                mesg.i1 = (who->exit_status << 8) | (who->sig_status & 0377);
                 mp->s_flags &= ~WAITING;
 
                 winix_send(mp->proc_nr,&mesg);
@@ -83,7 +97,7 @@ void exit_proc(struct proc *who, int status){
 }
 
 int do_exit(struct proc *who, struct message *m){
-    // kprintf("\r\n[SYSTEM] Process \"%s (%d)\" exited with code %d\r\n", who->name, who->proc_nr, m->i1);
+
     exit_proc(who,m->i1);
     return SUSPEND;
 }
