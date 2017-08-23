@@ -27,9 +27,9 @@ RexSimulator.dll
 RexSimulatorGui.exe
 
 !kernel/winix/kwramp.s
-!lib/ucontext.s
-!lib/wramp_syscall.s
-!lib/debug.s
+!lib/gen/ucontext.s
+!lib/syscall/wramp_syscall.s
+!lib/util/debug.s
 !winix/kwramp.s
 !winix/limits/limits_head.s
 !winix/limits/limits_tail.s
