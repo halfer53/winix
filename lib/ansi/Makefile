@@ -1,7 +1,7 @@
 INCLUDE_DIR = ../../include
 INCLUDES = $(wildcard $(INCLUDE_DIR)/*.h $(INCLUDE_DIR)/sys/*.h)
 
-PROGS = ansi rand string
+PROGS = abort raise rand string
 SOURCES = $(PROGS:=.c)
 ASSEMBLY = $(PROGS:=.s)
 

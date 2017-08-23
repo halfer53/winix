@@ -9,6 +9,8 @@
 #ifndef _SYSCALL_H_
 #define _SYSCALL_H_ 1
 
+#include <sys/ipc.h>
+
 /**
  * System Call Numbers
  **/
@@ -51,6 +53,7 @@ function params{\
 #define WINFO_MEM   2
 #define WINFO_SLAB  4
 
+int _SYSCALL(int syscall_num, struct message *m);
 
 /**
  * Returns the current system uptime, specified as the number of ticks since boot.

@@ -5,7 +5,3 @@ int raise(int signum){
         return -1;
     return kill(getpid(),signum);
 }
-
-int abort(){
-    return kill(getpid(),SIGABRT);
-}

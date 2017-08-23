@@ -1,7 +1,9 @@
 INCLUDE_DIR = ../../include
 INCLUDES = $(wildcard $(INCLUDE_DIR)/*.h $(INCLUDE_DIR)/sys/*.h)
 
-PROGS = syscall ipc
+PROGS = syscall ipc _exit alarm brk_sbrk execve \
+		getchar kill printf sigaction sys_uptime \
+		sys_winfo wait fork_getpid 
 SOURCES = $(PROGS:=.c)
 ASSEMBLY = $(PROGS:=.s)
 

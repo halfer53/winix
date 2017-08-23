@@ -1,8 +1,8 @@
 REFORMAT = reformat_srec
 GEN_BIN = gen_bin_code
 
-export CFLAGS = "-D_DEBUG"
-RELEASE_FLAGS = ""
+export CFLAGS = -D_DEBUG
+RELEASE_FLAGS = 
 
 LIBS_O = $(shell find lib -name "*.o")
 
@@ -24,7 +24,7 @@ all:
 
 release: 
 	$(MAKE) clean
-	$(MAKE) all CFLAGS=""
+	$(MAKE) all CFLAGS=
 
 clean:
 	$(MAKE) -C kernel clean
