@@ -1,12 +1,17 @@
-#include "../winix.h"
-
 /**
  * Syscall in this file: sigreturn
  * Input:   i1: signum number
  *
  * Return:  This syscall does not return
  * 
- */
+ * @author Bruce Tan
+ * @email brucetansh@gmail.com
+ * @author Paul Monigatti
+ * @email paulmoni@waikato.ac.nz
+ * @create date 2017-08-23 06:10:17
+ * @modify date 2017-08-23 06:10:17
+*/
+#include "../winix.h"
 
 int do_sigreturn(struct proc *who, struct message *m){
     reg_t *sp;

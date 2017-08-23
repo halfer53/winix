@@ -1,10 +1,14 @@
 /**
+ * 
  * A rather limited version of <string.h>
  *
- * Revision History:
- *  2016-09-19		Paul Monigatti			Original
- *  2016-11-20		Bruce Tan			Modified
- **/
+ * @author Bruce Tan
+ * @email brucetansh@gmail.com
+ * @author Paul Monigatti
+ * @email paulmoni@waikato.ac.nz
+ * @create date 2016-09-19
+ * @modify date 2017-08-23 06:04:27
+*/
 #ifndef _STRING_H_
 #define _STRING_H_ 1
 

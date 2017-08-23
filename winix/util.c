@@ -1,3 +1,14 @@
+/**
+ * 
+ * Micellaneous utilities
+ *
+ * @author Bruce Tan
+ * @email brucetansh@gmail.com
+ * @author Paul Monigatti
+ * @email paulmoni@waikato.ac.nz
+ * @create date 2017-08-23 06:13:08
+ * @modify date 2017-08-23 06:13:08
+*/
 #include <kernel/kernel.h>
 
 int align_page(int len){
@@ -10,10 +21,14 @@ int align_page(int len){
  * Side Effects:
  *   OS locks up.
  **/
-void panic(const char* str) {
-	kprintf("\r\nPanic! ");
+void _panic(const char* str, const char* file) {
+	kprintf("\r\nPanic!");
+	if(file)
+		kprintf("in file %s\n", file);
+
     if(str)
-        kprintf(str);
+		kprintf(str);
+		
 	while(1) {
 		RexParallel->Ctrl = 0;
 		RexParallel->LeftSSD = 0x79;  //E
@@ -26,10 +41,10 @@ void panic(const char* str) {
  * If so, this function has no effect.
  * If not, panic is called with the appropriate message.
  */
-void assert(int expression, int line, char* filename) {
+void _assert(int expression, int line, char* filename) {
 	if(!expression) {
 		kprintf("\nAssert Failed at line %d in %s",line,filename);
-        panic(NULL);
+        _panic(NULL, NULL);
 	}
 }
 

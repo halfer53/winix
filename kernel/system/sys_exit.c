@@ -1,9 +1,15 @@
-#include "../winix.h"
-
 /**
  * Syscall in this file: exit
  * Input:   i1: exit status
- */
+ *
+ * @author Bruce Tan
+ * @email brucetansh@gmail.com
+ * @author Paul Monigatti
+ * @email paulmoni@waikato.ac.nz
+ * @create date 2017-08-23 06:09:19
+ * @modify date 2017-08-23 06:09:19
+*/
+#include "../winix.h"
 
 /**
  * Clear all the messages this process is sending

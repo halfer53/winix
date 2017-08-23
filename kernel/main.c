@@ -1,10 +1,14 @@
 /**
- * Main entry point for WINIX.
+ * 
+ * Main Entry point for Winix
  *
- * Revision History:
- *  2016-09-19		Paul Monigatti			Original
- *  2016-11-20		Bruce Tan			Modified
- **/
+ * @author Bruce Tan
+ * @email brucetansh@gmail.com
+ * @author Paul Monigatti
+ * @email paulmoni@waikato.ac.nz
+ * @create date 2016-09-19
+ * @modify date 2017-08-23 05:59:52
+*/
 
 #include "winix.h"
 #include <winix/rex.h>

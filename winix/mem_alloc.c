@@ -1,12 +1,18 @@
+/**
+ * 
+ * IMPORTANT:
+ * This file is not included during compilation
+ * This file is depreciated, use slab.c instead 
+ *
+ * @author Bruce Tan
+ * @email brucetansh@gmail.com
+ * @author Paul Monigatti
+ * @email paulmoni@waikato.ac.nz
+ * @create date 2017-08-23 06:12:01
+ * @modify date 2017-08-23 06:12:01
+*/
 #include <kernel/kernel.h>
 
-/**
-
-IMPORTANT:
-This file is not included during compilation
-This file is depreciated, use slab.c instead
-
-**/
 
 struct hole hole_table[NUM_HOLES];
 

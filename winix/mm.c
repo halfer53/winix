@@ -1,5 +1,3 @@
-#include <kernel/kernel.h>
-
 /**
  * Memory allocation module
  * This is an abstraction layer of the system bitmap. System memories
@@ -14,7 +12,15 @@
  *
  * Internally mm uses bitmap utilities to search, set, unset bits and pages
  * in the system bitmap.
- */
+ *
+ * @author Bruce Tan
+ * @email brucetansh@gmail.com
+ * @author Paul Monigatti
+ * @email paulmoni@waikato.ac.nz
+ * @create date 2017-08-23 06:12:27
+ * @modify date 2017-08-23 06:12:27
+*/
+#include <kernel/kernel.h>
 
 PRIVATE unsigned int mem_map[MEM_MAP_LEN];
 PRIVATE int bss_page_end;

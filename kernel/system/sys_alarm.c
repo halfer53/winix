@@ -1,12 +1,17 @@
-#include "../winix.h"
-
 /**
  * Syscall in this file: alarm
  * Input:   i1: seconds
  *
- * Return: i1: previous timer seconds
- * 
- */
+ * Return:  i1: previous timer seconds
+ *
+ * @author Bruce Tan
+ * @email brucetansh@gmail.com
+ * @author Paul Monigatti
+ * @email paulmoni@waikato.ac.nz
+ * @create date 2017-08-23 06:08:30
+ * @modify date 2017-08-23 06:07:03
+*/
+#include "../winix.h"
 
 //alarm syscall
 //input     m.i1    seconds

@@ -1,3 +1,14 @@
+/**
+ * 
+ * kernel slab
+ *
+ * @author Bruce Tan
+ * @email brucetansh@gmail.com
+ * @author Paul Monigatti
+ * @email paulmoni@waikato.ac.nz
+ * @create date 2017-08-23 06:22:32
+ * @modify date 2017-08-23 06:22:32
+*/
 #ifndef _W_SLAB_H_
 #define _W_SLAB_H_ 1
 

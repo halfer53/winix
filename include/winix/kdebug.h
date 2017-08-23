@@ -1,3 +1,14 @@
+/**
+ * 
+ * kernel debugging
+ *
+ * @author Bruce Tan
+ * @email brucetansh@gmail.com
+ * @author Paul Monigatti
+ * @email paulmoni@waikato.ac.nz
+ * @create date 2017-08-23 06:22:04
+ * @modify date 2017-08-23 06:22:04
+*/
 #ifndef _W_DEBUG_
 #define _W_DEBUG_ 1
 

@@ -1,16 +1,22 @@
 /**
- * Exception-handling routines for WINIX.
+ * 
+ * Winix exception handler
  *
- * Revision History:
- *  2016-09-19		Paul Monigatti			Original
- *  2016-11-20		Bruce Tan			Modified
- **/
+ * @author Bruce Tan
+ * @email brucetansh@gmail.com
+ * @author Paul Monigatti
+ * @email paulmoni@waikato.ac.nz
+ * @create date 2016-09-19
+ * @modify date 2017-08-23 05:59:30
+*/
+
+
 #include "winix.h"
 #include <winix/rex.h>
 #include <kernel/clock.h>
 
-PRIVATE int _exception_stack[EXCEPTION_STACK_SIZE];
-PRIVATE int* exception_stack;
+PRIVATE int _expt_stack[EXCEPTION_STACK_SIZE];
+PRIVATE int* _expt_stack_ptr;
 
 //Number of exception sources
 #define NUM_HANDLERS 16
@@ -48,7 +54,7 @@ PRIVATE expt_handler_t handlers[NUM_HANDLERS] = {
 };
 
 //System uptime, stored as number of timer interrupts since boot
-int system_uptime = 0;
+PUBLIC int system_uptime = 0;
 
 // counts the number of irqs during exception
 PRIVATE int _irq_count = 0;
@@ -62,11 +68,11 @@ void reset_irq_count(){
 }
 
 int* get_exception_stack_top(){
-	return _exception_stack;
+	return _expt_stack;
 }
 
 int* get_exception_stack_bottom(){
-	return exception_stack;
+	return _expt_stack_ptr;
 }
 
 /**
@@ -212,7 +218,7 @@ PRIVATE void arith_handler() {
  *   System Panic! Does not return.
  **/
 PRIVATE void no_handler() {
-	panic("Unhandled Exception");
+	PANIC("Unhandled Exception");
 }
 
 /**
@@ -239,9 +245,9 @@ PRIVATE void exception_handler(int estat) {
  *   Timer is configured to generate regular interrupts.
  **/
 void init_exceptions() {
-	exception_stack = _exception_stack;
-	*exception_stack = STACK_MAGIC;
-	exception_stack += EXCEPTION_STACK_SIZE - 1;
+	_expt_stack_ptr = _expt_stack;
+	*_expt_stack_ptr = STACK_MAGIC;
+	_expt_stack_ptr += EXCEPTION_STACK_SIZE - 1;
 
 	wramp_set_handler(exception_handler);
 	RexTimer->Load = 40; //60 Hz

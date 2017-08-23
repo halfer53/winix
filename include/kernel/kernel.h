@@ -1,3 +1,14 @@
+/**
+ * 
+ * commond kernel header
+ *
+ * @author Bruce Tan
+ * @email brucetansh@gmail.com
+ * @author Paul Monigatti
+ * @email paulmoni@waikato.ac.nz
+ * @create date 2017-08-23 06:25:03
+ * @modify date 2017-08-23 06:25:03
+*/
 #ifndef _W_KERNEL_H_
 #define _W_KERNEL_H_ 1
 

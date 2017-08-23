@@ -1,3 +1,14 @@
+/**
+ * 
+ * Shell parser
+ *
+ * @author Bruce Tan
+ * @email brucetansh@gmail.com
+ * @author Paul Monigatti
+ * @email paulmoni@waikato.ac.nz
+ * @create date 2017-08-23 06:13:40
+ * @modify date 2017-08-23 06:13:40
+*/
 #include "shell.h"
 
 int isseparator(char c){

@@ -1,5 +1,3 @@
-#include "../winix.h"
-
 /**
  * Syscall in this file: brk
  * Input:	p1: new user heap break
@@ -8,8 +6,14 @@
  * 			on success, it returns the new break set by user
  * 			on failure, it returns the previous heap break
  * 
- */
-
+ * @author Bruce Tan
+ * @email brucetansh@gmail.com
+ * @author Paul Monigatti
+ * @email paulmoni@waikato.ac.nz
+ * @create date 2017-08-23 06:08:30
+ * @modify date 2017-08-23 06:07:24
+*/
+#include "../winix.h"
 
 /**
  * For each process, the heap would look something like this

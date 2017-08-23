@@ -1,5 +1,3 @@
-#include "../winix.h"
-
 /**
  * Syscall in this file: fork
  * Input:	
@@ -7,8 +5,14 @@
  * Return: 	i1: child's pid to parent,
  * 				and 0 to child
  * 
- */
-
+ * @author Bruce Tan
+ * @email brucetansh@gmail.com
+ * @author Paul Monigatti
+ * @email paulmoni@waikato.ac.nz
+ * @create date 2017-08-23 06:08:30
+ * @modify date 2017-08-23 06:08:30
+*/
+#include "../winix.h"
 
 /**
  * copy the pcb struct from parent to child

@@ -1,3 +1,14 @@
+/**
+ * 
+ * Signal sending module
+ *
+ * @author Bruce Tan
+ * @email brucetansh@gmail.com
+ * @author Paul Monigatti
+ * @email paulmoni@waikato.ac.nz
+ * @create date 2017-08-23 06:12:40
+ * @modify date 2017-08-23 06:12:40
+*/
 #include <kernel/kernel.h>
 #include <kernel/system.h>
 #include <kernel/exception.h>

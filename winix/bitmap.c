@@ -1,3 +1,14 @@
+/**
+ * 
+ * Winix bitmap module
+ *
+ * @author Bruce Tan
+ * @email brucetansh@gmail.com
+ * @author Paul Monigatti
+ * @email paulmoni@waikato.ac.nz
+ * @create date 2017-08-23 06:11:36
+ * @modify date 2017-08-23 06:11:36
+*/
 #include <kernel/kernel.h>
 
 unsigned int mask[BITMASK_NR];

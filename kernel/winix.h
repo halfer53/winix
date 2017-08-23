@@ -1,10 +1,14 @@
 /**
+ * 
  * Globals used in WINIX.
  *
- * Revision History:
- *  2016-09-19		Paul Monigatti			Original
- *  2016-11-20		Bruce Tan			Modified
- **/
+ * @author Bruce Tan
+ * @email brucetansh@gmail.com
+ * @author Paul Monigatti
+ * @email paulmoni@waikato.ac.nz
+ * @create date 2016-09-19
+ * @modify date 2017-08-23 06:03:48
+*/
 
 #ifndef _WINIX_H_
 #define _WINIX_H_ 1

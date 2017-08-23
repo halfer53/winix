@@ -1,3 +1,15 @@
+/**
+ * 
+ * Winix clock exception handler
+ *
+ * @author Bruce Tan
+ * @email brucetansh@gmail.com
+ * @author Paul Monigatti
+ * @email paulmoni@waikato.ac.nz
+ * @create date 2016-09-19
+ * @modify date 2017-08-23 05:59:38
+*/
+
 #include "winix.h"
 
 void deliver_alarm(int proc_nr, clock_t time){

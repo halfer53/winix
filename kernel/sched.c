@@ -1,3 +1,14 @@
+/**
+ * 
+ * Winix Scheduling module
+ *
+ * @author Bruce Tan
+ * @email brucetansh@gmail.com
+ * @author Paul Monigatti
+ * @email paulmoni@waikato.ac.nz
+ * @create date 2016-09-19
+ * @modify date 2017-08-23 06:00:50
+*/
 #include "winix.h"
 
 /**
@@ -56,7 +67,7 @@ void sched() {
 
 	//Check exception stack
 	if(*(get_exception_stack_top()) != STACK_MAGIC)
-		panic("Exception stack overflow\n");
+		PANIC("Exception stack overflow\n");
 
 	if (current_proc != NULL && !current_proc->s_flags) {
 		//Accounting

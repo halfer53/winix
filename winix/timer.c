@@ -1,3 +1,14 @@
+/**
+ * 
+ * Winix timer module
+ *
+ * @author Bruce Tan
+ * @email brucetansh@gmail.com
+ * @author Paul Monigatti
+ * @email paulmoni@waikato.ac.nz
+ * @create date 2017-08-23 06:13:01
+ * @modify date 2017-08-23 06:13:01
+*/
 #include <kernel/kernel.h>
 
 //a linked list of pending timers to be alarmed

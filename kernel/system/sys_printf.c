@@ -1,5 +1,3 @@
-#include "../winix.h"
-
 /**
  * Syscall in this file: printf
  * Input:	p1: string parameter
@@ -7,7 +5,14 @@
  *
  * Return: 	i1: number of bytes being printed
  * 
- */
+ * @author Bruce Tan
+ * @email brucetansh@gmail.com
+ * @author Paul Monigatti
+ * @email paulmoni@waikato.ac.nz
+ * @create date 2017-08-23 06:09:58
+ * @modify date 2017-08-23 06:09:58
+*/
+#include "../winix.h"
 
 
 /**

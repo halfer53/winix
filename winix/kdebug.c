@@ -1,3 +1,14 @@
+/**
+ * 
+ * Winix debug utilities
+ *
+ * @author Bruce Tan
+ * @email brucetansh@gmail.com
+ * @author Paul Monigatti
+ * @email paulmoni@waikato.ac.nz
+ * @create date 2017-08-23 06:11:47
+ * @modify date 2017-08-23 06:11:47
+*/
 #include <kernel/kernel.h>
 
 PRIVATE int _debug_sched = 0;

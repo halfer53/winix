@@ -1,12 +1,17 @@
-#include "../winix.h"
-
 /**
  * Syscall in this file: sigaction
  * Input:	
  *
  * Return: 	i1: syscall status
  * 
- */
+ * @author Bruce Tan
+ * @email brucetansh@gmail.com
+ * @author Paul Monigatti
+ * @email paulmoni@waikato.ac.nz
+ * @create date 2017-08-23 06:10:09
+ * @modify date 2017-08-23 06:10:09
+*/
+#include "../winix.h"
 
 int do_sigaction(struct proc *who, struct message *m){
     int signum;

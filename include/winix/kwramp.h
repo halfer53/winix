@@ -1,9 +1,15 @@
 /**
+ * 
  * WRAMP-specific functions for WINIX.
  *
- * Revision History:
- *  2016-09-19		Paul Monigatti			Original
- **/
+ * @author Bruce Tan
+ * @email brucetansh@gmail.com
+ * @author Paul Monigatti
+ * @email paulmoni@waikato.ac.nz
+ * @create date 2016-09-19
+ * @modify date 2017-08-23 06:03:07
+*/
+
 
 #ifndef _WRAMP_H_
 #define _WRAMP_H_ 1
