@@ -9,7 +9,7 @@
  * @email paulmoni@waikato.ac.nz
  * 
  * @create date 2017-08-23 06:22:01
- * @modify date 2017-08-23 06:22:01
+ * 
 */
 #ifndef _W_GFP_H_
 #define _W_GFP_H_ 1

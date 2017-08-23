@@ -9,7 +9,7 @@
  * @email paulmoni@waikato.ac.nz
  * 
  * @create date 2017-08-23 06:22:29
- * @modify date 2017-08-23 06:22:29
+ * 
 */
 #ifndef _W_SIGNAL_H_
 #define _W_SIGNAL_H_ 1

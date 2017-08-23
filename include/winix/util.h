@@ -9,7 +9,7 @@
  * @email paulmoni@waikato.ac.nz
  * 
  * @create date 2017-08-23 06:22:47
- * @modify date 2017-08-23 06:22:47
+ * 
 */
 #ifndef _W_UTIL_H_
 #define _W_UTIL_H_

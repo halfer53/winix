@@ -9,7 +9,7 @@
  * @email paulmoni@waikato.ac.nz
  * 
  * @create date 2017-08-23 06:22:42
- * @modify date 2017-08-23 06:22:42
+ * 
 */
 #ifndef _W_TIMER_H_
 #define _W_TIMER_H_ 1
