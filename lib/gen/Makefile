@@ -1,11 +1,11 @@
 INCLUDE_DIR = ../../include
 INCLUDES = $(wildcard $(INCLUDE_DIR)/*.h $(INCLUDE_DIR)/sys/*.h)
 
-PROGS = errno stdlib atoi
+PROGS = makecontext
 SOURCES = $(PROGS:=.c)
 ASSEMBLY = $(PROGS:=.s)
 
-OBJECT = $(PROGS:=.o)
+OBJECT = $(PROGS:=.o) ucontext.o
 
 wramp: $(OBJECT)
 $(ASSEMBLY): %.s: %.c $(INCLUDES)

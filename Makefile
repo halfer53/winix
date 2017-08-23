@@ -6,7 +6,7 @@ RELEASE_FLAGS = ""
 
 LIBS_O = $(shell find lib -name "*.o")
 
-KLIB = ipc string util wramp_syscall ucontext stdlib/atoi
+KLIB = syscall/ipc ansi/string util/util syscall/wramp_syscall gen/ucontext stdlib/atoi
 KLIB_O = $(addprefix lib/, $(KLIB:=.o))
 L_HEAD = winix/limits/limits_head.o
 L_TAIL = winix/limits/limits_tail.o

@@ -1,11 +1,11 @@
 INCLUDE_DIR = ../../include
 INCLUDES = $(wildcard $(INCLUDE_DIR)/*.h $(INCLUDE_DIR)/sys/*.h)
 
-PROGS = errno stdlib atoi
+PROGS = syscall ipc
 SOURCES = $(PROGS:=.c)
 ASSEMBLY = $(PROGS:=.s)
 
-OBJECT = $(PROGS:=.o)
+OBJECT = $(PROGS:=.o) wramp_syscall.o
 
 wramp: $(OBJECT)
 $(ASSEMBLY): %.s: %.c $(INCLUDES)

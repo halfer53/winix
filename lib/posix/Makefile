@@ -1,7 +1,7 @@
 INCLUDE_DIR = ../../include
 INCLUDES = $(wildcard $(INCLUDE_DIR)/*.h $(INCLUDE_DIR)/sys/*.h)
 
-PROGS = errno stdlib atoi
+PROGS = _sigset
 SOURCES = $(PROGS:=.c)
 ASSEMBLY = $(PROGS:=.s)
 

@@ -1,25 +1,32 @@
 INCLUDE_DIR = ../include
-# INCLUDES = $(wildcard $(INCLUDE_DIR)/*.h $(INCLUDE_DIR)/sys/*.h)
+INCLUDES = $(wildcard $(INCLUDE_DIR)/*.h $(INCLUDE_DIR)/sys/*.h)
 
-PROGS = stdio string syscall ipc util makecontext ansi
+PROGS = 
 SOURCES = $(PROGS:=.c)
 ASSEMBLY = $(PROGS:=.s)
 
 OBJECT = $(PROGS:=.o) wramp_syscall.o ucontext.o debug.o
 
-wramp: $(OBJECT)
+wramp: 
+	$(MAKE) -C ansi
+	$(MAKE) -C gen
+	$(MAKE) -C posix
+	$(MAKE) -C stdio
 	$(MAKE) -C stdlib
-$(ASSEMBLY): %.s: %.c $(INCLUDES)
-	wcc $(CFLAGS) -S -N -I$(INCLUDE_DIR) -o $@ $<
-	
-$(OBJECT): %.o: %.s
-	wasm $< -o $@
+	$(MAKE) -C syscall
+	$(MAKE) -C util
 
 depend:
 	makedepend -I$(INCLUDE_DIR) $(SOURCES)
 
 clean:
+	$(MAKE) -C ansi clean
+	$(MAKE) -C gen clean
+	$(MAKE) -C posix clean
+	$(MAKE) -C stdio clean
 	$(MAKE) -C stdlib clean
+	$(MAKE) -C syscall clean
+	$(MAKE) -C util clean
 	-rm -f $(OBJECT) $(ASSEMBLY)
 
 .DELETE_ON_ERROR:

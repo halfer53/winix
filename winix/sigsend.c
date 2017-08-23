@@ -9,8 +9,13 @@ PRIVATE unsigned int sigframe_code[SIGRET_CODE_LEN] = {0x1ee10001,0x200d0000};
 
 /**
  * How does signal works in winix
+
  * When signal is to be delivered, it first checks if the signal is set to 
- * default or ignored. if neither of those two are set, the signal context will
+ * default or ignored. If it is, then the kernel choose the default action 
+ * according to the signal. Currently, if handler is default, it simply kills the 
+ * process. If it's ignored, register $pc moves to the next instruction
+ *
+ * if neither of those two are set, the signal context will
  * be built on the user stack. The reason we do that is to simulate calling methods
  * for stack trace information.
  *
@@ -27,8 +32,8 @@ PRIVATE unsigned int sigframe_code[SIGRET_CODE_LEN] = {0x1ee10001,0x200d0000};
  *                 operation is WINIX_SEND, destination is SYSTEM_TASK, (or kernel)
  *                 and pm points to the messages being passed to the kernel. NB
  *                 that pm is the virtual memory
- * messages     <- The actual messages, remember that pm points to this messages
- * sigret_code  <- assemblyl code for invoking system call, see sigframe_code,
+ * messages     <- The actual messages, remember that pm points to this message
+ * sigret_code  <- assembly code for invoking system call, see sigframe_code,
  *                 This is where ra points to
  * PCB context  <- The previous pcb context saved, will be restored after sigreturn
  */
@@ -94,12 +99,12 @@ PRIVATE int build_signal_ctx(struct proc *who, int signum){
  * @return        return OK if system has handled the signal
  *                return ERR if the user needs to handle the signal
  */
-PRIVATE bool sys_sig_handler(struct proc *who, int signum){
+PRIVATE int sys_sig_handler(struct proc *who, int signum){
     struct message m;
     
     if(who->sig_table[signum].sa_handler == SIG_DFL){
         int exit_status = SIG_STATUS(signum);
-        KDEBUG(("Signal %d: kill %s [%d]\n",signum,who->name,who->proc_nr));
+        KDEBUG(("Signal %d: kill process \"%s [%d]\"\n",signum,who->name,who->proc_nr));
         if(in_interrupt()){
             //if we are in interrupt, send an exit syscall to the kernel, 
             //and set current_proc to NULL so the scheduler picks the next proc
@@ -145,7 +150,7 @@ PRIVATE int sigsend_comm(struct proc *who, int signum){
 }
 
 /**
- * cause the signal, signal handler will be invoked next the 
+ * cause the signal, signal handler will be invoked next time the 
  * process is scheduled
  * @param  who    
  * @param  signum 
@@ -174,7 +179,7 @@ int send_sig(struct proc *who, int signum){
 
     if(in_interrupt()){
         //send_sig is usually called during exception
-        //so we manually add the currentproc to the ready queue
+        //so we manually add the current proc to the ready queue
         //and schedule the process imeediately
         if(current_proc != who){
             enqueue_schedule(current_proc);
