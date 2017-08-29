@@ -47,6 +47,22 @@ void alarm_handler(int signum){
 	cont = 0;
 }
 
+/**
+
+	The difference between test_alarm and test_signal is that
+	test_signal will return to the main shell loop after issuing the
+	alarm syscall, thus it will be blocked until a new character arrives.
+	After one second, when SIGALRM is scheduled to be delivered, and when
+	shell process is still blocked, the kernel will temporarily schedule 
+	the process, and call the signal handler. Upon exiting signal handler,
+	the shell process will be blocked again.
+
+	On the other side, test_alarm() simply calls a while loop to wait for
+	the signal to be delivered, this serves as a simple test case for signal
+	but avoids to test on the edge cases where signal is delivered while 
+	a process is blocked by a system call.
+
+**/
 int test_alarm(int input){
 	int i;
 	seconds = input;
