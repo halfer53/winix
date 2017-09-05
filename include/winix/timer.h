@@ -26,7 +26,6 @@ struct timer{
 	int flags;
 };
 
-extern clock_t next_timeout;
 
 void insert_timer(struct timer *timer);
 struct timer* dequeue_alarm();

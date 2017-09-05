@@ -55,9 +55,6 @@ PRIVATE expt_handler_t handlers[NUM_HANDLERS] = {
 	arith_handler 		//ARITH
 };
 
-//System uptime, stored as number of timer interrupts since boot
-PUBLIC int system_uptime = 0;
-
 // counts the number of irqs during exception
 PRIVATE int _irq_count = 0;
 

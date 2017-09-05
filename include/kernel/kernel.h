@@ -46,6 +46,7 @@
 #include <winix/mm.h>
 #include <winix/sys_stdio.h>
 #include <winix/wini_ipc.h>
+#include <kernel/clock.h>
 #include <winix/timer.h>
 #include <kernel/proc.h>
 

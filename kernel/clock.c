@@ -14,6 +14,10 @@
 
 #include "winix.h"
 
+//System uptime, stored as number of timer interrupts since boot
+PUBLIC int system_uptime = 0;
+
+//Global variable for the next timeout event jiddles
 PUBLIC clock_t next_timeout = 0;
 
 void deliver_alarm(int proc_nr, clock_t time){

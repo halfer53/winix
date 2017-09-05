@@ -15,9 +15,6 @@
 #ifndef _K_EXCEPTION_H_
 #define _K_EXCEPTION_H_ 1
 
-//System uptime, in ticks.
-extern int system_uptime;
-
 typedef void (*expt_handler_t)( void );
 
 /**
