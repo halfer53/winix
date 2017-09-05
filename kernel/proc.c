@@ -17,19 +17,19 @@
 //Linked lists are defined by a head and tail pointer.
 
 //Process table
-struct proc proc_table[NUM_PROCS];
+PUBLIC struct proc proc_table[NUM_PROCS];
 
 //Scheduling queues
-struct proc *ready_q[NUM_QUEUES][2];
+PUBLIC struct proc *ready_q[NUM_QUEUES][2];
 
 //blocking queues
-struct proc *block_q[2];
+PUBLIC struct proc *block_q[2];
 
 //Entries in the process table that are not in use
-static struct proc *free_proc[2];
+PRIVATE struct proc *free_proc[2];
 
 //The currently-running process
-struct proc *current_proc;
+PUBLIC struct proc *current_proc;
 
 
 /**
@@ -107,8 +107,6 @@ struct proc *get_proc(int proc_nr) {
 	if (IS_PROCN_OK(proc_nr)){
 		p = &proc_table[proc_nr];
 		return p;
-		// if(p->state != ZOMBIE && p->state != DEAD)
-		// 	return p;
 	}
 	return NULL;
 }
@@ -200,9 +198,6 @@ int dequeue_schedule( struct proc *h) {
 	struct proc ** q = ready_q[h->priority];
 
 	curr = q[HEAD];
-
-	if (curr == NULL)
-		return ERR;
 
 	while (curr != h && curr != NULL) {
 		prev = curr;

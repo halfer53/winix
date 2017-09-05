@@ -14,9 +14,9 @@
 
 #include "winix.h"
 
-struct message m;
-int who_proc_nr;
-struct proc *who;
+PRIVATE struct message m;
+PRIVATE int who_proc_nr;
+PRIVATE struct proc *who;
 
 PRIVATE ucontext_t recv_ctx;
 PRIVATE struct syscall_ctx syscall_ctx;

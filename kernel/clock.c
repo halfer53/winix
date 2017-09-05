@@ -14,6 +14,8 @@
 
 #include "winix.h"
 
+PUBLIC clock_t next_timeout = 0;
+
 void deliver_alarm(int proc_nr, clock_t time){
     cause_sig(get_proc(proc_nr),SIGALRM);
 }
@@ -37,10 +39,10 @@ void handle_timer(struct timer *timer){
 void clock_handler(){
     RexTimer->Iack = 0;
 
-	//Increment uptime, and check if there is any alarm
-	system_uptime++;
-	if(next_timeout == system_uptime)
-		handle_timer(dequeue_alarm());
+    //Increment uptime, and check if there is any alarm
+    system_uptime++;
+    if(next_timeout == system_uptime)
+        handle_timer(dequeue_alarm());
 
-	sched();
+    sched();
 }
