@@ -32,7 +32,7 @@ depend:
 clean:
 	$(Q)-rm -f $(OBJECT) $(ASSEMBLY)
 ifeq ($(KBUILD_VERBOSE),0)
-	@echo "RM \t WINIX"
+	@echo "RM \t KERNEL/SYSTEM"
 endif
 
 .DELETE_ON_ERROR:# DO NOT DELETE

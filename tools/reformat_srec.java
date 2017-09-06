@@ -18,7 +18,7 @@ public class reformat_srec{
     try{
       long wordsCount = 0;
      wordsCount = LoadSrec(filename);
-     System.out.println("words loaded "+wordsCount);
+     //System.out.println("words loaded "+wordsCount);
      String newcontent = "";
      int byteCount = 0;
      int checksum = 0;
@@ -193,7 +193,7 @@ public class reformat_srec{
 
                     case 7: //entry point for the program.
                         // CPU.PC = (long)address;
-                        System.out.println("pc "+address);
+                        //System.out.println("pc "+address);
                         break;
                 }
             }
