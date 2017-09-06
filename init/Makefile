@@ -35,7 +35,7 @@ depend:
 clean:
 	$(Q)-rm -f $(OBJECT) $(ASSEMBLY)
 ifeq ($(KBUILD_VERBOSE),0)
-	@echo "RM \t WINIX"
+	@echo "RM \t INIT"
 endif
 
 .DELETE_ON_ERROR:
