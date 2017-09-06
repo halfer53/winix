@@ -98,7 +98,7 @@ PRIVATE int build_signal_ctx(struct proc *who, int signum){
 
     who->pc = (void (*)())who->sig_table[signum].sa_handler;
 
-    if(who->s_flags)
+    if(who->s_flags) //reschedule the process if it's blocked
         enqueue_schedule(who);
 
     who->s_flags = 0;//reset flags

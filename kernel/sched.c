@@ -13,18 +13,18 @@
 */
 #include "winix.h"
 
-/**
- * return the idle proc
- * @return 
- */
-struct proc *get_idle(){
-	static struct proc *idle = NULL;
-	if(idle == NULL){
-		idle = start_kernel_proc(idle_main, IDLE_PRIORITY, "IDLE");
+void rebalance_queues(int proc_nr, clock_t time){
+	struct proc* curr;
+	int i;
+	for(i = 0; i < NUM_PROCS; i++){
+		curr = &proc_table[i];
+			if(! IS_IDLE(curr)){
+				curr->priority = MAX_PRIORITY;
+			}
+		}
 	}
-	return idle;
+	new_timer(REBALANCE_TIMEOUT, rebalance_queues);
 }
-
 
 /**
  * Chooses a process to run.
@@ -46,7 +46,8 @@ struct proc *pick_proc() {
 		}
 	}
 
-	return get_idle();
+	PANIC("No procs left");
+	return NULL;
 }
 
 
@@ -79,6 +80,9 @@ void sched() {
 			enqueue_head(ready_q[current_proc->priority], current_proc);
 		}
 		else { //Re-insert process at the tail of its priority queue
+			if(current_proc->priority < NUM_QUEUES - 1){
+				current_proc->priority++;
+			}
 			enqueue_tail(ready_q[current_proc->priority], current_proc);
 		}
 	}

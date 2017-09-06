@@ -35,8 +35,8 @@ all:
 	$(Q)$(MAKE) -C tools
 	$(Q)$(MAKE) -C lib
 	$(Q)$(MAKE) -C user
-	$(Q)$(MAKE) shell
 	$(Q)$(MAKE) -C winix
+	$(Q)$(MAKE) shell
 	$(Q)$(MAKE) -C kernel
 	$(Q)wlink $(LDFLAGS) -o winix.srec $(L_HEAD) $(KERNEL_O) $(KLIB_O) $(L_TAIL)
 ifeq ($(KBUILD_VERBOSE),0)

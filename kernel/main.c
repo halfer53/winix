@@ -34,6 +34,7 @@ void main() {
 	init_bitmap();
 	init_mem_table();
 	init_proc();
+	init_timer();
 
 	//Initialise the system task
 	p = start_kernel_proc(system_main, SYSTEM_PRIORITY, "SYSTEM");
@@ -46,8 +47,13 @@ void main() {
 	ASSERT(p != NULL);
 	p->parent = 1;//hack 
 
+	p = start_kernel_proc(idle_main, IDLE_PRIORITY, "IDLE");
+	p->proc_nr = IDLE;
+	p->quantum = 1;
+
 	init_slab(shell_code,shell_code_length);
 	
+	new_timer(REBALANCE_TIMEOUT, rebalance_queues);
 	//Initialise exceptions
 	init_exceptions();
 	//Kick off first task. Note: never returns

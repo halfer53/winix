@@ -49,6 +49,7 @@
 #include <kernel/clock.h>
 #include <winix/timer.h>
 #include <kernel/proc.h>
+#include <kernel/sched.h>
 
 #include <winix/syscall_ctx.h>
 #include <winix/rex.h>

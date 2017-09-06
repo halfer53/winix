@@ -32,7 +32,7 @@ int do_alarm(struct proc *who, struct message *m){
 
     if(alarm->flags & TIMER_INUSE){
         remove_timer(alarm);
-        // kprintf("remove timer\n");
+        kinfo("remove timer\n");
     }
     
     //if seconds is 0, any pending alarm is canceled

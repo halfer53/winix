@@ -18,13 +18,21 @@
 #include <winix/timer.h>
 #include <winix/kwramp.h>
 
+//Kernel Process
+#define IDLE					-1
+
 //Process & Scheduling
 #define PROC_NAME_LEN			20
-#define NUM_PROCS				13
+#define NUM_PROCS				10
 #define NUM_QUEUES				5
 #define IDLE_PRIORITY			4
 #define USER_PRIORITY			3
 #define SYSTEM_PRIORITY			0
+
+#define USER_MIN_PRIORITY		2
+#define USER_MAX_PRIORITY		4
+#define MAX_PRIORITY			0
+#define MIN_PRIORITY			((NUM_QUEUES) - 1)
 
 #define USER_PRIORITY_MAX		1
 #define USER_PRIORITY_MIN		4
@@ -50,8 +58,8 @@
 
 //stack
 #define STACK_MAGIC				0x12345678
-#define USER_STACK_SIZE		1024
-#define KERNEL_STACK_SIZE		2048
+#define USER_STACK_SIZE			1024
+#define KERNEL_STACK_SIZE		1024
 
 //heap
 #define USER_HEAP_SIZE		2048
@@ -156,6 +164,7 @@ typedef struct proc {
 #define IS_PRIORITY_OK(priority)	(0 <= (priority) && (priority) < NUM_QUEUES)
 #define IS_KERNEL_PROC(p)	((p->proc_nr) == 0)
 #define IS_USER_PROC(p)		((p->proc_nr) > 0)
+#define IS_IDLE(p)			((p->proc_nr) == IDLE)
 #define CHECK_STACK(p)		(*(p->stack_top) == STACK_MAGIC)
 #define GET_DEF_STACK_SIZE(who)	(IS_USER_PROC(who) ? USER_STACK_SIZE : KERNEL_STACK_SIZE)
 #define GET_HEAP_TOP(who)	((who)->stack_top + GET_DEF_STACK_SIZE(who))
@@ -165,7 +174,6 @@ extern struct proc *ready_q[NUM_QUEUES][2];
 extern struct proc *block_q[2];
 
 void* get_pc_ptr(struct proc* who);
-
 void enqueue_tail(struct proc **q, struct proc *proc);
 void enqueue_head(struct proc **q, struct proc *proc);
 struct proc *dequeue(struct proc **q);
@@ -180,18 +188,9 @@ int alloc_proc_mem(struct proc *who, int tdb_length, int stack_size, int heap_si
 void enqueue_schedule(struct proc* p);
 reg_t* alloc_kstack(struct proc *who);
 int proc_memctl(struct proc* who ,vptr_t* page_addr, int flags);
-/**
- * WINIX Scheduler.
- **/
-void sched();
 void end_process(struct proc *p);
 struct proc *get_proc(int proc_nr);
 struct proc *get_running_proc(int proc_nr);
-
-
-//fork the next process in the ready_q, return the new pid of the forked process
-//side effect: the head of the free_proc is dequeued, and added to the ready_q with all relevant values equal
-//to the original process, except stack pointer.
 void print_runnable_procs();
 void printProceInfo(struct proc* curr);
 char* getStateName(proc_state_t state);

@@ -29,12 +29,12 @@ PRIVATE struct syscall_ctx syscall_ctx;
  */
 void resume_syscall(struct proc *to){
 	if(syscall_ctx.who->proc_nr == to->proc_nr &&
-		 				to->s_flags & RECEIVING &&
-		  				syscall_ctx.interruptted){
+		to->s_flags & RECEIVING && syscall_ctx.interruptted){
+
+		(&syscall_ctx)->m.i1 = EINTR;
 		winix_send(to->proc_nr,&syscall_ctx.m);
 	}
-	syscall_ctx.interruptted = 0;
-	// setcontext(&syscall_ctx);
+	syscall_ctx.interruptted = false;
 }
 
 /**
@@ -44,16 +44,12 @@ void resume_syscall(struct proc *to){
  */
 void intr_syscall(){
 	struct syscall_ctx *ctx = &syscall_ctx;
-	//if the system is executing a system call, save the system call context
-	//and interrupt the System as if it has finished executing the current syscall
-	if(!get_proc(SYSTEM_TASK)->s_flags){
-		// kprintf("interrupt syscall %d\n",who->proc_nr);
+	if(who_proc_nr){
 		ctx->m = m;
-		ctx->m.i1 = EINTR;
 		ctx->who = who;
-		ctx->interruptted = 1;
+		ctx->interruptted = true;
+		setcontext(&recv_ctx);
 	}
-	setcontext(&recv_ctx);
 }
 
 /**
@@ -98,9 +94,6 @@ void system_main() {
 		who_proc_nr = m.src;
 		who = get_proc(who_proc_nr);
 
-		//assuming this is monolithic kernel, and all system calls are from user space
-		//If you plan to change it to micro kernel in the future, you may want to remove
-		//this 
 		ASSERT(who != NULL && IS_USER_PROC(who)); 
 
 		//Do the work
@@ -133,6 +126,10 @@ void system_main() {
 		//if this assertion failed, that means null pointer is deferenced
 		//during the syscall
 		ASSERT(null_val == *(unsigned int*)NULL);
+
+		//reset messages
+		memset(&m, 0, sizeof(struct message));
+		who_proc_nr = 0;
 	}
 }
 

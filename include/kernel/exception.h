@@ -26,6 +26,6 @@ int* get_exception_stack_top();
 int* get_exception_stack_bottom();
 
 #define in_interrupt()  (irq_count())
-#define EXCEPTION_STACK_SIZE    300
+#define EXCEPTION_STACK_SIZE    600
 
 #endif
