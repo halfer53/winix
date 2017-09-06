@@ -113,5 +113,5 @@ unsigned int init_code[] = {
 
 };
 #define init_pc	0x00000000
-int init_code_length =  109;
+#define init_code_length	109
 #endif

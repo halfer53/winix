@@ -80,7 +80,7 @@ int main(int argc, char const *argv[]) {
 		}
 	}
 
-	printf("int %s_code_length =  %d;\n",filename, wordslength);
+	printf("#define %s_code_length\t%d\n",filename, wordslength);
 	printf("#endif\n");
 	free(filename);
 	free(upperfilename);
