@@ -11,27 +11,53 @@ L_TAIL = winix/limits/limits_tail.o
 KERNEL_O = winix/*.o kernel/system/*.o kernel/*.o
 KMAIN = kernel/main.s kernel/main.o 
 
+ifeq ("$(origin V)", "command line")
+  	KBUILD_VERBOSE = $(V)
+endif
+ifndef KBUILD_VERBOSE
+  	KBUILD_VERBOSE = 0
+endif
+
+ifeq ($(KBUILD_VERBOSE),1)
+  	quiet =
+  	Q =
+else
+	MAKEFLAGS += --no-print-directory
+  	quiet=quiet_
+  	Q = @
+endif
+
+export KBUILD_VERBOSE
+export Q
+export quiet
+
 all:
-	$(MAKE) -C tools
-	$(MAKE) -C lib
-	$(MAKE) -C user
-	$(MAKE) shell
-	$(MAKE) -C winix
-	$(MAKE) -C kernel
-	@wlink $(LDFLAGS) -o winix.srec $(L_HEAD) $(KERNEL_O) $(KLIB_O) $(L_TAIL)
+	$(Q)$(MAKE) -C tools
+	$(Q)$(MAKE) -C lib
+	$(Q)$(MAKE) -C user
+	$(Q)$(MAKE) shell
+	$(Q)$(MAKE) -C winix
+	$(Q)$(MAKE) -C kernel
+	$(Q)wlink $(LDFLAGS) -o winix.srec $(L_HEAD) $(KERNEL_O) $(KLIB_O) $(L_TAIL)
+ifeq ($(KBUILD_VERBOSE),0)
 	@echo "LD \t winix.srec"
+endif
 
 release: 
 	$(MAKE) clean
-	$(MAKE) all CFLAGS=
+	$(MAKE) all CFLAGS=$(RELEASE_FLAGS)
 
 clean:
-	$(MAKE) -C kernel clean
-	$(MAKE) -C lib clean
-	$(MAKE) -C winix clean
-	$(MAKE) -C user clean
-	@-rm -f winix.srec
+	$(Q)$(MAKE) -C kernel clean
+	$(Q)$(MAKE) -C lib clean
+	$(Q)$(MAKE) -C winix clean
+	$(Q)$(MAKE) -C user clean
+	$(Q)-rm -f shell.srec
+	$(Q)-rm -f winix.srec
+ifeq ($(KBUILD_VERBOSE),0)
+	@echo "RM \t shell.srec"
 	@echo "RM \t winix.srec"
+endif
 
 stat:
 	@echo "C Lines: "

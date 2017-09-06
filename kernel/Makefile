@@ -8,25 +8,31 @@ SOURCES = $(PROGS:=.c)
 ASSEMBLY = $(PROGS:=.s)
 OBJECT = $(PROGS:=.o)
 
-wramp:$(OBJECT) $(INCLUDES) $(LIMITS)
-	$(MAKE) -C system
+kernel:$(OBJECT) $(INCLUDES) $(LIMITS)
+	$(Q)$(MAKE) -C system
 
 $(ASSEMBLY): %.s: %.c $(INCLUDES)
-	@wcc $(CFLAGS) -S -N -I$(INCLUDE_DIR) -o $@ $<
+	$(Q)wcc $(CFLAGS) -S -N -I$(INCLUDE_DIR) -o $@ $<
+ifeq ($(KBUILD_VERBOSE),0)
 	@echo "CC \t $<"
+endif
 
 $(OBJECT): %.o: %.s
-	@wasm $< -o $@
+	$(Q)wasm $< -o $@
+ifeq ($(KBUILD_VERBOSE),0)
 	@echo "AS \t $<"
+endif
 
 depend:
 	$(MAKE) -C system depend
 	makedepend -I$(INCLUDE_DIR) $(SOURCES)
 
 clean:
-	$(MAKE) -C system clean
-	@-rm -f $(OBJECT) $(ASSEMBLY) $(LIMITS)
+	$(Q)$(MAKE) -C system clean
+	$(Q)-rm -f $(OBJECT) $(ASSEMBLY) $(LIMITS)
+ifeq ($(KBUILD_VERBOSE),0)
 	@echo "RM \t KERNEL"
+endif
 
 .DELETE_ON_ERROR:# DO NOT DELETE
 

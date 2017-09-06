@@ -10,25 +10,31 @@ OBJECT = $(PROGS:=.o)
 
 .PHONY : all
 
-all: wramp
+shell: user
 	@wlink -o shell.srec shell.o shell_test.o shell_parse.o $(LIBS_O)
 	@echo "LD \t SHELL"
 
-wramp: $(OBJECT)
+user: $(OBJECT)
 $(ASSEMBLY): %.s: %.c $(INCLUDES)
-	@wcc $(CFLAGS) -S -N -I$(INCLUDE_DIR) -o $@ $<
+	$(Q)wcc $(CFLAGS) -S -N -I$(INCLUDE_DIR) -o $@ $<
+ifeq ($(KBUILD_VERBOSE),0)
 	@echo "CC \t $<"
+endif
 	
 $(OBJECT): %.o: %.s
-	@wasm $< -o $@
+	$(Q)wasm $< -o $@
+ifeq ($(KBUILD_VERBOSE),0)
 	@echo "AS \t $<"
+endif
 
 depend:
 	makedepend -I$(INCLUDE_DIR) $(SOURCES)
 
 clean:
-	@-rm -f $(OBJECT) $(ASSEMBLY)
+	$(Q)-rm -f $(OBJECT) $(ASSEMBLY)
+ifeq ($(KBUILD_VERBOSE),0)
 	@echo "RM \t USER"
+endif
 
 .DELETE_ON_ERROR:
 # DO NOT DELETE

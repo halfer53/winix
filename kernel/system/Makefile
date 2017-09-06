@@ -13,21 +13,27 @@ OBJECT = $(PROGS:=.o)
 
 MAKEDEPEND = gcc -M $(CPPFLAGS) -o $*.Td $<
 
-wramp: $(OBJECT)
+system: $(OBJECT)
 $(ASSEMBLY): %.s: %.c $(INCLUDES)
-	@wcc $(CFLAGS) -S -N -I$(INCLUDE_DIR) -o $@ $<
+	$(Q)wcc $(CFLAGS) -S -N -I$(INCLUDE_DIR) -o $@ $<
+ifeq ($(KBUILD_VERBOSE),0)
 	@echo "CC \t $<"
+endif
 
 $(OBJECT): %.o: %.s
-	@wasm $< -o $@
+	$(Q)wasm $< -o $@
+ifeq ($(KBUILD_VERBOSE),0)
 	@echo "AS \t $<"
+endif
 
 depend:
 	makedepend -I$(INCLUDE_DIR) $(SOURCES)
 
 clean:
-	@-rm -f $(ASSEMBLY) $(OBJECT)
-	@echo "RM \t KERNEL/SYSTEM"
+	$(Q)-rm -f $(OBJECT) $(ASSEMBLY)
+ifeq ($(KBUILD_VERBOSE),0)
+	@echo "RM \t WINIX"
+endif
 
 .DELETE_ON_ERROR:# DO NOT DELETE
 

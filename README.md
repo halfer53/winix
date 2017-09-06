@@ -58,6 +58,18 @@ Click ```Quick Load```, select ```winix.srec```
 
 [Demo](https://github.com/halfer53/Winix2/blob/master/Documentations/demo.md)
 
+## Debug tips
+
+### Debug Makefile
+
+Similar to linux kbuild, **Winix** supports verbose option, you can debug Makefile by setting verbose to 1
+
+```make V=1```
+
+### Debug Kernel
+
+
+
 ## Run File System
 
 Currently the file system is not integrated into the OS yet, but you can still test it as a standalone process
