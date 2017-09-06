@@ -17,8 +17,11 @@ void makecontext(ucontext_t *ucp, void (* func)(), int argc, ...){
 	unsigned int *sp;
 
 	if(ucp == NULL || ucp->uc_stack.ss_sp == NULL 
-			|| ucp->uc_stack.ss_size < MINSIGSTKSZ)
-		return;
+			|| ucp->uc_stack.ss_size < MINSIGSTKSZ){
+				printf("no\n");
+				return;
+			}
+		
 
 	ucp->uc_mcontext.pc = (void (*)())&_ctx_start;
 	ucp->uc_mcontext.regs[7] = (unsigned int)&_ctx_end; //reg 8

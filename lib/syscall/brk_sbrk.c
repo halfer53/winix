@@ -19,7 +19,7 @@ void *sbrk(int incr){
 	char *newsize, *oldsize;
 
 	if(_brk == NULL){
-		brk(NULL); //initialise _brk
+		brk((void *)0xffffffff); //initialise _brk
 	}
 
 	oldsize = _brk;

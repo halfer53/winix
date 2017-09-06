@@ -13,7 +13,7 @@
 */
 #include <kernel/kernel.h>
 
-unsigned int mask[BITMASK_NR];
+PRIVATE unsigned int mask[BITMASK_NR];
 
 void init_bitmap(){
 	register int i;

@@ -16,10 +16,13 @@
 
 int get_debug_ipc_count();
 int get_debug_sched_count();
+int is_debugging_syscall();
 void debug_scheduling(int val);
-void debug_ipc();
+void debug_ipc(int val);
+void debug_syscall();
 void stop_debug_scheduling();
 void stop_debug_ipc();
+void stop_debug_syscall();
 
 #ifdef _DEBUG
     #define KDEBUG(token)   kinfo token

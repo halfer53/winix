@@ -15,6 +15,7 @@
 
 PRIVATE int _debug_sched = 0;
 PRIVATE int _debug_ipc = 0;
+PRIVATE int _debug_syscall = 0;
 
 /**
  * Testing functions for debugging purpoess
@@ -37,16 +38,20 @@ int get_debug_ipc_count(){
     return 0;
 }
 
+int is_debugging_syscall(){
+    return _debug_syscall;
+}
+
 void debug_scheduling(int val){
     _debug_sched = val;
 }
 
-void debug_ipc(){
-    _debug_ipc = INT_MAX;
+void debug_ipc(int val){
+    _debug_ipc = val;
 }
 
 void debug_syscall(){
-    _debug_ipc = INT_MAX;
+    _debug_syscall = true;
 }
 
 void stop_debug_scheduling(){
@@ -55,6 +60,10 @@ void stop_debug_scheduling(){
 
 void stop_debug_ipc(){
     _debug_ipc = 0;
+}
+
+void stop_debug_syscall(){
+    _debug_syscall = 0;
 }
 
 

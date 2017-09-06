@@ -68,7 +68,13 @@ Similar to linux kbuild, **Winix** supports verbose option, you can debug Makefi
 
 ### Debug Kernel
 
+```kprintf()``` is your friend. 
 
+```debug_syscall();```: Print all the system call from user space.
+
+```debug_ipc(int val);```: Print IPC messages in the system, you can set the limit on the number of maximum ipc messages to be displayed. e.g. if val is set to 10, then only the next 10 ipc messages will be printed out.
+
+```debug_scheduling(int val)```: Print the process that the scheduling algorithms choose during each clock interrupt. val indicates the number of maximum messages to be printed.
 
 ## Run File System
 

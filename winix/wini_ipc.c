@@ -31,12 +31,11 @@ int wini_send(int dest, struct message *m) {
 	//Is the destination valid?
 	if (pDest = get_running_proc(dest)) {
 
-		if(get_debug_ipc_count()){
-			if(dest == SYSTEM_TASK){
+		if(is_debugging_syscall()){
+			if(dest == SYSTEM_TASK)
 				kprintf("\nSyscall %d from %d|", m->type, m->src);
-			}else if(current_proc->proc_nr != SYSTEM_TASK){
-				kprintf("\nSEND %d flags %d from %d t %d| ",dest, pDest->s_flags, current_proc->proc_nr,m->type);
-			}
+		}else if(get_debug_ipc_count()){
+			kprintf("\nIPC: SEND to %d from %d type %d| ",dest, current_proc->proc_nr,m->type);
 		}
 		
 		if (pDest->s_flags & RECEIVING) {
@@ -72,13 +71,12 @@ int wini_receive(struct message *m) {
 	//If a process is waiting to send to this process, deliver it immediately.
 	if (p != NULL) {
 
-		if(get_debug_ipc_count()){
+		if(is_debugging_syscall()){
 			if(current_proc->proc_nr == SYSTEM_TASK)
 				kprintf("\nSyscall %d from %d|", m->type, m->src);
-			else
-				kprintf("\nREC from %d t %d| ",p->proc_nr ,m->type);
+		}else if(get_debug_ipc_count()){
+			kprintf("\nIPC; REC from %d t %d| ",p->proc_nr ,m->type);
 		}
-			
 		
 		//Dequeue head node
 		current_proc->sender_q = p->next_sender;
@@ -115,7 +113,7 @@ int wini_notify(int dest, struct message *m) {
 	if (pDest = get_running_proc(dest)) {
 
 		if(get_debug_ipc_count())
-				kprintf("\nNOTIFY %d flags %d from %d t %d| ",dest, pDest->s_flags, current_proc->proc_nr,m->type);
+				kprintf("\nIPC: NOTIFY to %d from %d t %d| ",dest, current_proc->proc_nr,m->type);
 			
 		//If destination is waiting, deliver message immediately.
 		if (pDest->s_flags & RECEIVING) {
