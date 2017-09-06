@@ -8,6 +8,15 @@
 .text
 
 ##
+#	void* get_pc(struct proc* who)
+##
+.global get_pc_ptr
+get_pc_ptr:
+	lw $1, 0($sp)
+	lw $1, pcb_ear($1)
+	jr $ra
+
+##
 # void wramp_set_handler(void (*handler)(int estat));
 ##
 .global wramp_set_handler

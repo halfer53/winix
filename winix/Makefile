@@ -9,15 +9,18 @@ OBJECT = $(PROGS:=.o) kwramp.o limits/limits_head.o limits/limits_tail.o
 wramp: $(OBJECT)
 
 $(ASSEMBLY): %.s: %.c $(INCLUDES)
-	wcc $(CFLAGS) -S -N -I$(INCLUDE_DIR) -o $@ $<
+	@wcc $(CFLAGS) -S -N -I$(INCLUDE_DIR) -o $@ $<
+	@echo "CC \t $<"
 
 $(OBJECT): %.o: %.s
-	wasm $< -o $@
+	@wasm $< -o $@
+	@echo "AS \t $<"
 
 depend:
 	makedepend -I$(INCLUDE_DIR) $(SOURCES)
 
 clean:
-	-rm -f $(OBJECT) $(ASSEMBLY)
+	@-rm -f $(OBJECT) $(ASSEMBLY)
+	@echo "RM \t WINIX"
 
 .DELETE_ON_ERROR:

@@ -90,23 +90,19 @@ block_t *extend_heap(block_t *last , size_t s)
 	block_t *b, *b2;
 	
 	b = sbrk (0);
-	if (b != (void *)-1)
-	{
-		sb = sbrk(BLOCK_SIZE+s);
+	sb = sbrk(BLOCK_SIZE+s);
 
-		if ((int)sb < 0)
-			return (NULL);
-			
-		b->size = s;
-		b->next = NULL;
-		b->prev = last;
-		b->ptr = b->data;
-		if (last)
-			last->next = b;
-		b->free = 0;
-		return b;
-	}
-	return NULL;
+	if ((int)sb < 0)
+		return (NULL);
+		
+	b->size = s;
+	b->next = NULL;
+	b->prev = last;
+	b->ptr = b->data;
+	if (last)
+		last->next = b;
+	b->free = 0;
+	return b;
 }
 
 void *malloc(size_t size) {

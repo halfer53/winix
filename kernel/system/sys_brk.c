@@ -45,7 +45,6 @@ void* sys_sbrk(struct proc *who, int size){
 
 	if(size == 0)
 		return get_virtual_addr(who->heap_break, who);
-
 	
 	//residual is the remaining unused heap by the user
 	residual = who->heap_bottom - who->heap_break;
@@ -58,7 +57,7 @@ void* sys_sbrk(struct proc *who, int size){
 	next_page = who->heap_bottom + 1;
 	request_size = size - residual; 
 	if(user_get_free_pages_from(who,next_page, request_size ) == ERR)
-		return (void *)-1;
+		return NULL;
 	// kinfo("extending heap size %d oheap %x newheap %x\n", size, who->heap_break, 
 	// 														(who->heap_break + size));
 	
@@ -90,7 +89,7 @@ int do_brk(struct proc *who, struct message *m){
 
 	size = (int)addr - (int)who->heap_break;
 	new_brk = sys_sbrk(who, size);
-	if(new_brk == (void *)-1)
+	if(new_brk == NULL)
 		return ENOMEM;
 	
 	m->p1 = new_brk;

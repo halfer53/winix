@@ -164,6 +164,8 @@ extern struct proc proc_table[NUM_PROCS];
 extern struct proc *ready_q[NUM_QUEUES][2];
 extern struct proc *block_q[2];
 
+void* get_pc_ptr(struct proc* who);
+
 void enqueue_tail(struct proc **q, struct proc *proc);
 void enqueue_head(struct proc **q, struct proc *proc);
 struct proc *dequeue(struct proc **q);

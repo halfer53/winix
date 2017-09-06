@@ -116,6 +116,7 @@ PRIVATE void serial2_handler() {
  **/
 PRIVATE void gpf_handler() {
 	ptr_t* sp;
+	ptr_t* pc;
 	//is the current process a valid one?
 	ASSERT(IS_PROCN_OK(current_proc->proc_nr));
 	
@@ -130,14 +131,19 @@ PRIVATE void gpf_handler() {
 		kinfo("Stack Overflow\n");
 
 #ifdef _DEBUG
-	kinfo("Current Instruction: 0x%08x\n",*get_physical_addr(current_proc->pc,current_proc));
-	kinfo("Physical pc %x, sp %x\n", get_physical_addr(current_proc->pc, current_proc), 
-									get_physical_addr(current_proc->sp, current_proc));
-	kinfo("$1: 0x%08x, $2, 0x%08x, $3, 0x%08x\n",current_proc->regs[0],current_proc->regs[1],current_proc->regs[2]);
-	kinfo("$4: 0x%08x, $5, 0x%08x, $6, 0x%08x\n",current_proc->regs[3],current_proc->regs[4],current_proc->regs[5]);
-	kinfo("$7: 0x%08x, $8, 0x%08x, $9, 0x%08x\n",current_proc->regs[6],current_proc->regs[7],current_proc->regs[8]);
-	kinfo("$10: 0x%08x, $11, 0x%08x, $12, 0x%08x\n",current_proc->regs[9],current_proc->regs[10],current_proc->regs[11]);
-	kinfo("$13: 0x%08x, $sp, 0x%08x, $ra, 0x%08x\n",current_proc->regs[12],current_proc->regs[13],current_proc->regs[14]);
+	pc = get_physical_addr(get_pc_ptr(current_proc),current_proc);
+	kinfo("Current Instruction: 0x%08x\n",*pc);
+	kinfo("Physical pc %x, sp %x\n", pc, get_physical_addr(current_proc->sp, current_proc));
+	kinfo("$1: 0x%08x, $2, 0x%08x, $3, 0x%08x\n",current_proc->regs[0],
+							current_proc->regs[1],current_proc->regs[2]);
+	kinfo("$4: 0x%08x, $5, 0x%08x, $6, 0x%08x\n",current_proc->regs[3],
+							current_proc->regs[4],current_proc->regs[5]);
+	kinfo("$7: 0x%08x, $8, 0x%08x, $9, 0x%08x\n",current_proc->regs[6],
+							current_proc->regs[7],current_proc->regs[8]);
+	kinfo("$10: 0x%08x, $11, 0x%08x, $12, 0x%08x\n",current_proc->regs[9],
+							current_proc->regs[10],current_proc->regs[11]);
+	kinfo("$13: 0x%08x, $sp, 0x%08x, $ra, 0x%08x\n",current_proc->regs[12],
+							current_proc->regs[13],current_proc->regs[14]);
 #endif
 	//Kill process and call scheduler.
 	send_sig(current_proc,SIGSEGV);

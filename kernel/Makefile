@@ -1,6 +1,7 @@
 
 INCLUDE_DIR = ../include
-INCLUDES = $(wildcard $(INCLUDE_DIR)/*.h $(INCLUDE_DIR)/winix/*.h $(INCLUDE_DIR)/sys/*.h $(INCLUDE_DIR)/kernel/*.h)
+INCLUDES = $(wildcard $(INCLUDE_DIR)/*.h $(INCLUDE_DIR)/winix/*.h\
+				 $(INCLUDE_DIR)/sys/*.h $(INCLUDE_DIR)/kernel/*.h)
 
 PROGS = main proc system exception idle clock sched
 SOURCES = $(PROGS:=.c)
@@ -11,10 +12,12 @@ wramp:$(OBJECT) $(INCLUDES) $(LIMITS)
 	$(MAKE) -C system
 
 $(ASSEMBLY): %.s: %.c $(INCLUDES)
-	wcc $(CFLAGS) -S -N -I$(INCLUDE_DIR) -o $@ $<
+	@wcc $(CFLAGS) -S -N -I$(INCLUDE_DIR) -o $@ $<
+	@echo "CC \t $<"
 
 $(OBJECT): %.o: %.s
-	wasm $< -o $@
+	@wasm $< -o $@
+	@echo "AS \t $<"
 
 depend:
 	$(MAKE) -C system depend
@@ -22,7 +25,8 @@ depend:
 
 clean:
 	$(MAKE) -C system clean
-	-rm -f $(OBJECT) $(ASSEMBLY) $(LIMITS)
+	@-rm -f $(OBJECT) $(ASSEMBLY) $(LIMITS)
+	@echo "RM \t KERNEL"
 
 .DELETE_ON_ERROR:# DO NOT DELETE
 

@@ -7,7 +7,7 @@ int brk(void *addr){
 	int ret = 0;
 	if(addr != _brk){
 		m.p1 = addr;
-		ret = _SYSCALL(SYSCALL_BRK,&m);
+		ret = _syscall(SYSCALL_BRK,&m);
 		_brk = m.p1;
 		if(m.i1 != 0)
 			return -1;
@@ -19,16 +19,18 @@ void *sbrk(int incr){
 	char *newsize, *oldsize;
 
 	if(_brk == NULL){
-		brk((void *)-1); //initialise _brk
+		brk(NULL); //initialise _brk
 	}
+
 	oldsize = _brk;
 	newsize = _brk + incr;
 	if ((incr > 0 && newsize < oldsize) || (incr < 0 && newsize > oldsize))
-		return( (void *) -1);
+		goto return_err;
 		
 	if (brk(newsize) == 0)
 		return(oldsize);
-	else
+
+	return_err:
 		return( (void *) -1);
 		
 }

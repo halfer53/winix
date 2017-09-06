@@ -10,8 +10,8 @@
 // #include <sys/direct.h>
 // #include <sys/stat.h>
 #include <sys/wait.h>
+#include <sys/syscall.h>
 
-#include <syscall.h>
 #include <errno.h>
 #include <signal.h>
 #include <stddef.h>

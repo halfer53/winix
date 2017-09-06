@@ -4,8 +4,6 @@ GEN_BIN = gen_bin_code
 export CFLAGS = -D_DEBUG
 RELEASE_FLAGS = 
 
-LIBS_O = $(shell find lib -name "*.o")
-
 KLIB = syscall/ipc ansi/string util/util syscall/wramp_syscall gen/ucontext stdlib/atoi
 KLIB_O = $(addprefix lib/, $(KLIB:=.o))
 L_HEAD = winix/limits/limits_head.o
@@ -15,12 +13,13 @@ KMAIN = kernel/main.s kernel/main.o
 
 all:
 	$(MAKE) -C tools
-	-rm -f winix.srec
 	$(MAKE) -C lib
+	$(MAKE) -C user
 	$(MAKE) shell
 	$(MAKE) -C winix
 	$(MAKE) -C kernel
-	wlink $(LDFLAGS) -o winix.srec $(L_HEAD) $(KERNEL_O) $(KLIB_O) $(L_TAIL)
+	@wlink $(LDFLAGS) -o winix.srec $(L_HEAD) $(KERNEL_O) $(KLIB_O) $(L_TAIL)
+	@echo "LD \t winix.srec"
 
 release: 
 	$(MAKE) clean
@@ -30,29 +29,25 @@ clean:
 	$(MAKE) -C kernel clean
 	$(MAKE) -C lib clean
 	$(MAKE) -C winix clean
-	-rm *.o *.s
-	-rm -f winix.srec
+	$(MAKE) -C user clean
+	@-rm -f winix.srec
+	@echo "RM \t winix.srec"
 
 stat:
 	@echo "C Lines: "
 	@find . -type d -name "include" -prune -o -name "*.c"  -exec cat {} \; | wc -l
 	@echo "Header LoC: "
 	@find . -name "*.h" -exec cat {} \; | wc -l
-	@echo "Assembly LoC: "
+	@echo "AS \tsembly LoC: "
 	@find . -name "*.s" -exec cat {} \; | wc -l
 
 shell:
-	-rm -f $(KMAIN)
-	wcc -S user/shell_parse.c
-	wcc -S user/shell_test.c
-	wcc -S user/shell.c
-	wasm shell.s
-	wasm shell_test.s
-	wasm shell_parse.s
-	wlink -o shell.srec shell.o shell_test.o shell_parse.o $(LIBS_O)
-	java $(REFORMAT) shell.srec
-	./$(GEN_BIN) shell.srec > include/shell_codes.c
-	-rm -f shell.srec shell.s shell.o
+	@rm -f $(KMAIN)
+	@cp user/shell.srec .
+	@java $(REFORMAT) shell.srec
+	@./$(GEN_BIN) shell.srec > include/shell_codes.c
+	@rm -f shell.srec shell.s shell.o
+	@echo "LOAD\t SHELL"
 
 test:
 	gcc -D_GCC_DEBUG -I./include test.c winix/bitmap.c winix/mm.c

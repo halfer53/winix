@@ -86,7 +86,7 @@ void printProceInfo(struct proc* curr) {
 	        curr->proc_nr,
 			curr->parent,
 	        curr->rbase,
-	        get_physical_addr(curr->pc,curr),
+	        get_physical_addr(get_pc_ptr(curr),curr),
 	        get_physical_addr(curr->sp,curr),
 	        curr->heap_break,
 			ptable_idx,

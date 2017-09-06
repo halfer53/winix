@@ -3,3 +3,4 @@
 int abort(){
     return kill(getpid(),SIGABRT);
 }
+

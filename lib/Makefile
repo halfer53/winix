@@ -1,32 +1,27 @@
 INCLUDE_DIR = ../include
 INCLUDES = $(wildcard $(INCLUDE_DIR)/*.h $(INCLUDE_DIR)/sys/*.h)
 
-PROGS = 
-SOURCES = $(PROGS:=.c)
-ASSEMBLY = $(PROGS:=.s)
+MODULES := ansi gen posix stdio stdlib syscall util
+SOURCES = $(foreach sdir, $(MODULES), $(wildcard $(sdir)/*.c))
+ASSEMBLY = $(SOURCES:.c=.s)
+OBJECT = $(SOURCES:.c=.o) syscall/wramp_syscall.o util/debug.o gen/ucontext.o
 
-OBJECT = $(PROGS:=.o) wramp_syscall.o ucontext.o debug.o
 
-wramp: 
-	$(MAKE) -C ansi
-	$(MAKE) -C gen
-	$(MAKE) -C posix
-	$(MAKE) -C stdio
-	$(MAKE) -C stdlib
-	$(MAKE) -C syscall
-	$(MAKE) -C util
+
+wramp: $(OBJECT)
+$(ASSEMBLY): %.s: %.c $(INCLUDES)
+	@wcc $(CFLAGS) -S -N -I$(INCLUDE_DIR) -o $@ $<
+	@echo "CC \t $<"
+	
+$(OBJECT): %.o: %.s
+	@wasm $< -o $@
+	@echo "AS \t $<"
 
 depend:
 	makedepend -I$(INCLUDE_DIR) $(SOURCES)
 
 clean:
-	$(MAKE) -C ansi clean
-	$(MAKE) -C gen clean
-	$(MAKE) -C posix clean
-	$(MAKE) -C stdio clean
-	$(MAKE) -C stdlib clean
-	$(MAKE) -C syscall clean
-	$(MAKE) -C util clean
-	-rm -f $(OBJECT) $(ASSEMBLY)
+	@-rm -f $(OBJECT) $(ASSEMBLY)
+	@echo "RM \t LIB"
 
 .DELETE_ON_ERROR:

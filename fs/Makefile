@@ -5,13 +5,16 @@ assemble = lru.o
 all: $(assemble)
 
 $(compile): %.s: %.c
-	wcc -S -N -I../../include -o $@ $<
+	@wcc -S -N -I../../include -o $@ $<
+	@echo "CC \t $<"
 
 $(debug): %.s: %.c
-	wcc -b -S -N -I../../include -o $@ $<
+	@wcc -b -S -N -I../../include -o $@ $<
+	@echo "CC \t $<"
 
 $(assemble): %.o: %.s
-	wasm $< -o $@
+	@wasm $< -o $@
+	@echo "AS \t $<"
 
 $(link): $(assemble)
 	wlink -o $(link) $(assemble)

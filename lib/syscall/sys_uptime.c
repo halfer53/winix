@@ -6,5 +6,5 @@
  **/
  int sys_uptime() {
 	struct message m;
-	return _SYSCALL(SYSCALL_UPTIME,&m);
+	return _syscall(SYSCALL_UPTIME,&m);
 }
