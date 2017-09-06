@@ -18,9 +18,8 @@ void rebalance_queues(int proc_nr, clock_t time){
 	int i;
 	for(i = 0; i < NUM_PROCS; i++){
 		curr = &proc_table[i];
-			if(! IS_IDLE(curr)){
-				curr->priority = MAX_PRIORITY;
-			}
+		if(! IS_IDLE(curr)){
+			curr->priority = MAX_PRIORITY;
 		}
 	}
 	new_timer(REBALANCE_TIMEOUT, rebalance_queues);

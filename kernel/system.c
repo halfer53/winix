@@ -93,7 +93,6 @@ void system_main() {
 		winix_receive(&m);
 		who_proc_nr = m.src;
 		who = get_proc(who_proc_nr);
-
 		ASSERT(who != NULL && IS_USER_PROC(who)); 
 
 		//Do the work

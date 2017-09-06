@@ -324,8 +324,8 @@ reg_t* alloc_kstack(struct proc *who){
 /**
  * set corressponding fields of struct pro
  */
-int set_proc(struct proc *p, void (*entry)(), int priority, const char *name) {
-	p->priority = priority;
+int set_proc(struct proc *p, void (*entry)(), int quantum, const char *name) {
+	p->quantum = quantum;
 	p->pc = entry;
 
 	//NB: this may result in buffer overflow
@@ -349,20 +349,16 @@ int set_proc(struct proc *p, void (*entry)(), int priority, const char *name) {
  * Side Effects:
  *   A proc is removed from the free_proc list, reinitialised, and added to ready_q.
  */
-struct proc *start_kernel_proc(void (*entry)(), int priority, const char *name) {
+struct proc *start_kernel_proc(void (*entry)(), const char *name, int quantum) {
 	struct proc *p;
-
-	if (!IS_PRIORITY_OK(priority)) 
-		return NULL;
 	
 	if (!(p = get_free_proc_slot()))
 		return NULL;
 	
-	set_proc(p, entry, priority, name);
+	set_proc(p, entry, quantum, name);
 	bitmap_fill(p->ptable, PTABLE_LEN);
 	p->sp = alloc_kstack(p);
 	enqueue_schedule(p);
-	p->quantum = DEFAULT_KERNEL_QUANTUM;
 	return p;
 }
 
@@ -375,13 +371,13 @@ struct proc *start_kernel_proc(void (*entry)(), int priority, const char *name) 
  * @param  name     
  * @return          
  */
-struct proc *start_user_proc(size_t *lines, size_t length, size_t entry, int priority, const char *name){
+struct proc *start_user_proc(size_t *lines, size_t length, size_t entry, int quantum, const char *name){
 	struct proc *p;
 	if(!(p = get_free_proc_slot()))
 		return NULL;
 
 	
-	if(exec_proc(p,lines,length,entry,priority,name) == ERR)
+	if(exec_proc(p,lines,length,entry,quantum,name) == ERR)
 		return NULL;
 
 	return p;

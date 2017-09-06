@@ -53,6 +53,9 @@
 
 #include <winix/syscall_ctx.h>
 #include <winix/rex.h>
+#include <winix/exec.h>
+#include <winix/slab.h>
+#include <winix/signal.h>
 
 #define FREE_MEM_END    0x1ffff
 

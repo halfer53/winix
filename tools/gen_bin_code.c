@@ -4,21 +4,31 @@
 int winix_load_srec_words_length(char *line);
 int winix_load_srec_mem_val(char *line, size_t *memory_values, int start_index, int memvalLength);
 
-char *filename = NULL;
 
-char *remove_extension(const char* mystr) {
-    char *retstr;
+#define IS_LOWER_CHAR(c)		(c >= 'a' && c <= 'z')
+#define TO_UPPER_CHAR(c)	(c - 32)
+
+char *filename;
+
+int remove_extension(char* retstr, const char* mystr) {
     char *lastdot;
     if (mystr == NULL)
-         return NULL;
-    if ((retstr = malloc (strlen (mystr) + 1)) == NULL)
-        return NULL;
+         return -1;
     strcpy (retstr, mystr);
     lastdot = strrchr (retstr, '.');
     if (lastdot != NULL)
         *lastdot = '\0';
-    return retstr;
+    return 0;
 }
+
+int toUpperCase(char *to, const char* src){
+	while(*src){
+		*to++ = IS_LOWER_CHAR(*src) ? TO_UPPER_CHAR(*src) : *src;
+		src++;
+	}
+	return 0;
+}
+
 
 int main(int argc, char const *argv[]) {
 	int i = 0;
@@ -36,13 +46,18 @@ int main(int argc, char const *argv[]) {
 	char * line = NULL;
 	size_t len = 0;
 	ssize_t read;
-	
+	char *upperfilename = malloc(strlen(argv[1]) + 1);
 
-	filename = remove_extension(argv[1]);
+	filename = malloc(strlen(argv[1]) + 1);
+	remove_extension(filename, argv[1]);
+	toUpperCase(upperfilename, filename);
+
 	fp = fopen(argv[1], "r");
 	if (fp == NULL)
 		exit(EXIT_FAILURE);
-	printf("size_t %s_code[] = {\n",filename );
+	printf("#ifndef _%s_H_\n",upperfilename);
+	printf("#define _%s_H_\n",upperfilename);
+	printf("unsigned int %s_code[] = {\n",filename );
 	if ((read = getline(&line, &len, fp)) != -1) {
 		if (wordslength = winix_load_srec_words_length(line)) {
 			if (memory_values = (size_t *)malloc(wordslength * sizeof(size_t))) {
@@ -66,7 +81,9 @@ int main(int argc, char const *argv[]) {
 	}
 
 	printf("int %s_code_length =  %d;\n",filename, wordslength);
-
+	printf("#endif\n");
+	free(filename);
+	free(upperfilename);
 	return 0;
 
 }
@@ -74,6 +91,7 @@ void assert(int expression, const char *message) {
 	if (!expression) {
 		printf("\r\nAssertion Failed ");
 		printf("%s\r\n", message );
+		abort();
 	}
 }
 int hex2int(char *a, int len)
@@ -333,7 +351,7 @@ int winix_load_srec_mem_val(char *line, size_t *memory_values, int start_index, 
 
 
 	case 7: //entry point for the program.
-		printf("\n};\nint %s_pc =  0x%08x;\n", filename,(unsigned int)address);
+		printf("\n};\n#define %s_pc\t0x%08x\n", filename,(unsigned int)address);
 		break;
 	}
 

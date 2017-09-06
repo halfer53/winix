@@ -36,6 +36,7 @@ all:
 	$(Q)$(MAKE) -C lib
 	$(Q)$(MAKE) -C user
 	$(Q)$(MAKE) -C winix
+	$(Q)$(MAKE) init
 	$(Q)$(MAKE) shell
 	$(Q)$(MAKE) -C kernel
 	$(Q)wlink $(LDFLAGS) -o winix.srec $(L_HEAD) $(KERNEL_O) $(KLIB_O) $(L_TAIL)
@@ -67,13 +68,22 @@ stat:
 	@echo "AS \tsembly LoC: "
 	@find . -name "*.s" -exec cat {} \; | wc -l
 
-shell:
-	@rm -f $(KMAIN)
-	@cp user/shell.srec .
-	@java $(REFORMAT) shell.srec
-	@./$(GEN_BIN) shell.srec > include/shell_codes.c
-	@rm -f shell.srec shell.s shell.o
-	@echo "LOAD\t SHELL"
+shell: user/shell.srec
+	$(Q)-rm -f $(KMAIN)
+	$(Q)cp user/shell.srec .
+	$(Q)java $(REFORMAT) shell.srec
+	$(Q)./$(GEN_BIN) shell.srec > include/shell_codes.c
+	$(Q)rm -f shell.srec
+	$(Q)echo "BIN\t SHELL"
+
+init: init/init.srec
+	$(Q)$(MAKE) -C init
+	$(Q)-rm -f $(KMAIN)
+	$(Q)cp init/init.srec .
+	$(Q)java $(REFORMAT) init.srec
+	$(Q)./$(GEN_BIN) init.srec > include/init_codes.c
+	$(Q)rm -f init.srec
+	$(Q)echo "BIN\t INIT"
 
 test:
 	gcc -D_GCC_DEBUG -I./include test.c winix/bitmap.c winix/mm.c

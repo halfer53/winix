@@ -24,12 +24,12 @@ int do_exec(struct proc *who, struct message *m){
 * malloc a new memory and write the values of lines into that address
 * the process is updated
 **/
-int exec_proc(struct proc *p,size_t *lines, size_t length, size_t entry, int priority, const char *name){
+int exec_proc(struct proc *p,size_t *lines, size_t length, size_t entry, int quantum, const char *name){
 	ptr_t* ptr_base = NULL;
 	size_t length_bak, stack_heap_len;
 	int page,page_len;
 
-	set_proc(p, (void (*)())entry, priority, name);
+	set_proc(p, (void (*)())entry, quantum, name);
 	if(alloc_proc_mem(p, length, USER_STACK_SIZE , USER_HEAP_SIZE, 
 					     PROC_SET_SP | PROC_SET_HEAP) != OK){
 		return ERR;
@@ -38,7 +38,6 @@ int exec_proc(struct proc *p,size_t *lines, size_t length, size_t entry, int pri
 	memcpy(p->rbase, lines , length);
 
 	p->length = length;
-	p->quantum = DEFAULT_USER_QUANTUM;
 	enqueue_schedule(p);
 	return OK;
 }

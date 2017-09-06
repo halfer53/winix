@@ -30,13 +30,6 @@ int wini_send(int dest, struct message *m) {
 	
 	//Is the destination valid?
 	if (pDest = get_running_proc(dest)) {
-
-		if(is_debugging_syscall()){
-			if(dest == SYSTEM_TASK)
-				kprintf("\nSyscall %d from %d|", m->type, m->src);
-		}else if(get_debug_ipc_count()){
-			kprintf("\nIPC: SEND to %d from %d type %d| ",dest, current_proc->proc_nr,m->type);
-		}
 		
 		if (pDest->s_flags & RECEIVING) {
 			*(pDest->message) = *m;
@@ -50,6 +43,14 @@ int wini_send(int dest, struct message *m) {
 			current_proc->s_flags |= SENDING;
 			current_proc->next_sender = pDest->sender_q;
 			pDest->sender_q = current_proc;
+		}
+
+		if(is_debugging_syscall()){
+			if(dest == SYSTEM_TASK)
+				kprintf("\nSyscall %d from %d|", m->type, m->src);
+		}else if(get_debug_ipc_count()){
+			kprintf("\nIPC: SEND to %d from %d type %d rflags %d s %d| ",dest, current_proc->proc_nr,m->type,
+			pDest->s_flags, current_proc->s_flags);
 		}
 
 		return OK;
@@ -70,14 +71,6 @@ int wini_receive(struct message *m) {
 
 	//If a process is waiting to send to this process, deliver it immediately.
 	if (p != NULL) {
-
-		if(is_debugging_syscall()){
-			if(current_proc->proc_nr == SYSTEM_TASK)
-				kprintf("\nSyscall %d from %d|", m->type, m->src);
-		}else if(get_debug_ipc_count()){
-			kprintf("\nIPC; REC from %d t %d| ",p->proc_nr ,m->type);
-		}
-		
 		//Dequeue head node
 		current_proc->sender_q = p->next_sender;
 
@@ -86,7 +79,15 @@ int wini_receive(struct message *m) {
 
 		//Unblock sender
 		p->s_flags &= ~SENDING;
-		enqueue_head(ready_q[p->priority], p);
+		if(! p->s_flags)
+			enqueue_head(ready_q[p->priority], p);
+			
+		if(is_debugging_syscall()){
+			if(current_proc->proc_nr == SYSTEM_TASK)
+				kprintf("\nSyscall %d from %d|", m->type, m->src);
+		}else if(get_debug_ipc_count()){
+			kprintf("\nIPC; %d REC from %d type %d| ",current_proc->proc_nr, m->src ,m->type);
+		}
 	}
 	else {
 		current_proc->message = m;

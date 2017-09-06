@@ -20,6 +20,7 @@
 
 //Kernel Process
 #define IDLE					-1
+#define INIT					1
 
 //Process & Scheduling
 #define PROC_NAME_LEN			20
@@ -180,8 +181,8 @@ struct proc *dequeue(struct proc **q);
 void init_proc();
 void proc_set_default(struct proc *p);
 reg_t* alloc_stack(struct proc *who);
-int set_proc(struct proc *p, void (*entry)(), int priority, const char *name);
-struct proc *start_kernel_proc(void (*entry)(), int priority, const char *name);
+int set_proc(struct proc *p, void (*entry)(), int quantum, const char *name);
+struct proc *start_kernel_proc(void (*entry)(), const char *name,int quantum);
 struct proc *start_user_proc(size_t *lines, size_t length, size_t entry, int priority, const char *name);
 struct proc *get_free_proc_slot();
 int alloc_proc_mem(struct proc *who, int tdb_length, int stack_size, int heap_size, int flags);

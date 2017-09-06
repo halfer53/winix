@@ -38,7 +38,7 @@
 //Process Flags
 #define SENDING					0x0001
 #define RECEIVING				0x0002
-#define REJECT				0x0003
+#define REJECT					0x0003
 
 /**
  * State of a process.
