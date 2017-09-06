@@ -36,9 +36,11 @@ Click ```Quick Load```, select ```winix.srec```
 
 ```kill [ -n signum ] pid```: send specified signum to specified process. If signum is not provided, SIGKIL is sent
 
+```?```: show the list of commands available
+
 ### Testing commands
 
-```thread [ num ]```: Spawn the number of user threads specified by the parameter num, or 2 by default
+```test thread [ num ]```: Spawn the number of user threads specified by the parameter num, or 2 by default
 
 ```test malloc```: test malloc function
 
@@ -48,9 +50,9 @@ Click ```Quick Load```, select ```winix.srec```
 
 ```test float```: test floating point exception
 
-```alarm [ seconds ]```: set the alarm in number of seconds, or 1 by default
+```test alarm [ seconds ]```: set the alarm in number of seconds, or 1 by default
 
-```signal [ seconds ]```: set an alarm after specified seconds. Any system calls that are currently executing are interrupted (kgetc()) 
+```test signal [ seconds ]```: set an alarm after specified seconds. Any system calls that are currently executing are interrupted (kgetc()) 
 
 ## Demo
 
