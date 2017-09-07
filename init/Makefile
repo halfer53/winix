@@ -10,32 +10,32 @@ LIBS = syscall/syscall.o syscall/wramp_syscall.o syscall/ipc.o stdlib/errno.o
 LIBS_O = $(addprefix ../lib/, $(LIBS))
 
 init: wramp
-    $(Q)wlink -o init.srec init.o $(LIBS_O)
+	$(Q)wlink -o init.srec init.o $(LIBS_O)
 ifeq ($(KBUILD_VERBOSE),0)
-    @echo "LD \t INIT"
+	@echo "LD \t INIT"
 endif
 
 wramp: $(OBJECT)
 
 $(ASSEMBLY): %.s: %.c $(INCLUDES)
-    $(Q)wcc $(CFLAGS) -S -N -I$(INCLUDE_DIR) -o $@ $<
+	$(Q)wcc $(CFLAGS) -S -N -I$(INCLUDE_DIR) -o $@ $<
 ifeq ($(KBUILD_VERBOSE),0)
-    @echo "CC \t $<"
+	@echo "CC \t $<"
 endif
 
 $(OBJECT): %.o: %.s
-    $(Q)wasm $< -o $@
+	$(Q)wasm $< -o $@
 ifeq ($(KBUILD_VERBOSE),0)
-    @echo "AS \t $<"
+	@echo "AS \t $<"
 endif
 
 depend:
-    makedepend -I$(INCLUDE_DIR) $(SOURCES)
+	makedepend -I$(INCLUDE_DIR) $(SOURCES)
 
 clean:
-    $(Q)-rm -f $(OBJECT) $(ASSEMBLY)
+	$(Q)-rm -f $(OBJECT) $(ASSEMBLY)
 ifeq ($(KBUILD_VERBOSE),0)
-    @echo "RM \t INIT"
+	@echo "RM \t INIT"
 endif
 
 .DELETE_ON_ERROR:

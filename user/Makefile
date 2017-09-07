@@ -9,31 +9,31 @@ ASSEMBLY = $(PROGS:=.s)
 OBJECT = $(PROGS:=.o)
 
 shell: user
-    $(Q)wlink -o shell.srec shell.o shell_test.o shell_parse.o $(LIBS_O)
+	$(Q)wlink -o shell.srec shell.o shell_test.o shell_parse.o $(LIBS_O)
 ifeq ($(KBUILD_VERBOSE),0)
-    @echo "LD \t SHELL"
+	@echo "LD \t SHELL"
 endif
 
 user: $(OBJECT)
 $(ASSEMBLY): %.s: %.c $(INCLUDES)
-    $(Q)wcc $(CFLAGS) -S -N -I$(INCLUDE_DIR) -o $@ $<
+	$(Q)wcc $(CFLAGS) -S -N -I$(INCLUDE_DIR) -o $@ $<
 ifeq ($(KBUILD_VERBOSE),0)
-    @echo "CC \t $<"
+	@echo "CC \t $<"
 endif
-    
+	
 $(OBJECT): %.o: %.s
-    $(Q)wasm $< -o $@
+	$(Q)wasm $< -o $@
 ifeq ($(KBUILD_VERBOSE),0)
-    @echo "AS \t $<"
+	@echo "AS \t $<"
 endif
 
 depend:
-    makedepend -I$(INCLUDE_DIR) $(SOURCES)
+	makedepend -I$(INCLUDE_DIR) $(SOURCES)
 
 clean:
-    $(Q)-rm -f $(OBJECT) $(ASSEMBLY)
+	$(Q)-rm -f $(OBJECT) $(ASSEMBLY)
 ifeq ($(KBUILD_VERBOSE),0)
-    @echo "RM \t USER"
+	@echo "RM \t USER"
 endif
 
 .DELETE_ON_ERROR:
