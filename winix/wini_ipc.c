@@ -165,5 +165,5 @@ int interrupt_send(int dest, struct message* pm){
     em->src = current_proc->proc_nr;
 
     current_proc->s_flags |= RECEIVING;
-    return wini_send(SYSTEM_TASK, em);
+    return wini_send(dest, em);
 }

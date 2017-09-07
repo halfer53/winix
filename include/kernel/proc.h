@@ -129,8 +129,8 @@ typedef struct proc {
 
     /* Accounting */
     clock_t time_used;            	//CPU time used
-    clock_t sys_time_used;        	//system time used while system is executing on behalf of this
-                                	//proc
+    clock_t sys_time_used;        	//system time used while the system is executing on behalf 
+                                	//of this proc
 
     /* Metadata */
     char name[PROC_NAME_LEN];    	//Process name
@@ -154,25 +154,25 @@ typedef struct proc {
 } proc_t;
 
 /**
- * Pointer to the current process.
- **/
- extern struct proc *current_proc;
-
-#define IS_PROCN_OK(i)                ((i)>= 0 && (i) < NUM_PROCS)
-#define IS_PRIORITY_OK(priority)    (0 <= (priority) && (priority) < NUM_QUEUES)
-#define IS_KERNEL_PROC(p)            ((p)->rbase == NULL)
-#define IS_USER_PROC(p)                ((p)->rbase != NULL)
-#define IS_IDLE(p)                    ((p)->proc_nr == IDLE)
-#define IS_SYSTEM(p)                ((p)->proc_nr == SYSTEM_TASK)
-#define IS_RUNNABLE(p)                (((p)->i_flags & (IN_USE | RUNNABLE)) == (IN_USE | RUNNABLE))
-
-#define CHECK_STACK(p)                (*((p)->stack_top) == STACK_MAGIC)
-#define GET_DEF_STACK_SIZE(who)        (IS_USER_PROC(who) ? USER_STACK_SIZE : KERNEL_STACK_SIZE)
-#define GET_HEAP_TOP(who)            ((who)->stack_top + GET_DEF_STACK_SIZE(who))
+* Pointer to the current process.
+**/
+extern struct proc *current_proc;
 
 extern struct proc proc_table[NUM_PROCS];
 extern struct proc *ready_q[NUM_QUEUES][2];
 extern struct proc *block_q[2];
+
+#define IS_PROCN_OK(i)                  ((i)>= 0 && (i) < NUM_PROCS)
+#define IS_PRIORITY_OK(priority)        (0 <= (priority) && (priority) < NUM_QUEUES)
+#define IS_KERNEL_PROC(p)               ((p)->rbase == NULL)
+#define IS_USER_PROC(p)                 ((p)->rbase != NULL)
+#define IS_IDLE(p)                      ((p)->proc_nr == IDLE)
+#define IS_SYSTEM(p)                    ((p)->proc_nr == SYSTEM_TASK)
+#define IS_RUNNABLE(p)                  (((p)->i_flags & (IN_USE | RUNNABLE)) == (IN_USE | RUNNABLE))
+
+#define CHECK_STACK(p)                  (*((p)->stack_top) == STACK_MAGIC)
+#define GET_DEF_STACK_SIZE(who)         (IS_USER_PROC(who) ? USER_STACK_SIZE : KERNEL_STACK_SIZE)
+#define GET_HEAP_TOP(who)               ((who)->stack_top + GET_DEF_STACK_SIZE(who))
 
 void* get_pc_ptr(struct proc* who);
 void enqueue_tail(struct proc **q, struct proc *proc);

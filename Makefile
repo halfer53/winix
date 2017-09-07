@@ -66,7 +66,7 @@ stat:
 	@find . -type d -name "include" -prune -o -name "*.c"  -exec cat {} \; | wc -l
 	@echo "Header LoC: "
 	@find . -name "*.h" -exec cat {} \; | wc -l
-	@echo "AS \tsembly LoC: "
+	@echo "Assembly LoC: "
 	@find . -name "*.s" -exec cat {} \; | wc -l
 
 shell: user/shell.c user/shell_test.c user/shell_parse.c
