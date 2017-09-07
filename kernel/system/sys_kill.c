@@ -21,9 +21,10 @@ int do_kill(struct proc *who, struct message *m){
     if(!to)
         return ESRCH;
 
-    if(to->proc_nr <= 1)
-        return EINVAL;
+    if(IS_USER_PROC(to)){
+        cause_sig(to,m->i2);
+        return OK;
+    }
     
-    cause_sig(to,m->i2);
-    return OK;
+    return EINVAL;
 }

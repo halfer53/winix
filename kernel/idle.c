@@ -16,7 +16,7 @@
  
 #include <winix/rex.h>
 
-#define DELAY 20000
+#define DELAY 10000
 
 // Simple animation sequence for the SSDs.
 int pattern[] = { 0x1000, 0x2000, 0x0100, 0x0001, 0x0002, 0x0004, 0x0008, 0x0800 };

@@ -194,6 +194,7 @@ void main() {
 
 	c = buf;
 	end_buf = c + BUF_LEN -2;
+	test_so();
 	while(1) {
 		printf("WINIX> ");
 		c = buf;

@@ -119,7 +119,7 @@ int do_fork(struct proc *who, struct message *m){
 		return EINVAL;
 	
 	m->i1 = 0;
-	winix_send(child_pr,m);
+	notify(child_pr,m);
 
 	return child_pr;
 }

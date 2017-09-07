@@ -228,7 +228,8 @@ void* dup_vm(struct proc* parent, struct proc* child){
  * @param who 
  */
 void release_proc_mem(struct proc *who){
-    bitmap_xor(mem_map,who->ptable,MEM_MAP_LEN);
+	bitmap_xor(mem_map,who->ptable,MEM_MAP_LEN);
+	bitmap_clear(who->ptable, PTABLE_LEN);
 }
 
 void print_ptable(struct proc* who){

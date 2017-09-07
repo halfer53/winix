@@ -24,6 +24,7 @@ void init_exceptions();
 int irq_count();
 int* get_exception_stack_top();
 int* get_exception_stack_bottom();
+struct message* get_exception_m();
 
 #define in_interrupt()  (irq_count())
 #define EXCEPTION_STACK_SIZE    300

@@ -17,6 +17,7 @@
 #include <winix/rex.h>
 #include <kernel/clock.h>
 
+PRIVATE struct message m;
 PRIVATE int _expt_stack[EXCEPTION_STACK_SIZE];
 PRIVATE int* _expt_stack_ptr;
 
@@ -74,6 +75,10 @@ int* get_exception_stack_bottom(){
 	return _expt_stack_ptr;
 }
 
+struct message* get_exception_m(){
+	return &m;
+}
+
 /**
  * User Interrupt Button (IRQ1)
  **/
@@ -101,8 +106,8 @@ PRIVATE void serial1_handler() {
  **/
 PRIVATE void serial2_handler() {
 	int stat = RexSp2->Stat;
-	if(stat & 1 == 1){
-		kprintf("Got %c\n",RexSp2->Rx);
+	if(stat & 1){
+		kputc2(RexSp2->Rx);
 	}
 	RexSp2->Iack = 0;
 }
@@ -131,19 +136,19 @@ PRIVATE void gpf_handler() {
 		kinfo("Stack Overflow\n");
 
 #ifdef _DEBUG
-	pc = get_physical_addr(get_pc_ptr(current_proc),current_proc);
-	kinfo("Current Instruction: 0x%08x\n",*pc);
-	kinfo("Physical pc %x, sp %x\n", pc, get_physical_addr(current_proc->sp, current_proc));
-	kinfo("$1: 0x%08x, $2, 0x%08x, $3, 0x%08x\n",current_proc->regs[0],
-							current_proc->regs[1],current_proc->regs[2]);
-	kinfo("$4: 0x%08x, $5, 0x%08x, $6, 0x%08x\n",current_proc->regs[3],
-							current_proc->regs[4],current_proc->regs[5]);
-	kinfo("$7: 0x%08x, $8, 0x%08x, $9, 0x%08x\n",current_proc->regs[6],
-							current_proc->regs[7],current_proc->regs[8]);
-	kinfo("$10: 0x%08x, $11, 0x%08x, $12, 0x%08x\n",current_proc->regs[9],
-							current_proc->regs[10],current_proc->regs[11]);
-	kinfo("$13: 0x%08x, $sp, 0x%08x, $ra, 0x%08x\n",current_proc->regs[12],
-							current_proc->regs[13],current_proc->regs[14]);
+	// pc = get_physical_addr(get_pc_ptr(current_proc),current_proc);
+	// kinfo("Current Instruction: 0x%08x\n",*pc);
+	// kinfo("Physical pc %x, sp %x\n", pc, get_physical_addr(current_proc->sp, current_proc));
+	// kinfo("$1: 0x%08x, $2, 0x%08x, $3, 0x%08x\n",current_proc->regs[0],
+	// 						current_proc->regs[1],current_proc->regs[2]);
+	// kinfo("$4: 0x%08x, $5, 0x%08x, $6, 0x%08x\n",current_proc->regs[3],
+	// 						current_proc->regs[4],current_proc->regs[5]);
+	// kinfo("$7: 0x%08x, $8, 0x%08x, $9, 0x%08x\n",current_proc->regs[6],
+	// 						current_proc->regs[7],current_proc->regs[8]);
+	// kinfo("$10: 0x%08x, $11, 0x%08x, $12, 0x%08x\n",current_proc->regs[9],
+	// 						current_proc->regs[10],current_proc->regs[11]);
+	// kinfo("$13: 0x%08x, $sp, 0x%08x, $ra, 0x%08x\n",current_proc->regs[12],
+	// 						current_proc->regs[13],current_proc->regs[14]);
 #endif
 	//Kill process and call scheduler.
 	send_sig(current_proc,SIGSEGV);

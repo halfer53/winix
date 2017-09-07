@@ -26,10 +26,12 @@ void stack_overflow(int a){
 }
 
 int test_so(){
-	if(!fork()){
+	if(!fork()){//child
 		stack_overflow(1);
 	}else{
-		wait(NULL);
+		int status;
+		wait(&status);
+		printf("child exit status %d signal %d\n",WEXITSTATUS(status), WTERMSIG(status));
 	}
 	return 0;
 }

@@ -19,22 +19,10 @@ PRIVATE int who_proc_nr;
 PRIVATE struct proc *who;
 
 PRIVATE ucontext_t recv_ctx;
-PRIVATE struct syscall_ctx syscall_ctx;
+PRIVATE struct syscall_ctx syscall_context;
 
-/**
- * This method resume the system call if it was previously interruppted
- * currently, it just simply return -1 to the user space, and set errno 
- * to EINTR to indicate failure
- * @param to user process to which we send err to
- */
-void resume_syscall(struct proc *to){
-	if(syscall_ctx.who->proc_nr == to->proc_nr &&
-		to->s_flags & RECEIVING && syscall_ctx.interruptted){
-
-		(&syscall_ctx)->m.i1 = EINTR;
-		winix_send(to->proc_nr,&syscall_ctx.m);
-	}
-	syscall_ctx.interruptted = false;
+struct syscall_ctx *interrupted_syscall_ctx(){
+	return &syscall_context;
 }
 
 /**
@@ -43,7 +31,7 @@ void resume_syscall(struct proc *to){
  * and start receiving syscalls again
  */
 void intr_syscall(){
-	struct syscall_ctx *ctx = &syscall_ctx;
+	struct syscall_ctx *ctx = &syscall_context;
 	if(who_proc_nr){
 		ctx->m = m;
 		ctx->who = who;
@@ -52,10 +40,7 @@ void intr_syscall(){
 	}
 }
 
-/**
- * public get method for current syscall message
- * @return [description]
- */
+
 struct message *curr_mesg(){
 	return &m;
 }
@@ -82,7 +67,6 @@ void print_sysinfo(){
  **/
 void system_main() {
 	unsigned int null_val = *((unsigned int*)NULL);
-
 	print_sysinfo();
 	getcontext(&recv_ctx);
 
@@ -93,7 +77,7 @@ void system_main() {
 		winix_receive(&m);
 		who_proc_nr = m.src;
 		who = get_proc(who_proc_nr);
-		ASSERT(who != NULL && IS_USER_PROC(who)); 
+		ASSERT(who != NULL && who_proc_nr != SYSTEM_TASK); 
 
 		//Do the work
 		switch(m.type) {
@@ -119,7 +103,7 @@ void system_main() {
 		}
 
 		if(m.i1 != SUSPEND && m.i1 != DONOTHING){
-			winix_send(who_proc_nr,&m);
+			notify(who_proc_nr,&m);
 		}
 
 		//if this assertion failed, that means null pointer is deferenced

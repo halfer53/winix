@@ -24,16 +24,6 @@
 #include <kernel/idle.h>
 
 
-struct proc_config{
-    char name[PROC_NAME_LEN];
-    void (*entry)();
-    int pid;
-    int quantum;
-    bool iskernel_proc;
-    unsigned int *image_array;
-    int image_len;
-};
-
 //Major and minor version numbers for WINIX.
 #define MAJOR_VERSION 2
 #define MINOR_VERSION 0

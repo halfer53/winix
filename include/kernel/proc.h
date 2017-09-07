@@ -19,27 +19,29 @@
 #include <winix/kwramp.h>
 
 //Kernel Process
-#define IDLE					-1
+#define INTERRUPT				-5
 #define INIT					1
+#define IDLE					2
 
 //Process & Scheduling
 #define PROC_NAME_LEN			20
 #define NUM_PROCS				10
 #define NUM_QUEUES				5
-#define IDLE_PRIORITY			4
-#define USER_PRIORITY			3
-#define SYSTEM_PRIORITY			0
-
-#define USER_MIN_PRIORITY		2
-#define USER_MAX_PRIORITY		4
 #define MAX_PRIORITY			0
 #define MIN_PRIORITY			((NUM_QUEUES) - 1)
 
-#define USER_PRIORITY_MAX		1
-#define USER_PRIORITY_MIN		4
+//min bss segment size
+#define MIN_BSS_SIZE			300
+
+//stack
+#define STACK_MAGIC				0x12345678
+#define USER_STACK_SIZE			1024
+#define KERNEL_STACK_SIZE		1024
+
+//heap
+#define USER_HEAP_SIZE			2048
 
 //Signal Context
-#define PROCESS_REGS_LEN		16
 #define SIGNAL_CTX_LEN			21
 
 //Process Defaults
@@ -57,18 +59,18 @@
 #define DEFAULT_RETURN_ADDR		0x00000000
 #define DEFAULT_PROGRAM_COUNTER	0x00000000
 
-//stack
-#define STACK_MAGIC				0x12345678
-#define USER_STACK_SIZE			1024
-#define KERNEL_STACK_SIZE		1024
+//Process Scheduling Flags s_flags, process is runnable when s_flags == 0
+#define SENDING					0x0001	/* process blocked trying to SEND */
+#define RECEIVING				0x0002	/* process blocked trying to RECEIVE */
+#define WAITING					0x0004	/* process blocked wait(2) */
+#define SIGNALED        		0x0008	/* set when new kernel signal arrives */
+#define SIG_PENDING				0x0010	/* unready while signal being processed */
 
-//heap
-#define USER_HEAP_SIZE		2048
-
-//Process Flags
-#define SENDING					0x0001
-#define RECEIVING				0x0002
-#define WAITING					0x0004
+//Process Information flags
+#define IN_USE					0x0001	/* process slot is in use */
+#define RUNNABLE				0x0002
+#define ZOMBIE					0x0004
+#define STOPPED					0x0008
 
 //alloc_proc_mem flags
 #define PROC_SET_SP				1
@@ -78,18 +80,6 @@
 #define PROC_ACCESS				1
 #define PROC_NO_ACCESS			0
 
-//min bss segment size
-#define MIN_BSS_SIZE			300
-
-//i_flags
-#define PROC_IN_USE				1
-
-
-/**
- * State of a process.
- **/
-typedef enum { DEAD, INITIALISING, RUNNABLE, ZOMBIE } proc_state_t;
-
 /**
  * Process structure for use in the process table.
  *
@@ -98,55 +88,56 @@ typedef enum { DEAD, INITIALISING, RUNNABLE, ZOMBIE } proc_state_t;
  **/
 typedef struct proc {
 	/* Process State */
-	reg_t regs[NUM_REGS];	//Register values
+	reg_t regs[NUM_REGS];		//Register values
 	reg_t *sp;
 	reg_t *ra;
 	void (*pc)();
 	reg_t *rbase;
 	reg_t *ptable;
-	reg_t cctrl;  //len 19
+	reg_t cctrl;  				//len 19
 
 	/* IPC messages */
-	struct message *message;	//Message buffer;
-	int s_flags; 		//schedling s_flags, NB this is different
-								//from i_flags which is for information
+	int s_flags; 				//schedling flags
+	struct message* message;	//Message Buffer
 
 	/* Heap and Stack*/
-	ptr_t* stack_top; //stack_top is the physical address
-	ptr_t* heap_break; //heap_break is also the physical address
-	ptr_t* heap_bottom; //
-	size_t length; //length is the total of text + data segment
+	ptr_t* stack_top; 			//Stack_top is the physical address
+	ptr_t* heap_break; 			//Heap_break is also the physical address of the curr
+								//Brk, retrived by syscall brk(2)
+	ptr_t* heap_bottom; 		//Bottom of the process image
+	size_t length; 				//Length is the total of text + data segment
 
 	/* Protection */
 	reg_t protection_table[PTABLE_LEN];
 
 	/* IPC queue */
-	struct proc *sender_q;	//Head of process queue waiting to send to this process
-	struct proc *next_sender; //Link to next sender in the queue
+	struct proc *sender_q;		//Head of process queue waiting to send to this process
+	struct proc *next_sender; 	//Link to next sender in the queue
+
+	/* Pending messages, used by notify */
+	unsigned int notify_pending;//bitmap for masking list of pending messages by system proc
 
 	/* Scheduling */
-	struct proc *next;	//Next pointer
+	struct proc *next;			//Next pointer
 	int priority;	
-	int quantum;		//Timeslice length
-	int ticks_left;		//Timeslice remaining
+	int quantum;				//Timeslice length
+	int ticks_left;				//Timeslice remaining
 
 	/* Accounting */
-	int time_used;		//CPU time used
+	int time_used;				//CPU time used
 
 	/* Metadata */
-	char name[PROC_NAME_LEN];		//Process name
-	proc_state_t state;	//Current process state
-	int exit_status;	//Storage for status when process exits
-	int sig_status;		//Storage for siginal status when process exits
-	pid_t pid;			//Process id
-	pid_t procgrp;		//Pid of the process group (used for signals)
-	pid_t wpid;			//pid this process is waiting for
-	int parent;			//proc_index of parent
-	int i_flags;	//information flags, contains various information
-							//about this proc
+	char name[PROC_NAME_LEN];	//Process name
+	int exit_status;			//Storage for status when process exits
+	int sig_status;				//Storage for siginal status when process exits
+	pid_t pid;					//Process id
+	pid_t procgrp;				//Pid of the process group (used for signals)
+	pid_t wpid;					//pid this process is waiting for
+	int parent;					//proc_index of parent
+	int i_flags;				//information flags
 
 	/* Process Table Index */
-	int proc_nr;		//Index in the process table
+	int proc_nr;				//Index in the process table
 
 	/* Signal Information */
 	sigset_t pending_sigs;
@@ -161,14 +152,17 @@ typedef struct proc {
  **/
  extern struct proc *current_proc;
 
-#define IS_PROCN_OK(i)	((i)>= 0 && (i) < NUM_PROCS)
+#define IS_PROCN_OK(i)				((i)>= 0 && (i) < NUM_PROCS)
 #define IS_PRIORITY_OK(priority)	(0 <= (priority) && (priority) < NUM_QUEUES)
-#define IS_KERNEL_PROC(p)	((p->proc_nr) == 0)
-#define IS_USER_PROC(p)		((p->proc_nr) > 0)
-#define IS_IDLE(p)			((p->proc_nr) == IDLE)
-#define CHECK_STACK(p)		(*(p->stack_top) == STACK_MAGIC)
-#define GET_DEF_STACK_SIZE(who)	(IS_USER_PROC(who) ? USER_STACK_SIZE : KERNEL_STACK_SIZE)
-#define GET_HEAP_TOP(who)	((who)->stack_top + GET_DEF_STACK_SIZE(who))
+#define IS_KERNEL_PROC(p)			((p)->rbase == NULL)
+#define IS_USER_PROC(p)				((p)->rbase != NULL)
+#define IS_IDLE(p)					((p)->proc_nr == IDLE)
+#define IS_SYSTEM(p)				((p)->proc_nr == SYSTEM_TASK)
+#define IS_RUNNABLE(p)				(((p)->i_flags & (IN_USE | RUNNABLE)) == (IN_USE | RUNNABLE))
+
+#define CHECK_STACK(p)				(*((p)->stack_top) == STACK_MAGIC)
+#define GET_DEF_STACK_SIZE(who)		(IS_USER_PROC(who) ? USER_STACK_SIZE : KERNEL_STACK_SIZE)
+#define GET_HEAP_TOP(who)			((who)->stack_top + GET_DEF_STACK_SIZE(who))
 
 extern struct proc proc_table[NUM_PROCS];
 extern struct proc *ready_q[NUM_QUEUES][2];
@@ -194,8 +188,19 @@ struct proc *get_proc(int proc_nr);
 struct proc *get_running_proc(int proc_nr);
 void print_runnable_procs();
 void printProceInfo(struct proc* curr);
-char* getStateName(proc_state_t state);
 struct proc *pick_proc();
+void unsched(struct proc *p);
 
+
+
+struct proc_config{
+    char name[PROC_NAME_LEN];
+    void (*entry)();
+    int pid;
+    int quantum;
+    bool iskernel_proc;
+    unsigned int *image_array;
+    int image_len;
+};
 
 #endif

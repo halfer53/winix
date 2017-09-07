@@ -84,7 +84,7 @@ PRIVATE int build_signal_ctx(struct proc *who, int signum){
     //ra points at the sigframe code, so that when user signal handler finishes,
     //pc will point to the sig return code, to initiate sig return sys call
     who->ra = who->sp - sizeof(sigframe_code);
-    sigframe->operation = WINIX_SEND;
+    sigframe->operation = WINIX_SENDREC;
     sigframe->dest = SYSTEM_TASK;
     //pm points at the syscall message, not that this is a virtual address
     sigframe->pm = (struct message *)(who->sp - sizeof(sigframe_code) - sizeof(struct message));
@@ -113,22 +113,24 @@ PRIVATE int build_signal_ctx(struct proc *who, int signum){
  *                return ERR if the user needs to handle the signal
  */
 PRIVATE int sys_sig_handler(struct proc *who, int signum){
-    struct message m;
     
     if(who->sig_table[signum].sa_handler == SIG_DFL){
-        int exit_status = SIG_STATUS(signum);
+        who->sig_status = signum;
         KDEBUG(("Signal %d: kill process \"%s [%d]\"\n",signum,who->name,who->proc_nr));
         if(in_interrupt()){
             //if we are in interrupt, send an exit syscall to the kernel, 
             //and set current_proc to NULL so the scheduler picks the next proc
-            m.type = SYSCALL_EXIT;
-            m.i1 = exit_status;
-            m.src = who->proc_nr;
-            wini_send(SYSTEM_TASK, &m);
+
+            struct message* em = get_exception_m();
+            em->type = SYSCALL_EXIT;
+            em->i1 = 0;
+            interrupt_send(SYSTEM_TASK, em);
+
             if(current_proc == who)
                 current_proc = NULL;
+            
         }else{
-            exit_proc(who, exit_status);
+            exit_proc(who, 0);
         }
         return OK;
     }
@@ -148,7 +150,7 @@ PRIVATE int sys_sig_handler(struct proc *who, int signum){
  * @return        
  */
 PRIVATE int sigsend_comm(struct proc *who, int signum){
-    if(who->state != RUNNABLE)
+    if(!IS_RUNNABLE(who))
         return ERR;
 
     if(build_signal_ctx(who,signum) != OK)

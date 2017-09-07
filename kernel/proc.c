@@ -73,7 +73,7 @@ void print_runnable_procs() {
 	kprintf("NAME     PID PPID RBASE      PC         STACK      HEAP       PROTECTION   FLAGS\n");
 	for (i = 0; i < NUM_PROCS; i++) {
 		curr = &proc_table[i];
-		if(curr->i_flags & PROC_IN_USE && curr->state != ZOMBIE)
+		if(IS_RUNNABLE(curr))
 			printProceInfo(curr);
 	}
 }
@@ -92,6 +92,32 @@ void printProceInfo(struct proc* curr) {
 			ptable_idx,
 	        curr->ptable[ptable_idx],
 			curr->s_flags);
+}
+
+void print_readyqueue(){
+	int i,j;
+	struct proc* curr;
+	kprintf(" q| ");
+	for (i = 0; i < NUM_QUEUES; i++) {
+		curr = ready_q[i][HEAD];
+		while(curr != NULL)
+		{
+			kprintf("%d ", curr->proc_nr);
+			curr = curr->next;
+		}
+	}
+	kprintf("| ");
+}
+
+void print_receiver_queue(struct proc* who){
+	struct proc* curr;
+	curr = who->sender_q;
+	if(curr)
+		kprintf(" %d sending queue: ", who->proc_nr);
+	while(curr != NULL){
+		kprintf("%d ",curr->proc_nr);
+		curr = curr->next_sender;
+	}
 }
 
 /**
@@ -119,9 +145,9 @@ struct proc *get_proc(int proc_nr) {
  */
 struct proc *get_running_proc(int proc_nr){
 	struct proc *p = get_proc(proc_nr);
-	if(p->state != RUNNABLE)
-		return NULL;
-	return p;
+	if(p->i_flags & RUNNABLE)
+		return p;
+	return NULL;
 }
 
 /**
@@ -215,6 +241,7 @@ int dequeue_schedule( struct proc *h) {
 	} else {
 		prev->next = curr->next;
 	}
+	h->i_flags &= ~RUNNABLE;
 	return OK;
 }
 
@@ -224,7 +251,7 @@ int dequeue_schedule( struct proc *h) {
  * @param p 
  */
 void enqueue_schedule(struct proc* p) {
-	p->state = RUNNABLE;
+	p->i_flags |= RUNNABLE;
 	enqueue_tail(ready_q[p->priority], p);
 }
 
@@ -233,7 +260,9 @@ void enqueue_schedule(struct proc* p) {
  * ready_q, and memory will be released by the system
  * @param p 
  */
-void unseched(struct proc *p){
+void unsched(struct proc *p){
+	p->i_flags &= ~RUNNABLE;
+	p->i_flags |= ZOMBIE;
 	release_proc_mem(p);
 	dequeue_schedule(p);
 }
@@ -244,8 +273,7 @@ void unseched(struct proc *p){
  * @param p 
  */
 void free_slot(struct proc *p){
-	p->state = DEAD;
-	p->i_flags &= ~PROC_IN_USE;
+	p->i_flags = 0;
 	enqueue_head(free_proc, p);
 }
 
@@ -260,7 +288,7 @@ void free_slot(struct proc *p){
  *   Process state is set to DEAD, and is returned to the free_proc list.
  **/
 void end_process(struct proc *p) {
-	unseched(p);
+	unsched(p);
 	free_slot(p);
 }
 
@@ -275,7 +303,7 @@ struct proc *get_free_proc_slot() {
 
 	if (p) {
 		proc_set_default(p);
-		p->i_flags |= PROC_IN_USE;
+		p->i_flags |= IN_USE;
 		return p;
 	}
 	return NULL;
@@ -294,7 +322,6 @@ void proc_set_default(struct proc *p) {
 	p->cctrl = DEFAULT_CCTRL;
 
 	p->quantum = DEFAULT_USER_QUANTUM;
-	p->state = INITIALISING;
 	p->ptable = p->protection_table;
 	p->alarm.proc_nr = p->proc_nr;
 }
@@ -483,7 +510,6 @@ void init_proc() {
 	for ( i = 0; i < NUM_PROCS; i++) {
 		p = &proc_table[i];
 		proc_set_default(p);
-		p->state = DEAD;
 		p->proc_nr = i;
 		enqueue_tail(free_proc, p);
 	}

@@ -46,11 +46,3 @@ int winix_receive(struct message *m) {
 int winix_sendrec(int dest, struct message *m) {
 	return wramp_syscall(WINIX_SENDREC, dest, m);
 }
-
-/**
- * Non-blocking send
- *
- **/
-int winix_notify(int dest, struct message *m) {
-	return wramp_syscall(WINIX_NOTIFY, dest, m);
-}

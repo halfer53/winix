@@ -49,5 +49,17 @@ int wini_notify(int dest, struct message *m);
  **/
 int wini_receive(struct message *m);
 
+/**
+ * send used by interrupt handler during exception
+ *
+ * Parameters:
+ *   m				Pointer to write the message to.
+ *
+ * Returns:
+ *   0 on success
+ *   -1 if destination is invalid or not in interrupt mode
+ **/
+int interrupt_send(int dest, struct message* pm);
+
 
 #endif

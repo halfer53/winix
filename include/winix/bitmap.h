@@ -21,6 +21,9 @@ struct bit_pattern{
     int size;
 };
 
+#define set_bit(map,i)      ((map) |= (1 << (i)))
+#define unset_bit(map,i)    ((map) &= ~(1 << (i)))
+
 void init_bitmap();
 int get_mask(int i);
 bool is_bit_on(unsigned int *map, int map_len, int bit);

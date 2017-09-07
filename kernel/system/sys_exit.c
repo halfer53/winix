@@ -24,7 +24,7 @@ void clear_sending_mesg(struct proc *who){
 
     for(i = 0; i < NUM_PROCS; i++){
         rp = &proc_table[i];
-        if(rp->i_flags & PROC_IN_USE && (xp = &(rp->sender_q)) != NULL){
+        if(rp->i_flags & IN_USE && (xp = &(rp->sender_q)) != NULL){
 
             //walk through the message queues
             while(*xp && *xp != who)
@@ -52,7 +52,7 @@ void clear_receiving_mesg(struct proc *who){
         xp = who->sender_q;
         while(xp){
             memset(&m,-1,sizeof( struct message));
-            winix_notify(xp->proc_nr,&m);
+            notify(xp->proc_nr,&m);
             xp = xp->next_sender;
         }
     }
@@ -69,21 +69,21 @@ void exit_proc(struct proc *who, int status){
     struct proc *mp;
     int i, children = 0;
     
-    unseched(who);
+    unsched(who);
     clear_proc(who);
 
     // print_runnable_procs();
     //if parent is waiting
-    KDEBUG(("%s[%d] exit status %d \n",who->name, who->proc_nr, status));
-
+    KDEBUG(("%s[%d] exit status %d signal %d\n",who->name, who->proc_nr, 
+                                              status, who->sig_status));
     for( i=0; i< NUM_PROCS; i++){
         mp = &proc_table[i];
-        if(mp->i_flags & PROC_IN_USE){
+        if(mp->i_flags & IN_USE){
             if(mp->s_flags & WAITING && mp->wpid == who->proc_nr){
-                mesg.i1 = (who->exit_status << 8) | (who->sig_status & 0377);
+                mesg.i2 = (who->exit_status << 8) | (who->sig_status & 0x7f);
                 mp->s_flags &= ~WAITING;
 
-                winix_send(mp->proc_nr,&mesg);
+                notify(mp->proc_nr,&mesg);
                 children++;
             }else if(mp->parent == who->proc_nr){
                 //Change the child process's parent to init
@@ -99,9 +99,8 @@ void exit_proc(struct proc *who, int status){
         
     //if parent is not waiting
     //block the current process
-    who->state = ZOMBIE;
     who->exit_status = status;
-    who->i_flags |= PROC_IN_USE;
+    who->i_flags |= IN_USE;
 }
 
 int do_exit(struct proc *who, struct message *m){

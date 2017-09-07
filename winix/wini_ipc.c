@@ -27,12 +27,13 @@ int wini_send(int dest, struct message *m) {
 	struct proc *pDest;
 
 	current_proc->message = m; //save for later
-	
+
 	//Is the destination valid?
 	if (pDest = get_running_proc(dest)) {
 		
 		if (pDest->s_flags & RECEIVING) {
 			*(pDest->message) = *m;
+
 			//Unblock receiver
 			pDest->s_flags &= ~RECEIVING;
 			enqueue_head(ready_q[pDest->priority], pDest);
@@ -79,20 +80,28 @@ int wini_receive(struct message *m) {
 
 		//Unblock sender
 		p->s_flags &= ~SENDING;
-		if(! p->s_flags)
+		if(! p->s_flags && p->i_flags & RUNNABLE)
 			enqueue_head(ready_q[p->priority], p);
-			
-		if(is_debugging_syscall()){
-			if(current_proc->proc_nr == SYSTEM_TASK)
-				kprintf("\nSyscall %d from %d|", m->type, m->src);
-		}else if(get_debug_ipc_count()){
-			kprintf("\nIPC; %d REC from %d type %d| ",current_proc->proc_nr, m->src ,m->type);
+		
+		if(get_debug_ipc_count()){
+			kprintf("\nIPC: %d REC from %d type %d| ",current_proc->proc_nr, m->src ,m->type);
+		}
+		return OK;
+	}
+	else if(current_proc->notify_pending != 0){
+		int i;
+		unsigned int map = current_proc->notify_pending;
+		for(i = 0; i < 32; i++){
+			if(map & (1 << i)){
+				unset_bit(current_proc->notify_pending, i);
+				*m = *(get_proc(i)->message);
+				return OK;
+			}
 		}
 	}
-	else {
-		current_proc->message = m;
-		current_proc->s_flags |= RECEIVING;
-	}
+
+	current_proc->message = m;
+	current_proc->s_flags |= RECEIVING;
 	return OK;
 }
 /**
@@ -125,10 +134,9 @@ int wini_notify(int dest, struct message *m) {
 			//Unblock receiver
 			pDest->s_flags &= ~RECEIVING;
 			enqueue_head(ready_q[pDest->priority], pDest);
-			//if the destination rejects any message it receives,
-			//do not deliver the message, but add it to the scheduling queue
+		}else{
+			set_bit(pDest->notify_pending, current_proc->proc_nr);
 		}
-
 		//do nothing if it's not waiting
 		return OK;
 	}
@@ -136,12 +144,26 @@ int wini_notify(int dest, struct message *m) {
 }
 
 /**
- * send err to the destination
- * @param  dest 
- * @return      
- */
-int winix_senderr(int dest){
-	struct message m;
-	memset(&m,-1,sizeof( struct message));
-	return winix_send(dest,&m);
+ * Non-blocking send
+ *
+ **/
+ int notify(int dest, struct message *m) {
+	return wramp_syscall(WINIX_NOTIFY, dest, m);
+}
+
+int syscall_reply(int dest, struct message* m){
+	return notify(dest,m);
+}
+
+//send used by interrupt
+int interrupt_send(int dest, struct message* pm){
+	struct message* em = get_exception_m();
+	if(!in_interrupt())
+		return ERR;
+
+	*em = *pm;
+	em->src = current_proc->proc_nr;
+
+	current_proc->s_flags |= RECEIVING;
+	return wini_send(SYSTEM_TASK, em);
 }

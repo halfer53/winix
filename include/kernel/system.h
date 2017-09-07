@@ -16,11 +16,14 @@
 #ifndef _K_SYSTEM_H_
 #define _K_SYSTEM_H_ 1
 
+#include <winix/syscall_ctx.h>
+
 /**
  * Entry point for the system task.
  **/
 void system_main();
 struct message *curr_mesg();
 void intr_syscall();
+struct syscall_ctx* interrupted_syscall_ctx();
 
 #endif

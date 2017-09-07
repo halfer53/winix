@@ -29,10 +29,10 @@ int do_wait(struct proc *parent, struct message *mesg){
         child = &proc_table[i];
         
         //if there is a child process that is zombie
-        if(child->i_flags & PROC_IN_USE && child->parent == parent->proc_nr){
-            if(child->state == ZOMBIE){
+        if(child->i_flags & IN_USE && child->parent == parent->proc_nr){
+            if(child->i_flags & ZOMBIE){
+                mesg->i2 = (child->exit_status << 8) | (child->sig_status & 0x7f);
                 free_slot(child);
-                mesg->i2 = (child->exit_status << 8) | (child->sig_status & 0377);
                 return child->proc_nr;
             }
             parent->wpid = child->proc_nr;
@@ -41,11 +41,9 @@ int do_wait(struct proc *parent, struct message *mesg){
     }
 	
     //Proc has no children
-    if(children == 0){
-        mesg->i1 = -1;
-        // winix_send(parent->proc_nr,mesg);
+    if(children == 0)
         return ECHILD;
-    }
+    
     //block the process
     parent->s_flags |= WAITING;
     return SUSPEND;

@@ -15,6 +15,29 @@
 */
 #include "../winix.h"
 
+/**
+ * This method resume the system call if it was previously interruppted
+ * currently, it just simply return -1 to the user space, and set errno 
+ * to EINTR to indicate failure
+ * @param to user process to which we send err to
+ */
+ int resume_from_sig(struct proc *to){
+    struct syscall_ctx* prev_syscall;
+
+    prev_syscall = interrupted_syscall_ctx();
+
+    if(prev_syscall->who->proc_nr == to->proc_nr &&
+        to->s_flags & RECEIVING && prev_syscall->interruptted){
+        
+        prev_syscall->m.i1 = EINTR;
+        notify(to->proc_nr,&prev_syscall->m);
+    }else{
+        enqueue_schedule(to);
+    }
+    memset(prev_syscall, 0, sizeof(struct syscall_ctx));
+    return OK;
+}
+
 int do_sigreturn(struct proc *who, struct message *m){
     reg_t *sp;
     struct proc *systask;
@@ -22,14 +45,15 @@ int do_sigreturn(struct proc *who, struct message *m){
 
     sp = get_physical_addr(who->sp,who);
 
-    // kprintf("sig ret sp 0x%08x\n",sp);
-
     sp += sizeof(struct sigframe);
+    //Copy the previous pcb saved on the user stack back
+    //to system proc struct, information includes registers
+    //scheduling flags, and messages
     memcpy(who,sp,SIGNAL_CTX_LEN);
 
     //reset the signal to default
     who->sig_table[signum].sa_handler = SIG_DFL;
-    resume_syscall(who);
+    resume_from_sig(who);
 
     return DONOTHING;
 }
