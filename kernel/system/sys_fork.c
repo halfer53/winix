@@ -2,7 +2,7 @@
  * Syscall in this file: fork
  * Input:    
  *
- * Return:     m1_i1: child's pid to parent,
+ * Return:     reply_res: child's pid to parent,
  *                 and 0 to child
  * 
  * @author Bruce Tan
@@ -122,8 +122,7 @@ int do_fork(struct proc *who, struct message *m){
         return EINVAL;
     
     //send 0 to child
-    m->m1_i1 = 0;
-    notify(child_pr,m);
+    syscall_reply(child_pr, 0);
 
     //send the child pid to parent
     return child_pr;

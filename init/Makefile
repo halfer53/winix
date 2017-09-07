@@ -5,9 +5,10 @@ PROGS = init
 SOURCES = $(PROGS:=.c)
 ASSEMBLY = $(PROGS:=.s)
 OBJECT = $(PROGS:=.o)
+OUT = init.srec
 
 LIBS = syscall/syscall.o syscall/wramp_syscall.o syscall/ipc.o stdlib/errno.o\
-		syscall/wait.o syscall/printf.o
+		syscall/wait.o syscall/printf.o syscall/_exit.o 
 LIBS_O = $(addprefix ../lib/, $(LIBS))
 
 init: wramp
@@ -34,7 +35,7 @@ depend:
 	makedepend -I$(INCLUDE_DIR) $(SOURCES)
 
 clean:
-	$(Q)-rm -f $(OBJECT) $(ASSEMBLY)
+	$(Q)-rm -f $(OBJECT) $(ASSEMBLY) $(OUT)
 ifeq ($(KBUILD_VERBOSE),0)
 	@echo "RM \t INIT"
 endif

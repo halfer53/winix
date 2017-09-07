@@ -3,7 +3,7 @@
  * NB this is a winix specific system call
  * Input:   m1_i1: type of information to be displayed
  *
- * Return:  m1_i1: OK
+ * Return:  reply_res: OK
  * 
  * @author Bruce Tan
  * @email brucetansh@gmail.com

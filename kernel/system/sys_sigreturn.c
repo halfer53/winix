@@ -29,8 +29,9 @@
     if(prev_syscall->who->proc_nr == to->proc_nr &&
         to->s_flags & RECEIVING && prev_syscall->interruptted){
         
-        prev_syscall->m.m1_i1 = EINTR;
+        prev_syscall->m.reply_res = EINTR;
         notify(to->proc_nr,&prev_syscall->m);
+
     }else{
         // kprintf("enqueue %d pri %d\n",to->proc_nr, to->priority);
         enqueue_schedule(to);
@@ -44,7 +45,7 @@ int do_sigreturn(struct proc *who, struct message *m){
     struct proc *systask;
     int signum = m->m1_i1;
 
-    debug_ipc(4);
+    // debug_ipc(4); //debug
     sp = get_physical_addr(who->sp,who);
 
     sp += sizeof(struct sigframe);

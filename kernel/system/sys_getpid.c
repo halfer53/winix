@@ -2,7 +2,7 @@
  * Syscall in this file: getpid
  * Input:    
  *
- * Return:     m1_i1:    pid
+ * Return:     reply_res:    pid
  *             m1_i2: ppid
  * 
  * @author Bruce Tan

@@ -50,8 +50,7 @@ int wini_send(int dest, struct message *m) {
             if(dest == SYSTEM)
                 kprintf("\nSyscall %d from %d|", m->type, m->src);
         }else if(get_debug_ipc_count()){
-            kprintf("\nIPC: SEND to %d from %d type %d rflags %d s %d| ",dest, current_proc->proc_nr,m->type,
-            pDest->s_flags, current_proc->s_flags);
+            kprintf("\nIPC: SEND to %d from %d type %d| ",dest, current_proc->proc_nr,m->type);
         }
 
         return OK;
@@ -123,7 +122,7 @@ int wini_notify(int dest, struct message *m) {
     if (pDest = get_running_proc(dest)) {
 
         if(get_debug_ipc_count())
-                kprintf("\nIPC: NOTIFY to %d from %d t %d| ",dest, current_proc->proc_nr,m->type);
+                kprintf("\nNOTIFY %d from %d reply %d| ",dest, current_proc->proc_nr,m->type);
             
         //If destination is waiting, deliver message immediately.
         if (pDest->s_flags & RECEIVING) {
@@ -147,11 +146,13 @@ int wini_notify(int dest, struct message *m) {
  * Non-blocking send
  *
  **/
- int notify(int dest, struct message *m) {
+int notify(int dest, struct message *m) {
     return wramp_syscall(WINIX_NOTIFY, dest, m);
 }
 
-int syscall_reply(int dest, struct message* m){
+int syscall_reply(int dest, int ret){
+    struct message* m = curr_mesg();
+    m->reply_res = ret;
     return notify(dest,m);
 }
 
@@ -164,6 +165,8 @@ int interrupt_send(int dest, struct message* pm){
     *em = *pm;
     em->src = current_proc->proc_nr;
 
+    //curr proc is the process that generated exception
+    //most likely segmentation fault or float fault
     current_proc->s_flags |= RECEIVING;
     return wini_send(dest, em);
 }

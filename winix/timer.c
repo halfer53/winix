@@ -85,6 +85,7 @@ struct timer* dequeue_alarm(){
     }
     mq->flags &= ~TIMER_INUSE;
     mq->next = NULL;
+      
     return mq;
 }
 
@@ -98,6 +99,8 @@ void insert_timer(struct timer *timer){
     struct timer *curr = pending_timers;
     clock_t new_timeout = timer->time_out;
 
+    if(!in_interrupt())
+        disable_interrupt();
     while(curr && curr->time_out < new_timeout){
         prev = curr;
         curr = curr->next;
@@ -107,12 +110,15 @@ void insert_timer(struct timer *timer){
         prev->next = timer;
         timer->next = curr;
     }else{
-        
         timer->next = pending_timers;
         pending_timers = timer;
         next_timeout = pending_timers->time_out;
     }
     timer->flags &= TIMER_INUSE;
+    if(!in_interrupt())
+        enable_interrupt();
+    if(get_debug_timer_count())
+        print_timers();
 }
 
 /**

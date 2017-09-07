@@ -39,30 +39,30 @@ void system_main() {
         syscall_region_begin();
 
         //Do the work
-        switch(m.type) {
-            case SYSCALL_TIMES:             m.m1_i1 = do_times(who,&m);             break;
-            case SYSCALL_EXIT:              m.m1_i1 = do_exit(who,&m);              break;
-            case SYSCALL_FORK:              m.m1_i1 = do_fork(who,&m);              break;
-            case SYSCALL_EXECVE:            m.m1_i1 = do_exec(who,&m);              break;
-            case SYSCALL_BRK:               m.m1_i1 = do_brk(who,&m);               break;
-            case SYSCALL_ALARM:             m.m1_i1 = do_alarm(who,&m);             break;
-            case SYSCALL_SIGNAL:            m.m1_i1 = do_sigaction(who,&m);         break;
-            case SYSCALL_SIGRET:            m.m1_i1 = do_sigreturn(who,&m);         break;
-            case SYSCALL_WAIT:              m.m1_i1 = do_wait(who,&m);              break;
-            case SYSCALL_KILL:              m.m1_i1 = do_kill(who,&m);              break;
-            case SYSCALL_GETPID:            m.m1_i1 = do_getpid(who,&m);            break;
-            case SYSCALL_GETC:              m.m1_i1 = do_getc(who,&m);              break;
-            case SYSCALL_WINFO:             m.m1_i1 = do_winfo(who,&m);             break;
-            case SYSCALL_PRINTF:            m.m1_i1 = do_printf(who,&m);            break;
-            case SYSCALL_SYSCONF:           m.m1_i1 = do_sysconf(who,&m);           break;
+        switch(m.type){
+            case SYSCALL_TIMES:             m.reply_res = do_times(who,&m);             break;
+            case SYSCALL_EXIT:              m.reply_res = do_exit(who,&m);              break;
+            case SYSCALL_FORK:              m.reply_res = do_fork(who,&m);              break;
+            case SYSCALL_EXECVE:            m.reply_res = do_exec(who,&m);              break;
+            case SYSCALL_BRK:               m.reply_res = do_brk(who,&m);               break;
+            case SYSCALL_ALARM:             m.reply_res = do_alarm(who,&m);             break;
+            case SYSCALL_SIGNAL:            m.reply_res = do_sigaction(who,&m);         break;
+            case SYSCALL_SIGRET:            m.reply_res = do_sigreturn(who,&m);         break;
+            case SYSCALL_WAIT:              m.reply_res = do_wait(who,&m);              break;
+            case SYSCALL_KILL:              m.reply_res = do_kill(who,&m);              break;
+            case SYSCALL_GETPID:            m.reply_res = do_getpid(who,&m);            break;
+            case SYSCALL_GETC:              m.reply_res = do_getc(who,&m);              break;
+            case SYSCALL_WINFO:             m.reply_res = do_winfo(who,&m);             break;
+            case SYSCALL_PRINTF:            m.reply_res = do_printf(who,&m);            break;
+            case SYSCALL_SYSCONF:           m.reply_res = do_sysconf(who,&m);           break;
             default:
                 kinfo("Process \"%s (%d)\" performed unknown system call %d\r\n", 
                                                 who->name, who->proc_nr, m.type);
-                m.m1_i1 = ENOSYS;
+                m.reply_res = ENOSYS;
                 break;
         }
 
-        switch(m.m1_i1){
+        switch(m.reply_res){
             case SUSPEND:
             case DONOTHING:
                 break;
@@ -113,7 +113,7 @@ void syscall_region_end(){
  * it saves the current syscall context into struct syscall_ctx
  * and start receiving syscalls again
  */
- void intr_syscall(){
+void intr_syscall(){
     struct syscall_ctx *ctx = &syscall_context;
     if(who_proc_nr){
         ctx->m = m;

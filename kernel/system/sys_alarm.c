@@ -17,7 +17,7 @@
 
 //alarm syscall
 //input     m.m1_i1    seconds
-//output    m.m1_i1    previous timeout
+//output    m.reply_res    previous timeout
 int do_alarm(struct proc *who, struct message *m){
     clock_t seconds;
     struct timer *alarm;
@@ -38,7 +38,7 @@ int do_alarm(struct proc *who, struct message *m){
     //if seconds is 0, any pending alarm is canceled
     if(seconds != 0){
         alarm->proc_nr = who->proc_nr;
-        alarm->time_out = get_uptime() + seconds * 60;
+        alarm->time_out = get_uptime() + seconds * get_hz();
         alarm->handler = &deliver_alarm;
         insert_timer(alarm);
     }

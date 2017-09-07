@@ -9,4 +9,10 @@
     return _syscall(SYSCALL_EXIT,&m);
 }
 
+int exit(int status){
+    _exit(status);
+    //should never get here
+    return -1;
+}
+
 

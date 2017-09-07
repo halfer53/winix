@@ -2,7 +2,7 @@
  * Syscall in this file: wait
  * Input:   
  *
- * Return:  m1_i1: pid of the child process
+ * Return:  reply_res: pid of the child process
  *          m1_i2: wstatus value
  *
  *          if no child is found, this process is blocked

@@ -16,6 +16,7 @@
 PRIVATE int _debug_sched = 0;
 PRIVATE int _debug_ipc = 0;
 PRIVATE int _debug_syscall = 0;
+PRIVATE int _debug_timer = 0;
 
 /**
  * Testing functions for debugging purpoess
@@ -38,6 +39,12 @@ int get_debug_ipc_count(){
     return 0;
 }
 
+int get_debug_timer_count(){
+    if(_debug_timer > 0)
+        return _debug_timer--;
+    return 0;
+}
+
 int is_debugging_syscall(){
     return _debug_syscall;
 }
@@ -52,6 +59,10 @@ void debug_ipc(int val){
 
 void debug_syscall(){
     _debug_syscall = true;
+}
+
+void debug_timer(int val){
+    _debug_timer = val;
 }
 
 void stop_debug_scheduling(){

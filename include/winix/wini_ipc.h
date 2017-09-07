@@ -61,5 +61,7 @@ int wini_receive(struct message *m);
  **/
 int interrupt_send(int dest, struct message* pm);
 
+int syscall_reply(int dest, int ret);
+
 
 #endif

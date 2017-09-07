@@ -3,7 +3,7 @@
  * Input:    m1_p1: string parameter
  *             m1_p2: options parameter
  *
- * Return:     m1_i1: number of bytes being printed
+ * Return:     reply_res: number of bytes being printed
  * 
  * @author Bruce Tan
  * @email brucetansh@gmail.com

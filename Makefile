@@ -36,8 +36,8 @@ all:
 	$(Q)$(MAKE) -C lib
 	$(Q)$(MAKE) -C user
 	$(Q)$(MAKE) -C winix
+	$(Q)$(MAKE) shell 
 	$(Q)$(MAKE) init
-	$(Q)$(MAKE) shell
 	$(Q)$(MAKE) -C kernel
 	$(Q)wlink $(LDFLAGS) -o winix.srec $(L_HEAD) $(KERNEL_O) $(KLIB_O) $(L_TAIL)
 ifeq ($(KBUILD_VERBOSE),0)
@@ -69,7 +69,7 @@ stat:
 	@echo "Assembly LoC: "
 	@find . -name "*.s" -exec cat {} \; | wc -l
 
-shell: user/shell.srec
+shell: include/shell_codes.c 
 	$(Q)-rm -f $(KMAIN)
 	$(Q)cp user/shell.srec .
 	$(Q)java $(REFORMAT) shell.srec
@@ -77,7 +77,7 @@ shell: user/shell.srec
 	$(Q)rm -f shell.srec
 	$(Q)echo "BIN\t SHELL"
 
-init: init/init.srec
+init: include/init_codes.c
 	$(Q)$(MAKE) -C init
 	$(Q)-rm -f $(KMAIN)
 	$(Q)cp init/init.srec .

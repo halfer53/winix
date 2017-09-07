@@ -260,6 +260,6 @@ void init_exceptions() {
     _expt_stack_ptr += EXCEPTION_STACK_SIZE - 1;
 
     wramp_set_handler(exception_handler);
-    RexTimer->Load = 40; //60 Hz
-    RexTimer->Ctrl = 3; //Enabled, auto-restart
+    RexTimer->Load = 2400 / get_hz(); //currently 60 Hz
+    enable_interrupt();
 }

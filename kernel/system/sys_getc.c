@@ -2,7 +2,7 @@
  * Syscall in this file: getc
  * Input:    
  *
- * Return:     m1_i1:    character read from serial port 1
+ * Return:     reply_res:    character read from serial port 1
  *
  * NB this is a blocking syscall
  * 

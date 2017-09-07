@@ -73,17 +73,19 @@ void* sys_sbrk(struct proc *who, int size){
 int do_brk(struct proc *who, struct message *m){
     int size;
     ptr_t* new_brk;
+    vptr_t* vaddr = m->m1_p1;
     ptr_t* addr = get_physical_addr(m->m1_p1, who);
     ptr_t* heap_top;
 
     m->m1_p1 = get_virtual_addr(who->heap_break, who);
-
     if(addr < who->heap_break){
         heap_top = GET_HEAP_TOP(who);
-        if(addr < heap_top)
+        if(addr < heap_top){
             return EINVAL;
+        }
         
         who->heap_break = addr;
+        m->m1_p1 = vaddr;
         return OK;
     }
 

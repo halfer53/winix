@@ -49,6 +49,8 @@ typedef struct message{
 #define m2_l5  m_u.m_m2.m2l5
 #define m2_l6  m_u.m_m2.m2l6
 
+#define reply_res	type
+
 /**
  * Magic Numbers for send/receive
  **/

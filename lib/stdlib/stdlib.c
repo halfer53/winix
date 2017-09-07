@@ -263,10 +263,3 @@ void *realloc(void *p, size_t size)
 }
 
 
-int exit(int status){
-    _exit(status);
-    //should never get here
-    return EXIT_FAILURE;
-}
-
-

@@ -65,7 +65,6 @@ void clear_proc(struct proc *who){
 
 
 void exit_proc(struct proc *who, int status){
-    struct message mesg;
     struct proc *mp;
     int i, children = 0;
     
@@ -82,11 +81,11 @@ void exit_proc(struct proc *who, int status){
         mp = &proc_table[i];
         if(mp->i_flags & IN_USE){
             if(mp->s_flags & WAITING && mp->wpid == who->proc_nr){
-                mesg.m1_i1 = who->proc_nr;
-                mesg.m1_i2 = (who->exit_status << 8) | (who->sig_status & 0x7f);
-                mp->s_flags &= ~WAITING;
 
-                notify(mp->proc_nr,&mesg);
+                curr_mesg()->m1_i2 = (who->exit_status << 8) | (who->sig_status & 0x7f);
+                mp->s_flags &= ~WAITING;
+                syscall_reply(mp->proc_nr, who->proc_nr);
+
                 children++;
             }else if(mp->parent == who->proc_nr){
                 //Change the child process's parent to init

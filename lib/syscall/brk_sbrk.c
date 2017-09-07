@@ -9,7 +9,7 @@ int brk(void *addr){
         m.m1_p1 = addr;
         ret = _syscall(SYSCALL_BRK,&m);
         _brk = m.m1_p1;
-        if(m.m1_i1 != 0)
+        if(ret != 0)
             return -1;
     }
     return ret;
@@ -31,6 +31,7 @@ void *sbrk(int incr){
         return(oldsize);
 
     return_err:
+        printf("sbrk err\n");
         return( (void *) -1);
         
 }

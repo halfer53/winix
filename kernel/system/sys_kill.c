@@ -2,7 +2,7 @@
  * Syscall in this file: kill
  * Input:    m1_i1: pid to which the signal is sent
  *
- * Return:     m1_i1:    default return
+ * Return:     reply_res:    default return
  * 
  * @author Bruce Tan
  * @email brucetansh@gmail.com
