@@ -1,9 +1,9 @@
 /**
  * Syscall in this file: winfo
  * NB this is a winix specific system call
- * Input:   i1: type of information to be displayed
+ * Input:   m1_i1: type of information to be displayed
  *
- * Return:  i1: OK
+ * Return:  m1_i1: OK
  * 
  * @author Bruce Tan
  * @email brucetansh@gmail.com
@@ -17,7 +17,7 @@
 #include "../winix.h"
 
 int do_winfo(struct proc *who, struct message *m){
-    switch(m->i1){
+    switch(m->m1_i1){
         case WINFO_PS:
             print_runnable_procs();
             break;

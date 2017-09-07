@@ -2,7 +2,7 @@
  * Syscall in this file: sigaction
  * Input:	
  *
- * Return: 	i1: syscall status
+ * Return: 	m1_i1: syscall status
  * 
  * @author Bruce Tan
  * @email brucetansh@gmail.com
@@ -19,7 +19,7 @@ int do_sigaction(struct proc *who, struct message *m){
     int signum;
     sighandler_t osig;
 
-    signum = m->i1;
+    signum = m->m1_i1;
     if(signum == SIGKILL)
         return EINVAL;
     osig = who->sig_table[signum].sa_handler;

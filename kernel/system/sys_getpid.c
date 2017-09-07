@@ -2,8 +2,8 @@
  * Syscall in this file: getpid
  * Input:	
  *
- * Return: 	i1:	pid
- * 			i2: ppid
+ * Return: 	m1_i1:	pid
+ * 			m1_i2: ppid
  * 
  * @author Bruce Tan
  * @email brucetansh@gmail.com
@@ -18,6 +18,6 @@
 
 
 int do_getpid(struct proc *who, struct message *m){
-    m->i2 = who->parent;
+    m->m1_i2 = who->parent;
     return who->proc_nr;
 }

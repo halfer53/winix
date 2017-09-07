@@ -1,8 +1,8 @@
 /**
  * Syscall in this file: alarm
- * Input:   i1: seconds
+ * Input:   m1_i1: seconds
  *
- * Return:  i1: previous timer seconds
+ * Return:  m1_i1: previous timer seconds
  *
  * @author Bruce Tan
  * @email brucetansh@gmail.com
@@ -16,17 +16,17 @@
 #include "../winix.h"
 
 //alarm syscall
-//input     m.i1    seconds
-//output    m.i1    previous timeout
+//input     m.m1_i1    seconds
+//output    m.m1_i1    previous timeout
 int do_alarm(struct proc *who, struct message *m){
     clock_t seconds;
     struct timer *alarm;
     clock_t prev_timeout;
 
-    if(m->i1 < 0)
+    if(m->m1_i1 < 0)
         return EINVAL;
 
-    seconds = (clock_t )m->i1; 
+    seconds = (clock_t )m->m1_i1; 
     alarm = &who->alarm;
     prev_timeout = alarm->time_out; //return previous alarm
 
@@ -38,7 +38,7 @@ int do_alarm(struct proc *who, struct message *m){
     //if seconds is 0, any pending alarm is canceled
     if(seconds != 0){
         alarm->proc_nr = who->proc_nr;
-        alarm->time_out = system_uptime + seconds * 60;
+        alarm->time_out = get_uptime() + seconds * 60;
         alarm->handler = &deliver_alarm;
         insert_timer(alarm);
     }

@@ -21,7 +21,7 @@
 /**
  * System Call Numbers
  **/
-#define SYSCALL_UPTIME		1
+#define SYSCALL_TIMES		1
 #define SYSCALL_EXIT		2
 #define SYSCALL_FORK		3
 #define SYSCALL_VFORK		4
@@ -37,7 +37,7 @@
 #define SYSCALL_GETC        14
 #define SYSCALL_PRINTF    	15
 
-#define SYSCALL_DEFAULT_RETURN  m.i1
+#define SYSCALL_DEFAULT_RETURN  m.m1_i1
 
 #define DECLARE_SYSCALL(function, params, syscall_num, passing_codes)\
 function params{\
@@ -46,13 +46,13 @@ function params{\
     m.type = syscall_num;\
     passing_codes;\
     __ret = winix_sendrec(SYSTEM_TASK,&m);\
-    if(m.i1 < 0){\
-        __errno = -m.i1;\
-        m.i1 = -1;\
+    if(m.m1_i1 < 0){\
+        __errno = -m.m1_i1;\
+        m.m1_i1 = -1;\
     }else{\
         __errno = 0;\
     }\
-    return m.i1;\
+    return m.m1_i1;\
 }\
 
 
@@ -61,11 +61,6 @@ function params{\
 #define WINFO_SLAB  4
 
 int _SYSCALL(int syscall_num, struct message *m);
-
-/**
- * Returns the current system uptime, specified as the number of ticks since boot.
- **/
-int sys_uptime();
 
 /**
  * Exits the current process.

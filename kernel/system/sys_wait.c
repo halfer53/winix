@@ -2,8 +2,8 @@
  * Syscall in this file: wait
  * Input:   
  *
- * Return:  i1: pid of the child process
- *          i2: wstatus value
+ * Return:  m1_i1: pid of the child process
+ *          m1_i2: wstatus value
  *
  *          if no child is found, this process is blocked
  * 
@@ -31,7 +31,7 @@ int do_wait(struct proc *parent, struct message *mesg){
         //if there is a child process that is zombie
         if(child->i_flags & IN_USE && child->parent == parent->proc_nr){
             if(child->i_flags & ZOMBIE){
-                mesg->i2 = (child->exit_status << 8) | (child->sig_status & 0x7f);
+                mesg->m1_i2 = (child->exit_status << 8) | (child->sig_status & 0x7f);
                 free_slot(child);
                 return child->proc_nr;
             }

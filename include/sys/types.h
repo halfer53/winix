@@ -5,7 +5,7 @@ typedef unsigned int size_t;
 typedef unsigned char byte;
 typedef unsigned char byte_t;
 typedef unsigned int uint32_t;
-typedef unsigned int clock_t;
+typedef long clock_t;
 typedef unsigned int mode_t;
 typedef unsigned int uid_t;
 typedef unsigned int gid_t;

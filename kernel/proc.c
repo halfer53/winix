@@ -241,7 +241,6 @@ int dequeue_schedule( struct proc *h) {
 	} else {
 		prev->next = curr->next;
 	}
-	h->i_flags &= ~RUNNABLE;
 	return OK;
 }
 

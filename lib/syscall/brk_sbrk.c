@@ -6,10 +6,10 @@ int brk(void *addr){
 	struct message m;
 	int ret = 0;
 	if(addr != _brk){
-		m.p1 = addr;
+		m.m1_p1 = addr;
 		ret = _syscall(SYSCALL_BRK,&m);
-		_brk = m.p1;
-		if(m.i1 != 0)
+		_brk = m.m1_p1;
+		if(m.m1_i1 != 0)
 			return -1;
 	}
 	return ret;

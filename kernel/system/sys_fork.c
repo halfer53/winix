@@ -2,7 +2,7 @@
  * Syscall in this file: fork
  * Input:	
  *
- * Return: 	i1: child's pid to parent,
+ * Return: 	m1_i1: child's pid to parent,
  * 				and 0 to child
  * 
  * @author Bruce Tan
@@ -101,9 +101,12 @@ int sys_fork(struct proc *parent) {
 		//Divide the quantum size between the parent and child
 		//if quantum size is 1, quantum size is not changed
 		if(parent->quantum != 1){
-			child->quantum = (child->quantum + 1) / 2;
+			//child get an extra quantum if the quantum size is odd
+			child->quantum = (child->quantum + 1) / 2; 
 			parent->quantum /= 2;
 		}
+
+		child->time_used = child->sys_time_used = 0;
 
 		child->parent = parent->proc_nr;
 		return child->proc_nr;
@@ -118,9 +121,11 @@ int do_fork(struct proc *who, struct message *m){
 	if(child_pr == ERR)
 		return EINVAL;
 	
-	m->i1 = 0;
+	//send 0 to child
+	m->m1_i1 = 0;
 	notify(child_pr,m);
 
+	//send the child pid to parent
 	return child_pr;
 }
 

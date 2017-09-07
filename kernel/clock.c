@@ -15,7 +15,7 @@
 #include "winix.h"
 
 //System uptime, stored as number of timer interrupts since boot
-PUBLIC int system_uptime = 0;
+PRIVATE clock_t system_uptime = 0;
 
 //Global variable for the next timeout event
 PUBLIC clock_t next_timeout = 0;
@@ -26,10 +26,14 @@ void deliver_alarm(int proc_nr, clock_t time){
 
 void handle_timer(struct timer *timer){
 
-    if(timer != NULL && timer->time_out == system_uptime)
+    if(timer != NULL && timer->time_out == get_uptime())
         timer->handler(timer->proc_nr,timer->time_out);
     else
-        kprintf("Inconsis alarm %d %d from %d\n",system_uptime,next_timeout,timer->proc_nr);
+        kprintf("Inconsis alarm %d %d from %d\n",get_uptime(),next_timeout,timer->proc_nr);
+}
+
+clock_t get_uptime(){
+    return system_uptime;
 }
 
 /**

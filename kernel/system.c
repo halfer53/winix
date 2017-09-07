@@ -21,9 +21,7 @@ PRIVATE struct proc *who;
 PRIVATE ucontext_t recv_ctx;
 PRIVATE struct syscall_ctx syscall_context;
 
-struct syscall_ctx *interrupted_syscall_ctx(){
-	return &syscall_context;
-}
+
 
 /**
  * interrupt the current executing system call
@@ -40,9 +38,11 @@ void intr_syscall(){
 	}
 }
 
-
 struct message *curr_mesg(){
 	return &m;
+}
+struct syscall_ctx *interrupted_syscall_ctx(){
+	return &syscall_context;
 }
 
 /**
@@ -77,32 +77,39 @@ void system_main() {
 		winix_receive(&m);
 		who_proc_nr = m.src;
 		who = get_proc(who_proc_nr);
+
+		//Bill the user proc's sys_used_time while executing syscall
+		//on behalf of the user process
+		get_proc(SYSTEM_TASK)->i_flags |= BILLABLE;
+		set_bill_ptr(who);
+
+		//Make sure system doesn't send a message to itself
 		ASSERT(who != NULL && who_proc_nr != SYSTEM_TASK); 
 
 		//Do the work
 		switch(m.type) {
-			case SYSCALL_UPTIME:		m.i1 = do_time(who,&m);			break;
-			case SYSCALL_EXIT:			m.i1 = do_exit(who,&m);			break;
-			case SYSCALL_FORK:			m.i1 = do_fork(who,&m);			break;
-			case SYSCALL_EXECVE:		m.i1 = do_exec(who,&m);			break;
-			case SYSCALL_BRK:			m.i1 = do_brk(who,&m);			break;
-			case SYSCALL_ALARM:			m.i1 = do_alarm(who,&m);		break;
-			case SYSCALL_SIGNAL:		m.i1 = do_sigaction(who,&m);	break;
-			case SYSCALL_SIGRET:		m.i1 = do_sigreturn(who,&m);	break;
-			case SYSCALL_WAIT:			m.i1 = do_wait(who,&m);			break;
-			case SYSCALL_KILL: 			m.i1 = do_kill(who,&m);			break;
-			case SYSCALL_GETPID:		m.i1 = do_getpid(who,&m);		break;
-			case SYSCALL_GETC:			m.i1 = do_getc(who,&m);			break;
-			case SYSCALL_WINFO:			m.i1 = do_winfo(who,&m);		break;
-			case SYSCALL_PRINTF:		m.i1 = do_printf(who,&m);		break;
+			case SYSCALL_TIMES:			m.m2_l1 = do_times(who,&m);			break;
+			case SYSCALL_EXIT:			m.m1_i1 = do_exit(who,&m);			break;
+			case SYSCALL_FORK:			m.m1_i1 = do_fork(who,&m);			break;
+			case SYSCALL_EXECVE:		m.m1_i1 = do_exec(who,&m);			break;
+			case SYSCALL_BRK:			m.m1_i1 = do_brk(who,&m);			break;
+			case SYSCALL_ALARM:			m.m1_i1 = do_alarm(who,&m);		break;
+			case SYSCALL_SIGNAL:		m.m1_i1 = do_sigaction(who,&m);	break;
+			case SYSCALL_SIGRET:		m.m1_i1 = do_sigreturn(who,&m);	break;
+			case SYSCALL_WAIT:			m.m1_i1 = do_wait(who,&m);			break;
+			case SYSCALL_KILL: 			m.m1_i1 = do_kill(who,&m);			break;
+			case SYSCALL_GETPID:		m.m1_i1 = do_getpid(who,&m);		break;
+			case SYSCALL_GETC:			m.m1_i1 = do_getc(who,&m);			break;
+			case SYSCALL_WINFO:			m.m1_i1 = do_winfo(who,&m);		break;
+			case SYSCALL_PRINTF:		m.m1_i1 = do_printf(who,&m);		break;
 			default:
 				kinfo("Process \"%s (%d)\" performed unknown system call %d\r\n", 
 												who->name, who->proc_nr, m.type);
-				m.i1 = ENOSYS;
+				m.m1_i1 = ENOSYS;
 				break;
 		}
 
-		if(m.i1 != SUSPEND && m.i1 != DONOTHING){
+		if(m.m1_i1 != SUSPEND && m.m1_i1 != DONOTHING){
 			notify(who_proc_nr,&m);
 		}
 
@@ -110,7 +117,8 @@ void system_main() {
 		//during the syscall
 		ASSERT(null_val == *(unsigned int*)NULL);
 
-		//reset messages
+		//pro syscall
+		get_proc(SYSTEM_TASK)->i_flags &= ~BILLABLE;
 		memset(&m, 0, sizeof(struct message));
 		who_proc_nr = 0;
 	}

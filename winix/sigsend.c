@@ -89,7 +89,7 @@ PRIVATE int build_signal_ctx(struct proc *who, int signum){
     //pm points at the syscall message, not that this is a virtual address
     sigframe->pm = (struct message *)(who->sp - sizeof(sigframe_code) - sizeof(struct message));
     sigframe->m.type = SYSCALL_SIGRET;
-    sigframe->m.i1 = signum;
+    sigframe->m.m1_i1 = signum;
     memcpy(sigframe->sigret_codes, sigframe_code, sizeof(sigframe_code));
 
     build_user_stack(who,sigframe,sizeof(struct sigframe));
@@ -123,7 +123,7 @@ PRIVATE int sys_sig_handler(struct proc *who, int signum){
 
             struct message* em = get_exception_m();
             em->type = SYSCALL_EXIT;
-            em->i1 = 0;
+            em->m1_i1 = 0;
             interrupt_send(SYSTEM_TASK, em);
 
             if(current_proc == who)

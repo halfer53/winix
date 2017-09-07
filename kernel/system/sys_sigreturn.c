@@ -1,6 +1,6 @@
 /**
  * Syscall in this file: sigreturn
- * Input:   i1: signum number
+ * Input:   m1_i1: signum number
  *
  * Return:  This syscall does not return
  * 
@@ -29,7 +29,7 @@
     if(prev_syscall->who->proc_nr == to->proc_nr &&
         to->s_flags & RECEIVING && prev_syscall->interruptted){
         
-        prev_syscall->m.i1 = EINTR;
+        prev_syscall->m.m1_i1 = EINTR;
         notify(to->proc_nr,&prev_syscall->m);
     }else{
         enqueue_schedule(to);
@@ -41,7 +41,7 @@
 int do_sigreturn(struct proc *who, struct message *m){
     reg_t *sp;
     struct proc *systask;
-    int signum = m->i1;
+    int signum = m->m1_i1;
 
     sp = get_physical_addr(who->sp,who);
 

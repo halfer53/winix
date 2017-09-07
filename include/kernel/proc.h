@@ -71,6 +71,7 @@
 #define RUNNABLE				0x0002
 #define ZOMBIE					0x0004
 #define STOPPED					0x0008
+#define BILLABLE				0x0010
 
 //alloc_proc_mem flags
 #define PROC_SET_SP				1
@@ -94,11 +95,14 @@ typedef struct proc {
 	void (*pc)();
 	reg_t *rbase;
 	reg_t *ptable;
-	reg_t cctrl;  				//len 19
+	reg_t cctrl;  				//len 19 words
 
 	/* IPC messages */
 	int s_flags; 				//schedling flags
 	struct message* message;	//Message Buffer
+								//len 21 words
+								//DO NOT MODIFY or CHANGE the order of the above
+								//fields unless you know what you are doing
 
 	/* Heap and Stack*/
 	ptr_t* stack_top; 			//Stack_top is the physical address
@@ -119,12 +123,14 @@ typedef struct proc {
 
 	/* Scheduling */
 	struct proc *next;			//Next pointer
-	int priority;	
+	int priority;				//Priority
 	int quantum;				//Timeslice length
 	int ticks_left;				//Timeslice remaining
 
 	/* Accounting */
-	int time_used;				//CPU time used
+	clock_t time_used;			//CPU time used
+	clock_t sys_time_used;		//system time used while system is executing on behalf of this
+								//proc
 
 	/* Metadata */
 	char name[PROC_NAME_LEN];	//Process name

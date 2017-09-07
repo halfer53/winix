@@ -55,7 +55,7 @@ int new_timer(clock_t timeout, timerhandler_t watchdog){
     {
         curr = &timer_table[i]; 
         if(! curr->flags & TIMER_INUSE){
-            curr->time_out = system_uptime + timeout;
+            curr->time_out = get_uptime() + timeout;
             curr->proc_nr = SYSTEM_TASK;
             curr->handler = watchdog;
             insert_timer(curr);

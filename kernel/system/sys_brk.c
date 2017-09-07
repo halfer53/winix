@@ -1,8 +1,8 @@
 /**
  * Syscall in this file: brk
- * Input:	p1: new user heap break
+ * Input:	m1_p1: new user heap break
  *
- * Return: 	p1: current user heap break
+ * Return: 	m1_p1: current user heap break
  * 			on success, it returns the new break set by user
  * 			on failure, it returns the previous heap break
  * 
@@ -73,10 +73,10 @@ void* sys_sbrk(struct proc *who, int size){
 int do_brk(struct proc *who, struct message *m){
 	int size;
 	ptr_t* new_brk;
-	ptr_t* addr = get_physical_addr(m->p1, who);
+	ptr_t* addr = get_physical_addr(m->m1_p1, who);
 	ptr_t* heap_top;
 
-	m->p1 = get_virtual_addr(who->heap_break, who);
+	m->m1_p1 = get_virtual_addr(who->heap_break, who);
 
 	if(addr < who->heap_break){
 		heap_top = GET_HEAP_TOP(who);
@@ -92,6 +92,6 @@ int do_brk(struct proc *who, struct message *m){
 	if(new_brk == NULL)
 		return ENOMEM;
 	
-	m->p1 = new_brk;
+	m->m1_p1 = new_brk;
 	return OK;
 }

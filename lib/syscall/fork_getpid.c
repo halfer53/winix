@@ -24,5 +24,5 @@ pid_t getpid(){
 pid_t getppid(){
 	struct message m;
 	_syscall(SYSCALL_GETPID,&m);
-	return m.i2;
+	return m.m1_i2;
 }

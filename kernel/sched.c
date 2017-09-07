@@ -13,6 +13,12 @@
 */
 #include "winix.h"
 
+PRIVATE struct proc* bill_ptr;
+
+void set_bill_ptr(struct proc* who){
+	bill_ptr = who;
+}
+
 /**
  * This method is called every 100 timer interrupts
  * It effectly moves every processes in the ready queues
@@ -89,6 +95,10 @@ void sched() {
 	if (current_proc != NULL && !current_proc->s_flags) {
 		//Accounting
 		current_proc->time_used++;
+
+		if(current_proc->i_flags & BILLABLE){
+			bill_ptr->sys_time_used++;
+		}
 
 		if (--current_proc->ticks_left) {
 			enqueue_head(ready_q[current_proc->priority], current_proc);

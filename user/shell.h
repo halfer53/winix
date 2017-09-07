@@ -7,6 +7,7 @@
 #include <string.h>
 #include <debug.h>
 #include <ucontext.h>
+#include <sys/times.h>
 
 
 #define CMD_PROTOTYPE(name)	int name(int argc, char**argv)

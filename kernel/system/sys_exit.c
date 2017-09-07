@@ -1,6 +1,6 @@
 /**
  * Syscall in this file: exit
- * Input:   i1: exit status
+ * Input:   m1_i1: exit status
  *
  * @author Bruce Tan
  * @email brucetansh@gmail.com
@@ -80,7 +80,7 @@ void exit_proc(struct proc *who, int status){
         mp = &proc_table[i];
         if(mp->i_flags & IN_USE){
             if(mp->s_flags & WAITING && mp->wpid == who->proc_nr){
-                mesg.i2 = (who->exit_status << 8) | (who->sig_status & 0x7f);
+                mesg.m1_i2 = (who->exit_status << 8) | (who->sig_status & 0x7f);
                 mp->s_flags &= ~WAITING;
 
                 notify(mp->proc_nr,&mesg);
@@ -105,7 +105,7 @@ void exit_proc(struct proc *who, int status){
 
 int do_exit(struct proc *who, struct message *m){
 
-    exit_proc(who,m->i1);
+    exit_proc(who,m->m1_i1);
     return SUSPEND;
 }
 

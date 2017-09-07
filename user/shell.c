@@ -145,8 +145,8 @@ int ps(int argc, char **argv){
  **/
 int uptime(int argc, char **argv) {
 	int ticks, days, hours, minutes, seconds;
-
-	ticks = sys_uptime();
+	struct tms tbuf;
+	ticks = times(&tbuf);
 	seconds = ticks / 60; //TODO: define tick rate somewhere
 	minutes = seconds / 60;
 	hours = minutes / 60;
@@ -158,6 +158,7 @@ int uptime(int argc, char **argv) {
 	// ticks %= 100;
 
 	printf("Uptime is %dd %dh %dm %d.%ds\n", days, hours, minutes, seconds, ticks%100);
+	printf("utime %d stime %d\n", tbuf.tms_utime, tbuf.tms_stime);
 	return 0;
 }
 
@@ -191,6 +192,7 @@ void main() {
 	char *end_buf;
 	struct cmd *handler = NULL;
 	struct cmdLine sc;
+	struct message m;
 
 	c = buf;
 	end_buf = c + BUF_LEN -2;

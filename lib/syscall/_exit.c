@@ -5,7 +5,8 @@
  **/
  int _exit(int status) {
 	struct message m;
-	m.i1 = status;
+	m.m1_i1 = status;
 	return _syscall(SYSCALL_EXIT,&m);
 }
+
 

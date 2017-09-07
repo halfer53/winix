@@ -1,9 +1,9 @@
 /**
  * Syscall in this file: printf
- * Input:	p1: string parameter
- * 			p2: options parameter
+ * Input:	m1_p1: string parameter
+ * 			m1_p2: options parameter
  *
- * Return: 	i1: number of bytes being printed
+ * Return: 	m1_i1: number of bytes being printed
  * 
  * @author Bruce Tan
  * @email brucetansh@gmail.com
@@ -34,7 +34,7 @@
  */
 int do_printf(struct proc *who, struct message *m){
     void *ptr, *ptr2;
-    ptr = get_physical_addr(m->p1,who);
-    ptr2 = get_physical_addr(m->p2,who);
+    ptr = get_physical_addr(m->m1_p1,who);
+    ptr2 = get_physical_addr(m->m1_p2,who);
     return kprintf_vm(ptr,ptr2,who->rbase);
 }

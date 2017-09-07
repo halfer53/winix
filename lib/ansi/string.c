@@ -1,8 +1,5 @@
 #include <lib.h>
 
-/*
-
- */
 void *memcpy(void *s1, const void *s2, register size_t n)
 {
 	register char *p1 = s1;
@@ -98,3 +95,4 @@ int Substring(char* buffer, char* original, int start_index, int length) {
 	buffer[count] = '\0';
 	return count;
 }
+
