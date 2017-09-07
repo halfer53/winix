@@ -93,15 +93,16 @@ void system_main() {
 			case SYSCALL_FORK:			m.m1_i1 = do_fork(who,&m);			break;
 			case SYSCALL_EXECVE:		m.m1_i1 = do_exec(who,&m);			break;
 			case SYSCALL_BRK:			m.m1_i1 = do_brk(who,&m);			break;
-			case SYSCALL_ALARM:			m.m1_i1 = do_alarm(who,&m);		break;
-			case SYSCALL_SIGNAL:		m.m1_i1 = do_sigaction(who,&m);	break;
-			case SYSCALL_SIGRET:		m.m1_i1 = do_sigreturn(who,&m);	break;
+			case SYSCALL_ALARM:			m.m1_i1 = do_alarm(who,&m);			break;
+			case SYSCALL_SIGNAL:		m.m1_i1 = do_sigaction(who,&m);		break;
+			case SYSCALL_SIGRET:		m.m1_i1 = do_sigreturn(who,&m);		break;
 			case SYSCALL_WAIT:			m.m1_i1 = do_wait(who,&m);			break;
 			case SYSCALL_KILL: 			m.m1_i1 = do_kill(who,&m);			break;
 			case SYSCALL_GETPID:		m.m1_i1 = do_getpid(who,&m);		break;
 			case SYSCALL_GETC:			m.m1_i1 = do_getc(who,&m);			break;
-			case SYSCALL_WINFO:			m.m1_i1 = do_winfo(who,&m);		break;
+			case SYSCALL_WINFO:			m.m1_i1 = do_winfo(who,&m);			break;
 			case SYSCALL_PRINTF:		m.m1_i1 = do_printf(who,&m);		break;
+			case SYSCALL_SYSCONF:		m.m1_i1 = do_sysconf(who,&m);		break;
 			default:
 				kinfo("Process \"%s (%d)\" performed unknown system call %d\r\n", 
 												who->name, who->proc_nr, m.type);

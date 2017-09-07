@@ -144,10 +144,11 @@ int ps(int argc, char **argv){
  * Prints the system uptime
  **/
 int uptime(int argc, char **argv) {
-	int ticks, days, hours, minutes, seconds;
+	int ticks, days, hours, minutes, seconds, tick_rate;
 	struct tms tbuf;
 	ticks = times(&tbuf);
-	seconds = ticks / 60; //TODO: define tick rate somewhere
+	tick_rate = sysconf(_SC_CLK_TCK);
+	seconds = ticks / tick_rate; 
 	minutes = seconds / 60;
 	hours = minutes / 60;
 	days = hours / 24;

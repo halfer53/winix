@@ -36,6 +36,7 @@
 #define SYSCALL_WINFO		13
 #define SYSCALL_GETC        14
 #define SYSCALL_PRINTF    	15
+#define SYSCALL_SYSCONF     16
 
 #define SYSCALL_DEFAULT_RETURN  m.m1_i1
 
@@ -62,15 +63,12 @@ function params{\
 
 int _SYSCALL(int syscall_num, struct message *m);
 
-/**
- * Exits the current process.
- **/
+
 int _exit(int status);
 int sys_ps();
 pid_t fork();
 int brk(void *addr);
 void *sbrk(int incr);
-
 int getc();
 int printf(const char *format, ...);
 unsigned int alarm(unsigned int seconds);
@@ -78,5 +76,6 @@ pid_t wait(int *wstatus);
 pid_t getpid();
 pid_t getppid();
 int kill (pid_t pid, int sig);
+long sysconf(int name);
 
 #endif

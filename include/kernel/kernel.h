@@ -27,6 +27,7 @@
 #include <sys/ipc.h>
 #include <sys/types.h>
 #include <sys/syscall.h>
+#include <sys/unistd.h>
 #include <stddef.h>
 #include <util.h>
 #include <const.h>
