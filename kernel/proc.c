@@ -510,6 +510,7 @@ void init_proc() {
         p = &proc_table[i];
         proc_set_default(p);
         p->proc_nr = i;
+        p->s_flags |= STOPPED;
         enqueue_tail(free_proc, p);
     }
 

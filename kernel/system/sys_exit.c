@@ -76,10 +76,13 @@ void exit_proc(struct proc *who, int status){
     //if parent is waiting
     KDEBUG(("%s[%d] exit status %d signal %d\n",who->name, who->proc_nr, 
                                               status, who->sig_status));
+
+    who->exit_status = status;                                          
     for( i=0; i< NUM_PROCS; i++){
         mp = &proc_table[i];
         if(mp->i_flags & IN_USE){
             if(mp->s_flags & WAITING && mp->wpid == who->proc_nr){
+                mesg.m1_i1 = who->proc_nr;
                 mesg.m1_i2 = (who->exit_status << 8) | (who->sig_status & 0x7f);
                 mp->s_flags &= ~WAITING;
 

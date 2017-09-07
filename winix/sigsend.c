@@ -42,7 +42,7 @@ PRIVATE unsigned int sigframe_code[SIGRET_CODE_LEN] = {0x1ee10001,0x200d0000};
  * operation   
  * destination
  * pm           <- The above three are necessary parameters for invoking syscall
- *                 operation is WINIX_SEND, destination is SYSTEM_TASK, (or kernel)
+ *                 operation is WINIX_SEND, destination is SYSTEM, (or kernel)
  *                 and pm points to the messages being passed to the kernel. NB
  *                 that pm is the virtual memory
  * messages     <- The actual messages, remember that pm points to this message
@@ -85,7 +85,7 @@ PRIVATE int build_signal_ctx(struct proc *who, int signum){
     //pc will point to the sig return code, to initiate sig return sys call
     who->ra = who->sp - sizeof(sigframe_code);
     sigframe->operation = WINIX_SENDREC;
-    sigframe->dest = SYSTEM_TASK;
+    sigframe->dest = SYSTEM;
     //pm points at the syscall message, not that this is a virtual address
     sigframe->pm = (struct message *)(who->sp - sizeof(sigframe_code) - sizeof(struct message));
     sigframe->m.type = SYSCALL_SIGRET;
@@ -124,7 +124,7 @@ PRIVATE int sys_sig_handler(struct proc *who, int signum){
             struct message* em = get_exception_m();
             em->type = SYSCALL_EXIT;
             em->m1_i1 = 0;
-            interrupt_send(SYSTEM_TASK, em);
+            interrupt_send(SYSTEM, em);
 
             if(current_proc == who)
                 current_proc = NULL;
@@ -158,7 +158,7 @@ PRIVATE int sigsend_comm(struct proc *who, int signum){
     
     if(in_interrupt()){
         if(who->proc_nr == curr_mesg()->src){
-            get_proc(SYSTEM_TASK)->pc = &intr_syscall;
+            get_proc(SYSTEM)->pc = &intr_syscall;
         }
     }
     return OK;

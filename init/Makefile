@@ -6,7 +6,8 @@ SOURCES = $(PROGS:=.c)
 ASSEMBLY = $(PROGS:=.s)
 OBJECT = $(PROGS:=.o)
 
-LIBS = syscall/syscall.o syscall/wramp_syscall.o syscall/ipc.o stdlib/errno.o
+LIBS = syscall/syscall.o syscall/wramp_syscall.o syscall/ipc.o stdlib/errno.o\
+		syscall/wait.o syscall/printf.o
 LIBS_O = $(addprefix ../lib/, $(LIBS))
 
 init: wramp

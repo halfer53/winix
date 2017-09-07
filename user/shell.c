@@ -157,10 +157,10 @@ int uptime(int argc, char **argv) {
     minutes %= 60;
     hours %= 24;
 
-    printf("Uptime is %dd %dh %dm %d.%ds\n", days, hours, minutes, seconds, ticks%100);
-    printf("user time %d.%d seconds, system time %d.%d seconds\n",
-                                    tbuf.tms_utime / tick_rate, tbuf.tms_utime %100,
-                                    tbuf.tms_stime / tick_rate, tbuf.tms_stime %100);
+    printf("Uptime is %dd %dh %dm %d.%02ds\n", days, hours, minutes, seconds, ticks%60);
+    printf("user time %d.%d seconds, system time %d.%02d seconds\n",
+                            tbuf.tms_utime  / tick_rate , (tbuf.tms_utime) %60,
+                            tbuf.tms_stime / tick_rate , (tbuf.tms_stime) %60);
     return 0;
 }
 

@@ -46,7 +46,7 @@ function params{\
     int __ret;\
     m.type = syscall_num;\
     passing_codes;\
-    __ret = winix_sendrec(SYSTEM_TASK,&m);\
+    __ret = winix_sendrec(SYSTEM,&m);\
     if(m.m1_i1 < 0){\
         __errno = -m.m1_i1;\
         m.m1_i1 = -1;\
@@ -61,7 +61,7 @@ function params{\
 #define WINFO_MEM   2
 #define WINFO_SLAB  4
 
-int _SYSCALL(int syscall_num, struct message *m);
+int _syscall(int syscall_num, struct message *m);
 
 
 int _exit(int status);

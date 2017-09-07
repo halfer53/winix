@@ -14,7 +14,7 @@
 */
 
 struct proc_config boot_table[] = {
-    {"SYSTEM", system_main,         SYSTEM_TASK,    64, true,   NULL,       0                   },
+    {"SYSTEM", system_main,         SYSTEM,    64, true,   NULL,       0                   },
     {"INIT",   (void(*)())init_pc,  INIT,           1,  false,  init_code,  init_code_length    },
     {"IDLE",   idle_main,           IDLE,           1,  true,   NULL,       0                   },
 };

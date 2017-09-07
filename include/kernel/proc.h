@@ -167,7 +167,7 @@ extern struct proc *block_q[2];
 #define IS_KERNEL_PROC(p)               ((p)->rbase == NULL)
 #define IS_USER_PROC(p)                 ((p)->rbase != NULL)
 #define IS_IDLE(p)                      ((p)->proc_nr == IDLE)
-#define IS_SYSTEM(p)                    ((p)->proc_nr == SYSTEM_TASK)
+#define IS_SYSTEM(p)                    ((p)->proc_nr == SYSTEM)
 #define IS_RUNNABLE(p)                  (((p)->i_flags & (IN_USE | RUNNABLE)) == (IN_USE | RUNNABLE))
 
 #define CHECK_STACK(p)                  (*((p)->stack_top) == STACK_MAGIC)

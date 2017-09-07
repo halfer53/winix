@@ -69,7 +69,7 @@ stat:
 	@echo "Assembly LoC: "
 	@find . -name "*.s" -exec cat {} \; | wc -l
 
-shell: user/shell.c user/shell_test.c user/shell_parse.c
+shell: user/shell.srec
 	$(Q)-rm -f $(KMAIN)
 	$(Q)cp user/shell.srec .
 	$(Q)java $(REFORMAT) shell.srec
@@ -77,7 +77,7 @@ shell: user/shell.c user/shell_test.c user/shell_parse.c
 	$(Q)rm -f shell.srec
 	$(Q)echo "BIN\t SHELL"
 
-init: init/init.c
+init: init/init.srec
 	$(Q)$(MAKE) -C init
 	$(Q)-rm -f $(KMAIN)
 	$(Q)cp init/init.srec .

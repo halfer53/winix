@@ -80,15 +80,15 @@ void system_main() {
 
         //Bill the user proc's sys_used_time while executing syscall
         //on behalf of the user process
-        get_proc(SYSTEM_TASK)->i_flags |= BILLABLE;
+        get_proc(SYSTEM)->i_flags |= BILLABLE;
         set_bill_ptr(who);
 
         //Make sure system doesn't send a message to itself
-        ASSERT(who != NULL && who_proc_nr != SYSTEM_TASK); 
+        ASSERT(who != NULL && who_proc_nr != SYSTEM); 
 
         //Do the work
         switch(m.type) {
-            case SYSCALL_TIMES:             m.m2_l1 = do_times(who,&m);             break;
+            case SYSCALL_TIMES:             m.m1_i1 = do_times(who,&m);             break;
             case SYSCALL_EXIT:              m.m1_i1 = do_exit(who,&m);              break;
             case SYSCALL_FORK:              m.m1_i1 = do_fork(who,&m);              break;
             case SYSCALL_EXECVE:            m.m1_i1 = do_exec(who,&m);              break;
@@ -119,7 +119,7 @@ void system_main() {
         ASSERT(null_val == *(unsigned int*)NULL);
 
         //pro syscall
-        get_proc(SYSTEM_TASK)->i_flags &= ~BILLABLE;
+        get_proc(SYSTEM)->i_flags &= ~BILLABLE;
         memset(&m, 0, sizeof(struct message));
         who_proc_nr = 0;
     }

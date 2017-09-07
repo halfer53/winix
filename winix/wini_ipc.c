@@ -47,7 +47,7 @@ int wini_send(int dest, struct message *m) {
         }
 
         if(is_debugging_syscall()){
-            if(dest == SYSTEM_TASK)
+            if(dest == SYSTEM)
                 kprintf("\nSyscall %d from %d|", m->type, m->src);
         }else if(get_debug_ipc_count()){
             kprintf("\nIPC: SEND to %d from %d type %d rflags %d s %d| ",dest, current_proc->proc_nr,m->type,

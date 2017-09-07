@@ -21,7 +21,8 @@
 #include <sys/times.h>
 
 int do_times(struct proc *who, struct message *m){
+    m->m2_l1 = get_uptime(); 
     m->m2_l2 = who->time_used;
     m->m2_l3 = who->sys_time_used;
-    return get_uptime();
+    return OK;
 }

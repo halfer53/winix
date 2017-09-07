@@ -60,7 +60,7 @@ typedef struct message{
 /**
  * Boot Image Task Numbers
  **/
-#define SYSTEM_TASK 0
+#define SYSTEM 0
 
 
 /**

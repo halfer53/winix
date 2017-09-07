@@ -23,14 +23,16 @@
 void rebalance_queues(int proc_nr, clock_t time){
     int i;
     struct proc* curr;
-    for (i = 1; i < NUM_QUEUES; i++) {
-        while (curr = dequeue(ready_q[i])) {
+    for(i = 0; i < NUM_PROCS; i++)
+    {
+        curr = &proc_table[i];
+        if(!curr->s_flags){
             curr->priority = MAX_PRIORITY;
-            enqueue_head(ready_q[MAX_PRIORITY], curr);
         }
     }
     current_proc->priority = MAX_PRIORITY;
-    
+    //Idle process always remain the lowest queue
+    get_proc(IDLE)->priority = MIN_PRIORITY;
     new_timer(REBALANCE_TIMEOUT, rebalance_queues);
 }
 
