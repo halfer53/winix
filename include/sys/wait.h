@@ -22,18 +22,18 @@
 #include <sys/types.h>
 #endif
 
-#define _LOW(v)        ( (v) & 0x7f)
-#define _HIGH(v)    ( ((v) >> 8) & 0xff)
+#define _LOW(v)         ( (v) & 0x7f)
+#define _HIGH(v)        ( ((v) >> 8) & 0xff)
 
 #define WNOHANG         1    /* do not wait for child to exit */
 #define WUNTRACED       2    /* for job control; not implemented */
 
-#define WIFEXITED(s)    (_LOW(s) == 0)                /* normal exit */
-#define WEXITSTATUS(s)    (_HIGH(s))                /* exit status */
-#define WTERMSIG(s)        (_LOW(s))            /* sig value */
-#define WIFSIGNALED(s)    (((unsigned int)(s)-1 & 0xFFFF) < 0xFF) /* signaled */
-#define WIFSTOPPED(s)    (_LOW(s) == 0177)            /* stopped */
-#define WSTOPSIG(s)        (_HIGH(s))                    /* stop signal */
+#define WIFEXITED(s)        (_LOW(s) == 0)                /* normal exit */
+#define WEXITSTATUS(s)      (_HIGH(s))                /* exit status */
+#define WTERMSIG(s)         (_LOW(s))            /* sig value */
+#define WIFSIGNALED(s)      (((unsigned int)(s)-1 & 0xFFFF) < 0xFF) /* signaled */
+#define WIFSTOPPED(s)       (_LOW(s) == 0177)            /* stopped */
+#define WSTOPSIG(s)         (_HIGH(s))                    /* stop signal */
 
 pid_t wait(int *wstatus);
 // pid_t waitpid(pid_t pid, int *wstatus, int options);

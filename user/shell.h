@@ -12,7 +12,7 @@
 
 #define CMD_PROTOTYPE(name)    int name(int argc, char**argv)
 
-#define BUF_LEN            32
+#define BUF_LEN         32
 #define MAX_COMMANDS    5
 #define MAX_ARGS        10
 

@@ -21,22 +21,22 @@
 /**
  * System Call Numbers
  **/
-#define SYSCALL_TIMES        1
-#define SYSCALL_EXIT        2
-#define SYSCALL_FORK        3
-#define SYSCALL_VFORK        4
-#define SYSCALL_EXECVE        5
-#define SYSCALL_BRK            6
-#define SYSCALL_ALARM       7
-#define SYSCALL_SIGNAL        8
-#define SYSCALL_SIGRET      9
-#define SYSCALL_WAIT        10
-#define SYSCALL_KILL        11
-#define SYSCALL_GETPID      12
-#define SYSCALL_WINFO        13
-#define SYSCALL_GETC        14
-#define SYSCALL_PRINTF        15
-#define SYSCALL_SYSCONF     16
+#define SYSCALL_TIMES           1
+#define SYSCALL_EXIT            2
+#define SYSCALL_FORK            3
+#define SYSCALL_VFORK           4
+#define SYSCALL_EXECVE          5
+#define SYSCALL_BRK             6
+#define SYSCALL_ALARM           7
+#define SYSCALL_SIGNAL          8
+#define SYSCALL_SIGRET          9
+#define SYSCALL_WAIT            10
+#define SYSCALL_KILL            11
+#define SYSCALL_GETPID          12
+#define SYSCALL_WINFO           13
+#define SYSCALL_GETC            14
+#define SYSCALL_PRINTF          15
+#define SYSCALL_SYSCONF         16
 
 #define SYSCALL_DEFAULT_RETURN  m.m1_i1
 

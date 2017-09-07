@@ -18,9 +18,9 @@ typedef struct s_block {
 static void *base = NULL;
 static int count = 0;
 
-#define BLOCK_SIZE (sizeof(struct s_block) - 1)
-#define align4(x) (((((x)-1)>>2)<<2)+4)
-#define ALIGN1K(x) (((((x)-1)>>10)<<10)+1024)
+#define BLOCK_SIZE 	(sizeof(struct s_block) - 1)
+#define align4(x) 	(((((x)-1)>>2)<<2)+4)
+#define ALIGN1K(x) 	(((((x)-1)>>10)<<10)+1024)
 
 void printblock(block_t *b) {
     printf("0x%04x size %04d prev 0x%04x next 0x%04x %s\n",

@@ -6,7 +6,7 @@ int winix_load_srec_mem_val(char *line, size_t *memory_values, int start_index, 
 
 
 #define IS_LOWER_CHAR(c)        (c >= 'a' && c <= 'z')
-#define TO_UPPER_CHAR(c)    (c - 32)
+#define TO_UPPER_CHAR(c)    	(c - 32)
 
 char *filename;
 

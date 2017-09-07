@@ -33,12 +33,12 @@ typedef unsigned int sigset_t;
 #define SIGALRM           14    /* alarm clock */
 #define SIGTERM           15    /* software termination signal from kill */
 #ifndef _POSIX_SOURCE
-#define    SIGURG              16    /* urgent condition on IO channel */
+#define    SIGURG         16    /* urgent condition on IO channel */
 #endif
-#define    SIGSTOP              17    /* sendable stop signal not from tty */
-#define    SIGTSTP              18    /* stop signal from tty */
-#define    SIGCONT              19    /* continue a stopped process */
-#define    SIGCHLD              20    /* to parent on child stop or exit */
+#define    SIGSTOP        17    /* sendable stop signal not from tty */
+#define    SIGTSTP        18    /* stop signal from tty */
+#define    SIGCONT        19    /* continue a stopped process */
+#define    SIGCHLD        20    /* to parent on child stop or exit */
 
 
 /* The sighandler_t type is not allowed unless _POSIX_SOURCE is defined. */

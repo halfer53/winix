@@ -6,7 +6,7 @@ int hexstr2int(char *a, int len)
     int val = 0;
 
     for(i=0;i<len;i++){
-            if(a[i] <= 57)
+        if(a[i] <= 57)
              val += (a[i]-48)*(1<<(4*(len-1-i)));
             else
              val += (a[i]-55)*(1<<(4*(len-1-i)));

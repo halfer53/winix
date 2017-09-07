@@ -62,10 +62,10 @@ typedef volatile struct
 /**
  * Declarations
  **/
-#define RexSp1         ((RexSp_t*)0x70000)
-#define RexSp2         ((RexSp_t*)0x71000)
-#define RexTimer      ((RexTimer_t*)0x72000)
-#define RexParallel    ((RexParallel_t*)0x73000)
-#define RexUserInt    ((RexUserInt_t*)0x7f000)
+#define RexSp1         	((RexSp_t*)0x70000)
+#define RexSp2         	((RexSp_t*)0x71000)
+#define RexTimer      	((RexTimer_t*)0x72000)
+#define RexParallel    	((RexParallel_t*)0x73000)
+#define RexUserInt    	((RexUserInt_t*)0x7f000)
 
 #endif

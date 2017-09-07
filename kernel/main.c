@@ -38,7 +38,7 @@ void main() {
             p->proc_nr = pconfig->pid;
         }else{//user proc
             p = start_user_proc(pconfig->image_array, pconfig->image_len, 
-                        (size_t)pconfig->entry, pconfig->quantum, pconfig->name);
+            		(size_t)pconfig->entry, pconfig->quantum, pconfig->name);
             
         }
         ASSERT(p != NULL);

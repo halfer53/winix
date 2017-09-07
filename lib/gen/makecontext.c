@@ -12,15 +12,14 @@ void _ctx_end(ucontext_t *ucp){
     exit(EXIT_FAILURE);
 }
 
-void makecontext(ucontext_t *ucp, void (* func)(), int argc, ...){
+void makecontext(ucontext_t *ucp, void (*  func)(), int argc, ...){
     int *args = &argc + 1;
     unsigned int *sp;
 
     if(ucp == NULL || ucp->uc_stack.ss_sp == NULL 
             || ucp->uc_stack.ss_size < MINSIGSTKSZ){
-                printf("no\n");
-                return;
-            }
+		return;
+	}
         
 
     ucp->uc_mcontext.pc = (void (*)())&_ctx_start;
@@ -32,22 +31,22 @@ void makecontext(ucontext_t *ucp, void (* func)(), int argc, ...){
     ucp->uc_mcontext.sp = sp;
 
     /**
-     *     Arrange the stack as follows:
-     *     func
+     *  Arrange the stack as follows:
+     *  func
      *  argc
-     *     arg1
+     *  arg1
      *  ...
      *  argn
      *  ucp
      *
-     *     The PC of the ucp will set to _ctx_start (refer to lib/ucontext.s)
-     *     _ctx_start will pop func and argc from the stack, such that 
-     *     the stack will be arranged that arg1 to argn are left on the stack.
-     *     Then func() is called.
-     *     When func() returns, _ctx_start will pop stack by the value of argc,
+     *  The PC of the ucp will set to _ctx_start (refer to lib/ucontext.s)
+     *  _ctx_start will pop func and argc from the stack, such that 
+     *  the stack will be arranged that arg1 to argn are left on the stack.
+     *  Then func() is called.
+     *  When func() returns, _ctx_start will pop stack by the value of argc,
      *  so that ucp is left on the stack. It then loads value from reg $8, which 
      *  is the address of the _ctx_end, then _ctx_end is called.
-     *    
+     *     
     **/
     *sp++ = (unsigned int)func;
     *sp++ = argc;
