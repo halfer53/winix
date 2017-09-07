@@ -14,7 +14,7 @@
 #include "shell.h"
 
 
-int test_float(){
+int test_float(int argc, char **argv){
     int foo;
     signal(SIGFPE, SIG_IGN);
     foo = 1 / 0;
@@ -25,7 +25,7 @@ void stack_overflow(int a){
     stack_overflow(a);
 }
 
-int test_so(){
+int test_so(int argc, char **argv){
     if(!fork()){//child
         stack_overflow(1);
     }else{
@@ -37,7 +37,7 @@ int test_so(){
 }
 
 
-int seconds;
+int seconds = 1;
 int cont;
 
 void signal_handler(int signum){
@@ -65,9 +65,11 @@ void alarm_handler(int signum){
     a process is blocked by a system call.
 
 **/
-int test_alarm(int input){
+int test_alarm(int argc, char **argv){
     int i;
-    seconds = input;
+    if(argc > 1)
+        seconds = atoi(argv[1]);
+
     signal(SIGALRM,alarm_handler);
     alarm(seconds);
     cont = 1;
@@ -81,11 +83,12 @@ int test_alarm(int input){
     return 0;
 }
 
-int test_signal(int input){
+int test_signal(int argc, char **argv){
     int i;
     pid_t pid;
     pid_t fr;
-    seconds = input;
+    if(argc > 1)
+        seconds = atoi(argv[1]);
     signal(SIGALRM,signal_handler);
     alarm(seconds);
     return 0;
@@ -98,13 +101,15 @@ void func(int arg) {
       printf("Hello World! I'm thread %d\n",arg);
 }
 
-int test_thread(int num){
-    int i,j;
+int test_thread(int argc, char **argv){
+    int i,j,num = 2;
     int count = 1;
     void **thread_stack_op;
     ucontext_t *threads; 
     ucontext_t *cthread;
 
+    if(argc > 1)
+        num = atoi(argv[1]);
     //ucontext represents the context for each thread
     threads = malloc(sizeof(ucontext_t) * num);
     if(threads == NULL)
@@ -157,7 +162,7 @@ int test_thread(int num){
 }
 
 
-int test_malloc(){
+int test_malloc(int argc, char **argv){
     
     void *p0 = malloc(512);
     void *p1 = malloc(512);
@@ -179,7 +184,7 @@ int test_malloc(){
   return 0;
 }
 
-int test_fork(){
+int test_fork(int argc, char **argv){
     pid_t cpid;
     pid_t ppid;
     ppid = getpid();

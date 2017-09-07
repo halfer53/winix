@@ -34,14 +34,6 @@ struct cmd {
 
 int parse(char *line, struct cmdLine *sc);
 
-int test_so();
-int test_float();
-int test_alarm(int input);
-int test_signal(int input);
-int test_thread(int num);
-int test_malloc();
-int test_fork();
-
 #define isspace(c)    (c==' ')
 #define isPrintable(c)    ('!' <= c && c <= '~')
 
