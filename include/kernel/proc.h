@@ -53,7 +53,7 @@
 #define DEFAULT_RBASE            	0x00000
 #define DEFAULT_PTABLE           	0x00000
 #define DEFAULT_KERNEL_QUANTUM   	64
-#define DEFAULT_USER_QUANTUM		2
+#define DEFAULT_USER_QUANTUM		8
 #define DEFAULT_REG_VALUE        	0xffffffff
 #define DEFAULT_MEM_VALUE        	0xffffffff
 #define DEFAULT_RETURN_ADDR        	0x00000000

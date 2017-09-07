@@ -330,8 +330,8 @@ void proc_set_default(struct proc *p) {
  * stack size is defined by KERNEL_STACK_SIZE
  * this method can be used for creating kernel process 
  * or kernel threads'  stack
- * @param  who 
- * @return     virtual address of the stack
+ * @param       who 
+ * @return      virtual address of the stack
  */
 reg_t* alloc_kstack(struct proc *who){
     int page_size;
