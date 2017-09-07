@@ -20,6 +20,12 @@ PRIVATE clock_t system_uptime = 0;
 //Global variable for the next timeout event
 PUBLIC clock_t next_timeout = 0;
 
+PRIVATE struct proc* bill_ptr;
+
+void set_bill_ptr(struct proc* who){
+	bill_ptr = who;
+}
+
 void deliver_alarm(int proc_nr, clock_t time){
     cause_sig(get_proc(proc_nr),SIGALRM);
 }
@@ -49,8 +55,17 @@ void clock_handler(){
 
     //Increment uptime, and check if there is any alarm
     system_uptime++;
+        
     if(next_timeout == system_uptime)
         handle_timer(dequeue_alarm());
 
+    //Accounting
+    current_proc->time_used++;
+    current_proc->ticks_left--;
+
+    if(current_proc->i_flags & BILLABLE){
+        bill_ptr->sys_time_used++;
+    }
+    
     sched();
 }
