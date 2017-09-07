@@ -86,6 +86,7 @@ int test_general(int argc, char **argv){
     }
     //Run it
     handler->handle(argc-1, argv+1);
+    return 0;
 }
 
 int cmd_kill(int argc, char **argv){
@@ -113,7 +114,7 @@ int help(int argc, char** argv){
         printf(" * %s\n",handler->name);
         handler++;
     }
-    test_general(0, NULL);
+    test_nohandler(0, NULL);
     return 0;
 }
 
@@ -199,7 +200,6 @@ void main() {
         c = buf;
         //Read line from terminal
         while( c < end_buf) {
-
             ret = getchar();     //read
             
             if(ret == EOF){
@@ -210,32 +210,34 @@ void main() {
                 continue;
             }
             
-            if(ret == '\r')  //test for end
-                break;    
+            if(ret == '\r'){//test for end
+                break;
+            }  
+                    
 
             if ((int)ret == 8) { //backspace
-                if (c > buf) {
+                if(c > buf){
                     putchar(ret);
                     c--;
                 }
                 continue;
             }
+            
             *c++ = ret;
             putchar(ret);         //echo
         }
+        
         *c = '\0';
         putchar('\n');
-        ret = parse(buf,&sc);
-
+        ret = parse(buf,&sc, builtin_commands);
         
         //Decode command
         handler = builtin_commands;
         while(handler->name != NULL && strcmp(sc.argv[0], handler->name)) {
             handler++;
         }
-
         //Run it
-        handler->handle(sc.argc, sc.argv);
+        handler->handle(sc.argc, sc.argv);        
     }
     exit(EXIT_SUCCESS);
 }

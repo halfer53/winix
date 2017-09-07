@@ -67,9 +67,7 @@ void alarm_handler(int signum){
 **/
 int test_alarm(int argc, char **argv){
     int i;
-    if(argc > 1)
-        seconds = atoi(argv[1]);
-
+    seconds = (argc > 1) ? atoi(argv[1]) : 1;
     signal(SIGALRM,alarm_handler);
     alarm(seconds);
     cont = 1;
@@ -87,8 +85,8 @@ int test_signal(int argc, char **argv){
     int i;
     pid_t pid;
     pid_t fr;
-    if(argc > 1)
-        seconds = atoi(argv[1]);
+    
+    seconds = (argc > 1) ? atoi(argv[1]) : 1;
     signal(SIGALRM,signal_handler);
     alarm(seconds);
     return 0;

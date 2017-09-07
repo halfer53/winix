@@ -17,7 +17,7 @@ int isseparator(char c){
     return isspace(c); 
 }
 
-int parse(char *line, struct cmdLine *sc){
+int parse(char *line, struct cmdLine *sc, struct cmd *builtin_commands){
     int argc = 0;
     char *in;
     struct cmd *handler;
@@ -26,7 +26,7 @@ int parse(char *line, struct cmdLine *sc){
     in = sc->buf;
     sc->cmdStart[0] = 0;    /* the 0th command starts at argv[0] */
     sc->numCommands = 0;
-
+    
     while(argc < MAX_ARGS-1 && sc->numCommands < MAX_COMMANDS){
         
         while(isspace(*in)) /* skip initial whitespace */
@@ -50,15 +50,18 @@ int parse(char *line, struct cmdLine *sc){
         else
             *in++ = '\0'; //terminate the current argument and go to the next one
     }
+    
     sc->argv[argc] = NULL;  // terminate the last command 
     sc->argv[argc + 1] = NULL;  // marker meaning "no more commands" 
     sc->argc = argc;
-
+    
     if(argc > 0)
         ++sc->numCommands;
     
-    if(argc == 0)
-        sc->argv[0][0] = '\0';
-
+    if(argc == 0){
+        sc->argv[0] = in;
+        (sc->argv)[0][0] = '\0';
+    }
+       
     return 0;
 }

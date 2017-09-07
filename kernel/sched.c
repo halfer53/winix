@@ -18,7 +18,7 @@
  * It effectly moves every processes in the ready queues
  * to the top priority ready queue, refer to Multi-fedback
  * queue scheduling for more details
- *
+ *  
  **/
 void rebalance_queues(int proc_nr, clock_t time){
     int i;
@@ -51,10 +51,10 @@ struct proc *pick_proc() {
     struct proc* mp;
 
     //Find the highest-priority non-empty queue
-    for (i = 0; i < NUM_QUEUES; i++) {
-        if (mp = dequeue(ready_q[i])) {
+    for (i = 0; i < NUM_QUEUES; i++){
+        if(mp = dequeue(ready_q[i])){
             if(get_debug_sched_count()){
-                kprintf("|| %d || ", mp->proc_nr);
+                kprintf("|| %d %d || ", i, mp->proc_nr);
             }
             return mp;
         }

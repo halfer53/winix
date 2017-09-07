@@ -204,6 +204,7 @@ struct proc_config{
     void (*entry)();
     int pid;
     int quantum;
+    int priority;
     bool iskernel_proc;
     unsigned int *image_array;
     int image_len;

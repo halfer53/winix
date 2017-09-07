@@ -26,4 +26,11 @@ struct message *curr_mesg();
 void intr_syscall();
 struct syscall_ctx* interrupted_syscall_ctx();
 
+void syscall_region_begin();
+void syscall_region_end();
+void intr_syscall();
+struct message *curr_mesg();
+struct syscall_ctx *interrupted_syscall_ctx();
+void print_sysinfo();
+
 #endif

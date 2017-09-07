@@ -32,7 +32,7 @@ struct cmd {
 };
 
 
-int parse(char *line, struct cmdLine *sc);
+int parse(char *line, struct cmdLine *sc, struct cmd* builtin_commands);
 
 #define isspace(c)    (c==' ')
 #define isPrintable(c)    ('!' <= c && c <= '~')

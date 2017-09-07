@@ -7,6 +7,7 @@
         void (*entry)();
         int pid;
         int quantum;
+        int priority;
         bool iskernel_proc;
         unsigned int *image_array;
         int image_len;
@@ -14,8 +15,8 @@
 */
 
 struct proc_config boot_table[] = {
-    {"SYSTEM", system_main,         SYSTEM,    64, true,   NULL,       0                   },
-    {"INIT",   (void(*)())init_pc,  INIT,           1,  false,  init_code,  init_code_length    },
-    {"IDLE",   idle_main,           IDLE,           1,  true,   NULL,       0                   },
+    {"SYSTEM", system_main,         SYSTEM, 64, MAX_PRIORITY,       true,   NULL,       0                   },
+    {"INIT",   (void(*)())init_pc,  INIT,   8,  MAX_PRIORITY,       false,  init_code,  init_code_length    },
+    {"IDLE",   idle_main,           IDLE,   1,  MIN_PRIORITY,       true,   NULL,       0                   },
 };
 
