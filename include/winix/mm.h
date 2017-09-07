@@ -11,7 +11,7 @@
  * @create date 2017-08-23 06:22:17
  * 
 */
-#ifndef	_W_MEM_MAP_H_
+#ifndef    _W_MEM_MAP_H_
 #define _W_MEM_MAP_H_
 
 #include <kernel/proc.h>
@@ -36,6 +36,6 @@ void* dup_vm(struct proc* parent, struct proc* child);
 void print_ptable(struct proc* who);
 void print_sysmap();
 
-#define MEM_MAP_LEN	4
+#define MEM_MAP_LEN    4
 
 #endif

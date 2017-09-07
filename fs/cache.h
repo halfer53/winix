@@ -6,7 +6,7 @@ typedef struct buf
     char block[BLOCK_SIZE];
     struct buf *prev, *next;
     block_t b_blocknr; //block number for this buffer
-	dev_t b_dev;			/* major | minor device where block resides */
+    dev_t b_dev;            /* major | minor device where block resides */
     int b_dirt; //clean or dirty
     int b_count; //number of users on this buffer
 } buf_t;

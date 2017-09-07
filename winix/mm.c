@@ -34,12 +34,12 @@ PRIVATE int bss_page_end;
  * @return      
  */
 bool is_addr_accessible(struct proc* who, vptr_t* addr){
-	int page;
-	ptr_t* paddr;
+    int page;
+    ptr_t* paddr;
 
-	paddr = get_physical_addr(addr, who);
-	page = PADDR_TO_PAGED(paddr);
-	return is_bit_on(who->ptable, PTABLE_LEN, page);
+    paddr = get_physical_addr(addr, who);
+    page = PADDR_TO_PAGED(paddr);
+    return is_bit_on(who->ptable, PTABLE_LEN, page);
 }
 
 /**
@@ -48,9 +48,9 @@ bool is_addr_accessible(struct proc* who, vptr_t* addr){
  * @return      
  */
 bool is_page_free(ptr_t* addr){
-	int paged = PADDR_TO_PAGED(addr);
+    int paged = PADDR_TO_PAGED(addr);
 
-	return is_bit_on(mem_map, MEM_MAP_LEN, paged);
+    return is_bit_on(mem_map, MEM_MAP_LEN, paged);
 }
 
 /**
@@ -62,16 +62,16 @@ bool is_page_free(ptr_t* addr){
  * @return      
  */
 bool is_pages_free_from(ptr_t* addr, int size){
-	int i;
-	int paged = PADDR_TO_PAGED(addr);
-	int page_num = PADDR_TO_NUM_PAGES(size);
+    int i;
+    int paged = PADDR_TO_PAGED(addr);
+    int page_num = PADDR_TO_NUM_PAGES(size);
 
-	for(i = 0; i < page_num; i++){
-		if(!is_bit_on(mem_map, MEM_MAP_LEN, paged++)){
-			return false;
-		}
-	}
-	return true;
+    for(i = 0; i < page_num; i++){
+        if(!is_bit_on(mem_map, MEM_MAP_LEN, paged++)){
+            return false;
+        }
+    }
+    return true;
 }
 
 /**
@@ -81,18 +81,18 @@ bool is_pages_free_from(ptr_t* addr, int size){
  * @return        pointer to the start of the page, or Null if failed
  */
 ptr_t *get_free_pages(int length, int flags) {
-	int nstart;
-	int num = PADDR_TO_NUM_PAGES(length);
-	if(flags & GFP_HIGH){
-		nstart =  bitmap_search_reverse(mem_map, MEM_MAP_LEN, num);
-	}else{
-		nstart =  bitmap_search_from(mem_map, MEM_MAP_LEN, bss_page_end, num);
-	}
-	if (nstart >= 0){
-		bitmap_set_nbits(mem_map, MEM_MAP_LEN, nstart, num);
-		return PAGE_TO_PADDR(nstart);
-	}
-	return NULL;
+    int nstart;
+    int num = PADDR_TO_NUM_PAGES(length);
+    if(flags & GFP_HIGH){
+        nstart =  bitmap_search_reverse(mem_map, MEM_MAP_LEN, num);
+    }else{
+        nstart =  bitmap_search_from(mem_map, MEM_MAP_LEN, bss_page_end, num);
+    }
+    if (nstart >= 0){
+        bitmap_set_nbits(mem_map, MEM_MAP_LEN, nstart, num);
+        return PAGE_TO_PADDR(nstart);
+    }
+    return NULL;
 }
 
 /**
@@ -105,18 +105,18 @@ ptr_t *get_free_pages(int length, int flags) {
  * @return        
  */
 ptr_t* user_get_free_pages(struct proc* who, int length, int flags){
-	int index;
-	ptr_t* p;
-	int page_num;
+    int index;
+    ptr_t* p;
+    int page_num;
 
-	p = get_free_pages(length,flags);
-	if(p == NULL)
-		return NULL;
-	index = PADDR_TO_PAGED(p);
-	page_num = PADDR_TO_NUM_PAGES(length);
-	if(bitmap_set_nbits(who->ptable, PTABLE_LEN, index, page_num) == ERR)
-		return NULL;
-	return p;
+    p = get_free_pages(length,flags);
+    if(p == NULL)
+        return NULL;
+    index = PADDR_TO_PAGED(p);
+    page_num = PADDR_TO_NUM_PAGES(length);
+    if(bitmap_set_nbits(who->ptable, PTABLE_LEN, index, page_num) == ERR)
+        return NULL;
+    return p;
 }
 
 /**
@@ -126,17 +126,17 @@ ptr_t* user_get_free_pages(struct proc* who, int length, int flags){
  * @return      
  */
 int get_free_pages_from(ptr_t* addr, int size){
-	int paged, page_num;
+    int paged, page_num;
 
-	if(!is_pages_free_from(addr, size))
-		return ERR;
-	
-	paged = PADDR_TO_PAGED(addr);
-	page_num = PADDR_TO_NUM_PAGES(size);
-	if(bitmap_set_nbits(mem_map, MEM_MAP_LEN, paged, page_num) == ERR)
-		return ERR;
+    if(!is_pages_free_from(addr, size))
+        return ERR;
+    
+    paged = PADDR_TO_PAGED(addr);
+    page_num = PADDR_TO_NUM_PAGES(size);
+    if(bitmap_set_nbits(mem_map, MEM_MAP_LEN, paged, page_num) == ERR)
+        return ERR;
 
-	return OK;
+    return OK;
 }
 
 /**
@@ -147,18 +147,18 @@ int get_free_pages_from(ptr_t* addr, int size){
  * @return      
  */
 int user_get_free_pages_from(struct proc* who, ptr_t* addr, int size){
-	int index;
-	int ret;
-	int page_num;
+    int index;
+    int ret;
+    int page_num;
 
-	ret = get_free_pages_from(addr,size);
-	if(ret == ERR)
-		return ERR;
-	index = PADDR_TO_PAGED(addr);
-	page_num = PADDR_TO_NUM_PAGES(size);
-	if(bitmap_set_nbits(who->ptable, PTABLE_LEN, index, page_num) == ERR)
-		return ERR;
-	return OK;
+    ret = get_free_pages_from(addr,size);
+    if(ret == ERR)
+        return ERR;
+    index = PADDR_TO_PAGED(addr);
+    page_num = PADDR_TO_NUM_PAGES(size);
+    if(bitmap_set_nbits(who->ptable, PTABLE_LEN, index, page_num) == ERR)
+        return ERR;
+    return OK;
 }
 
 /**
@@ -166,11 +166,11 @@ int user_get_free_pages_from(struct proc* who, ptr_t* addr, int size){
  * @return 
  */
 int peek_next_free_page(){
-	return bitmap_search_from(mem_map, MEM_MAP_LEN, bss_page_end,  1);
+    return bitmap_search_from(mem_map, MEM_MAP_LEN, bss_page_end,  1);
 }
 
 int peek_last_free_page(){
-	return bitmap_search_reverse(mem_map, MEM_MAP_LEN, 1);
+    return bitmap_search_reverse(mem_map, MEM_MAP_LEN, 1);
 }
 
 /**
@@ -180,19 +180,19 @@ int peek_last_free_page(){
  * @return      
  */
 int free_pages(ptr_t* page, int len){
-	int page_index;
-	if((int)page % PAGE_LEN != 0)
-		return ERR;
-	page_index = PADDR_TO_PAGED(page);
-	return bitmap_clear_nbits(mem_map, MEM_MAP_LEN, page_index, len);
+    int page_index;
+    if((int)page % PAGE_LEN != 0)
+        return ERR;
+    page_index = PADDR_TO_PAGED(page);
+    return bitmap_clear_nbits(mem_map, MEM_MAP_LEN, page_index, len);
 }
 
 int user_free_pages(struct proc* who, ptr_t* page, int len){
-	int index;
-	if(free_pages(page,len) != OK)
-		return ERR;
-	index = PADDR_TO_PAGED(page);
-	return bitmap_clear_nbits(who->ptable, PTABLE_LEN, index, len);
+    int index;
+    if(free_pages(page,len) != OK)
+        return ERR;
+    index = PADDR_TO_PAGED(page);
+    return bitmap_clear_nbits(who->ptable, PTABLE_LEN, index, len);
 }
 
 /**
@@ -204,23 +204,23 @@ int user_free_pages(struct proc* who, ptr_t* page, int len){
  * return the new rbase of the child
  */
 void* dup_vm(struct proc* parent, struct proc* child){
-	int len;
+    int len;
 
-	len = parent->heap_bottom + 1 - parent->rbase;
-	
-	return user_get_free_pages(child, len, GFP_NORM);
-	// int index;
-	// if(bitmap_extract_pattern(parent->ptable, MEM_MAP_LEN, (int)child->heap_break, ptn) == ERR)
-	// 	return NULL;
-	
-	// index = bitmap_search_pattern(mem_map, MEM_MAP_LEN, ptn->pattern, ptn->size);
-	// if(index == ERR)
-	// 	return NULL;
+    len = parent->heap_bottom + 1 - parent->rbase;
+    
+    return user_get_free_pages(child, len, GFP_NORM);
+    // int index;
+    // if(bitmap_extract_pattern(parent->ptable, MEM_MAP_LEN, (int)child->heap_break, ptn) == ERR)
+    //     return NULL;
+    
+    // index = bitmap_search_pattern(mem_map, MEM_MAP_LEN, ptn->pattern, ptn->size);
+    // if(index == ERR)
+    //     return NULL;
 
-	// bitmap_set_pattern(mem_map, MEM_MAP_LEN, index, ptn->pattern, ptn->size);
-	// bitmap_set_pattern(child->ptable, PTABLE_LEN, index, ptn->pattern, ptn->size);
+    // bitmap_set_pattern(mem_map, MEM_MAP_LEN, index, ptn->pattern, ptn->size);
+    // bitmap_set_pattern(child->ptable, PTABLE_LEN, index, ptn->pattern, ptn->size);
 
-	// return PAGE_TO_PADDR(index);
+    // return PAGE_TO_PADDR(index);
 }
 
 /**
@@ -228,44 +228,44 @@ void* dup_vm(struct proc* parent, struct proc* child){
  * @param who 
  */
 void release_proc_mem(struct proc *who){
-	bitmap_xor(mem_map,who->ptable,MEM_MAP_LEN);
-	bitmap_clear(who->ptable, PTABLE_LEN);
+    bitmap_xor(mem_map,who->ptable,MEM_MAP_LEN);
+    bitmap_clear(who->ptable, PTABLE_LEN);
 }
 
 void print_ptable(struct proc* who){
-	print_bitmap(who->ptable, MEM_MAP_LEN);
+    print_bitmap(who->ptable, MEM_MAP_LEN);
 }
 
 void print_sysmap(){
-	static char free_str[] = "Free";
-	static char used_str[] = "Used";
-	int flags, pages, i;
-	char* str;
-	kprintf("Sys Mem bitmap: ");
-	print_bitmap(mem_map, MEM_MAP_LEN);
+    static char free_str[] = "Free";
+    static char used_str[] = "Used";
+    int flags, pages, i;
+    char* str;
+    kprintf("Sys Mem bitmap: ");
+    print_bitmap(mem_map, MEM_MAP_LEN);
 
-	for(i = 0; i < 2; i++){
-		flags = i == 0 ? ZERO_BITS : ONE_BITS;
-		pages = count_bits(mem_map, MEM_MAP_LEN, flags);
-		str = i == 0 ? free_str : used_str;
-		kprintf("%s pages: %03d, %03dk words\n",str, pages, pages);
-	}
+    for(i = 0; i < 2; i++){
+        flags = i == 0 ? ZERO_BITS : ONE_BITS;
+        pages = count_bits(mem_map, MEM_MAP_LEN, flags);
+        str = i == 0 ? free_str : used_str;
+        kprintf("%s pages: %03d, %03dk words\n",str, pages, pages);
+    }
 }
 
 
 void init_mem_table() {
-	int len, i;
-	uint32_t free_mem_begin;
+    int len, i;
+    uint32_t free_mem_begin;
 
-	free_mem_begin = (uint32_t)&BSS_END;
-	free_mem_begin |= 0x03ff;
-	free_mem_begin++;
-	len = free_mem_begin / PAGE_LEN;
+    free_mem_begin = (uint32_t)&BSS_END;
+    free_mem_begin |= 0x03ff;
+    free_mem_begin++;
+    len = free_mem_begin / PAGE_LEN;
 
-	bitmap_clear(mem_map, MEM_MAP_LEN);
-	bitmap_set_nbits(mem_map, MEM_MAP_LEN, 0, len);
-	bitmap_set_bit(mem_map, MEM_MAP_LEN, FREE_MEM_END / PAGE_LEN);
-	bss_page_end = PADDR_TO_PAGED(free_mem_begin);
+    bitmap_clear(mem_map, MEM_MAP_LEN);
+    bitmap_set_nbits(mem_map, MEM_MAP_LEN, 0, len);
+    bitmap_set_bit(mem_map, MEM_MAP_LEN, FREE_MEM_END / PAGE_LEN);
+    bss_page_end = PADDR_TO_PAGED(free_mem_begin);
 }
 
 

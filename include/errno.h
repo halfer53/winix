@@ -9,7 +9,7 @@
  * the system and positive outside, the following mechanism is used.  All the
  * definitions are are the form:
  *
- *	#define EPERM		(_SIGN 1)
+ *    #define EPERM        (_SIGN 1)
  *
  * If the macro _SYSTEM is defined, then  _SIGN is set to "-", otherwise it is
  * set to "".  Thus when compiling the operating system, the  macro _SYSTEM
@@ -17,8 +17,8 @@
  * file is included in an ordinary user program, EPERM has the value ( 1).
  */
 
-#ifndef _ERRNO_H_		/* check if <errno.h> is already included */
-#define _ERRNO_H_ 1		/* it is not included; note that fact */
+#ifndef _ERRNO_H_        /* check if <errno.h> is already included */
+#define _ERRNO_H_ 1        /* it is not included; note that fact */
 
 /* Now define _SIGN as "" or "-" depending on _SYSTEM. */
 #ifdef _SYSTEM
@@ -27,7 +27,7 @@
 #   define _SIGN         
 #endif
 
-extern int __errno;		  /* place where the error numbers go */
+extern int __errno;          /* place where the error numbers go */
 #define errno   (__errno)
 
 /* Here are the numerical values of the error numbers. */
@@ -66,8 +66,8 @@ extern int __errno;		  /* place where the error numbers go */
 #define EROFS         (_SIGN 30)  /* read-only file system */
 #define EMLINK        (_SIGN 31)  /* too many links */
 #define EPIPE         (_SIGN 32)  /* broken pipe */
-#define EDOM          (_SIGN 33)  /* domain error    	(from ANSI C std) */
-#define ERANGE        (_SIGN 34)  /* result too large	(from ANSI C std) */
+#define EDOM          (_SIGN 33)  /* domain error        (from ANSI C std) */
+#define ERANGE        (_SIGN 34)  /* result too large    (from ANSI C std) */
 #define EDEADLK       (_SIGN 35)  /* resource deadlock avoided */
 #define ENAMETOOLONG  (_SIGN 36)  /* file name too long */
 #define ENOLCK        (_SIGN 37)  /* no locks available */
@@ -82,13 +82,13 @@ extern int __errno;		  /* place where the error numbers go */
 #define EWOULDBLOCK   (_SIGN 54)
 #define EBADDEST      (_SIGN 55)  /* not a valid destination address */
 #define EDSTNOTRCH    (_SIGN 56)  /* destination not reachable */
-#define EISCONN	      (_SIGN 57)  /* all ready connected */
+#define EISCONN          (_SIGN 57)  /* all ready connected */
 #define EADDRINUSE    (_SIGN 58)  /* address in use */
 #define ECONNREFUSED  (_SIGN 59)  /* connection refused */
 #define ECONNRESET    (_SIGN 60)  /* connection reset */
 #define ETIMEDOUT     (_SIGN 61)  /* connection timed out */
-#define EURG	      (_SIGN 62)  /* urgent data present */
-#define ENOURG	      (_SIGN 63)  /* no urgent data present */
+#define EURG          (_SIGN 62)  /* urgent data present */
+#define ENOURG          (_SIGN 63)  /* no urgent data present */
 #define ENOTCONN      (_SIGN 64)  /* no connection (yet or anymore) */
 #define ESHUTDOWN     (_SIGN 65)  /* a write call to a shutdown connection */
 #define ENOCONN       (_SIGN 66)  /* no such connection */

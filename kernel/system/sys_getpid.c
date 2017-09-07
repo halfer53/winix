@@ -1,9 +1,9 @@
 /**
  * Syscall in this file: getpid
- * Input:	
+ * Input:    
  *
- * Return: 	m1_i1:	pid
- * 			m1_i2: ppid
+ * Return:     m1_i1:    pid
+ *             m1_i2: ppid
  * 
  * @author Bruce Tan
  * @email brucetansh@gmail.com

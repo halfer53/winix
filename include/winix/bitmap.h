@@ -14,7 +14,7 @@
 #ifndef _BITMAP_H_
 #define _BITMAP_H_ 1
 
-#define BITMASK_NR	32
+#define BITMASK_NR    32
 
 struct bit_pattern{
     unsigned int pattern;

@@ -23,7 +23,7 @@ PUBLIC clock_t next_timeout = 0;
 PRIVATE struct proc* bill_ptr;
 
 void set_bill_ptr(struct proc* who){
-	bill_ptr = who;
+    bill_ptr = who;
 }
 
 void deliver_alarm(int proc_nr, clock_t time){
@@ -66,6 +66,6 @@ void clock_handler(){
     if(current_proc->i_flags & BILLABLE){
         bill_ptr->sys_time_used++;
     }
-    
+
     sched();
 }

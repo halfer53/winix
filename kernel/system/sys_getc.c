@@ -1,8 +1,8 @@
 /**
  * Syscall in this file: getc
- * Input:	
+ * Input:    
  *
- * Return: 	m1_i1:	character read from serial port 1
+ * Return:     m1_i1:    character read from serial port 1
  *
  * NB this is a blocking syscall
  * 

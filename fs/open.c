@@ -12,7 +12,7 @@ int sys_open(struct proc *who, char *path, mode_t mode){
     }
 
     ret = get_fd(who, 0, &open_slot, &filp);
-	who->fp_filp[open_slot] = filp;
+    who->fp_filp[open_slot] = filp;
 
     return open_slot;
 }

@@ -68,73 +68,73 @@ PUBLIC struct proc *current_proc;
 //print out the list of processes currently in the ready_q
 //and the currently running process
 void print_runnable_procs() {
-	int i;
-	struct proc *curr;
-	kprintf("NAME     PID PPID RBASE      PC         STACK      HEAP       PROTECTION   FLAGS\n");
-	for (i = 0; i < NUM_PROCS; i++) {
-		curr = &proc_table[i];
-		if(IS_RUNNABLE(curr))
-			printProceInfo(curr);
-	}
+    int i;
+    struct proc *curr;
+    kprintf("NAME     PID PPID RBASE      PC         STACK      HEAP       PROTECTION   FLAGS\n");
+    for (i = 0; i < NUM_PROCS; i++) {
+        curr = &proc_table[i];
+        if(IS_RUNNABLE(curr))
+            printProceInfo(curr);
+    }
 }
 
 //print the process state
 void printProceInfo(struct proc* curr) {
-	int ptable_idx = PADDR_TO_PAGED(curr->rbase)/32;
-	kprintf("%-08s %-03d %-04d 0x%08x 0x%08x 0x%08x 0x%08x %d 0x%08x %d\n",
-	        curr->name,
-	        curr->proc_nr,
-			curr->parent,
-	        curr->rbase,
-	        get_physical_addr(get_pc_ptr(curr),curr),
-	        get_physical_addr(curr->sp,curr),
-	        curr->heap_break,
-			ptable_idx,
-	        curr->ptable[ptable_idx],
-			curr->s_flags);
+    int ptable_idx = PADDR_TO_PAGED(curr->rbase)/32;
+    kprintf("%-08s %-03d %-04d 0x%08x 0x%08x 0x%08x 0x%08x %d 0x%08x %d\n",
+            curr->name,
+            curr->proc_nr,
+            curr->parent,
+            curr->rbase,
+            get_physical_addr(get_pc_ptr(curr),curr),
+            get_physical_addr(curr->sp,curr),
+            curr->heap_break,
+            ptable_idx,
+            curr->ptable[ptable_idx],
+            curr->s_flags);
 }
 
 void print_readyqueue(){
-	int i,j;
-	struct proc* curr;
-	kprintf(" q| ");
-	for (i = 0; i < NUM_QUEUES; i++) {
-		curr = ready_q[i][HEAD];
-		while(curr != NULL)
-		{
-			kprintf("%d ", curr->proc_nr);
-			curr = curr->next;
-		}
-	}
-	kprintf("| ");
+    int i,j;
+    struct proc* curr;
+    kprintf(" q| ");
+    for (i = 0; i < NUM_QUEUES; i++) {
+        curr = ready_q[i][HEAD];
+        while(curr != NULL)
+        {
+            kprintf("%d ", curr->proc_nr);
+            curr = curr->next;
+        }
+    }
+    kprintf("| ");
 }
 
 void print_receiver_queue(struct proc* who){
-	struct proc* curr;
-	curr = who->sender_q;
-	if(curr)
-		kprintf(" %d sending queue: ", who->proc_nr);
-	while(curr != NULL){
-		kprintf("%d ",curr->proc_nr);
-		curr = curr->next_sender;
-	}
+    struct proc* curr;
+    curr = who->sender_q;
+    if(curr)
+        kprintf(" %d sending queue: ", who->proc_nr);
+    while(curr != NULL){
+        kprintf("%d ",curr->proc_nr);
+        curr = curr->next_sender;
+    }
 }
 
 /**
  * Gets a pointer to a process.
  *
  * Parameters:
- *   proc_nr		The process to retrieve.
+ *   proc_nr        The process to retrieve.
  *
- * Returns:			The relevant process, or NULL if it does not exist.
+ * Returns:            The relevant process, or NULL if it does not exist.
  **/
 struct proc *get_proc(int proc_nr) {
-	struct proc *p;
-	if (IS_PROCN_OK(proc_nr)){
-		p = &proc_table[proc_nr];
-		return p;
-	}
-	return NULL;
+    struct proc *p;
+    if (IS_PROCN_OK(proc_nr)){
+        p = &proc_table[proc_nr];
+        return p;
+    }
+    return NULL;
 }
 
 /**
@@ -144,73 +144,73 @@ struct proc *get_proc(int proc_nr) {
  * @return         
  */
 struct proc *get_running_proc(int proc_nr){
-	struct proc *p = get_proc(proc_nr);
-	if(p->i_flags & RUNNABLE)
-		return p;
-	return NULL;
+    struct proc *p = get_proc(proc_nr);
+    if(p->i_flags & RUNNABLE)
+        return p;
+    return NULL;
 }
 
 /**
  * Adds a proc to the tail of a list.
  *
  * Parameters:
- *   q		An array containing a head and tail pointer of a linked list.
- *   proc	The proc struct to add to the list.
+ *   q        An array containing a head and tail pointer of a linked list.
+ *   proc    The proc struct to add to the list.
  **/
 void enqueue_tail(struct proc **q, struct proc *proc) {
-	if (q[HEAD] == NULL) {
-		q[HEAD] = q[TAIL] = proc;
-	}
-	else {
-		q[TAIL]->next = proc;
-		q[TAIL] = proc;
-	}
-	proc->next = NULL;
+    if (q[HEAD] == NULL) {
+        q[HEAD] = q[TAIL] = proc;
+    }
+    else {
+        q[TAIL]->next = proc;
+        q[TAIL] = proc;
+    }
+    proc->next = NULL;
 }
 
 /**
  * Adds a proc to the head of a list.
  *
  * Parameters:
- *   q		An array containing a head and tail pointer of a linked list.
- *   proc	The proc struct to add to the list.
+ *   q        An array containing a head and tail pointer of a linked list.
+ *   proc    The proc struct to add to the list.
  **/
 void enqueue_head(struct proc **q, struct proc *proc) {
-	struct proc *curr = NULL;
-	if (q[HEAD] == NULL) {
-		proc->next = NULL;
-		q[HEAD] = q[TAIL] = proc;
-	}
-	else {
-		proc->next = q[HEAD];
-		q[HEAD] = proc;
-	}
+    struct proc *curr = NULL;
+    if (q[HEAD] == NULL) {
+        proc->next = NULL;
+        q[HEAD] = q[TAIL] = proc;
+    }
+    else {
+        proc->next = q[HEAD];
+        q[HEAD] = proc;
+    }
 }
 
 /**
  * Removes the head of a list.
  *
  * Parameters:
- *   q		An array containing a head and tail pointer of a linked list.
+ *   q        An array containing a head and tail pointer of a linked list.
  *
  * Returns:
  *   The proc struct that was removed from the head of the list
  *   NULL if the list is empty.
  **/
 struct proc *dequeue(struct proc **q) {
-	struct proc *p = q[HEAD];
+    struct proc *p = q[HEAD];
 
-	if (p == NULL)
-		return NULL;
+    if (p == NULL)
+        return NULL;
 
-	if (q[HEAD] == q[TAIL]) { //Last item
-		q[HEAD] = q[TAIL] = NULL;
-	}
-	else { //At least one remaining item
-		q[HEAD] = p->next;
-	}
-	p->next = NULL;
-	return p;
+    if (q[HEAD] == q[TAIL]) { //Last item
+        q[HEAD] = q[TAIL] = NULL;
+    }
+    else { //At least one remaining item
+        q[HEAD] = p->next;
+    }
+    p->next = NULL;
+    return p;
 }
 
 /**
@@ -219,29 +219,29 @@ struct proc *dequeue(struct proc **q) {
  * @return   0 on success, -1 if not
  */
 int dequeue_schedule( struct proc *h) {
-	struct proc *curr;
-	struct proc *prev = NULL;
-	struct proc ** q = ready_q[h->priority];
+    struct proc *curr;
+    struct proc *prev = NULL;
+    struct proc ** q = ready_q[h->priority];
 
-	curr = q[HEAD];
+    curr = q[HEAD];
 
-	while (curr != h && curr != NULL) {
-		prev = curr;
-		curr = curr->next;
-	}
+    while (curr != h && curr != NULL) {
+        prev = curr;
+        curr = curr->next;
+    }
 
-	if (curr == NULL)
-		return ERR;
+    if (curr == NULL)
+        return ERR;
 
-	if (prev == NULL) {
-		q[HEAD] = curr->next;
-		if(curr->next == NULL){
-			q[TAIL] = curr->next;
-		}
-	} else {
-		prev->next = curr->next;
-	}
-	return OK;
+    if (prev == NULL) {
+        q[HEAD] = curr->next;
+        if(curr->next == NULL){
+            q[TAIL] = curr->next;
+        }
+    } else {
+        prev->next = curr->next;
+    }
+    return OK;
 }
 
 /**
@@ -250,8 +250,8 @@ int dequeue_schedule( struct proc *h) {
  * @param p 
  */
 void enqueue_schedule(struct proc* p) {
-	p->i_flags |= RUNNABLE;
-	enqueue_tail(ready_q[p->priority], p);
+    p->i_flags |= RUNNABLE;
+    enqueue_tail(ready_q[p->priority], p);
 }
 
 /**
@@ -260,10 +260,10 @@ void enqueue_schedule(struct proc* p) {
  * @param p 
  */
 void unsched(struct proc *p){
-	p->i_flags &= ~RUNNABLE;
-	p->i_flags |= ZOMBIE;
-	release_proc_mem(p);
-	dequeue_schedule(p);
+    p->i_flags &= ~RUNNABLE;
+    p->i_flags |= ZOMBIE;
+    release_proc_mem(p);
+    dequeue_schedule(p);
 }
 
 /**
@@ -272,8 +272,8 @@ void unsched(struct proc *p){
  * @param p 
  */
 void free_slot(struct proc *p){
-	p->i_flags = 0;
-	enqueue_head(free_proc, p);
+    p->i_flags = 0;
+    enqueue_head(free_proc, p);
 }
 
 /**
@@ -287,8 +287,8 @@ void free_slot(struct proc *p){
  *   Process state is set to DEAD, and is returned to the free_proc list.
  **/
 void end_process(struct proc *p) {
-	unsched(p);
-	free_slot(p);
+    unsched(p);
+    free_slot(p);
 }
 
 /**
@@ -296,16 +296,16 @@ void end_process(struct proc *p) {
  * @return pointer to the free slot, or NULL
  */
 struct proc *get_free_proc_slot() {
-	int i;
-	struct proc *p = dequeue(free_proc);
-	size_t *sp = NULL;
+    int i;
+    struct proc *p = dequeue(free_proc);
+    size_t *sp = NULL;
 
-	if (p) {
-		proc_set_default(p);
-		p->i_flags |= IN_USE;
-		return p;
-	}
-	return NULL;
+    if (p) {
+        proc_set_default(p);
+        p->i_flags |= IN_USE;
+        return p;
+    }
+    return NULL;
 }
 
 /**
@@ -313,16 +313,16 @@ struct proc *get_free_proc_slot() {
  * @param p 
  */
 void proc_set_default(struct proc *p) {
-	int pnr_bak = p->proc_nr;
-	memset(p, 0, sizeof(struct proc));
-	p->proc_nr = pnr_bak;
+    int pnr_bak = p->proc_nr;
+    memset(p, 0, sizeof(struct proc));
+    p->proc_nr = pnr_bak;
 
-	memset(p->regs, DEFAULT_REG_VALUE, NUM_REGS);
-	p->cctrl = DEFAULT_CCTRL;
+    memset(p->regs, DEFAULT_REG_VALUE, NUM_REGS);
+    p->cctrl = DEFAULT_CCTRL;
 
-	p->quantum = DEFAULT_USER_QUANTUM;
-	p->ptable = p->protection_table;
-	p->alarm.proc_nr = p->proc_nr;
+    p->quantum = DEFAULT_USER_QUANTUM;
+    p->ptable = p->protection_table;
+    p->alarm.proc_nr = p->proc_nr;
 }
 
 /**
@@ -334,38 +334,38 @@ void proc_set_default(struct proc *p) {
  * @return     virtual address of the stack
  */
 reg_t* alloc_kstack(struct proc *who){
-	int page_size;
-	int index;
-	ptr_t *addr, *stack_top;
+    int page_size;
+    int index;
+    ptr_t *addr, *stack_top;
 
-	stack_top = user_get_free_pages(who, KERNEL_STACK_SIZE, GFP_HIGH);
+    stack_top = user_get_free_pages(who, KERNEL_STACK_SIZE, GFP_HIGH);
 
-	ASSERT(stack_top != NULL);
-	
-	addr = stack_top + KERNEL_STACK_SIZE - 1;
-	who->stack_top = stack_top;
-	return get_virtual_addr(addr, who);
+    ASSERT(stack_top != NULL);
+    
+    addr = stack_top + KERNEL_STACK_SIZE - 1;
+    who->stack_top = stack_top;
+    return get_virtual_addr(addr, who);
 }
 
 /**
  * set corressponding fields of struct pro
  */
 int set_proc(struct proc *p, void (*entry)(), int quantum, const char *name) {
-	p->quantum = quantum;
-	p->pc = entry;
+    p->quantum = quantum;
+    p->pc = entry;
 
-	//NB: this may result in buffer overflow
-	strcpy(p->name, name);
-	return OK;
+    //NB: this may result in buffer overflow
+    strcpy(p->name, name);
+    return OK;
 }
 
 /**
  * Creates a new kernel process and adds it to the runnable queue
  *
  * Parameters:
- *   entry		A pointer to the entry point of the new process.
- *   priority	The scheduling priority of the new process.
- *   name		The name of the process, up to PROC_NAME_LEN characters long.
+ *   entry        A pointer to the entry point of the new process.
+ *   priority    The scheduling priority of the new process.
+ *   name        The name of the process, up to PROC_NAME_LEN characters long.
  *
  * Returns:
  *   The newly-created proc struct.
@@ -376,16 +376,16 @@ int set_proc(struct proc *p, void (*entry)(), int quantum, const char *name) {
  *   A proc is removed from the free_proc list, reinitialised, and added to ready_q.
  */
 struct proc *start_kernel_proc(void (*entry)(), const char *name, int quantum) {
-	struct proc *p;
-	
-	if (!(p = get_free_proc_slot()))
-		return NULL;
-	
-	set_proc(p, entry, quantum, name);
-	bitmap_fill(p->ptable, PTABLE_LEN);
-	p->sp = alloc_kstack(p);
-	enqueue_schedule(p);
-	return p;
+    struct proc *p;
+    
+    if (!(p = get_free_proc_slot()))
+        return NULL;
+    
+    set_proc(p, entry, quantum, name);
+    bitmap_fill(p->ptable, PTABLE_LEN);
+    p->sp = alloc_kstack(p);
+    enqueue_schedule(p);
+    return p;
 }
 
 /**
@@ -398,15 +398,15 @@ struct proc *start_kernel_proc(void (*entry)(), const char *name, int quantum) {
  * @return          
  */
 struct proc *start_user_proc(size_t *lines, size_t length, size_t entry, int quantum, const char *name){
-	struct proc *p;
-	if(!(p = get_free_proc_slot()))
-		return NULL;
+    struct proc *p;
+    if(!(p = get_free_proc_slot()))
+        return NULL;
 
-	
-	if(exec_proc(p,lines,length,entry,quantum,name) == ERR)
-		return NULL;
+    
+    if(exec_proc(p,lines,length,entry,quantum,name) == ERR)
+        return NULL;
 
-	return p;
+    return p;
 }
 
 /**
@@ -417,14 +417,14 @@ struct proc *start_user_proc(size_t *lines, size_t length, size_t entry, int qua
  * @return           
  */
 int proc_memctl(struct proc* who ,vptr_t* page_addr, int flags){
-	int paged = PADDR_TO_PAGED(get_physical_addr(page_addr,who)); //get page descriptor
+    int paged = PADDR_TO_PAGED(get_physical_addr(page_addr,who)); //get page descriptor
 
-	if(flags == PROC_ACCESS){
-		return bitmap_set_bit(who->ptable, PTABLE_LEN, paged);
-	}else if(flags == PROC_NO_ACCESS){
-		return bitmap_clear_bit(who->ptable, PTABLE_LEN, paged);
-	}
-	return ERR;
+    if(flags == PROC_ACCESS){
+        return bitmap_set_bit(who->ptable, PTABLE_LEN, paged);
+    }else if(flags == PROC_NO_ACCESS){
+        return bitmap_clear_bit(who->ptable, PTABLE_LEN, paged);
+    }
+    return ERR;
 }
 
 /**
@@ -433,55 +433,55 @@ int proc_memctl(struct proc* who ,vptr_t* page_addr, int flags){
  * @param  text_data_length total of text and data size
  * @param  stack_size 
  * @param  heap_size  
- * @param  flags      PROC_SET_SP or/and PROC_SET_HEAP	
+ * @param  flags      PROC_SET_SP or/and PROC_SET_HEAP    
  * @return            
  */
 int alloc_proc_mem(struct proc *who, int text_data_length, int stack_size, int heap_size, int flags){
-	int proc_len;
-	int td_aligned;
-	ptr_t *bss_start;
-	int bss_size;
+    int proc_len;
+    int td_aligned;
+    ptr_t *bss_start;
+    int bss_size;
 
-	//make sizes page aligned
-	//text_Data_length is the length of text plus data.
-	//Since srec file does not include the size of bss segment by
-	//default, so we have to manually set it. By default, bss segment
-	//extends from the end of the data segment. So the initial bss 
-	//size is simply aligned size minus exact size
-	td_aligned = align_page(text_data_length);
-	bss_size = td_aligned - text_data_length;
+    //make sizes page aligned
+    //text_Data_length is the length of text plus data.
+    //Since srec file does not include the size of bss segment by
+    //default, so we have to manually set it. By default, bss segment
+    //extends from the end of the data segment. So the initial bss 
+    //size is simply aligned size minus exact size
+    td_aligned = align_page(text_data_length);
+    bss_size = td_aligned - text_data_length;
 
-	stack_size = align_page(stack_size);
-	heap_size = align_page(heap_size);
-	
-	//give bss an extra page if its not enough. not that if bss size 
-	//is not enough, it could extend to the stack segment, which could
-	//potentially corrupt the stack 
-	if(bss_size < MIN_BSS_SIZE)
-		bss_size += PAGE_LEN;
+    stack_size = align_page(stack_size);
+    heap_size = align_page(heap_size);
+    
+    //give bss an extra page if its not enough. not that if bss size 
+    //is not enough, it could extend to the stack segment, which could
+    //potentially corrupt the stack 
+    if(bss_size < MIN_BSS_SIZE)
+        bss_size += PAGE_LEN;
 
-	proc_len = text_data_length + bss_size + stack_size + heap_size;
-	who->rbase = user_get_free_pages(who, proc_len, GFP_NORM);
-	if(who->rbase == NULL)
-		return ERR;
+    proc_len = text_data_length + bss_size + stack_size + heap_size;
+    who->rbase = user_get_free_pages(who, proc_len, GFP_NORM);
+    if(who->rbase == NULL)
+        return ERR;
 
-	//set bss segment to 0
-	bss_start = who->rbase + text_data_length;
-	memset(bss_start, 0, bss_size);
+    //set bss segment to 0
+    bss_start = who->rbase + text_data_length;
+    memset(bss_start, 0, bss_size);
 
-	//for information on how process memory are structured, 
-	//look at the first line of this file
-	if(flags & PROC_SET_SP){
-		who->stack_top = who->rbase + text_data_length + bss_size;
-		who->sp = get_virtual_addr(who->stack_top + stack_size - 1,who);
-		*(who->stack_top) = STACK_MAGIC;
-	}
+    //for information on how process memory are structured, 
+    //look at the first line of this file
+    if(flags & PROC_SET_SP){
+        who->stack_top = who->rbase + text_data_length + bss_size;
+        who->sp = get_virtual_addr(who->stack_top + stack_size - 1,who);
+        *(who->stack_top) = STACK_MAGIC;
+    }
 
-	if(flags & PROC_SET_HEAP){
-		who->heap_break = who->rbase + text_data_length + bss_size + stack_size;
-		who->heap_bottom = who->heap_break + heap_size - 1;
-	}
-	return OK;
+    if(flags & PROC_SET_HEAP){
+        who->heap_break = who->rbase + text_data_length + bss_size + stack_size;
+        who->heap_bottom = who->heap_break + heap_size - 1;
+    }
+    return OK;
 }
 
 
@@ -495,26 +495,26 @@ int alloc_proc_mem(struct proc *who, int text_data_length, int stack_size, int h
  *   current_proc is set to NULL.
  **/
 void init_proc() {
-	int i;
-	struct proc *p;
-	//Initialise queues
+    int i;
+    struct proc *p;
+    //Initialise queues
 
-	for (i = 0; i < NUM_QUEUES; i++) {
-		ready_q[i][HEAD] = NULL;
-		ready_q[i][TAIL] = NULL;
-	}
+    for (i = 0; i < NUM_QUEUES; i++) {
+        ready_q[i][HEAD] = NULL;
+        ready_q[i][TAIL] = NULL;
+    }
 
-	free_proc[HEAD] = free_proc[TAIL] = NULL;
-	//Add all proc structs to the free list
-	for ( i = 0; i < NUM_PROCS; i++) {
-		p = &proc_table[i];
-		proc_set_default(p);
-		p->proc_nr = i;
-		enqueue_tail(free_proc, p);
-	}
+    free_proc[HEAD] = free_proc[TAIL] = NULL;
+    //Add all proc structs to the free list
+    for ( i = 0; i < NUM_PROCS; i++) {
+        p = &proc_table[i];
+        proc_set_default(p);
+        p->proc_nr = i;
+        enqueue_tail(free_proc, p);
+    }
 
-	//No current process yet.
-	current_proc = NULL;
+    //No current process yet.
+    current_proc = NULL;
 }
 
 

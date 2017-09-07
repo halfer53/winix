@@ -3,9 +3,9 @@
 
 
 sighandler_t signal(int signum, sighandler_t handler){
-	struct message m;
-	m.m1_i1 = signum;
-	m.s1 = handler;
-	_syscall(SYSCALL_SIGNAL,&m);
-	return m.s1;
+    struct message m;
+    m.m1_i1 = signum;
+    m.s1 = handler;
+    _syscall(SYSCALL_SIGNAL,&m);
+    return m.s1;
 }

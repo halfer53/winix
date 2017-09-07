@@ -7,6 +7,6 @@
      filp->filp_ino = NIL_INODE;
      filp->filp_pos = 0;
 
-	 who->fp_filp[fd] = 0;
+     who->fp_filp[fd] = 0;
      return OK;
  }

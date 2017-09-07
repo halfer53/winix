@@ -112,6 +112,6 @@ unsigned int init_code[] = {
 0x50f00000,
 
 };
-#define init_pc	0x00000000
-#define init_code_length	109
+#define init_pc    0x00000000
+#define init_code_length    109
 #endif

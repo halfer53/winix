@@ -3,10 +3,10 @@
 
 
 #ifndef ERR
-#define ERR (-1)	/* general error flag */
+#define ERR (-1)    /* general error flag */
 #endif
 #ifndef OK
-#define OK 0		/* general OK flag */
+#define OK 0        /* general OK flag */
 #endif
 
 

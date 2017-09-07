@@ -22,7 +22,7 @@
  * Sets the global exception handler function.
  *
  * Parameters:
- *   handler		The handler that will be called to handle exceptions.
+ *   handler        The handler that will be called to handle exceptions.
  **/
 void wramp_set_handler(void (*handler)(int estat));
 

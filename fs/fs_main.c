@@ -49,41 +49,41 @@ struct super_block superblock = {
 
 void init_fs() {
 
-	printf("\nNum of blocks in use %d\n", sb->s_block_inuse);
-	printf("First free block num: %d\n", sb->s_nblock);
-	printf("Block size %d\n inode size %d\n", sb->s_block_size, sb->s_inode_size);
-	printf("inode per block %d\n", sb->s_inode_per_block);
+    printf("\nNum of blocks in use %d\n", sb->s_block_inuse);
+    printf("First free block num: %d\n", sb->s_nblock);
+    printf("Block size %d\n inode size %d\n", sb->s_block_size, sb->s_inode_size);
+    printf("inode per block %d\n", sb->s_inode_per_block);
 }
 
 int main(){
-	
+    
     int ret = makefs();
     inode_t *rootinode;
     sb = &superblock;
-	int i;
+    int i;
 
-	
+    
     init_buf();
     init_inode();
     init_filp();
 
     sb->s_iroot = get_inode(1);
     sb->s_iroot->i_nlinks += 1;
-	current_proc = &pcurrent_proc;
-	current_proc->fp_workdir = current_proc->fp_rootdir = sb->s_iroot;
-	init_fs();
+    current_proc = &pcurrent_proc;
+    current_proc->fp_workdir = current_proc->fp_rootdir = sb->s_iroot;
+    init_fs();
 
 
-	char abc[] = "abcdefghijklmnopqrstuvwxyz";
-	char c = 'a';
+    char abc[] = "abcdefghijklmnopqrstuvwxyz";
+    char c = 'a';
     int fd = sys_open(current_proc, "/foo.txt",O_CREAT);
-	for (i = 0; i < 2048; i++) {
-		sys_write(current_proc, fd, &c, 1);
-		c++;
-		if (c == 'z')
-			c = 'a';
-	}
-	sys_write(current_proc,fd, "a", 2);
+    for (i = 0; i < 2048; i++) {
+        sys_write(current_proc, fd, &c, 1);
+        c++;
+        if (c == 'z')
+            c = 'a';
+    }
+    sys_write(current_proc,fd, "a", 2);
     sys_close(current_proc, fd);
 
     char buf[1024];
@@ -91,7 +91,7 @@ int main(){
     sys_read(current_proc, fd,buf,2049);
     sys_close(current_proc, fd);
 
-	printf("\nread foo.txt\n");
+    printf("\nread foo.txt\n");
     printf("Got \"%s\" from foo.txt\n",buf);
 
 }

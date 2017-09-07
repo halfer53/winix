@@ -5,30 +5,30 @@ assemble = dev.o
 drivers: $(assemble)
 
 $(compile): %.s: %.c
-	$(Q)wcc -S -N -I../../include -o $@ $<
+    $(Q)wcc -S -N -I../../include -o $@ $<
 ifeq ($(KBUILD_VERBOSE),0)
-	@echo "CC \t $<"
+    @echo "CC \t $<"
 endif
 
 $(debug): %.s: %.c
-	$(Q)wcc -b -S -N -I../../include -o $@ $<
+    $(Q)wcc -b -S -N -I../../include -o $@ $<
 ifeq ($(KBUILD_VERBOSE),0)
-	@echo "CC \t $<"
+    @echo "CC \t $<"
 endif
 
 $(assemble): %.o: %.s
-	$(Q)wasm $< -o $@
+    $(Q)wasm $< -o $@
 ifeq ($(KBUILD_VERBOSE),0)
-	@echo "AS \t $<"
+    @echo "AS \t $<"
 endif
 
 $(link): $(assemble)
-	wlink -o $(link) $(assemble)
+    wlink -o $(link) $(assemble)
 
 depend:
-	makedepend $(sources)
+    makedepend $(sources)
 
 clean:
-	-rm $(compile) $(assemble)
+    -rm $(compile) $(assemble)
 
 .DELETE_ON_ERROR:

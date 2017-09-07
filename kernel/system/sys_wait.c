@@ -39,7 +39,7 @@ int do_wait(struct proc *parent, struct message *mesg){
             children++;
         }
     }
-	
+    
     //Proc has no children
     if(children == 0)
         return ECHILD;

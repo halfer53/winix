@@ -19,138 +19,138 @@
 #include <winix/kwramp.h>
 
 //Kernel Process
-#define INTERRUPT				-5
-#define INIT					1
-#define IDLE					2
+#define INTERRUPT                -5
+#define INIT                    1
+#define IDLE                    2
 
 //Process & Scheduling
-#define PROC_NAME_LEN			20
-#define NUM_PROCS				10
-#define NUM_QUEUES				5
-#define MAX_PRIORITY			0
-#define MIN_PRIORITY			((NUM_QUEUES) - 1)
+#define PROC_NAME_LEN            20
+#define NUM_PROCS                10
+#define NUM_QUEUES                5
+#define MAX_PRIORITY            0
+#define MIN_PRIORITY            ((NUM_QUEUES) - 1)
 
 //min bss segment size
-#define MIN_BSS_SIZE			300
+#define MIN_BSS_SIZE            300
 
 //stack
-#define STACK_MAGIC				0x12345678
-#define USER_STACK_SIZE			1024
-#define KERNEL_STACK_SIZE		1024
+#define STACK_MAGIC                0x12345678
+#define USER_STACK_SIZE            1024
+#define KERNEL_STACK_SIZE        1024
 
 //heap
-#define USER_HEAP_SIZE			2048
+#define USER_HEAP_SIZE            2048
 
 //Signal Context
-#define SIGNAL_CTX_LEN			21
+#define SIGNAL_CTX_LEN            21
 
 //Process Defaults
-#define DEFAULT_FLAGS			0
-#define PTABLE_LEN				32
-#define DEFAULT_CCTRL			0xff9
-#define DEFAULT_STACK_POINTER	0x00000
-#define USER_CCTRL				0x8 //OKU is set to 0
-#define DEFAULT_RBASE			0x00000
-#define DEFAULT_PTABLE			0x00000
-#define DEFAULT_KERNEL_QUANTUM	64
-#define DEFAULT_USER_QUANTUM	2
-#define DEFAULT_REG_VALUE		0xffffffff
-#define DEFAULT_MEM_VALUE		0xffffffff
-#define DEFAULT_RETURN_ADDR		0x00000000
-#define DEFAULT_PROGRAM_COUNTER	0x00000000
+#define DEFAULT_FLAGS            0
+#define PTABLE_LEN                32
+#define DEFAULT_CCTRL            0xff9
+#define DEFAULT_STACK_POINTER    0x00000
+#define USER_CCTRL                0x8 //OKU is set to 0
+#define DEFAULT_RBASE            0x00000
+#define DEFAULT_PTABLE            0x00000
+#define DEFAULT_KERNEL_QUANTUM    64
+#define DEFAULT_USER_QUANTUM    2
+#define DEFAULT_REG_VALUE        0xffffffff
+#define DEFAULT_MEM_VALUE        0xffffffff
+#define DEFAULT_RETURN_ADDR        0x00000000
+#define DEFAULT_PROGRAM_COUNTER    0x00000000
 
 //Process Scheduling Flags s_flags, process is runnable when s_flags == 0
-#define SENDING					0x0001	/* process blocked trying to SEND */
-#define RECEIVING				0x0002	/* process blocked trying to RECEIVE */
-#define WAITING					0x0004	/* process blocked wait(2) */
-#define SIGNALED        		0x0008	/* set when new kernel signal arrives */
-#define SIG_PENDING				0x0010	/* unready while signal being processed */
+#define SENDING                    0x0001    /* process blocked trying to SEND */
+#define RECEIVING                0x0002    /* process blocked trying to RECEIVE */
+#define WAITING                    0x0004    /* process blocked wait(2) */
+#define SIGNALED                0x0008    /* set when new kernel signal arrives */
+#define SIG_PENDING                0x0010    /* unready while signal being processed */
 
 //Process Information flags
-#define IN_USE					0x0001	/* process slot is in use */
-#define RUNNABLE				0x0002
-#define ZOMBIE					0x0004
-#define STOPPED					0x0008
-#define BILLABLE				0x0010
+#define IN_USE                    0x0001    /* process slot is in use */
+#define RUNNABLE                0x0002
+#define ZOMBIE                    0x0004
+#define STOPPED                    0x0008
+#define BILLABLE                0x0010
 
 //alloc_proc_mem flags
-#define PROC_SET_SP				1
-#define PROC_SET_HEAP			2
+#define PROC_SET_SP                1
+#define PROC_SET_HEAP            2
 
 //proc_memctll flags
-#define PROC_ACCESS				1
-#define PROC_NO_ACCESS			0
+#define PROC_ACCESS                1
+#define PROC_NO_ACCESS            0
 
 /**
  * Process structure for use in the process table.
  *
- * Note: 	Do not update this structure without also
- * 			updating the definitions in "wramp.s"
+ * Note:     Do not update this structure without also
+ *             updating the definitions in "wramp.s"
  **/
 typedef struct proc {
-	/* Process State */
-	reg_t regs[NUM_REGS];		//Register values
-	reg_t *sp;
-	reg_t *ra;
-	void (*pc)();
-	reg_t *rbase;
-	reg_t *ptable;
-	reg_t cctrl;  				//len 19 words
+    /* Process State */
+    reg_t regs[NUM_REGS];        //Register values
+    reg_t *sp;
+    reg_t *ra;
+    void (*pc)();
+    reg_t *rbase;
+    reg_t *ptable;
+    reg_t cctrl;                  //len 19 words
 
-	/* IPC messages */
-	int s_flags; 				//schedling flags
-	struct message* message;	//Message Buffer
-								//len 21 words
-								//DO NOT MODIFY or CHANGE the order of the above
-								//fields unless you know what you are doing
+    /* IPC messages */
+    int s_flags;                 //schedling flags
+    struct message* message;    //Message Buffer
+                                //len 21 words
+                                //DO NOT MODIFY or CHANGE the order of the above
+                                //fields unless you know what you are doing
 
-	/* Heap and Stack*/
-	ptr_t* stack_top; 			//Stack_top is the physical address
-	ptr_t* heap_break; 			//Heap_break is also the physical address of the curr
-								//Brk, retrived by syscall brk(2)
-	ptr_t* heap_bottom; 		//Bottom of the process image
-	size_t length; 				//Length is the total of text + data segment
+    /* Heap and Stack*/
+    ptr_t* stack_top;             //Stack_top is the physical address
+    ptr_t* heap_break;             //Heap_break is also the physical address of the curr
+                                //Brk, retrived by syscall brk(2)
+    ptr_t* heap_bottom;         //Bottom of the process image
+    size_t length;                 //Length is the total of text + data segment
 
-	/* Protection */
-	reg_t protection_table[PTABLE_LEN];
+    /* Protection */
+    reg_t protection_table[PTABLE_LEN];
 
-	/* IPC queue */
-	struct proc *sender_q;		//Head of process queue waiting to send to this process
-	struct proc *next_sender; 	//Link to next sender in the queue
+    /* IPC queue */
+    struct proc *sender_q;        //Head of process queue waiting to send to this process
+    struct proc *next_sender;     //Link to next sender in the queue
 
-	/* Pending messages, used by notify */
-	unsigned int notify_pending;//bitmap for masking list of pending messages by system proc
+    /* Pending messages, used by notify */
+    unsigned int notify_pending;//bitmap for masking list of pending messages by system proc
 
-	/* Scheduling */
-	struct proc *next;			//Next pointer
-	int priority;				//Priority
-	int quantum;				//Timeslice length
-	int ticks_left;				//Timeslice remaining
+    /* Scheduling */
+    struct proc *next;            //Next pointer
+    int priority;                //Priority
+    int quantum;                //Timeslice length
+    int ticks_left;                //Timeslice remaining
 
-	/* Accounting */
-	clock_t time_used;			//CPU time used
-	clock_t sys_time_used;		//system time used while system is executing on behalf of this
-								//proc
+    /* Accounting */
+    clock_t time_used;            //CPU time used
+    clock_t sys_time_used;        //system time used while system is executing on behalf of this
+                                //proc
 
-	/* Metadata */
-	char name[PROC_NAME_LEN];	//Process name
-	int exit_status;			//Storage for status when process exits
-	int sig_status;				//Storage for siginal status when process exits
-	pid_t pid;					//Process id
-	pid_t procgrp;				//Pid of the process group (used for signals)
-	pid_t wpid;					//pid this process is waiting for
-	int parent;					//proc_index of parent
-	int i_flags;				//information flags
+    /* Metadata */
+    char name[PROC_NAME_LEN];    //Process name
+    int exit_status;            //Storage for status when process exits
+    int sig_status;                //Storage for siginal status when process exits
+    pid_t pid;                    //Process id
+    pid_t procgrp;                //Pid of the process group (used for signals)
+    pid_t wpid;                    //pid this process is waiting for
+    int parent;                    //proc_index of parent
+    int i_flags;                //information flags
 
-	/* Process Table Index */
-	int proc_nr;				//Index in the process table
+    /* Process Table Index */
+    int proc_nr;                //Index in the process table
 
-	/* Signal Information */
-	sigset_t pending_sigs;
-	struct sigaction sig_table[_NSIG];
+    /* Signal Information */
+    sigset_t pending_sigs;
+    struct sigaction sig_table[_NSIG];
 
-	/* Alarm */
-	struct timer alarm;
+    /* Alarm */
+    struct timer alarm;
 } proc_t;
 
 /**
@@ -158,17 +158,17 @@ typedef struct proc {
  **/
  extern struct proc *current_proc;
 
-#define IS_PROCN_OK(i)				((i)>= 0 && (i) < NUM_PROCS)
-#define IS_PRIORITY_OK(priority)	(0 <= (priority) && (priority) < NUM_QUEUES)
-#define IS_KERNEL_PROC(p)			((p)->rbase == NULL)
-#define IS_USER_PROC(p)				((p)->rbase != NULL)
-#define IS_IDLE(p)					((p)->proc_nr == IDLE)
-#define IS_SYSTEM(p)				((p)->proc_nr == SYSTEM_TASK)
-#define IS_RUNNABLE(p)				(((p)->i_flags & (IN_USE | RUNNABLE)) == (IN_USE | RUNNABLE))
+#define IS_PROCN_OK(i)                ((i)>= 0 && (i) < NUM_PROCS)
+#define IS_PRIORITY_OK(priority)    (0 <= (priority) && (priority) < NUM_QUEUES)
+#define IS_KERNEL_PROC(p)            ((p)->rbase == NULL)
+#define IS_USER_PROC(p)                ((p)->rbase != NULL)
+#define IS_IDLE(p)                    ((p)->proc_nr == IDLE)
+#define IS_SYSTEM(p)                ((p)->proc_nr == SYSTEM_TASK)
+#define IS_RUNNABLE(p)                (((p)->i_flags & (IN_USE | RUNNABLE)) == (IN_USE | RUNNABLE))
 
-#define CHECK_STACK(p)				(*((p)->stack_top) == STACK_MAGIC)
-#define GET_DEF_STACK_SIZE(who)		(IS_USER_PROC(who) ? USER_STACK_SIZE : KERNEL_STACK_SIZE)
-#define GET_HEAP_TOP(who)			((who)->stack_top + GET_DEF_STACK_SIZE(who))
+#define CHECK_STACK(p)                (*((p)->stack_top) == STACK_MAGIC)
+#define GET_DEF_STACK_SIZE(who)        (IS_USER_PROC(who) ? USER_STACK_SIZE : KERNEL_STACK_SIZE)
+#define GET_HEAP_TOP(who)            ((who)->stack_top + GET_DEF_STACK_SIZE(who))
 
 extern struct proc proc_table[NUM_PROCS];
 extern struct proc *ready_q[NUM_QUEUES][2];

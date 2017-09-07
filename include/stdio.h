@@ -15,8 +15,8 @@
 #ifndef _STDIO_H_
 #define _STDIO_H_ 1
 
-#define	BUFSIZ		1024
-#define	EOF		(-1)
+#define    BUFSIZ        1024
+#define    EOF        (-1)
 
 int putcharhar(const char c);
 int getchar();

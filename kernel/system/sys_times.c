@@ -1,8 +1,8 @@
 /**
  * Syscall in this file: time
- * Input:	
+ * Input:    
  *      
- * Return: 	
+ * Return:     
  *          m2_l1  return
  *          m2_l2: tms_utime
  *          m2_l3: tms_stime

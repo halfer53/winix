@@ -24,18 +24,18 @@ int align_page(int len){
  *   OS locks up.
  **/
 void _panic(const char* str, const char* file) {
-	kprintf("\r\nPanic!");
-	if(file)
-		kprintf("in file %s\n", file);
+    kprintf("\r\nPanic!");
+    if(file)
+        kprintf("in file %s\n", file);
 
     if(str)
-		kprintf(str);
-		
-	while(1) {
-		RexParallel->Ctrl = 0;
-		RexParallel->LeftSSD = 0x79;  //E
-		RexParallel->RightSSD = 0x50; //r
-	}
+        kprintf(str);
+        
+    while(1) {
+        RexParallel->Ctrl = 0;
+        RexParallel->LeftSSD = 0x79;  //E
+        RexParallel->RightSSD = 0x50; //r
+    }
 }
 
 /**
@@ -44,10 +44,10 @@ void _panic(const char* str, const char* file) {
  * If not, panic is called with the appropriate message.
  */
 void _assert(int expression, int line, char* filename) {
-	if(!expression) {
-		kprintf("\nAssert Failed at line %d in %s",line,filename);
+    if(!expression) {
+        kprintf("\nAssert Failed at line %d in %s",line,filename);
         _panic(NULL, NULL);
-	}
+    }
 }
 
 

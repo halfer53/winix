@@ -3,10 +3,10 @@
 
 #include <sys/types.h>
 
-#define	DIRBLKSIZ	1024	/* size of directory block */
+#define    DIRBLKSIZ    1024    /* size of directory block */
 
 #ifndef DIRSIZ
-#define DIRSIZ	32
+#define DIRSIZ    32
 #endif
 
 struct direct {

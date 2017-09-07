@@ -19,7 +19,7 @@
  * Sends a message
  *
  * Parameters:
- *   m				Pointer to write the message to.
+ *   m                Pointer to write the message to.
  *
  * Returns:
  *   0 on success
@@ -31,7 +31,7 @@ int wini_send(int dest, struct message *m);
  * non-blocking send
  *
  * Parameters:
- *   m				Pointer to write the message to.
+ *   m                Pointer to write the message to.
  *
  * Returns:
  *   0 on success
@@ -43,9 +43,9 @@ int wini_notify(int dest, struct message *m);
  * Receives a message.
  *
  * Parameters:
- *   m				Pointer to write the message to.
+ *   m                Pointer to write the message to.
  *
- * Returns:			0
+ * Returns:            0
  **/
 int wini_receive(struct message *m);
 
@@ -53,7 +53,7 @@ int wini_receive(struct message *m);
  * send used by interrupt handler during exception
  *
  * Parameters:
- *   m				Pointer to write the message to.
+ *   m                Pointer to write the message to.
  *
  * Returns:
  *   0 on success

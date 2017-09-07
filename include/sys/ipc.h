@@ -25,13 +25,13 @@ typedef struct {long m2l1, m2l2, m2l3, m2l4, m2l5, m2l6;} mess_2;
  * The message structure for IPC
  **/
 typedef struct message{
-	int src;
-	int type;
-	union {
-		mess_1 m_m1;
-		mess_2 m_m2;
-	} m_u;
-	sighandler_t s1;
+    int src;
+    int type;
+    union {
+        mess_1 m_m1;
+        mess_2 m_m2;
+    } m_u;
+    sighandler_t s1;
 } message_t;
 
 /* The following defines provide names for useful members. */
@@ -52,10 +52,10 @@ typedef struct message{
 /**
  * Magic Numbers for send/receive
  **/
-#define WINIX_SEND		0x13370001
-#define WINIX_RECEIVE	0x13370002
-#define WINIX_SENDREC	0x13370003
-#define WINIX_NOTIFY	0x13370004
+#define WINIX_SEND        0x13370001
+#define WINIX_RECEIVE    0x13370002
+#define WINIX_SENDREC    0x13370003
+#define WINIX_NOTIFY    0x13370004
 
 /**
  * Boot Image Task Numbers

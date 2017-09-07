@@ -16,14 +16,14 @@
 
 typedef void (*timerhandler_t)(int,clock_t);
 
-#define TIMER_INUSE	1
+#define TIMER_INUSE    1
 
 struct timer{
-	int proc_nr;
-	clock_t time_out;
-	struct timer *next;
-	timerhandler_t handler;
-	int flags;
+    int proc_nr;
+    clock_t time_out;
+    struct timer *next;
+    timerhandler_t handler;
+    int flags;
 };
 
 int new_timer(clock_t timeout, timerhandler_t watchdog);

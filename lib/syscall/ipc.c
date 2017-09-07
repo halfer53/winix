@@ -27,15 +27,15 @@ int wramp_syscall(int operation, ...);
  * Sends a message to the destination process
  **/
 int winix_send(int dest, struct message *m) {
-	return wramp_syscall(WINIX_SEND, dest, m);
+    return wramp_syscall(WINIX_SEND, dest, m);
 }
 
 /**
  * Receives a message.
  **/
 int winix_receive(struct message *m) {
-	//Note: second parameter is currently unused, but is included to simplify kernel code.
-	return wramp_syscall(WINIX_RECEIVE, NULL, m);
+    //Note: second parameter is currently unused, but is included to simplify kernel code.
+    return wramp_syscall(WINIX_RECEIVE, NULL, m);
 }
 
 /**
@@ -44,5 +44,5 @@ int winix_receive(struct message *m) {
  * Note: overwrites m with the reply message.
  **/
 int winix_sendrec(int dest, struct message *m) {
-	return wramp_syscall(WINIX_SENDREC, dest, m);
+    return wramp_syscall(WINIX_SENDREC, dest, m);
 }

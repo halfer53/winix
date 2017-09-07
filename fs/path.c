@@ -2,8 +2,8 @@
 #include "proc.h"
 #include "inode.h"
 
-char dot1[2] = ".";	/* used for search_dir to bypass the access */
-char dot2[3] = "..";	/* permissions for . and ..		    */
+char dot1[2] = ".";    /* used for search_dir to bypass the access */
+char dot2[3] = "..";    /* permissions for . and ..            */
 
 
 
@@ -20,10 +20,10 @@ char *get_name(char *old_name, char string[NAME_MAX]){
     register int c;
     register char *np, *rnp;
 
-    np = string;			/* 'np' points to current position */
-    rnp = old_name;		/* 'rnp' points to unparsed string */
+    np = string;            /* 'np' points to current position */
+    rnp = old_name;        /* 'rnp' points to unparsed string */
     while ( (c = *rnp) == '/'){
-      rnp++;	/* skip leading slashes */
+      rnp++;    /* skip leading slashes */
     }
 
     /* Copy the unparsed path, 'old_name', to the array, 'string'. */
@@ -31,7 +31,7 @@ char *get_name(char *old_name, char string[NAME_MAX]){
       if (np < &string[NAME_MAX]){
         *np++ = c;
       }
-      c = *++rnp;		/* advance to next character */
+      c = *++rnp;        /* advance to next character */
     }
 
     /* To make /usr/ast/ equivalent to /usr/ast, skip trailing slashes. */
@@ -39,7 +39,7 @@ char *get_name(char *old_name, char string[NAME_MAX]){
       c = *++rnp;
     }
 
-    if (np < &string[NAME_MAX]) *np = '\0';	/* Terminate string */
+    if (np < &string[NAME_MAX]) *np = '\0';    /* Terminate string */
 
     if (rnp >= &old_name[PATH_MAX]) {
     //   err_code = ENAMETOOLONG;

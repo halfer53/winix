@@ -1,8 +1,8 @@
 /**
  * Syscall in this file: sigaction
- * Input:	
+ * Input:    
  *
- * Return: 	m1_i1: syscall status
+ * Return:     m1_i1: syscall status
  * 
  * @author Bruce Tan
  * @email brucetansh@gmail.com

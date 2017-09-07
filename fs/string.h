@@ -2,8 +2,8 @@
  * A rather limited version of <string.h>
  *
  * Revision History:
- *  2016-09-19		Paul Monigatti			Original
- *  2016-11-20		Bruce Tan			Modified
+ *  2016-09-19        Paul Monigatti            Original
+ *  2016-11-20        Bruce Tan            Modified
  **/
 #ifndef _STRING_H_
 #define _STRING_H_ 1
