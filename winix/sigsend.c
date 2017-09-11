@@ -52,21 +52,6 @@ PRIVATE unsigned int sigframe_code[SIGRET_CODE_LEN] = {0x1ee10001,0x200d0000};
  */
 
 /**
- * Copy values onto the user stack, this is very similar to memcpy
- * @param  who 
- * @param  src 
- * @param  len 
- * @return     
- */
-int build_user_stack(struct proc *who, void *src, size_t len){
-    reg_t *sp = get_physical_addr(who->sp,who);
-    sp -= len;
-    memcpy(sp,src,len);
-    who->sp = get_virtual_addr(sp,who);
-    return OK;
-}
-
-/**
  * Build signal context onto the user stack, PC points to the user
  * signal handler. Once building stack is successful, the next time 
  * the process runs, it will run the next process

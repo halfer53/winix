@@ -13,6 +13,7 @@
 */
 
 #include "winix.h"
+#include <winix/srec.h>
 
 //Linked lists are defined by a head and tail pointer.
 
@@ -384,6 +385,7 @@ struct proc *start_kernel_proc(void (*entry)(), const char *name, int quantum) {
     set_proc(p, entry, quantum, name);
     bitmap_fill(p->ptable, PTABLE_LEN);
     p->sp = alloc_kstack(p);
+    build_initial_stack(p,0,NULL);
     enqueue_schedule(p);
     return p;
 }
@@ -481,6 +483,21 @@ int alloc_proc_mem(struct proc *who, int text_data_length, int stack_size, int h
         who->heap_break = who->rbase + text_data_length + bss_size + stack_size;
         who->heap_bottom = who->heap_break + heap_size - 1;
     }
+    return OK;
+}
+
+/**
+ * Copy values onto the user stack, this is very similar to memcpy
+ * @param  who 
+ * @param  src 
+ * @param  len 
+ * @return     
+ */
+ int build_user_stack(struct proc *who, void *src, size_t len){
+    reg_t *sp = get_physical_addr(who->sp,who);
+    sp -= len;
+    memcpy(sp,src,len);
+    who->sp = get_virtual_addr(sp,who);
     return OK;
 }
 

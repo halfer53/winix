@@ -14,6 +14,7 @@
  * 
 */
 #include "../winix.h"
+#include <winix/srec.h>
 
 int do_exec(struct proc *who, struct message *m){
     return exec_read_srec(who);
@@ -33,7 +34,7 @@ int exec_proc(struct proc *p,size_t *lines, size_t length, size_t entry, int qua
                          PROC_SET_SP | PROC_SET_HEAP) != OK){
         return ERR;
     }
-
+    build_initial_stack(p, 0, NULL);
     memcpy(p->rbase, lines , length);
 
     p->length = length;

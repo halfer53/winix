@@ -38,8 +38,6 @@
 #define SYSCALL_PRINTF          15
 #define SYSCALL_SYSCONF         16
 
-#define SYSCALL_DEFAULT_RETURN  m.m1_i1
-
 #define DECLARE_SYSCALL(function, params, syscall_num, passing_codes)\
 function params{\
     struct message m;\
@@ -47,13 +45,13 @@ function params{\
     m.type = syscall_num;\
     passing_codes;\
     __ret = winix_sendrec(SYSTEM,&m);\
-    if(m.m1_i1 < 0){\
-        __errno = -m.m1_i1;\
-        m.m1_i1 = -1;\
+    if(m.reply_res < 0){\
+        __errno = -m.reply_res;\
+        m.reply_res = -1;\
     }else{\
         __errno = 0;\
     }\
-    return m.m1_i1;\
+    return m.reply_res;\
 }\
 
 

@@ -8,9 +8,9 @@ int main(int argc, char **argv){
   while(1){
     pid = wait(&status);
     if(pid == -1){
-      exit(0);
+      return 0;
     }
-    printf("INIT: child %d exit status %d\n", pid, WEXITSTATUS(status));
+    // printf("INIT: child %d exit status %d\n", pid, WEXITSTATUS(status));
   }
   
   return 0;

@@ -106,7 +106,9 @@ void exit_proc(struct proc *who, int status){
 }
 
 int do_exit(struct proc *who, struct message *m){
-
+    if(m->m1_i1 == EXIT_MAGIC){
+        m->m1_i1 = who->regs[0];
+    }
     exit_proc(who,m->m1_i1);
     return SUSPEND;
 }

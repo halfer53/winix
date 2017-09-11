@@ -20,4 +20,6 @@
 #define INT_MAX         0x7FFFFFFF
 #define INT_MIN         0x80000000
 
+#define EXIT_MAGIC      0x10293847
+
 #endif

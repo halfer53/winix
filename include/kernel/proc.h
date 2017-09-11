@@ -196,6 +196,7 @@ void print_runnable_procs();
 void printProceInfo(struct proc* curr);
 struct proc *pick_proc();
 void unsched(struct proc *p);
+int build_user_stack(struct proc *who, void *src, size_t len);
 
 
 
