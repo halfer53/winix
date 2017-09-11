@@ -19,19 +19,25 @@
 #include <winix/kwramp.h>
 
 //Kernel Process
-#define INTERRUPT               	-5
+#define NUM_TASKS                   2   //number of kernel tasks,
+#define IDLE                    	-1
+#define SYSTEM                      0
+
+//User Process
+#define NUM_INIT_TASKS              1  //number of initial tasks, it's just init
 #define INIT                   		1
-#define IDLE                    	2
+
 
 //Process & Scheduling
 #define PROC_NAME_LEN           	20
 #define NUM_PROCS               	10
+#define NUM_USER_PROCS              (NUM_PROCS - NUM_TASKS)
 #define NUM_QUEUES              	5
 #define MAX_PRIORITY            	0
 #define MIN_PRIORITY            	((NUM_QUEUES) - 1)
 
 //min bss segment size
-#define MIN_BSS_SIZE            	300
+#define MIN_BSS_SIZE            	200
 
 //stack
 #define STACK_MAGIC             	0x12345678
@@ -41,7 +47,7 @@
 //heap
 #define USER_HEAP_SIZE          	2048
 
-//Signal Context
+//Signal PCB Context
 #define SIGNAL_CTX_LEN          	21
 
 //Process Defaults
@@ -118,8 +124,8 @@ typedef struct proc {
     struct proc *sender_q;        	//Head of process queue waiting to send to this process
     struct proc *next_sender;     	//Link to next sender in the queue
 
-    /* Pending messages, used by notify */
-    unsigned int notify_pending;	//bitmap for masking list of pending messages by system proc
+    /* Pending messages, used by winix_notify */
+    unsigned int winix_notify_pending;	//bitmap for masking list of pending messages by system proc
 
     /* Scheduling */
     struct proc *next;            	//Next pointer
@@ -158,11 +164,11 @@ typedef struct proc {
 **/
 extern struct proc *current_proc;
 
-extern struct proc proc_table[NUM_PROCS];
+extern struct proc *proc_table;
 extern struct proc *ready_q[NUM_QUEUES][2];
 extern struct proc *block_q[2];
 
-#define IS_PROCN_OK(i)                  ((i)>= 0 && (i) < NUM_PROCS)
+#define IS_PROCN_OK(i)                  ((i)> -NUM_TASKS && (i) < NUM_PROCS)
 #define IS_PRIORITY_OK(priority)        (0 <= (priority) && (priority) < NUM_QUEUES)
 #define IS_KERNEL_PROC(p)               ((p)->rbase == NULL)
 #define IS_USER_PROC(p)                 ((p)->rbase != NULL)
@@ -174,6 +180,13 @@ extern struct proc *block_q[2];
 #define GET_DEF_STACK_SIZE(who)         (IS_USER_PROC(who) ? USER_STACK_SIZE : KERNEL_STACK_SIZE)
 #define GET_HEAP_TOP(who)               ((who)->stack_top + GET_DEF_STACK_SIZE(who))
 
+#define for_each_proc_except_idle(curr)\
+for(curr = proc_table; curr < proc_table + NUM_PROCS - NUM_TASKS + 1; curr++)
+
+#define for_each_user_proc(curr)\
+for(curr = proc_table + 1; curr < proc_table + NUM_PROCS - NUM_TASKS + 1 ; curr++)
+
+
 void* get_pc_ptr(struct proc* who);
 void enqueue_tail(struct proc **q, struct proc *proc);
 void enqueue_head(struct proc **q, struct proc *proc);
@@ -181,8 +194,8 @@ struct proc *dequeue(struct proc **q);
 void init_proc();
 void proc_set_default(struct proc *p);
 reg_t* alloc_stack(struct proc *who);
-int set_proc(struct proc *p, void (*entry)(), int quantum, const char *name);
-struct proc *start_kernel_proc(void (*entry)(), const char *name,int quantum);
+void set_proc(struct proc *p, void (*entry)(), int quantum, const char *name);
+struct proc *start_kernel_proc(void (*entry)(), int proc_nr, const char *name,int quantum);
 struct proc *start_user_proc(size_t *lines, size_t length, size_t entry, int priority, const char *name);
 struct proc *get_free_proc_slot();
 int alloc_proc_mem(struct proc *who, int tdb_length, int stack_size, int heap_size, int flags);
@@ -192,23 +205,18 @@ int proc_memctl(struct proc* who ,vptr_t* page_addr, int flags);
 void end_process(struct proc *p);
 struct proc *get_proc(int proc_nr);
 struct proc *get_running_proc(int proc_nr);
-void print_runnable_procs();
-void printProceInfo(struct proc* curr);
+void kprint_runnable_procs();
+void kprint_proc_info(struct proc* curr);
 struct proc *pick_proc();
 void unsched(struct proc *p);
 int build_user_stack(struct proc *who, void *src, size_t len);
 
-
-
-struct proc_config{
+struct boot_image{
     char name[PROC_NAME_LEN];
     void (*entry)();
-    int pid;
+    int proc_nr;
     int quantum;
     int priority;
-    bool iskernel_proc;
-    unsigned int *image_array;
-    int image_len;
 };
 
 #endif

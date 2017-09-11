@@ -232,17 +232,17 @@ void release_proc_mem(struct proc *who){
     bitmap_clear(who->ptable, PTABLE_LEN);
 }
 
-void print_ptable(struct proc* who){
-    print_bitmap(who->ptable, MEM_MAP_LEN);
+void kprint_ptable(struct proc* who){
+    kprint_bitmap(who->ptable, MEM_MAP_LEN);
 }
 
-void print_sysmap(){
+void kprint_sysmap(){
     static char free_str[] = "Free";
     static char used_str[] = "Used";
     int flags, pages, i;
     char* str;
     kprintf("Sys Mem bitmap: ");
-    print_bitmap(mem_map, MEM_MAP_LEN);
+    kprint_bitmap(mem_map, MEM_MAP_LEN);
 
     for(i = 0; i < 2; i++){
         flags = i == 0 ? ZERO_BITS : ONE_BITS;

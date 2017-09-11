@@ -54,18 +54,24 @@ char *strcpy(char *dest, const char *src) {
     return saved;
 }
 
-/**
- * append the src to the end of the dest, the dest should be large enough to hold extra src
- **/
-char *strcat(char *dest, const char *src) {
-    int i = 0, src_index = 0;
-    while (dest[i] != '\0') i++;
-
-    for (; src[src_index] != '\0'; src_index++) {
-        dest[i + src_index] = src[src_index];
+char *strncpy(char *dest, const char *src, size_t n){
+    char *saved = dest;
+    while (*src && n--) {
+        *dest++ = *src++;
     }
-    dest[i + src_index] = '\0';
-    return dest;
+    *dest = 0;
+    return saved;
+}
+
+char *strcat(char *dest, const char *src) {
+    char* saved = dest;
+    while (*dest != '\0') dest++;
+
+    while(*src != '\0') {
+        *dest++ = *src++;
+    }
+    *dest = '\0';
+    return saved;
 }
 
 

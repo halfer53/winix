@@ -125,20 +125,21 @@ PRIVATE void gpf_handler() {
     //is the current process a valid one?
     ASSERT(IS_PROCN_OK(current_proc->proc_nr));
     
-    kinfo("General Protection Fault: \"%s (%d)\" Rbase=0x%x vPC=0x%x vSP=0x%x.\r\n",
+    kinfo("General Protection Fault: \"%s (%d)\" Rbase=0x%x \n",
         current_proc->name,
         current_proc->proc_nr,
-        current_proc->rbase,
-        current_proc->pc,
-        current_proc->sp);
+        current_proc->rbase);
+    pc = get_physical_addr(get_pc_ptr(current_proc),current_proc);
+    kinfo("Physical $pc %x, $sp %x $ra %x\n", 
+        pc, 
+        get_physical_addr(current_proc->sp, current_proc),
+        get_physical_addr(current_proc->ra, current_proc));    
+    kinfo("Current Instruction: 0x%08x\n",*pc);
 
     if(!CHECK_STACK(current_proc))
         kinfo("Stack Overflow\n");
 
 #ifdef _DEBUG
-    // pc = get_physical_addr(get_pc_ptr(current_proc),current_proc);
-    // kinfo("Current Instruction: 0x%08x\n",*pc);
-    // kinfo("Physical pc %x, sp %x\n", pc, get_physical_addr(current_proc->sp, current_proc));
     // kinfo("$1: 0x%08x, $2, 0x%08x, $3, 0x%08x\n",current_proc->regs[0],
     //                         current_proc->regs[1],current_proc->regs[2]);
     // kinfo("$4: 0x%08x, $5, 0x%08x, $6, 0x%08x\n",current_proc->regs[3],
@@ -188,7 +189,7 @@ PRIVATE void syscall_handler() {
             *retval = wini_receive(m);
             break;
 
-        case WINIX_NOTIFY:
+        case WINIX_winix_notify:
             *retval = wini_notify(dest,m);
             break;
 

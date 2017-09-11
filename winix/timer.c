@@ -13,26 +13,11 @@
 */
 #include <kernel/kernel.h>
 
-#define NUM_TIMERS  5
 
 //a linked list of pending timers to be alarmed
 PRIVATE struct timer *pending_timers = NULL;
 
-//Internal timer struct
-PRIVATE struct timer timer_table[NUM_TIMERS];
-
-void init_timer(){
-    int i;
-    struct timer* curr;
-    for(i = 0; i < NUM_TIMERS; i++)
-    {
-        curr = &timer_table[i]; 
-        memset(curr, 0, sizeof(struct timer));
-    }
-}
-
-
-void print_timers(){
+void kprint_timers(){
     struct timer *mq = pending_timers;
     
     while(mq != NULL)
@@ -43,25 +28,19 @@ void print_timers(){
     kinfo("next timeout %d\n",next_timeout);
 }
 
-int new_timer(clock_t timeout, timerhandler_t watchdog){
-    
-    int i;
-    struct timer* curr;
+int new_timer(struct timer* curr, clock_t timeout, timerhandler_t watchdog){
 
     if(timeout == 0)
         return ERR;
-    
-    for(i = 0; i < NUM_TIMERS; i++)
-    {
-        curr = &timer_table[i]; 
-        if(! curr->flags & TIMER_INUSE){
-            curr->time_out = get_uptime() + timeout;
-            curr->proc_nr = SYSTEM;
-            curr->handler = watchdog;
-            insert_timer(curr);
-            return OK;
-        }
+
+    if( !(curr->flags & TIMER_INUSE) ){
+        curr->time_out = get_uptime() + timeout;
+        curr->proc_nr = SYSTEM;
+        curr->handler = watchdog;
+        insert_timer(curr);
+        return OK;
     }
+    
     // PANIC("No timer left");
     return ERR;
 }
@@ -99,8 +78,7 @@ void insert_timer(struct timer *timer){
     struct timer *curr = pending_timers;
     clock_t new_timeout = timer->time_out;
 
-    if(!in_interrupt())
-        disable_interrupt();
+    disable_interrupt();
     while(curr && curr->time_out < new_timeout){
         prev = curr;
         curr = curr->next;
@@ -115,10 +93,11 @@ void insert_timer(struct timer *timer){
         next_timeout = pending_timers->time_out;
     }
     timer->flags &= TIMER_INUSE;
-    if(!in_interrupt())
-        enable_interrupt();
+
+    enable_interrupt();
+    
     if(get_debug_timer_count())
-        print_timers();
+        kprint_timers();
 }
 
 /**

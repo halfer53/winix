@@ -18,7 +18,10 @@
 //Linked lists are defined by a head and tail pointer.
 
 //Process table
-PUBLIC struct proc proc_table[NUM_PROCS];
+PRIVATE struct proc _proc_table[NUM_PROCS];
+
+//Pointer to proc table, public system wise
+PUBLIC struct proc *proc_table;
 
 //Scheduling queues
 PUBLIC struct proc *ready_q[NUM_QUEUES][2];
@@ -68,23 +71,25 @@ PUBLIC struct proc *current_proc;
 
 //print out the list of processes currently in the ready_q
 //and the currently running process
-void print_runnable_procs() {
+void kprint_runnable_procs() {
     int i;
     struct proc *curr;
     kprintf("NAME     PID PPID RBASE      PC         STACK      HEAP       PROTECTION   FLAGS\n");
     for (i = 0; i < NUM_PROCS; i++) {
-        curr = &proc_table[i];
-        if(IS_RUNNABLE(curr))
-            printProceInfo(curr);
+        curr = &_proc_table[i];
+        if(IS_RUNNABLE(curr)){
+            kprint_proc_info(curr);
+        }
+            
     }
 }
 
 //print the process state
-void printProceInfo(struct proc* curr) {
+void kprint_proc_info(struct proc* curr) {
     int ptable_idx = PADDR_TO_PAGED(curr->rbase)/32;
     kprintf("%-08s %-03d %-04d 0x%08x 0x%08x 0x%08x 0x%08x %d 0x%08x %d\n",
             curr->name,
-            curr->proc_nr,
+            curr->proc_nr < 0 ? 0 : curr->proc_nr,
             curr->parent,
             curr->rbase,
             get_physical_addr(get_pc_ptr(curr),curr),
@@ -95,7 +100,7 @@ void printProceInfo(struct proc* curr) {
             curr->s_flags);
 }
 
-void print_readyqueue(){
+void kprint_readyqueue(){
     int i,j;
     struct proc* curr;
     kprintf(" q| ");
@@ -110,7 +115,7 @@ void print_readyqueue(){
     kprintf("| ");
 }
 
-void print_receiver_queue(struct proc* who){
+void kprint_receiver_queue(struct proc* who){
     struct proc* curr;
     curr = who->sender_q;
     if(curr)
@@ -132,7 +137,7 @@ void print_receiver_queue(struct proc* who){
 struct proc *get_proc(int proc_nr) {
     struct proc *p;
     if (IS_PROCN_OK(proc_nr)){
-        p = &proc_table[proc_nr];
+        p = proc_table + proc_nr;
         return p;
     }
     return NULL;
@@ -297,9 +302,7 @@ void end_process(struct proc *p) {
  * @return pointer to the free slot, or NULL
  */
 struct proc *get_free_proc_slot() {
-    int i;
     struct proc *p = dequeue(free_proc);
-    size_t *sp = NULL;
 
     if (p) {
         proc_set_default(p);
@@ -344,6 +347,7 @@ reg_t* alloc_kstack(struct proc *who){
     ASSERT(stack_top != NULL);
     
     addr = stack_top + KERNEL_STACK_SIZE - 1;
+    *stack_top = STACK_MAGIC;
     who->stack_top = stack_top;
     return get_virtual_addr(addr, who);
 }
@@ -351,13 +355,27 @@ reg_t* alloc_kstack(struct proc *who){
 /**
  * set corressponding fields of struct pro
  */
-int set_proc(struct proc *p, void (*entry)(), int quantum, const char *name) {
+void set_proc(struct proc *p, void (*entry)(), int quantum, const char *name) {
     p->quantum = quantum;
     p->pc = entry;
+    strncpy(p->name, name, PROC_NAME_LEN - 1);
+}
 
-    //NB: this may result in buffer overflow
-    strcpy(p->name, name);
-    return OK;
+/**
+ * The first page in the kernel is set as unaccessible
+ * Remember that NULL is just a macro of a pointer pointing at 0
+ *  #define NULL    (void *)0
+ * Thus when NULL pointer is dereferenced (is written), 
+ * program attemps to write value to address 0, we would set
+ * the first page unaccessible, 
+ * so that GFP is raised when null pointer is dereferenced
+ * 
+ */
+ void kset_ptable(struct proc* who){
+    if(IS_KERNEL_PROC(who)){
+        bitmap_fill(who->ptable, PTABLE_LEN);
+        bitmap_clear_bit(who->ptable, PTABLE_LEN, 0);
+    }
 }
 
 /**
@@ -376,16 +394,16 @@ int set_proc(struct proc *p, void (*entry)(), int quantum, const char *name) {
  * Side Effects:
  *   A proc is removed from the free_proc list, reinitialised, and added to ready_q.
  */
-struct proc *start_kernel_proc(void (*entry)(), const char *name, int quantum) {
+struct proc *start_kernel_proc(void (*entry)(), int proc_nr, const char *name, int quantum) {
     struct proc *p;
     
     if (!(p = get_free_proc_slot()))
         return NULL;
     
     set_proc(p, entry, quantum, name);
-    bitmap_fill(p->ptable, PTABLE_LEN);
+    kset_ptable(p);
     p->sp = alloc_kstack(p);
-    build_initial_stack(p,0,NULL);
+    p->proc_nr = proc_nr;
     enqueue_schedule(p);
     return p;
 }
@@ -493,7 +511,7 @@ int alloc_proc_mem(struct proc *who, int text_data_length, int stack_size, int h
  * @param  len 
  * @return     
  */
- int build_user_stack(struct proc *who, void *src, size_t len){
+int build_user_stack(struct proc *who, void *src, size_t len){
     reg_t *sp = get_physical_addr(who->sp,who);
     sp -= len;
     memcpy(sp,src,len);
@@ -512,7 +530,7 @@ int alloc_proc_mem(struct proc *who, int text_data_length, int stack_size, int h
  *   current_proc is set to NULL.
  **/
 void init_proc() {
-    int i;
+    int i, procnr_offset;
     struct proc *p;
     //Initialise queues
 
@@ -521,16 +539,18 @@ void init_proc() {
         ready_q[i][TAIL] = NULL;
     }
 
+    procnr_offset = NUM_TASKS - 1;
     free_proc[HEAD] = free_proc[TAIL] = NULL;
     //Add all proc structs to the free list
     for ( i = 0; i < NUM_PROCS; i++) {
-        p = &proc_table[i];
+        p = &_proc_table[i];
         proc_set_default(p);
-        p->proc_nr = i;
-        p->s_flags |= STOPPED;
+        p->proc_nr = i - procnr_offset;
         enqueue_tail(free_proc, p);
     }
 
+    proc_table = _proc_table;
+    proc_table += procnr_offset;
     //No current process yet.
     current_proc = NULL;
 }

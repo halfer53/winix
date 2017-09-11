@@ -12,6 +12,14 @@
  * 
 */
 #include "winix.h"
+#include <kernel/sched.h>
+
+PRIVATE struct timer sched_timer;
+
+void init_sched(){
+    memset(&sched_timer, 0, sizeof(struct timer));
+    new_timer(&sched_timer, REBALANCE_TIMEOUT, rebalance_queues);
+}
 
 /**
  * This method is called every 12 timer interrupts
@@ -21,19 +29,15 @@
  *  
  **/
 void rebalance_queues(int proc_nr, clock_t time){
-    int i;
     struct proc* curr;
-    for(i = 0; i < NUM_PROCS; i++)
+    for_each_proc_except_idle(curr)
     {
-        curr = &proc_table[i];
-        if(!curr->s_flags){
+        if(curr->i_flags & IN_USE){
             curr->priority = MAX_PRIORITY;
         }
     }
-    current_proc->priority = MAX_PRIORITY;
     //Idle process always remain the lowest queue
-    get_proc(IDLE)->priority = MIN_PRIORITY;
-    new_timer(REBALANCE_TIMEOUT, rebalance_queues);
+    new_timer(&sched_timer, REBALANCE_TIMEOUT, rebalance_queues);
 }
 
 /**
@@ -54,7 +58,7 @@ struct proc *pick_proc() {
     for (i = 0; i < NUM_QUEUES; i++){
         if(mp = dequeue(ready_q[i])){
             if(get_debug_sched_count()){
-                kprintf("|| %d %d || ", i, mp->proc_nr);
+                kprintf("|| %d || ", mp->proc_nr);
             }
             return mp;
         }

@@ -31,6 +31,6 @@ void syscall_region_end();
 void intr_syscall();
 struct message *curr_mesg();
 struct syscall_ctx *interrupted_syscall_ctx();
-void print_sysinfo();
+void kprint_sysinfo();
 
 #endif

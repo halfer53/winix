@@ -16,6 +16,8 @@
 
 #include <ucontext.h>
 
+typedef int (*syscall_handler_t)(struct proc* who, struct message* m);
+
 struct syscall_ctx{
     struct message m;
     struct proc *who;

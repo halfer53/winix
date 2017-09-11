@@ -25,51 +25,53 @@ PRIVATE struct syscall_ctx syscall_context;
  * Entry point for system task.
  **/
 void system_main() {
-    print_sysinfo();
+    int reply;
+    struct message* mesg = &m;
+    kprint_sysinfo();
     getcontext(&recv_ctx);
 
     //Receive message, do work, repeat.
     while(true) {
         
         //get a message
-        winix_receive(&m);
-        who_proc_nr = m.src;
+        winix_receive(mesg);
+        who_proc_nr = mesg->src;
         who = get_proc(who_proc_nr);
 
         syscall_region_begin();
 
         //Do the work
-        switch(m.type){
-            case SYSCALL_TIMES:             m.reply_res = do_times(who,&m);             break;
-            case SYSCALL_EXIT:              m.reply_res = do_exit(who,&m);              break;
-            case SYSCALL_FORK:              m.reply_res = do_fork(who,&m);              break;
-            case SYSCALL_EXECVE:            m.reply_res = do_exec(who,&m);              break;
-            case SYSCALL_BRK:               m.reply_res = do_brk(who,&m);               break;
-            case SYSCALL_ALARM:             m.reply_res = do_alarm(who,&m);             break;
-            case SYSCALL_SIGNAL:            m.reply_res = do_sigaction(who,&m);         break;
-            case SYSCALL_SIGRET:            m.reply_res = do_sigreturn(who,&m);         break;
-            case SYSCALL_WAIT:              m.reply_res = do_wait(who,&m);              break;
-            case SYSCALL_KILL:              m.reply_res = do_kill(who,&m);              break;
-            case SYSCALL_GETPID:            m.reply_res = do_getpid(who,&m);            break;
-            case SYSCALL_GETC:              m.reply_res = do_getc(who,&m);              break;
-            case SYSCALL_WINFO:             m.reply_res = do_winfo(who,&m);             break;
-            case SYSCALL_PRINTF:            m.reply_res = do_printf(who,&m);            break;
-            case SYSCALL_SYSCONF:           m.reply_res = do_sysconf(who,&m);           break;
+        switch(mesg->type){
+            case SYSCALL_TIMES:             reply = do_times(who,mesg);             break;
+            case SYSCALL_EXIT:              reply = do_exit(who,mesg);              break;
+            case SYSCALL_FORK:              reply = do_fork(who,mesg);              break;
+            case SYSCALL_EXECVE:            reply = do_exec(who,mesg);              break;
+            case SYSCALL_BRK:               reply = do_brk(who,mesg);               break;
+            case SYSCALL_ALARM:             reply = do_alarm(who,mesg);             break;
+            case SYSCALL_SIGNAL:            reply = do_sigaction(who,mesg);         break;
+            case SYSCALL_SIGRET:            reply = do_sigreturn(who,mesg);         break;
+            case SYSCALL_WAIT:              reply = do_wait(who,mesg);              break;
+            case SYSCALL_KILL:              reply = do_kill(who,mesg);              break;
+            case SYSCALL_GETPID:            reply = do_getpid(who,mesg);            break;
+            case SYSCALL_GETC:              reply = do_getc(who,mesg);              break;
+            case SYSCALL_WINFO:             reply = do_winfo(who,mesg);             break;
+            case SYSCALL_PRINTF:            reply = do_printf(who,mesg);            break;
+            case SYSCALL_SYSCONF:           reply = do_sysconf(who,mesg);           break;
             default:
                 kinfo("Process \"%s (%d)\" performed unknown system call %d\r\n", 
                                                 who->name, who->proc_nr, m.type);
-                m.reply_res = ENOSYS;
+                reply = ENOSYS;
                 break;
         }
 
-        switch(m.reply_res){
+        switch(reply){
             case SUSPEND:
             case DONOTHING:
                 break;
             default:
-                notify(who_proc_nr,&m);
+                mesg->reply_res = reply;
+                syscall_reply(who_proc_nr, mesg);
         }
-        
         syscall_region_end();
     }
 }
@@ -77,7 +79,7 @@ void system_main() {
 /**
  * print sys info of text, data and bss segment size
  */
- void print_sysinfo(){
+ void kprint_sysinfo(){
     int free_mem_begin, mem_end;
     free_mem_begin = peek_next_free_page() * PAGE_LEN;
     mem_end = peek_last_free_page() * PAGE_LEN;

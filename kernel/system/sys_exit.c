@@ -22,8 +22,7 @@ void clear_sending_mesg(struct proc *who){
     register struct proc **xp; //iterate over the process's queue
     int i;
 
-    for(i = 0; i < NUM_PROCS; i++){
-        rp = &proc_table[i];
+    for_each_user_proc(rp){
         if(rp->i_flags & IN_USE && (xp = &(rp->sender_q)) != NULL){
 
             //walk through the message queues
@@ -52,7 +51,7 @@ void clear_receiving_mesg(struct proc *who){
         xp = who->sender_q;
         while(xp){
             memset(&m,-1,sizeof( struct message));
-            notify(xp->proc_nr,&m);
+            syscall_reply(xp->proc_nr,&m);
             xp = xp->next_sender;
         }
     }
@@ -71,20 +70,21 @@ void exit_proc(struct proc *who, int status){
     unsched(who);
     clear_proc(who);
 
-    // print_runnable_procs();
+    // kprint_runnable_procs();
     //if parent is waiting
-    KDEBUG(("%s[%d] exit status %d signal %d\n",who->name, who->proc_nr, 
+    KPRINT_DEBUG(("%s[%d] exit status %d signal %d\n",who->name, who->proc_nr, 
                                               status, who->sig_status));
 
     who->exit_status = status;                                          
-    for( i=0; i< NUM_PROCS; i++){
-        mp = &proc_table[i];
+    for_each_user_proc(mp){
         if(mp->i_flags & IN_USE){
             if(mp->s_flags & WAITING && mp->wpid == who->proc_nr){
 
-                curr_mesg()->m1_i2 = (who->exit_status << 8) | (who->sig_status & 0x7f);
+                struct message* mesg = curr_mesg();
+                mesg->reply_res = who->proc_nr;
+                mesg->m1_i2 = (who->exit_status << 8) | (who->sig_status & 0x7f);
                 mp->s_flags &= ~WAITING;
-                syscall_reply(mp->proc_nr, who->proc_nr);
+                syscall_reply(mp->proc_nr, mesg);
 
                 children++;
             }else if(mp->parent == who->proc_nr){
@@ -106,10 +106,11 @@ void exit_proc(struct proc *who, int status){
 }
 
 int do_exit(struct proc *who, struct message *m){
-    if(m->m1_i1 == EXIT_MAGIC){
-        m->m1_i1 = who->regs[0];
+    int status = m->m1_i1;
+    if(status == EXIT_MAGIC){
+        status = who->regs[0];
     }
-    exit_proc(who,m->m1_i1);
+    exit_proc(who,status);
     return SUSPEND;
 }
 

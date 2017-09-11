@@ -44,7 +44,10 @@ ifeq ($(KBUILD_VERBOSE),0)
 	@echo "AS \t $<"
 endif
 
-
+foo: foo.c
+	wcc -N -S -I../include -o foo.s foo.c
+	wasm -o foo.o foo.s
+	wlink -v -o foo.srec foo.o
 
 depend:
 	makedepend -I$(INCLUDE_DIR) $(SOURCES) $(SHELL_SREC)

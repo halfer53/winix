@@ -8,7 +8,7 @@ ASSEMBLY = $(PROGS:=.s)
 OBJECT = $(PROGS:=.o)
 OUT = init.srec
 
-LIBS = syscall/syscall.o syscall/wramp_syscall.o syscall/ipc_receive.o\
+LIBS = syscall/_syscall.o syscall/wramp_syscall.o syscall/ipc_receive.o\
 		 syscall/ipc_send.o stdlib/errno.o syscall/wait.o syscall/printf.o\
 		  syscall/_exit.o 
 LIBS_O = $(addprefix ../lib/, $(LIBS))

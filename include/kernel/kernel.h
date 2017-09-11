@@ -55,7 +55,6 @@
 #include <winix/timer.h>
 #include <kernel/clock.h>
 #include <kernel/proc.h>
-#include <kernel/sched.h>
 #include <kernel/exception.h>
 #include <kernel/system.h>
 

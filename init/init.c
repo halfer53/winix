@@ -8,10 +8,12 @@ int main(int argc, char **argv){
   while(1){
     pid = wait(&status);
     if(pid == -1){
-      return 0;
+      goto end;
     }
     // printf("INIT: child %d exit status %d\n", pid, WEXITSTATUS(status));
   }
   
+  end:
+  printf("Shutting down\n");
   return 0;
 }

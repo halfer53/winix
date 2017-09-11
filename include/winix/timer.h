@@ -26,7 +26,7 @@ struct timer{
     int flags;
 };
 
-int new_timer(clock_t timeout, timerhandler_t watchdog);
+int new_timer(struct timer* curr, clock_t timeout, timerhandler_t watchdog);
 void insert_timer(struct timer *timer);
 struct timer* dequeue_alarm();
 void remove_timer(struct timer *timer);

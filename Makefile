@@ -45,10 +45,14 @@ all:
 	$(Q)$(MAKE) -C winix
 	$(Q)$(MAKE) -C init
 	$(Q)$(MAKE) -C kernel
-	$(Q)wlink $(LDFLAGS) -o winix.srec $(L_HEAD) $(KERNEL_O) $(KLIB_O) $(L_TAIL)
+	$(Q)wlink $(LDFLAGS) -Ttext 1024 -o winix.srec $(L_HEAD) $(KERNEL_O) $(KLIB_O) $(L_TAIL)
 ifeq ($(KBUILD_VERBOSE),0)
 	@echo "LD \t winix.srec"
 endif
+
+debug:
+	$(MAKE) all
+	$(Q)wlink $(LDFLAGS) -Ttext 1024 -v -o winix.srec $(L_HEAD) $(KERNEL_O) $(KLIB_O) $(L_TAIL)
 
 release: 
 	$(MAKE) clean

@@ -13,6 +13,7 @@
 */
 #include <kernel/kernel.h>
 
+
 /**
  * Writes a character to serial port 1.
  **/
@@ -267,6 +268,14 @@ int kinfo(const char *format, ...){
     arg = ((char*)arg) + 1;
 
     kputs("[SYSTEM] ");
+    return kprintf_vm(format,arg,0);
+}
+
+int kdebug(const char *format, ...){
+    void *arg = &format;
+    arg = ((char*)arg) + 1;
+
+    kputs("[DEBUG ] ");
     return kprintf_vm(format,arg,0);
 }
 

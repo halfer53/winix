@@ -25,9 +25,9 @@ void stop_debug_ipc();
 void stop_debug_syscall();
 
 #ifdef _DEBUG
-    #define KDEBUG(token)   kinfo token
+    #define KPRINT_DEBUG(token)   kinfo token
 #else
-    #define KDEBUG(token)
+    #define KPRINT_DEBUG(token)
 #endif
 
 #endif

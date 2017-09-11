@@ -52,7 +52,6 @@ int wini_send(int dest, struct message *m) {
         }else if(get_debug_ipc_count()){
             kprintf("\nIPC: SEND to %d from %d type %d| ",dest, current_proc->proc_nr,m->type);
         }
-
         return OK;
     }
     return ERR;
@@ -87,12 +86,12 @@ int wini_receive(struct message *m) {
         }
         return OK;
     }
-    else if(current_proc->notify_pending != 0){
+    else if(current_proc->winix_notify_pending != 0){
         int i;
-        unsigned int map = current_proc->notify_pending;
+        unsigned int map = current_proc->winix_notify_pending;
         for(i = 0; i < 32; i++){
             if(map & (1 << i)){
-                unset_bit(current_proc->notify_pending, i);
+                unset_bit(current_proc->winix_notify_pending, i);
                 *m = *(get_proc(i)->message);
                 return OK;
             }
@@ -122,7 +121,7 @@ int wini_notify(int dest, struct message *m) {
     if (pDest = get_running_proc(dest)) {
 
         if(get_debug_ipc_count())
-                kprintf("\nNOTIFY %d from %d reply %d| ",dest, current_proc->proc_nr,m->type);
+                kprintf("\nwinix_notify %d from %d reply %d| ",dest, current_proc->proc_nr,m->type);
             
         //If destination is waiting, deliver message immediately.
         if (pDest->s_flags & RECEIVING) {
@@ -134,7 +133,7 @@ int wini_notify(int dest, struct message *m) {
             pDest->s_flags &= ~RECEIVING;
             enqueue_head(ready_q[pDest->priority], pDest);
         }else{
-            set_bit(pDest->notify_pending, current_proc->proc_nr);
+            set_bit(pDest->winix_notify_pending, current_proc->proc_nr);
         }
         //do nothing if it's not waiting
         return OK;
@@ -146,14 +145,12 @@ int wini_notify(int dest, struct message *m) {
  * Non-blocking send
  *
  **/
-int notify(int dest, struct message *m) {
-    return wramp_syscall(WINIX_NOTIFY, dest, m);
+int winix_notify(int dest, struct message *m) {
+    return wramp_syscall(WINIX_winix_notify, dest, m);
 }
 
-int syscall_reply(int dest, int ret){
-    struct message* m = curr_mesg();
-    m->reply_res = ret;
-    return notify(dest,m);
+int syscall_reply(int dest,struct message* m){
+    return winix_notify(dest,m);
 }
 
 //send used by interrupt

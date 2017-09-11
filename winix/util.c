@@ -24,7 +24,7 @@ int align_page(int len){
  *   OS locks up.
  **/
 void _panic(const char* str, const char* file) {
-    kprintf("\r\nPanic!");
+    kprintf("\r\nPanic! ");
     if(file)
         kprintf("in file %s\n", file);
 

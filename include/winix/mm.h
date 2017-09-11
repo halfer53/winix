@@ -33,8 +33,8 @@ ptr_t* user_get_free_pages(struct proc* who, int length, int flags);
 int next_free_page_index();
 
 void* dup_vm(struct proc* parent, struct proc* child);
-void print_ptable(struct proc* who);
-void print_sysmap();
+void kprint_ptable(struct proc* who);
+void kprint_sysmap();
 
 #define MEM_MAP_LEN    4
 

@@ -57,12 +57,12 @@ typedef struct message{
 #define WINIX_SEND        	0x13370001
 #define WINIX_RECEIVE    	0x13370002
 #define WINIX_SENDREC    	0x13370003
-#define WINIX_NOTIFY    	0x13370004
+#define WINIX_winix_notify    	0x13370004
 
 /**
  * Boot Image Task Numbers
  **/
-#define SYSTEM 0
+#define SYSTEM_TASK         0
 
 
 /**
