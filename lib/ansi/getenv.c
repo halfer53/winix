@@ -10,13 +10,15 @@ extern const char **_penviron;
 
 char *getenv(const char *name)
 {
-	register const char **v = _penviron;
+	register const char **v;
     register const char *p, *q;
     
-    if(v == NULL)
+    if(_penviron == NULL)
         init_environ();
-	if (v == NULL || name == NULL)
+	if (name == NULL || _penviron == NULL)
 		return (char *)NULL;
+	
+	v = _penviron;
 	while ((p = *v++) != NULL) {
 		q = name;
 		while (*q && (*q == *p++))

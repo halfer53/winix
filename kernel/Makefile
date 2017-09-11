@@ -3,7 +3,7 @@ INCLUDE_DIR = ../include
 INCLUDES = $(wildcard $(INCLUDE_DIR)/*.h $(INCLUDE_DIR)/winix/*.h\
 				 $(INCLUDE_DIR)/sys/*.h $(INCLUDE_DIR)/kernel/*.h)
 
-PROGS = main proc system exception idle clock sched
+PROGS = main proc system exception idle clock sched table
 SOURCES = $(PROGS:=.c)
 ASSEMBLY = $(PROGS:=.s)
 OBJECT = $(PROGS:=.o)

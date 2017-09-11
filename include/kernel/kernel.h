@@ -37,6 +37,7 @@
 #include <stdbool.h>
 #include <curses.h>
 #include <debug.h>
+#include <string.h>
 
 #include <winix/type.h>
 #include <winix/page.h>
@@ -57,6 +58,7 @@
 #include <kernel/proc.h>
 #include <kernel/exception.h>
 #include <kernel/system.h>
+#include <kernel/table.h>
 
 #define FREE_MEM_END    0x1ffff
 

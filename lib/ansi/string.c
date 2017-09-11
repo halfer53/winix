@@ -1,4 +1,5 @@
 #include <lib.h>
+#include <string.h>
 
 void *memcpy(void *s1, const void *s2, register size_t n)
 {
@@ -65,15 +66,20 @@ char *strncpy(char *dest, const char *src, size_t n){
 
 char *strcat(char *dest, const char *src) {
     char* saved = dest;
-    while (*dest != '\0') dest++;
+    while(*dest) dest++;
 
-    while(*src != '\0') {
+    while(*src) {
         *dest++ = *src++;
     }
     *dest = '\0';
     return saved;
 }
 
+char *strchr(char *s, int c){
+    while(*s && *s != c)
+        s++;
+    return s;
+}
 
 void *memset(void *dst, int c, size_t n)
 {

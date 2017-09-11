@@ -64,7 +64,7 @@ PRIVATE int build_signal_ctx(struct proc *who, int signum){
     struct sigframe* sigframe = &sigframe_s;
 
     //pcb context are saved onto the user stack, and will be restored after sigreturn syscall
-    build_user_stack(who,who,SIGNAL_CTX_LEN);
+    copyto_user_stack(who,who,SIGNAL_CTX_LEN);
     
     //ra points at the sigframe code, so that when user signal handler finishes,
     //pc will point to the sig return code, to initiate sig return sys call
@@ -77,9 +77,9 @@ PRIVATE int build_signal_ctx(struct proc *who, int signum){
     sigframe->m.m1_i1 = signum;
     memcpy(sigframe->sigret_codes, sigframe_code, sizeof(sigframe_code));
 
-    build_user_stack(who,sigframe,sizeof(struct sigframe));
+    copyto_user_stack(who,sigframe,sizeof(struct sigframe));
     //signum is sitting on top of the stack
-    build_user_stack(who, &signum, sizeof(signum));
+    copyto_user_stack(who, &signum, sizeof(signum));
 
     who->pc = (void (*)())who->sig_table[signum].sa_handler;
 

@@ -3,7 +3,7 @@ INCLUDES = $(wildcard $(INCLUDE_DIR)/*.h $(INCLUDE_DIR)/winix/*.h \
 			$(INCLUDE_DIR)/sys/*.h $(INCLUDE_DIR)/kernel/*.h)
 
 PROGS = slab mm bitmap sys_stdio wini_ipc kdebug timer sigsend util\
-		srec
+
 FOO = *.c
 SOURCES = $(PROGS:=.c)
 ASSEMBLY = $(PROGS:=.s)

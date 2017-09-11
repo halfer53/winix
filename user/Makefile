@@ -7,7 +7,8 @@ SOURCES =
 ASSEMBLY = 
 OBJECT = 
 
-SHELL_PROGS = shell shell_parse shell_test
+SHELL_COMPONENTS = shell parse shell_test
+SHELL_PROGS = $(addprefix sh/, $(SHELL_COMPONENTS))
 SHELL_SOURCES = $(SHELL_PROGS:=.c)
 SHELL_ASSEMBLY = $(SHELL_PROGS:=.s)
 SHELL_OBJECT = $(SHELL_PROGS:=.o)
@@ -23,7 +24,7 @@ shell: | user shell.srec
 
 
 shell.srec: $(OBJECT) $(LIBS_O) 
-	$(Q)wlink -o $(SHELL_SREC) $(OBJECT) $(LIBS_O)
+	$(Q)wlink $(LDFLAGS) -o $(SHELL_SREC) $(OBJECT) $(LIBS_O)
 	$(Q)java -cp $(MAIN_DIR)/tools reformat_srec $(SHELL_SREC)
 	$(Q)./$(MAIN_DIR)/tools/gen_bin_code $(SHELL_SREC) > $(INCLUDE_DIR)/shell_bin.c
 

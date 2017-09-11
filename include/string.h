@@ -19,6 +19,7 @@ int strcmp(const char *s1, const char *s2);
 int strlen(const char *s);
 char *strcpy(char *dest,const char *src);
 char *strcat(char *dest, const char *src);
+char *strchr(char *s, int c);
 void *memset(void *dst, int c, size_t n);
 int Substring(char* buffer,char* original,int start_index,int length);
 

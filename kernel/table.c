@@ -15,7 +15,9 @@ struct boot_image boot_table[NUM_TASKS] = {
     {"SYSTEM", system_main,         SYSTEM, 64, MAX_PRIORITY,},
 };
 
-char *initial_env[]{
+
+char *initial_env[] = {
+    "HOME=/",
     "PATH=/bin",
     NULL
 };

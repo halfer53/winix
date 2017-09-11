@@ -16,12 +16,11 @@
 
 
 //Input buffer & tokeniser
-static char buf[BUF_LEN];
+static char buf[MAX_LINE];
 
 //Prototypes
 CMD_PROTOTYPE(ps);
 CMD_PROTOTYPE(uptime);
-CMD_PROTOTYPE(shell_exit);
 CMD_PROTOTYPE(cmd_kill);
 CMD_PROTOTYPE(test_general);
 CMD_PROTOTYPE(print_pid);
@@ -29,6 +28,7 @@ CMD_PROTOTYPE(mem_info);
 CMD_PROTOTYPE(mall_info);
 CMD_PROTOTYPE(generic);
 CMD_PROTOTYPE(help);
+CMD_PROTOTYPE(printenv);
 
 CMD_PROTOTYPE(test_malloc);
 CMD_PROTOTYPE(test_so);
@@ -43,7 +43,7 @@ CMD_PROTOTYPE(test_nohandler);
 struct cmd builtin_commands[] = {
     { test_general, "test"},
     { uptime, "uptime" },
-    { shell_exit, "exit" },
+    { printenv, "printenv" },
     { ps, "ps" },
     { cmd_kill, "kill"},
     { print_pid, "pid"},
@@ -87,6 +87,19 @@ int test_general(int argc, char **argv){
     }
     //Run it
     handler->handle(argc-1, argv+1);
+    return 0;
+}
+
+extern const char** _penviron;
+int printenv(int argc, char **argv){
+    const char **v;
+    const char *p;
+    if(_penviron == NULL)
+        init_environ();
+    v = _penviron;
+    while((p = *v++)){
+        printf("%s\n",p);
+    }
     return 0;
 }
 
@@ -142,6 +155,7 @@ int ps(int argc, char **argv){
  * Prints the system uptime
  **/
 int uptime(int argc, char **argv) {
+    
     int ticks, days, hours, minutes, seconds, tick_rate;
     struct tms tbuf;
     ticks = times(&tbuf);
@@ -163,18 +177,6 @@ int uptime(int argc, char **argv) {
 }
 
 /**
- * Exits the terminal.
- **/
-int shell_exit(int argc, char **argv) {
-    int status = 0;
-    if(argc > 1)
-        status = atoi(argv[1]);
-    printf("Bye!\n");
-    printf("Child %d [parent %d] exits\n",getpid(),getppid());
-    return exit(status);
-}
-
-/**
  * Handles any unknown command.
  **/
 int generic(int argc, char **argv) {
@@ -186,16 +188,52 @@ int generic(int argc, char **argv) {
     return -1;
 }
 
+
+
+int exec_cmd(char *line, int tpipe[2]){
+    struct cmdLine cmd;
+    int ret;
+    char *p;
+    char* buf;
+    struct cmd *handler = NULL;
+
+    ret = parse(line,&cmd);
+
+    if(strcmp(line, "exit") == 0){
+        printf("Child %d [parent %d] exits\n",getpid(),getppid());
+        exit(0);
+    }
+
+    if(cmd.env && cmd.env_val){ //if a new environment variable is set
+        buf = malloc(MAX_LINE);
+
+        // printf("set env %s %s\n", cmd.env, cmd.env_val);
+        if(parse_quotes(cmd.env_val, buf))
+            goto err_free_buf;
+
+        setenv(cmd.env, buf, 1);
+        err_free_buf:
+            free(buf);
+        return 0;
+    }
+
+    //Decode command
+    handler = builtin_commands;
+    while(handler->name != NULL && strcmp(cmd.argv[0], handler->name)) {
+        handler++;
+    }
+    //Run it
+    handler->handle(cmd.argc, cmd.argv);
+    return 0;
+}
+
 void main() {
     int ret;
     char *c;
     char *end_buf;
-    struct cmd *handler = NULL;
-    struct cmdLine sc;
-    struct message m;
 
     c = buf;
-    end_buf = c + BUF_LEN -2;
+    end_buf = c + MAX_LINE -2;
     while(1) {
         printf("WINIX> ");
         c = buf;
@@ -230,15 +268,8 @@ void main() {
         
         *c = '\0';
         putchar('\n');
-        ret = parse(buf,&sc, builtin_commands);
         
-        //Decode command
-        handler = builtin_commands;
-        while(handler->name != NULL && strcmp(sc.argv[0], handler->name)) {
-            handler++;
-        }
-        //Run it
-        handler->handle(sc.argc, sc.argv);        
+        exec_cmd(buf, NULL);     
     }
     exit(EXIT_SUCCESS);
 }

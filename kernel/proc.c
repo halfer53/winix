@@ -511,12 +511,19 @@ int alloc_proc_mem(struct proc *who, int text_data_length, int stack_size, int h
  * @param  len 
  * @return     
  */
-int build_user_stack(struct proc *who, void *src, size_t len){
+int copyto_user_stack(struct proc *who, void *src, size_t len){
     reg_t *sp = get_physical_addr(who->sp,who);
     sp -= len;
     memcpy(sp,src,len);
     who->sp = get_virtual_addr(sp,who);
     return OK;
+}
+
+vptr_t* copyto_user_heap(struct proc* who, void *src, size_t len){
+    vptr_t* addr = get_virtual_addr(who->heap_break, who);
+    memcpy(who->heap_break, src, len);
+    who->heap_break += len;
+    return addr;
 }
 
 

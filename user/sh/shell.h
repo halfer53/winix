@@ -8,22 +8,11 @@
 #include <debug.h>
 #include <ucontext.h>
 #include <sys/times.h>
+#include "parse.h"
 
 
 #define CMD_PROTOTYPE(name)    int name(int argc, char**argv)
 
-#define BUF_LEN         32
-#define MAX_COMMANDS    5
-#define MAX_ARGS        10
-
-struct cmdLine{
-    char buf[BUF_LEN];
-    int argc;
-    char cmdStart[MAX_COMMANDS];
-    int numCommands;
-    char *argv[MAX_ARGS];
-    int append;
-};
 
 //Maps strings to function pointers
 struct cmd {
@@ -31,10 +20,6 @@ struct cmd {
     char *name;
 };
 
-
-int parse(char *line, struct cmdLine *sc, struct cmd* builtin_commands);
-
-#define isspace(c)    (c==' ')
 #define isPrintable(c)    ('!' <= c && c <= '~')
 
 #endif

@@ -209,7 +209,9 @@ void kprint_runnable_procs();
 void kprint_proc_info(struct proc* curr);
 struct proc *pick_proc();
 void unsched(struct proc *p);
-int build_user_stack(struct proc *who, void *src, size_t len);
+int copyto_user_stack(struct proc *who, void *src, size_t len);
+vptr_t* copyto_user_heap(struct proc* who, void *src, size_t len);
+int build_initial_stack(struct proc* who, int argc, char** argv, char** env, struct proc* srcproc);
 
 struct boot_image{
     char name[PROC_NAME_LEN];
@@ -217,6 +219,14 @@ struct boot_image{
     int proc_nr;
     int quantum;
     int priority;
+};
+
+struct initial_frame{
+    int operation;
+    int dest;
+    struct message *pm;
+    struct message m;
+    unsigned int syscall_code;
 };
 
 #endif

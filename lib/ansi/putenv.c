@@ -23,9 +23,10 @@ int putenv(char *name)
 	 */
 
     if (!name) return 0;
-    if(v == NULL)
+    if(_penviron == NULL)
         init_environ();
 	if (_penviron == NULL) return 1;
+	v = _penviron;
 	if (r = strchr(name, '=')) {
 		register char *p, *q;
 
@@ -56,10 +57,12 @@ int putenv(char *name)
 		register char **p;
 		register int i = 0;
 
-		if (v)
+		if (v){
 			do {
 				i++;
 			} while (*v++);
+		}
+			
 		if (!(v = malloc(rounded(i) * sizeof(char **))))
 			return 1;
 		size = i;
