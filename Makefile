@@ -4,9 +4,6 @@ GEN_BIN = gen_bin_code
 export CFLAGS = -D_DEBUG
 RELEASE_FLAGS = 
 
-# List of srec files to be translated into binary arrays into include/binaries.c
-BIN_SREC = init/init.srec user/shell.srec
-
 # List of user libraries used by the kernel
 KLIB = syscall/wramp_syscall syscall/ipc_receive ansi/string util/util \
 		gen/ucontext stdlib/atoi
@@ -16,7 +13,6 @@ L_TAIL = winix/limits/limits_tail.o
 KERNEL_O = winix/*.o kernel/system/*.o kernel/*.o
 KMAIN = kernel/main.s kernel/main.o 
 KLIB_O = $(addprefix lib/, $(KLIB:=.o))
-BIN_OUT = $(addprefix include/, $(notdir $(BIN_SREC)))
 
 # Check if V options is set by user, if V=1, debug mode is set
 # e.g. make V=1 produces all the commands being executed through
@@ -64,8 +60,6 @@ clean:
 	$(Q)$(MAKE) -C winix clean
 	$(Q)$(MAKE) -C user clean
 	$(Q)$(MAKE) -C init clean
-	$(Q)-rm -f shell.srec
-	$(Q)-rm -f winix.srec
 ifeq ($(KBUILD_VERBOSE),0)
 	@echo "RM \t shell.srec"
 	@echo "RM \t winix.srec"

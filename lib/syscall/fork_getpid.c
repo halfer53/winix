@@ -8,7 +8,7 @@ pid_t fork(){
     struct message m;
     result = _syscall(SYSCALL_FORK,&m);
     if(result == 0)
-        _pid = 0; //reset pid cache
+        _pid = 0; //reset pid cache if its child
     return result;
 }
 
@@ -21,6 +21,8 @@ pid_t getpid(){
     return _pid;
 }
 
+//ppid may change through init adoption, so it's not a
+//good idea to cache it
 pid_t getppid(){
     struct message m;
     _syscall(SYSCALL_GETPID,&m);
