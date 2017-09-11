@@ -13,9 +13,7 @@
 */
 
 #include "winix.h"
-#include <winix/rex.h>
 #include "table.c"
-#include <shell_codes.c>
 
 /**
  * Entry point for WINIX.

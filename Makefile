@@ -4,13 +4,23 @@ GEN_BIN = gen_bin_code
 export CFLAGS = -D_DEBUG
 RELEASE_FLAGS = 
 
-KLIB = syscall/ipc ansi/string util/util syscall/wramp_syscall gen/ucontext stdlib/atoi
-KLIB_O = $(addprefix lib/, $(KLIB:=.o))
+# List of srec files to be translated into binary arrays into include/binaries.c
+BIN_SREC = init/init.srec user/shell.srec
+
+# List of user libraries used by the kernel
+KLIB = syscall/wramp_syscall syscall/ipc_receive ansi/string util/util \
+		gen/ucontext stdlib/atoi
+
 L_HEAD = winix/limits/limits_head.o
 L_TAIL = winix/limits/limits_tail.o
 KERNEL_O = winix/*.o kernel/system/*.o kernel/*.o
 KMAIN = kernel/main.s kernel/main.o 
+KLIB_O = $(addprefix lib/, $(KLIB:=.o))
+BIN_OUT = $(addprefix include/, $(notdir $(BIN_SREC)))
 
+# Check if V options is set by user, if V=1, debug mode is set
+# e.g. make V=1 produces all the commands being executed through
+# the building process
 ifeq ("$(origin V)", "command line")
 	  KBUILD_VERBOSE = $(V)
 endif
@@ -32,12 +42,12 @@ export Q
 export quiet
 
 all:
+	$(Q)-rm -f $(KMAIN)
 	$(Q)$(MAKE) -C tools
 	$(Q)$(MAKE) -C lib
 	$(Q)$(MAKE) -C user
 	$(Q)$(MAKE) -C winix
-	$(Q)$(MAKE) shell 
-	$(Q)$(MAKE) init
+	$(Q)$(MAKE) -C init
 	$(Q)$(MAKE) -C kernel
 	$(Q)wlink $(LDFLAGS) -o winix.srec $(L_HEAD) $(KERNEL_O) $(KLIB_O) $(L_TAIL)
 ifeq ($(KBUILD_VERBOSE),0)
@@ -68,23 +78,6 @@ stat:
 	@find . -name "*.h" -exec cat {} \; | wc -l
 	@echo "Assembly LoC: "
 	@find . -name "*.s" -exec cat {} \; | wc -l
-
-shell: include/shell_codes.c 
-	$(Q)-rm -f $(KMAIN)
-	$(Q)cp user/shell.srec .
-	$(Q)java $(REFORMAT) shell.srec
-	$(Q)./$(GEN_BIN) shell.srec > include/shell_codes.c
-	$(Q)rm -f shell.srec
-	$(Q)echo "BIN\t SHELL"
-
-init: include/init_codes.c
-	$(Q)$(MAKE) -C init
-	$(Q)-rm -f $(KMAIN)
-	$(Q)cp init/init.srec .
-	$(Q)java $(REFORMAT) init.srec
-	$(Q)./$(GEN_BIN) init.srec > include/init_codes.c
-	$(Q)rm -f init.srec
-	$(Q)echo "BIN\t INIT"
 
 test:
 	gcc -D_GCC_DEBUG -I./include test.c winix/bitmap.c winix/mm.c

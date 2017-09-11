@@ -126,7 +126,7 @@ public class reformat_srec{
                         break;
                     case 5:
                     case 6:
-                        throw new Exception("data already reformated");
+                        System.exit(0);
 
                     case 3:
                     case 7:

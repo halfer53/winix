@@ -1,5 +1,6 @@
 #include "winix.h"
-#include <init_codes.c>
+#include <init_bin.c>
+#include <shell_bin.c>
 
 /*
     struct proc_config{

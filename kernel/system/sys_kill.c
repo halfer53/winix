@@ -18,13 +18,11 @@
 int do_kill(struct proc *who, struct message *m){
     struct proc *to = get_running_proc(m->m1_i1);
 
-    if(!to)
+    if(!to || !IS_USER_PROC(to))
         return ESRCH;
 
-    if(IS_USER_PROC(to)){
-        cause_sig(to,m->m1_i2);
-        return OK;
-    }
+    if(to->proc_nr == INIT)
+        return EINVAL;
 
-    return EINVAL;
+    return send_sig(to,m->m1_i2);
 }

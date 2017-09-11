@@ -22,7 +22,6 @@
 
 
 int send_sig(struct proc *who, int signum);
-int cause_sig(struct proc *who, int signum);
 int set_signal(struct proc *who, int signum, sighandler_t handler);
 
 struct sigframe{

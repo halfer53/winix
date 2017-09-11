@@ -1,96 +1,114 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+int decode_srec(char *filename);
 int winix_load_srec_words_length(char *line);
-int winix_load_srec_mem_val(char *line, size_t *memory_values, int start_index, int memvalLength);
+int winix_load_srec_mem_val(char *line, size_t *memory_values, int start_index, int memvalLength, const char* filename);
 
+#define IS_LOWER_CHAR(c) (c >= 'a' && c <= 'z')
+#define TO_UPPER_CHAR(c) (c - 32)
 
-#define IS_LOWER_CHAR(c)        (c >= 'a' && c <= 'z')
-#define TO_UPPER_CHAR(c)    	(c - 32)
-
-char *filename;
-
-int remove_extension(char* retstr, const char* mystr) {
+char* remove_extension(char *mystr)
+{
     char *lastdot;
     if (mystr == NULL)
-         return -1;
-    strcpy (retstr, mystr);
-    lastdot = strrchr (retstr, '.');
+        return NULL;
+    lastdot = strrchr(mystr, '.');
     if (lastdot != NULL)
         *lastdot = '\0';
-    return 0;
+    lastdot = strchr(mystr, '/');
+    if(lastdot != NULL)
+        return lastdot + 1;//skip slashes
+    return mystr;
 }
 
-int toUpperCase(char *to, const char* src){
-    while(*src){
+int toUpperCase(char *to, char *src)
+{
+    while (*src)
+    {
         *to++ = IS_LOWER_CHAR(*src) ? TO_UPPER_CHAR(*src) : *src;
         src++;
     }
     return 0;
 }
 
+int main(int argc, char *argv[])
+{
+    int i;
+    for(int i = 1; i < argc; i++)
+    {
+        decode_srec(argv[i]);
+    }
+    return 0;
+}
 
-int main(int argc, char const *argv[]) {
-    int i = 0;
-    int length = 0;
-    int wordslength = 0;
-    int temp = 0;
-    int recordtype = 0;
+int decode_srec(char *filename)
+{
+
+    int i = -1;
+    int length = -1;
+    int wordslength = -1;
+    int temp = -1;
+    int recordtype = -1;
     char **lines = NULL;
-    int success = 0;
-    int counter = 0;
+    int success = -1;
+    int counter = -1;
     size_t *memory_values;
-    size_t wordsLoaded = 0;
+    size_t wordsLoaded = -1;
 
-    FILE * fp;
-    char * line = NULL;
-    size_t len = 0;
+    FILE *fp;
+    char *line = NULL;
+    size_t len = -1;
     ssize_t read;
-    char *upperfilename = malloc(strlen(argv[1]) + 1);
+    char *upperfilename;
 
-    filename = malloc(strlen(argv[1]) + 1);
-    remove_extension(filename, argv[1]);
-    toUpperCase(upperfilename, filename);
-
-    fp = fopen(argv[1], "r");
+    fp = fopen(filename, "r");
     if (fp == NULL)
         exit(EXIT_FAILURE);
-    printf("#ifndef _%s_H_\n",upperfilename);
-    printf("#define _%s_H_\n",upperfilename);
-    printf("unsigned int %s_code[] = {\n",filename );
-    if ((read = getline(&line, &len, fp)) != -1) {
-        if (wordslength = winix_load_srec_words_length(line)) {
-            if (memory_values = (size_t *)malloc(wordslength * sizeof(size_t))) {
+    
+    filename = remove_extension(filename);
+    upperfilename = malloc(strlen(filename) + 1);
+    toUpperCase(upperfilename, filename);
 
-                while ((read = getline(&line, &len, fp)) != -1) {
-                    if (line[1] == '7') {
-                        temp = wordsLoaded;
-                        if (winix_load_srec_mem_val(line, memory_values, wordsLoaded, wordslength)) {
-                            continue;
-                        }
-                        if (temp != wordsLoaded) {
-                            return 0;
-                        }
+    printf("#ifndef _%s_H_\n", upperfilename);
+    printf("#define _%s_H_\n", upperfilename);
+    printf("unsigned int %s_code[] = {\n", filename);
+    if ((read = getline(&line, &len, fp)) != 0)
+    {
+        if (wordslength = winix_load_srec_words_length(line))
+        {
+            if (memory_values = (size_t *)malloc(wordslength * sizeof(size_t)))
+            {
+
+                while ((read = getline(&line, &len, fp)) != 0)
+                {
+                    int temp = winix_load_srec_mem_val(line, memory_values, wordsLoaded, wordslength, filename);
+                    if(!temp){
                         break;
-                    } else {
-                        wordsLoaded += winix_load_srec_mem_val(line, memory_values, wordsLoaded, wordslength);
+                    }else{
+                        wordsLoaded += temp;
+                        continue;
                     }
                 }
             }
         }
     }
 
-    printf("#define %s_code_length\t%d\n",filename, wordslength);
+    printf("#define %s_code_length\t%d\n", filename, wordslength);
     printf("#endif\n");
-    free(filename);
-    free(upperfilename);
-    return 0;
+    err_end:
+        free(upperfilename);
 
+    return 0;
 }
-void assert(int expression, const char *message) {
-    if (!expression) {
+
+void assert(int expression, const char *message)
+{
+    if (!expression)
+    {
         printf("\r\nAssertion Failed ");
-        printf("%s\r\n", message );
+        printf("%s\r\n", message);
         abort();
     }
 }
@@ -99,21 +117,24 @@ int hex2int(char *a, int len)
     int i;
     int val = 0;
 
-    for (i = 0; i < len; i++) {
-        if (a[i] <= 57) {
+    for (i = 0; i < len; i++)
+    {
+        if (a[i] <= 57)
+        {
             val += (a[i] - 48) * (1 << (4 * (len - 1 - i)));
         }
 
-        else {
+        else
+        {
             val += (a[i] - 55) * (1 << (4 * (len - 1 - i)));
         }
-
     }
 
     return val;
 }
 
-int Substring(char* buffer, char* original, int start_index, int length) {
+int Substring(char *buffer, char *original, int start_index, int length)
+{
     int i = 0;
     int count = 0;
     for (i = start_index; i < length + start_index; i++)
@@ -127,7 +148,8 @@ int Substring(char* buffer, char* original, int start_index, int length) {
 
 typedef unsigned char byte;
 
-int winix_load_srec_words_length(char *line) {
+int winix_load_srec_words_length(char *line)
+{
     int i = 0;
 
     int index = 0;
@@ -146,14 +168,16 @@ int winix_load_srec_words_length(char *line) {
     checksum = 0;
     //printf("loop %d\n",linecount );
     //Start code, always 'S'
-    if (line[index++] != 'S') {
+    if (line[index++] != 'S')
+    {
         printf("Expection S\n");
     }
 
     recordType = line[index++] - '0';
-    if (recordType != 6) {
-        printf("recordType %d\n", recordType );
-        printf("format is incorrect\n" );
+    if (recordType != 6)
+    {
+        printf("recordType %d\n", recordType);
+        printf("format is incorrect\n");
         return 0;
     }
     tempBufferCount = Substring(buffer, line, index, 2);
@@ -161,7 +185,7 @@ int winix_load_srec_words_length(char *line) {
     byteCount = hex2int(buffer, tempBufferCount);
     index += 2;
     checksum += byteCount;
-    tempBufferCount = Substring(buffer, line, index, (byteCount - 1) * 2 );
+    tempBufferCount = Substring(buffer, line, index, (byteCount - 1) * 2);
     //printf("temp byte value %s, value in base 10: %d,length %d\r\n",buffer,hex2int(buffer,tempBufferCount),tempBufferCount);
     data = hex2int(buffer, tempBufferCount);
     //printf("data %d\n", data);
@@ -177,24 +201,28 @@ int winix_load_srec_words_length(char *line) {
     // printf("readChecksum %d\n",readChecksum );
     // printf("checksum %d\n",checksum );
     //printf("checksum %d\r\n",checksum );
-    if (checksum > 255) {
+    if (checksum > 255)
+    {
         byteCheckSum = (byte)(checksum & 0xFF);
         //printf("checksum %d\r\n",byteCheckSum );
         byteCheckSum = ~byteCheckSum;
-    } else {
+    }
+    else
+    {
         byteCheckSum = ~byteCheckSum;
         byteCheckSum = checksum;
     }
     //printf("checksum %d\r\n",byteCheckSum );
-    if (readChecksum != byteCheckSum) {
-        printf("failed checksum\r\n" );
+    if (readChecksum != byteCheckSum)
+    {
+        printf("failed checksum\r\n");
         return 0;
     }
     return data;
 }
 
-
-int winix_load_srec_mem_val(char *line, size_t *memory_values, int start_index, int memvalLength) {
+int winix_load_srec_mem_val(char *line, size_t *memory_values, int start_index, int memvalLength, const char* filename)
+{
     int wordsLoaded = 0;
     int index = 0;
     int checksum = 0;
@@ -216,8 +244,10 @@ int winix_load_srec_mem_val(char *line, size_t *memory_values, int start_index, 
     //printf("%s\r\n",line);
     //printf("loop %d\n",linecount );
     //Start code, always 'S'
-    if (line[index++] != 'S') {
+    if (line[index++] != 'S')
+    {
         printf("Expection S\n");
+        goto err_end;
     }
 
     //Record type, 1 digit, 0-9, defining the data field
@@ -256,8 +286,9 @@ int winix_load_srec_mem_val(char *line, size_t *memory_values, int start_index, 
 
     default:
         printf("unknown record type\n");
-        return 0;
+        goto err_end;
     }
+
     tempBufferCount = Substring(buffer, line, index, 2);
     //printf("record value %s, value in base 10: %d,length %d\r\n",buffer,hex2int(buffer,tempBufferCount),tempBufferCount);
     byteCount = hex2int(buffer, tempBufferCount);
@@ -268,8 +299,6 @@ int winix_load_srec_mem_val(char *line, size_t *memory_values, int start_index, 
     //int byteCount = Convert.ToInt32(line.Substring(index, 2), 16);
     //printf("byteCount %d\r\n",byteCount);
 
-
-
     //Address, 4, 6 or 8 hex digits determined by the record type
     for (i = 0; i < addressLength; i++)
     {
@@ -279,18 +308,18 @@ int winix_load_srec_mem_val(char *line, size_t *memory_values, int start_index, 
         //string ch = line.Substring(index + i * 2, 2);
         //checksum += Convert.ToInt32(ch, 16);
     }
-    if (addressLength != 0) {
+    if (addressLength != 0)
+    {
         tempBufferCount = Substring(buffer, line, index, addressLength * 2);
         //printf("temp address value %s, value in base 10: %d,length %d\r\n",buffer,hex2int(buffer,tempBufferCount),tempBufferCount);
         address = hex2int(buffer, tempBufferCount);
     }
 
-
     //address = Convert.ToInt32(line.Substring(index, addressLength * 2), 16);
     //printf("index %d\n",index );
     index += addressLength * 2;
     //printf("index %d\n",index );
-    byteCount -= addressLength ;
+    byteCount -= addressLength;
     //printf("byteCount %d\n",byteCount );
     //Data, a sequence of bytes.
     //data.length = 255
@@ -316,13 +345,15 @@ int winix_load_srec_mem_val(char *line, size_t *memory_values, int start_index, 
     // printf("checksum %d\r\n",byteCheckSum );
     byteCheckSum = ~byteCheckSum;
     // printf("checksum %d\r\n",byteCheckSum );
-    if (readChecksum != byteCheckSum) {
-        printf("failed checksum\r\n" );
-        return 0;
+    if (readChecksum != byteCheckSum)
+    {
+        printf("failed checksum\r\n");
+        goto err_end;
     }
 
     //Put in memory
-    if ((byteCount - 1) % 4 != 0) {
+    if ((byteCount - 1) % 4 != 0)
+    {
         printf("Data should only contain full 32-bit words.\n");
     }
 
@@ -331,29 +362,31 @@ int winix_load_srec_mem_val(char *line, size_t *memory_values, int start_index, 
     //printf("byteCount %d\n",byteCount );
     switch (recordType)
     {
-    case 3: //data intended to be stored in memory.
+        case 3: //data intended to be stored in memory.
 
-        for (i = 0; i < byteCount - 1; i += 4)
-        {
-            memVal = 0;
-            for (j = i; j < i + 4; j++)
+            for (i = 0; i < byteCount - 1; i += 4)
             {
+                memVal = 0;
+                for (j = i; j < i + 4; j++)
+                {
 
-                memVal <<= 8;
-                memVal |= data[j];
+                    memVal <<= 8;
+                    memVal |= data[j];
+                }
+
+                wordsLoaded++;
+                //memory_values[start_index + wordsLoaded] = memVal;
+                printf("0x%08x,\n", (unsigned int)memVal);
             }
+            break;
 
-            wordsLoaded++;
-            //memory_values[start_index + wordsLoaded] = memVal;
-            printf("0x%08x,\n", (unsigned int)memVal );
-        }
-        break;
-
-
-    case 7: //entry point for the program.
-        printf("\n};\n#define %s_pc\t0x%08x\n", filename,(unsigned int)address);
-        break;
+        case 7: //entry point for the program.
+            printf("\n};\n#define %s_pc\t0x%08x\n", filename, (unsigned int)address);
+            return 0;
     }
 
-    return -1;
+    return wordsLoaded;
+    err_end:
+        return 0;
+
 }

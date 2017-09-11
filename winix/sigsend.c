@@ -144,58 +144,30 @@ PRIVATE int sys_sig_handler(struct proc *who, int signum){
 }
 
 /**
- * commond signal send function for both cause_sig and send_sig
- * @param  who    
- * @param  signum 
- * @return        
- */
-PRIVATE int sigsend_comm(struct proc *who, int signum){
-    if(!IS_RUNNABLE(who))
-        return ERR;
-
-    if(build_signal_ctx(who,signum) != OK)
-        return ERR;
-    
-    if(in_interrupt()){
-        if(who->proc_nr == curr_mesg()->src){
-            get_proc(SYSTEM)->pc = &intr_syscall;
-        }
-    }
-    return OK;
-}
-
-/**
- * cause the signal, signal handler will be invoked next time the 
+ * send the signal, signal handler will be invoked next time the 
  * process is scheduled
  * @param  who    
  * @param  signum 
  * @return        
  */
-int cause_sig(struct proc *who,int signum){
-    if(sys_sig_handler(who,signum) == OK)
-        return OK;
-
-    return sigsend_comm(who,signum);
-}
-
-/**
- * In contrast to cause_sig, send_sig is usually called during exception
- * it delivers the signal immediately
- * @param  who    
- * @param  signum 
- * @return        
- */
 int send_sig(struct proc *who, int signum){
-    if(sys_sig_handler(who,signum) == OK)
-        return OK;
-
-    if(sigsend_comm(who,signum) == ERR)
+    if(!IS_RUNNABLE(who))
         return ERR;
 
+    if(sys_sig_handler(who,signum) == OK)
+        return OK;
+
+    if(build_signal_ctx(who,signum) != OK)
+        return ERR;
+    
     if(in_interrupt()){
-        //send_sig is usually called during exception
-        //so we manually add the current proc to the ready queue
-        //and schedule the process imeediately
+        //interrupt the current system call
+        if(who->proc_nr == curr_mesg()->src){
+            get_proc(SYSTEM)->pc = &intr_syscall;
+        }
+
+        //if signal is delivered during exception, 
+        //we can schedule the process imeediately
         if(current_proc != who){
             enqueue_schedule(current_proc);
             dequeue_schedule(who);

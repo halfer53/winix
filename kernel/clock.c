@@ -27,7 +27,7 @@ void set_bill_ptr(struct proc* who){
 }
 
 void deliver_alarm(int proc_nr, clock_t time){
-    cause_sig(get_proc(proc_nr),SIGALRM);
+    send_sig(get_proc(proc_nr),SIGALRM);
 }
 
 void handle_timer(struct timer *timer){

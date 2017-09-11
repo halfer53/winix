@@ -31,14 +31,6 @@ int winix_send(int dest, struct message *m) {
 }
 
 /**
- * Receives a message.
- **/
-int winix_receive(struct message *m) {
-    //Note: second parameter is currently unused, but is included to simplify kernel code.
-    return wramp_syscall(WINIX_RECEIVE, NULL, m);
-}
-
-/**
  * Sends and receives a message to/from the destination process.
  *
  * Note: overwrites m with the reply message.

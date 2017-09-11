@@ -14,7 +14,7 @@
 #include "winix.h"
 
 /**
- * This method is called every 50 timer interrupts
+ * This method is called every 12 timer interrupts
  * It effectly moves every processes in the ready queues
  * to the top priority ready queue, refer to Multi-fedback
  * queue scheduling for more details
