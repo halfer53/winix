@@ -34,13 +34,9 @@ int strcmp(const char *s1, const char *s2) {
  * Calculates the length of a string.
  **/
 int strlen(const char *s) {
-    int len = 0;
-
-    while (*s++) {
-        len++;
-    }
-
-    return len;
+    const char* bak = s;
+    while (*s++);
+    return s - bak;
 }
 
 /**
@@ -48,9 +44,7 @@ int strlen(const char *s) {
  **/
 char *strcpy(char *dest, const char *src) {
     char *saved = dest;
-    while (*src) {
-        *dest++ = *src++;
-    }
+    while (*dest++ = *src++);
     *dest = 0;
     return saved;
 }
@@ -66,11 +60,9 @@ char *strncpy(char *dest, const char *src, size_t n){
 
 char *strcat(char *dest, const char *src) {
     char* saved = dest;
-    while(*dest) dest++;
-
-    while(*src) {
-        *dest++ = *src++;
-    }
+    while(*dest++);
+    dest--;
+    while(*dest++ = *src++);
     *dest = '\0';
     return saved;
 }
@@ -96,7 +88,7 @@ void *memset(void *dst, int c, size_t n)
 /**
  * return the length of substring of the original string, starting at start_index, and has specified length
  **/
-int Substring(char* buffer, char* original, int start_index, int length) {
+int substring(char* buffer, char* original, int start_index, int length) {
     int i = 0;
     int count = 0;
     for (i = start_index; i < length + start_index; i++)

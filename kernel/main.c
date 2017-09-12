@@ -26,6 +26,7 @@ void main() {
     init_bitmap();
     init_mem_table();
     init_proc();
+    init_holes();
     init_sched();
 
     for(i = 0; i < sizeof(boot_table) / sizeof(struct boot_image); i++)
@@ -36,11 +37,12 @@ void main() {
     }
 
     p = start_user_proc(init_code, init_code_length, init_pc, 1, "init");
+    add_free_mem(init_code, init_code_length);
 
-    p = start_user_proc(shell_code,shell_code_length,shell_pc, 3,"shell");
+    p = start_user_proc(shell_code,shell_code_length,shell_pc, 8,"shell");
     p->parent = 1;//hack 
+    add_free_mem(shell_code,shell_code_length);
     
-    init_slab(shell_code,shell_code_length);
     
     //Initialise exceptions
     init_exceptions();

@@ -73,7 +73,7 @@ char *strcat(char *dest, const char *src) {
 /**
  * return the length of substring of the original string, starting at start_index, and has specified length
  **/
-int Substring(char* buffer, char* original, int start_index, int length) {
+int substring(char* buffer, char* original, int start_index, int length) {
     int i = 0;
     int count = 0;
     for (i = start_index; i < length + start_index; i++)

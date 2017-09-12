@@ -1,8 +1,6 @@
 #include <stdlib.h>
 #include "parse.h"
 
-#define isChar(c)  ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'))
-
 static int isShellSymb(char c) {
     return (c)=='|' || (c)=='<' || (c)=='>' || (c)== '\'' || (c) == '=' || (c) == '"' || (c) == '`';
 }
@@ -180,11 +178,12 @@ int parse_quotes(char *input, char* buffer){
             if(*in == '$'){ //if env
                 int bak_char;
                 char *envval, *val_start = ++in;//one for '$'
-                while(*in && isChar(*in)){
+                while(*in && (isupper(*in) || islower(*in))){
                     in++;
                 }
                 bak_char = *in;
                 *in = '\0';
+                
                 // printf("search %s\n", val_start);
                 
                 //insert the environment value at the $
@@ -195,12 +194,12 @@ int parse_quotes(char *input, char* buffer){
                 }
                 *out = '\0';
                 strcat(out,envval);
-                out += strlen(envval);
+                out += strlen(envval) - 1;
                 *in = bak_char;
             }
             if(*in == '"')
                 *in = '\0';
-               
+                        
             *out++ = *in++;
         }
     }else{

@@ -31,12 +31,13 @@ struct hole{
   struct hole *next;
 };
 
-#define NUM_HOLES 100
+#define NUM_HOLES 50
 
 void hole_list_overview();
 
 void *mem_alloc(size_t size);
 void mem_free(void *ptr_parameter);
+void add_free_mem(void* addr, size_t size);
 void init_holes();
 
 #endif

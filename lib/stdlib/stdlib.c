@@ -31,7 +31,7 @@ void printblock(block_t *b) {
         b->free ? "is free" : "in use");
 }
 
-void print_mallinfo() {
+void print_heap() {
     int frees = 0;
     int used = 0;
     block_t *b = base;

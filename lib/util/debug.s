@@ -7,3 +7,8 @@ get_pc:
 get_sp:
 	addui $1, $sp, 0
 	jr $ra
+
+.global _break
+_break:
+	break
+	jr $ra

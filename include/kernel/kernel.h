@@ -51,7 +51,7 @@
 #include <winix/syscall_ctx.h>
 #include <winix/rex.h>
 #include <winix/exec.h>
-#include <winix/slab.h>
+#include <winix/mem_alloc.h>
 #include <winix/signal.h>
 #include <winix/timer.h>
 #include <kernel/clock.h>

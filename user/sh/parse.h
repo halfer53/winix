@@ -1,6 +1,8 @@
 #ifndef _PARSE_H_
 #define _PARSE_H_ 1
 
+#include <ctype.h>
+
 #define isspace(c)    (c==' ')
 
 #define MAX_LINE        128  /* longest accepted command line */

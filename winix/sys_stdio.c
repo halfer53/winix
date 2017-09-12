@@ -176,6 +176,7 @@ int kprintf_vm(const char *format, void *arg, ptr_t *who_rbase){
             format++;
             padding_len = 0;
             padding_direction = LEFT_PADDING;
+            buf = buffer;
             
             //decode padding options
             if(*format == '-'){
@@ -203,7 +204,7 @@ int kprintf_vm(const char *format, void *arg, ptr_t *who_rbase){
 
                 case 's':
                     // buf_len = kputs_vm_buf(*(char **)arg,who_rbase,buffer);
-                    buf = *(char **)arg)+ (int)who_rbase;
+                    buf = *(char **)arg+ (int)who_rbase;
                     buf_len = strlen(buf);
                     goto arg_end;
 

@@ -34,6 +34,7 @@ int exec_proc(struct proc *p,size_t *lines, size_t length, size_t entry, int qua
                          PROC_SET_SP | PROC_SET_HEAP) != OK){
         return ERR;
     }
+    
     build_initial_stack(p, 0, NULL, initial_env, get_proc(SYSTEM));
     memcpy(p->rbase, lines , length);
 
@@ -60,7 +61,7 @@ int build_initial_stack(struct proc* who, int argc, char** argv, char** env, str
     env_len++; //for the last null terminator
 
     //malloc the pointer for each environment variable
-    env_ptr_list = kmalloc(env_len);
+    env_ptr_list = (unsigned int *)kmalloc(env_len);
     p = env_ptr_list;
 
     //copy each of the environment to the user stack

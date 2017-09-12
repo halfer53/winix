@@ -13,6 +13,51 @@
 */
 #include "shell.h"
 
+CMD_PROTOTYPE(test_malloc);
+CMD_PROTOTYPE(test_so);
+CMD_PROTOTYPE(test_float);
+CMD_PROTOTYPE(test_fork);
+CMD_PROTOTYPE(test_thread);
+CMD_PROTOTYPE(test_alarm);
+CMD_PROTOTYPE(test_signal);
+CMD_PROTOTYPE(test_nohandler);
+
+struct cmd test_commands[] = {
+    { test_malloc, "malloc"}, 
+    { test_so, "stack"},
+    { test_float, "float"},
+    { test_fork, "fork"},
+    { test_thread, "thread"},
+    { test_alarm, "alarm"},
+    { test_signal, "signal"},
+    { test_nohandler, NULL},
+};
+
+
+int test_nohandler(int argc, char** argv){
+    int i;
+    struct cmd* handler;
+    handler = test_commands;
+    printf("Available Test Options\n");
+    for( i = 0; i < sizeof(test_commands) / sizeof(struct cmd) - 1; i++){
+        if(handler->name)
+            printf(" * %s\n",handler->name);
+        handler++;
+    }
+    printf("e.g. \"test alarm 1\", \"test thread 100\" \n");
+    return 0;
+}
+
+int test_general(int argc, char **argv){
+    struct cmd* handler;
+    handler = test_commands;
+    while(handler->name != NULL && strcmp(argv[1], handler->name)) {
+        handler++;
+    }
+    //Run it
+    handler->handle(argc-1, argv+1);
+    return 0;
+}
 
 int test_float(int argc, char **argv){
     int foo;
@@ -172,28 +217,25 @@ int test_malloc(int argc, char **argv){
     void *p7 = malloc(1024);
     void *p8 = malloc(512);
     void *p9 = malloc(1024);
-    print_mallinfo();
     free(p5);
     free(p6);
     free(p2);
     free(p8);
-    print_mallinfo();
+    print_heap();
   
-  return 0;
+    return 0;
 }
 
 int test_fork(int argc, char **argv){
     pid_t cpid;
-    pid_t ppid;
-    ppid = getpid();
     if(cpid = fork()){
         if(cpid == -1){
-            printf("fork failed\n");
+            perror("fork failed");
             return -1;
         }
-        printf("parent %d waiting for child %d\n",ppid,cpid);
+        printf("parent %d waiting for child %d\n",getpid(),cpid);
         cpid = wait(NULL);
-        printf("parent %d awakened by child %d\n",ppid,cpid);
+        printf("parent %d awakened by child %d\n",getpid(),cpid);
     }else{
         printf("Child %d [parent %d] start:\n",getpid(),getppid());
     }

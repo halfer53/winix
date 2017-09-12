@@ -14,7 +14,6 @@
 
 #include "shell.h"
 
-
 //Input buffer & tokeniser
 static char buf[MAX_LINE];
 
@@ -28,67 +27,25 @@ CMD_PROTOTYPE(mem_info);
 CMD_PROTOTYPE(mall_info);
 CMD_PROTOTYPE(generic);
 CMD_PROTOTYPE(help);
+CMD_PROTOTYPE(cmd_exit);
 CMD_PROTOTYPE(printenv);
 
-CMD_PROTOTYPE(test_malloc);
-CMD_PROTOTYPE(test_so);
-CMD_PROTOTYPE(test_float);
-CMD_PROTOTYPE(test_fork);
-CMD_PROTOTYPE(test_thread);
-CMD_PROTOTYPE(test_alarm);
-CMD_PROTOTYPE(test_signal);
-CMD_PROTOTYPE(test_nohandler);
 
 //Command handling
 struct cmd builtin_commands[] = {
     { test_general, "test"},
-    { uptime, "uptime" },
     { printenv, "printenv" },
+    { mall_info, "printheap"},
+    { uptime, "uptime" },
     { ps, "ps" },
     { cmd_kill, "kill"},
     { print_pid, "pid"},
     { mem_info, "free"},
-    { mall_info, "mallinfo"},
+    { cmd_exit, "exit"},
     { help, "?"},
     { generic, NULL }
 };
 
-struct cmd test_commands[] = {
-    { test_malloc, "malloc"}, 
-    { test_so, "stack"},
-    { test_float, "float"},
-    { test_fork, "fork"},
-    { test_thread, "thread"},
-    { test_alarm, "alarm"},
-    { test_signal, "signal"},
-    { test_nohandler, NULL},
-};
-
-
-int test_nohandler(int argc, char** argv){
-    int i;
-    struct cmd* handler;
-    handler = test_commands;
-    printf("Available Test Options\n");
-    for( i = 0; i < sizeof(test_commands) / sizeof(struct cmd) - 1; i++){
-        if(handler->name)
-            printf(" * %s\n",handler->name);
-        handler++;
-    }
-    printf("e.g. \"test thread 100\"\n");
-    return 0;
-}
-
-int test_general(int argc, char **argv){
-    struct cmd* handler;
-    handler = test_commands;
-    while(handler->name != NULL && strcmp(argv[1], handler->name)) {
-        handler++;
-    }
-    //Run it
-    handler->handle(argc-1, argv+1);
-    return 0;
-}
 
 extern const char** _penviron;
 int printenv(int argc, char **argv){
@@ -133,13 +90,12 @@ int help(int argc, char** argv){
 }
 
 int mall_info(int argc, char** argv){
-    print_mallinfo();
+    print_heap();
     return 0;
 }
 
 int mem_info(int argc, char** argv){
-    sys_meminfo();
-    return 0;
+    return sys_meminfo();
 }
 
 int print_pid(int argc, char **argv){
@@ -176,6 +132,15 @@ int uptime(int argc, char **argv) {
     return 0;
 }
 
+int cmd_exit(int argc, char **argv){
+    int status = 0;
+    if(argc > 1)
+        status = atoi(argv[1]);
+    printf("Bye!\n");
+    printf("Child %d [parent %d] exits\n",getpid(),getppid());
+    return exit(status);
+}
+
 /**
  * Handles any unknown command.
  **/
@@ -199,18 +164,13 @@ int exec_cmd(char *line, int tpipe[2]){
 
     ret = parse(line,&cmd);
 
-    if(strcmp(line, "exit") == 0){
-        printf("Child %d [parent %d] exits\n",getpid(),getppid());
-        exit(0);
-    }
-
     if(cmd.env && cmd.env_val){ //if a new environment variable is set
         buf = malloc(MAX_LINE);
 
-        // printf("set env %s %s\n", cmd.env, cmd.env_val);
         if(parse_quotes(cmd.env_val, buf))
             goto err_free_buf;
 
+        printf("setenv %s=%s\n", cmd.env, buf);
         setenv(cmd.env, buf, 1);
         err_free_buf:
             free(buf);
@@ -234,6 +194,7 @@ void main() {
 
     c = buf;
     end_buf = c + MAX_LINE -2;
+
     while(1) {
         printf("WINIX> ");
         c = buf;

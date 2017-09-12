@@ -21,6 +21,6 @@ char *strcpy(char *dest,const char *src);
 char *strcat(char *dest, const char *src);
 char *strchr(char *s, int c);
 void *memset(void *dst, int c, size_t n);
-int Substring(char* buffer,char* original,int start_index,int length);
+int substring(char* buffer,char* original,int start_index,int length);
 
 #endif

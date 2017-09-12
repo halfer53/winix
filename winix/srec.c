@@ -116,12 +116,12 @@ int winix_load_srec_words_length(char *line){
           // kprintf("format is incorrect\n" );
         return ERR;
     }
-    tempBufferCount = Substring(buffer,line,index,2);
+    tempBufferCount = substring(buffer,line,index,2);
                 //kprintf("record value %s, value in base 10: %d,length %d\r\n",buffer,hex2int(buffer,tempBufferCount),tempBufferCount);
     byteCount = hex2int(buffer,tempBufferCount);
     index += 2;
     checksum += byteCount;
-    tempBufferCount = Substring(buffer,line,index,(byteCount-1)*2 );
+    tempBufferCount = substring(buffer,line,index,(byteCount-1)*2 );
                         //kprintf("temp byte value %s, value in base 10: %d,length %d\r\n",buffer,hex2int(buffer,tempBufferCount),tempBufferCount);
     data = hex2int(buffer,tempBufferCount);
             // kprintf("data %d\n", data);
@@ -129,9 +129,9 @@ int winix_load_srec_words_length(char *line){
     checksum += data;
 
                 //Checksum, two hex digits. Inverted LSB of the sum of values, including byte count, address and all data.
-                //readChecksum = (byte)Convert.ToInt32(line.Substring(index, 2), 16);
+                //readChecksum = (byte)Convert.ToInt32(line.substring(index, 2), 16);
         //kprintf("checksum %d\n",checksum );
-    tempBufferCount = Substring(buffer,line,index,2);
+    tempBufferCount = substring(buffer,line,index,2);
                 //kprintf("read checksum value %s, value in base 10: %d,length %d\r\n",buffer,hex2int(buffer,tempBufferCount),tempBufferCount);
     readChecksum = (byte_t)hex2int(buffer,tempBufferCount);
         //kprintf("readChecksum %d\n",readChecksum & 0xffffffff);
@@ -225,14 +225,14 @@ int winix_load_srec_mem_val(char *line,size_t *memory_values,int start_index,int
         kprintf("unknown record type\n");
         return ERR;
     }
-    tempBufferCount = Substring(buffer,line,index,2);
+    tempBufferCount = substring(buffer,line,index,2);
     //kprintf("record value %s, value in base 10: %d,length %d\r\n",buffer,hex2int(buffer,tempBufferCount),tempBufferCount);
     byteCount = hex2int(buffer,tempBufferCount);
     index += 2;
     checksum += byteCount;
 
     //byteCount = ((int)line[index++])*10 + ((int)line[index++]);
-    //int byteCount = Convert.ToInt32(line.Substring(index, 2), 16);
+    //int byteCount = Convert.ToInt32(line.substring(index, 2), 16);
     //kprintf("byteCount %d\r\n",byteCount);
 
 
@@ -240,20 +240,20 @@ int winix_load_srec_mem_val(char *line,size_t *memory_values,int start_index,int
                 //Address, 4, 6 or 8 hex digits determined by the record type
     for (i = 0; i < addressLength; i++)
     {
-        tempBufferCount = Substring(buffer,line,index+i*2,2);
+        tempBufferCount = substring(buffer,line,index+i*2,2);
         //kprintf("temp byte value %s, value in base 10: %d,length %d\r\n",buffer,hex2int(buffer,tempBufferCount),tempBufferCount);
         checksum += hex2int(buffer,tempBufferCount);
-        //string ch = line.Substring(index + i * 2, 2);
+        //string ch = line.substring(index + i * 2, 2);
         //checksum += Convert.ToInt32(ch, 16);
     }
     if (addressLength!=0) {
-        tempBufferCount = Substring(buffer,line,index,addressLength*2);
+        tempBufferCount = substring(buffer,line,index,addressLength*2);
         //kprintf("temp address value %s, value in base 10: %d,length %d\r\n",buffer,hex2int(buffer,tempBufferCount),tempBufferCount);
         address = hex2int(buffer,tempBufferCount);
     }
 
 
-    //address = Convert.ToInt32(line.Substring(index, addressLength * 2), 16);
+    //address = Convert.ToInt32(line.substring(index, addressLength * 2), 16);
     //kprintf("index %d\n",index );
     index += addressLength * 2;
     //kprintf("index %d\n",index );
@@ -264,18 +264,18 @@ int winix_load_srec_mem_val(char *line,size_t *memory_values,int start_index,int
 
     for (i = 0; i < byteCount-1; i++)
     {
-        tempBufferCount = Substring(buffer,line,index,2);
+        tempBufferCount = substring(buffer,line,index,2);
         //kprintf("temp byte value %s, value in base 10: %d,length %d\r\n",buffer,hex2int(buffer,tempBufferCount),tempBufferCount);
         data[i] = hex2int(buffer,tempBufferCount);
-        //data[i] = (byte)Convert.ToInt32(line.Substring(index, 2), 16);
+        //data[i] = (byte)Convert.ToInt32(line.substring(index, 2), 16);
         index += 2;
         checksum += data[i];
     }
 
     //Checksum, two hex digits. Inverted LSB of the sum of values, including byte count, address and all data.
-    //readChecksum = (byte)Convert.ToInt32(line.Substring(index, 2), 16);
+    //readChecksum = (byte)Convert.ToInt32(line.substring(index, 2), 16);
 
-    tempBufferCount = Substring(buffer,line,index,2);
+    tempBufferCount = substring(buffer,line,index,2);
     //kprintf("read checksum value %s, value in base 10: %d,length %d\r\n",buffer,hex2int(buffer,tempBufferCount),tempBufferCount);
     readChecksum = hex2int(buffer,tempBufferCount);
     //kprintf("checksum %d\r\n",checksum );

@@ -74,7 +74,7 @@ PUBLIC struct proc *current_proc;
 void kprint_runnable_procs() {
     int i;
     struct proc *curr;
-    kprintf("NAME     PID PPID RBASE      PC         STACK      HEAP       PROTECTION   FLAGS\n");
+    kprintf("NAME    PID PPID RBASE      PC         STACK      HEAP       PROTECTION   FLAGS\n");
     for (i = 0; i < NUM_PROCS; i++) {
         curr = &_proc_table[i];
         if(IS_RUNNABLE(curr)){
@@ -425,7 +425,7 @@ struct proc *start_user_proc(size_t *lines, size_t length, size_t entry, int qua
     
     if(exec_proc(p,lines,length,entry,quantum,name) == ERR)
         return NULL;
-
+    
     return p;
 }
 

@@ -1,7 +1,12 @@
 #ifndef _TYPE_H_
 #define _TYPE_H_ 1
 
-typedef unsigned int size_t;
+
+#ifndef _SIZE_T
+#define	_SIZE_T
+typedef unsigned int	size_t;		/* type returned by sizeof */
+#endif /* _SIZE_T */
+
 typedef unsigned char byte;
 typedef unsigned char byte_t;
 typedef unsigned int uint32_t;

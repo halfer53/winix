@@ -15,6 +15,8 @@
 */
 #include <kernel/kernel.h>
 
+#define INITIAL_SYSFREEMEM_LEN     64
+
 
 struct hole hole_table[NUM_HOLES];
 
@@ -27,9 +29,7 @@ static struct hole *pending_holes[2];
 static struct hole *used_holes[2];
 //Linked lists are defined by a head and tail pointer.
 
-size_t SYS_BSS_START = 0;
-
-
+static char initial_free_sysmem[INITIAL_SYSFREEMEM_LEN];
 
 /**
  * Adds a hole to the tail of a list.
@@ -112,7 +112,7 @@ static void hole_delete(struct hole **q, struct hole *h) {
     register struct hole *prev = NULL;
 
     if (curr == NULL) 
-        return NULL;
+        return;
 
     while (curr != h && curr != NULL) {
         prev = curr;
@@ -127,7 +127,7 @@ static void hole_delete(struct hole **q, struct hole *h) {
 //if it can't, sbrk is called to allocate a new memory space
 //a new used hole of given size is added to the used hole list
 //
-void *mem_alloc(size_t size) {
+void *kmalloc(size_t size) {
     register struct hole *prev = NULL;
     register struct hole *h = unused_holes[HEAD];
     size_t *p_start_addr = NULL;
@@ -161,15 +161,14 @@ void *mem_alloc(size_t size) {
     } else {
         //if no hole size  that is big enough is found in the unused_holes list,
         //it's gonna call sbrk to allocate a new chunk of memory
-        if ((p_start_addr = (size_t *)expand_mem(size)) != NULL) {
+        if (p_start_addr = get_free_pages(align_page(size), GFP_HIGH)) {
             if (h = hole_dequeue(pending_holes)) {
                 h->start = p_start_addr;
                 h->length = size;
                 hole_enqueue_head(used_holes, h);
                 return p_start_addr;
             }
-            //else if hole table ran out
-        }//else if sbrk fails
+        }//else if system out of memory
     }
     return NULL;
 }
@@ -179,7 +178,7 @@ void *mem_alloc(size_t size) {
 //used hole that matches the parameter.
 //hole is deleted from used holes, and added to the unused holes, if it finds it
 //if it can't find any matching holes, it does nothing
-void mem_free(void *ptr_parameter) {
+void kfree(void *ptr_parameter) {
     register size_t *p = (size_t *)ptr_parameter;
     register struct hole *h = used_holes[HEAD];
     int i = 0;
@@ -231,7 +230,7 @@ int merge_holes(struct hole **merging_holes_list, struct hole *h) {
     }
 }
 
-void hole_list_overview() {
+void print_holelist() {
     struct hole *curr = unused_holes[HEAD];
     if (curr == NULL) {
         kprintf("unused hole empty\n" );
@@ -252,11 +251,18 @@ void hole_list_overview() {
 
 }
 
+void add_free_mem(void* addr, size_t size){
+    struct hole *h;
+    h = hole_dequeue(pending_holes);
+    h->start = addr;
+    h->length = size;
+    hole_enqueue_head(unused_holes, h);
+}
+
 
 void init_holes() {
     struct hole *h = NULL;
     int i = 0;
-    size_t *p = NULL;
     unused_holes[HEAD] = unused_holes[TAIL] = NULL;
     used_holes[HEAD] = used_holes[TAIL] = NULL;
     pending_holes[HEAD] = pending_holes[TAIL] = NULL;
@@ -268,17 +274,5 @@ void init_holes() {
         h->next = NULL;
         hole_enqueue_head(pending_holes, h);
     }
-
-    //since proc_malloc is a system call, and we don't have individual
-    //bss segment for each process, so a 1023 words memory is created as
-    //the common bss segment for all processes. the reason to keep it as 1023
-    //is that process is allocated with a size of multiple of 1024, so making it
-    //smaller than 1024 allows to be ignored when allocating a new process
-    // h = hole_dequeue(pending_holes);
-    // h->start = (size_t *)expand_mem(1024);
-    // SYS_BSS_START = (size_t)h->start;
-    // h->length = 1023; //this is bit of hack here,
-
-    // hole_enqueue_head(unused_holes, h);
-
+    add_free_mem(initial_free_sysmem, INITIAL_SYSFREEMEM_LEN);
 }
