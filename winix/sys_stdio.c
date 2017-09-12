@@ -145,6 +145,9 @@ void kputs(const char *s) {
 #define SPACE    ' '
 #define ZERO    '0'
 
+#define LEFT_PADDING    1
+#define RIGHT_PADDING   2
+
 #define PUT_PADDING(_padding_len,_token)\
     while(_padding_len--){    \
         kputc(_token);        \
@@ -159,11 +162,10 @@ void kputs(const char *s) {
  * @return           number of bytes being printed
  */
 int kprintf_vm(const char *format, void *arg, ptr_t *who_rbase){
-    char c = *format;
     static char buffer[64];
     char *buf = buffer;
-    int padding_len = 0;
-    bool right_padding_len;
+    int padding_len;
+    int padding_direction;
     int buf_len;
     int count = 0;
 
@@ -172,25 +174,19 @@ int kprintf_vm(const char *format, void *arg, ptr_t *who_rbase){
             char prev;
             char token = SPACE;
             format++;
-            buf = buffer;
+            padding_len = 0;
+            padding_direction = LEFT_PADDING;
             
             //decode padding options
             if(*format == '-'){
                 format++;
-                right_padding_len = true;
-            }else{
-                right_padding_len = false;
+                padding_direction = RIGHT_PADDING;
             }
             
-            if(*format == '*'){
-                padding_len = atoi(*(int *)arg);
-                arg = ((int*)arg) + 1;
-            }else if(*format >= '0' && *format <= '9'){
-                *buf++ = *format++;
-                *buf++ = *format++;
-                *buf = '\0';
+            if(*format >= '0' && *format <= '9'){
+                strncpy(buffer, format, 2);
                 padding_len = atoi(buffer);
-                buf = buffer;
+                format += 2;
             }
 
             prev = *format;
@@ -198,55 +194,53 @@ int kprintf_vm(const char *format, void *arg, ptr_t *who_rbase){
                 
                 case 'd':
                     buf_len = kputd_buf(*((int*)arg),buf);
-                    arg = ((int*)arg) + 1;
-                    format++;
-                    break;
+                    goto arg_end;
 
                 case 'x':
                     buf_len = kputx_buf(*((int*)arg),buf);
-                    arg = ((int*)arg) + 1;
-                    format++;
-                    right_padding_len = false;
-                    break;
+                    padding_direction = LEFT_PADDING;
+                    goto arg_end;
 
                 case 's':
                     // buf_len = kputs_vm_buf(*(char **)arg,who_rbase,buffer);
-                    buf = (*(char **)arg)+ (int)who_rbase;
+                    buf = *(char **)arg)+ (int)who_rbase;
                     buf_len = strlen(buf);
-                    arg = ((char *)arg) + 1;
-                    format++;
-                    break;
+                    goto arg_end;
 
                 case 'c':
                     // kputc(*(int *)arg);
                     buffer[0] = *(int *)arg;
                     buffer[1] = '\0';
                     buf_len = 1;
-                    arg = ((char *)arg) + 1;
-                    format++;
-                    break;
+                    goto arg_end;
 
                 default:
                     kputc(*format++);
+                    break;
+                
+                arg_end:
+                    arg = ((char *)arg) + 1;
+                    format++;
             }
+            
 
             padding_len -= buf_len;
             count += buf_len;
 
             //left padding
-            if(!right_padding_len && padding_len > 0){ 
+            if(padding_direction == LEFT_PADDING && padding_len > 0){ 
                 if(prev == 'x' || prev == 'd')
                     token = ZERO;
                 PUT_PADDING(padding_len,token);
             }
+
             kputs(buf);
             //right padding
-            if(right_padding_len && padding_len > 0){
+            if(padding_direction == RIGHT_PADDING && padding_len > 0){
                 PUT_PADDING(padding_len,token);
             }
-            padding_len = 0;    
-        }
-        else {
+            
+        }else {
             //if this is a normal character, simply print it to 
             //serial port 1
             kputc(*format++);

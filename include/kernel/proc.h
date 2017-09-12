@@ -19,6 +19,7 @@
 #include <winix/kwramp.h>
 
 //Kernel Process
+//Plz do make sure IDLE has the lowest process number
 #define NUM_TASKS                   2   //number of kernel tasks,
 #define IDLE                    	-1
 #define SYSTEM                      0
@@ -180,11 +181,30 @@ extern struct proc *block_q[2];
 #define GET_DEF_STACK_SIZE(who)         (IS_USER_PROC(who) ? USER_STACK_SIZE : KERNEL_STACK_SIZE)
 #define GET_HEAP_TOP(who)               ((who)->stack_top + GET_DEF_STACK_SIZE(who))
 
+//This macro assumes idle has the lowest process number in the system
 #define for_each_proc_except_idle(curr)\
-for(curr = proc_table; curr < proc_table + NUM_PROCS - NUM_TASKS + 1; curr++)
+for(curr = proc_table + IDLE + 1; curr < proc_table + NUM_PROCS - NUM_TASKS + 1; curr++)
 
+//proc_table points at inex zero of the process table, so proc_table + 1 
+//simply starts at init (init has process number 1)
 #define for_each_user_proc(curr)\
 for(curr = proc_table + 1; curr < proc_table + NUM_PROCS - NUM_TASKS + 1 ; curr++)
+
+struct boot_image{
+    char name[PROC_NAME_LEN];
+    void (*entry)();
+    int proc_nr;
+    int quantum;
+    int priority;
+};
+
+struct initial_frame{
+    int operation;
+    int dest;
+    struct message *pm;
+    struct message m;
+    unsigned int syscall_code;
+};
 
 
 void* get_pc_ptr(struct proc* who);
@@ -212,21 +232,5 @@ void unsched(struct proc *p);
 int copyto_user_stack(struct proc *who, void *src, size_t len);
 vptr_t* copyto_user_heap(struct proc* who, void *src, size_t len);
 int build_initial_stack(struct proc* who, int argc, char** argv, char** env, struct proc* srcproc);
-
-struct boot_image{
-    char name[PROC_NAME_LEN];
-    void (*entry)();
-    int proc_nr;
-    int quantum;
-    int priority;
-};
-
-struct initial_frame{
-    int operation;
-    int dest;
-    struct message *pm;
-    struct message m;
-    unsigned int syscall_code;
-};
 
 #endif

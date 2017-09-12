@@ -13,6 +13,5 @@ int setenv(const char *name, const char *value, int overwrite) {
     strcpy(buf,name);
     strcat(buf,"=");
     strcat(buf,value);
-    printf("setenv %s\n",buf);
 	return putenv(buf);
 }
