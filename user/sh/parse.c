@@ -167,44 +167,54 @@ int parse(char *input_line, struct cmdLine *sc)
     return 0;
 }
 
+#define DOUBLE_QUOTES   1
+#define SINGLE_QUOTE    2
 
 int parse_quotes(char *input, char* buffer){
     char* in = input;
     char* out = buffer;
-    if(*input == '"'){
-        in++;
-        while(*in){
+    int mode = 0;
 
-            if(*in == '$'){ //if env
-                int bak_char;
-                char *envval, *val_start = ++in;//one for '$'
-                while(*in && (isupper(*in) || islower(*in))){
-                    in++;
-                }
-                bak_char = *in;
-                *in = '\0';
-                
-                // printf("search %s\n", val_start);
-                
-                //insert the environment value at the $
-                envval = getenv(val_start);
-                if(envval == NULL){
-                    perror("Nu such env variable");
-                    return -1;
-                }
-                *out = '\0';
-                strcat(out,envval);
-                out += strlen(envval) - 1;
-                *in = bak_char;
+    if(*in == '"'){
+        in++;
+        mode = DOUBLE_QUOTES;
+    }else if(*in == '\''){
+        in++;
+        mode = SINGLE_QUOTE;
+    }
+        
+    while(*in){
+
+        if(*in == '"' || *in == '\'')
+            *in = '\0';
+
+        if(*in == '$'){ //if env
+            int bak_char;
+            char *envval, *val_start = ++in;//one for '$'
+            while(*in && (isupper(*in) || islower(*in))){
+                in++;
             }
-            if(*in == '"')
-                *in = '\0';
-                        
+            bak_char = *in;
+            *in = '\0';
+            
+            // printf("search %s\n", val_start);
+            
+            //insert the environment value at the $
+            envval = getenv(val_start);
+            if(envval == NULL){
+                *in = bak_char;
+                continue;
+            }
+
+            //concatenate the environment value to the output 
+            //buffer
+            *out = '\0';
+            strcat(out,envval);
+            out += strlen(envval) - 1;
+            *in = bak_char;
+        }else{
             *out++ = *in++;
         }
-    }else{
-        while(*in)
-            *out++ = *in++;
     }
     *out = '\0';
     return 0;

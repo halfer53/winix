@@ -24,9 +24,12 @@
  */
 int copy_pcb(struct proc* parent, struct proc* child){
     int pbak;
+    pid_t pidbak;
     pbak = child->proc_nr;
+    pidbak = child->pid;
     *child = *parent;
     child->proc_nr = pbak;
+    child->pid = pidbak;
     child->ptable = child->protection_table;
     bitmap_clear(child->ptable, PTABLE_LEN);
     return OK;
@@ -47,6 +50,9 @@ int copy_mm(struct proc* parent, struct proc* child){
     if(child->rbase == NULL)
         return ERR;
 
+    if(parent->i_flags & DISABLE_FIRST_PAGE){
+        proc_memctl(child, NULL, PROC_NO_ACCESS);
+    }
     src = (ptr_t *)parent->rbase;
     dest = (ptr_t *)child->rbase;
     while(src < parent->heap_bottom){

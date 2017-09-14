@@ -1,12 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
-int decode_srec(char *filename);
+int decode_srec(char *filename, int offset);
 int winix_load_srec_words_length(char *line);
 int winix_load_srec_mem_val(char *line, size_t *memory_values, int start_index, int memvalLength, const char* filename);
 
-#define IS_LOWER_CHAR(c) (c >= 'a' && c <= 'z')
 #define TO_UPPER_CHAR(c) (c - 32)
 
 char* remove_extension(char *mystr)
@@ -27,7 +27,7 @@ int toUpperCase(char *to, char *src)
 {
     while (*src)
     {
-        *to++ = IS_LOWER_CHAR(*src) ? TO_UPPER_CHAR(*src) : *src;
+        *to++ = islower(*src) ? TO_UPPER_CHAR(*src) : *src;
         src++;
     }
     return 0;
@@ -35,15 +35,22 @@ int toUpperCase(char *to, char *src)
 
 int main(int argc, char *argv[])
 {
-    int i;
-    for(int i = 1; i < argc; i++)
+    int i = 1;
+    int offset = 0;
+
+    if(strcmp("-offset", argv[i]) == 0){
+        i++;
+        offset = atoi(argv[i++]);
+    }
+
+    for(; i < argc; i++)
     {
-        decode_srec(argv[i]);
+        decode_srec(argv[i], offset);
     }
     return 0;
 }
 
-int decode_srec(char *filename)
+int decode_srec(char *filename, int offset)
 {
 
     int i = -1;
@@ -95,7 +102,8 @@ int decode_srec(char *filename)
         }
     }
 
-    printf("#define %s_code_length\t%d\n", filename, wordslength);
+    printf("#define %s_code_length\t %d\n", filename, wordslength);
+    printf("#define %s_offset\t %d\n",filename, offset);
     printf("#endif\n");
     err_end:
         free(upperfilename);

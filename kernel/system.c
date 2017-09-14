@@ -40,6 +40,7 @@ void system_main() {
 
         syscall_region_begin();
 
+
         //Do the work
         switch(mesg->type){
             case SYSCALL_TIMES:             reply = do_times(who,mesg);             break;
@@ -58,8 +59,8 @@ void system_main() {
             case SYSCALL_PRINTF:            reply = do_printf(who,mesg);            break;
             case SYSCALL_SYSCONF:           reply = do_sysconf(who,mesg);           break;
             default:
-                kinfo("Process \"%s (%d)\" performed unknown system call %d\r\n", 
-                                                who->name, who->proc_nr, m.type);
+                KPRINT_DEBUG(("Process \"%s (%d)\" performed unknown system call %d\r\n", 
+                                                who->name, who->proc_nr, m.type));
                 reply = ENOSYS;
                 break;
         }

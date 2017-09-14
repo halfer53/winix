@@ -50,9 +50,8 @@ ifeq ($(KBUILD_VERBOSE),0)
 	@echo "LD \t winix.srec"
 endif
 
-debug:
-	$(MAKE) all
-	$(Q)wlink $(LDFLAGS) -Ttext 1024 -v -o winix.srec $(L_HEAD) $(KERNEL_O) $(KLIB_O) $(L_TAIL)
+debug-verbose:
+	$(MAKE) all CFLAGS=-D_DEBUG=2
 
 release: 
 	$(MAKE) clean

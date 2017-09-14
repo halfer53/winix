@@ -22,11 +22,10 @@ CMD_PROTOTYPE(test_alarm);
 CMD_PROTOTYPE(test_signal);
 CMD_PROTOTYPE(test_nohandler);
 
-struct cmd test_commands[] = {
+struct cmd_internal test_commands[] = {
     { test_malloc, "malloc"}, 
     { test_so, "stack"},
     { test_float, "float"},
-    { test_fork, "fork"},
     { test_thread, "thread"},
     { test_alarm, "alarm"},
     { test_signal, "signal"},
@@ -36,10 +35,10 @@ struct cmd test_commands[] = {
 
 int test_nohandler(int argc, char** argv){
     int i;
-    struct cmd* handler;
+    struct cmd_internal* handler;
     handler = test_commands;
     printf("Available Test Options\n");
-    for( i = 0; i < sizeof(test_commands) / sizeof(struct cmd) - 1; i++){
+    for( i = 0; i < sizeof(test_commands) / sizeof(struct cmd_internal) - 1; i++){
         if(handler->name)
             printf(" * %s\n",handler->name);
         handler++;
@@ -49,7 +48,7 @@ int test_nohandler(int argc, char** argv){
 }
 
 int test_general(int argc, char **argv){
-    struct cmd* handler;
+    struct cmd_internal* handler;
     handler = test_commands;
     while(handler->name != NULL && strcmp(argv[1], handler->name)) {
         handler++;
@@ -72,11 +71,11 @@ void stack_overflow(int a){
 
 int test_so(int argc, char **argv){
     if(!fork()){//child
+        printf("Generating stack overflow ....\n");
         stack_overflow(1);
     }else{
         int status;
         wait(&status);
-        printf("child exit status %d signal %d\n",WEXITSTATUS(status), WTERMSIG(status));
     }
     return 0;
 }
@@ -223,21 +222,5 @@ int test_malloc(int argc, char **argv){
     free(p8);
     print_heap();
   
-    return 0;
-}
-
-int test_fork(int argc, char **argv){
-    pid_t cpid;
-    if(cpid = fork()){
-        if(cpid == -1){
-            perror("fork failed");
-            return -1;
-        }
-        printf("parent %d waiting for child %d\n",getpid(),cpid);
-        cpid = wait(NULL);
-        printf("parent %d awakened by child %d\n",getpid(),cpid);
-    }else{
-        printf("Child %d [parent %d] start:\n",getpid(),getppid());
-    }
     return 0;
 }

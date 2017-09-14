@@ -23,7 +23,7 @@ OBJECT += $(SHELL_OBJECT)
 shell: | user shell.srec	
 
 
-shell.srec: $(OBJECT) $(LIBS_O) 
+shell.srec: $(OBJECT) $(LIBS_O) sh/*.h
 	$(Q)wlink $(LDFLAGS) -o $(SHELL_SREC) $(OBJECT) $(LIBS_O)
 	$(Q)java -cp $(MAIN_DIR)/tools reformat_srec $(SHELL_SREC)
 	$(Q)./$(MAIN_DIR)/tools/gen_bin_code $(SHELL_SREC) > $(INCLUDE_DIR)/shell_bin.c

@@ -89,7 +89,7 @@ void kprint_proc_info(struct proc* curr) {
     int ptable_idx = PADDR_TO_PAGED(curr->rbase)/32;
     kprintf("%-08s %-03d %-04d 0x%08x 0x%08x 0x%08x 0x%08x %d 0x%08x %d\n",
             curr->name,
-            curr->proc_nr < 0 ? 0 : curr->proc_nr,
+            curr->pid,
             curr->parent,
             curr->rbase,
             get_physical_addr(get_pc_ptr(curr),curr),
@@ -320,8 +320,9 @@ void proc_set_default(struct proc *p) {
     int pnr_bak = p->proc_nr;
     memset(p, 0, sizeof(struct proc));
     p->proc_nr = pnr_bak;
+    p->pid = p->proc_nr < 0 ? 0 : p->proc_nr;
 
-    memset(p->regs, DEFAULT_REG_VALUE, NUM_REGS);
+    memset(p->regs, -1, NUM_REGS);
     p->cctrl = DEFAULT_CCTRL;
 
     p->quantum = DEFAULT_USER_QUANTUM;
@@ -355,8 +356,7 @@ reg_t* alloc_kstack(struct proc *who){
 /**
  * set corressponding fields of struct pro
  */
-void set_proc(struct proc *p, void (*entry)(), int quantum, const char *name) {
-    p->quantum = quantum;
+void set_proc(struct proc *p, void (*entry)(), const char *name) {
     p->pc = entry;
     strncpy(p->name, name, PROC_NAME_LEN - 1);
 }
@@ -400,10 +400,12 @@ struct proc *start_kernel_proc(void (*entry)(), int proc_nr, const char *name, i
     if (!(p = get_free_proc_slot()))
         return NULL;
     
-    set_proc(p, entry, quantum, name);
+    set_proc(p, entry, name);
     kset_ptable(p);
+    p->quantum = quantum;
     p->sp = alloc_kstack(p);
     p->proc_nr = proc_nr;
+    p->pid = 0;
     enqueue_schedule(p);
     return p;
 }
@@ -417,13 +419,12 @@ struct proc *start_kernel_proc(void (*entry)(), int proc_nr, const char *name, i
  * @param  name     
  * @return          
  */
-struct proc *start_user_proc(size_t *lines, size_t length, size_t entry, int quantum, const char *name){
+struct proc *start_user_proc(size_t *lines, size_t length, size_t entry, int options, const char *name){
     struct proc *p;
     if(!(p = get_free_proc_slot()))
         return NULL;
 
-    
-    if(exec_proc(p,lines,length,entry,quantum,name) == ERR)
+    if(exec_proc(p,lines,length,entry,options,name) == ERR)
         return NULL;
     
     return p;
@@ -437,8 +438,8 @@ struct proc *start_user_proc(size_t *lines, size_t length, size_t entry, int qua
  * @return           
  */
 int proc_memctl(struct proc* who ,vptr_t* page_addr, int flags){
-    int paged = PADDR_TO_PAGED(get_physical_addr(page_addr,who)); //get page descriptor
-
+    int paged = PADDR_TO_PAGED(get_physical_addr(page_addr, who)); //get page descriptor
+    
     if(flags == PROC_ACCESS){
         return bitmap_set_bit(who->ptable, PTABLE_LEN, paged);
     }else if(flags == PROC_NO_ACCESS){
@@ -539,6 +540,7 @@ vptr_t* copyto_user_heap(struct proc* who, void *src, size_t len){
 void init_proc() {
     int i, procnr_offset;
     struct proc *p;
+    int preset_pid;
     //Initialise queues
 
     for (i = 0; i < NUM_QUEUES; i++) {
@@ -552,7 +554,9 @@ void init_proc() {
     for ( i = 0; i < NUM_PROCS; i++) {
         p = &_proc_table[i];
         proc_set_default(p);
-        p->proc_nr = i - procnr_offset;
+        preset_pid = i - procnr_offset;
+        p->proc_nr = preset_pid;
+        p->pid = preset_pid;
         enqueue_tail(free_proc, p);
     }
 

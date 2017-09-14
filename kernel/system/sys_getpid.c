@@ -19,5 +19,5 @@
 
 int do_getpid(struct proc *who, struct message *m){
     m->m1_i2 = who->parent;
-    return who->proc_nr;
+    return who->pid;
 }

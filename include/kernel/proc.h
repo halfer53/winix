@@ -74,11 +74,12 @@
 #define SIG_PENDING                	0x0010    /* unready while signal being processed */
 
 //Process Information flags
-#define IN_USE                    	0x0001    /* process slot is in use */
-#define RUNNABLE                	0x0002
-#define ZOMBIE                    	0x0004
-#define STOPPED                    	0x0008
-#define BILLABLE                	0x0010
+#define IN_USE                    	0x0001      /* process slot is in use */
+#define RUNNABLE                	0x0002      /* Running in the system */
+#define ZOMBIE                    	0x0004      /* Zombie process */
+#define STOPPED                    	0x0008      /* Stopped by signals */
+#define BILLABLE                	0x0010      /* Set when user is invoking a system call */
+#define DISABLE_FIRST_PAGE          0x0020      /* Set when the first page of the user address space is disabled */
 
 //alloc_proc_mem flags
 #define PROC_SET_SP                	1
@@ -126,7 +127,7 @@ typedef struct proc {
     struct proc *next_sender;     	//Link to next sender in the queue
 
     /* Pending messages, used by winix_notify */
-    unsigned int winix_notify_pending;	//bitmap for masking list of pending messages by system proc
+    unsigned int notify_pending;	//bitmap for masking list of pending messages by system proc
 
     /* Scheduling */
     struct proc *next;            	//Next pointer
@@ -214,7 +215,7 @@ struct proc *dequeue(struct proc **q);
 void init_proc();
 void proc_set_default(struct proc *p);
 reg_t* alloc_stack(struct proc *who);
-void set_proc(struct proc *p, void (*entry)(), int quantum, const char *name);
+void set_proc(struct proc *p, void (*entry)(), const char *name);
 struct proc *start_kernel_proc(void (*entry)(), int proc_nr, const char *name,int quantum);
 struct proc *start_user_proc(size_t *lines, size_t length, size_t entry, int priority, const char *name);
 struct proc *get_free_proc_slot();

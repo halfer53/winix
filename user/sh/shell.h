@@ -15,7 +15,7 @@
 
 
 //Maps strings to function pointers
-struct cmd {
+struct cmd_internal {
     int (*handle)(int argc, char **argv);
     char *name;
 };

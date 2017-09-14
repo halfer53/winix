@@ -5,7 +5,7 @@
 
 #define isspace(c)    (c==' ')
 
-#define MAX_LINE        128  /* longest accepted command line */
+#define MAX_LINE        100  /* longest accepted command line */
 #define BUF_LEN         32
 #define MAX_COMMANDS    5
 #define MAX_ARGS        10

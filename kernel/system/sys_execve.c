@@ -27,19 +27,27 @@ int do_exec(struct proc *who, struct message *m){
 * malloc a new memory and write the values of lines into that address
 * the process is updated
 **/
-int exec_proc(struct proc *p,size_t *lines, size_t length, size_t entry, int quantum, const char *name){
-
-    set_proc(p, (void (*)())entry, quantum, name);
-    if(alloc_proc_mem(p, length, USER_STACK_SIZE , USER_HEAP_SIZE, 
+int exec_proc(struct proc *who,size_t *lines, size_t length, size_t entry, int offset, const char *name){
+    set_proc(who, (void (*)())entry, name);
+    if(alloc_proc_mem(who, length + offset, USER_STACK_SIZE , USER_HEAP_SIZE, 
                          PROC_SET_SP | PROC_SET_HEAP) != OK){
         return ERR;
     }
-    
-    build_initial_stack(p, 0, NULL, initial_env, get_proc(SYSTEM));
-    memcpy(p->rbase, lines , length);
 
-    p->length = length;
-    enqueue_schedule(p);
+    //set the first page unaccessible if offset is set
+    //Normally, for each user address space, NULL pointer, which is a macro 
+    //for (void *)0, is set to return invalid value. For this reason, the
+    //first page of the user process is disabled, so that dereferencing
+    //NULL pointer will immediately trigger segfault.
+    if(offset){
+        proc_memctl(who, (void *)0, PROC_NO_ACCESS);
+        who->i_flags |= DISABLE_FIRST_PAGE;
+    }
+
+    build_initial_stack(who, 0, NULL, initial_env, get_proc(SYSTEM));
+    memcpy(who->rbase + offset, lines , length);
+    who->length = length;
+    enqueue_schedule(who);
     return OK;
 }
 

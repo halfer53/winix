@@ -36,10 +36,10 @@ void main() {
         ASSERT(p != NULL);
     }
 
-    p = start_user_proc(init_code, init_code_length, init_pc, 1, "init");
+    p = start_user_proc(init_code, init_code_length, init_pc, init_offset, "init");
     add_free_mem(init_code, init_code_length);
 
-    p = start_user_proc(shell_code,shell_code_length,shell_pc, 8,"shell");
+    p = start_user_proc(shell_code,shell_code_length,shell_pc, shell_offset,"shell");
     p->parent = 1;//hack 
     add_free_mem(shell_code,shell_code_length);
     

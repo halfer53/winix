@@ -1,8 +1,5 @@
 /**
- * 
- * IMPORTANT:
- * This file is not included during compilation
- * This file is depreciated, use slab.c instead 
+ * Dynamic memory allocation for the kernel
  *
  * @author Bruce Tan
  * @email brucetansh@gmail.com
@@ -38,7 +35,7 @@ static char initial_free_sysmem[INITIAL_SYSFREEMEM_LEN];
  *   q        An array containing a head and tail pointer of a linked list.
  *   hole    The hole struct to add to the list.
  **/
-static void hole_enqueue_tail(struct hole **q, struct hole *hole) {
+ PRIVATE void hole_enqueue_tail(struct hole **q, struct hole *hole) {
     if (q[HEAD] == NULL) {
         q[HEAD] = q[TAIL] = hole;
     }
@@ -56,7 +53,7 @@ static void hole_enqueue_tail(struct hole **q, struct hole *hole) {
  *   q        An array containing a head and tail pointer of a linked list.
  *   hole    The hole struct to add to the list.
  **/
-static void hole_enqueue_head(struct hole **q, struct hole *hole) {
+ PRIVATE void hole_enqueue_head(struct hole **q, struct hole *hole) {
     if (q[HEAD] == NULL) {
         hole->next = NULL;
         q[HEAD] = q[TAIL] = hole;
@@ -77,7 +74,7 @@ static void hole_enqueue_head(struct hole **q, struct hole *hole) {
  *   The hole struct that was removed from the head of the list
  *   NULL if the list is empty.
  **/
-static struct hole *hole_dequeue(struct hole **q) {
+PRIVATE struct hole *hole_dequeue(struct hole **q) {
     struct hole *hole = q[HEAD];
 
     if (hole == NULL)
@@ -93,7 +90,7 @@ static struct hole *hole_dequeue(struct hole **q) {
     return hole;
 }
 
-static void hole_delete2(struct hole **q, struct hole *prev, struct hole *curr) {
+PRIVATE void hole_delete2(struct hole **q, struct hole *prev, struct hole *curr) {
     if (curr != NULL) {
         if (prev == NULL) {
             if (q[HEAD] == q[TAIL]) {
@@ -107,7 +104,7 @@ static void hole_delete2(struct hole **q, struct hole *prev, struct hole *curr) 
     }
 }
 
-static void hole_delete(struct hole **q, struct hole *h) {
+PRIVATE void hole_delete(struct hole **q, struct hole *h) {
     register struct hole *curr = q[HEAD];
     register struct hole *prev = NULL;
 
@@ -173,6 +170,36 @@ void *kmalloc(size_t size) {
     return NULL;
 }
 
+//TODO release big enough unused holes to free pages
+PRIVATE int merge_holes(struct hole **merging_holes_list, struct hole *h) {
+    
+        register struct hole *curr = merging_holes_list[HEAD];
+    
+        while (curr != NULL) {
+            //if there is hole that is adjacent to the hole to be merged
+            if (curr->start + curr->length == h->start) {
+                curr->length += h->length;
+                break;
+            } else if (h->start + h->length == curr->start) {
+                curr->start -= h->length;
+                curr->length += h->length;
+                break;
+            }
+            curr = curr->next;
+        }
+    
+    //if curr is not null, that means it is merged with other holes, whose size is increased by the size of h
+    //so we simply add h to the pending_holes list
+        if (curr != NULL) {
+            hole_enqueue_head(pending_holes, h);
+            return OK;
+        } else {
+            //if curr is null, that means it can't merge with any holes
+            hole_enqueue_head(unused_holes, h);
+            return ERR;
+        }
+    }
+
 //equivalent to free()
 //it loops through the used holes list, and find any starting address of the
 //used hole that matches the parameter.
@@ -197,36 +224,6 @@ void kfree(void *ptr_parameter) {
         hole_delete(used_holes, h);
         //try to merge the newly deleted hole with exiting unused holes
         merge_holes(unused_holes, h);
-    }
-}
-
-//TODO release big enough unused holes to free pages
-int merge_holes(struct hole **merging_holes_list, struct hole *h) {
-
-    register struct hole *curr = merging_holes_list[HEAD];
-
-    while (curr != NULL) {
-        //if there is hole that is adjacent to the hole to be merged
-        if (curr->start + curr->length == h->start) {
-            curr->length += h->length;
-            break;
-        } else if (h->start + h->length == curr->start) {
-            curr->start -= h->length;
-            curr->length += h->length;
-            break;
-        }
-        curr = curr->next;
-    }
-
-//if curr is not null, that means it is merged with other holes, whose size is increased by the size of h
-//so we simply add h to the pending_holes list
-    if (curr != NULL) {
-        hole_enqueue_head(pending_holes, h);
-        return ERR;
-    } else {
-        //if curr is null, that means it can't merge with any holes
-        hole_enqueue_head(unused_holes, h);
-        return OK;
     }
 }
 

@@ -25,11 +25,12 @@ int align_page(int len){
  **/
 void _panic(const char* str, const char* file) {
     kprintf("\r\nPanic! ");
-    if(file)
-        kprintf("in file %s\n", file);
 
     if(str)
         kprintf(str);
+
+    if(file)
+        kprintf("in file %s\n", file);
         
     while(1) {
         RexParallel->Ctrl = 0;
