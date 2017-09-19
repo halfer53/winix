@@ -3,9 +3,9 @@ INCLUDES = $(wildcard $(INCLUDE_DIR)/*.h $(INCLUDE_DIR)/winix/*.h \
 				$(INCLUDE_DIR)/sys/*.h $(INCLUDE_DIR)/kernel/*.h)
 
 
-PROGS = sys_alarm sys_brk sys_execve sys_exit do_vfork sys_fork \
-		sys_sigaction sys_sigreturn sys_wait sys_kill sys_times\
-		sys_winfo sys_printf sys_getc sys_getpid sys_sysconf
+PROGS = do_alarm do_brk do_execve do_exit do_vfork do_fork \
+		do_sigaction do_sigreturn do_wait do_kill do_times\
+		do_winfo do_printf do_getc do_getpid do_sysconf
 		
 SOURCES = $(PROGS:=.c)
 ASSEMBLY = $(PROGS:=.s)
