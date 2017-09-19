@@ -31,7 +31,7 @@ void deliver_alarm(int proc_nr, clock_t time){
 }
 
 void handle_timer(struct timer *timer){
-
+    // kdebug("handle timer at %d from %d\n", timer->time_out, timer->proc_nr);
     if(timer != NULL && timer->time_out == get_uptime())
         timer->handler(timer->proc_nr,timer->time_out);
     else

@@ -191,14 +191,6 @@ for(curr = proc_table + IDLE + 1; curr < proc_table + NUM_PROCS - NUM_TASKS + 1;
 #define for_each_user_proc(curr)\
 for(curr = proc_table + 1; curr < proc_table + NUM_PROCS - NUM_TASKS + 1 ; curr++)
 
-struct boot_image{
-    char name[PROC_NAME_LEN];
-    void (*entry)();
-    int proc_nr;
-    int quantum;
-    int priority;
-};
-
 struct initial_frame{
     int operation;
     int dest;

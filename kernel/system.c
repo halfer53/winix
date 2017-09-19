@@ -26,6 +26,7 @@ PRIVATE struct syscall_ctx syscall_context;
  **/
 void system_main() {
     int reply;
+    syscall_handler_t handler;
     struct message* mesg = &m;
     kprint_sysinfo();
     getcontext(&recv_ctx);
@@ -40,39 +41,21 @@ void system_main() {
 
         syscall_region_begin();
 
-
-        //Do the work
-        switch(mesg->type){
-            case SYSCALL_TIMES:             reply = do_times(who,mesg);             break;
-            case SYSCALL_EXIT:              reply = do_exit(who,mesg);              break;
-            case SYSCALL_FORK:              reply = do_fork(who,mesg);              break;
-            case SYSCALL_EXECVE:            reply = do_exec(who,mesg);              break;
-            case SYSCALL_BRK:               reply = do_brk(who,mesg);               break;
-            case SYSCALL_ALARM:             reply = do_alarm(who,mesg);             break;
-            case SYSCALL_SIGNAL:            reply = do_sigaction(who,mesg);         break;
-            case SYSCALL_SIGRET:            reply = do_sigreturn(who,mesg);         break;
-            case SYSCALL_WAIT:              reply = do_wait(who,mesg);              break;
-            case SYSCALL_KILL:              reply = do_kill(who,mesg);              break;
-            case SYSCALL_GETPID:            reply = do_getpid(who,mesg);            break;
-            case SYSCALL_GETC:              reply = do_getc(who,mesg);              break;
-            case SYSCALL_WINFO:             reply = do_winfo(who,mesg);             break;
-            case SYSCALL_PRINTF:            reply = do_printf(who,mesg);            break;
-            case SYSCALL_SYSCONF:           reply = do_sysconf(who,mesg);           break;
-            default:
-                KPRINT_DEBUG(("Process \"%s (%d)\" performed unknown system call %d\r\n", 
-                                                who->name, who->proc_nr, m.type));
-                reply = ENOSYS;
-                break;
-        }
+        if(mesg->type >= 1 && mesg->type <= _NSYSCALL)
+            handler = syscall_table[mesg->type];
+        else
+            handler = no_syscall;
+        
+        reply = handler(who,mesg);
 
         switch(reply){
             case SUSPEND:
-            case DONOTHING:
+            case DONTREPLY:
                 break;
             default:
-                mesg->reply_res = reply;
-                syscall_reply(who_proc_nr, mesg);
+                syscall_reply(reply, who_proc_nr, mesg);
         }
+
         syscall_region_end();
     }
 }
@@ -124,6 +107,12 @@ void intr_syscall(){
         ctx->interruptted = true;
         setcontext(&recv_ctx);
     }
+}
+
+int no_syscall(struct proc* who, struct message* m){
+    KPRINT_DEBUG(("Process \"%s (%d)\" performed unknown system call %d\r\n", 
+        who->name, who->proc_nr, m->type));
+    return ENOSYS;
 }
 
 struct message *curr_mesg(){

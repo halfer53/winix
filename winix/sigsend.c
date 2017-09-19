@@ -113,6 +113,7 @@ PRIVATE int sys_sig_handler(struct proc *who, int signum){
             struct message* em = get_exception_m();
             em->type = SYSCALL_EXIT;
             em->m1_i1 = 0;
+            em->src = who->proc_nr;
             interrupt_send(SYSTEM, em);
 
             if(current_proc == who)
@@ -154,16 +155,6 @@ int send_sig(struct proc *who, int signum){
         if(who->proc_nr == curr_mesg()->src){
             get_proc(SYSTEM)->pc = &intr_syscall;
         }
-
-        //if signal is delivered during exception, 
-        //we can schedule the process imeediately
-        if(current_proc != who){
-            enqueue_schedule(current_proc);
-            dequeue_schedule(who);
-        }
-
-        current_proc = who;
-        wramp_load_context();
     }
     return OK;
 }

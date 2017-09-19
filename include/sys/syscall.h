@@ -18,6 +18,7 @@
 
 #include <sys/ipc.h>
 
+#define _NSYSCALL               16
 /**
  * System Call Numbers
  **/

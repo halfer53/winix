@@ -29,8 +29,8 @@
     if(prev_syscall->interruptted && to->s_flags & RECEIVING &&
         prev_syscall->who->proc_nr == to->proc_nr){
         
-        prev_syscall->m.reply_res = EINTR;
-        syscall_reply(to->proc_nr,&prev_syscall->m);
+        //return EINTR to the user
+        syscall_reply(EINTR, to->proc_nr,&prev_syscall->m);
 
     }else{
         // kprintf("enqueue %d pri %d\n",to->proc_nr, to->priority);
@@ -58,5 +58,5 @@ int do_sigreturn(struct proc *who, struct message *m){
     who->sig_table[signum].sa_handler = SIG_DFL;
     resume_from_sig(who);
 
-    return DONOTHING;
+    return DONTREPLY;
 }

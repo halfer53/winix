@@ -26,11 +26,8 @@ PUBLIC struct proc *proc_table;
 //Scheduling queues
 PUBLIC struct proc *ready_q[NUM_QUEUES][2];
 
-//blocking queues
+//blocking queues, not in use at the moment
 PUBLIC struct proc *block_q[2];
-
-//Entries in the process table that are not in use
-PRIVATE struct proc *free_proc[2];
 
 //The currently-running process
 PUBLIC struct proc *current_proc;
@@ -135,10 +132,8 @@ void kprint_receiver_queue(struct proc* who){
  * Returns:            The relevant process, or NULL if it does not exist.
  **/
 struct proc *get_proc(int proc_nr) {
-    struct proc *p;
     if (IS_PROCN_OK(proc_nr)){
-        p = proc_table + proc_nr;
-        return p;
+        return proc_table + proc_nr;
     }
     return NULL;
 }
@@ -279,7 +274,6 @@ void unsched(struct proc *p){
  */
 void free_slot(struct proc *p){
     p->i_flags = 0;
-    enqueue_head(free_proc, p);
 }
 
 /**
@@ -302,12 +296,17 @@ void end_process(struct proc *p) {
  * @return pointer to the free slot, or NULL
  */
 struct proc *get_free_proc_slot() {
-    struct proc *p = dequeue(free_proc);
+    int i;
+    struct proc *who;
 
-    if (p) {
-        proc_set_default(p);
-        p->i_flags |= IN_USE;
-        return p;
+    for(i = 0; i < NUM_PROCS; i++)
+    {
+        who = &_proc_table[i];
+        if(!(who->i_flags & IN_USE)){
+            proc_set_default(who);
+            who->i_flags |= IN_USE;
+            return who;
+        }
     }
     return NULL;
 }
@@ -395,19 +394,20 @@ void set_proc(struct proc *p, void (*entry)(), const char *name) {
  *   A proc is removed from the free_proc list, reinitialised, and added to ready_q.
  */
 struct proc *start_kernel_proc(void (*entry)(), int proc_nr, const char *name, int quantum) {
-    struct proc *p;
+    struct proc *who = NULL;
     
-    if (!(p = get_free_proc_slot()))
-        return NULL;
-    
-    set_proc(p, entry, name);
-    kset_ptable(p);
-    p->quantum = quantum;
-    p->sp = alloc_kstack(p);
-    p->proc_nr = proc_nr;
-    p->pid = 0;
-    enqueue_schedule(p);
-    return p;
+    if(who = get_proc(proc_nr)){
+        proc_set_default(who);
+        who->i_flags |= IN_USE;
+
+        set_proc(who, entry, name);
+        kset_ptable(who);
+        who->quantum = quantum;
+        who->sp = alloc_kstack(who);
+        who->pid = 0;
+        enqueue_schedule(who);
+    }
+    return who;
 }
 
 /**
@@ -549,7 +549,6 @@ void init_proc() {
     }
 
     procnr_offset = NUM_TASKS - 1;
-    free_proc[HEAD] = free_proc[TAIL] = NULL;
     //Add all proc structs to the free list
     for ( i = 0; i < NUM_PROCS; i++) {
         p = &_proc_table[i];
@@ -557,7 +556,6 @@ void init_proc() {
         preset_pid = i - procnr_offset;
         p->proc_nr = preset_pid;
         p->pid = preset_pid;
-        enqueue_tail(free_proc, p);
     }
 
     proc_table = _proc_table;

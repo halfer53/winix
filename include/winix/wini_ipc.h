@@ -37,7 +37,7 @@ int wini_send(int dest, struct message *m);
  *   0 on success
  *   -1 if destination is invalid
  **/
-int wini_winix_notify(int dest, struct message *m);
+int wini_notify(int dest, struct message *m);
 
 /**
  * Receives a message.
@@ -61,7 +61,7 @@ int wini_receive(struct message *m);
  **/
 int interrupt_send(int dest, struct message* pm);
 
-int syscall_reply(int dest, struct message* m);
+int syscall_reply(int reply, int dest, struct message* m);
 
 
 #endif

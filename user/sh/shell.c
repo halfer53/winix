@@ -217,6 +217,8 @@ void main() {
     c = buf;
     end_buf = c + MAX_LINE -2;
 
+    
+
     while(1) {
         printf("WINIX> ");
         c = buf;

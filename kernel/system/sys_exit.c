@@ -51,7 +51,7 @@ void clear_receiving_mesg(struct proc *who){
         xp = who->sender_q;
         while(xp){
             memset(&m,-1,sizeof( struct message));
-            syscall_reply(xp->proc_nr,&m);
+            syscall_reply(-1, xp->proc_nr,&m);
             xp = xp->next_sender;
         }
     }
@@ -81,10 +81,10 @@ void exit_proc(struct proc *who, int status){
             if(mp->s_flags & WAITING && mp->wpid == who->proc_nr){
 
                 struct message* mesg = curr_mesg();
-                mesg->reply_res = who->proc_nr;
+                // mesg->reply_res = who->proc_nr;
                 mesg->m1_i2 = (who->exit_status << 8) | (who->sig_status & 0x7f);
                 mp->s_flags &= ~WAITING;
-                syscall_reply(mp->proc_nr, mesg);
+                syscall_reply(who->proc_nr, mp->proc_nr, mesg);
 
                 children++;
             }else if(mp->parent == who->proc_nr){

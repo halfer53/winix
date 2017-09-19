@@ -149,21 +149,18 @@ int winix_notify(int dest, struct message *m) {
     return wramp_syscall(WINIX_winix_notify, dest, m);
 }
 
-int syscall_reply(int dest,struct message* m){
+int syscall_reply(int reply, int dest,struct message* m){
+    m->reply_res = reply;
     return winix_notify(dest,m);
 }
 
 //send used by interrupt
 int interrupt_send(int dest, struct message* pm){
-    struct message* em = get_exception_m();
     if(!in_interrupt())
         return ERR;
-
-    *em = *pm;
-    em->src = current_proc->proc_nr;
 
     //curr proc is the process that generated exception
     //most likely segmentation fault or float fault
     current_proc->s_flags |= RECEIVING;
-    return wini_send(dest, em);
+    return wini_send(dest, pm);
 }
