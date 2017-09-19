@@ -20,7 +20,7 @@ int no_syscall(struct proc* who, struct message* m);
 int do_times(struct proc* who, struct message* m);
 int do_exit(struct proc* who, struct message* m);
 int do_fork(struct proc* who, struct message* m);
-//todo vfork
+int do_vfork(struct proc* who, struct message* m);
 int do_exec(struct proc* who, struct message* m);
 int do_brk(struct proc* who, struct message* m);
 int do_alarm(struct proc* who, struct message* m);

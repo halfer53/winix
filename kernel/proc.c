@@ -263,7 +263,6 @@ void enqueue_schedule(struct proc* p) {
 void unsched(struct proc *p){
     p->i_flags &= ~RUNNABLE;
     p->i_flags |= ZOMBIE;
-    release_proc_mem(p);
     dequeue_schedule(p);
 }
 
@@ -304,7 +303,7 @@ struct proc *get_free_proc_slot() {
         who = &_proc_table[i];
         if(!(who->i_flags & IN_USE)){
             proc_set_default(who);
-            who->i_flags |= IN_USE;
+            who->i_flags |= IN_USE | RUNNABLE;
             return who;
         }
     }

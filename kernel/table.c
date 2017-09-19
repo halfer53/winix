@@ -27,7 +27,7 @@ syscall_handler_t syscall_table[(_NSYSCALL + 1)] = {
     do_times,       //SYSCALL_TIMES           1
     do_exit,        //SYSCALL_EXIT            2
     do_fork,        //SYSCALL_FORK            3
-    no_syscall,     //SYSCALL_VFORK           4
+    do_vfork,       //SYSCALL_VFORK           4
     do_exec,        //SYSCALL_EXECVE          5
     do_brk,         //SYSCALL_BRK             6
     do_alarm,       //SYSCALL_ALARM           7

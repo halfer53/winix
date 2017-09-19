@@ -3,7 +3,7 @@ INCLUDES = $(wildcard $(INCLUDE_DIR)/*.h $(INCLUDE_DIR)/winix/*.h \
 				$(INCLUDE_DIR)/sys/*.h $(INCLUDE_DIR)/kernel/*.h)
 
 
-PROGS = sys_alarm sys_brk sys_execve sys_exit sys_fork \
+PROGS = sys_alarm sys_brk sys_execve sys_exit do_vfork sys_fork \
 		sys_sigaction sys_sigreturn sys_wait sys_kill sys_times\
 		sys_winfo sys_printf sys_getc sys_getpid sys_sysconf
 		

@@ -57,7 +57,7 @@ void clear_receiving_mesg(struct proc *who){
     }
 }
 
-void clear_proc(struct proc *who){
+void clear_proc_mesg(struct proc *who){
     // clear_receiving_mesg(who);
     clear_sending_mesg(who);
 }
@@ -66,22 +66,20 @@ void clear_proc(struct proc *who){
 void exit_proc(struct proc *who, int status){
     struct proc *mp;
     int i, children = 0;
-    
-    unsched(who);
-    clear_proc(who);
+    struct message* mesg = curr_mesg();
 
-    // kprint_runnable_procs();
-    //if parent is waiting
     KPRINT_DEBUG(("%s[%d] exit status %d signal %d\n",who->name, who->proc_nr, 
                                               status, who->sig_status));
 
-    who->exit_status = status;                                          
+    unsched(who);
+    clear_proc_mesg(who);
+    who->exit_status = status;      
+
     for_each_user_proc(mp){
         if(mp->i_flags & IN_USE){
+            //if this process if waiting for the current tobe exited process
             if(mp->s_flags & WAITING && mp->wpid == who->proc_nr){
 
-                struct message* mesg = curr_mesg();
-                // mesg->reply_res = who->proc_nr;
                 mesg->m1_i2 = (who->exit_status << 8) | (who->sig_status & 0x7f);
                 mp->s_flags &= ~WAITING;
                 syscall_reply(who->proc_nr, mp->proc_nr, mesg);
@@ -90,9 +88,17 @@ void exit_proc(struct proc *who, int status){
             }else if(mp->parent == who->proc_nr){
                 //Change the child process's parent to init
                 mp->parent = 1;
+            }else if(mp->s_flags & VFORK){  //parent is blocked by vfork(2)
+
+                mp->s_flags &= ~VFORK;
+                
+                syscall_reply(who->proc_nr, mp->proc_nr, mesg);
+                return;
             }
         }
     }
+
+    release_proc_mem(who);
 
     if(children){
         free_slot(who);

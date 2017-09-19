@@ -201,7 +201,7 @@ PRIVATE void syscall_handler() {
             *retval = wini_receive(m);
             break;
 
-        case WINIX_winix_notify:
+        case WINIX_NOTIFY:
             *retval = wini_notify(dest,m);
             break;
 

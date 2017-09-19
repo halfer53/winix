@@ -218,7 +218,7 @@ void main() {
     end_buf = c + MAX_LINE -2;
 
     
-
+    test_vfork(0,NULL);
     while(1) {
         printf("WINIX> ");
         c = buf;

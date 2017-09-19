@@ -67,11 +67,13 @@ int wini_send(int dest, struct message *m) {
  **/
 int wini_receive(struct message *m) {
     struct proc *p = current_proc->sender_q;
-
+    
     //If a process is waiting to send to this process, deliver it immediately.
     if (p != NULL) {
+        
         //Dequeue head node
         current_proc->sender_q = p->next_sender;
+        
 
         //Copy message to this process
         *m = *(p->message);
@@ -146,7 +148,7 @@ int wini_notify(int dest, struct message *m) {
  *
  **/
 int winix_notify(int dest, struct message *m) {
-    return wramp_syscall(WINIX_winix_notify, dest, m);
+    return wramp_syscall(WINIX_NOTIFY, dest, m);
 }
 
 int syscall_reply(int reply, int dest,struct message* m){

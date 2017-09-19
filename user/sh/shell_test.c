@@ -21,6 +21,7 @@ CMD_PROTOTYPE(test_thread);
 CMD_PROTOTYPE(test_alarm);
 CMD_PROTOTYPE(test_signal);
 CMD_PROTOTYPE(test_nohandler);
+CMD_PROTOTYPE(test_vfork);
 
 struct cmd_internal test_commands[] = {
     { test_malloc, "malloc"}, 
@@ -29,6 +30,7 @@ struct cmd_internal test_commands[] = {
     { test_thread, "thread"},
     { test_alarm, "alarm"},
     { test_signal, "signal"},
+    { test_vfork, "vfork"},
     { test_nohandler, NULL},
 };
 
@@ -44,6 +46,15 @@ int test_nohandler(int argc, char** argv){
         handler++;
     }
     printf("e.g. \"test alarm 1\", \"test thread 100\" \n");
+    return 0;
+}
+
+int test_vfork(int argc, char **argv){
+    pid_t pid = vfork();
+    if(pid == 0){
+        _exit(0);
+    }
+    printf("parent awaken\n");
     return 0;
 }
 

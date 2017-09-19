@@ -76,5 +76,6 @@ pid_t getpid();
 pid_t getppid();
 int kill (pid_t pid, int sig);
 long sysconf(int name);
+pid_t vfork();
 
 #endif

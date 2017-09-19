@@ -31,7 +31,6 @@ int copy_pcb(struct proc* parent, struct proc* child){
     child->proc_nr = pbak;
     child->pid = pidbak;
     child->ptable = child->protection_table;
-    bitmap_clear(child->ptable, PTABLE_LEN);
     return OK;
 }
 
@@ -46,6 +45,7 @@ int copy_mm(struct proc* parent, struct proc* child){
     ptr_t *src, *dest;
     int j;
 
+    bitmap_clear(child->ptable, PTABLE_LEN);
     child->rbase = dup_vm(parent,child);
     if(child->rbase == NULL)
         return ERR;

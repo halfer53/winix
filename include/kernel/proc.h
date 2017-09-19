@@ -72,6 +72,7 @@
 #define WAITING                    	0x0004    /* process blocked wait(2) */
 #define SIGNALED                	0x0008    /* set when new kernel signal arrives */
 #define SIG_PENDING                	0x0010    /* unready while signal being processed */
+#define VFORK                   	0x0020    /* parent is blocked by vfork(2) */
 
 //Process Information flags
 #define IN_USE                    	0x0001      /* process slot is in use */
