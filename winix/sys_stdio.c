@@ -12,15 +12,18 @@
  * 
 */
 #include <kernel/kernel.h>
-
+#include <ctype.h>
 
 /**
  * Writes a character to serial port 1.
  **/
 int kputc(const int c) {
-    while(!(RexSp1->Stat & 2));
-    RexSp1->Tx = c;
-    return c;
+    if(isprint(c) || c - 7 < 6){
+        while(!(RexSp1->Stat & 2));
+        RexSp1->Tx = c;
+        return c;
+    }
+    return EOF;
 }
 
 
@@ -137,9 +140,22 @@ PRIVATE int kputs_vm_buf(char *s, void *who_rbase, char *buf) {
  * print the string to serial port 1
  * @param s 
  */
-void kputs(const char *s) {
-    while(*s)
-        kputc(*s++);
+int kputs(const char *s) {
+    int count = 0;
+    while(*s){
+        if(kputc(*s++) != EOF)
+            count++;
+    }
+    return count;    
+}
+
+int kput_token(char token, int len){
+    int count = 0;
+    while(len--){
+        if(kputc(token) != EOF)
+            count++;
+    }
+    return count;
 }
 
 #define SPACE    ' '
@@ -147,11 +163,6 @@ void kputs(const char *s) {
 
 #define LEFT_PADDING    1
 #define RIGHT_PADDING   2
-
-#define PUT_PADDING(_padding_len,_token)\
-    while(_padding_len--){    \
-        kputc(_token);        \
-    }                    \
 
 
 /**
@@ -203,20 +214,19 @@ int kprintf_vm(const char *format, void *arg, ptr_t *who_rbase){
                     goto arg_end;
 
                 case 's':
-                    // buf_len = kputs_vm_buf(*(char **)arg,who_rbase,buffer);
                     buf = *(char **)arg+ (int)who_rbase;
                     buf_len = strlen(buf);
                     goto arg_end;
 
                 case 'c':
-                    // kputc(*(int *)arg);
                     buffer[0] = *(int *)arg;
                     buffer[1] = '\0';
                     buf_len = 1;
                     goto arg_end;
 
                 default:
-                    kputc(*format++);
+                    if(kputc(*format++) != EOF)
+                        count++;
                     break;
                 
                 arg_end:
@@ -232,20 +242,19 @@ int kprintf_vm(const char *format, void *arg, ptr_t *who_rbase){
             if(padding_direction == LEFT_PADDING && padding_len > 0){ 
                 if(prev == 'x' || prev == 'd')
                     token = ZERO;
-                PUT_PADDING(padding_len,token);
+                count += kput_token(token, padding_len);
             }
 
-            kputs(buf);
+            count += kputs(buf);
             //right padding
-            if(padding_direction == RIGHT_PADDING && padding_len > 0){
-                PUT_PADDING(padding_len,token);
-            }
+            if(padding_direction == RIGHT_PADDING && padding_len > 0)
+                count += kput_token(token, padding_len);
             
         }else {
             //if this is a normal character, simply print it to 
             //serial port 1
-            kputc(*format++);
-            count++;
+            if(kputc(*format++)!= EOF)
+                count++;
         }
     }
     return count;

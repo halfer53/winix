@@ -41,8 +41,7 @@ int test_nohandler(int argc, char** argv){
     handler = test_commands;
     printf("Available Test Options\n");
     for( i = 0; i < sizeof(test_commands) / sizeof(struct cmd_internal) - 1; i++){
-        if(handler->name)
-            printf(" * %s\n",handler->name);
+        printf(" * %s\n",handler->name);
         handler++;
     }
     printf("e.g. \"test alarm 1\", \"test thread 100\" \n");

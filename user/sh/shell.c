@@ -38,8 +38,8 @@ struct cmd_internal builtin_commands[] = {
     { printenv, "printenv" },
     { mall_info, "printheap"},
     { cmd_bash, "bash"},
-    { uptime, "uptime" },
-    { ps, "ps" },
+    { uptime, "uptime"},
+    { ps, "ps"},
     { cmd_kill, "kill"},
     { print_pid, "pid"},
     { mem_info, "free"},
@@ -47,6 +47,92 @@ struct cmd_internal builtin_commands[] = {
     { help, "help"},
     { generic, NULL }
 };
+
+
+int main() {
+    int ret;
+    char *c;
+    char *end_buf;
+
+    c = buf;
+    end_buf = c + MAX_LINE -2;
+
+    while(1) {
+        printf("WINIX> ");
+        c = buf;
+        //Read line from terminal
+        while( c < end_buf) {
+            ret = getchar();     //read
+            
+            if(ret == EOF){
+                if(errno == EINTR){
+                    perror("getc() is interrupted");
+                    printf("WINIX> ");
+                }
+                continue;
+            }
+            
+            if(ret == '\r'){//test for end
+                break;
+            }
+                    
+
+            if ((int)ret == 8) { //backspace
+                if(c > buf){
+                    putchar(ret);
+                    c--;
+                }
+                continue;
+            }
+            
+            if(isprint(ret)){
+                *c++ = ret;
+                putchar(ret);         //echo
+            }else{
+                putchar(7);            //beep
+            }
+            
+        }
+        
+        *c = '\0';
+        putchar('\n');
+        
+        exec_cmd(buf, NULL);     
+    }
+    return 0;
+}
+
+
+int exec_cmd(char *line, int tpipe[2]){
+    struct cmdLine cmd;
+    int ret;
+    char *p;
+    char* buf;
+    struct cmd_internal *handler = NULL;
+
+    ret = parse(line,&cmd);
+
+    if(cmd.env && cmd.env_val){ //if a new environment variable is set
+        buf = malloc(MAX_LINE);
+        parse_quotes(cmd.env_val, buf);
+        
+        if(*buf){
+            printf("setenv %s=%s\n", cmd.env, buf);
+            setenv(cmd.env, buf, 1);
+        }
+        free(buf);
+        return 0;
+    }
+
+    //Decode command
+    handler = builtin_commands;
+    while(handler->name != NULL && strcmp(cmd.argv[0], handler->name)) {
+        handler++;
+    }
+    //Run it
+    handler->handle(cmd.argc, cmd.argv);
+    return 0;
+}
 
 
 extern const char** _penviron;
@@ -178,81 +264,3 @@ int generic(int argc, char **argv) {
 
 
 
-int exec_cmd(char *line, int tpipe[2]){
-    struct cmdLine cmd;
-    int ret;
-    char *p;
-    char* buf;
-    struct cmd_internal *handler = NULL;
-
-    ret = parse(line,&cmd);
-
-    if(cmd.env && cmd.env_val){ //if a new environment variable is set
-        buf = malloc(MAX_LINE);
-        parse_quotes(cmd.env_val, buf);
-        
-        if(*buf){
-            printf("setenv %s=%s\n", cmd.env, buf);
-            setenv(cmd.env, buf, 1);
-        }
-        free(buf);
-        return 0;
-    }
-
-    //Decode command
-    handler = builtin_commands;
-    while(handler->name != NULL && strcmp(cmd.argv[0], handler->name)) {
-        handler++;
-    }
-    //Run it
-    handler->handle(cmd.argc, cmd.argv);
-    return 0;
-}
-
-void main() {
-    int ret;
-    char *c;
-    char *end_buf;
-
-    c = buf;
-    end_buf = c + MAX_LINE -2;
-
-    while(1) {
-        printf("WINIX> ");
-        c = buf;
-        //Read line from terminal
-        while( c < end_buf) {
-            ret = getchar();     //read
-            
-            if(ret == EOF){
-                if(errno == EINTR){
-                    perror("getc() is interrupted");
-                    printf("WINIX> ");
-                }
-                continue;
-            }
-            
-            if(ret == '\r'){//test for end
-                break;
-            }  
-                    
-
-            if ((int)ret == 8) { //backspace
-                if(c > buf){
-                    putchar(ret);
-                    c--;
-                }
-                continue;
-            }
-            
-            *c++ = ret;
-            putchar(ret);         //echo
-        }
-        
-        *c = '\0';
-        putchar('\n');
-        
-        exec_cmd(buf, NULL);     
-    }
-    exit(EXIT_SUCCESS);
-}

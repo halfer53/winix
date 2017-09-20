@@ -38,6 +38,7 @@
 #include <curses.h>
 #include <debug.h>
 #include <string.h>
+#include <stdio.h>
 
 #include <winix/compiler.h>
 #include <winix/type.h>
