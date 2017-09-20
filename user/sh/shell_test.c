@@ -22,6 +22,7 @@ CMD_PROTOTYPE(test_alarm);
 CMD_PROTOTYPE(test_signal);
 CMD_PROTOTYPE(test_nohandler);
 CMD_PROTOTYPE(test_vfork);
+CMD_PROTOTYPE(test_hack);
 
 struct cmd_internal test_commands[] = {
     { test_malloc, "malloc"}, 
@@ -31,6 +32,7 @@ struct cmd_internal test_commands[] = {
     { test_alarm, "alarm"},
     { test_signal, "signal"},
     { test_vfork, "vfork"},
+    { test_hack, "hack"},
     { test_nohandler, NULL},
 };
 
@@ -54,6 +56,12 @@ int test_vfork(int argc, char **argv){
         _exit(0);
     }
     printf("parent awaken\n");
+    return 0;
+}
+
+int test_hack(int argc, char **argv){
+    long *a = (void *)0xffff;
+    *a = 0;
     return 0;
 }
 
@@ -122,6 +130,8 @@ void alarm_handler(int signum){
 int test_alarm(int argc, char **argv){
     int i;
     seconds = (argc > 1) ? atoi(argv[1]) : 1;
+    if(seconds < 0)
+        seconds = 0;
     signal(SIGALRM,alarm_handler);
     alarm(seconds);
     cont = 1;

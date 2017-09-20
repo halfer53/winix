@@ -9,6 +9,7 @@
 *.sublime-workspace
 *.obj
 *.log
+*.kdbg
 
 tmp.txt
 fs/Debug/

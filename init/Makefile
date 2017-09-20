@@ -18,7 +18,7 @@ LIBS_O = $(addprefix ../lib/, $(LIBS))
 init: | wramp init.srec
 
 init.srec: $(OBJECT) $(LIBS_O)
-	$(Q)wlink -o $(OUT) init.o $(LIBS_O)
+	$(Q)wlink -v -o $(OUT) init.o $(LIBS_O) > $(MAIN_DIR)/tools/kdbg/init.kdbg
 	$(Q)java -cp $(MAIN_DIR)/tools reformat_srec init.srec
 	$(Q)./$(MAIN_DIR)/tools/gen_bin_code init.srec > $(INCLUDE_DIR)/init_bin.c
 

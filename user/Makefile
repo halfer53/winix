@@ -12,7 +12,7 @@ SHELL_PROGS = $(addprefix sh/, $(SHELL_COMPONENTS))
 SHELL_SOURCES = $(SHELL_PROGS:=.c)
 SHELL_ASSEMBLY = $(SHELL_PROGS:=.s)
 SHELL_OBJECT = $(SHELL_PROGS:=.o)
-SHELL_SREC = shell.srec
+SHELL_SREC = sh.srec
 
 SOURCES += $(SHELL_SOURCES)
 ASSEMBLY += $(SHELL_ASSEMBLY)
@@ -22,11 +22,12 @@ OBJECT += $(SHELL_OBJECT)
 
 shell: | user shell.srec	
 
-
+	
 shell.srec: $(OBJECT) $(LIBS_O) sh/*.h
-	$(Q)wlink $(LDFLAGS) -o $(SHELL_SREC) $(OBJECT) $(LIBS_O)
+	$(Q)wlink $(LDFLAGS) -v -o $(SHELL_SREC) $(OBJECT) $(LIBS_O) > \
+								$(MAIN_DIR)/tools/kdbg/sh.kdbg
 	$(Q)java -cp $(MAIN_DIR)/tools reformat_srec $(SHELL_SREC)
-	$(Q)./$(MAIN_DIR)/tools/gen_bin_code $(SHELL_SREC) > $(INCLUDE_DIR)/shell_bin.c
+	$(Q)./$(MAIN_DIR)/tools/gen_bin_code $(SHELL_SREC) > $(INCLUDE_DIR)/sh_bin.c
 
 ifeq ($(KBUILD_VERBOSE),0)
 	@echo "LD \t SHELL\nBIN\t SHELL"

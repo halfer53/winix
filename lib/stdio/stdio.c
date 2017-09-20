@@ -1,9 +1,14 @@
 #include <lib.h>
 
+extern const char *_sys_errlist[_NERROR];
 void perror(const char *s){
     if(s)
         printf("%s",s);
-    printf(" errno val: %d\n",errno);
+    
+    if(errno > 0 && errno < _NERROR)
+        printf(" E%s",_sys_errlist[errno]);
+
+    putchar('\n');
 }
 
 int putchar(const char c){

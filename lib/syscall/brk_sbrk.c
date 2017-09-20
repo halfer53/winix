@@ -31,7 +31,6 @@ void *sbrk(int incr){
         return(oldsize);
 
     return_err:
-        printf("sbrk err\n");
         return( (void *) -1);
         
 }

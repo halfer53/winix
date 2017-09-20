@@ -66,7 +66,7 @@ int main() {
             
             if(ret == EOF){
                 if(errno == EINTR){
-                    perror("getc() is interrupted");
+                    perror("getc(): ");
                     printf("WINIX> ");
                 }
                 continue;
@@ -162,7 +162,9 @@ int cmd_kill(int argc, char **argv){
     }else{
         pid = atoi(argv[1]);
     }
-    return kill(pid,signum);
+    if(kill(pid,signum))
+        perror("kill ");
+    return 0;
 }
 
 int help(int argc, char** argv){
