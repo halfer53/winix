@@ -6,9 +6,7 @@ void perror(const char *s){
         printf("%s",s);
     
     if(errno > 0 && errno < _NERROR)
-        printf(" E%s",_sys_errlist[errno]);
-
-    putchar('\n');
+        printf(" %s\n",_sys_errlist[errno]);
 }
 
 int putchar(const char c){

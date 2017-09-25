@@ -146,7 +146,7 @@ struct proc *get_proc(int proc_nr) {
  */
 struct proc *get_running_proc(int proc_nr){
     struct proc *p = get_proc(proc_nr);
-    if(p->i_flags & RUNNABLE)
+    if(p && IS_RUNNABLE(p))
         return p;
     return NULL;
 }

@@ -25,7 +25,7 @@ shell: | user shell.srec
 	
 shell.srec: $(OBJECT) $(LIBS_O) sh/*.h
 	$(Q)wlink $(LDFLAGS) -v -o $(SHELL_SREC) $(OBJECT) $(LIBS_O) > \
-								$(MAIN_DIR)/tools/kdbg/sh.kdbg
+								$(MAIN_DIR)/tools/kdbg_srec/sh.kdbg
 	$(Q)java -cp $(MAIN_DIR)/tools reformat_srec $(SHELL_SREC)
 	$(Q)./$(MAIN_DIR)/tools/gen_bin_code $(SHELL_SREC) > $(INCLUDE_DIR)/sh_bin.c
 

@@ -5,9 +5,10 @@ tools: $(REFORMAT).class $(GEN_BIN)
 $(REFORMAT).class $(GEN_BIN): $(REFORMAT).java $(GEN_BIN).c
 	$(Q)javac $(REFORMAT).java
 	$(Q)gcc $(GEN_BIN).c -o $(GEN_BIN)
+	ln -f -s `pwd`/kdbg.py `pwd`/..
 
 clean:
-	$(Q)-rm -f $(OBJECT) $(ASSEMBLY)
+	$(Q)-rm -f $(REFORMAT).class $(GEN_BIN)
 ifeq ($(KBUILD_VERBOSE),0)
 	@echo "RM \t TOOLS"
 endif

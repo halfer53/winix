@@ -9,7 +9,8 @@
 *.sublime-workspace
 *.obj
 *.log
-tools/kdbg/*.kdbg
+kdbg.py
+tools/kdbg_srec/*.kdbg
 
 tmp.txt
 fs/Debug/
@@ -27,7 +28,8 @@ shell.txt
 RexSimulator.dll
 RexSimulatorGui.exe
 
-!tools/kdbg/.gitkeep
+!tools/kdbg.py
+!tools/kdbg_srec/.gitkeep
 !kernel/winix/kwramp.s
 !lib/gen/ucontext.s
 !lib/syscall/wramp_syscall.s

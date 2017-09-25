@@ -4,22 +4,24 @@ import os
 import glob
 import uuid
 
+userfile_dirs = {
+    "sh.c":"user/sh.c",
+    "init.c":"init/init.c"
+}
+
 def main():
     if(len(sys.argv) < 2):
         print("Plz provide the PC address when kernel crashed")
         return 0
 
-    main_path = os.path.dirname(os.path.realpath(__file__))
-    rpath = "kdbg"
-    if( "tools/" in sys.argv[0]):
-        rpath = "tools/kdbg"
-        main_path += "/.."
-
+    main_path = os.path.dirname(os.path.realpath(__file__)) + "/.."
+    rpath = "tools/kdbg_srec"
     in_file = "winix.kdbg"
+
     if(len(sys.argv) == 3):
         in_file = sys.argv[2] + ".kdbg"
-        if(not os.path.isfile(main_path + "/tools/kdbg/" + in_file)):
-            print(in_file + " is not found in tools/kdbg")
+        if(not os.path.isfile(main_path + "/tools/kdbg_srec/" + in_file)):
+            print(in_file + " is not found in tools/kdbg_srec")
             return 0
     
     target = int(sys.argv[1],16)
@@ -50,8 +52,9 @@ def main():
     # print(linecount)
 
     tmp_filename = str(uuid.uuid4())
-    if("winix" not in filename):
-        filename = "user/" + filename
+
+    if(filename in userfile_dirs):
+        filename = userfile_dirs[filename]
 
     wcc_cmd = ["wcc","-N", "-g", "-S", "-I"+main_path+"/include",\
                      "-o",tmp_filename, main_path+"/"+filename, ]
