@@ -79,3 +79,60 @@ void stop_debug_syscall(){
 
 
 
+
+//print out the list of processes currently in the ready_q
+//and the currently running process
+void kprint_runnable_procs() {
+    struct proc *curr;
+    kprintf("NAME    PID PPID RBASE      PC         STACK      HEAP       PROTECTION   FLAGS\n");
+    for_each_proc(curr){
+        if(IS_RUNNABLE(curr)){
+            kprint_proc_info(curr);
+        }
+    }
+}
+
+//print the process state
+void kprint_proc_info(struct proc* curr) {
+    int ptable_idx = PADDR_TO_PAGED(curr->rbase)/32;
+    kprintf("%-08s %-03d %-04d 0x%08x 0x%08x 0x%08x 0x%08x %d 0x%08x %d %d\n",
+            curr->name,
+            curr->pid,
+            get_proc(curr->parent)->pid,
+            curr->rbase,
+            get_physical_addr(get_pc_ptr(curr),curr),
+            get_physical_addr(curr->sp,curr),
+            curr->heap_break,
+            ptable_idx,
+            curr->ptable[ptable_idx],
+            curr->s_flags,
+            curr->proc_nr);
+}
+
+void kprint_readyqueue(){
+    int i,j;
+    struct proc* curr;
+    kprintf(" q| ");
+    for (i = 0; i < NUM_QUEUES; i++) {
+        curr = ready_q[i][HEAD];
+        while(curr != NULL)
+        {
+            kprintf("%d ", curr->proc_nr);
+            curr = curr->next;
+        }
+    }
+    kprintf("| ");
+}
+
+void kprint_receiver_queue(struct proc* who){
+    struct proc* curr;
+    curr = who->sender_q;
+    if(curr)
+        kprintf(" %d sending queue: ", who->proc_nr);
+    while(curr != NULL){
+        kprintf("%d ",curr->proc_nr);
+        curr = curr->next_sender;
+    }
+}
+
+

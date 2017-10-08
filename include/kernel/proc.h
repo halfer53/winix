@@ -18,24 +18,27 @@
 #include <winix/timer.h>
 #include <winix/kwramp.h>
 
+//Init
+#define INIT                   		1
+
 //Kernel Process
 //Plz do make sure IDLE has the lowest process number
-#define NUM_TASKS                   2   //number of kernel tasks,
+#define NUM_TASKS                   2
 #define IDLE                    	-1
 #define SYSTEM                      0
 
-//User Process
-#define NUM_INIT_TASKS              1  //number of initial tasks, it's just init
-#define INIT                   		1
-
-
-//Process & Scheduling
-#define PROC_NAME_LEN           	20
+//Process Table
 #define NUM_PROCS               	10
 #define NUM_USER_PROCS              (NUM_PROCS - NUM_TASKS)
+
+//Scheduling
 #define NUM_QUEUES              	5
 #define MAX_PRIORITY            	0
-#define MIN_PRIORITY            	((NUM_QUEUES) - 1)
+#define MIN_PRIORITY            	4
+
+//Max string len for a process name 
+//(including NULL terminator)
+#define PROC_NAME_LEN           	16
 
 //min bss segment size
 #define MIN_BSS_SIZE            	200
@@ -171,7 +174,7 @@ extern struct proc *proc_table;
 extern struct proc *ready_q[NUM_QUEUES][2];
 extern struct proc *block_q[2];
 
-#define IS_PROCN_OK(i)                  ((i)> -NUM_TASKS && (i) < NUM_PROCS)
+#define IS_PROCN_OK(i)                  ((i)> -NUM_TASKS && (i) <= NUM_USER_PROCS)
 #define IS_PRIORITY_OK(priority)        (0 <= (priority) && (priority) < NUM_QUEUES)
 #define IS_KERNEL_PROC(p)               ((p)->rbase == NULL)
 #define IS_USER_PROC(p)                 ((p)->rbase != NULL)
@@ -184,13 +187,19 @@ extern struct proc *block_q[2];
 #define GET_HEAP_TOP(who)               ((who)->stack_top + GET_DEF_STACK_SIZE(who))
 
 //This macro assumes idle has the lowest process number in the system
-#define for_each_proc_except_idle(curr)\
-for(curr = proc_table + IDLE + 1; curr < proc_table + NUM_PROCS - NUM_TASKS + 1; curr++)
+#define for_each_proc(curr)\
+for(curr = proc_table + IDLE; curr <= proc_table + NUM_USER_PROCS ; curr++)
 
-//proc_table points at inex zero of the process table, so proc_table + 1 
+#define for_each_proc_except_idle(curr)\
+for(curr = proc_table + IDLE + 1; curr <= proc_table + NUM_USER_PROCS; curr++)
+
+//proc_table points at index zero of the process table, so proc_table + 1 
 //simply starts at init (init has process number 1)
 #define for_each_user_proc(curr)\
-for(curr = proc_table + 1; curr < proc_table + NUM_PROCS - NUM_TASKS + 1 ; curr++)
+for(curr = proc_table + 1; curr <= proc_table + NUM_USER_PROCS ; curr++)
+
+#define for_each_user_proc_reverse(curr)\
+for(curr = proc_table + NUM_USER_PROCS; curr >= proc_table + 1  ; curr--)
 
 struct initial_frame{
     int operation;
@@ -216,13 +225,12 @@ int alloc_proc_mem(struct proc *who, int tdb_length, int stack_size, int heap_si
 void enqueue_schedule(struct proc* p);
 reg_t* alloc_kstack(struct proc *who);
 int proc_memctl(struct proc* who ,vptr_t* page_addr, int flags);
-void end_process(struct proc *p);
 struct proc *get_proc(int proc_nr);
 struct proc *get_running_proc(int proc_nr);
 void kprint_runnable_procs();
 void kprint_proc_info(struct proc* curr);
 struct proc *pick_proc();
-void unsched(struct proc *p);
+void zombify(struct proc *p);
 int copyto_user_stack(struct proc *who, void *src, size_t len);
 vptr_t* copyto_user_heap(struct proc* who, void *src, size_t len);
 int build_initial_stack(struct proc* who, int argc, char** argv, char** env, struct proc* srcproc);

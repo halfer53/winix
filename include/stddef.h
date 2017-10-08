@@ -15,6 +15,8 @@
 #ifndef _STDDEF_H_
 #define _STDDEF_H_ 1
 
-#define NULL ((void*)0)
+#ifndef NULL
+#define	NULL		((void *)0)
+#endif
 
 #endif

@@ -17,8 +17,11 @@
 #include <winix/signal.h>
 
 PRIVATE unsigned int sigframe_code[SIGRET_CODE_LEN] = {0x1ee10001,0x200d0000};
-//addui sp,sp, 1
-//syscall
+
+/**
+    addui $sp, $sp, 1
+    syscall
+**/
 
 /**
  * How does signal works in winix
@@ -98,10 +101,6 @@ PRIVATE int build_signal_ctx(struct proc *who, int signum){
  *                return ERR if the user needs to handle the signal
  */
 PRIVATE int sys_sig_handler(struct proc *who, int signum){
-    
-    if(IS_KERNEL_PROC(who)){
-        _panic("kernel crashed", NULL);
-    }
 
     if(who->sig_table[signum].sa_handler == SIG_DFL){
         who->sig_status = signum;
@@ -141,14 +140,14 @@ PRIVATE int sys_sig_handler(struct proc *who, int signum){
  * @return        
  */
 int send_sig(struct proc *who, int signum){
-    if(!IS_RUNNABLE(who))
-        return ERR;
+    if(!who || !IS_RUNNABLE(who))
+        return ESRCH;
 
     if(sys_sig_handler(who,signum) == OK)
         return OK;
 
-    if(build_signal_ctx(who,signum) != OK)
-        return ERR;
+    if(build_signal_ctx(who,signum))
+        return EINVAL;
     
     if(in_interrupt()){
         //interrupt the current system call

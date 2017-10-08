@@ -64,63 +64,9 @@ PUBLIC struct proc *current_proc;
  * 
  */
 
-
-
-//print out the list of processes currently in the ready_q
-//and the currently running process
-void kprint_runnable_procs() {
-    int i;
-    struct proc *curr;
-    kprintf("NAME    PID PPID RBASE      PC         STACK      HEAP       PROTECTION   FLAGS\n");
-    for (i = 0; i < NUM_PROCS; i++) {
-        curr = &_proc_table[i];
-        if(IS_RUNNABLE(curr)){
-            kprint_proc_info(curr);
-        }
-            
-    }
-}
-
-//print the process state
-void kprint_proc_info(struct proc* curr) {
-    int ptable_idx = PADDR_TO_PAGED(curr->rbase)/32;
-    kprintf("%-08s %-03d %-04d 0x%08x 0x%08x 0x%08x 0x%08x %d 0x%08x %d\n",
-            curr->name,
-            curr->pid,
-            curr->parent,
-            curr->rbase,
-            get_physical_addr(get_pc_ptr(curr),curr),
-            get_physical_addr(curr->sp,curr),
-            curr->heap_break,
-            ptable_idx,
-            curr->ptable[ptable_idx],
-            curr->s_flags);
-}
-
-void kprint_readyqueue(){
-    int i,j;
-    struct proc* curr;
-    kprintf(" q| ");
-    for (i = 0; i < NUM_QUEUES; i++) {
-        curr = ready_q[i][HEAD];
-        while(curr != NULL)
-        {
-            kprintf("%d ", curr->proc_nr);
-            curr = curr->next;
-        }
-    }
-    kprintf("| ");
-}
-
-void kprint_receiver_queue(struct proc* who){
-    struct proc* curr;
-    curr = who->sender_q;
-    if(curr)
-        kprintf(" %d sending queue: ", who->proc_nr);
-    while(curr != NULL){
-        kprintf("%d ",curr->proc_nr);
-        curr = curr->next_sender;
-    }
+pid_t get_next_pid(){
+    static pid_t pid = 2;
+    return pid++;
 }
 
 /**
@@ -256,11 +202,11 @@ void enqueue_schedule(struct proc* p) {
 }
 
 /**
- * unsched the process, the process will be removed from the
+ * zombify the process, the process will be removed from the
  * ready_q, and memory will be released by the system
  * @param p 
  */
-void unsched(struct proc *p){
+void zombify(struct proc *p){
     p->i_flags &= ~RUNNABLE;
     p->i_flags |= ZOMBIE;
     dequeue_schedule(p);
@@ -271,23 +217,8 @@ void unsched(struct proc *p){
  * only be called when a zombie process is released
  * @param p 
  */
-void free_slot(struct proc *p){
+void release_zombie(struct proc *p){
     p->i_flags = 0;
-}
-
-/**
- * Exits a process, release memory, unschedule the process
- * and frees its slot in the process table.
- *
- * Note:
- *   The process must not currently belong to any linked list.
- *
- * Side Effects:
- *   Process state is set to DEAD, and is returned to the free_proc list.
- **/
-void end_process(struct proc *p) {
-    unsched(p);
-    free_slot(p);
 }
 
 /**
@@ -297,13 +228,11 @@ void end_process(struct proc *p) {
 struct proc *get_free_proc_slot() {
     int i;
     struct proc *who;
-
-    for(i = 0; i < NUM_PROCS; i++)
-    {
-        who = &_proc_table[i];
+    for_each_user_proc(who){
         if(!(who->i_flags & IN_USE)){
             proc_set_default(who);
             who->i_flags |= IN_USE | RUNNABLE;
+            who->pid = get_next_pid();
             return who;
         }
     }
@@ -318,7 +247,6 @@ void proc_set_default(struct proc *p) {
     int pnr_bak = p->proc_nr;
     memset(p, 0, sizeof(struct proc));
     p->proc_nr = pnr_bak;
-    p->pid = p->proc_nr < 0 ? 0 : p->proc_nr;
 
     memset(p->regs, -1, NUM_REGS);
     p->cctrl = DEFAULT_CCTRL;
@@ -342,8 +270,6 @@ reg_t* alloc_kstack(struct proc *who){
     ptr_t *addr, *stack_top;
 
     stack_top = user_get_free_pages(who, KERNEL_STACK_SIZE, GFP_HIGH);
-
-    ASSERT(stack_top != NULL);
     
     addr = stack_top + KERNEL_STACK_SIZE - 1;
     *stack_top = STACK_MAGIC;
@@ -420,13 +346,12 @@ struct proc *start_kernel_proc(void (*entry)(), int proc_nr, const char *name, i
  */
 struct proc *start_user_proc(size_t *lines, size_t length, size_t entry, int options, const char *name){
     struct proc *p;
-    if(!(p = get_free_proc_slot()))
-        return NULL;
-
-    if(exec_proc(p,lines,length,entry,options,name) == ERR)
-        return NULL;
-    
-    return p;
+    if(p = get_free_proc_slot()){
+        if(exec_proc(p,lines,length,entry,options,name))
+            return NULL;
+        return p;
+    }
+    return NULL;
 }
 
 /**
@@ -539,7 +464,7 @@ vptr_t* copyto_user_heap(struct proc* who, void *src, size_t len){
 void init_proc() {
     int i, procnr_offset;
     struct proc *p;
-    int preset_pid;
+    int preset_pnr;
     //Initialise queues
 
     for (i = 0; i < NUM_QUEUES; i++) {
@@ -552,9 +477,8 @@ void init_proc() {
     for ( i = 0; i < NUM_PROCS; i++) {
         p = &_proc_table[i];
         proc_set_default(p);
-        preset_pid = i - procnr_offset;
-        p->proc_nr = preset_pid;
-        p->pid = preset_pid;
+        preset_pnr = i - procnr_offset;
+        p->proc_nr = preset_pnr;
     }
 
     proc_table = _proc_table;
