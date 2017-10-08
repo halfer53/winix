@@ -13,9 +13,9 @@ LIBS = syscall/_syscall.o syscall/wramp_syscall.o syscall/ipc_receive.o\
 		  syscall/_exit.o 
 LIBS_O = $(addprefix ../lib/, $(LIBS))
 
-.PHONY: wramp init 
+.PHONY: depend wramp init 
 
-init: | wramp init.srec
+init: | depend wramp init.srec
 
 init.srec: $(OBJECT) $(LIBS_O)
 	$(Q)wlink -v -o $(OUT) init.o $(LIBS_O) > $(MAIN_DIR)/tools/kdbg_srec/init.kdbg
@@ -26,9 +26,13 @@ ifeq ($(KBUILD_VERBOSE),0)
 	@echo "LD \t INIT\nBIN\t INIT"
 endif
 
-wramp: $(OBJECT)
+.PHONY: depend init
 
-$(ASSEMBLY): %.s: %.c $(INCLUDES)
+all: | depend init
+
+init: $(OBJECT)
+
+$(ASSEMBLY): %.s: %.c
 	$(Q)wcc $(CFLAGS) -S -N -I$(INCLUDE_DIR) -o $@ $<
 ifeq ($(KBUILD_VERBOSE),0)
 	@echo "CC \t $<"
@@ -41,7 +45,7 @@ ifeq ($(KBUILD_VERBOSE),0)
 endif
 
 depend:
-	makedepend -I$(INCLUDE_DIR) $(SOURCES)
+	$(Q)makedepend -o.s -I$(INCLUDE_DIR) $(SOURCES)
 
 clean:
 	$(Q)-rm -f $(OBJECT) $(ASSEMBLY) $(OUT)
@@ -50,3 +54,9 @@ ifeq ($(KBUILD_VERBOSE),0)
 endif
 
 .DELETE_ON_ERROR:
+# DO NOT DELETE
+
+init.s: ../include/unistd.h ../include/sys/types.h ../include/sys/ipc.h
+init.s: ../include/signal.h ../include/sys/unistd.h ../include/sys/wait.h
+init.s: ../include/sys/syscall.h ../include/errno.h ../include/stddef.h
+init.s: ../include/stdlib.h

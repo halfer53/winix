@@ -21,7 +21,7 @@ OBJECT += $(SHELL_OBJECT)
 
 .PHONY : user shell
 
-shell: | user shell.srec
+all: | depend user shell.srec
 	
 shell.srec: $(SHELL_OBJECT) $(LIBS_O) $(SH)/*.h
 	$(Q)wlink $(LDFLAGS) -v -o $(SHELL_SREC) $(SHELL_OBJECT) $(LIBS_O) > \
@@ -34,7 +34,7 @@ ifeq ($(KBUILD_VERBOSE),0)
 endif
 
 user: $(OBJECT)
-$(ASSEMBLY): %.s: %.c $(INCLUDES)
+$(ASSEMBLY): %.s: %.c
 	$(Q)wcc $(CFLAGS) -S -N -I$(INCLUDE_DIR) -o $@ $<
 ifeq ($(KBUILD_VERBOSE),0)
 	@echo "CC \t $<"
@@ -52,7 +52,7 @@ foo: foo.c
 	wlink -v -o foo.srec foo.o
 
 depend:
-	makedepend -I$(INCLUDE_DIR) $(SOURCES)
+	$(Q)makedepend -o.s -I$(INCLUDE_DIR) $(SOURCES)
 
 clean:
 	$(Q)-rm -f $(OBJECT) $(ASSEMBLY) $(SHELL_SREC)
@@ -62,3 +62,22 @@ endif
 
 .DELETE_ON_ERROR:
 # DO NOT DELETE
+
+shell/shell.s: shell/shell.h ../include/unistd.h ../include/sys/types.h
+shell/shell.s: ../include/sys/ipc.h ../include/signal.h
+shell/shell.s: ../include/sys/unistd.h ../include/sys/wait.h
+shell/shell.s: ../include/sys/syscall.h ../include/errno.h
+shell/shell.s: ../include/stddef.h ../include/stdlib.h ../include/stdio.h
+shell/shell.s: ../include/string.h ../include/debug.h ../include/ucontext.h
+shell/shell.s: ../include/sys/ucontext.h ../include/sys/times.h shell/parse.h
+shell/shell.s: ../include/ctype.h
+shell/parse.s: ../include/stdlib.h ../include/stddef.h ../include/sys/types.h
+shell/parse.s: shell/parse.h ../include/ctype.h
+shell/shell_test.s: shell/shell.h ../include/unistd.h ../include/sys/types.h
+shell/shell_test.s: ../include/sys/ipc.h ../include/signal.h
+shell/shell_test.s: ../include/sys/unistd.h ../include/sys/wait.h
+shell/shell_test.s: ../include/sys/syscall.h ../include/errno.h
+shell/shell_test.s: ../include/stddef.h ../include/stdlib.h
+shell/shell_test.s: ../include/stdio.h ../include/string.h ../include/debug.h
+shell/shell_test.s: ../include/ucontext.h ../include/sys/ucontext.h
+shell/shell_test.s: ../include/sys/times.h shell/parse.h ../include/ctype.h

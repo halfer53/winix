@@ -9,6 +9,7 @@
 *.sublime-workspace
 *.obj
 *.log
+Makefile.bak
 kdbg.py
 tools/kdbg_srec/*.kdbg
 
