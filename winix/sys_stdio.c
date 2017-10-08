@@ -14,11 +14,13 @@
 #include <kernel/kernel.h>
 #include <ctype.h>
 
+
+#define IS_VALID_SERIAL_CODE(c) (isprint(c) || c - 7 < 6)
 /**
  * Writes a character to serial port 1.
  **/
 int kputc(const int c) {
-    if(isprint(c) || c - 7 < 6){
+    if(IS_VALID_SERIAL_CODE(c)){
         while(!(RexSp1->Stat & 2));
         RexSp1->Tx = c;
         return c;

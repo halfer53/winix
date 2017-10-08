@@ -14,6 +14,7 @@
 #include <signal.h>
 #include <const.h>
 
+extern pid_t _pid;
 
 #endif
 

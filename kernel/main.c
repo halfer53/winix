@@ -14,7 +14,7 @@
 
 #include "winix.h"
 #include <init_bin.c>
-#include <sh_bin.c>
+#include <shell_bin.c>
 
 /**
  * Entry point for WINIX.
@@ -39,9 +39,9 @@ void main() {
     p = start_user_proc(init_code, init_code_length, init_pc, init_offset, "init");
     add_free_mem(init_code, init_code_length);
 
-    p = start_user_proc(sh_code,sh_code_length,sh_pc, sh_offset,"sh");
+    p = start_user_proc(shell_code,shell_code_length,shell_pc, shell_offset,"shell");
     p->parent = 1;//hack 
-    add_free_mem(sh_code,sh_code_length);
+    add_free_mem(shell_code,shell_code_length);
     
     
     //Initialise exceptions

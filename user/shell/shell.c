@@ -48,6 +48,11 @@ struct cmd_internal builtin_commands[] = {
     { generic, NULL }
 };
 
+void testfoo(){
+    int n = 100;
+    int m = 32;
+}
+
 
 int main() {
     int ret;
@@ -56,7 +61,6 @@ int main() {
 
     c = buf;
     end_buf = c + MAX_LINE -2;
-
     while(1) {
         printf("WINIX> ");
         c = buf;

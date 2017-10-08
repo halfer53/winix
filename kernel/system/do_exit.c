@@ -68,7 +68,7 @@ void exit_proc(struct proc *who, int status){
     int i, children = 0;
     struct message* mesg = curr_mesg();
 
-    KPRINT_DEBUG(("%s[%d] exit status %d signal %d\n",who->name, who->proc_nr, 
+    KDEBUG(("%s[%d] exit status %d signal %d\n",who->name, who->proc_nr, 
                                               status, who->sig_status));
 
     unsched(who);
@@ -93,6 +93,7 @@ void exit_proc(struct proc *who, int status){
                 mp->s_flags &= ~VFORK;
                 
                 syscall_reply(who->proc_nr, mp->proc_nr, mesg);
+                free_slot(who);
                 return;
             }
         }

@@ -28,8 +28,10 @@ is_vfork_parent:
 
 is_vfork_child:			# in child, we do not modify the stack.
 						# stack is only popped when parent returns
+	la $3, _pid
+	sw $0, 0($3)		# invalidate pid cache
 	lw $ra, 4($sp)
 	lw $3, 3($sp)
 	jr $ra
 
-    
+.extern	_pid 1

@@ -194,15 +194,15 @@ PRIVATE void syscall_handler() {
             //fall through to send
 
         case WINIX_SEND:
-            *retval = wini_send(dest, m);
+            *retval = do_send(dest, m);
             break;
 
         case WINIX_RECEIVE:
-            *retval = wini_receive(m);
+            *retval = do_receive(m);
             break;
 
         case WINIX_NOTIFY:
-            *retval = wini_notify(dest,m);
+            *retval = do_notify(dest,m);
             break;
 
         default:
@@ -229,7 +229,7 @@ PRIVATE void break_handler() {
  *   Current process is killed, and scheduler is called (i.e. this handler does not return).
  **/
 PRIVATE void arith_handler() {
-    KPRINT_DEBUG(("Arith Exception: \"%s (%d)\" PC=0x%08x.\r\n", 
+    KDEBUG(("Arith Exception: \"%s (%d)\" PC=0x%08x.\r\n", 
         current_proc->name, current_proc->proc_nr, current_proc->pc));
     send_sig(current_proc,SIGFPE);
     sched();

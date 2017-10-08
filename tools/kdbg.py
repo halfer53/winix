@@ -4,9 +4,9 @@ import os
 import glob
 import uuid
 
-userfile_dirs = {
-    "sh.c":"user/sh.c",
-    "init.c":"init/init.c"
+userfile_dir = {
+    "shell.kdbg":"user/",
+    "init.kdbg":"init/"
 }
 
 def main():
@@ -50,11 +50,12 @@ def main():
                     .replace(",","").replace(".o",".c")
     # print(filename)
     # print(linecount)
+    # print(in_file)
 
     tmp_filename = str(uuid.uuid4())
 
-    if(filename in userfile_dirs):
-        filename = userfile_dirs[filename]
+    if(in_file in userfile_dir):
+        filename = userfile_dir[in_file] + filename
 
     wcc_cmd = ["wcc","-N", "-g", "-S", "-I"+main_path+"/include",\
                      "-o",tmp_filename, main_path+"/"+filename, ]

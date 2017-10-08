@@ -23,7 +23,7 @@
  *   -1 if destination is invalid
  **/
 
-int wini_send(int dest, struct message *m) {
+int do_send(int dest, struct message *m) {
     struct proc *pDest;
 
     current_proc->message = m; //save for later
@@ -65,7 +65,7 @@ int wini_send(int dest, struct message *m) {
  *
  * Returns:            0
  **/
-int wini_receive(struct message *m) {
+int do_receive(struct message *m) {
     struct proc *p = current_proc->sender_q;
     
     //If a process is waiting to send to this process, deliver it immediately.
@@ -114,7 +114,7 @@ int wini_receive(struct message *m) {
  *   0 on success
  *   -1 if destination is invalid
  **/
-int wini_notify(int dest, struct message *m) {
+int do_notify(int dest, struct message *m) {
     struct proc *pDest;
 
     current_proc->message = m; //save for later
@@ -153,7 +153,7 @@ int winix_notify(int dest, struct message *m) {
 
 int syscall_reply(int reply, int dest,struct message* m){
     m->reply_res = reply;
-    return winix_notify(dest,m);
+    return do_notify(dest,m);
 }
 
 //send used by interrupt
@@ -164,5 +164,5 @@ int interrupt_send(int dest, struct message* pm){
     //curr proc is the process that generated exception
     //most likely segmentation fault or float fault
     current_proc->s_flags |= RECEIVING;
-    return wini_send(dest, pm);
+    return do_send(dest, pm);
 }
