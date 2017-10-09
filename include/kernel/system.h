@@ -34,4 +34,7 @@ struct syscall_ctx *interrupted_syscall_ctx();
 void kprint_sysinfo();
 void init_syscall_table();
 
+
+#define LINK_SYSCALL(i,fn)  syscall_table[i] = fn
+
 #endif

@@ -126,9 +126,6 @@ struct syscall_ctx *interrupted_syscall_ctx(){
     return &syscall_context;
 }
 
-
-#define LINK_SYSCALL(i,fn)  syscall_table[i] = fn
-
 void init_syscall_table(){
     LINK_SYSCALL(SYSCALL_NONE, no_syscall);     //0
     LINK_SYSCALL(SYSCALL_TIMES, do_times);      //1

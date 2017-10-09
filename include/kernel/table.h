@@ -4,6 +4,8 @@
 #include <sys/ipc.h>
 #include <kernel/proc.h>
 
+#define INITILISE_ARRAY(n,val)  
+
 struct boot_image{
     char name[PROC_NAME_LEN];
     void (*entry)();

@@ -61,6 +61,7 @@ PUBLIC struct proc *current_proc;
  * 
  */
 
+
 pid_t get_next_pid(){
     static pid_t pid = 2;
     return pid++;
@@ -485,8 +486,7 @@ void init_proc() {
     //Initialise queues
 
     for (i = 0; i < NUM_QUEUES; i++) {
-        ready_q[i][HEAD] = NULL;
-        ready_q[i][TAIL] = NULL;
+        ready_q[i][HEAD]  = ready_q[i][TAIL] = NULL;
     }
 
     procnr_offset = NUM_TASKS - 1;
@@ -498,9 +498,7 @@ void init_proc() {
         p->proc_nr = preset_pnr;
     }
 
-    proc_table = _proc_table;
-    proc_table += procnr_offset;
-    //No current process yet.
+    proc_table = _proc_table + procnr_offset;
     current_proc = NULL;
 }
 

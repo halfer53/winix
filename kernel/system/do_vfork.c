@@ -10,7 +10,7 @@ int do_vfork(struct proc* parent, struct message* m){
         parent->s_flags |= VFORK;
         return SUSPEND;
     }
-    return EINVAL;
+    return EAGAIN;
 }
 
 

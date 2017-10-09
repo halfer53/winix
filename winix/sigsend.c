@@ -142,7 +142,7 @@ PRIVATE int sys_sig_handler(struct proc *who, int signum){
  * @return        
  */
 int send_sig(struct proc *who, int signum){
-    if(!who || !IS_RUNNABLE(who))
+    if(!who)
         return ESRCH;
 
     if(sys_sig_handler(who,signum) == OK)

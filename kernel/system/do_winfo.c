@@ -28,6 +28,6 @@ int do_winfo(struct proc *who, struct message *m){
         default:
             break;
     }
-    return OK;
+    return EINVAL;
 }
 

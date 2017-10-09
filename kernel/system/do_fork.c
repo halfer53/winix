@@ -97,9 +97,9 @@ int sys_fork(struct proc *parent) {
     if (child = get_free_proc_slot()) {
         copy_pcb(parent,child);
 
-        if(copy_mm(parent,child) == ERR){
+        if(copy_mm(parent,child)){
             release_proc_slot(child);
-            return ERR;
+            return ENOMEM;
         }
 
         copy_pregs(parent,child);
@@ -117,7 +117,7 @@ int sys_fork(struct proc *parent) {
         child->parent = parent->proc_nr;
         return child->proc_nr;
     }
-    return ERR;
+    return EAGAIN;
 }
 
 int do_fork(struct proc *who, struct message *m){
@@ -125,8 +125,9 @@ int do_fork(struct proc *who, struct message *m){
     struct proc* child;
     child_pr = sys_fork(who);
     
-    if(child_pr == ERR)
-        return EINVAL;
+    //if and error is encounted
+    if(child_pr < 0)
+        return child_pr;
     
     //send 0 to child
     syscall_reply(0, child_pr, m);
