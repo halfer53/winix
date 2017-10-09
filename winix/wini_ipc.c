@@ -34,6 +34,8 @@ int do_send(int dest, struct message *m) {
     //Is the destination valid?
     if (pDest) {
 
+        //if the destination is waiting for the curr proc
+        //avoid deadlock
         if(pDest->s_flags & SENDING){
             struct proc* xp = current_proc->sender_q;
             while(xp){
@@ -49,10 +51,12 @@ int do_send(int dest, struct message *m) {
 
             //Unblock receiver
             pDest->s_flags &= ~RECEIVING;
+            pDest->regs[0] = m->reply_res;
             enqueue_head(ready_q[pDest->priority], pDest);
         }else {
             
-            //Otherwise, block current process and add it to head of sending queue of the destination.
+            //Otherwise, block current process and add it to
+            // head of sending queue of the destination.
             current_proc->s_flags |= SENDING;
             current_proc->next_sender = pDest->sender_q;
             pDest->sender_q = current_proc;
@@ -62,7 +66,8 @@ int do_send(int dest, struct message *m) {
             if(dest == SYSTEM)
                 kprintf("\nSyscall %d from %d|", m->type, m->src);
         }else if(get_debug_ipc_count()){
-            kprintf("\nIPC: SEND to %d from %d type %d| ",dest, current_proc->proc_nr,m->type);
+            kprintf("\nIPC: SEND to %d from %d type %d| ",
+                        dest, current_proc->proc_nr,m->type);
         }
         return OK;
     }

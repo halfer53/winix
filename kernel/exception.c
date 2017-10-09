@@ -203,7 +203,7 @@ PRIVATE void syscall_handler() {
 
         case WINIX_SEND:
             *retval = do_send(dest, m);
-            if(*retval == ERR)
+            if(*retval < 0)
                 current_proc->s_flags &= ~RECEIVING;
             break;
 

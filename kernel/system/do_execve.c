@@ -47,7 +47,6 @@ int exec_proc(struct proc *who,size_t *lines, size_t length, size_t entry, int o
 
     build_initial_stack(who, 0, NULL, initial_env, get_proc(SYSTEM));
     memcpy(who->rbase + offset, lines , length);
-    who->length = length;
     enqueue_schedule(who);
     return OK;
 }

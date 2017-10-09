@@ -30,7 +30,7 @@ void _panic(const char* str, const char* file) {
         kprintf(str);
 
     if(file)
-        kprintf("in file %s\n", file);
+        kprintf(" in %s\n", file);
         
     while(1) {
         RexParallel->Ctrl = 0;

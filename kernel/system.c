@@ -32,7 +32,6 @@ void system_main() {
     syscall_handler_t handler;
     struct message* mesg = &m;
 
-    init_syscall_table();
     kprint_sysinfo();
     getcontext(&recv_ctx);
 

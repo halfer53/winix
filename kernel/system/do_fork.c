@@ -103,14 +103,6 @@ int sys_fork(struct proc *parent) {
         }
 
         copy_pregs(parent,child);
-        
-        //Divide the quantum size between the parent and child
-        //if quantum size is 1, quantum size is not changed
-        if(parent->quantum != 1){
-            //child get an extra quantum if the quantum size is odd
-            child->quantum = (child->quantum + 1) / 2; 
-            parent->quantum /= 2;
-        }
 
         child->time_used = child->sys_time_used = 0;
 

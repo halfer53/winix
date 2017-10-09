@@ -124,7 +124,6 @@ typedef struct proc {
     ptr_t* heap_break;             	//Heap_break is also the physical address of the curr
                                 	//Brk, retrived by syscall brk(2)
     ptr_t* heap_bottom;         	//Bottom of the process image
-    size_t length;                 	//Length is the total of text + data segment
 
     /* Protection */
     reg_t protection_table[PTABLE_LEN];

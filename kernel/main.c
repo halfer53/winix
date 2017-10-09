@@ -17,34 +17,27 @@
 #include <init_bin.c>
 #include <shell_bin.c>
 
-void start_init();
 void init_kernel_tasks();
+void start_init();
+void start_bins();
 
 /**
  * Entry point for WINIX.
  **/
 void main() {
-    struct proc *p;
 
     init_bitmap();
     init_mem_table();
     init_proc();
     init_holes();
     init_sched();
+    init_syscall_table();
 
     init_kernel_tasks();
     start_init();
+    start_bins();
 
-    add_free_mem(boot_table, sizeof(boot_table));
-
-    p = start_user_proc(shell_code,shell_code_length, shell_pc, shell_offset,"shell");
-    p->parent = INIT;//hack 
-    add_free_mem(shell_code,shell_code_length);
-    
-    //Initialise exceptions
     init_exceptions();
-    //Kick off first task. Note: never returns
-    schedule:
     sched();
 }
 
@@ -56,6 +49,7 @@ void init_kernel_tasks(){
         p = start_kernel_proc(task->entry, task->proc_nr, task->name, task->quantum);
         ASSERT(p != NULL);
     }
+    add_free_mem(boot_table, sizeof(boot_table));
 }
 
 void start_init(){
@@ -66,4 +60,11 @@ void start_init(){
     if(exec_proc(init,init_code,init_code_length,init_pc,init_offset,"init"))
         PANIC("init");
     add_free_mem(init_code, init_code_length);
+}
+
+void start_bins(){
+    struct proc* p;
+    p = start_user_proc(shell_code,shell_code_length, shell_pc, shell_offset,"shell");
+    p->parent = INIT;//hack 
+    add_free_mem(shell_code,shell_code_length);
 }
