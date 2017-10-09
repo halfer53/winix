@@ -25,7 +25,7 @@
  *   0 on success
  *   -1 if destination is invalid
  **/
-int wini_send(int dest, struct message *m);
+int do_send(int dest, struct message *m);
 
 /**
  * non-blocking send
@@ -37,7 +37,7 @@ int wini_send(int dest, struct message *m);
  *   0 on success
  *   -1 if destination is invalid
  **/
-int wini_notify(int dest, struct message *m);
+int do_notify(int dest, struct message *m);
 
 /**
  * Receives a message.
@@ -47,7 +47,7 @@ int wini_notify(int dest, struct message *m);
  *
  * Returns:            0
  **/
-int wini_receive(struct message *m);
+int do_receive(struct message *m);
 
 /**
  * send used by interrupt handler during exception
