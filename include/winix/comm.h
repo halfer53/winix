@@ -21,6 +21,11 @@
 
 #define INT_MAX         0x7FFFFFFF
 #define INT_MIN         0x80000000
+#define UINT_MAX        0xffffffff
+
+#define LONG_MIN (-2147483647L-1)/* minimum value of a long */
+#define LONG_MAX  2147483647L	/* maximum value of a long */
+#define ULONG_MAX 0xFFFFFFFFL	/* maximum value of an unsigned long */
 
 #define EXIT_MAGIC      0x10293847
 

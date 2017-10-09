@@ -6,7 +6,7 @@ RELEASE_FLAGS =
 
 # List of user libraries used by the kernel
 KLIB = syscall/wramp_syscall syscall/ipc ansi/string util/util \
-		gen/ucontext stdlib/atoi util/debug
+		gen/ucontext stdlib/atoi util/debug stdlib/errno
 
 L_HEAD = winix/limits/limits_head.o
 L_TAIL = winix/limits/limits_tail.o

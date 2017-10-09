@@ -22,7 +22,8 @@ CMD_PROTOTYPE(test_alarm);
 CMD_PROTOTYPE(test_signal);
 CMD_PROTOTYPE(test_nohandler);
 CMD_PROTOTYPE(test_vfork);
-CMD_PROTOTYPE(test_hack);
+CMD_PROTOTYPE(test_deadlock);
+CMD_PROTOTYPE(test_ipc);
 
 struct cmd_internal test_commands[] = {
     { test_malloc, "malloc"}, 
@@ -32,7 +33,8 @@ struct cmd_internal test_commands[] = {
     { test_alarm, "alarm"},
     { test_signal, "signal"},
     { test_vfork, "vfork"},
-    { test_hack, "hack"},
+    { test_deadlock, "deadlock"},
+    { test_ipc, "ipc"},
     { test_nohandler, NULL},
 };
 
@@ -59,9 +61,38 @@ int test_vfork(int argc, char **argv){
     return 0;
 }
 
-int test_hack(int argc, char **argv){
-    long *a = (void *)0xffff;
-    *a = 0;
+int test_ipc(int argc, char **argv){
+    pid_t pid;
+    struct message m;
+    if(pid = fork()){
+        m.type = 100;
+        winix_sendrec(pid,&m);
+        printf("received %d from child\n",m.reply_res);
+        kill(pid, SIGKILL);
+    }else{
+        winix_receive(&m);
+        printf("received %d from parent\n",m.type);
+        m.reply_res = 200;
+        winix_send(getppid(), &m);
+        wait(NULL);
+    }
+    return 0;
+}
+
+int test_deadlock(int argc, char **argv){
+    pid_t pid;
+    struct message m;
+    if(pid = fork()){
+        int n = 100000;
+        while(n--);
+        if(winix_send(pid,&m))
+            perror("send to child");
+        kill(pid,SIGKILL);
+    }else{
+        int ret;
+        ret = winix_send(getppid(),&m);
+        while(1);
+    }
     return 0;
 }
 

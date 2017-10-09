@@ -28,9 +28,22 @@ int do_send(int dest, struct message *m) {
     struct proc *pDest;
 
     current_proc->message = m; //save for later
-
+    
+    pDest = IS_KERNELN(dest) ? get_proc(dest) : get_proc_by_pid(dest);
+    
     //Is the destination valid?
-    if (pDest = get_running_proc(dest)) {
+    if (pDest) {
+
+        if(pDest->s_flags & SENDING){
+            struct proc* xp = current_proc->sender_q;
+            while(xp){
+                if(xp == pDest){
+                    m->reply_res = EDEADLK;
+                    return ERR;
+                }
+                xp = xp->next_sender;
+            }
+        }
         
         if (pDest->s_flags & RECEIVING) {
             *(pDest->message) = *m;
@@ -38,7 +51,6 @@ int do_send(int dest, struct message *m) {
             //Unblock receiver
             pDest->s_flags &= ~RECEIVING;
             enqueue_head(ready_q[pDest->priority], pDest);
-            
         }else {
             
             //Otherwise, block current process and add it to head of sending queue of the destination.
@@ -67,8 +79,22 @@ int do_send(int dest, struct message *m) {
  * Returns:            0
  **/
 int do_receive(struct message *m) {
-    struct proc *p = current_proc->sender_q;
+    struct proc *p;
+
+    if(current_proc->notify_pending){
+        int i;
+        unsigned int map = current_proc->notify_pending;
+        for(i = 0; i < 32; i++){
+            if(map & (1 << i)){
+                unset_bit(current_proc->notify_pending, i);
+                i = SID_TO_TASK_NR(i);
+                *m = i == INTERRUPT ? *get_exception_m() : *(get_proc(i)->message);
+                return OK;
+            }
+        }
+    }
     
+    p = current_proc->sender_q;
     //If a process is waiting to send to this process, deliver it immediately.
     if (p != NULL) {
         
@@ -89,17 +115,6 @@ int do_receive(struct message *m) {
         }
         return OK;
     }
-    else if(current_proc->notify_pending != 0){
-        int i;
-        unsigned int map = current_proc->notify_pending;
-        for(i = 0; i < 32; i++){
-            if(map & (1 << i)){
-                unset_bit(current_proc->notify_pending, i);
-                *m = *(get_proc(i)->message);
-                return OK;
-            }
-        }
-    }
 
     current_proc->message = m;
     current_proc->s_flags |= RECEIVING;
@@ -115,16 +130,14 @@ int do_receive(struct message *m) {
  *   0 on success
  *   -1 if destination is invalid
  **/
-int do_notify(int dest, struct message *m) {
-    struct proc *pDest;
-
-    current_proc->message = m; //save for later
+int do_notify(int src, int dest, struct message *m) {
+    struct proc *pDest, *pSrc;
 
     //Is the destination valid?
     if (pDest = get_running_proc(dest)) {
 
         if(get_debug_ipc_count())
-                kprintf("\nNOTIFY %d from %d type %d| ",dest, current_proc->proc_nr,m->type);
+                kprintf("\nNOTIFY %d from %d type %d| ",dest, src ,m->type);
             
         //If destination is waiting, deliver message immediately.
         if (pDest->s_flags & RECEIVING) {
@@ -136,7 +149,8 @@ int do_notify(int dest, struct message *m) {
             pDest->s_flags &= ~RECEIVING;
             enqueue_head(ready_q[pDest->priority], pDest);
         }else{
-            set_bit(pDest->notify_pending, current_proc->proc_nr);
+            int sid = TASK_NR_TO_SID(src);
+            set_bit(pDest->notify_pending, sid);
         }
         //do nothing if it's not waiting
         return OK;
@@ -154,7 +168,7 @@ int winix_notify(int dest, struct message *m) {
 
 int syscall_reply(int reply, int dest,struct message* m){
     m->reply_res = reply;
-    return do_notify(dest,m);
+    return do_notify(SYSTEM, dest,m);
 }
 
 //send used by interrupt

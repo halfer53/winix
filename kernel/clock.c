@@ -42,7 +42,7 @@ void clock_main(){
 }
 
 bool has_next_timeout(){
-    return next_timeout > 0 && next_timeout <= system_uptime;
+    return next_timeout <= system_uptime;
 }
 
 void do_ticks(){
@@ -86,11 +86,10 @@ void clock_handler(){
         bill_ptr->sys_time_used++;
     }
 
-    if(next_timeout == system_uptime){
+    if(next_timeout <= system_uptime){
         struct message* m = get_exception_m();
         m->type = DO_CLOCKTICK;
-        do_notify(CLOCK, m);
+        do_notify(INTERRUPT, CLOCK, m);
     }
-
     sched();
 }

@@ -37,7 +37,7 @@ int do_send(int dest, struct message *m);
  *   0 on success
  *   -1 if destination is invalid
  **/
-int do_notify(int dest, struct message *m);
+int do_notify(int src, int dest, struct message *m);
 
 /**
  * Receives a message.

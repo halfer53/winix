@@ -20,6 +20,7 @@
 
 //Init
 #define INIT                   		1
+#define INTERRUPT                   -30
 
 //Kernel Process
 //Plz do make sure IDLE has the lowest process number
@@ -115,7 +116,8 @@ typedef struct proc {
     struct message* message;    	//Message Buffer
                                 	//len 21 words
                                 	//DO NOT MODIFY or CHANGE the order of the above
-                                	//fields unless you know what you are doing
+                                    //fields unless you know what you are doing
+    
 
     /* Heap and Stack*/
     ptr_t* stack_top;             	//Stack_top is the physical address
@@ -133,6 +135,7 @@ typedef struct proc {
 
     /* Pending messages, used by winix_notify */
     unsigned int notify_pending;	//bitmap for masking list of pending messages by system proc
+    int pending_type;
 
     /* Scheduling */
     struct proc *next;            	//Next pointer
@@ -179,6 +182,7 @@ extern struct proc *block_q[2];
 #define IS_PROCN_OK(i)                  ((i)> -NUM_TASKS && (i) <= NUM_USER_PROCS)
 #define IS_PRIORITY_OK(priority)        (0 <= (priority) && (priority) < NUM_QUEUES)
 #define IS_KERNEL_PROC(p)               ((p)->rbase == NULL)
+#define IS_KERNELN(n)                   ((n)<= 0 && (n)> -NUM_TASKS)
 #define IS_USER_PROC(p)                 ((p)->rbase != NULL)
 #define IS_IDLE(p)                      ((p)->proc_nr == IDLE)
 #define IS_SYSTEM(p)                    ((p)->proc_nr == SYSTEM)
@@ -188,6 +192,9 @@ extern struct proc *block_q[2];
 #define CHECK_STACK(p)                  (*((p)->stack_top) == STACK_MAGIC)
 #define GET_DEF_STACK_SIZE(who)         (IS_USER_PROC(who) ? USER_STACK_SIZE : KERNEL_STACK_SIZE)
 #define GET_HEAP_TOP(who)               ((who)->stack_top + GET_DEF_STACK_SIZE(who))
+
+#define TASK_NR_TO_SID(tnr)             (tnr <= 0 ? -tnr + 1 : tnr)
+#define SID_TO_TASK_NR(sid)             (-sid + 1)
 
 
 #define foreach_proc_slot(curr)\

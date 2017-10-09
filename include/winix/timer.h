@@ -14,9 +14,12 @@
 #ifndef _W_TIMER_H_
 #define _W_TIMER_H_ 1
 
+#include <winix/comm.h>
+
 typedef void (*timerhandler_t)(int,clock_t);
 
-#define TIMER_INUSE    1
+#define TIMER_INUSE         1
+#define TIMER_NEVER       (LONG_MAX)  
 
 struct timer{
     int proc_nr;

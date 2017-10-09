@@ -130,7 +130,7 @@ syscall/kill.s: ../include/sys/syscall.h ../include/sys/ipc.h
 syscall/kill.s: ../include/signal.h ../include/stddef.h ../include/stdlib.h
 syscall/kill.s: ../include/stdio.h ../include/string.h ../include/const.h
 syscall/ipc.s: ../include/sys/ipc.h ../include/signal.h
-syscall/ipc.s: ../include/sys/types.h ../include/stddef.h
+syscall/ipc.s: ../include/sys/types.h ../include/stddef.h ../include/errno.h
 syscall/sysconf.s: ../include/lib.h ../include/errno.h ../include/sys/types.h
 syscall/sysconf.s: ../include/sys/syscall.h ../include/sys/ipc.h
 syscall/sysconf.s: ../include/signal.h ../include/stddef.h

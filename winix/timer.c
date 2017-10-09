@@ -60,7 +60,7 @@ struct timer* dequeue_alarm(){
         if(pending_timers)
             next_timeout = pending_timers->time_out;
         else
-            next_timeout = 0;
+            next_timeout = TIMER_NEVER;
     }else{
         PANIC("No alarm in the queue");
     }
