@@ -150,9 +150,10 @@ int send_sig(struct proc *who, int signum){
     if(build_signal_ctx(who,signum))
         return EINVAL;
     
-    if(in_interrupt()){
-        //interrupt the current system call
-        if(who->proc_nr == curr_mesg()->src){
+    if(who->proc_nr == curr_mesg()->src){
+        if(IS_SYSTEM(current_proc)){
+            intr_syscall();
+        }else{
             get_proc(SYSTEM)->pc = &intr_syscall;
         }
     }

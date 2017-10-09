@@ -124,7 +124,7 @@ int do_notify(int dest, struct message *m) {
     if (pDest = get_running_proc(dest)) {
 
         if(get_debug_ipc_count())
-                kprintf("\nNOTIFY %d from %d reply %d| ",dest, current_proc->proc_nr,m->type);
+                kprintf("\nNOTIFY %d from %d type %d| ",dest, current_proc->proc_nr,m->type);
             
         //If destination is waiting, deliver message immediately.
         if (pDest->s_flags & RECEIVING) {

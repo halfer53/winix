@@ -94,7 +94,8 @@ do_execve.s: ../../include/winix/wini_ipc.h ../../include/winix/rex.h
 do_execve.s: ../../include/winix/mem_alloc.h ../../include/kernel/system.h
 do_execve.s: ../../include/winix/syscall_ctx.h ../../include/ucontext.h
 do_execve.s: ../../include/sys/ucontext.h ../../include/winix/srec.h
-do_execve.s: ../../include/kernel/table.h
+do_execve.s: ../../include/kernel/table.h ../../include/kernel/clock.h
+do_execve.s: ../../include/kernel/idle.h
 do_exit.s: ../../include/kernel/kernel.h ../../include/sys/ipc.h
 do_exit.s: ../../include/signal.h ../../include/sys/types.h
 do_exit.s: ../../include/sys/syscall.h ../../include/sys/unistd.h

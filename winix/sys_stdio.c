@@ -277,6 +277,14 @@ int kinfo(const char *format, ...){
     return kprintf_vm(format,arg,0);
 }
 
+int kerror(const char *format, ...){
+    void *arg = &format;
+    arg = ((char*)arg) + 1;
+
+    kputs("[ERROR ] ");
+    return kprintf_vm(format,arg,0);
+}
+
 int kdebug(const char *format, ...){
     void *arg = &format;
     arg = ((char*)arg) + 1;

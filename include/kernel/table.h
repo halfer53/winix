@@ -5,6 +5,9 @@
 #include <sys/ipc.h>
 #include <winix/syscall_ctx.h>
 #include <kernel/proc.h>
+#include <kernel/clock.h>
+#include <kernel/system.h>
+#include <kernel/idle.h>
 
 #define INITILISE_ARRAY(n,val)  
 

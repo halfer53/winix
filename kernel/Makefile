@@ -59,6 +59,7 @@ main.s: ../include/winix/wini_ipc.h ../include/winix/rex.h
 main.s: ../include/winix/mem_alloc.h ../include/kernel/system.h
 main.s: ../include/winix/syscall_ctx.h ../include/ucontext.h
 main.s: ../include/sys/ucontext.h ../include/kernel/table.h
+main.s: ../include/kernel/clock.h ../include/kernel/idle.h
 main.s: ../include/init_bin.c ../include/shell_bin.c
 proc.s: ../include/kernel/kernel.h ../include/sys/ipc.h ../include/signal.h
 proc.s: ../include/sys/types.h ../include/sys/syscall.h
@@ -92,7 +93,8 @@ system.s: ../include/winix/wini_ipc.h ../include/winix/rex.h
 system.s: ../include/winix/mem_alloc.h ../include/kernel/system.h
 system.s: ../include/winix/syscall_ctx.h ../include/ucontext.h
 system.s: ../include/sys/ucontext.h ../include/kernel/sched.h
-system.s: ../include/kernel/table.h
+system.s: ../include/kernel/table.h ../include/kernel/clock.h
+system.s: ../include/kernel/idle.h
 exception.s: ../include/kernel/kernel.h ../include/sys/ipc.h
 exception.s: ../include/signal.h ../include/sys/types.h
 exception.s: ../include/sys/syscall.h ../include/sys/unistd.h
@@ -127,6 +129,8 @@ clock.s: ../include/winix/wini_ipc.h ../include/winix/rex.h
 clock.s: ../include/winix/mem_alloc.h ../include/kernel/system.h
 clock.s: ../include/winix/syscall_ctx.h ../include/ucontext.h
 clock.s: ../include/sys/ucontext.h ../include/kernel/clock.h
+clock.s: ../include/kernel/table.h ../include/kernel/idle.h
+clock.s: ../include/kernel/exception.h
 sched.s: ../include/kernel/kernel.h ../include/sys/ipc.h ../include/signal.h
 sched.s: ../include/sys/types.h ../include/sys/syscall.h
 sched.s: ../include/sys/unistd.h ../include/stddef.h ../include/util.h
@@ -160,4 +164,4 @@ table.s: ../include/winix/wini_ipc.h ../include/winix/rex.h
 table.s: ../include/winix/mem_alloc.h ../include/kernel/system.h
 table.s: ../include/winix/syscall_ctx.h ../include/ucontext.h
 table.s: ../include/sys/ucontext.h ../include/kernel/table.h
-table.s: ../include/kernel/idle.h
+table.s: ../include/kernel/clock.h ../include/kernel/idle.h
