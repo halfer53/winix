@@ -28,6 +28,8 @@ void system_main() {
     int reply;
     syscall_handler_t handler;
     struct message* mesg = &m;
+
+    init_syscall_table();
     kprint_sysinfo();
     getcontext(&recv_ctx);
 
@@ -124,6 +126,28 @@ struct syscall_ctx *interrupted_syscall_ctx(){
     return &syscall_context;
 }
 
+
+#define LINK_SYSCALL(i,fn)  syscall_table[i] = fn
+
+void init_syscall_table(){
+    LINK_SYSCALL(SYSCALL_NONE, no_syscall);     //0
+    LINK_SYSCALL(SYSCALL_TIMES, do_times);      //1
+    LINK_SYSCALL(SYSCALL_EXIT, do_exit);        //2
+    LINK_SYSCALL(SYSCALL_FORK, do_fork);        //3
+    LINK_SYSCALL(SYSCALL_VFORK, do_vfork);      //4
+    LINK_SYSCALL(SYSCALL_EXECVE, do_exec);      //5
+    LINK_SYSCALL(SYSCALL_BRK, do_brk);          //6
+    LINK_SYSCALL(SYSCALL_ALARM, do_alarm);      //7
+    LINK_SYSCALL(SYSCALL_SIGNAL, do_sigaction); //8
+    LINK_SYSCALL(SYSCALL_SIGRET, do_sigreturn); //9
+    LINK_SYSCALL(SYSCALL_WAIT, do_wait);        //10
+    LINK_SYSCALL(SYSCALL_KILL, do_kill);        //11
+    LINK_SYSCALL(SYSCALL_GETPID, do_getpid);    //12
+    LINK_SYSCALL(SYSCALL_WINFO, do_winfo);      //13
+    LINK_SYSCALL(SYSCALL_GETC, do_getc);        //14
+    LINK_SYSCALL(SYSCALL_PRINTF, do_printf);    //15
+    LINK_SYSCALL(SYSCALL_SYSCONF, do_sysconf);  //16
+}
 
 
 
