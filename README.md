@@ -3,12 +3,17 @@ A UNIX-style Operating System for the Waikato RISC Architecture Microprocessor (
 
 NB Due to bugs in the kernel, the feature of redirection and multiple pipes for Bourne Shell have been moved to a separate project [TBash](https://github.com/halfer53/TBash)
 
-## How to Compile
-```cd Winix2```
+## Prerequisite
+
+```sudo apt-get install xutils-dev```
+
+```cd winix```
+
+```chmod +x tools/bin/*```
 
 ```export PATH=`pwd`/tools/bin:$PATH```
 
-```chmod +x tools/bin/*```
+## How to Compile
 
 ```make```
 
@@ -34,9 +39,15 @@ Click ```Quick Load```, select ```winix.srec```
 
 ```uptime```: shows the system uptime
 
-```kill [ -n signum ] pid```: send specified signum to specified process. If signum is not provided, SIGKIL is sent
+```kill [ -s signum ] pid```: send specified signum to specified process. If signum is not provided, SIGKIL is sent
 
-```?```: show the list of commands available
+```bash```: fork off a new bash shell.
+
+```printenv```: print all the environment variables
+
+```printheap```: print the heap memory pools
+
+```help```: show the list of commands available
 
 ### Testing commands
 
@@ -44,9 +55,7 @@ Click ```Quick Load```, select ```winix.srec```
 
 ```test malloc```: test malloc function
 
-```test fork```: fork off a child shell process, parent shell wait until child shell exits or killed.
-
-```test stack_overflow```: test stack overflow
+```test stack```: test stack overflow
 
 ```test float```: test floating point exception
 
