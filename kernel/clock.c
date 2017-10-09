@@ -41,12 +41,8 @@ void clock_main(){
     }
 }
 
-bool has_next_timeout(){
-    return next_timeout <= system_uptime;
-}
-
 void do_ticks(){
-    while(has_next_timeout()){
+    while(next_timeout <= system_uptime){
         struct timer* next_timer = dequeue_alarm();
         next_timer->handler(next_timer->proc_nr,next_timer->time_out);
     }
@@ -90,6 +86,8 @@ void clock_handler(){
         struct message* m = get_exception_m();
         m->type = DO_CLOCKTICK;
         do_notify(INTERRUPT, CLOCK, m);
+        //in winix, kernel tasks are preemptible
+        preempt_currproc();
     }
     sched();
 }

@@ -23,7 +23,7 @@ void init_sched(){
 }
 
 /**
- * This method is called every 12 timer interrupts
+ * This method is called every 24 timer interrupts
  * It effectly moves every processes in the ready queues
  * to the top priority ready queue, refer to Multi-fedback
  * queue scheduling for more details
@@ -90,14 +90,14 @@ void sched() {
         PANIC("Exception stack overflow\n");
 #endif
 
-    if (current_proc != NULL && !current_proc->s_flags) {
+    if (current_proc && !current_proc->s_flags) {
 
         if (current_proc->ticks_left > 0) {
             enqueue_head(ready_q[current_proc->priority], current_proc);
         }
         else { 
             //move the proc down to the lower ready queue, unless this proc
-            //if already at the lowest ready queue, for every 100 timer interrupts
+            //if already at the lowest ready queue, for every 24 timer interrupts
             //rebalance_queue is called which bumps every processes in the top
             //ready queue
             if(current_proc->priority < NUM_QUEUES - 1){

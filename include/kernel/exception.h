@@ -25,6 +25,7 @@ int irq_count();
 int* get_exception_stack_top();
 int* get_exception_stack_bottom();
 struct message* get_exception_m();
+void preempt_currproc();
 
 #define in_interrupt()  (irq_count())
 #define enable_interrupt()  RexTimer->Ctrl = 3

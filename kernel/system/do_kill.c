@@ -18,13 +18,14 @@
 int do_kill(struct proc *who, struct message *m){
     struct proc *to;
     pid_t pid = m->m1_i1;
+    int signum = m->m1_i2;
 
-    if(pid <= INIT)
+    if(signum < 0 || signum >= _NSIG)
         return EINVAL;
 
     to = get_proc_by_pid(pid);
     if(!to)
         return ESRCH;
 
-    return send_sig(to,m->m1_i2);
+    return send_sig(to,signum);
 }

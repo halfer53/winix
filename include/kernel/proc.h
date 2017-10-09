@@ -135,7 +135,6 @@ typedef struct proc {
 
     /* Pending messages, used by winix_notify */
     unsigned int notify_pending;	//bitmap for masking list of pending messages by system proc
-    int pending_type;
 
     /* Scheduling */
     struct proc *next;            	//Next pointer

@@ -38,8 +38,7 @@ int do_send(int dest, struct message *m) {
             struct proc* xp = current_proc->sender_q;
             while(xp){
                 if(xp == pDest){
-                    m->reply_res = EDEADLK;
-                    return ERR;
+                    return EDEADLK;
                 }
                 xp = xp->next_sender;
             }
@@ -67,7 +66,7 @@ int do_send(int dest, struct message *m) {
         }
         return OK;
     }
-    return ERR;
+    return ESRCH;
 }
 
 /**
@@ -107,7 +106,7 @@ int do_receive(struct message *m) {
 
         //Unblock sender
         p->s_flags &= ~SENDING;
-        if(! p->s_flags && p->i_flags & RUNNABLE)
+        if(!p->s_flags && p->i_flags & RUNNABLE)
             enqueue_head(ready_q[p->priority], p);
         
         if(get_debug_ipc_count()){
@@ -147,6 +146,7 @@ int do_notify(int src, int dest, struct message *m) {
 
             //Unblock receiver
             pDest->s_flags &= ~RECEIVING;
+            pDest->regs[0] = m->reply_res;
             enqueue_head(ready_q[pDest->priority], pDest);
         }else{
             int sid = TASK_NR_TO_SID(src);
@@ -155,7 +155,7 @@ int do_notify(int src, int dest, struct message *m) {
         //do nothing if it's not waiting
         return OK;
     }
-    return ERR;
+    return ESRCH;
 }
 
 /**

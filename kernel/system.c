@@ -38,7 +38,7 @@ void system_main() {
 
     //Receive message, do work, repeat.
     while(true) {
-        
+
         //get a message
         winix_receive(mesg);
         who_proc_nr = mesg->src;

@@ -133,8 +133,7 @@ int do_fork(struct proc *who, struct message *m){
     syscall_reply(0, child_pr, m);
 
     //send the child pid to parent
-    child = get_proc(child_pr);
-    return child->pid;
+    return get_proc(child_pr)->pid;
 }
 
 

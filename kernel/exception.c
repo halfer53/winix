@@ -64,6 +64,13 @@ int irq_count(){
     return _irq_count;
 }
 
+void preempt_currproc(){
+    if(current_proc){
+        enqueue_schedule(current_proc);
+        current_proc = NULL;
+    }
+}
+
 void reset_irq_count(){
     _irq_count = 0;
 }
