@@ -13,7 +13,7 @@
  * @create date 2017-08-23 06:10:09
  * 
 */
-#include "../winix.h"
+#include <kernel/kernel.h>
 
 int do_sigaction(struct proc *who, struct message *m){
     int signum;

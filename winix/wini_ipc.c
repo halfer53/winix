@@ -12,6 +12,7 @@
  * 
 */
 #include <kernel/kernel.h>
+#include <kernel/exception.h>
 /**
  * sends a message.
  *

@@ -15,6 +15,7 @@
 
  
 #include <winix/rex.h>
+#include <kernel/idle.h>
 
 #define DELAY 10000
 

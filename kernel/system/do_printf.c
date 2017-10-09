@@ -14,7 +14,7 @@
  * @create date 2017-08-23 06:09:58
  * 
 */
-#include "../winix.h"
+#include <kernel/kernel.h>
 
 
 /**

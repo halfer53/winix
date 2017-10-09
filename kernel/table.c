@@ -1,4 +1,6 @@
-#include "winix.h"
+#include <kernel/kernel.h>
+#include <kernel/table.h>
+#include <kernel/idle.h>
 
 /*
     struct proc_config{
@@ -24,7 +26,7 @@ char *initial_env[] = {
     NULL
 };
 
-syscall_handler_t syscall_table[_NSYSCALL] = {{no_syscall}};
+syscall_handler_t syscall_table[_NSYSCALL] = {{0}};
 
 
 

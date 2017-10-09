@@ -201,6 +201,9 @@ for(curr = proc_table + IDLE; curr <= proc_table + NUM_USER_PROCS ; curr++)\
 for(curr = proc_table + IDLE + 1; curr <= proc_table + NUM_USER_PROCS; curr++)\
     if(IS_INUSE(curr))
 
+#define foreach_kernel_task(curr)\
+for(curr = proc_table + IDLE ; curr <= proc_table ; curr++)\
+
 //proc_table points at index zero of the process table, so proc_table + 1 
 //simply starts at init (init has process number 1)
 #define foreach_user_proc(curr)\
@@ -239,8 +242,8 @@ pid_t get_next_pid();
 struct proc* get_proc_by_pid(pid_t pid);
 struct proc *get_proc(int proc_nr);
 struct proc *get_running_proc(int proc_nr);
-void kprint_runnable_procs();
-void kprint_proc_info(struct proc* curr);
+void kprint_all_procs();
+void kprint_proc(struct proc* curr);
 struct proc *pick_proc();
 void zombify(struct proc *p);
 void release_zombie(struct proc*p);

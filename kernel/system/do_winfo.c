@@ -14,12 +14,12 @@
  * @create date 2017-08-23 06:10:46
  * 
 */
-#include "../winix.h"
+#include <kernel/kernel.h>
 
 int do_winfo(struct proc *who, struct message *m){
     switch(m->m1_i1){
         case WINFO_PS:
-            kprint_runnable_procs();
+            kprint_all_procs();
             break;
 
         case WINFO_MEM:

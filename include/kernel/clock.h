@@ -23,6 +23,4 @@ void clock_handler();
 void sys_alarm(struct proc *who, struct message *m);
 extern void deliver_alarm(pid_t pid, clock_t time);
 
-#define get_hz()    (60)
-
 #endif

@@ -77,35 +77,6 @@ void stop_debug_syscall(){
     _debug_syscall = 0;
 }
 
-//print out the list of processes currently in the ready_q
-//and the currently running process
-void kprint_runnable_procs() {
-    struct proc *curr;
-    kprintf("NAME    PID PPID RBASE      PC         STACK      HEAP       PROTECTION   FLAGS\n");
-    foreach_proc(curr){
-        if(curr->i_flags & RUNNABLE){
-            kprint_proc_info(curr);
-        }
-    }
-}
-
-//print the process state
-void kprint_proc_info(struct proc* curr) {
-    int ptable_idx = PADDR_TO_PAGED(curr->rbase)/32;
-    kprintf("%-08s %-03d %-04d 0x%08x 0x%08x 0x%08x 0x%08x %d 0x%08x %d %d\n",
-            curr->name,
-            curr->pid,
-            get_proc(curr->parent)->pid,
-            curr->rbase,
-            get_physical_addr(get_pc_ptr(curr),curr),
-            get_physical_addr(curr->sp,curr),
-            curr->heap_break,
-            ptable_idx,
-            curr->ptable[ptable_idx],
-            curr->s_flags,
-            curr->proc_nr);
-}
-
 void kprint_readyqueue(){
     int i,j;
     struct proc* curr;

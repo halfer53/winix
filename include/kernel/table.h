@@ -1,7 +1,9 @@
 #ifndef _K_TABLE_H_
 #define _K_TABLE_H_
 
+#include <sys/syscall.h>
 #include <sys/ipc.h>
+#include <winix/syscall_ctx.h>
 #include <kernel/proc.h>
 
 #define INITILISE_ARRAY(n,val)  
@@ -16,7 +18,7 @@ struct boot_image{
 
 extern struct boot_image boot_table[NUM_TASKS];
 extern char *initial_env[];
-extern syscall_handler_t syscall_table[];
+extern syscall_handler_t syscall_table[_NSYSCALL];
 
 int no_syscall(struct proc* who, struct message* m);
 int do_times(struct proc* who, struct message* m);

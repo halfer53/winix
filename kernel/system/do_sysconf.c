@@ -1,4 +1,4 @@
-#include "../winix.h"
+#include <kernel/kernel.h>
 
 int do_sysconf(struct proc* who, struct message *m){
     switch(m->m1_i1){

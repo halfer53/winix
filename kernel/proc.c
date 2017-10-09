@@ -12,7 +12,7 @@
  * 
 */
 
-#include "winix.h"
+#include <kernel/kernel.h>
 #include <winix/srec.h>
 
 //Linked lists are defined by a head and tail pointer.
@@ -61,7 +61,40 @@ PUBLIC struct proc *current_proc;
  * 
  */
 
+/**
+ * Report all the running procs to serial port 1
+ * 
+ *
+**/
+void kprint_all_procs() {
+    struct proc *curr;
+    kprintf("NAME    PID PPID RBASE      PC         STACK      HEAP       PROTECTION   FLAGS\n");
+    foreach_proc(curr){
+        kprint_proc(curr);
+    }
+}
 
+/**
+ * Report the proc's info
+**/
+void kprint_proc(struct proc* curr) {
+    int ptable_idx = PADDR_TO_PAGED(curr->rbase)/32;
+    kprintf("%-08s %-03d %-04d 0x%08x 0x%08x 0x%08x 0x%08x %d 0x%08x %d\n",
+            curr->name,
+            curr->pid,
+            get_proc(curr->parent)->pid,
+            curr->rbase,
+            get_physical_addr(get_pc_ptr(curr),curr),
+            get_physical_addr(curr->sp,curr),
+            curr->heap_break,
+            ptable_idx,
+            curr->ptable[ptable_idx],
+            curr->s_flags);
+}
+
+/**
+ * get next free pid
+**/
 pid_t get_next_pid(){
     static pid_t pid = 2;
     return pid++;

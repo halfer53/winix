@@ -1,4 +1,4 @@
-#include "../winix.h"
+#include <kernel/kernel.h>
 
 int do_vfork(struct proc* parent, struct message* m){
     struct proc* child;

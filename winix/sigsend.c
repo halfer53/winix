@@ -12,7 +12,6 @@
  * 
 */
 #include <kernel/kernel.h>
-#include <kernel/system.h>
 #include <kernel/exception.h>
 #include <winix/signal.h>
 

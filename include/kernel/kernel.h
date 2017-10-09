@@ -40,27 +40,20 @@
 #include <string.h>
 #include <stdio.h>
 
+#include <winix/comm.h>
 #include <winix/compiler.h>
 #include <winix/type.h>
 #include <winix/page.h>
-#include <winix/comm.h>
 #include <winix/util.h>
 #include <winix/kdebug.h>
 #include <winix/bitmap.h>
 #include <winix/mm.h>
 #include <winix/sys_stdio.h>
 #include <winix/wini_ipc.h>
-#include <winix/syscall_ctx.h>
 #include <winix/rex.h>
-#include <winix/exec.h>
 #include <winix/mem_alloc.h>
-#include <winix/signal.h>
-#include <winix/timer.h>
-#include <kernel/clock.h>
 #include <kernel/proc.h>
-#include <kernel/exception.h>
 #include <kernel/system.h>
-#include <kernel/table.h>
 
 #define FREE_MEM_END    0x1ffff
 

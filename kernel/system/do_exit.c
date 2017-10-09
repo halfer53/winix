@@ -11,7 +11,8 @@
  * @create date 2017-08-23 06:09:19
  * 
 */
-#include "../winix.h"
+#include <kernel/kernel.h>
+
 
 /**
  * Clear all the messages this process is sending

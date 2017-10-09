@@ -13,7 +13,7 @@
  * @create date 2017-08-23 06:09:49
  * 
 */
-#include "../winix.h"
+#include <kernel/kernel.h>
 
 int do_kill(struct proc *who, struct message *m){
     struct proc *to;

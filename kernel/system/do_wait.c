@@ -16,7 +16,7 @@
  * @create date 2017-08-23 06:10:38
  * 
 */
-#include "../winix.h"
+#include <kernel/kernel.h>
 #include <sys/wait.h>
 
 int do_wait(struct proc *parent, struct message *mesg){

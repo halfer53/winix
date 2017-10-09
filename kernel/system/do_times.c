@@ -17,7 +17,7 @@
  * @create date 2017-08-23 06:10:29
  * 
 */
-#include "../winix.h"
+#include <kernel/kernel.h>
 #include <sys/times.h>
 
 int do_times(struct proc *who, struct message *m){

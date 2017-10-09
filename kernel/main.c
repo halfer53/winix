@@ -12,7 +12,8 @@
  * 
 */
 
-#include "winix.h"
+#include <kernel/kernel.h>
+#include <kernel/table.h>
 #include <init_bin.c>
 #include <shell_bin.c>
 

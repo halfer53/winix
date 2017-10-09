@@ -14,8 +14,6 @@
 #ifndef _W_PAGE_H_
 #define _W_PAGE_H_ 1
 
-#define PAGE_LEN    1024
-
 #define align4(x)                       (((((x)-1)>>2)<<2)+4)
 #define ALIGN1K_LB(x)                   ((((((int)x)-1)>>10)<<10))
 

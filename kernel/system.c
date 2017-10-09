@@ -12,7 +12,10 @@
  * 
 */
 
-#include "winix.h"
+#include <kernel/kernel.h>
+#include <kernel/sched.h>
+#include <kernel/table.h>
+#include <ucontext.h>
 
 PRIVATE struct message m;
 PRIVATE int who_proc_nr;
@@ -125,6 +128,7 @@ struct message *curr_mesg(){
 struct syscall_ctx *interrupted_syscall_ctx(){
     return &syscall_context;
 }
+
 
 void init_syscall_table(){
     LINK_SYSCALL(SYSCALL_NONE, no_syscall);     //0

@@ -15,7 +15,7 @@
  * @create date 2017-08-23 06:09:33
  * 
 */
-#include "../winix.h"
+#include <kernel/kernel.h>
 
 int do_getc(struct proc *who, struct message *m){
     return kgetc();

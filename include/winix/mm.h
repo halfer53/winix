@@ -36,6 +36,4 @@ void* dup_vm(struct proc* parent, struct proc* child);
 void kprint_ptable(struct proc* who);
 void kprint_sysmap();
 
-#define MEM_MAP_LEN    4
-
 #endif

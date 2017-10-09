@@ -11,7 +11,8 @@
  * @create date 2016-09-19
  * 
 */
-#include "winix.h"
+#include <kernel/kernel.h>
+#include <kernel/exception.h>
 #include <kernel/sched.h>
 
 PRIVATE struct timer sched_timer;

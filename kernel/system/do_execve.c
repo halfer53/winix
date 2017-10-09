@@ -13,8 +13,9 @@
  * @create date 2017-08-23 06:08:30
  * 
 */
-#include "../winix.h"
+#include <kernel/kernel.h>
 #include <winix/srec.h>
+#include <kernel/table.h>
 
 PRIVATE unsigned int syscall_code = 0x200d0000;
 

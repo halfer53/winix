@@ -13,7 +13,8 @@
 */
 
 
-#include "winix.h"
+#include <kernel/kernel.h>
+#include <kernel/exception.h>
 #include <winix/rex.h>
 #include <kernel/clock.h>
 

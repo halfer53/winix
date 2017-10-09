@@ -13,7 +13,8 @@
  * @create date 2017-08-23 06:08:30
  * 
 */
-#include "../winix.h"
+#include <kernel/kernel.h>
+#include <kernel/clock.h>
 
 //alarm syscall
 //input     m.m1_i1    seconds

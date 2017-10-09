@@ -12,6 +12,8 @@
  * 
 */
 #include <kernel/kernel.h>
+#include <kernel/clock.h>
+#include <kernel/exception.h>
 
 
 //a linked list of pending timers to be alarmed

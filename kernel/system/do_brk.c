@@ -15,7 +15,7 @@
  * @create date 2017-08-23 06:08:30
  * 
 */
-#include "../winix.h"
+#include <kernel/kernel.h>
 
 /**
  * For each process, the heap would look something like this

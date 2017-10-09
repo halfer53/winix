@@ -13,7 +13,8 @@
  * @create date 2017-08-23 06:10:17
  * 
 */
-#include "../winix.h"
+#include <kernel/kernel.h>
+#include <winix/signal.h>
 
 /**
  * This method resume the system call if it was previously interruppted
