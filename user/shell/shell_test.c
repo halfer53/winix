@@ -68,13 +68,13 @@ int test_ipc(int argc, char **argv){
         m.type = 100;
         winix_sendrec(pid,&m);
         printf("received %d from child\n",m.reply_res);
-        kill(pid, SIGKILL);
+        wait(NULL);
     }else{
         winix_receive(&m);
         printf("received %d from parent\n",m.type);
         m.reply_res = 200;
         winix_send(getppid(), &m);
-        wait(NULL);
+        exit(0);
     }
     return 0;
 }
@@ -88,6 +88,7 @@ int test_deadlock(int argc, char **argv){
         if(winix_send(pid,&m))
             perror("send to child");
         kill(pid,SIGKILL);
+        wait(NULL);
     }else{
         int ret;
         ret = winix_send(getppid(),&m);

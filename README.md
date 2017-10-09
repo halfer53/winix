@@ -63,6 +63,12 @@ Click ```Quick Load```, select ```winix.srec```
 
 ```test signal [ seconds ]```: set an alarm after specified seconds. Any system calls that are currently executing are interrupted (kgetc()) 
 
+```test vfork```: test vfork
+
+```test deadlock```: test deadlock
+
+```test ipc```: test ipc
+
 ## Demo
 
 [Demo](https://github.com/halfer53/Winix2/blob/master/Documentations/demo.md)
