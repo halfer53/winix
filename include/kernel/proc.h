@@ -159,6 +159,7 @@ typedef struct proc {
 
     /* Signal Information */
     sigset_t pending_sigs;
+    sigset_t blocked_sigs;
     struct sigaction sig_table[_NSIG];
 
     /* Alarm */
@@ -225,6 +226,8 @@ int alloc_proc_mem(struct proc *who, int tdb_length, int stack_size, int heap_si
 void enqueue_schedule(struct proc* p);
 reg_t* alloc_kstack(struct proc *who);
 int proc_memctl(struct proc* who ,vptr_t* page_addr, int flags);
+pid_t get_next_pid();
+struct proc* get_proc_by_pid(pid_t pid);
 struct proc *get_proc(int proc_nr);
 struct proc *get_running_proc(int proc_nr);
 void kprint_runnable_procs();

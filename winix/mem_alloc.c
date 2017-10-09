@@ -14,19 +14,18 @@
 
 #define INITIAL_SYSFREEMEM_LEN     64
 
-
-struct hole hole_table[NUM_HOLES];
+PRIVATE struct hole hole_table[NUM_HOLES];
 
 //Entries to the list of unallocated memory space in RAM
-static struct hole *unused_holes[2];
+PRIVATE struct hole *unused_holes[2];
 
 //ENtries in the holes that are not in use, but can be added to the holes list
-static struct hole *pending_holes[2];
+PRIVATE struct hole *pending_holes[2];
 
-static struct hole *used_holes[2];
+PRIVATE struct hole *used_holes[2];
 //Linked lists are defined by a head and tail pointer.
 
-static char initial_free_sysmem[INITIAL_SYSFREEMEM_LEN];
+PRIVATE char initial_free_sysmem[INITIAL_SYSFREEMEM_LEN];
 
 /**
  * Adds a hole to the tail of a list.

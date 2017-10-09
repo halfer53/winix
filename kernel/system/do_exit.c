@@ -68,7 +68,7 @@ void exit_proc(struct proc *who, int status){
     int i, children = 0;
     struct message* mesg = curr_mesg();
 
-    KDEBUG(("%s[%d] exit status %d signal %d\n",who->name, who->proc_nr, 
+    KDEBUG(("%s[%d] exit status %d signal %d\n",who->name, who->pid, 
                                               status, who->sig_status));
 
     zombify(who);
@@ -78,11 +78,11 @@ void exit_proc(struct proc *who, int status){
     for_each_user_proc(mp){
         if(mp->i_flags & IN_USE){
             //if this process if waiting for the current tobe exited process
-            if(mp->s_flags & WAITING && mp->wpid == who->proc_nr){
+            if(mp->s_flags & WAITING && mp->wpid == who->pid){
 
                 mesg->m1_i2 = (who->exit_status << 8) | (who->sig_status & 0x7f);
                 mp->s_flags &= ~WAITING;
-                syscall_reply(who->proc_nr, mp->proc_nr, mesg);
+                syscall_reply(who->pid, mp->proc_nr, mesg);
 
                 children++;
             }else if(mp->parent == who->proc_nr){
@@ -91,7 +91,7 @@ void exit_proc(struct proc *who, int status){
             }else if(who->parent == mp->proc_nr && mp->s_flags & VFORK){  
                 //parent is blocked by vfork(2)
                 mp->s_flags &= ~VFORK;
-                syscall_reply(who->proc_nr, mp->proc_nr, mesg);
+                syscall_reply(who->pid, mp->proc_nr, mesg);
 
                 release_zombie(who);
                 return;

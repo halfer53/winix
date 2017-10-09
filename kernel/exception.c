@@ -230,7 +230,7 @@ PRIVATE void break_handler() {
  **/
 PRIVATE void arith_handler() {
     KDEBUG(("Arith Exception: \"%s (%d)\" PC=0x%08x.\r\n", 
-        current_proc->name, current_proc->proc_nr, current_proc->pc));
+        current_proc->name, current_proc->pid, current_proc->pc));
     send_sig(current_proc,SIGFPE);
     sched();
 }

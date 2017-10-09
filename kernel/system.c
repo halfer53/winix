@@ -112,7 +112,7 @@ void intr_syscall(){
 
 int no_syscall(struct proc* who, struct message* m){
     KDEBUG(("Process \"%s (%d)\" performed unknown system call %d\r\n", 
-        who->name, who->proc_nr, m->type));
+        who->name, who->pid, m->type));
     return ENOSYS;
 }
 

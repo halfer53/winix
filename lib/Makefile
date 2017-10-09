@@ -98,8 +98,6 @@ syscall/getchar.s: ../include/sys/syscall.h ../include/sys/ipc.h
 syscall/getchar.s: ../include/signal.h ../include/stddef.h
 syscall/getchar.s: ../include/stdlib.h ../include/stdio.h ../include/string.h
 syscall/getchar.s: ../include/const.h
-syscall/ipc_send.s: ../include/sys/ipc.h ../include/signal.h
-syscall/ipc_send.s: ../include/sys/types.h ../include/stddef.h
 syscall/printf.s: ../include/lib.h ../include/errno.h ../include/sys/types.h
 syscall/printf.s: ../include/sys/syscall.h ../include/sys/ipc.h
 syscall/printf.s: ../include/signal.h ../include/stddef.h ../include/stdlib.h
@@ -131,6 +129,8 @@ syscall/kill.s: ../include/lib.h ../include/errno.h ../include/sys/types.h
 syscall/kill.s: ../include/sys/syscall.h ../include/sys/ipc.h
 syscall/kill.s: ../include/signal.h ../include/stddef.h ../include/stdlib.h
 syscall/kill.s: ../include/stdio.h ../include/string.h ../include/const.h
+syscall/ipc.s: ../include/sys/ipc.h ../include/signal.h
+syscall/ipc.s: ../include/sys/types.h ../include/stddef.h
 syscall/sysconf.s: ../include/lib.h ../include/errno.h ../include/sys/types.h
 syscall/sysconf.s: ../include/sys/syscall.h ../include/sys/ipc.h
 syscall/sysconf.s: ../include/signal.h ../include/stddef.h
@@ -155,6 +155,4 @@ syscall/fork.s: ../include/lib.h ../include/errno.h ../include/sys/types.h
 syscall/fork.s: ../include/sys/syscall.h ../include/sys/ipc.h
 syscall/fork.s: ../include/signal.h ../include/stddef.h ../include/stdlib.h
 syscall/fork.s: ../include/stdio.h ../include/string.h ../include/const.h
-syscall/ipc_receive.s: ../include/sys/ipc.h ../include/signal.h
-syscall/ipc_receive.s: ../include/sys/types.h ../include/stddef.h
 util/util.s: ../include/util.h

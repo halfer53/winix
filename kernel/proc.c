@@ -26,9 +26,6 @@ PUBLIC struct proc *proc_table;
 //Scheduling queues
 PUBLIC struct proc *ready_q[NUM_QUEUES][2];
 
-//blocking queues, not in use at the moment
-PUBLIC struct proc *block_q[2];
-
 //The currently-running process
 PUBLIC struct proc *current_proc;
 
@@ -67,6 +64,26 @@ PUBLIC struct proc *current_proc;
 pid_t get_next_pid(){
     static pid_t pid = 2;
     return pid++;
+}
+
+/**
+ * Gets a pointer to a process by pid
+ * if multiple process has the same pid, the first
+ * one is returned
+ *
+ * Parameters:
+ *   pid               The process's pid'.
+ *
+ * Returns:            The relevant process, or NULL if it can't be found
+ **/
+struct proc* get_proc_by_pid(pid_t pid){
+    struct proc* curr;
+    for_each_user_proc(curr){
+        if(curr->i_flags & IN_USE && curr->pid == pid){
+            return curr;
+        }
+    }
+    return NULL;
 }
 
 /**
@@ -183,7 +200,7 @@ int dequeue_schedule( struct proc *h) {
     if (prev == NULL) {
         q[HEAD] = curr->next;
         if(curr->next == NULL){
-            q[TAIL] = curr->next;
+            q[TAIL] = NULL;
         }
     } else {
         prev->next = curr->next;

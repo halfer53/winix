@@ -20,8 +20,9 @@ int do_sigaction(struct proc *who, struct message *m){
     sighandler_t osig;
 
     signum = m->m1_i1;
-    if(signum == SIGKILL)
+    if(signum == SIGKILL || signum == SIGSTOP)
         return EINVAL;
+
     osig = who->sig_table[signum].sa_handler;
     who->sig_table[signum].sa_handler = m->s1;
     m->s1 = osig;

@@ -18,10 +18,11 @@
 
 #include <sys/ipc.h>
 
-#define _NSYSCALL               16
+#define _NSYSCALL               17
 /**
  * System Call Numbers
  **/
+#define SYSCALL_NONE            0   //not used
 #define SYSCALL_TIMES           1
 #define SYSCALL_EXIT            2
 #define SYSCALL_FORK            3
@@ -48,9 +49,7 @@ function params{\
     __ret = winix_sendrec(SYSTEM,&m);\
     if(m.reply_res < 0){\
         __errno = -m.reply_res;\
-        m.reply_res = -1;\
-    }else{\
-        __errno = 0;\
+        return -1;\
     }\
     return m.reply_res;\
 }\
@@ -60,22 +59,20 @@ function params{\
 #define WINFO_MEM   2
 #define WINFO_SLAB  4
 
+
 int _syscall(int syscall_num, struct message *m);
-
-
 int _exit(int status);
 int sys_ps();
 pid_t fork();
+pid_t vfork();
 int brk(void *addr);
 void *sbrk(int incr);
 int getc();
-int printf(const char *format, ...);
 unsigned int alarm(unsigned int seconds);
 pid_t wait(int *wstatus);
 pid_t getpid();
 pid_t getppid();
 int kill (pid_t pid, int sig);
 long sysconf(int name);
-pid_t vfork();
 
 #endif

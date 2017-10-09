@@ -104,7 +104,9 @@ PRIVATE int sys_sig_handler(struct proc *who, int signum){
 
     if(who->sig_table[signum].sa_handler == SIG_DFL){
         who->sig_status = signum;
-        KDEBUG(("Signal %d: kill process \"%s [%d]\"\n",signum,who->name,who->proc_nr));
+        KDEBUG(("Signal %d: kill process \"%s [%d]\"\n",signum,who->name,who->pid));
+        
+        who->i_flags |= STOPPED;
         if(in_interrupt()){
             //if we are in interrupt, send an exit syscall to the kernel, 
             //and set current_proc to NULL so the scheduler picks the next proc
@@ -125,7 +127,7 @@ PRIVATE int sys_sig_handler(struct proc *who, int signum){
     }
     //if it's ignored
     if(who->sig_table[signum].sa_handler == SIG_IGN){
-        KDEBUG(("Signal %d ignored by process \"%s [%d]\"\n",signum,who->name,who->proc_nr));
+        KDEBUG(("Signal %d ignored by process \"%s [%d]\"\n",signum,who->name,who->pid));
         who->pc = (void (*)())((int)who->pc+1);
         return OK;
     }

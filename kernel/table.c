@@ -15,6 +15,8 @@ struct boot_image boot_table[NUM_TASKS] = {
     {"SYSTEM", system_main,         SYSTEM, 64, MAX_PRIORITY,},
 };
 
+//IDLE's process number must be the lowest
+BUILD_BUG_ON_FALSE(IDLE == -NUM_TASKS + 1); 
 
 char *initial_env[] = {
     "HOME=/",
@@ -22,7 +24,7 @@ char *initial_env[] = {
     NULL
 };
 
-syscall_handler_t syscall_table[(_NSYSCALL + 1)] = {
+syscall_handler_t syscall_table[_NSYSCALL] = {
     no_syscall,
     do_times,       //SYSCALL_TIMES           1
     do_exit,        //SYSCALL_EXIT            2
@@ -41,6 +43,4 @@ syscall_handler_t syscall_table[(_NSYSCALL + 1)] = {
     do_printf,      //SYSCALL_PRINTF          15
     do_sysconf      //SYSCALL_SYSCONF         16
 };
-
-
 

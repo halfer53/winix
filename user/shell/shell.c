@@ -139,13 +139,13 @@ int exec_cmd(char *line, int tpipe[2]){
 }
 
 
-extern const char** _penviron;
+extern const char** _environ;
 int printenv(int argc, char **argv){
     const char **v;
     const char *p;
-    if(_penviron == NULL)
+    if(_environ == NULL)
         init_environ();
-    v = _penviron;
+    v = _environ;
     while((p = *v++)){
         printf("%s\n",p);
     }

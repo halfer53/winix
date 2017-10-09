@@ -6,19 +6,19 @@
 
 #include	<stdlib.h>
 
-extern const char **_penviron;
+extern const char **_environ;
 
 char *getenv(const char *name)
 {
 	register const char **v;
     register const char *p, *q;
     
-    if(_penviron == NULL)
+    if(_environ == NULL)
         init_environ();
-	if (name == NULL || _penviron == NULL)
+	if (name == NULL || _environ == NULL)
 		return (char *)NULL;
 	
-	v = _penviron;
+	v = _environ;
 	while ((p = *v++) != NULL) {
 		q = name;
 		while (*q && (*q == *p++))

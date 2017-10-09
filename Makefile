@@ -5,7 +5,7 @@ export CFLAGS = -D_DEBUG
 RELEASE_FLAGS = 
 
 # List of user libraries used by the kernel
-KLIB = syscall/wramp_syscall syscall/ipc_receive ansi/string util/util \
+KLIB = syscall/wramp_syscall syscall/ipc ansi/string util/util \
 		gen/ucontext stdlib/atoi util/debug
 
 L_HEAD = winix/limits/limits_head.o

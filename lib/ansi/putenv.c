@@ -10,11 +10,11 @@
 #define	ENTRY_INC	10
 #define	rounded(x)	(((x / ENTRY_INC) + 1) * ENTRY_INC)
 
-extern char **_penviron;
+extern char **_environ;
 
 int putenv(char *name)
 {
-	register char **v = _penviron;
+	register char **v = _environ;
 	register char *r;
 	static int size = 0;
 	/* When size != 0, it contains the number of entries in the
@@ -23,10 +23,10 @@ int putenv(char *name)
 	 */
 
     if (!name) return 0;
-    if(_penviron == NULL)
+    if(_environ == NULL)
         init_environ();
-	if (_penviron == NULL) return 1;
-	v = _penviron;
+	if (_environ == NULL) return 1;
+	v = _environ;
 	if (r = strchr(name, '=')) {
 		register char *p, *q;
 
@@ -50,7 +50,7 @@ int putenv(char *name)
 			}
 		}
 		*r = '=';
-		v = _penviron;
+		v = _environ;
 	}
 
 	if (!size) {
@@ -66,14 +66,14 @@ int putenv(char *name)
 		if (!(v = malloc(rounded(i) * sizeof(char **))))
 			return 1;
 		size = i;
-		p = _penviron;
-		_penviron = v;
+		p = _environ;
+		_environ = v;
 		while (*v++ = *p++);		/* copy the environment */
-		v = _penviron;
+		v = _environ;
 	} else if (!(size % ENTRY_INC)) {
-		if (!(v = realloc(_penviron, rounded(size) * sizeof(char **))))
+		if (!(v = realloc(_environ, rounded(size) * sizeof(char **))))
 			return 1;
-		_penviron = v;
+		_environ = v;
 	}
 	v[size - 1] = name;
 	v[size] = NULL;

@@ -6,7 +6,7 @@ int do_sysconf(struct proc* who, struct message *m){
             return get_hz();
 
         default:
-            return ERR;
+            return EINVAL;
     }
 }
 

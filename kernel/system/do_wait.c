@@ -31,9 +31,9 @@ int do_wait(struct proc *parent, struct message *mesg){
             if(child->i_flags & ZOMBIE){
                 mesg->m1_i2 = (child->exit_status << 8) | (child->sig_status & 0x7f);
                 release_zombie(child);
-                return child->proc_nr;
+                return child->pid;
             }
-            parent->wpid = child->proc_nr;
+            parent->wpid = child->pid;
             children++;
         }
     }

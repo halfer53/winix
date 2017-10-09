@@ -78,6 +78,7 @@ typedef long int	fpos_t;
 typedef unsigned int	size_t;		/* type returned by sizeof */
 #endif /* _SIZE_T */
 
+int printf(const char *format, ...);
 int putchar(const char c);
 int getchar();
 

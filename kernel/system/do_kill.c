@@ -16,13 +16,15 @@
 #include "../winix.h"
 
 int do_kill(struct proc *who, struct message *m){
-    struct proc *to = get_running_proc(m->m1_i1);
+    struct proc *to;
+    pid_t pid = m->m1_i1;
 
-    if(!to || !IS_USER_PROC(to))
-        return ESRCH;
-
-    if(to->proc_nr == INIT)
+    if(pid <= INIT)
         return EINVAL;
+
+    to = get_proc_by_pid(pid);
+    if(!to)
+        return ESRCH;
 
     return send_sig(to,m->m1_i2);
 }
