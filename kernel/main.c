@@ -16,7 +16,8 @@
 #include <init_bin.c>
 #include <shell_bin.c>
 
-struct proc* start_init();
+void start_init();
+void init_kernel_tasks();
 
 /**
  * Entry point for WINIX.
@@ -48,6 +49,7 @@ void main() {
 
 void init_kernel_tasks(){
     int i;
+    struct proc* p;
     for(i = 0; i < ARRAY_SIZE(boot_table); i++){
         struct boot_image* task = &boot_table[i];
         p = start_kernel_proc(task->entry, task->proc_nr, task->name, task->quantum);
