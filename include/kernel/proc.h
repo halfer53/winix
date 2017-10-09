@@ -181,26 +181,35 @@ extern struct proc *block_q[2];
 #define IS_USER_PROC(p)                 ((p)->rbase != NULL)
 #define IS_IDLE(p)                      ((p)->proc_nr == IDLE)
 #define IS_SYSTEM(p)                    ((p)->proc_nr == SYSTEM)
+#define IS_INUSE(p)                     ((p)->i_flags & IN_USE)
 #define IS_RUNNABLE(p)                  (((p)->i_flags & (IN_USE | RUNNABLE)) == (IN_USE | RUNNABLE))
 
 #define CHECK_STACK(p)                  (*((p)->stack_top) == STACK_MAGIC)
 #define GET_DEF_STACK_SIZE(who)         (IS_USER_PROC(who) ? USER_STACK_SIZE : KERNEL_STACK_SIZE)
 #define GET_HEAP_TOP(who)               ((who)->stack_top + GET_DEF_STACK_SIZE(who))
 
-//This macro assumes idle has the lowest process number in the system
-#define for_each_proc(curr)\
+
+#define foreach_proc_slot(curr)\
 for(curr = proc_table + IDLE; curr <= proc_table + NUM_USER_PROCS ; curr++)
 
-#define for_each_proc_except_idle(curr)\
-for(curr = proc_table + IDLE + 1; curr <= proc_table + NUM_USER_PROCS; curr++)
+//This macro assumes idle has the lowest process number in the system
+#define foreach_proc(curr)\
+for(curr = proc_table + IDLE; curr <= proc_table + NUM_USER_PROCS ; curr++)\
+    if(IS_INUSE(curr))
+
+#define foreach_proc_except_idle(curr)\
+for(curr = proc_table + IDLE + 1; curr <= proc_table + NUM_USER_PROCS; curr++)\
+    if(IS_INUSE(curr))
 
 //proc_table points at index zero of the process table, so proc_table + 1 
 //simply starts at init (init has process number 1)
-#define for_each_user_proc(curr)\
-for(curr = proc_table + 1; curr <= proc_table + NUM_USER_PROCS ; curr++)
+#define foreach_user_proc(curr)\
+for(curr = proc_table + 1; curr <= proc_table + NUM_USER_PROCS ; curr++)\
+    if(IS_INUSE(curr))
 
-#define for_each_user_proc_reverse(curr)\
-for(curr = proc_table + NUM_USER_PROCS; curr >= proc_table + 1  ; curr--)
+#define foreach_user_proc_reverse(curr)\
+for(curr = proc_table + NUM_USER_PROCS; curr >= proc_table + 1  ; curr--)\
+    if(IS_INUSE(curr))
 
 struct initial_frame{
     int operation;
@@ -234,8 +243,11 @@ void kprint_runnable_procs();
 void kprint_proc_info(struct proc* curr);
 struct proc *pick_proc();
 void zombify(struct proc *p);
+void release_zombie(struct proc*p);
 int copyto_user_stack(struct proc *who, void *src, size_t len);
 vptr_t* copyto_user_heap(struct proc* who, void *src, size_t len);
 int build_initial_stack(struct proc* who, int argc, char** argv, char** env, struct proc* srcproc);
+
+#define release_proc_slot(p)    release_zombie(p)
 
 #endif

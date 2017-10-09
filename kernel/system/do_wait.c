@@ -25,9 +25,9 @@ int do_wait(struct proc *parent, struct message *mesg){
     ptr_t* wstatus;
     int children = 0,i;
 
-    for_each_user_proc(child) {
+    foreach_user_proc(child) {
         //if there is a child process that is zombie
-        if(child->i_flags & IN_USE && child->parent == parent->proc_nr){
+        if(child->parent == parent->proc_nr){
             if(child->i_flags & ZOMBIE){
                 mesg->m1_i2 = (child->exit_status << 8) | (child->sig_status & 0x7f);
                 release_zombie(child);

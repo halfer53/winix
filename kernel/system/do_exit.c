@@ -22,8 +22,8 @@ void clear_sending_mesg(struct proc *who){
     register struct proc **xp; //iterate over the process's queue
     int i;
 
-    for_each_user_proc(rp){
-        if(rp->i_flags & IN_USE && (xp = &(rp->sender_q)) != NULL){
+    foreach_user_proc(rp){
+        if((xp = &(rp->sender_q)) != NULL){
 
             //walk through the message queues
             while(*xp && *xp != who)
@@ -75,27 +75,25 @@ void exit_proc(struct proc *who, int status){
     clear_proc_mesg(who);
     who->exit_status = status;
 
-    for_each_user_proc(mp){
-        if(mp->i_flags & IN_USE){
-            //if this process if waiting for the current tobe exited process
-            if(mp->s_flags & WAITING && mp->wpid == who->pid){
+    foreach_user_proc(mp){
+        //if this process if waiting for the current tobe exited process
+        if(mp->s_flags & WAITING && mp->wpid == who->pid){
 
-                mesg->m1_i2 = (who->exit_status << 8) | (who->sig_status & 0x7f);
-                mp->s_flags &= ~WAITING;
-                syscall_reply(who->pid, mp->proc_nr, mesg);
+            mesg->m1_i2 = (who->exit_status << 8) | (who->sig_status & 0x7f);
+            mp->s_flags &= ~WAITING;
+            syscall_reply(who->pid, mp->proc_nr, mesg);
 
-                children++;
-            }else if(mp->parent == who->proc_nr){
-                //Change the child process's parent to init
-                mp->parent = INIT;
-            }else if(who->parent == mp->proc_nr && mp->s_flags & VFORK){  
-                //parent is blocked by vfork(2)
-                mp->s_flags &= ~VFORK;
-                syscall_reply(who->pid, mp->proc_nr, mesg);
+            children++;
+        }else if(mp->parent == who->proc_nr){
+            //Change the child process's parent to init
+            mp->parent = INIT;
+        }else if(who->parent == mp->proc_nr && mp->s_flags & VFORK){  
+            //parent is blocked by vfork(2)
+            mp->s_flags &= ~VFORK;
+            syscall_reply(who->pid, mp->proc_nr, mesg);
 
-                release_zombie(who);
-                return;
-            }
+            release_zombie(who);
+            return;
         }
     }
 

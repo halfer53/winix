@@ -98,7 +98,7 @@ int sys_fork(struct proc *parent) {
         copy_pcb(parent,child);
 
         if(copy_mm(parent,child) == ERR){
-            release_zombie(child);
+            release_proc_slot(child);
             return ERR;
         }
 

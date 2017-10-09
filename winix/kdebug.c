@@ -77,16 +77,13 @@ void stop_debug_syscall(){
     _debug_syscall = 0;
 }
 
-
-
-
 //print out the list of processes currently in the ready_q
 //and the currently running process
 void kprint_runnable_procs() {
     struct proc *curr;
     kprintf("NAME    PID PPID RBASE      PC         STACK      HEAP       PROTECTION   FLAGS\n");
-    for_each_proc(curr){
-        if(IS_RUNNABLE(curr)){
+    foreach_proc(curr){
+        if(curr->i_flags & RUNNABLE){
             kprint_proc_info(curr);
         }
     }

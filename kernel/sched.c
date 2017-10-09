@@ -30,11 +30,8 @@ void init_sched(){
  **/
 void rebalance_queues(int proc_nr, clock_t time){
     struct proc* curr;
-    for_each_proc_except_idle(curr)
-    {
-        if(curr->i_flags & IN_USE){
-            curr->priority = MAX_PRIORITY;
-        }
+    foreach_proc_except_idle(curr){
+        curr->priority = MAX_PRIORITY;
     }
     //Idle process always remain the lowest queue
     new_timer(&sched_timer, REBALANCE_TIMEOUT, rebalance_queues);

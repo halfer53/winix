@@ -78,8 +78,8 @@ pid_t get_next_pid(){
  **/
 struct proc* get_proc_by_pid(pid_t pid){
     struct proc* curr;
-    for_each_user_proc(curr){
-        if(curr->i_flags & IN_USE && curr->pid == pid){
+    foreach_user_proc(curr){
+        if(curr->pid == pid){
             return curr;
         }
     }
@@ -245,8 +245,8 @@ void release_zombie(struct proc *p){
 struct proc *get_free_proc_slot() {
     int i;
     struct proc *who;
-    for_each_user_proc(who){
-        if(!(who->i_flags & IN_USE)){
+    foreach_proc_slot(who){
+        if(!IS_INUSE(who)){
             proc_set_default(who);
             who->i_flags |= IN_USE | RUNNABLE;
             who->pid = get_next_pid();
