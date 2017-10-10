@@ -18,6 +18,10 @@ invoke_vfork:
 	sw $3, 2($sp)		# address of mesg
 	jal wramp_syscall	# invoke vfork() system call
 	lw $1, 1($3)		# load mesg->reply_res
+
+	la $3, _pid
+	sw $0, 0($3)		# invalidate pid cache
+	
 	beqz $1, is_vfork_child		#if reply is 0
 
 is_vfork_parent:
@@ -28,8 +32,6 @@ is_vfork_parent:
 
 is_vfork_child:			# in child, we do not modify the stack.
 						# stack is only popped when parent returns
-	la $3, _pid
-	sw $0, 0($3)		# invalidate pid cache
 	lw $ra, 4($sp)
 	lw $3, 3($sp)
 	jr $ra

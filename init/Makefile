@@ -44,8 +44,10 @@ ifeq ($(KBUILD_VERBOSE),0)
 	@echo "AS \t $<"
 endif
 
-depend:
-	$(Q)makedepend -o.s -I$(INCLUDE_DIR) $(SOURCES)
+depend:.depend
+
+.depend:$(SOURCES)
+	$(Q)makedepend -o.s -f- -I$(INCLUDE_DIR) $(SOURCES) > .depend
 
 clean:
 	$(Q)-rm -f $(OBJECT) $(ASSEMBLY) $(OUT)
@@ -54,9 +56,4 @@ ifeq ($(KBUILD_VERBOSE),0)
 endif
 
 .DELETE_ON_ERROR:
-# DO NOT DELETE
-
-init.s: ../include/unistd.h ../include/sys/types.h ../include/sys/ipc.h
-init.s: ../include/signal.h ../include/sys/unistd.h ../include/sys/wait.h
-init.s: ../include/sys/syscall.h ../include/errno.h ../include/stddef.h
-init.s: ../include/stdlib.h ../include/stdio.h
+include .depend
