@@ -14,7 +14,7 @@ typedef unsigned int sigset_t;
 #endif
 #endif
 
-#define _NSIG             17    /* number of signals used */
+#define _NSIG             21    /* number of signals used */
 
 #define SIGHUP             1    /* hangup */
 #define SIGINT             2    /* interrupt (DEL) */

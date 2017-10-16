@@ -57,6 +57,9 @@ int do_sigreturn(struct proc *who, struct message *m){
 
     //reset the signal to default
     who->sig_table[signum].sa_handler = SIG_DFL;
+    if(signum == SIGABRT)
+        send_sig(who, SIGABRT);
+
     resume_from_sig(who);
 
     return DONTREPLY;

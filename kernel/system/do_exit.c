@@ -20,19 +20,18 @@
  */
 void clear_sending_mesg(struct proc *who){
     register struct proc *rp; //iterate over the process table
-    register struct proc *xp; //iterate over the process's queue
-    int i = -2;
+    register struct proc **xp; //iterate over the process's queue
 
     foreach_proc_and_task(rp){
-        if(xp = rp->sender_q){
+        if((xp = &(rp->sender_q)) != NULL && *xp){
             //walk through the message queues
-            while(xp && xp != who){
-                xp = xp->next_sender;
+            while(*xp && *xp != who){
+                xp = &(*xp)->next_sender;
             }
 
             //remove it
-            if(xp)
-                xp = xp->next_sender;
+            if(*xp)
+                *xp = (*xp)->next_sender;
         }
     }
 }

@@ -31,6 +31,8 @@ int copy_pcb(struct proc* parent, struct proc* child){
     child->proc_nr = pbak;
     child->pid = pidbak;
     child->ptable = child->protection_table;
+
+    kprintf("child %x parent %x\n", child->sig_table[SIGABRT].sa_handler, parent->sig_table[SIGABRT].sa_handler);
     return OK;
 }
 
@@ -117,7 +119,8 @@ int do_fork(struct proc *who, struct message *m){
     struct proc* child;
     child_pr = sys_fork(who);
     
-    //if and error is encounted
+    
+    //if an error is encounted
     if(child_pr < 0)
         return child_pr;
     

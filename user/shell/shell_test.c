@@ -24,6 +24,7 @@ CMD_PROTOTYPE(test_nohandler);
 CMD_PROTOTYPE(test_vfork);
 CMD_PROTOTYPE(test_deadlock);
 CMD_PROTOTYPE(test_ipc);
+CMD_PROTOTYPE(test_abort);
 
 struct cmd_internal test_commands[] = {
     { test_malloc, "malloc"}, 
@@ -35,6 +36,7 @@ struct cmd_internal test_commands[] = {
     { test_vfork, "vfork"},
     { test_deadlock, "deadlock"},
     { test_ipc, "ipc"},
+    { test_abort, "abort"},
     { test_nohandler, NULL},
 };
 
@@ -49,6 +51,19 @@ int test_nohandler(int argc, char** argv){
         handler++;
     }
     printf("e.g. \"test alarm 1\", \"test thread 100\" \n");
+    return 0;
+}
+
+void abrt_handler(int signal){
+    printf("aborting");
+}
+
+int test_abort(int argc, char **argv){
+    signal(SIGABRT, abrt_handler);
+    if(!fork()){
+        abort();
+    }
+    wait(NULL);
     return 0;
 }
 
