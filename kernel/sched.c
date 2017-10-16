@@ -23,7 +23,7 @@ void init_sched(){
 }
 
 /**
- * This method is called every 24 timer interrupts
+ * This method is called every REBALANCE_TIMEOUT timer interrupts
  * It effectly moves every processes in the ready queues
  * to the top priority ready queue, refer to Multi-fedback
  * queue scheduling for more details
@@ -31,7 +31,7 @@ void init_sched(){
  **/
 void rebalance_queues(int proc_nr, clock_t time){
     struct proc* curr;
-    foreach_proc_except_idle(curr){
+    foreach_proc(curr){
         curr->priority = MAX_PRIORITY;
     }
     //Idle process always remain the lowest queue
@@ -95,15 +95,16 @@ void sched() {
         if (current_proc->ticks_left > 0) {
             enqueue_head(ready_q[current_proc->priority], current_proc);
         }
-        else { 
+        else {
             //move the proc down to the lower ready queue, unless this proc
-            //if already at the lowest ready queue, for every 24 timer interrupts
+            //if already at the lowest ready queue, for every REBALANCE_TIMEOUT timer interrupts
             //rebalance_queue is called which bumps every processes in the top
             //ready queue
-            if(current_proc->priority < NUM_QUEUES - 1){
+            if(IS_USER_PROC(current_proc) && current_proc->priority < MIN_PRIORITY ){
                 current_proc->priority++;
             }
             enqueue_tail(ready_q[current_proc->priority], current_proc);
+            
         }
     }
 

@@ -46,7 +46,7 @@ void init_kernel_tasks(){
     struct proc* p;
     for(i = 0; i < ARRAY_SIZE(boot_table); i++){
         struct boot_image* task = &boot_table[i];
-        p = start_kernel_proc(task->entry, task->proc_nr, task->name, task->quantum);
+        p = start_kernel_proc(task->entry, task->proc_nr, task->name, task->quantum, task->priority);
         ASSERT(p != NULL);
     }
     add_free_mem(boot_table, sizeof(boot_table));

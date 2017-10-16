@@ -29,9 +29,11 @@
 #define CLOCK                    	-1
 #define SYSTEM                      0
 
-//Process Table
-#define NUM_PROCS               	10
-#define NUM_USER_PROCS              (NUM_PROCS - NUM_TASKS)
+//Number of User procs
+#define NUM_PROCS               	8
+
+//Total number of procs
+#define NUM_PROCS_AND_TASKS         (NUM_TASKS + NUM_PROCS)
 
 //Scheduling
 #define NUM_QUEUES              	5
@@ -78,14 +80,14 @@
 #define SIGNALED                	0x0008    /* set when new kernel signal arrives */
 #define SIG_PENDING                	0x0010    /* unready while signal being processed */
 #define VFORK                   	0x0020    /* parent is blocked by vfork(2) */
+#define STOPPED                    	0x0040    /* Stopped by signals */
 
 //Process Information flags
 #define IN_USE                    	0x0001      /* process slot is in use */
 #define RUNNABLE                	0x0002      /* Running in the system */
 #define ZOMBIE                    	0x0004      /* Zombie process */
-#define STOPPED                    	0x0008      /* Stopped by signals */
-#define BILLABLE                	0x0010      /* Set when user is invoking a system call */
-#define DISABLE_FIRST_PAGE          0x0020      /* Set when the first page of the user address space is disabled */
+#define BILLABLE                	0x0008      /* Set when user is invoking a system call */
+#define DISABLE_FIRST_PAGE          0x0010      /* Set when the first page of the user address space is disabled */
 
 //alloc_proc_mem flags
 #define PROC_SET_SP                	1
@@ -177,7 +179,7 @@ extern struct proc *proc_table;
 extern struct proc *ready_q[NUM_QUEUES][2];
 extern struct proc *block_q[2];
 
-#define IS_PROCN_OK(i)                  ((i)> -NUM_TASKS && (i) <= NUM_USER_PROCS)
+#define IS_PROCN_OK(i)                  ((i)> -NUM_TASKS && (i) <= NUM_PROCS)
 #define IS_PRIORITY_OK(priority)        (0 <= (priority) && (priority) < NUM_QUEUES)
 #define IS_KERNEL_PROC(p)               ((p)->rbase == NULL)
 #define IS_KERNELN(n)                   ((n)<= 0 && (n)> -NUM_TASKS)
@@ -195,38 +197,22 @@ extern struct proc *block_q[2];
 #define SID_TO_TASK_NR(sid)             (-sid + 1)
 
 
-#define foreach_proc_slot(curr)\
-for(curr = proc_table + IDLE; curr <= proc_table + NUM_USER_PROCS ; curr++)
-
-//This macro assumes idle has the lowest process number in the system
-#define foreach_proc(curr)\
-for(curr = proc_table + IDLE; curr <= proc_table + NUM_USER_PROCS ; curr++)\
-    if(IS_INUSE(curr))
-
-#define foreach_proc_except_idle(curr)\
-for(curr = proc_table + IDLE + 1; curr <= proc_table + NUM_USER_PROCS; curr++)\
-    if(IS_INUSE(curr))
-
-#define foreach_kernel_task(curr)\
-for(curr = proc_table + IDLE ; curr <= proc_table ; curr++)\
-
 //proc_table points at index zero of the process table, so proc_table + 1 
 //simply starts at init (init has process number 1)
-#define foreach_user_proc(curr)\
-for(curr = proc_table + 1; curr <= proc_table + NUM_USER_PROCS ; curr++)\
+#define foreach_proc(curr)\
+for(curr = proc_table + 1; curr <= proc_table + NUM_PROCS ; curr++)\
     if(IS_INUSE(curr))
 
-#define foreach_user_proc_reverse(curr)\
-for(curr = proc_table + NUM_USER_PROCS; curr >= proc_table + 1  ; curr--)\
+#define foreach_ktask(curr)\
+    for(curr = proc_table - NUM_TASKS + 1 ; curr <= proc_table ; curr++)\
+
+#define foreach_proc_and_task(curr)\
+for(curr = proc_table - NUM_TASKS + 1; curr <= proc_table + NUM_PROCS; curr++)\
     if(IS_INUSE(curr))
 
-struct initial_frame{
-    int operation;
-    int dest;
-    struct message *pm;
-    struct message m;
-    unsigned int syscall_code;
-};
+#define foreach_blocked_proc(curr)\
+for(curr = proc_table + 1; curr <= proc_table + NUM_PROCS; curr++)\
+    if(IS_INUSE(curr) && curr->s_flags)
 
 
 void* get_pc_ptr(struct proc* who);
@@ -237,7 +223,7 @@ void init_proc();
 void proc_set_default(struct proc *p);
 reg_t* alloc_stack(struct proc *who);
 void set_proc(struct proc *p, void (*entry)(), const char *name);
-struct proc *start_kernel_proc(void (*entry)(), int proc_nr, const char *name,int quantum);
+struct proc *start_kernel_proc(void (*entry)(), int proc_nr, const char *name,int quantum, int priority);
 struct proc *start_user_proc(size_t *lines, size_t length, size_t entry, int priority, const char *name);
 struct proc *get_free_proc_slot();
 int alloc_proc_mem(struct proc *who, int tdb_length, int stack_size, int heap_size, int flags);

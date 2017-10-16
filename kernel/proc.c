@@ -18,7 +18,7 @@
 //Linked lists are defined by a head and tail pointer.
 
 //Process table
-PRIVATE struct proc _proc_table[NUM_PROCS];
+PRIVATE struct proc _proc_table[NUM_PROCS + NUM_TASKS];
 
 //Pointer to proc table, public system wise
 PUBLIC struct proc *proc_table;
@@ -69,6 +69,10 @@ PUBLIC struct proc *current_proc;
 void kprint_all_procs() {
     struct proc *curr;
     kprintf("NAME    PID PPID RBASE      PC         STACK      HEAP       PROTECTION   FLAGS\n");
+    foreach_ktask(curr){
+        kprint_proc(curr);
+    }
+
     foreach_proc(curr){
         kprint_proc(curr);
     }
@@ -112,7 +116,7 @@ pid_t get_next_pid(){
  **/
 struct proc* get_proc_by_pid(pid_t pid){
     struct proc* curr;
-    foreach_user_proc(curr){
+    foreach_proc(curr){
         if(curr->pid == pid){
             return curr;
         }
@@ -279,7 +283,8 @@ void release_zombie(struct proc *p){
 struct proc *get_free_proc_slot() {
     int i;
     struct proc *who;
-    foreach_proc_slot(who){
+    for(i = 1; i <= NUM_PROCS; i++){
+        who = &proc_table[i];
         if(!IS_INUSE(who)){
             proc_set_default(who);
             who->i_flags |= IN_USE | RUNNABLE;
@@ -369,7 +374,7 @@ void set_proc(struct proc *p, void (*entry)(), const char *name) {
  * Side Effects:
  *   A proc is removed from the free_proc list, reinitialised, and added to ready_q.
  */
-struct proc *start_kernel_proc(void (*entry)(), int proc_nr, const char *name, int quantum) {
+struct proc *start_kernel_proc(void (*entry)(), int proc_nr, const char *name, int quantum, int priority) {
     struct proc *who = NULL;
     
     if(who = get_proc(proc_nr)){
@@ -380,6 +385,7 @@ struct proc *start_kernel_proc(void (*entry)(), int proc_nr, const char *name, i
         kset_ptable(who);
         who->quantum = quantum;
         who->sp = alloc_kstack(who);
+        who->priority = priority;
         who->pid = 0;
         enqueue_schedule(who);
     }
@@ -524,7 +530,7 @@ void init_proc() {
 
     procnr_offset = NUM_TASKS - 1;
     //Add all proc structs to the free list
-    for ( i = 0; i < NUM_PROCS; i++) {
+    for ( i = 0; i < NUM_PROCS + NUM_TASKS; i++) {
         p = &_proc_table[i];
         proc_set_default(p);
         preset_pnr = i - procnr_offset;

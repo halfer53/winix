@@ -17,7 +17,10 @@
 #include <winix/srec.h>
 #include <kernel/table.h>
 
-PRIVATE unsigned int syscall_code = 0x200d0000;
+struct initial_frame{
+    struct syscall_frame_comm i_base;
+    unsigned int i_code;
+};
 
 int do_exec(struct proc *who, struct message *m){
     return OK;
@@ -74,11 +77,10 @@ int build_initial_stack(struct proc* who, int argc, char** argv, char** env, str
 
     //copy each of the environment to the user stack
     env_ptr = env;
-    while((v = *env_ptr) != NULL){
+    while((v = *env_ptr++) != NULL){
         v = (char *)get_physical_addr(v, srcproc);
         *p++ = (unsigned int)copyto_user_heap(who, v, strlen(v)+1);
         //save the pointer of the environment as well
-        env_ptr++;
     }
     *p = 0;
 
@@ -87,14 +89,14 @@ int build_initial_stack(struct proc* who, int argc, char** argv, char** env, str
 
     *sp_btm = (unsigned int)who->sp;
     //setup argc and argv before
-    who->ra = who->sp -1;
+    who->ra = who->sp - sizeof(ASM_SYSCALL);
 
-    pstack->operation = WINIX_SENDREC;
-    pstack->dest = SYSTEM;
-    pstack->pm = (struct message*)(who->sp - sizeof(syscall_code) - sizeof(struct message));
-    pstack->m.type = SYSCALL_EXIT;
-    pstack->m.m1_i1 = EXIT_MAGIC;
-    pstack->syscall_code = syscall_code;
+    pstack->i_base.operation = WINIX_SENDREC;
+    pstack->i_base.dest = SYSTEM;
+    pstack->i_base.pm = (struct message*)(who->sp - sizeof(ASM_SYSCALL) - sizeof(struct message));
+    pstack->i_base.m.type = SYSCALL_EXIT;
+    pstack->i_base.m.m1_i1 = EXIT_MAGIC;
+    pstack->i_code = ASM_SYSCALL;
     
     copyto_user_stack(who, pstack, sizeof(struct initial_frame));
 

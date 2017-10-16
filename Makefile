@@ -46,7 +46,8 @@ all:
 	$(Q)$(MAKE) -C init
 	$(Q)$(MAKE) -C kernel
 	$(Q)wlink $(LDFLAGS) -Ttext 1024 -v -o winix.srec \
-			$(L_HEAD) $(KERNEL_O) $(KLIB_O) $(L_TAIL) > tools/kdbg_srec/winix.kdbg
+			$(L_HEAD) $(KERNEL_O) $(KLIB_O) $(L_TAIL) \
+							> tools/kdbg_srec/winix.kdbg
 ifeq ($(KBUILD_VERBOSE),0)
 	@echo "LD \t winix.srec"
 endif
@@ -64,6 +65,7 @@ clean:
 	$(Q)$(MAKE) -C winix clean
 	$(Q)$(MAKE) -C user clean
 	$(Q)$(MAKE) -C init clean
+	$(Q)-rm -f winix.srec
 ifeq ($(KBUILD_VERBOSE),0)
 	@echo "RM \t shell.srec"
 	@echo "RM \t winix.srec"

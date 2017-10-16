@@ -14,9 +14,6 @@
 #include <kernel/kernel.h>
 #include <kernel/exception.h>
 #include <winix/signal.h>
-
-PRIVATE unsigned int sigframe_code[SIGRET_CODE_LEN] = {0x1ee10001,0x200d0000};
-
 /**
     addui $sp, $sp, 1
     syscall
@@ -70,14 +67,15 @@ PRIVATE int build_signal_ctx(struct proc *who, int signum){
     
     //ra points at the sigframe code, so that when user signal handler finishes,
     //pc will point to the sig return code, to initiate sig return sys call
-    who->ra = who->sp - sizeof(sigframe_code);
-    sigframe->operation = WINIX_SENDREC;
-    sigframe->dest = SYSTEM;
+    who->ra = who->sp - sizeof(struct sigframe_code);
+    sigframe->s_base.operation = WINIX_SENDREC;
+    sigframe->s_base.dest = SYSTEM;
     //pm points at the syscall message, not that this is a virtual address
-    sigframe->pm = (struct message *)(who->sp - sizeof(sigframe_code) - sizeof(struct message));
-    sigframe->m.type = SYSCALL_SIGRET;
-    sigframe->m.m1_i1 = signum;
-    memcpy(sigframe->sigret_codes, sigframe_code, sizeof(sigframe_code));
+    sigframe->s_base.pm = (struct message *)(who->sp - sizeof(struct sigframe_code) - sizeof(struct message));
+    sigframe->s_base.m.type = SYSCALL_SIGRET;
+    sigframe->s_base.m.m1_i1 = signum;
+    sigframe->s_codes.codes[0] = ASM_ADDUI_SP_SP_1;
+    sigframe->s_codes.codes[1] = ASM_SYSCALL;
 
     copyto_user_stack(who,sigframe,sizeof(struct sigframe));
     //signum is sitting on top of the stack
@@ -115,7 +113,6 @@ PRIVATE int sys_sig_handler(struct proc *who, int signum){
             em->m1_i1 = 0;
             em->src = who->proc_nr;
             interrupt_send(SYSTEM, em);
-
             if(current_proc == who)
                 current_proc = NULL;
             
