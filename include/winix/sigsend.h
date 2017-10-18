@@ -21,7 +21,8 @@
 
 
 int send_sig(struct proc *who, int signum);
-int set_signal(struct proc *who, int signum, sighandler_t handler);
+int sig_proc(struct proc *who, int signum);
+int check_sigpending(struct proc* who);
 
 #define SIG_FRAME_CODE_LEN  (2)
 

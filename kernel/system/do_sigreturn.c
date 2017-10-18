@@ -14,7 +14,7 @@
  * 
 */
 #include <kernel/kernel.h>
-#include <winix/do_signal.h>
+#include <winix/sigsend.h>
 
 int do_sigreturn(struct proc *who, struct message *m){
     reg_t *sp;
@@ -40,25 +40,19 @@ int do_sigreturn(struct proc *who, struct message *m){
         goto end;
     }
 
-    if(who->sig_pending){
-        int i;
-        sigset_t* pendings = &who->sig_pending;
-        sigset_t* blocked = &who->sig_mask;
-        for(i = 1; i < _NSIG; i++){
-            if(sigismember(pendings, i) && !sigismember(blocked, i)){
-                sigdelset(pendings, i);
-                sig_proc(who, i);
-                break;
-            }
-        }
-    }else{
-        struct message m;
-        if(!who->state)
-            enqueue_schedule(who);
-        else if(who->state & RECEIVING)
-            syscall_reply(EINTR, who->proc_nr, &m);
-    }
+    //Normall after invoking a system call, the process
+    //will be blocked on RECEIVING reply from the system
+    //But since we have restored the pcb context before
+    //the signal handler, so double check process state,
+    //add it to scheduling queue if necessary
+    if(!who->state)
+        enqueue_schedule(who);
+
+    if(who->sig_pending)
+        check_sigpending(who);
     
 end:
+    if(who->state & RECEIVING)
+        return EINTR;
     return DONTREPLY;
 }

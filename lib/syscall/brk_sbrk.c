@@ -1,4 +1,5 @@
-#include <lib.h>
+#include <sys/syscall.h>
+#include <stddef.h>
 
 static char* _brk = NULL; //data segment break cache
 

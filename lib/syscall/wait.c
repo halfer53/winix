@@ -1,5 +1,5 @@
-#include <lib.h>
-
+#include <sys/syscall.h>
+#include <stddef.h>
 
 pid_t wait(int *wstatus){
     struct message m;

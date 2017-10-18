@@ -13,7 +13,7 @@
 */
 #include <kernel/kernel.h>
 #include <kernel/exception.h>
-#include <winix/do_signal.h>
+#include <winix/sigsend.h>
 /**
     addui $sp, $sp, 1
     syscall
@@ -91,7 +91,6 @@ PRIVATE int sys_sig_handler(struct proc *who, int signum){
         who->sig_status = signum;
         KDEBUG(("Signal %d: kill process \"%s [%d]\"\n",signum,who->name,who->pid));
         
-        who->flags |= STOPPED;
         if(in_interrupt()){
             //if we are in interrupt, send an exit syscall to the kernel, 
             //and set current_proc to NULL so the scheduler picks the next proc
@@ -112,7 +111,6 @@ PRIVATE int sys_sig_handler(struct proc *who, int signum){
     //if it's ignored
     if(who->sig_table[signum].sa_handler == SIG_IGN){
         KDEBUG(("Signal %d ignored by process \"%s [%d]\"\n",signum,who->name,who->pid));
-        // who->pc = (void (*)())((int)who->pc+1);
         return OK;
     }
     return ERR;
@@ -121,14 +119,24 @@ PRIVATE int sys_sig_handler(struct proc *who, int signum){
 int sig_proc(struct proc *who, int signum){
     struct sigaction* act;
 
-    
     if(sigismember(&who->sig_mask, signum)){
         if(signum != SIGKILL && signum != SIGSTOP){
             // kdebug("sig %d pending\n", signum);
             return sigaddset(&who->sig_pending, signum);
         }
     }
+    // kdebug("send sig %d to %d\n", signum, who->pid);
 
+    //Unpause the process if it was blocked by pause(2)
+    //or sigsuspend(2)
+    if(who->state & (PAUSING | RECEIVING)){
+        struct message m;
+        // kdebug("wakeup %d\n", who->proc_nr);
+        who->state &= ~PAUSING;
+        syscall_reply(EINTR, who->proc_nr, &m);
+    }
+
+    //if the system can handle the signal
     if(sys_sig_handler(who,signum) == OK)
         return OK;
 
@@ -140,9 +148,30 @@ int sig_proc(struct proc *who, int signum){
         sigdelset(&act->sa_mask, signum);
 
     build_signal_ctx(who,signum);
-    if(act->sa_flags & SA_RESETHAND)
+    
+    if(act->sa_flags & SA_RESETHAND){
         act->sa_handler = SIG_DFL;
+    }
+        
     return OK;
+}
+
+
+int check_sigpending(struct proc* who){
+    int i;
+    sigset_t* pendings = &who->sig_pending;
+    sigset_t* blocked = &who->sig_mask;
+
+    if(who->sig_pending){
+        for(i = 1; i < _NSIG; i++){
+            if(sigismember(pendings, i) && !sigismember(blocked, i)){
+                sigdelset(pendings, i);
+                sig_proc(who, i);
+                return i;
+            }
+        }
+    }
+    return 0;
 }
 
 /**

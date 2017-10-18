@@ -61,8 +61,6 @@ int main() {
 
     c = buf;
     end_buf = c + MAX_LINE -2;
-    test_signal(1, NULL);
-    test_eintr(1, NULL);
     while(1) {
         printf("WINIX> ");
         c = buf;

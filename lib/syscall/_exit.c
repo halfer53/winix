@@ -1,4 +1,4 @@
-#include <lib.h>
+#include <sys/syscall.h>
 
 /**
  * Exits the current process.

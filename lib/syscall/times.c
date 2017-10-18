@@ -1,4 +1,4 @@
-#include <lib.h>
+#include <sys/syscall.h>
 #include <sys/times.h>
 
  clock_t times(struct tms* buf) {

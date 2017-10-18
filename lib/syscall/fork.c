@@ -1,4 +1,4 @@
-#include <lib.h>
+#include <sys/syscall.h>
 
 pid_t _pid = 0;//pid cache
 

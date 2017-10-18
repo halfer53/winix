@@ -29,6 +29,9 @@ int do_kill(struct proc *who, struct message *m){
         return ESRCH;
 
     ret = sig_proc(to,signum);
-    if(to != who)
-        return ret;
+
+    //Don't reply if the process sends a signal to itself
+    // if(to == who)
+    //     return DONTREPLY;
+    return ret;
 }

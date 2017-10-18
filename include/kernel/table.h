@@ -40,6 +40,9 @@ int do_winfo(struct proc* who, struct message* m);
 int do_getc(struct proc* who, struct message* m);
 int do_printf(struct proc* who, struct message* m);
 int do_sysconf(struct proc* who, struct message* m);
+int do_sigsuspend(struct proc* who, struct message* m);
+int do_sigpending(struct proc* who, struct message* m);
+int do_sigprocmask(struct proc* who, struct message* m);
 
 #endif
 

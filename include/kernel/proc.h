@@ -77,7 +77,7 @@
 #define SENDING                    	0x0001    /* process blocked trying to SEND */
 #define RECEIVING                	0x0002    /* process blocked trying to RECEIVE */
 #define WAITING                    	0x0004    /* process blocked wait(2) */
-#define SIG_PENDING                	0x0008    /* set when new kernel signal arrives */
+#define PAUSING                 	0x0008    /* set when new kernel signal arrives */
 #define VFORKING                   	0x0010    /* parent is blocked by vfork(2) */
 
 //Process Information flags

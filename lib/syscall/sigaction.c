@@ -1,5 +1,5 @@
-#include <lib.h>
-#include <debug.h>
+#include <sys/syscall.h>
+#include <signal.h>
 
 void __sigreturn(void);
 

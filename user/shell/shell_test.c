@@ -79,23 +79,44 @@ void term_handler(int signum){
 
 int test_signal(int argc, char **argv){
     struct sigaction sa;
+    int i;
+    sigset_t set, prevset;
+
+    //Check out what would happen after changing
+    // the following sigemptyset to sigfillset
+    //explain why
+
     sigemptyset(&sa.sa_mask);
+    sa.sa_flags = 0;
     
-    if(!fork()){
-        sa.sa_handler = usr_handler;
-        sigaction(SIGUSR1, &sa, NULL);
-        sa.sa_handler = usr2_handler;
-        sigaction(SIGUSR2, &sa, NULL);
-        sa.sa_handler = int_handler;
-        sigaction(SIGINT, &sa, NULL);
-        sa.sa_handler = term_handler;
-        sigaction(SIGTERM, &sa, NULL);
-        // signal(SIGINT, int_handler);
-        // signal(SIGTERM, term_handler);
-        raise(SIGUSR1);
-        abort();
-    }
-    wait(NULL);
+    //setup signal handlers
+    sa.sa_handler = usr_handler;
+    sigaction(SIGUSR1, &sa, NULL);
+    sa.sa_handler = usr2_handler;
+    sigaction(SIGUSR2, &sa, NULL);
+    sa.sa_handler = int_handler;
+    sigaction(SIGINT, &sa, NULL);
+    sa.sa_handler = term_handler;
+    sigaction(SIGTERM, &sa, NULL);
+    
+    sigfillset(&set);
+    sigprocmask(SIG_SETMASK, &set, &prevset);
+
+    //send SIGUSR1 to itself
+    //since SIGUSR1 is currently blocked by sigprocmask
+    //SIGUSR1 will be pended until sigsuspend
+    raise(SIGUSR1);
+
+    //check pending signals
+    sigpending(&set);
+    printf("pending sigs %x\n",set);
+
+    if(sigismember(&set, SIGUSR1))
+        printf("SIGUSR1 is pending\n");
+
+    //unblock all pending signals
+    printf("signal handler usr1 should be called after this\n");
+    sigsuspend(&prevset);
     return 0;
 }
 
@@ -155,8 +176,17 @@ int test_general(int argc, char **argv){
     return 0;
 }
 
+void usr1h(int sig){
+    printf("usr1h\n");
+}
+
+void usr2h(int sig){
+    printf("usr2h\n");
+}
+
 int test_float(int argc, char **argv){
     int foo;
+
     signal(SIGFPE, SIG_IGN);
     foo = 1 / 0;
     return 0;

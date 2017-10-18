@@ -1,12 +1,21 @@
 #include <kernel/kernel.h>
-
+/**
+ * Syscall in this file: sigpending
+ * Input:   
+ *
+ * Return:  m1_i1: pending masks
+ * 
+ * @author Bruce Tan
+ * @email brucetansh@gmail.com
+ * 
+ * @author Paul Monigatti
+ * @email paulmoni@waikato.ac.nz
+ * 
+ * @create date 2017-08-23 06:10:17
+ * 
+*/
 int do_sigpending(struct proc* who, struct message* m){
-    vptr_t* vset = m->m1_p1;
-    ptr_t* set;
-    if(!vset || !is_addr_accessible(vset, who))
-        return EFAULT;
-    set = get_physical_addr(vset,who);
-    *set = who->sig_pending;
+    m->m1_i1 = who->sig_pending;
     return OK;
 }
 

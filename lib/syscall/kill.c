@@ -1,4 +1,4 @@
-#include <lib.h>
+#include <sys/syscall.h>
 
 int kill (pid_t pid, int sig){
     struct message m;

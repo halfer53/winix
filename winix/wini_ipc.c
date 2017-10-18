@@ -28,8 +28,7 @@ int do_send(int dest, struct message *m) {
     struct proc *pDest;
 
     current_proc->message = m; //save for later
-    
-    pDest = IS_KERNELN(dest) ? get_proc(dest) : get_proc_by_pid(dest);
+    pDest = IS_USER_PROC(current_proc) ? get_proc_by_pid(dest) : get_proc(dest);
     
     //Is the destination valid?
     if (pDest) {

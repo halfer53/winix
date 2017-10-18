@@ -32,12 +32,10 @@ void system_main() {
     struct message* mesg = &m;
 
     kreport_sysinfo();
-    
     getcontext(&recv_ctx);
 
     //Receive message, do work, repeat.
     while(true) {
-
         //get a message
         winix_receive(mesg);
         who_proc_nr = mesg->src;
@@ -143,6 +141,9 @@ void init_syscall_table(){
     LINK_SYSCALL(SYSCALL_GETC, do_getc);        //14
     LINK_SYSCALL(SYSCALL_PRINTF, do_printf);    //15
     LINK_SYSCALL(SYSCALL_SYSCONF, do_sysconf);  //16
+    LINK_SYSCALL(SYSCALL_SIGSUSPEND, do_sigsuspend);
+    LINK_SYSCALL(SYSCALL_SIGPENDING, do_sigpending);
+    LINK_SYSCALL(SYSCALL_SIGPROCMASK, do_sigprocmask);
 }
 
 

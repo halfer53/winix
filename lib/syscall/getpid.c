@@ -1,4 +1,5 @@
-#include <lib.h>
+#include <sys/syscall.h>
+extern pid_t _pid;
 
 pid_t getpid(){
     struct message m;

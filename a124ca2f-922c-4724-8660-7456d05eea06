@@ -1,0 +1,372 @@
+.file 2,"/mnt/e/github/winix/tools/../winix/sigsend.c"
+.text
+.loc 2,59
+build_signal_ctx:
+	subui	$sp, $sp, 7
+	sw	$11, 3($sp)
+	sw	$12, 4($sp)
+	sw	$13, 5($sp)
+	sw	$ra, 6($sp)
+.loc 2,59
+.loc 2,61
+	lw	$13, 7($sp)
+	sw	$13, 0($sp)
+	sw	$13, 1($sp)
+	addui	$13, $0, 21
+	sw	$13, 2($sp)
+	jal	copyto_user_stack
+.loc 2,64
+	lw	$13, 7($sp)
+	sw	$13, 0($sp)
+	addui	$13, $sp, 8
+	sw	$13, 1($sp)
+	addui	$13, $0, 1
+	sw	$13, 2($sp)
+	jal	copyto_user_stack
+.loc 2,66
+	lw	$13, 7($sp)
+	addui	$12, $0, 3
+	lw	$11, 8($sp)
+	mult	$12, $12, $11
+	addui	$11, $13, 92
+	addu	$12, $12, $11
+	lw	$12, 0($12)
+	sw	$12, 15($13)
+.loc 2,67
+	lw	$13, 7($sp)
+	lw	$12, 155($13)
+	sw	$12, 14($13)
+.loc 2,70
+	lw	$13, 7($sp)
+	lw	$12, 90($13)
+	sw	$12, 91($13)
+.loc 2,71
+	lw	$13, 7($sp)
+	addui	$12, $0, 3
+	lw	$11, 8($sp)
+	mult	$12, $12, $11
+	addui	$11, $13, 92
+	addu	$12, $12, $11
+	lw	$12, 1($12)
+	sw	$12, 90($13)
+.loc 2,73
+	lw	$13, 7($sp)
+	lw	$13, 19($13)
+	seq	$13, $13, $0
+	bnez	$13, L.9
+.loc 2,73
+.loc 2,74
+	lw	$13, 7($sp)
+	sw	$0, 19($13)
+.loc 2,75
+	lw	$13, 7($sp)
+	sw	$13, 0($sp)
+	jal	enqueue_schedule
+.loc 2,76
+L.9:
+.loc 2,77
+	lw	$13, 7($sp)
+	addui	$13, $13, 87
+	lw	$12, 0($13)
+	ori	$12, $12, 64
+	sw	$12, 0($13)
+.loc 2,78
+	addu	$1, $0, $0
+L.8:
+	lw	$11, 3($sp)
+	lw	$12, 4($sp)
+	lw	$13, 5($sp)
+	lw	$ra, 6($sp)
+	addui	$sp, $sp, 7
+	jr	$ra
+.loc 2,88
+sys_sig_handler:
+	subui	$sp, $sp, 6
+	sw	$12, 2($sp)
+	sw	$13, 3($sp)
+	sw	$ra, 4($sp)
+.loc 2,88
+.loc 2,90
+	addui	$13, $0, 3
+	lw	$12, 7($sp)
+	mult	$13, $13, $12
+	lw	$12, 6($sp)
+	addui	$12, $12, 92
+	addu	$13, $13, $12
+	lw	$13, 0($13)
+	addu	$13, $0, $13
+	sneu	$13, $13, $0
+	bnez	$13, L.12
+.loc 2,90
+.loc 2,91
+	lw	$13, 6($sp)
+	lw	$12, 7($sp)
+	sw	$12, 82($13)
+.loc 2,92
+.loc 2,94
+	jal	irq_count
+	addu	$13, $0, $1
+	seq	$13, $13, $0
+	bnez	$13, L.14
+.loc 2,94
+.loc 2,98
+	jal	get_exception_m
+	addu	$13, $0, $1
+	sw	$13, 5($sp)
+.loc 2,99
+	lw	$13, 5($sp)
+	addui	$12, $0, 2
+	sw	$12, 1($13)
+.loc 2,100
+	lw	$13, 5($sp)
+	sw	$0, 2($13)
+.loc 2,101
+	lw	$13, 5($sp)
+	lw	$12, 6($sp)
+	lw	$12, 88($12)
+	sw	$12, 0($13)
+.loc 2,102
+	sw	$0, 0($sp)
+	lw	$13, 5($sp)
+	sw	$13, 1($sp)
+	jal	interrupt_send
+.loc 2,103
+	lw	$13, current_proc($0)
+	addu	$13, $0, $13
+	lw	$12, 6($sp)
+	addu	$12, $0, $12
+	sneu	$13, $13, $12
+	bnez	$13, L.15
+.loc 2,104
+	sw	$0, current_proc($0)
+.loc 2,106
+	j	L.15
+L.14:
+.loc 2,106
+.loc 2,107
+	lw	$13, 6($sp)
+	sw	$13, 0($sp)
+	sw	$0, 1($sp)
+	jal	exit_proc
+.loc 2,108
+L.15:
+.loc 2,109
+	addu	$1, $0, $0
+	j	L.11
+L.12:
+.loc 2,112
+	addui	$13, $0, 3
+	lw	$12, 7($sp)
+	mult	$13, $13, $12
+	lw	$12, 6($sp)
+	addui	$12, $12, 92
+	addu	$13, $13, $12
+	lw	$13, 0($13)
+	addu	$13, $0, $13
+	addui	$12, $0, 1
+	sneu	$13, $13, $12
+	bnez	$13, L.18
+.loc 2,112
+.loc 2,113
+.loc 2,114
+	addu	$1, $0, $0
+	j	L.11
+L.18:
+.loc 2,116
+	lhi	$1, 0xffff
+	ori	$1, $1, 0xffff
+L.11:
+	lw	$12, 2($sp)
+	lw	$13, 3($sp)
+	lw	$ra, 4($sp)
+	addui	$sp, $sp, 6
+	jr	$ra
+.global	sig_proc
+.loc 2,119
+sig_proc:
+	subui	$sp, $sp, 16
+	sw	$7, 3($sp)
+	sw	$11, 4($sp)
+	sw	$12, 5($sp)
+	sw	$13, 6($sp)
+	sw	$ra, 7($sp)
+.loc 2,119
+.loc 2,122
+	lw	$13, 16($sp)
+	addui	$13, $13, 90
+	sw	$13, 0($sp)
+	lw	$13, 17($sp)
+	sw	$13, 1($sp)
+	jal	sigismember
+	addu	$13, $0, $1
+	seq	$13, $13, $0
+	bnez	$13, L.21
+.loc 2,122
+.loc 2,123
+	lw	$13, 17($sp)
+	sw	$13, 15($sp)
+	seqi	$13, $13, 9
+	bnez	$13, L.23
+	lw	$13, 15($sp)
+	seqi	$13, $13, 17
+	bnez	$13, L.23
+.loc 2,123
+.loc 2,124
+	la	$13, L.25
+	sw	$13, 0($sp)
+	lw	$13, 17($sp)
+	sw	$13, 1($sp)
+	jal	kdebug
+.loc 2,125
+	lw	$13, 16($sp)
+	addui	$13, $13, 89
+	sw	$13, 0($sp)
+	lw	$13, 17($sp)
+	sw	$13, 1($sp)
+	jal	sigaddset
+	addu	$13, $0, $1
+	addu	$1, $0, $13
+	j	L.20
+L.23:
+.loc 2,127
+L.21:
+.loc 2,128
+	la	$13, L.26
+	sw	$13, 0($sp)
+	lw	$13, 17($sp)
+	sw	$13, 1($sp)
+	lw	$13, 16($sp)
+	lw	$13, 83($13)
+	sw	$13, 2($sp)
+	jal	kdebug
+.loc 2,132
+	lw	$13, 16($sp)
+	lw	$13, 19($13)
+	andi	$13, $13, 8
+	seq	$13, $13, $0
+	bnez	$13, L.27
+.loc 2,132
+.loc 2,134
+	lw	$13, 16($sp)
+	addui	$13, $13, 19
+	lw	$12, 0($13)
+	lhi	$11, 0xffff
+	ori	$11, $11, 0xfff7
+	and	$12, $12, $11
+	sw	$12, 0($13)
+.loc 2,135
+	lhi	$13, 0xffff
+	ori	$13, $13, 0xfffc
+	sw	$13, 0($sp)
+	lw	$13, 16($sp)
+	lw	$13, 88($13)
+	sw	$13, 1($sp)
+	addui	$13, $sp, 8
+	sw	$13, 2($sp)
+	jal	syscall_reply
+.loc 2,136
+L.27:
+.loc 2,139
+	lw	$13, 16($sp)
+	sw	$13, 0($sp)
+	lw	$13, 17($sp)
+	sw	$13, 1($sp)
+	jal	sys_sig_handler
+	addu	$13, $0, $1
+	sne	$13, $13, $0
+	bnez	$13, L.29
+.loc 2,140
+	addu	$1, $0, $0
+	j	L.20
+L.29:
+.loc 2,142
+	addui	$13, $0, 3
+	lw	$12, 17($sp)
+	mult	$13, $13, $12
+	lw	$12, 16($sp)
+	addui	$12, $12, 92
+	addu	$7, $13, $12
+.loc 2,144
+	lw	$13, 2($7)
+	andi	$13, $13, 4
+	seq	$13, $13, $0
+	bnez	$13, L.31
+.loc 2,145
+	addui	$13, $7, 1
+	sw	$13, 0($sp)
+	lw	$13, 17($sp)
+	sw	$13, 1($sp)
+	jal	sigaddset
+	j	L.32
+L.31:
+.loc 2,147
+	addui	$13, $7, 1
+	sw	$13, 0($sp)
+	lw	$13, 17($sp)
+	sw	$13, 1($sp)
+	jal	sigdelset
+L.32:
+.loc 2,149
+	lw	$13, 16($sp)
+	sw	$13, 0($sp)
+	lw	$13, 17($sp)
+	sw	$13, 1($sp)
+	jal	build_signal_ctx
+.loc 2,150
+	lw	$13, 2($7)
+	andi	$13, $13, 2
+	seq	$13, $13, $0
+	bnez	$13, L.33
+.loc 2,151
+	sw	$0, 0($7)
+L.33:
+.loc 2,152
+	addu	$1, $0, $0
+L.20:
+	lw	$7, 3($sp)
+	lw	$11, 4($sp)
+	lw	$12, 5($sp)
+	lw	$13, 6($sp)
+	lw	$ra, 7($sp)
+	addui	$sp, $sp, 16
+	jr	$ra
+.global	check_sigpending
+.loc 2,156
+check_sigpending:
+	subui	$sp, $sp, 1
+	sw	$ra, 0($sp)
+	lw	$ra, 0($sp)
+	addui	$sp, $sp, 1
+	jr	$ra
+.global	send_sig
+.loc 2,183
+send_sig:
+	subui	$sp, $sp, 1
+	sw	$ra, 0($sp)
+	lw	$ra, 0($sp)
+	addui	$sp, $sp, 1
+	jr	$ra
+.extern	BSS_END 1
+.extern	DATA_END 1
+.extern	TEXT_END 1
+.extern	BSS_BEGIN 1
+.extern	DATA_BEGIN 1
+.extern	TEXT_BEGIN 1
+.extern	block_q 2
+.extern	ready_q 10
+.extern	proc_table 1
+.extern	current_proc 1
+.extern	stderr 1
+.extern	stdout 1
+.extern	stdin 1
+.extern	__iotab 20
+.extern	__errno 1
+.data
+L.37:
+	.asciiz	"pending addr %x\n"
+L.36:
+	.asciiz	"sigpend %x %x\n"
+L.26:
+	.asciiz	"send sig %d to %d\n"
+L.25:
+	.asciiz	"sig %d pending\n"

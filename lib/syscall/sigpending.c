@@ -1,8 +1,17 @@
-#include <lib.h>
+#include <sys/syscall.h>
+#include <signal.h>
+#include <stddef.h>
+#include <errno.h>
 
 int sigpending(sigset_t *set){
     struct message m;
-    m.m1_p1 = set;
-    return _syscall(SYSCALL_SIGPENDING, &m);
+    int ret;
+    ret = _syscall(SYSCALL_SIGPENDING, &m);
+    if(set){
+        *set = m.m1_i1;
+    }else{
+        __set_errno(EFAULT);
+    }
+    return ret;
 }
 
