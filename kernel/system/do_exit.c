@@ -74,15 +74,16 @@ void exit_proc(struct proc *who, int status){
     zombify(who);
     clear_proc_mesg(who);
     who->exit_status = status;
-    who->state |= STOPPED;
+    who->flags |= STOPPED;
 
-    if(parent && parent->state & VFORK){
+    if(parent->state & VFORKING){
         //parent is blocked by vfork(2)
-        parent->state &= ~VFORK;
+        parent->state &= ~VFORKING;
         syscall_reply(who->pid, parent->proc_nr, mesg);
         release_zombie(who);
         return;
     }
+    send_sig(parent, SIGCHLD);
 
     foreach_proc(mp){
         //if this process if waiting for the current to be exited process

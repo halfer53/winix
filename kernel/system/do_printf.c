@@ -33,8 +33,13 @@
  * @return     
  */
 int do_printf(struct proc *who, struct message *m){
+    vptr_t* vp1, *vp2;
     void *ptr, *ptr2;
-    ptr = get_physical_addr(m->m1_p1,who);
-    ptr2 = get_physical_addr(m->m1_p2,who);
+    vp1 = m->m1_p1;
+    vp2 = m->m1_p2;
+    if(!is_addr_accessible(vp1, who) || !is_addr_accessible(vp2, who))
+        return EFAULT;
+    ptr = get_physical_addr(vp1,who);
+    ptr2 = get_physical_addr(vp2,who);
     return kprintf_vm(ptr,ptr2,who->rbase);
 }

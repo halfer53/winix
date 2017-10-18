@@ -16,37 +16,12 @@
 #include <kernel/kernel.h>
 #include <winix/do_signal.h>
 
-/**
- * This method resume the system call if it was previously interruppted
- * currently, it just simply return -1 to the user space, and set errno 
- * to EINTR to indicate failure
- * @param to user process to which we send err to
- */
- int resume_from_sig(struct proc *to){
-    struct syscall_ctx* prev_syscall;
-
-    prev_syscall = interrupted_syscall_ctx();
-
-    if(prev_syscall->interruptted && to->state & RECEIVING &&
-        prev_syscall->who->proc_nr == to->proc_nr){
-        
-        //return EINTR to the user
-        syscall_reply(EINTR, to->proc_nr,&prev_syscall->m);
-
-    }else{
-        // kprintf("enqueue %d pri %d\n",to->proc_nr, to->priority);
-        if(!to->state)
-            enqueue_schedule(to);
-    }
-    memset(prev_syscall, 0, sizeof(struct syscall_ctx));
-    return OK;
-}
-
 int do_sigreturn(struct proc *who, struct message *m){
     reg_t *sp;
     struct proc *systask;
     int signum = m->m1_i1;
 
+    who->flags &= ~IN_SIG_HANDLER;
     sp = get_physical_addr(who->sp,who);
 
     sp += sizeof(signum) + sizeof(struct syscall_frame_comm);
@@ -56,12 +31,34 @@ int do_sigreturn(struct proc *who, struct message *m){
     //scheduling flags, and messages
     memcpy(who,sp,SIGNAL_CTX_LEN);
 
-    //reset the signal to default
-    who->sig_table[signum].sa_handler = SIG_DFL;
-    if(signum == SIGABRT)
-        send_sig(who, SIGABRT);
+    //restore mask
+    who->sig_mask = who->sig_mask2;
 
-    resume_from_sig(who);
+    if(signum == SIGABRT){
+        who->sig_table[SIGABRT].sa_handler = SIG_DFL;
+        sig_proc(who, SIGABRT);
+        goto end;
+    }
 
+    if(who->sig_pending){
+        int i;
+        sigset_t* pendings = &who->sig_pending;
+        sigset_t* blocked = &who->sig_mask;
+        for(i = 1; i < _NSIG; i++){
+            if(sigismember(pendings, i) && !sigismember(blocked, i)){
+                sigdelset(pendings, i);
+                sig_proc(who, i);
+                break;
+            }
+        }
+    }else{
+        struct message m;
+        if(!who->state)
+            enqueue_schedule(who);
+        else if(who->state & RECEIVING)
+            syscall_reply(EINTR, who->proc_nr, &m);
+    }
+    
+end:
     return DONTREPLY;
 }

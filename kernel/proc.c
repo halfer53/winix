@@ -66,22 +66,22 @@ PUBLIC struct proc *current_proc;
  * 
  *
 **/
-void kprint_all_procs() {
+void kreport_all_procs() {
     struct proc *curr;
     kprintf("NAME    PID PPID RBASE      PC         STACK      HEAP       PROTECTION   FLAGS\n");
     foreach_ktask(curr){
-        kprint_proc(curr);
+        kreport_proc(curr);
     }
 
     foreach_proc(curr){
-        kprint_proc(curr);
+        kreport_proc(curr);
     }
 }
 
 /**
  * Report the proc's info
 **/
-void kprint_proc(struct proc* curr) {
+void kreport_proc(struct proc* curr) {
     int ptable_idx = PADDR_TO_PAGED(curr->rbase)/32;
     kprintf("%-08s %-03d %-04d 0x%08x 0x%08x 0x%08x 0x%08x %d 0x%08x %d\n",
             curr->name,
@@ -310,6 +310,7 @@ void proc_set_default(struct proc *p) {
     p->quantum = DEFAULT_USER_QUANTUM;
     p->ptable = p->protection_table;
     p->alarm.proc_nr = p->proc_nr;
+    p->sig_table[SIGCHLD].sa_handler = SIG_IGN;
 }
 
 /**

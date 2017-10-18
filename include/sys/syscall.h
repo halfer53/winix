@@ -39,6 +39,9 @@
 #define SYSCALL_GETC            14
 #define SYSCALL_PRINTF          15
 #define SYSCALL_SYSCONF         16
+#define SYSCALL_SIGSUSPEND      17
+#define SYSCALL_SIGPENDING      18
+#define SYSCALL_SIGPROCMASK     19
 
 #define DECLARE_SYSCALL(function, params, syscall_num, passing_codes)\
 function params{\

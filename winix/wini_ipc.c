@@ -63,8 +63,8 @@ int do_send(int dest, struct message *m) {
         }
 
         if(is_debugging_syscall()){
-            if(dest == SYSTEM)
-                kprintf("\nSyscall %d from %d|", m->type, m->src);
+            if(dest == SYSTEM && IS_USER_PROC(current_proc))
+                kprintf("\nSyscall %d from %d|", m->type, get_proc(m->src)->pid);
         }else if(get_debug_ipc_count()){
             kprintf("\nIPC: SEND to %d from %d type %d| ",
                         dest, current_proc->proc_nr,m->type);
@@ -140,8 +140,11 @@ int do_notify(int src, int dest, struct message *m) {
     //Is the destination valid?
     if (pDest = get_running_proc(dest)) {
 
-        if(get_debug_ipc_count())
-                kprintf("\nNOTIFY %d from %d type %d| ",dest, src ,m->type);
+        if(is_debugging_syscall()){
+            if(IS_KERNELN(src) && IS_USER_PROC(pDest))
+                kprintf("\nSyscall reply %d to %d|", m->reply_res, pDest->pid);
+        }else if(get_debug_ipc_count())
+            kprintf("\nNOTIFY %d from %d type %d| ",dest, src ,m->type);
             
         //If destination is waiting, deliver message immediately.
         if (pDest->state & RECEIVING) {

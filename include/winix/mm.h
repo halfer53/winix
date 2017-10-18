@@ -24,7 +24,7 @@ ptr_t* get_free_pages(int length, int flags);
 int free_pages(ptr_t* page, int num);
 int user_free_pages(struct proc* who, ptr_t* page, int len);
 ptr_t* user_get_free_pages(struct proc* who, int length, int flags);
-bool is_addr_accessible(struct proc* who, vptr_t* addr);
+bool is_addr_accessible(vptr_t* addr,struct proc* who);
 
 #define free_page(page)         (free_pages((page),1))
 #define get_free_page(flags)    (get_free_pages(1,(flags)))
@@ -34,7 +34,7 @@ bool is_addr_accessible(struct proc* who, vptr_t* addr);
 int next_free_page_index();
 
 void* dup_vm(struct proc* parent, struct proc* child);
-void kprint_ptable(struct proc* who);
-void kprint_sysmap();
+void kreport_ptable(struct proc* who);
+void kreport_sysmap();
 
 #endif

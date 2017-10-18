@@ -33,7 +33,7 @@ PRIVATE int bss_page_end;
  * @param  addr 
  * @return      
  */
-bool is_addr_accessible(struct proc* who, vptr_t* addr){
+bool is_addr_accessible( vptr_t* addr, struct proc* who){
     int page;
     ptr_t* paddr;
 
@@ -232,17 +232,17 @@ void release_proc_mem(struct proc *who){
     bitmap_clear(who->ptable, PTABLE_LEN);
 }
 
-void kprint_ptable(struct proc* who){
-    kprint_bitmap(who->ptable, MEM_MAP_LEN);
+void kreport_ptable(struct proc* who){
+    kreport_bitmap(who->ptable, MEM_MAP_LEN);
 }
 
-void kprint_sysmap(){
+void kreport_sysmap(){
     static char free_str[] = "Free";
     static char used_str[] = "Used";
     int flags, pages, i;
     char* str;
     kprintf("Sys Mem bitmap: ");
-    kprint_bitmap(mem_map, MEM_MAP_LEN);
+    kreport_bitmap(mem_map, MEM_MAP_LEN);
 
     for(i = 0; i < 2; i++){
         flags = i == 0 ? ZERO_BITS : ONE_BITS;

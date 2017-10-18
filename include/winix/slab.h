@@ -20,7 +20,7 @@ void* kmalloc (unsigned int size);
 void kfree(void *ptr);
 void* krealloc(void *p,unsigned int size);
 void *kcalloc(unsigned int number , unsigned int size);
-void kkprint_mallinfo();
+void kkreport_mallinfo();
 void init_slab(void *addr, int size);
 
 

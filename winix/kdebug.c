@@ -46,7 +46,9 @@ int get_debug_timer_count(){
 }
 
 int is_debugging_syscall(){
-    return _debug_syscall;
+    if(_debug_syscall > 0)
+        return _debug_syscall--;
+    return 0;
 }
 
 void debug_scheduling(int val){
@@ -77,7 +79,7 @@ void stop_debug_syscall(){
     _debug_syscall = 0;
 }
 
-void kprint_readyqueue(){
+void kreport_readyqueue(){
     int i,j;
     struct proc* curr;
     kprintf(" q| ");
@@ -89,10 +91,10 @@ void kprint_readyqueue(){
             curr = curr->next;
         }
     }
-    kprintf("| ");
+    kprintf("| \n");
 }
 
-void kprint_receiver_queue(struct proc* who){
+void kreport_receiver_queue(struct proc* who){
     struct proc* curr;
     curr = who->sender_q;
     if(curr)

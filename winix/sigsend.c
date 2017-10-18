@@ -57,24 +57,8 @@
  * @return        OK if building is successful
  */
 PRIVATE int build_signal_ctx(struct proc *who, int signum){
-    struct sigframe sigframe_s;
-    struct sigframe* sigframe = &sigframe_s;
-
     //pcb context are saved onto the user stack, and will be restored after sigreturn syscall
     copyto_user_stack(who,who,SIGNAL_CTX_LEN);
-    
-    // //ra points at the sigframe code, so that when user signal handler finishes,
-    // //pc will point to the sig return code, to initiate sig return sys call
-    // who->ra = who->sp - sizeof(struct sigframe_code);
-    // sigframe->s_base.operation = WINIX_SENDREC;
-    // sigframe->s_base.dest = SYSTEM;
-    // //pm points at the syscall message, not that this is a virtual address
-    // sigframe->s_base.pm = (struct message *)(who->sp - sizeof(struct sigframe_code) - sizeof(struct message));
-    // sigframe->s_base.m.type = SYSCALL_SIGRET;
-    // sigframe->s_base.m.m1_i1 = signum;
-    // sigframe->s_codes.codes[0] = ASM_ADDUI_SP_SP_1;
-    // sigframe->s_codes.codes[1] = ASM_SYSCALL;
-    // copyto_user_stack(who,sigframe,sizeof(struct sigframe));
 
     //signum is sitting on top of the stack
     copyto_user_stack(who, &signum, sizeof(signum));
@@ -82,11 +66,15 @@ PRIVATE int build_signal_ctx(struct proc *who, int signum){
     who->pc = (void (*)())who->sig_table[signum].sa_handler;
     who->ra = (reg_t*)who->sa_restorer;
 
+    //backup sig mask
+    who->sig_mask2 = who->sig_mask;
+    who->sig_mask = who->sig_table[signum].sa_mask;
+
     if(who->state){//reschedule the process if it's blocked
         who->state = 0;//reset flags
         enqueue_schedule(who);
     }
-
+    who->flags |= IN_SIG_HANDLER;
     return OK;
 }
 
@@ -124,21 +112,22 @@ PRIVATE int sys_sig_handler(struct proc *who, int signum){
     //if it's ignored
     if(who->sig_table[signum].sa_handler == SIG_IGN){
         KDEBUG(("Signal %d ignored by process \"%s [%d]\"\n",signum,who->name,who->pid));
-        who->pc = (void (*)())((int)who->pc+1);
+        // who->pc = (void (*)())((int)who->pc+1);
         return OK;
     }
     return ERR;
 }
 
-/**
- * send the signal, signal handler will be invoked next time the 
- * process is scheduled
- * @param  who    
- * @param  signum 
- * @return        
- */
-int send_sig(struct proc *who, int signum){
+int sig_proc(struct proc *who, int signum){
     struct sigaction* act;
+
+    
+    if(sigismember(&who->sig_mask, signum)){
+        if(signum != SIGKILL && signum != SIGSTOP){
+            // kdebug("sig %d pending\n", signum);
+            return sigaddset(&who->sig_pending, signum);
+        }
+    }
 
     if(sys_sig_handler(who,signum) == OK)
         return OK;
@@ -150,19 +139,31 @@ int send_sig(struct proc *who, int signum){
     else
         sigdelset(&act->sa_mask, signum);
 
-    if(build_signal_ctx(who,signum))
-        return EINVAL;
-    
-    if(who->proc_nr == curr_mesg()->src){
+    build_signal_ctx(who,signum);
+    if(act->sa_flags & SA_RESETHAND)
+        act->sa_handler = SIG_DFL;
+    return OK;
+}
+
+/**
+ * send the signal, signal handler will be invoked next time the 
+ * process is scheduled
+ * @param  who    
+ * @param  signum 
+ * @return        
+ */
+int send_sig(struct proc *who, int signum){
+
+    if(who->state & RECEIVING && who->proc_nr == curr_mesg()->src){
         if(IS_SYSTEM(current_proc)){
-            intr_syscall();
+            struct message m;
+            syscall_reply(EINTR, who->proc_nr,&m);
         }else{
             get_proc(SYSTEM)->pc = &intr_syscall;
         }
     }
 
-    if(act->sa_flags & SA_RESETHAND)
-        act->sa_handler = SIG_DFL;
+    sig_proc(who,signum);
     return OK;
 }
 

@@ -77,17 +77,17 @@
 #define SENDING                    	0x0001    /* process blocked trying to SEND */
 #define RECEIVING                	0x0002    /* process blocked trying to RECEIVE */
 #define WAITING                    	0x0004    /* process blocked wait(2) */
-#define SIGNALED                	0x0008    /* set when new kernel signal arrives */
-#define SIG_PENDING                	0x0010    /* unready while signal being processed */
-#define VFORK                   	0x0020    /* parent is blocked by vfork(2) */
-#define STOPPED                    	0x0040    /* Stopped by signals */
+#define SIG_PENDING                	0x0008    /* set when new kernel signal arrives */
+#define VFORKING                   	0x0010    /* parent is blocked by vfork(2) */
 
 //Process Information flags
 #define IN_USE                    	0x0001      /* process slot is in use */
 #define RUNNABLE                	0x0002      /* Running in the system */
 #define ZOMBIE                    	0x0004      /* Zombie process */
-#define BILLABLE                	0x0008      /* Set when user is invoking a system call */
-#define DISABLE_FIRST_PAGE          0x0010      /* Set when the first page of the user address space is disabled */
+#define STOPPED                    	0x0008      /* Stopped by signals */
+#define BILLABLE                	0x0010      /* Set when user is invoking a system call */
+#define DISABLE_FIRST_PAGE          0x0020      /* Set when the first page of the user address space is disabled */
+#define IN_SIG_HANDLER              0x0040      /* Set if user is in the signal handler */
 
 //alloc_proc_mem flags
 #define PROC_SET_SP                	1
@@ -236,8 +236,8 @@ pid_t get_next_pid();
 struct proc* get_proc_by_pid(pid_t pid);
 struct proc *get_proc(int proc_nr);
 struct proc *get_running_proc(int proc_nr);
-void kprint_all_procs();
-void kprint_proc(struct proc* curr);
+void kreport_all_procs();
+void kreport_proc(struct proc* curr);
 struct proc *pick_proc();
 void zombify(struct proc *p);
 void release_zombie(struct proc*p);

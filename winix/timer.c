@@ -19,7 +19,7 @@
 //a linked list of pending timers to be alarmed
 PRIVATE struct timer *pending_timers = NULL;
 
-void kprint_timers(){
+void kreport_timers(){
     struct timer *mq = pending_timers;
     
     while(mq != NULL)
@@ -30,15 +30,17 @@ void kprint_timers(){
     kinfo("next timeout %d\n",next_timeout);
 }
 
-int new_timer(struct timer* curr, clock_t timeout, timerhandler_t watchdog){
+int new_timer(struct proc* from, struct timer* curr, clock_t timeout, timerhandler_t watchdog){
 
-    if(timeout == 0)
+    if(timeout <= 0)
         return ERR;
 
     if( !(curr->flags & TIMER_INUSE) ){
+        curr->flags |= TIMER_INUSE;
         curr->time_out = get_uptime() + timeout;
-        curr->proc_nr = SYSTEM;
         curr->handler = watchdog;
+        curr->proc_nr = from->proc_nr;
+        curr->next = NULL;
         insert_timer(curr);
         return OK;
     }
@@ -66,7 +68,6 @@ struct timer* dequeue_alarm(){
     }
     mq->flags &= ~TIMER_INUSE;
     mq->next = NULL;
-      
     return mq;
 }
 
@@ -77,10 +78,12 @@ struct timer* dequeue_alarm(){
  */
 void insert_timer(struct timer *timer){
     struct timer *prev = NULL;
-    struct timer *curr = pending_timers;
-    clock_t new_timeout = timer->time_out;
+    struct timer *curr;
+    clock_t new_timeout;
 
     disable_interrupt();
+    curr = pending_timers;
+    new_timeout = timer->time_out;
     while(curr && curr->time_out < new_timeout){
         prev = curr;
         curr = curr->next;
@@ -99,7 +102,7 @@ void insert_timer(struct timer *timer){
     enable_interrupt();
     
     if(get_debug_timer_count())
-        kprint_timers();
+        kreport_timers();
 }
 
 /**
@@ -108,12 +111,13 @@ void insert_timer(struct timer *timer){
  */
 void remove_timer(struct timer *timer){
     struct timer *prev = NULL;
-    struct timer *curr = pending_timers;
-    clock_t timeout = timer->time_out;
+    struct timer *curr;
 
+    disable_interrupt();
+    curr = pending_timers;
     while(curr && curr != timer){
-        curr = curr->next;
         prev = curr;
+        curr = curr->next;
     }
 
     if(prev){
@@ -124,5 +128,6 @@ void remove_timer(struct timer *timer){
             next_timeout = pending_timers->time_out;
     }
     timer->flags &= ~TIMER_INUSE;
+    enable_interrupt();
 }
 

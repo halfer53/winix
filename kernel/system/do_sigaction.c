@@ -22,10 +22,10 @@ int do_sigaction(struct proc *who, struct message *m){
     int flags;
 
 
-    if(!is_addr_accessible(who, (vptr_t *)act))
+    if(!is_addr_accessible((vptr_t *)act, who))
         return EFAULT;
 
-    if(oact && !is_addr_accessible(who, (vptr_t *)oact))
+    if(oact && !is_addr_accessible((vptr_t *)oact, who))
         return EFAULT;
 
     if(signum < 1 || signum >= _NSIG)

@@ -10,7 +10,7 @@ int do_vfork(struct proc* parent, struct message* m){
         
         syscall_reply(0, child->proc_nr, m);
         
-        parent->state |= VFORK;
+        parent->state |= VFORKING;
         return SUSPEND;
     }
     return EAGAIN;

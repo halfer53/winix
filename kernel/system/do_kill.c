@@ -17,6 +17,7 @@
 
 int do_kill(struct proc *who, struct message *m){
     struct proc *to;
+    int ret;
     pid_t pid = m->m1_i1;
     int signum = m->m1_i2;
 
@@ -27,5 +28,7 @@ int do_kill(struct proc *who, struct message *m){
     if(!to)
         return ESRCH;
 
-    return send_sig(to,signum);
+    ret = sig_proc(to,signum);
+    if(to != who)
+        return ret;
 }

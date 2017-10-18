@@ -19,12 +19,12 @@ CMD_PROTOTYPE(test_float);
 CMD_PROTOTYPE(test_fork);
 CMD_PROTOTYPE(test_thread);
 CMD_PROTOTYPE(test_alarm);
-CMD_PROTOTYPE(test_signal);
+CMD_PROTOTYPE(test_eintr);
 CMD_PROTOTYPE(test_nohandler);
 CMD_PROTOTYPE(test_vfork);
 CMD_PROTOTYPE(test_deadlock);
 CMD_PROTOTYPE(test_ipc);
-CMD_PROTOTYPE(test_abort);
+CMD_PROTOTYPE(test_signal);
 
 struct cmd_internal test_commands[] = {
     { test_malloc, "malloc"}, 
@@ -32,11 +32,11 @@ struct cmd_internal test_commands[] = {
     { test_float, "float"},
     { test_thread, "thread"},
     { test_alarm, "alarm"},
-    { test_signal, "signal"},
+    { test_eintr, "eintr"},
     { test_vfork, "vfork"},
     { test_deadlock, "deadlock"},
     { test_ipc, "ipc"},
-    { test_abort, "abort"},
+    { test_signal, "signal"},
     { test_nohandler, NULL},
 };
 
@@ -54,13 +54,45 @@ int test_nohandler(int argc, char** argv){
     return 0;
 }
 
-void abrt_handler(int signal){
-    printf("aborting");
+void usr_handler(int signum){
+    printf("SIGUR1 start\n");
+    raise(SIGUSR2);
+    printf("SIGUR1 end\n");
 }
 
-int test_abort(int argc, char **argv){
-    signal(SIGABRT, abrt_handler);
+void usr2_handler(int signum){
+    printf("SIGUR2 start\n");
+    raise(SIGINT);
+    printf("SIGUR2 end\n");
+}
+
+void int_handler(int signum){
+    printf("SIGINT start\n");
+    raise(SIGTERM);
+    printf("SIGINT end\n");
+}
+
+void term_handler(int signum){
+    printf("SIGTERM start\n");
+    printf("SIGTERM end\n");
+}
+
+int test_signal(int argc, char **argv){
+    struct sigaction sa;
+    sigemptyset(&sa.sa_mask);
+    
     if(!fork()){
+        sa.sa_handler = usr_handler;
+        sigaction(SIGUSR1, &sa, NULL);
+        sa.sa_handler = usr2_handler;
+        sigaction(SIGUSR2, &sa, NULL);
+        sa.sa_handler = int_handler;
+        sigaction(SIGINT, &sa, NULL);
+        sa.sa_handler = term_handler;
+        sigaction(SIGTERM, &sa, NULL);
+        // signal(SIGINT, int_handler);
+        // signal(SIGTERM, term_handler);
+        raise(SIGUSR1);
         abort();
     }
     wait(NULL);
@@ -160,7 +192,7 @@ void alarm_handler(int signum){
 
 /**
 
-    The difference between test_alarm and test_signal is that
+    The difference between test_alarm and test_eintr is that
     test_signal will return to the main shell loop after issuing the
     alarm syscall, thus it will be blocked until a new character arrives.
     After one second, when SIGALRM is scheduled to be delivered, and when
@@ -192,7 +224,7 @@ int test_alarm(int argc, char **argv){
     return 0;
 }
 
-int test_signal(int argc, char **argv){
+int test_eintr(int argc, char **argv){
     int i;
     pid_t pid;
     pid_t fr;

@@ -30,9 +30,10 @@ int copy_pcb(struct proc* parent, struct proc* child){
     *child = *parent;
     child->proc_nr = pbak;
     child->pid = pidbak;
+    //child's pending signals are cleared
+    child->sig_pending = 0;
+    //ptable points to its own protection table
     child->ptable = child->protection_table;
-
-    kprintf("child %x parent %x\n", child->sig_table[SIGABRT].sa_handler, parent->sig_table[SIGABRT].sa_handler);
     return OK;
 }
 

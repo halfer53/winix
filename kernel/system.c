@@ -22,7 +22,6 @@ PRIVATE int who_proc_nr;
 PRIVATE struct proc *who;
 
 PRIVATE ucontext_t recv_ctx;
-PRIVATE struct syscall_ctx syscall_context;
 
 /**
  * Entry point for system task.
@@ -32,7 +31,8 @@ void system_main() {
     syscall_handler_t handler;
     struct message* mesg = &m;
 
-    kprint_sysinfo();
+    kreport_sysinfo();
+    
     getcontext(&recv_ctx);
 
     //Receive message, do work, repeat.
@@ -68,7 +68,7 @@ void system_main() {
 /**
  * print sys info of text, data and bss segment size
  */
- void kprint_sysinfo(){
+ void kreport_sysinfo(){
     int free_mem_begin, mem_end;
     free_mem_begin = peek_next_free_page() * PAGE_LEN;
     mem_end = peek_last_free_page() * PAGE_LEN;
@@ -101,15 +101,11 @@ void syscall_region_end(){
 
 /**
  * interrupt the current executing system call
- * it saves the current syscall context into struct syscall_ctx
  * and start receiving syscalls again
  */
 void intr_syscall(){
-    struct syscall_ctx *ctx = &syscall_context;
     if(who_proc_nr){
-        ctx->m = m;
-        ctx->who = who;
-        ctx->interruptted = true;
+        syscall_reply(EINTR, who_proc_nr, &m);
         setcontext(&recv_ctx);
     }
 }
@@ -124,8 +120,8 @@ struct message *curr_mesg(){
     return &m;
 }
 
-struct syscall_ctx *interrupted_syscall_ctx(){
-    return &syscall_context;
+int curr_proc_nr(){
+    return who_proc_nr;
 }
 
 

@@ -19,11 +19,11 @@
 int do_winfo(struct proc *who, struct message *m){
     switch(m->m1_i1){
         case WINFO_PS:
-            kprint_all_procs();
+            kreport_all_procs();
             break;
 
         case WINFO_MEM:
-            kprint_sysmap();
+            kreport_sysmap();
             break;
         default:
             break;
