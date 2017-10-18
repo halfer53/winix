@@ -54,10 +54,8 @@ void testfoo(){
 }
 
 void init_shell(){
-    sigset_t mask;
-    sigfillset(&mask);
-    sigprocmask(SIG_SETMASK, &mask, NULL);
-    setpgid(0,0);
+    signal(SIGINT, SIG_IGN);
+    signal(SIGTERM, SIG_IGN);
 }
 
 

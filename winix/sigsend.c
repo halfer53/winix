@@ -57,11 +57,20 @@
  * @return        OK if building is successful
  */
 PRIVATE int build_signal_ctx(struct proc *who, int signum){
+    struct sigframe sframe;
+    struct sigframe* frame = &sframe;
     //pcb context are saved onto the user stack, and will be restored after sigreturn syscall
     copyto_user_stack(who,who,SIGNAL_CTX_LEN);
 
+    frame->signum = signum;
+    frame->s_base.operation = WINIX_SENDREC;
+    frame->s_base.dest = SYSTEM_TASK;
+    frame->s_base.pm = (struct message*)(who->sp - sizeof(struct message));
+    frame->s_base.m.m1_i1 = signum;
+    frame->s_base.m.type = SYSCALL_SIGRET;
+
     //signum is sitting on top of the stack
-    copyto_user_stack(who, &signum, sizeof(signum));
+    copyto_user_stack(who, frame, sizeof(struct sigframe));
 
     who->pc = (void (*)())who->sig_table[signum].sa_handler;
     who->ra = (reg_t*)who->sa_restorer;
@@ -129,7 +138,7 @@ int sig_proc(struct proc *who, int signum){
 
     //Unpause the process if it was blocked by pause(2)
     //or sigsuspend(2)
-    if(who->state & (PAUSING | RECEIVING)){
+    if(who->state & PAUSING ){
         struct message m;
         // kdebug("wakeup %d\n", who->proc_nr);
         who->state &= ~PAUSING;
