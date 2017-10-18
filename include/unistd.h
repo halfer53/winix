@@ -2,7 +2,7 @@
 #define _UNISTD_H_ 1
 
 #ifndef _POSIX_SOURCE
-#define _POSIX_ 1SOURCE
+#define _POSIX_ 1
 #endif
 
 #include <sys/types.h>

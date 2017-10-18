@@ -19,4 +19,8 @@
 #define	NULL		((void *)0)
 #endif
 
+#ifndef EOF
+#define	EOF		(-1)
+#endif
+
 #endif

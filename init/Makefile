@@ -50,6 +50,7 @@ depend:.depend
 	$(Q)makedepend -o.s -f- -I$(INCLUDE_DIR) $(SOURCES) > .depend
 
 clean:
+	$(Q)echo -n "" > .depend
 	$(Q)-rm -f $(OBJECT) $(ASSEMBLY) $(OUT)
 ifeq ($(KBUILD_VERBOSE),0)
 	@echo "RM \t INIT"

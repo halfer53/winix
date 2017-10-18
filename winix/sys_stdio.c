@@ -12,6 +12,7 @@
  * 
 */
 #include <kernel/kernel.h>
+#include <winix/rex.h>
 #include <ctype.h>
 
 

@@ -27,32 +27,22 @@
 #include <sys/ipc.h>
 #include <sys/types.h>
 #include <sys/syscall.h>
-#include <sys/unistd.h>
 #include <stddef.h>
-#include <util.h>
 #include <const.h>
 #include <errno.h>
 #include <stdbool.h>
-#include <signal.h>
-#include <stdbool.h>
 #include <curses.h>
-#include <debug.h>
 #include <string.h>
-#include <stdio.h>
 
+#include <kernel/proc.h>
 #include <winix/comm.h>
 #include <winix/compiler.h>
 #include <winix/type.h>
 #include <winix/page.h>
-#include <winix/util.h>
-#include <winix/kdebug.h>
-#include <winix/bitmap.h>
 #include <winix/mm.h>
+#include <winix/kdebug.h>
 #include <winix/sys_stdio.h>
 #include <winix/wini_ipc.h>
-#include <winix/rex.h>
-#include <winix/mem_alloc.h>
-#include <kernel/proc.h>
 #include <kernel/system.h>
 
 #define FREE_MEM_END    0x1ffff

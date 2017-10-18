@@ -12,6 +12,7 @@
  * 
 */
 #include <kernel/kernel.h>
+#include <winix/rex.h>
 #include <kernel/clock.h>
 #include <kernel/exception.h>
 

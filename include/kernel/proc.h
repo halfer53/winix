@@ -15,6 +15,9 @@
 #ifndef _W_PROC_H_
 #define _W_PROC_H_ 1
 
+#include <sys/types.h>
+#include <signal.h>
+#include <winix/type.h>
 #include <winix/timer.h>
 #include <winix/kwramp.h>
 
@@ -77,7 +80,7 @@
 #define SENDING                    	0x0001    /* process blocked trying to SEND */
 #define RECEIVING                	0x0002    /* process blocked trying to RECEIVE */
 #define WAITING                    	0x0004    /* process blocked wait(2) */
-#define PAUSING                 	0x0008    /* set when new kernel signal arrives */
+#define PAUSING                 	0x0008    /* process blocked by sigsuspend(2) or pause(2) */
 #define VFORKING                   	0x0010    /* parent is blocked by vfork(2) */
 
 //Process Information flags
@@ -199,10 +202,10 @@ extern struct proc *block_q[2];
 #define SID_TO_TASK_NR(sid)             (-sid + 1)
 
 
-//proc_table points at index zero of the process table, so proc_table + 1 
-//simply starts at init (init has process number 1)
+//proc_table points at index zero of the process table, so proc_table + INIT
+//simply starts at init
 #define foreach_proc(curr)\
-for(curr = proc_table + 1; curr <= proc_table + NUM_PROCS ; curr++)\
+for(curr = proc_table + INIT; curr <= proc_table + NUM_PROCS ; curr++)\
     if(IS_INUSE(curr))
 
 #define foreach_ktask(curr)\

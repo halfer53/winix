@@ -1,7 +1,5 @@
 
 INCLUDE_DIR = ../include
-INCLUDES = $(wildcard $(INCLUDE_DIR)/*.h $(INCLUDE_DIR)/winix/*.h\
-				 $(INCLUDE_DIR)/sys/*.h $(INCLUDE_DIR)/kernel/*.h)
 
 PROGS = main proc system exception idle clock sched table
 SOURCES = $(PROGS:=.c)
@@ -34,6 +32,7 @@ depend:.depend
 	$(Q)makedepend -o.s -f- -I$(INCLUDE_DIR) $(SOURCES) > .depend
 
 clean:
+	$(Q)echo -n "" > .depend
 	$(Q)$(MAKE) -C system clean
 	$(Q)-rm -f $(OBJECT) $(ASSEMBLY) $(LIMITS)
 ifeq ($(KBUILD_VERBOSE),0)

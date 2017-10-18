@@ -116,6 +116,8 @@ pid_t get_next_pid(){
  **/
 struct proc* get_proc_by_pid(pid_t pid){
     struct proc* curr;
+    if(pid == 0)
+        return get_proc(SYSTEM);
     foreach_proc(curr){
         if(curr->pid == pid){
             return curr;
@@ -283,7 +285,7 @@ void release_zombie(struct proc *p){
 struct proc *get_free_proc_slot() {
     int i;
     struct proc *who;
-    for(i = 1; i <= NUM_PROCS; i++){
+    for(i = INIT; i <= NUM_PROCS; i++){
         who = &proc_table[i];
         if(!IS_INUSE(who)){
             proc_set_default(who);
