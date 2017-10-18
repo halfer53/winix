@@ -12,3 +12,8 @@ get_sp:
 _break:
 	break
 	jr $ra
+
+.global fcn_to_ptr
+fcn_to_ptr:
+	lw $1, 0($sp)
+	jr $ra

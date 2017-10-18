@@ -383,7 +383,7 @@ bool is_bit_on(unsigned int *map, int map_len, int bit){
     if(bit > map_len * 32)
         return false;
     
-    return (map[i] & mask[j]) == 0;
+    return (map[i] & mask[j]);
 }
 
 /**

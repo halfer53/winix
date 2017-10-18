@@ -50,7 +50,7 @@ bool is_addr_accessible(struct proc* who, vptr_t* addr){
 bool is_page_free(ptr_t* addr){
     int paged = PADDR_TO_PAGED(addr);
 
-    return is_bit_on(mem_map, MEM_MAP_LEN, paged);
+    return !is_bit_on(mem_map, MEM_MAP_LEN, paged);
 }
 
 /**
@@ -67,7 +67,7 @@ bool is_pages_free_from(ptr_t* addr, int size){
     int page_num = PADDR_TO_NUM_PAGES(size);
 
     for(i = 0; i < page_num; i++){
-        if(!is_bit_on(mem_map, MEM_MAP_LEN, paged++)){
+        if(is_bit_on(mem_map, MEM_MAP_LEN, paged++)){
             return false;
         }
     }

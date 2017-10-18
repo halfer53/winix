@@ -5,7 +5,7 @@ MODULES := ansi gen posix stdio stdlib syscall util
 SOURCES = $(foreach sdir, $(MODULES), $(wildcard $(sdir)/*.c))
 ASSEMBLY = $(SOURCES:.c=.s)
 OBJECT = $(SOURCES:.c=.o) syscall/wramp_syscall.o util/debug.o gen/ucontext.o\
-							syscall/vfork.o
+							syscall/vfork.o	syscall/__sigreturn.o
 
 .PHONY: lib depend
 

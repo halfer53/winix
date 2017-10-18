@@ -1,9 +1,9 @@
 
 .global vfork
 vfork:
-	subui $sp, $sp, 14	# 14 = 5 + 9
+	subui $sp, $sp, 13	# 13 = 5 + 8
 						# 5 is the function scope stack
-						# 9 is sizeof(struct message)
+						# 8 is sizeof(struct message)
 	sw $ra, 4($sp)
 	sw $3, 3($sp)
 	addi $3, $sp, 5		# $3 points to struct message used for syscall
@@ -27,7 +27,7 @@ invoke_vfork:
 is_vfork_parent:
 	lw $ra, 4($sp)
 	lw $3, 3($sp)
-	addui $sp, $sp, 14	# pop the function stack and message
+	addui $sp, $sp, 13	# pop the function stack and message
 	jr $ra
 
 is_vfork_child:			# in child, we do not modify the stack.

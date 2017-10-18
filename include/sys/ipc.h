@@ -23,6 +23,11 @@ typedef struct {long m2l1, m2l2, m2l3, m2l4, m2l5, m2l6;} mess_2;
 
 /**
  * The message structure for IPC
+ * IMPORTANT: the length of struct message and
+ * the alignment of the fields are pre assumed in assembly file
+ * lib/syscall/vfork.s and lib/syscall/__sigreturn.s. 
+ * If you are going to change the structure of message, make sure
+ * you make appropriate changes to these two assembly files as well
  **/
 typedef struct message{
     int src;
@@ -31,7 +36,9 @@ typedef struct message{
         mess_1 m_m1;
         mess_2 m_m2;
     } m_u;
-    sighandler_t s1;
+    /**
+     * Add anything after this
+     **/
 } message_t;
 
 /* The following defines provide names for useful members. */

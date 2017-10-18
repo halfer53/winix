@@ -45,8 +45,6 @@
  *                 and pm points to the messages being passed to the kernel. NB
  *                 that pm is the virtual memory
  * messages     <- The actual messages, remember that pm points to this message
- * sigret_code  <- assembly code for invoking system call, see sigframe_code,
- *                 This is where ra points to
  * PCB context  <- The previous pcb context saved, will be restored after sigreturn
  */
 
@@ -65,28 +63,30 @@ PRIVATE int build_signal_ctx(struct proc *who, int signum){
     //pcb context are saved onto the user stack, and will be restored after sigreturn syscall
     copyto_user_stack(who,who,SIGNAL_CTX_LEN);
     
-    //ra points at the sigframe code, so that when user signal handler finishes,
-    //pc will point to the sig return code, to initiate sig return sys call
-    who->ra = who->sp - sizeof(struct sigframe_code);
-    sigframe->s_base.operation = WINIX_SENDREC;
-    sigframe->s_base.dest = SYSTEM;
-    //pm points at the syscall message, not that this is a virtual address
-    sigframe->s_base.pm = (struct message *)(who->sp - sizeof(struct sigframe_code) - sizeof(struct message));
-    sigframe->s_base.m.type = SYSCALL_SIGRET;
-    sigframe->s_base.m.m1_i1 = signum;
-    sigframe->s_codes.codes[0] = ASM_ADDUI_SP_SP_1;
-    sigframe->s_codes.codes[1] = ASM_SYSCALL;
+    // //ra points at the sigframe code, so that when user signal handler finishes,
+    // //pc will point to the sig return code, to initiate sig return sys call
+    // who->ra = who->sp - sizeof(struct sigframe_code);
+    // sigframe->s_base.operation = WINIX_SENDREC;
+    // sigframe->s_base.dest = SYSTEM;
+    // //pm points at the syscall message, not that this is a virtual address
+    // sigframe->s_base.pm = (struct message *)(who->sp - sizeof(struct sigframe_code) - sizeof(struct message));
+    // sigframe->s_base.m.type = SYSCALL_SIGRET;
+    // sigframe->s_base.m.m1_i1 = signum;
+    // sigframe->s_codes.codes[0] = ASM_ADDUI_SP_SP_1;
+    // sigframe->s_codes.codes[1] = ASM_SYSCALL;
+    // copyto_user_stack(who,sigframe,sizeof(struct sigframe));
 
-    copyto_user_stack(who,sigframe,sizeof(struct sigframe));
     //signum is sitting on top of the stack
     copyto_user_stack(who, &signum, sizeof(signum));
 
     who->pc = (void (*)())who->sig_table[signum].sa_handler;
+    who->ra = (reg_t*)who->sa_restorer;
 
-    if(who->state) //reschedule the process if it's blocked
+    if(who->state){//reschedule the process if it's blocked
+        who->state = 0;//reset flags
         enqueue_schedule(who);
+    }
 
-    who->state = 0;//reset flags
     return OK;
 }
 
@@ -138,11 +138,17 @@ PRIVATE int sys_sig_handler(struct proc *who, int signum){
  * @return        
  */
 int send_sig(struct proc *who, int signum){
-    if(!who)
-        return ESRCH;
+    struct sigaction* act;
 
     if(sys_sig_handler(who,signum) == OK)
         return OK;
+
+    act = &who->sig_table[signum];
+
+    if(act->sa_flags & SA_NODEFER)
+        sigaddset(&act->sa_mask, signum);
+    else
+        sigdelset(&act->sa_mask, signum);
 
     if(build_signal_ctx(who,signum))
         return EINVAL;
@@ -154,6 +160,9 @@ int send_sig(struct proc *who, int signum){
             get_proc(SYSTEM)->pc = &intr_syscall;
         }
     }
+
+    if(act->sa_flags & SA_RESETHAND)
+        act->sa_handler = SIG_DFL;
     return OK;
 }
 

@@ -162,9 +162,11 @@ typedef struct proc {
     int proc_nr;                	//Index in the process table
 
     /* Signal Information */
-    sigset_t pending_sigs;
-    sigset_t blocked_sigs;
+    sigset_t sig_pending;
+    sigset_t sig_mask;
+    sigset_t sig_mask2;
     struct sigaction sig_table[_NSIG];
+    sighandler_t sa_restorer;
 
     /* Alarm */
     struct timer alarm;

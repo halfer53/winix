@@ -30,8 +30,8 @@ struct sigframe_code{
 };
 
 struct sigframe{
+    int signum;
     struct syscall_frame_comm s_base;
-    struct sigframe_code s_codes;
 };
 
 

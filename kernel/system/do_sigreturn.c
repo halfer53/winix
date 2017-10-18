@@ -35,7 +35,8 @@
 
     }else{
         // kprintf("enqueue %d pri %d\n",to->proc_nr, to->priority);
-        enqueue_schedule(to);
+        if(!to->state)
+            enqueue_schedule(to);
     }
     memset(prev_syscall, 0, sizeof(struct syscall_ctx));
     return OK;
@@ -46,10 +47,10 @@ int do_sigreturn(struct proc *who, struct message *m){
     struct proc *systask;
     int signum = m->m1_i1;
 
-    // debug_ipc(4); //debug
     sp = get_physical_addr(who->sp,who);
 
-    sp += sizeof(struct sigframe);
+    sp += sizeof(signum) + sizeof(struct syscall_frame_comm);
+
     //Copy the previous pcb saved on the user stack back
     //to system proc struct, information includes registers
     //scheduling flags, and messages

@@ -3,6 +3,7 @@
 
 void* get_pc();
 void* get_sp();
+void* fcn_to_ptr(void(*)());
 
 #define D_PRINT(token) printf( "%s: %d\n", #token,token)
 #define X_PRINT(token) printf( "%s: 0x%x\n", #token,token)

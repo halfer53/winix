@@ -234,7 +234,6 @@ PRIVATE void syscall_handler() {
  * Breakpoint.
  **/
 PRIVATE void break_handler() {
-    //TODO: implement handling of breakpoints
 }
 
 /**
