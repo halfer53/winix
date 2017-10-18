@@ -88,7 +88,7 @@ void exit_proc(struct proc *who, int status){
     foreach_proc(mp){
         //if this process if waiting for the current to be exited process
         if(mp->state & WAITING && mp->wpid == who->pid){
-            mesg->m1_i2 = (who->exit_status << 8) | (who->sig_status & 0x7f);
+            mesg->m1_i2 = get_wstats(who);
             mp->state &= ~WAITING;
             syscall_reply(who->pid, mp->proc_nr, mesg);
             children++;

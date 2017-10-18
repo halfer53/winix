@@ -18,7 +18,7 @@
 
 #include <sys/ipc.h>
 
-#define _NSYSCALL               20
+#define _NSYSCALL               22
 /**
  * System Call Numbers
  **/
@@ -32,7 +32,7 @@
 #define SYSCALL_ALARM           7
 #define SYSCALL_SIGNAL          8
 #define SYSCALL_SIGRET          9
-#define SYSCALL_WAIT            10
+#define SYSCALL_WAITPID            10
 #define SYSCALL_KILL            11
 #define SYSCALL_GETPID          12
 #define SYSCALL_WINFO           13
@@ -42,6 +42,8 @@
 #define SYSCALL_SIGSUSPEND      17
 #define SYSCALL_SIGPENDING      18
 #define SYSCALL_SIGPROCMASK     19
+#define SYSCALL_SETPGID         20
+#define SYSCALL_GETPGID         21
 
 #define DECLARE_SYSCALL(function, params, syscall_num, passing_codes)\
 function params{\
@@ -73,6 +75,7 @@ void *sbrk(int incr);
 int getc();
 unsigned int alarm(unsigned int seconds);
 pid_t wait(int *wstatus);
+pid_t waitpid(pid_t pid, int *wstatus, int options);
 pid_t getpid();
 pid_t getppid();
 int kill (pid_t pid, int sig);

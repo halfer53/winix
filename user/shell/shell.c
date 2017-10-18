@@ -53,12 +53,20 @@ void testfoo(){
     int m = 32;
 }
 
+void init_shell(){
+    sigset_t mask;
+    sigfillset(&mask);
+    sigprocmask(SIG_SETMASK, &mask, NULL);
+    setpgid(0,0);
+}
+
 
 int main() {
     int ret;
     char *c;
     char *end_buf;
 
+    init_shell();
     c = buf;
     end_buf = c + MAX_LINE -2;
     while(1) {

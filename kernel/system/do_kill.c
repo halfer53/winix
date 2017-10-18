@@ -18,20 +18,25 @@
 int do_kill(struct proc *who, struct message *m){
     struct proc *to;
     int ret;
-    pid_t pid = m->m1_i1;
+    pid_t pid = m->m1_i1, pgid;
     int signum = m->m1_i2;
 
     if(signum <= 0 || signum >= _NSIG || pid == 1)
         return EINVAL;
 
-    to = get_proc_by_pid(pid);
-    if(!to)
-        return ESRCH;
+    if(pid > 0){
+        to = get_proc_by_pid(pid);
+        if(!to)
+            return ESRCH;
 
-    ret = sig_proc(to,signum);
+        return sig_proc(to,signum);
+    }
 
-    //Don't reply if the process sends a signal to itself
-    // if(to == who)
-    //     return DONTREPLY;
-    return ret;
+    foreach_proc(to){
+        if(pid < -1 && -pid != to->procgrp) continue;
+        if(pid == 0 && to->procgrp == who->procgrp) continue;
+
+        sig_proc(to, signum);
+    }
+    return OK;
 }

@@ -8,9 +8,7 @@ ASSEMBLY = $(PROGS:=.s)
 OBJECT = $(PROGS:=.o)
 OUT = init.srec
 
-LIBS = syscall/_syscall.o syscall/wramp_syscall.o syscall/ipc.o\
-		 stdlib/errno.o syscall/wait.o syscall/printf.o\
-		  syscall/_exit.o 
+LIBS = syscall/*.o stdlib/errno.o posix/_sigset.o
 LIBS_O = $(addprefix ../lib/, $(LIBS))
 
 .PHONY: depend wramp init 

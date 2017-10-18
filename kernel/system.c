@@ -134,7 +134,7 @@ void init_syscall_table(){
     LINK_SYSCALL(SYSCALL_ALARM, do_alarm);      //7
     LINK_SYSCALL(SYSCALL_SIGNAL, do_sigaction); //8
     LINK_SYSCALL(SYSCALL_SIGRET, do_sigreturn); //9
-    LINK_SYSCALL(SYSCALL_WAIT, do_wait);        //10
+    LINK_SYSCALL(SYSCALL_WAITPID, do_wait);        //10
     LINK_SYSCALL(SYSCALL_KILL, do_kill);        //11
     LINK_SYSCALL(SYSCALL_GETPID, do_getpid);    //12
     LINK_SYSCALL(SYSCALL_WINFO, do_winfo);      //13
@@ -144,6 +144,8 @@ void init_syscall_table(){
     LINK_SYSCALL(SYSCALL_SIGSUSPEND, do_sigsuspend);
     LINK_SYSCALL(SYSCALL_SIGPENDING, do_sigpending);
     LINK_SYSCALL(SYSCALL_SIGPROCMASK, do_sigprocmask);
+    LINK_SYSCALL(SYSCALL_SETPGID, do_setpgid);
+    LINK_SYSCALL(SYSCALL_GETPGID, do_getpgid);
 }
 
 
