@@ -45,7 +45,7 @@ int exec_proc(struct proc *who,size_t *lines, size_t length, size_t entry, int o
     //NULL pointer will immediately trigger segfault.
     if(offset){
         proc_memctl(who, (void *)0, PROC_NO_ACCESS);
-        who->i_flags |= DISABLE_FIRST_PAGE;
+        who->flags |= DISABLE_FIRST_PAGE;
     }
 
     build_initial_stack(who, 0, NULL, initial_env, get_proc(SYSTEM));

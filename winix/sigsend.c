@@ -13,7 +13,7 @@
 */
 #include <kernel/kernel.h>
 #include <kernel/exception.h>
-#include <winix/signal.h>
+#include <winix/do_signal.h>
 /**
     addui $sp, $sp, 1
     syscall
@@ -83,10 +83,10 @@ PRIVATE int build_signal_ctx(struct proc *who, int signum){
 
     who->pc = (void (*)())who->sig_table[signum].sa_handler;
 
-    if(who->s_flags) //reschedule the process if it's blocked
+    if(who->state) //reschedule the process if it's blocked
         enqueue_schedule(who);
 
-    who->s_flags = 0;//reset flags
+    who->state = 0;//reset flags
     return OK;
 }
 
@@ -103,7 +103,7 @@ PRIVATE int sys_sig_handler(struct proc *who, int signum){
         who->sig_status = signum;
         KDEBUG(("Signal %d: kill process \"%s [%d]\"\n",signum,who->name,who->pid));
         
-        who->i_flags |= STOPPED;
+        who->flags |= STOPPED;
         if(in_interrupt()){
             //if we are in interrupt, send an exit syscall to the kernel, 
             //and set current_proc to NULL so the scheduler picks the next proc

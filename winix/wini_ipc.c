@@ -36,7 +36,7 @@ int do_send(int dest, struct message *m) {
 
         //if the destination is waiting for the curr proc
         //avoid deadlock
-        if(pDest->s_flags & SENDING){
+        if(pDest->state & SENDING){
             struct proc* xp = current_proc->sender_q;
             while(xp){
                 if(xp == pDest){
@@ -46,18 +46,18 @@ int do_send(int dest, struct message *m) {
             }
         }
         
-        if (pDest->s_flags & RECEIVING) {
+        if (pDest->state & RECEIVING) {
             *(pDest->message) = *m;
 
             //Unblock receiver
-            pDest->s_flags &= ~RECEIVING;
+            pDest->state &= ~RECEIVING;
             pDest->regs[0] = m->reply_res;
             enqueue_head(ready_q[pDest->priority], pDest);
         }else {
             
             //Otherwise, block current process and add it to
             // head of sending queue of the destination.
-            current_proc->s_flags |= SENDING;
+            current_proc->state |= SENDING;
             current_proc->next_sender = pDest->sender_q;
             pDest->sender_q = current_proc;
         }
@@ -110,8 +110,8 @@ int do_receive(struct message *m) {
         *m = *(p->message);
 
         //Unblock sender
-        p->s_flags &= ~SENDING;
-        if(!p->s_flags && p->i_flags & RUNNABLE)
+        p->state &= ~SENDING;
+        if(!p->state && p->flags & RUNNABLE)
             enqueue_head(ready_q[p->priority], p);
         
         if(get_debug_ipc_count()){
@@ -121,7 +121,7 @@ int do_receive(struct message *m) {
     }
 
     current_proc->message = m;
-    current_proc->s_flags |= RECEIVING;
+    current_proc->state |= RECEIVING;
     return OK;
 }
 /**
@@ -144,13 +144,13 @@ int do_notify(int src, int dest, struct message *m) {
                 kprintf("\nNOTIFY %d from %d type %d| ",dest, src ,m->type);
             
         //If destination is waiting, deliver message immediately.
-        if (pDest->s_flags & RECEIVING) {
+        if (pDest->state & RECEIVING) {
 
             //Copy message to destination
             *(pDest->message) = *m;
 
             //Unblock receiver
-            pDest->s_flags &= ~RECEIVING;
+            pDest->state &= ~RECEIVING;
             pDest->regs[0] = m->reply_res;
             enqueue_head(ready_q[pDest->priority], pDest);
         }else{
@@ -183,6 +183,6 @@ int interrupt_send(int dest, struct message* pm){
 
     //curr proc is the process that generated exception
     //most likely segmentation fault or float fault
-    current_proc->s_flags |= RECEIVING;
+    current_proc->state |= RECEIVING;
     return do_send(dest, pm);
 }

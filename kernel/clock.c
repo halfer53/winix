@@ -78,7 +78,7 @@ void clock_handler(){
     current_proc->time_used++;
     current_proc->ticks_left--;
 
-    if(current_proc->i_flags & BILLABLE){
+    if(current_proc->flags & BILLABLE){
         bill_ptr->sys_time_used++;
     }
 

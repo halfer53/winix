@@ -8,11 +8,6 @@
  * system uses, the signal number is mostly already known to be valid
  * before the sigset-changing routines are called.
  */
-#define sigaddset    _sigaddset
-#define sigdelset    _sigdelset
-#define sigemptyset    _sigemptyset
-#define sigfillset    _sigfillset
-#define sigismember    _sigismember
 #include <signal.h>
 
 /* Low bit of signal masks. */

@@ -20,7 +20,7 @@ int do_kill(struct proc *who, struct message *m){
     pid_t pid = m->m1_i1;
     int signum = m->m1_i2;
 
-    if(signum < 0 || signum >= _NSIG)
+    if(signum <= 0 || signum >= _NSIG || pid == 1)
         return EINVAL;
 
     to = get_proc_by_pid(pid);

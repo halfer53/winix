@@ -203,13 +203,13 @@ PRIVATE void syscall_handler() {
     //Decode operation
     switch(operation) {
         case WINIX_SENDREC:
-            current_proc->s_flags |= RECEIVING;
+            current_proc->state |= RECEIVING;
             //fall through to send
 
         case WINIX_SEND:
             *retval = do_send(dest, m);
             if(*retval < 0)
-                current_proc->s_flags &= ~RECEIVING;
+                current_proc->state &= ~RECEIVING;
             break;
 
         case WINIX_RECEIVE:

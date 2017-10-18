@@ -12,7 +12,7 @@
  * 
 */
 
-#include <sys/rex.h>
+#include <winix/rex.h>
 //TODO: remove rex.h include
 
 /**

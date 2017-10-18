@@ -7,7 +7,7 @@
 int main(int argc, char** argv){
     struct proc* curr;
     foreach_proc(curr){
-        curr->s_flags = 0;
+        curr->state = 0;
     }
     return 0;
 }

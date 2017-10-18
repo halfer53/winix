@@ -93,7 +93,7 @@ void kprint_proc(struct proc* curr) {
             curr->heap_break,
             ptable_idx,
             curr->ptable[ptable_idx],
-            curr->s_flags);
+            curr->state);
 }
 
 /**
@@ -252,7 +252,7 @@ int dequeue_schedule( struct proc *h) {
  * @param p 
  */
 void enqueue_schedule(struct proc* p) {
-    p->i_flags |= RUNNABLE;
+    p->flags |= RUNNABLE;
     enqueue_tail(ready_q[p->priority], p);
 }
 
@@ -262,8 +262,8 @@ void enqueue_schedule(struct proc* p) {
  * @param p 
  */
 void zombify(struct proc *p){
-    p->i_flags &= ~RUNNABLE;
-    p->i_flags |= ZOMBIE;
+    p->flags &= ~RUNNABLE;
+    p->flags |= ZOMBIE;
     dequeue_schedule(p);
 }
 
@@ -273,7 +273,7 @@ void zombify(struct proc *p){
  * @param p 
  */
 void release_zombie(struct proc *p){
-    p->i_flags = 0;
+    p->flags = 0;
 }
 
 /**
@@ -287,7 +287,7 @@ struct proc *get_free_proc_slot() {
         who = &proc_table[i];
         if(!IS_INUSE(who)){
             proc_set_default(who);
-            who->i_flags |= IN_USE | RUNNABLE;
+            who->flags |= IN_USE | RUNNABLE;
             who->pid = get_next_pid();
             return who;
         }
@@ -379,7 +379,7 @@ struct proc *start_kernel_proc(void (*entry)(), int proc_nr, const char *name, i
     
     if(who = get_proc(proc_nr)){
         proc_set_default(who);
-        who->i_flags |= IN_USE;
+        who->flags |= IN_USE;
 
         set_proc(who, entry, name);
         kset_ptable(who);

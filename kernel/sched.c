@@ -90,7 +90,7 @@ void sched() {
         PANIC("Exception stack overflow\n");
 #endif
 
-    if (current_proc && !current_proc->s_flags) {
+    if (current_proc && !current_proc->state) {
 
         if (current_proc->ticks_left > 0) {
             enqueue_head(ready_q[current_proc->priority], current_proc);

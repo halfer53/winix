@@ -52,17 +52,32 @@ typedef void (*sighandler_t)(int);
 #define SIG_HOLD   ((sighandler_t)  2)    /* block signal */
 #define SIG_CATCH  ((sighandler_t)  3)    /* catch signal */
 
-
+#ifdef _POSIX_SOURCE
 struct sigaction {
-  // sighandler_t sa_handler;    /* SIG_DFL, SIG_IGN, or pointer to function */
-  sighandler_t sa_handler;
-  sigset_t sa_mask;        /* signals to be blocked during handler */
-  int sa_flags;            /* special flags */
+  __sighandler_t sa_handler;	/* SIG_DFL, SIG_IGN, or pointer to function */
+  sigset_t sa_mask;		/* signals to be blocked during handler */
+  int sa_flags;			/* special flags */
 };
+
+/* Fields for sa_flags. */
+#define SA_ONSTACK   0x0001	/* deliver signal on alternate stack */
+#define SA_RESETHAND 0x0002	/* reset signal handler when signal caught */
+#define SA_NODEFER   0x0004	/* don't block signal while catching it */
+#define SA_RESTART   0x0008	/* automatic system call restart */
+#define SA_SIGINFO   0x0010	/* extended signal handling */
+#define SA_NOCLDWAIT 0x0020	/* don't create zombies */
+#define SA_NOCLDSTOP 0x0040	/* don't receive SIGCHLD when child stops */
+
+/* POSIX requires these values for use with sigprocmask(2). */
+#define SIG_BLOCK          0	/* for blocking signals */
+#define SIG_UNBLOCK        1	/* for unblocking signals */
+#define SIG_SETMASK        2	/* for setting the signal mask */
+#define SIG_INQUIRE        4	/* for internal use only */
+#endif	/* _POSIX_SOURCE */
 
 typedef struct stack{
   void  *ss_sp;     /* address of stack */
-  int    ss_flags;  /* Flags */
+  int    sstate;  /* Flags */
   size_t ss_size;   /* Number of bytes in stack */
 } stack_t;
 
@@ -71,5 +86,17 @@ void (*signal(int sig, void (*func)(int)))(int);
 
 //currently the minisal sigframe size is 35 words, we add an extra 10 for flexibility
 #define MINSIGSTKSZ 45
+
+
+/* Mask of valid signals (0 - _NSIG). */
+#define SIGMASK        (((SIGBIT_0 << _NSIG) << 1) - 1)
+
+#define sigisvalid(signo) ((unsigned) (signo) <= _NSIG)
+
+int sigaddset(sigset_t *, int);
+int sigdelset(sigset_t *, int);
+int sigemptyset(sigset_t *);
+int sigfillset(sigset_t *);
+int sigismember(sigset_t *, int);
 
 #endif

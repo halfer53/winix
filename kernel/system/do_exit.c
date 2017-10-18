@@ -47,7 +47,7 @@ void clear_receiving_mesg(struct proc *who){
     register struct proc *xp;
     struct message m;
 
-    if(who->s_flags & RECEIVING){
+    if(who->state & RECEIVING){
         xp = who->sender_q;
         while(xp){
             memset(&m,-1,sizeof( struct message));
@@ -74,11 +74,11 @@ void exit_proc(struct proc *who, int status){
     zombify(who);
     clear_proc_mesg(who);
     who->exit_status = status;
-    who->s_flags |= STOPPED;
+    who->state |= STOPPED;
 
-    if(parent && parent->s_flags & VFORK){
+    if(parent && parent->state & VFORK){
         //parent is blocked by vfork(2)
-        parent->s_flags &= ~VFORK;
+        parent->state &= ~VFORK;
         syscall_reply(who->pid, parent->proc_nr, mesg);
         release_zombie(who);
         return;
@@ -86,9 +86,9 @@ void exit_proc(struct proc *who, int status){
 
     foreach_proc(mp){
         //if this process if waiting for the current to be exited process
-        if(mp->s_flags & WAITING && mp->wpid == who->pid){
+        if(mp->state & WAITING && mp->wpid == who->pid){
             mesg->m1_i2 = (who->exit_status << 8) | (who->sig_status & 0x7f);
-            mp->s_flags &= ~WAITING;
+            mp->state &= ~WAITING;
             syscall_reply(who->pid, mp->proc_nr, mesg);
             children++;
 
@@ -107,7 +107,7 @@ void exit_proc(struct proc *who, int status){
 
     //if parent is not waiting
     //block the current process
-    who->i_flags |= IN_USE;
+    who->flags |= IN_USE;
 }
 
 int do_exit(struct proc *who, struct message *m){

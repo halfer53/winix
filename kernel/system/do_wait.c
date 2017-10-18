@@ -28,7 +28,7 @@ int do_wait(struct proc *parent, struct message *mesg){
     foreach_proc(child) {
         //if there is a child process that is zombie
         if(child->parent == parent->proc_nr){
-            if(child->i_flags & ZOMBIE){
+            if(child->flags & ZOMBIE){
                 mesg->m1_i2 = (child->exit_status << 8) | (child->sig_status & 0x7f);
                 release_zombie(child);
                 return child->pid;
@@ -43,6 +43,6 @@ int do_wait(struct proc *parent, struct message *mesg){
         return ECHILD;
     
     //block the process
-    parent->s_flags |= WAITING;
+    parent->state |= WAITING;
     return SUSPEND;
 }

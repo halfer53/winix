@@ -52,7 +52,7 @@ int copy_mm(struct proc* parent, struct proc* child){
     if(child->rbase == NULL)
         return ERR;
 
-    if(parent->i_flags & DISABLE_FIRST_PAGE){
+    if(parent->flags & DISABLE_FIRST_PAGE){
         proc_memctl(child, NULL, PROC_NO_ACCESS);
     }
     src = (ptr_t *)parent->rbase;

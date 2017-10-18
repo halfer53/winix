@@ -73,7 +73,7 @@
 #define DEFAULT_RETURN_ADDR        	0x00000000
 #define DEFAULT_PROGRAM_COUNTER    	0x00000000
 
-//Process Scheduling Flags s_flags, process is runnable when s_flags == 0
+//Process Scheduling Flags state, process is runnable when state == 0
 #define SENDING                    	0x0001    /* process blocked trying to SEND */
 #define RECEIVING                	0x0002    /* process blocked trying to RECEIVE */
 #define WAITING                    	0x0004    /* process blocked wait(2) */
@@ -114,7 +114,7 @@ typedef struct proc {
     reg_t cctrl;                  	//len 19 words
 
     /* IPC messages */
-    int s_flags;                 	//schedling flags
+    int state;                 	//schedling flags
     struct message* message;    	//Message Buffer
                                 	//len 21 words
                                 	//DO NOT MODIFY or CHANGE the order of the above
@@ -156,7 +156,7 @@ typedef struct proc {
     pid_t procgrp;                	//Pid of the process group (used for signals)
     pid_t wpid;                    	//pid this process is waiting for
     int parent;                    	//proc_index of parent
-    int i_flags;                	//information flags
+    int flags;                	//information flags
 
     /* Process Table Index */
     int proc_nr;                	//Index in the process table
@@ -186,8 +186,8 @@ extern struct proc *block_q[2];
 #define IS_USER_PROC(p)                 ((p)->rbase != NULL)
 #define IS_IDLE(p)                      ((p)->proc_nr == IDLE)
 #define IS_SYSTEM(p)                    ((p)->proc_nr == SYSTEM)
-#define IS_INUSE(p)                     ((p)->i_flags & IN_USE)
-#define IS_RUNNABLE(p)                  (((p)->i_flags & (IN_USE | RUNNABLE)) == (IN_USE | RUNNABLE))
+#define IS_INUSE(p)                     ((p)->flags & IN_USE)
+#define IS_RUNNABLE(p)                  (((p)->flags & (IN_USE | RUNNABLE)) == (IN_USE | RUNNABLE))
 
 #define CHECK_STACK(p)                  (*((p)->stack_top) == STACK_MAGIC)
 #define GET_DEF_STACK_SIZE(who)         (IS_USER_PROC(who) ? USER_STACK_SIZE : KERNEL_STACK_SIZE)
@@ -212,7 +212,7 @@ for(curr = proc_table - NUM_TASKS + 1; curr <= proc_table + NUM_PROCS; curr++)\
 
 #define foreach_blocked_proc(curr)\
 for(curr = proc_table + 1; curr <= proc_table + NUM_PROCS; curr++)\
-    if(IS_INUSE(curr) && curr->s_flags)
+    if(IS_INUSE(curr) && curr->state)
 
 
 void* get_pc_ptr(struct proc* who);

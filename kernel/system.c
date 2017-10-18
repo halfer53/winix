@@ -86,14 +86,14 @@ void syscall_region_begin(){
     //Bill the user proc's sys_used_time while executing syscall
     //on behalf of the user process
     set_bill_ptr(who);
-    get_proc(SYSTEM)->i_flags |= BILLABLE;
+    get_proc(SYSTEM)->flags |= BILLABLE;
 
     //Make sure system doesn't send a message to itself
     ASSERT(who != NULL && who_proc_nr != SYSTEM); 
 }
 
 void syscall_region_end(){
-    get_proc(SYSTEM)->i_flags &= ~BILLABLE;
+    get_proc(SYSTEM)->flags &= ~BILLABLE;
     //reset messages
     memset(&m, 0, sizeof(struct message));
     who_proc_nr = 0;

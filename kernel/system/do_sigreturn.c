@@ -14,7 +14,7 @@
  * 
 */
 #include <kernel/kernel.h>
-#include <winix/signal.h>
+#include <winix/do_signal.h>
 
 /**
  * This method resume the system call if it was previously interruppted
@@ -27,7 +27,7 @@
 
     prev_syscall = interrupted_syscall_ctx();
 
-    if(prev_syscall->interruptted && to->s_flags & RECEIVING &&
+    if(prev_syscall->interruptted && to->state & RECEIVING &&
         prev_syscall->who->proc_nr == to->proc_nr){
         
         //return EINTR to the user

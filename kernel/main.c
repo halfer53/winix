@@ -55,7 +55,7 @@ void init_kernel_tasks(){
 void start_init(){
     struct proc* init = get_proc(INIT);
     proc_set_default(init);
-    init->i_flags |= IN_USE | RUNNABLE;
+    init->flags |= IN_USE | RUNNABLE;
     init->pid = INIT;
     if(exec_proc(init,init_code,init_code_length,init_pc,init_offset,"init"))
         PANIC("init");
