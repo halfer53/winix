@@ -67,7 +67,7 @@ PRIVATE int build_signal_ctx(struct proc *who, int signum){
     frame->s_base.dest = SYSTEM_TASK;
     frame->s_base.pm = (struct message*)(who->sp - sizeof(struct message));
     frame->s_base.m.m1_i1 = signum;
-    frame->s_base.m.type = SYSCALL_SIGRET;
+    frame->s_base.m.type = SIGRET;
 
     //signum is sitting on top of the stack
     copyto_user_stack(who, frame, sizeof(struct sigframe));
@@ -102,7 +102,7 @@ PRIVATE int sys_sig_handler(struct proc *who, int signum){
             //and set current_proc to NULL so the scheduler picks the next proc
 
             struct message* em = get_exception_m();
-            em->type = SYSCALL_EXIT;
+            em->type = EXIT;
             em->m1_i1 = 0;
             em->m1_i2 = signum;
             em->src = who->proc_nr;

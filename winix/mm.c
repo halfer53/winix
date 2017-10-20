@@ -89,6 +89,7 @@ ptr_t *get_free_pages(int length, int flags) {
     }else{
         nstart =  bitmap_search_from(mem_map, MEM_MAP_LEN, bss_page_end, num);
     }
+    
     if (nstart >= 0){
         bitmap_set_nbits(mem_map, MEM_MAP_LEN, nstart, num);
         return PAGE_TO_PADDR(nstart);
@@ -249,8 +250,9 @@ void kreport_sysmap(){
         flags = i == 0 ? ZERO_BITS : ONE_BITS;
         pages = count_bits(mem_map, MEM_MAP_LEN, flags);
         str = i == 0 ? free_str : used_str;
-        kprintf("%s pages: %03d, %03dk words\n",str, pages, pages);
+        kprintf("%s pages: %03d\t",str, pages, pages);
     }
+    kprintf("\n");
 }
 
 

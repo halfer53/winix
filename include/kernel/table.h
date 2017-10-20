@@ -22,6 +22,7 @@ struct boot_image{
 extern struct boot_image boot_table[NUM_TASKS];
 extern char *initial_env[];
 extern syscall_handler_t syscall_table[_NSYSCALL];
+extern char *syscall_str[_NSYSCALL];
 
 int no_syscall(struct proc* who, struct message* m);
 int do_times(struct proc* who, struct message* m);

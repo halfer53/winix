@@ -26,7 +26,10 @@ char *initial_env[] = {
     NULL
 };
 
-syscall_handler_t syscall_table[_NSYSCALL] = {{0}};
+
+char *syscall_str[_NSYSCALL] = {{0}};
+
+syscall_handler_t syscall_table[_NSYSCALL] = {{no_syscall}};
 
 
 

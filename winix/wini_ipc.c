@@ -11,9 +11,12 @@
  * @create date 2016-09-19
  * 
 */
+
 #include <kernel/kernel.h>
+#include <kernel/table.h>
 #include <kernel/exception.h>
 #include <winix/bitmap.h>
+
 /**
  * sends a message.
  *
@@ -29,7 +32,7 @@ int do_send(int dest, struct message *m) {
     struct proc *pDest;
 
     current_proc->message = m; //save for later
-    pDest = IS_USER_PROC(current_proc) ? get_proc_by_pid(dest) : get_proc(dest);
+    pDest = IS_USER_PROC(current_proc) ? get_proc_by_pid(dest) : get_runnable_proc(dest);
     
     //Is the destination valid?
     if (pDest) {
@@ -63,9 +66,9 @@ int do_send(int dest, struct message *m) {
         }
 
         if(is_debugging_syscall()){
-            if(dest == SYSTEM && IS_USER_PROC(current_proc))
-                kprintf("\nSyscall %d from %d|", m->type, get_proc(m->src)->pid);
-        }else if(get_debug_ipc_count()){
+            if(dest == SYSTEM)
+                kprintf_syscall_request(m->type, m->src);
+        }else if(is_debugging_ipc()){
             kprintf("\nIPC: SEND to %d from %d type %d| ",
                         dest, current_proc->proc_nr,m->type);
         }
@@ -114,7 +117,7 @@ int do_receive(struct message *m) {
         if(!p->state && p->flags & RUNNABLE)
             enqueue_head(ready_q[p->priority], p);
         
-        if(get_debug_ipc_count()){
+        if(is_debugging_ipc()){
             kprintf("\nIPC: %d REC from %d type %d| ",current_proc->proc_nr, m->src ,m->type);
         }
         return OK;
@@ -138,12 +141,12 @@ int do_notify(int src, int dest, struct message *m) {
     struct proc *pDest, *pSrc;
 
     //Is the destination valid?
-    if (pDest = get_running_proc(dest)) {
+    if (pDest = get_runnable_proc(dest)) {
 
         if(is_debugging_syscall()){
-            if(IS_KERNELN(src) && IS_USER_PROC(pDest))
-                kprintf("\nSyscall reply %d to %d|", m->reply_res, pDest->pid);
-        }else if(get_debug_ipc_count())
+            if(IS_USER_PROC(pDest))
+                kprintf_syscall_reply(m->reply_res);
+        }else if(is_debugging_ipc())
             kprintf("\nNOTIFY %d from %d type %d| ",dest, src ,m->type);
             
         //If destination is waiting, deliver message immediately.
@@ -189,3 +192,4 @@ int interrupt_send(int dest, struct message* pm){
     current_proc->state |= RECEIVING;
     return do_send(dest, pm);
 }
+

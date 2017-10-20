@@ -244,11 +244,11 @@ int cmd_bash(int argc, char **argv){
             perror("fork failed");
             return -1;
         }
-        // printf("parent bash %d waiting for child bash %d\n",getpid(),child_pid);
+        // printf("parent shell %d waiting for child shell %d\n",getpid(),child_pid);
         child_pid = wait(NULL);
-        // printf("parent bash %d awakened by child bash %d\n",getpid(),child_pid);
+        // printf("parent shell %d awakened by child shell %d\n",getpid(),child_pid);
     }else{
-        // printf("Child bash %d [parent %d] start:\n",getpid(),getppid());
+        // printf("Child shell %d [parent %d] start:\n",getpid(),getppid());
     }
     return 0;
 }

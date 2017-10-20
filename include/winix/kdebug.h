@@ -14,15 +14,17 @@
 #ifndef _W_DEBUG_
 #define _W_DEBUG_ 1
 
-int get_debug_ipc_count();
-int get_debug_sched_count();
+int is_debugging_ipc();
+int is_debugging_sched();
 int is_debugging_syscall();
 void debug_scheduling(int val);
 void debug_ipc(int val);
-void debug_syscall();
+void debug_syscall(int val);
 void stop_debug_scheduling();
 void stop_debug_ipc();
 void stop_debug_syscall();
+void kprintf_syscall_reply(int reply);
+void kprintf_syscall_request(int type, pid_t from);
 
 #ifdef _DEBUG
     #define KDEBUG(token)   kinfo token

@@ -12,6 +12,7 @@
  * 
 */
 #include <kernel/kernel.h>
+#include <kernel/table.h>
 
 PRIVATE int _debug_sched = 0;
 PRIVATE int _debug_ipc = 0;
@@ -27,28 +28,26 @@ PRIVATE int _debug_timer = 0;
  * Counter is decremented for each debugging information it displays
  */
 
-int get_debug_sched_count(){
+int is_debugging_sched(){
     if(_debug_sched > 0)
         return _debug_sched--;
     return 0;
 }
 
-int get_debug_ipc_count(){
+int is_debugging_ipc(){
     if(_debug_ipc > 0)
         return _debug_ipc--;
     return 0;
 }
 
-int get_debug_timer_count(){
+int is_debugging_timer(){
     if(_debug_timer > 0)
         return _debug_timer--;
     return 0;
 }
 
 int is_debugging_syscall(){
-    if(_debug_syscall > 0)
-        return _debug_syscall--;
-    return 0;
+    return _debug_syscall;
 }
 
 void debug_scheduling(int val){
@@ -59,8 +58,8 @@ void debug_ipc(int val){
     _debug_ipc = val;
 }
 
-void debug_syscall(){
-    _debug_syscall = true;
+void debug_syscall(int val){
+    _debug_syscall = val * 2;
 }
 
 void debug_timer(int val){
@@ -77,6 +76,21 @@ void stop_debug_ipc(){
 
 void stop_debug_syscall(){
     _debug_syscall = 0;
+}
+
+void kprintf_syscall_reply(int reply){
+    if(_debug_syscall > 0){
+        kprintf("\n%s\t reply %d |",syscall_str[curr_syscall_num()], reply);
+        _debug_syscall--;
+    }
+}
+
+void kprintf_syscall_request(int type, pid_t from){
+    if(_debug_syscall > 0){
+        kprintf("\n%s\t from  %d |", syscall_str[type], from);
+        _debug_syscall--;
+    }
+    
 }
 
 void kreport_readyqueue(){

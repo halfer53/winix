@@ -70,9 +70,6 @@ PUBLIC struct proc *current_proc;
 void kreport_all_procs() {
     struct proc *curr;
     kprintf("NAME    PID PPID RBASE      PC         STACK      HEAP       PROTECTION   FLAGS\n");
-    foreach_ktask(curr){
-        kreport_proc(curr);
-    }
 
     foreach_proc(curr){
         kreport_proc(curr);
@@ -148,7 +145,7 @@ struct proc *get_proc(int proc_nr) {
  * @param  proc_nr 
  * @return         
  */
-struct proc *get_running_proc(int proc_nr){
+struct proc *get_runnable_proc(int proc_nr){
     struct proc *p = get_proc(proc_nr);
     if(p && IS_RUNNABLE(p))
         return p;
@@ -277,9 +274,11 @@ void zombify(struct proc *p){
  * @param p 
  */
 void release_zombie(struct proc *p){
-    p->flags = 0;
-    p->pid = 0;
-    p->state = -1;
+    if(p->flags & ZOMBIE){
+        p->flags = 0;
+        p->pid = 0;
+        p->state = -1;
+    }
 }
 
 /**
@@ -293,6 +292,7 @@ struct proc *get_free_proc_slot() {
         who = &proc_table[i];
         if(!IS_INUSE(who)){
             proc_set_default(who);
+            who->state = 0;
             who->flags |= IN_USE | RUNNABLE;
             who->pid = get_next_pid();
             return who;

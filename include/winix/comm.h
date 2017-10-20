@@ -53,4 +53,6 @@
 #define ZERO_BITS   1
 #define ONE_BITS    2
 
+#define _STR(s) (#s)
+
 #endif

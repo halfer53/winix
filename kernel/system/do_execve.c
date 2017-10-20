@@ -94,7 +94,7 @@ int build_initial_stack(struct proc* who, int argc, char** argv, char** env, str
     pstack->i_base.operation = WINIX_SENDREC;
     pstack->i_base.dest = SYSTEM;
     pstack->i_base.pm = (struct message*)(who->sp - sizeof(ASM_SYSCALL) - sizeof(struct message));
-    pstack->i_base.m.type = SYSCALL_EXIT;
+    pstack->i_base.m.type = EXIT;
     pstack->i_base.m.m1_i1 = EXIT_MAGIC;
     pstack->i_code = ASM_SYSCALL;
     

@@ -22,28 +22,28 @@
 /**
  * System Call Numbers
  **/
-#define SYSCALL_NONE            0   //not used
-#define SYSCALL_TIMES           1
-#define SYSCALL_EXIT            2
-#define SYSCALL_FORK            3
-#define SYSCALL_VFORK           4
-#define SYSCALL_EXECVE          5
-#define SYSCALL_BRK             6
-#define SYSCALL_ALARM           7
-#define SYSCALL_SIGACTION          8
-#define SYSCALL_SIGRET          9
-#define SYSCALL_WAITPID            10
-#define SYSCALL_KILL            11
-#define SYSCALL_GETPID          12
-#define SYSCALL_WINFO           13
-#define SYSCALL_GETC            14
-#define SYSCALL_PRINTF          15
-#define SYSCALL_SYSCONF         16
-#define SYSCALL_SIGSUSPEND      17
-#define SYSCALL_SIGPENDING      18
-#define SYSCALL_SIGPROCMASK     19
-#define SYSCALL_SETPGID         20
-#define SYSCALL_GETPGID         21
+#define NONE            0   //not used
+#define TIMES           1
+#define EXIT            2
+#define FORK            3
+#define VFORK           4
+#define EXECVE          5
+#define BRK             6
+#define ALARM           7
+#define SIGACTION       8
+#define SIGRET          9
+#define WAITPID         10
+#define KILL            11
+#define GETPID          12
+#define WINFO           13
+#define GETC            14
+#define PRINTF          15
+#define SYSCONF         16
+#define SIGSUSPEND      17
+#define SIGPENDING      18
+#define SIGPROCMASK     19
+#define SETPGID         20
+#define GETPGID         21
 
 #define DECLARE_SYSCALL(function, params, syscall_num, passing_codes)\
 function params{\

@@ -74,6 +74,7 @@ void exit_proc(struct proc *who, int status, int signum){
     zombify(who);
     clear_proc_mesg(who);
     who->exit_status = status;
+
     if(signum){
         who->sig_status = signum;
         who->flags |= STOPPED;
@@ -83,10 +84,9 @@ void exit_proc(struct proc *who, int status, int signum){
         //parent is blocked by vfork(2)
         parent->state &= ~VFORKING;
         syscall_reply(who->pid, parent->proc_nr, mesg);
-        release_zombie(who);
-        return;
+    }else{
+        release_proc_mem(who);
     }
-    cause_sig(parent, SIGCHLD);
 
     foreach_proc(mp){
         //if this process if waiting for the current to be exited process
@@ -102,16 +102,12 @@ void exit_proc(struct proc *who, int status, int signum){
         }
     }
 
-    release_proc_mem(who);
-
-    if(children){
+    if(children || parent->sig_table[SIGCHLD].sa_handler == SIG_IGN){
         release_zombie(who);
         return;
     }
-
-    //if parent is not waiting
-    //block the current process
-    who->flags |= IN_USE;
+    
+    cause_sig(parent, SIGCHLD);
 }
 
 int do_exit(struct proc *who, struct message *m){

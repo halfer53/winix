@@ -33,10 +33,15 @@ struct message *curr_mesg();
 struct syscall_ctx *interrupted_syscall_ctx();
 void kreport_sysinfo();
 void init_syscall_table();
-
 bool is_in_syscall(struct proc* who);
 
+#ifdef _DEBUG
+#define SYSCALL_MAP(i,fn)   syscall_table[i] = fn;\
+                    syscall_str[i] = #i
+#else
+#define SYSCALL_MAP(i,fn)   syscall_table[i] = fn;\
+                    syscall_str[i] = _STR(i)
+#endif
 
-#define LINK_SYSCALL(i,fn)  syscall_table[i] = fn
 
 #endif

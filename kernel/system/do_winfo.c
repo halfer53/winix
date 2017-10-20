@@ -26,8 +26,8 @@ int do_winfo(struct proc *who, struct message *m){
             kreport_sysmap();
             break;
         default:
-            break;
+            return EINVAL;
     }
-    return EINVAL;
+    return OK;
 }
 

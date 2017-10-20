@@ -6,7 +6,7 @@ pid_t waitpid(pid_t pid, int *wstatus, int options){
     int ret;
     m.m1_i1 = pid;
     m.m1_i2 = options;
-    ret = _syscall(SYSCALL_WAITPID, &m);
+    ret = _syscall(WAITPID, &m);
     if(ret < 0)
         return (pid_t)-1;
     if(wstatus)

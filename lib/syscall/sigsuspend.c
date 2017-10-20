@@ -10,6 +10,6 @@ int sigsuspend(const sigset_t *mask){
         return -1;
     }
     m.m1_i1 = *mask;
-    return _syscall(SYSCALL_SIGSUSPEND, &m);
+    return _syscall(SIGSUSPEND, &m);
 }
 
