@@ -12,6 +12,7 @@
  * 
 */
 #include <kernel/kernel.h>
+#include <winix/bitmap.h>
 
 PRIVATE unsigned int mask[BITMASK_NR];
 

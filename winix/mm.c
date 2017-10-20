@@ -23,6 +23,7 @@
  * 
 */
 #include <kernel/kernel.h>
+#include <winix/mm.h>
 
 PRIVATE unsigned int mem_map[MEM_MAP_LEN];
 PRIVATE int bss_page_end;

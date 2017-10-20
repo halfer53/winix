@@ -9,7 +9,7 @@ int sigaction(int signum, const struct sigaction *act, struct sigaction *oldact)
     m.m1_p1 = (void *)act;
     m.m1_p2 = (void *)oldact;
     m.m1_p3 = (void *)(__sigreturn);
-    return _syscall(SYSCALL_SIGNAL, &m);
+    return _syscall(SYSCALL_SIGACTION, &m);
 }
 
 sighandler_t signal(int signum, sighandler_t handler){

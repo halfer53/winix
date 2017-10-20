@@ -39,7 +39,6 @@
 #include <winix/compiler.h>
 #include <winix/type.h>
 #include <winix/page.h>
-#include <winix/mm.h>
 #include <winix/kdebug.h>
 #include <winix/sys_stdio.h>
 #include <winix/wini_ipc.h>

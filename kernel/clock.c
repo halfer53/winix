@@ -30,6 +30,7 @@ void do_ticks();
 
 void clock_main(){
     struct message m;
+    kprintf("uptime addr %x\n", &system_uptime);
     while(1){
         winix_receive(&m);
         switch(m.type){
@@ -54,7 +55,14 @@ void set_bill_ptr(struct proc* who){
 }
 
 void deliver_alarm(int proc_nr, clock_t time){
-    send_sig(get_proc(proc_nr),SIGALRM);
+    struct proc* who = get_proc(proc_nr);
+
+    send_sig(who,SIGALRM);
+    //SIGALRM will temporarily wake up the process
+    // if(who->state){
+    //     who->state = 0;//reset flags
+    //     enqueue_schedule(who);
+    // }
 }
 
 clock_t get_uptime(){
@@ -64,6 +72,10 @@ clock_t get_uptime(){
 /**
  * Timer (IRQ2)
  *
+ * NOTE: this method is called during exception context
+ * 
+ * This method is called for every timer interrupt
+ * 
  * Side Effects:
  *   system_uptime is incremented
  *   if there is an immediate timer, relevant handler is called
@@ -86,6 +98,9 @@ void clock_handler(){
     if(next_timeout <= system_uptime){
         struct message* m = get_exception_m();
         m->type = DO_CLOCKTICK;
+        //Since we are in exception context, 
+        //send a message from INTERRUPT to CLOCK
+        //to do_clockticks
         do_notify(INTERRUPT, CLOCK, m);
         //in winix, kernel tasks are preemptible
         preempt_currproc();

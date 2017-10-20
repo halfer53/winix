@@ -3,11 +3,25 @@ import subprocess
 import os
 import glob
 import uuid
+import shutil
+import tempfile
+from contextlib import contextmanager
 
 userfile_dir = {
     "shell.kdbg":"user/",
     "init.kdbg":"init/"
 }
+
+@contextmanager
+def tmpdir():
+    path = tempfile.mkdtemp()
+    try:
+        yield path
+    finally:
+        try:
+            shutil.rmtree(path)
+        except IOError:
+            sys.stderr.write("fail to clean up temporary directies")
 
 def main():
     if(len(sys.argv) < 2):
@@ -27,13 +41,26 @@ def main():
     target = int(sys.argv[1],16)
 
     prevfile = ""
+    target_target_segment = ""
     linecount = 0
     addr = 0
     with open( rpath + "/" + in_file) as f:
         for line in f:
             if("file" in line):
+                target_segment = "." + line.split(", .",1)[1]\
+                        .split(" : ")[0].replace("\n","")
                 prevfile = line
                 linecount = 0
+                if(target_segment == ".bss"):
+                    curr_size = int(line.split(".bss : ")[1].split(" ")[0])
+                    curr_addr = int(line.split("starting : ")[1]\
+                                        .split(", .bss : ")[0],16)
+                    if(curr_addr <= target and curr_addr + \
+                            curr_size >= target and curr_size != 0):
+                        linecount = target - curr_addr
+                        addr = curr_addr
+                        break
+                    
             elif(len(line) > 0 and line[0] == '0'):
                 curr_addr = int(line.split(" ")[0],16)
                 
@@ -46,48 +73,99 @@ def main():
         print("Instruction not found 1")
         return 0
     
-    filename = prevfile.split(" ")[1].replace("'","")\
+    filename = prevfile.split(" ")[1].split(", ")[0].replace("'","")\
                     .replace(",","").replace(".o",".c")
     # print(filename)
     # print(linecount)
     # print(in_file)
+    # print(target_segment)
 
-    tmp_filename = str(uuid.uuid4())
+    with tmpdir() as basedir:
+        tmp_filename = basedir + "/" + str(uuid.uuid4())
 
-    if(in_file in userfile_dir):
-        filename = userfile_dir[in_file] + filename
+        if(in_file in userfile_dir):
+            filename = userfile_dir[in_file] + filename
 
-    wcc_cmd = ["wcc","-N", "-g", "-S", "-I"+main_path+"/include",\
-                     "-o",tmp_filename, main_path+"/"+filename, ]
+        wcc_cmd = ["wcc","-N", "-g", "-S", "-I"+main_path+"/include",\
+                        "-o",tmp_filename, main_path+"/"+filename, ]
 
-    result = subprocess.call(wcc_cmd)
-    if(result != 0):
-        tmpfilename = filename.replace(".c",".s")
-        if(os.path.isfile(main_path+"/" +  tmpfilename)):
-            print("Line " + str(linecount) + \
-                        " in file "+tmpfilename)
-            return 0
+        result = subprocess.call(wcc_cmd)
+        if(result != 0):
+            tmpfilename = filename.replace(".c",".s")
+            if(os.path.isfile(main_path+"/" +  tmpfilename)):
+                print("Line " + str(linecount) + \
+                            " in file "+tmpfilename)
+                return 0
 
-    loc = ""
-    curr_count = 0
-    in_text_seg = False
-    with open(tmp_filename) as f:
-        for line in f:
+        loc = "0"
+        curr_count = 0
+        next_incr = 0
+        in_text_seg = False
+        prev_line = ""
+        prev_name = ""
+        prev_name_index = 0
+        curr_seg = ""
+        seg_types = [".text\n", ".data\n", ".bss\n"]
+        
+        with open(tmp_filename) as f:
+            for line in f:
+                if(line[-2] == ':'):
+                    prev_name = line
+                    prev_name_index = 0
 
-            if(".loc" in line):
-                loc = line
-            elif(line[0] == '\t'):
-                if(curr_count == linecount):
-                    print("Line "+ loc[:-1].split(",")[1] + \
-                                        " in file "+filename)
-                    break
-                curr_count += 1
+                elif(line[0] == '.'):
+                    if(".loc" in line):
+                        loc = line[:-1].split(",")[1]
+                    elif(line in seg_types):
+                        curr_seg = line.replace("\n","")
+                        curr_count = 0
+                        # print("in "+curr_seg)
 
-                
-    if(curr_count != linecount):
-        print("Instruction not found")
+                elif(line[0] == '\t'):
+                    if(curr_seg == "" and ".word" in line):
+                        next_incr = 1
+                        if(curr_count == linecount):
+                            print(".data: \n" + prev_name + "\tindex: " \
+                                + str(prev_name_index) + "\n" + line + "in file " \
+                                + filename)
+                            
+                            break
+                    elif(curr_seg == ".text"):
+                        next_incr = 1
+                        if(curr_seg == target_segment and \
+                                curr_count == linecount):
+                                print("Line "+ loc + "\nin file "+filename)
+                                break
+                        
+                    elif(curr_seg == ".data"):
+                        if(".asciiz" in line):
+                            tmp_str = line.split(".asciiz")[1].strip().replace("\"","")
+                            # print(".data: "+tmp_str)
+                            next_incr = len(tmp_str)
+                            if(curr_seg == target_segment and curr_count >= linecount\
+                                    and curr_count + next_incr >= linecount):
+                                    print(".data: \n" + line[:-1] + "\nin file " + filename)
+                                    break
 
-    os.remove(tmp_filename)
+                    elif(curr_seg == ".bss"):
+                        if(".space" in line):
+                            bss_len = int(line.split(".space")[1].strip())
+                            # print(prev_line)
+                            # print(bss_len)
+                            next_incr = bss_len 
+                            if(curr_seg == target_segment and curr_count <= linecount \
+                                    and curr_count + next_incr >= linecount):
+                                    print(".bss: \n" + prev_line[:-1] + "\n\t.words: " + \
+                                        str(bss_len) + "\nin file " + filename)
+                                    break
+
+                    prev_name_index += 1
+                    curr_count += next_incr
+
+                prev_line = line
+
+        if(target_segment == ".text" and curr_count != linecount):
+            print("Instruction not found ")
 
 if __name__ == '__main__':
     main()

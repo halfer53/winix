@@ -49,4 +49,8 @@
 #define ASM_ADDUI_SP_SP_1       (0x1ee10001)
 #define ASM_SYSCALL             (0x200d0000)
 
+
+#define ZERO_BITS   1
+#define ONE_BITS    2
+
 #endif

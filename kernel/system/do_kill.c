@@ -29,14 +29,14 @@ int do_kill(struct proc *who, struct message *m){
         if(!to)
             return ESRCH;
 
-        return sig_proc(to,signum);
+        return cause_sig(to,signum);
     }
 
     foreach_proc(to){
         if(pid < -1 && -pid != to->procgrp) continue;
         if(pid == 0 && to->procgrp == who->procgrp) continue;
 
-        sig_proc(to, signum);
+        cause_sig(to, signum);
     }
     return OK;
 }

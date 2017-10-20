@@ -122,6 +122,10 @@ int curr_proc_nr(){
     return who_proc_nr;
 }
 
+bool is_in_syscall(struct proc* who){
+    return who->state & RECEIVING && who_proc_nr == who->proc_nr;
+}
+
 
 void init_syscall_table(){
     LINK_SYSCALL(SYSCALL_NONE, no_syscall);     //0
@@ -132,7 +136,7 @@ void init_syscall_table(){
     LINK_SYSCALL(SYSCALL_EXECVE, do_exec);      //5
     LINK_SYSCALL(SYSCALL_BRK, do_brk);          //6
     LINK_SYSCALL(SYSCALL_ALARM, do_alarm);      //7
-    LINK_SYSCALL(SYSCALL_SIGNAL, do_sigaction); //8
+    LINK_SYSCALL(SYSCALL_SIGACTION, do_sigaction); //8
     LINK_SYSCALL(SYSCALL_SIGRET, do_sigreturn); //9
     LINK_SYSCALL(SYSCALL_WAITPID, do_wait);        //10
     LINK_SYSCALL(SYSCALL_KILL, do_kill);        //11

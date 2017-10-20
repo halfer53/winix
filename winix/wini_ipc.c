@@ -13,6 +13,7 @@
 */
 #include <kernel/kernel.h>
 #include <kernel/exception.h>
+#include <winix/bitmap.h>
 /**
  * sends a message.
  *

@@ -13,6 +13,7 @@
 */
 
 #include <kernel/kernel.h>
+#include <winix/mm.h>
 #include <winix/srec.h>
 
 //Linked lists are defined by a head and tail pointer.
@@ -264,6 +265,7 @@ void enqueue_schedule(struct proc* p) {
  * @param p 
  */
 void zombify(struct proc *p){
+    p->state = -1;
     p->flags &= ~RUNNABLE;
     p->flags |= ZOMBIE;
     dequeue_schedule(p);
@@ -276,6 +278,8 @@ void zombify(struct proc *p){
  */
 void release_zombie(struct proc *p){
     p->flags = 0;
+    p->pid = 0;
+    p->state = -1;
 }
 
 /**

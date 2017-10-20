@@ -24,6 +24,23 @@ int get_wstats(struct proc* child){
     return (child->exit_status << 8) | (child->sig_status & 0x7f);
 }
 
+
+// The value of pid can be:
+
+// < -1   meaning wait for any child process whose process group ID is
+//         equal to the absolute value of pid.
+
+// -1     meaning wait for any child process.
+
+// 0      meaning wait for any child process whose process group ID is
+//         equal to that of the calling process.
+
+// > 0    meaning wait for the child whose process ID is equal to the
+//         value of pid.
+
+// The value of options is an OR of zero or more of the following con‐
+// stants:
+
 int do_wait(struct proc *parent, struct message *mesg){
     register struct proc *child;
     pid_t pid;

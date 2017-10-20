@@ -15,7 +15,8 @@
  * 
 */
 #include <kernel/kernel.h>
-
+#include <winix/bitmap.h>
+#include <winix/mm.h>
 /**
  * copy the pcb struct from parent to child
  * @param  parent 

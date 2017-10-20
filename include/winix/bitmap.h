@@ -49,8 +49,5 @@ void kreport_bitmap(unsigned int *p, int len);
 
 #define bitmap_search(map,map_len,num)  bitmap_search_from((map),(map_len), 0 , (num))
 
-#define ZERO_BITS   1
-#define ONE_BITS    2
-
 #endif
 

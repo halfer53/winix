@@ -12,6 +12,7 @@
 */
 #include <kernel/kernel.h>
 #include <winix/mem_alloc.h>
+#include <winix/mm.h>
 
 #define INITIAL_SYSFREEMEM_LEN     64
 

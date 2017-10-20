@@ -79,10 +79,6 @@ PRIVATE int build_signal_ctx(struct proc *who, int signum){
     who->sig_mask2 = who->sig_mask;
     who->sig_mask = who->sig_table[signum].sa_mask;
 
-    if(who->state){//reschedule the process if it's blocked
-        who->state = 0;//reset flags
-        enqueue_schedule(who);
-    }
     who->flags |= IN_SIG_HANDLER;
     return OK;
 }
@@ -97,6 +93,7 @@ PRIVATE int build_signal_ctx(struct proc *who, int signum){
 PRIVATE int sys_sig_handler(struct proc *who, int signum){
 
     if(who->sig_table[signum].sa_handler == SIG_DFL){
+        
         who->sig_status = signum;
         KDEBUG(("Signal %d: kill process \"%s [%d]\"\n",signum,who->name,who->pid));
         
@@ -107,13 +104,14 @@ PRIVATE int sys_sig_handler(struct proc *who, int signum){
             struct message* em = get_exception_m();
             em->type = SYSCALL_EXIT;
             em->m1_i1 = 0;
+            em->m1_i2 = signum;
             em->src = who->proc_nr;
             interrupt_send(SYSTEM, em);
             if(current_proc == who)
                 current_proc = NULL;
             
         }else{
-            exit_proc(who, 0);
+            exit_proc(who, 0, signum);
         }
         return OK;
     }
@@ -125,13 +123,19 @@ PRIVATE int sys_sig_handler(struct proc *who, int signum){
     return ERR;
 }
 
-int sig_proc(struct proc *who, int signum){
+int cause_sig(struct proc *who, int signum){
     struct sigaction* act;
 
     if(sigismember(&who->sig_mask, signum)){
         if(signum != SIGKILL && signum != SIGSTOP){
+            int ret = 0;
             // kdebug("sig %d pending\n", signum);
-            return sigaddset(&who->sig_pending, signum);
+            //if a signal is ignored and blocked by the process
+            //it is quietly ignored, and not pended
+            if(who->sig_table[signum].sa_handler != SIG_DFL){
+                ret = sigaddset(&who->sig_pending, signum);
+            }
+            return ret;
         }
     }
     // kdebug("send sig %d to %d\n", signum, who->pid);
@@ -175,7 +179,7 @@ int check_sigpending(struct proc* who){
         for(i = 1; i < _NSIG; i++){
             if(sigismember(pendings, i) && !sigismember(blocked, i)){
                 sigdelset(pendings, i);
-                sig_proc(who, i);
+                cause_sig(who, i);
                 return i;
             }
         }
@@ -192,7 +196,8 @@ int check_sigpending(struct proc* who){
  */
 int send_sig(struct proc *who, int signum){
 
-    if(who->state & RECEIVING && who->proc_nr == curr_mesg()->src){
+    if(who->sig_table[signum].sa_handler != SIG_IGN &&
+         is_in_syscall(who)){
         if(IS_SYSTEM(current_proc)){
             struct message m;
             syscall_reply(EINTR, who->proc_nr,&m);
@@ -201,7 +206,7 @@ int send_sig(struct proc *who, int signum){
         }
     }
 
-    sig_proc(who,signum);
+    cause_sig(who,signum);
     return OK;
 }
 

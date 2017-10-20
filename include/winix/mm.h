@@ -15,7 +15,6 @@
 #define _W_MEM_MAP_H_
 
 #include <kernel/proc.h>
-#include <winix/bitmap.h>
 #include <winix/page.h>
 #include <winix/gfp.h>
 

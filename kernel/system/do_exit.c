@@ -62,7 +62,7 @@ void clear_proc_mesg(struct proc *who){
 }
 
 
-void exit_proc(struct proc *who, int status){
+void exit_proc(struct proc *who, int status, int signum){
     struct proc *mp;
     int children = 0;
     struct message* mesg = curr_mesg();
@@ -74,7 +74,10 @@ void exit_proc(struct proc *who, int status){
     zombify(who);
     clear_proc_mesg(who);
     who->exit_status = status;
-    who->flags |= STOPPED;
+    if(signum){
+        who->sig_status = signum;
+        who->flags |= STOPPED;
+    }
 
     if(parent->state & VFORKING){
         //parent is blocked by vfork(2)
@@ -83,7 +86,7 @@ void exit_proc(struct proc *who, int status){
         release_zombie(who);
         return;
     }
-    send_sig(parent, SIGCHLD);
+    cause_sig(parent, SIGCHLD);
 
     foreach_proc(mp){
         //if this process if waiting for the current to be exited process
@@ -113,6 +116,7 @@ void exit_proc(struct proc *who, int status){
 
 int do_exit(struct proc *who, struct message *m){
     int status = m->m1_i1;
+    int signum = m->m1_i2;
     
     //if exit_magic, this means process is returned
     //from main, and exit syscall is triggered by
@@ -121,7 +125,8 @@ int do_exit(struct proc *who, struct message *m){
     if(status == EXIT_MAGIC){
         status = who->regs[0];
     }
-    exit_proc(who,status);
+
+    exit_proc(who, status, signum);
     return SUSPEND;
 }
 

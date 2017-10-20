@@ -34,6 +34,8 @@ struct syscall_ctx *interrupted_syscall_ctx();
 void kreport_sysinfo();
 void init_syscall_table();
 
+bool is_in_syscall(struct proc* who);
+
 
 #define LINK_SYSCALL(i,fn)  syscall_table[i] = fn
 

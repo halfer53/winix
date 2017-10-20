@@ -30,7 +30,7 @@
 #define SYSCALL_EXECVE          5
 #define SYSCALL_BRK             6
 #define SYSCALL_ALARM           7
-#define SYSCALL_SIGNAL          8
+#define SYSCALL_SIGACTION          8
 #define SYSCALL_SIGRET          9
 #define SYSCALL_WAITPID            10
 #define SYSCALL_KILL            11

@@ -86,12 +86,6 @@ void (*signal(int sig, void (*func)(int)))(int);
 //currently the minisal sigframe size is 35 words, we add an extra 10 for flexibility
 #define MINSIGSTKSZ 45
 
-
-/* Mask of valid signals (0 - _NSIG). */
-#define SIGMASK        (((SIGBIT_0 << _NSIG) << 1) - 1)
-
-#define sigisvalid(signo) ((unsigned) (signo) <= _NSIG)
-
 int sigaddset(sigset_t *, int);
 int sigdelset(sigset_t *, int);
 int sigemptyset(sigset_t *);
