@@ -41,8 +41,8 @@ def main():
     target = int(sys.argv[1],16)
 
     prevfile = ""
-    target_target_segment = ""
-    linecount = 0
+    target_segment = ""
+    target_line_num = 0
     addr = 0
     with open( rpath + "/" + in_file) as f:
         for line in f:
@@ -50,14 +50,14 @@ def main():
                 target_segment = "." + line.split(", .",1)[1]\
                         .split(" : ")[0].replace("\n","")
                 prevfile = line
-                linecount = 0
+                target_line_num = 0
                 if(target_segment == ".bss"):
-                    curr_size = int(line.split(".bss : ")[1].split(" ")[0])
+                    curr_size = int(line.split(".bss : ")[1].split(" ")[0],16)
                     curr_addr = int(line.split("starting : ")[1]\
                                         .split(", .bss : ")[0],16)
                     if(curr_addr <= target and curr_addr + \
                             curr_size >= target and curr_size != 0):
-                        linecount = target - curr_addr
+                        target_line_num = target - curr_addr
                         addr = curr_addr
                         break
                     
@@ -67,7 +67,7 @@ def main():
                 if(target == curr_addr):
                     addr = curr_addr
                     break
-                linecount += 1
+                target_line_num += 1
 
     if(addr == 0):
         print("Instruction not found 1")
@@ -76,7 +76,7 @@ def main():
     filename = prevfile.split(" ")[1].split(", ")[0].replace("'","")\
                     .replace(",","").replace(".o",".c")
     # print(filename)
-    # print(linecount)
+    # print(target_line_num)
     # print(in_file)
     # print(target_segment)
 
@@ -93,7 +93,7 @@ def main():
         if(result != 0):
             tmpfilename = filename.replace(".c",".s")
             if(os.path.isfile(main_path+"/" +  tmpfilename)):
-                print("Line " + str(linecount) + \
+                print("Line " + str(target_line_num) + \
                             " in file "+tmpfilename)
                 return 0
 
@@ -109,7 +109,7 @@ def main():
         
         with open(tmp_filename) as f:
             for line in f:
-                if(line[-2] == ':'):
+                if(line[-2] == ':' and "L." not in line):
                     prev_name = line
                     prev_name_index = 0
 
@@ -117,34 +117,41 @@ def main():
                     if(".loc" in line):
                         loc = line[:-1].split(",")[1]
                     elif(line in seg_types):
+                        # print(curr_count)
+                        if(line == ".data\n" or line == ".bss\n"):
+                            curr_count = 0
+                        
                         curr_seg = line.replace("\n","")
-                        curr_count = 0
                         # print("in "+curr_seg)
 
                 elif(line[0] == '\t'):
-                    if(curr_seg == "" and ".word" in line):
+                    if(curr_seg == ""):
                         next_incr = 1
-                        if(curr_count == linecount):
+                        if(curr_count == target_line_num):
                             print(".data: \n" + prev_name + "\tindex: " \
                                 + str(prev_name_index) + "\n" + line + "in file " \
                                 + filename)
-                            
                             break
                     elif(curr_seg == ".text"):
                         next_incr = 1
                         if(curr_seg == target_segment and \
-                                curr_count == linecount):
-                                print("Line "+ loc + "\nin file "+filename)
+                                curr_count == target_line_num):
+                                print("Assembly: \n"\
+                                     + line + "Line: "+ loc + " in file "+filename)
                                 break
                         
                     elif(curr_seg == ".data"):
                         if(".asciiz" in line):
                             tmp_str = line.split(".asciiz")[1].strip().replace("\"","")
-                            # print(".data: "+tmp_str)
+                            
                             next_incr = len(tmp_str)
-                            if(curr_seg == target_segment and curr_count >= linecount\
-                                    and curr_count + next_incr >= linecount):
-                                    print(".data: \n" + line[:-1] + "\nin file " + filename)
+                            # print(".data: "+line)
+                            if(curr_seg == target_segment and curr_count <= target_line_num\
+                                    and curr_count + next_incr >= target_line_num):
+
+                                    index_offset = curr_count + next_incr - target_line_num
+                                    print(".data: \n\tindex: " + str(index_offset)\
+                                             + "\n" + line[:-1] +"\nin file " + filename)
                                     break
 
                     elif(curr_seg == ".bss"):
@@ -153,18 +160,21 @@ def main():
                             # print(prev_line)
                             # print(bss_len)
                             next_incr = bss_len 
-                            if(curr_seg == target_segment and curr_count <= linecount \
-                                    and curr_count + next_incr >= linecount):
-                                    print(".bss: \n" + prev_line[:-1] + "\n\t.words: " + \
+                            
+                            if(curr_seg == target_segment and curr_count <= target_line_num \
+                                    and curr_count + next_incr >= target_line_num):
+                                    index_offset = curr_count + next_incr - target_line_num
+                                    print(".bss: \n" + prev_line[:-1] + "\n\tindex: " + \
+                                        str(index_offset) + "\n\tTotal number of words: " + \
                                         str(bss_len) + "\nin file " + filename)
                                     break
-
+                    
                     prev_name_index += 1
                     curr_count += next_incr
 
                 prev_line = line
 
-        if(target_segment == ".text" and curr_count != linecount):
+        if(target_segment == ".text" and curr_count != target_line_num):
             print("Instruction not found ")
 
 if __name__ == '__main__':
