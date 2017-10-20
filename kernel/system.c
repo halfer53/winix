@@ -16,6 +16,7 @@
 #include <kernel/sched.h>
 #include <kernel/table.h>
 #include <ucontext.h>
+#include <winix/list.h>
 
 PRIVATE struct message m;
 PRIVATE int who_proc_nr;
@@ -23,6 +24,8 @@ PRIVATE int curr_syscall;
 PRIVATE struct proc *who;
 
 PRIVATE ucontext_t recv_ctx;
+
+void test_list();
 
 /**
  * Entry point for system task.
@@ -136,6 +139,7 @@ bool is_in_syscall(struct proc* who){
 
 
 void init_syscall_table(){
+
     SYSCALL_MAP(TIMES, do_times);      //1
     SYSCALL_MAP(EXIT, do_exit);        //2
     SYSCALL_MAP(FORK, do_fork);        //3
@@ -158,6 +162,7 @@ void init_syscall_table(){
     SYSCALL_MAP(SETPGID, do_setpgid);
     SYSCALL_MAP(GETPGID, do_getpgid);
 }
+
 
 
 

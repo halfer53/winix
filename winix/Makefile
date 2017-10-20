@@ -3,6 +3,7 @@ INCLUDES = $(wildcard $(INCLUDE_DIR)/*.h $(INCLUDE_DIR)/winix/*.h \
 			$(INCLUDE_DIR)/sys/*.h $(INCLUDE_DIR)/kernel/*.h)
 
 PROGS = mem_alloc mm bitmap sys_stdio wini_ipc kdebug timer sigsend util\
+	list
 
 FOO = *.c
 SOURCES = $(PROGS:=.c)

@@ -1,4 +1,5 @@
 #include <sys/syscall.h>
+#include <errno.h>
 #include <stddef.h>
 
 pid_t waitpid(pid_t pid, int *wstatus, int options){
@@ -7,8 +8,6 @@ pid_t waitpid(pid_t pid, int *wstatus, int options){
     m.m1_i1 = pid;
     m.m1_i2 = options;
     ret = _syscall(WAITPID, &m);
-    if(ret < 0)
-        return (pid_t)-1;
     if(wstatus)
         *wstatus = m.m1_i2;
     return (pid_t)ret;

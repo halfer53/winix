@@ -26,7 +26,6 @@ void start_bins();
  * Entry point for WINIX.
  **/
 void main() {
-
     init_bitmap();
     init_mem_table();
     init_proc();

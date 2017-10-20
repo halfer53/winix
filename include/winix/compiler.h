@@ -14,4 +14,6 @@
 #define ASSERT_OK(exp)          ASSERT(exp == OK)
 #define PANIC(expression)     _panic(expression, __FILE__)
 
+#define READ_ONCE(v)    (v)
+
 #endif

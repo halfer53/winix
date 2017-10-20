@@ -30,7 +30,6 @@ void do_ticks();
 
 void clock_main(){
     struct message m;
-    kprintf("uptime addr %x\n", &system_uptime);
     while(1){
         winix_receive(&m);
         switch(m.type){

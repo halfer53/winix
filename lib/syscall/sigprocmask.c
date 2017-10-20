@@ -15,8 +15,6 @@ int sigprocmask(int how, const sigset_t *set, sigset_t *oldset){
     ret = _syscall(SIGPROCMASK, &m);
     if(oldset)
         *oldset = m.m1_i1;
-    else
-        __set_errno(EFAULT);
     return ret;
 }
 

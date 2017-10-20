@@ -55,4 +55,6 @@
 
 #define _STR(s) (#s)
 
+#define WRITE_ONCE(n,v) (n = v)
+
 #endif
