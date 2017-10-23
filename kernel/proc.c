@@ -262,7 +262,6 @@ void enqueue_schedule(struct proc* p) {
  * @param p 
  */
 void zombify(struct proc *p){
-    p->state = -1;
     p->flags &= ~RUNNABLE;
     p->flags |= ZOMBIE;
     dequeue_schedule(p);

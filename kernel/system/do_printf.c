@@ -37,7 +37,7 @@ int do_printf(struct proc *who, struct message *m){
     void *ptr, *ptr2;
     vp1 = m->m1_p1;
     vp2 = m->m1_p2;
-    if(!is_addr_accessible(vp1, who) || !is_addr_accessible(vp2, who))
+    if(!is_vaddr_ok(vp1, who) || !is_vaddr_ok(vp2, who))
         return EFAULT;
     ptr = get_physical_addr(vp1,who);
     ptr2 = get_physical_addr(vp2,who);

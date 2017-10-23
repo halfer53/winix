@@ -106,8 +106,8 @@ PRIVATE void hole_delete2(struct hole **q, struct hole *prev, struct hole *curr)
 }
 
 PRIVATE void hole_delete(struct hole **q, struct hole *h) {
-    register struct hole *curr = q[HEAD];
-    register struct hole *prev = NULL;
+    struct hole *curr = q[HEAD];
+    struct hole *prev = NULL;
 
     if (curr == NULL) 
         return;
@@ -126,8 +126,8 @@ PRIVATE void hole_delete(struct hole **q, struct hole *h) {
 //a new used hole of given size is added to the used hole list
 //
 void *kmalloc(size_t size) {
-    register struct hole *prev = NULL;
-    register struct hole *h = unused_holes[HEAD];
+    struct hole *prev = NULL;
+    struct hole *h = unused_holes[HEAD];
     size_t *p_start_addr = NULL;
     size_t *old_base = 0;
 
@@ -174,7 +174,7 @@ void *kmalloc(size_t size) {
 //TODO release big enough unused holes to free pages
 PRIVATE int merge_holes(struct hole **merging_holes_list, struct hole *h) {
     
-        register struct hole *curr = merging_holes_list[HEAD];
+        struct hole *curr = merging_holes_list[HEAD];
     
         while (curr != NULL) {
             //if there is hole that is adjacent to the hole to be merged
@@ -207,8 +207,8 @@ PRIVATE int merge_holes(struct hole **merging_holes_list, struct hole *h) {
 //hole is deleted from used holes, and added to the unused holes, if it finds it
 //if it can't find any matching holes, it does nothing
 void kfree(void *ptr_parameter) {
-    register size_t *p = (size_t *)ptr_parameter;
-    register struct hole *h = used_holes[HEAD];
+    size_t *p = (size_t *)ptr_parameter;
+    struct hole *h = used_holes[HEAD];
     int i = 0;
     size_t start = 0;
     size_t hole_length = 0;

@@ -89,6 +89,7 @@ void syscall_region_begin(){
     //Bill the user proc's sys_used_time while executing syscall
     //on behalf of the user process
     set_bill_ptr(who);
+    who->flags |= RECEIVING;
     get_proc(SYSTEM)->flags |= BILLABLE;
     curr_syscall = m.type;
 
@@ -149,7 +150,7 @@ void init_syscall_table(){
     SYSCALL_MAP(ALARM, do_alarm);      //7
     SYSCALL_MAP(SIGACTION, do_sigaction); //8
     SYSCALL_MAP(SIGRET, do_sigreturn); //9
-    SYSCALL_MAP(WAITPID, do_wait);        //10
+    SYSCALL_MAP(WAITPID, do_waitpid);        //10
     SYSCALL_MAP(KILL, do_kill);        //11
     SYSCALL_MAP(GETPID, do_getpid);    //12
     SYSCALL_MAP(WINFO, do_winfo);      //13

@@ -16,15 +16,12 @@
 #define LIST_POISON1  ((void *) 0)
 #define LIST_POISON2  ((void *) 2)
 
-struct list_head {
-    struct list_head *next, *prev;
-};
-
 #define LIST_HEAD_INIT(name) { &(name), &(name) }
 
 #define LIST_HEAD(name) \
 	struct list_head name = LIST_HEAD_INIT(name)
 
+void INIT_LIST_HEAD(struct list_head *list);
 #define   INIT_LIST_HEAD(list)\
 do{\
 	WRITE_ONCE((list)->next, list);\
@@ -38,9 +35,8 @@ do{\
  * This is only for internal list manipulation where we know
  * the prev/next entries already!
  */
-#define   __list_add(new,\
-			      prevl,\
-			      nextl)\
+void __list_add(struct list_head *new, struct list_head *prev, struct list_head *next);
+#define   __list_add(new, prevl, nextl)\
 do{\
 \
 	(nextl)->prev = new;\
@@ -57,6 +53,7 @@ do{\
  * Insert a new entry after the specified head.
  * This is good for implementing stacks.
  */
+void list_add(struct list_head *new, struct list_head *head);
 #define   list_add(new, head)\
 do{\
 	__list_add(new, head, (head)->next);\
@@ -71,6 +68,7 @@ do{\
  * Insert a new entry before the specified head.
  * This is useful for implementing queues.
  */
+void list_add_tail(struct list_head *new, struct list_head *head);
 #define   list_add_tail(new, head)\
 do{\
 	__list_add(new, (head)->prev, head);\
@@ -83,6 +81,7 @@ do{\
  * This is only for internal list manipulation where we know
  * the prev/next entries already!
  */
+void __list_del(struct list_head * prev, struct list_head * next);
 #define   __list_del( prevl,  nextl)\
 do{\
 	(nextl)->prev = prevl;\
@@ -95,11 +94,13 @@ do{\
  * Note: list_empty() on entry does not return true after this, the entry is
  * in an undefined state.
  */
+void __list_del_entry(struct list_head *entry);
 #define   __list_del_entry(entry)\
 do{\
 	__list_del((entry)->prev, (entry)->next);\
 }while(0)
 
+void list_del(struct list_head *entry);
 #define   list_del(entry)\
 do{\
 	__list_del_entry(entry);\
@@ -114,8 +115,8 @@ do{\
  *
  * If @old was empty, it will be overwritten.
  */
-#define   list_replace(old,\
-				new)\
+void list_replace(struct list_head *old, struct list_head *new);
+#define   list_replace(old, new)\
 do{\
 	(new)->next = (old)->next;\
 	(new)->(next)->prev = new;\
@@ -123,8 +124,8 @@ do{\
 	(new)->(prev)->next = new;\
 }while(0)
 
-#define   list_replace_init(old,\
-					new)\
+void list_replace_init(struct list_head *old, struct list_head *new);
+#define   list_replace_init(old, new)\
 do{\
 	list_replace(old, new);\
 	INIT_LIST_HEAD(old);\
@@ -134,6 +135,7 @@ do{\
  * list_del_init - deletes entry from list and reinitialize it.
  * @entry: the element to delete from the list.
  */
+void list_del_init(struct list_head *entry);
 #define   list_del_init(entry)\
 do{\
 	__list_del_entry(entry);\
@@ -145,6 +147,7 @@ do{\
  * @list: the entry to move
  * @head: the head that will precede our entry
  */
+void list_move(struct list_head *list, struct list_head *head);
 #define   list_move(list, head)\
 do{\
 	__list_del_entry(list);\
@@ -156,8 +159,8 @@ do{\
  * @list: the entry to move
  * @head: the head that will follow our entry
  */
-#define   list_move_tail(list,\
-				  head)\
+void list_move_tail(struct list_head *list, struct list_head *head);
+#define   list_move_tail(list, head)\
 do{\
 	__list_del_entry(list);\
 	list_add_tail(list, head);\
@@ -168,8 +171,8 @@ do{\
  * @list: the entry to test
  * @head: the head of the list
  */
-#define   list_is_last( list,\
-				 head)\
+int list_is_last(const struct list_head *list, const struct list_head *head);
+#define   list_is_last( list,  head)\
 do{\
 	return (list)->next == head;\
 }while(0)
@@ -178,6 +181,7 @@ do{\
  * list_empty - tests whether a list is empty
  * @head: the list to test.
  */
+int list_empty(const struct list_head *head);
 #define   list_empty( head)\
 do{\
 	return READ_ONCE((head)->next) == head;\
@@ -196,6 +200,7 @@ do{\
  * to the list entry is list_del_init(). Eg. it cannot be used
  * if another CPU could re-list_add() it.
  */
+int list_empty_careful(const struct list_head *head);
 #define   list_empty_careful( head)\
 do{\
 	nextl = (head)->next;\
@@ -206,6 +211,7 @@ do{\
  * list_rotate_left - rotate the list to the left
  * @head: the head of the list
  */
+void list_rotate_left(struct list_head *head);
 #define   list_rotate_left(head)\
 do{\
 	first;\
@@ -220,13 +226,14 @@ do{\
  * list_is_singular - tests whether a list has just one entry.
  * @head: the list to test.
  */
+int list_is_singular(const struct list_head *head);
 #define   list_is_singular( head)\
 do{\
 	return !list_empty(head) && ((head)->next == (head)->prev);\
 }while(0)
 
-#define   __list_cut_position(list,\
-		head, entry)\
+void __list_cut_position(struct list_head *list, struct list_head *head, struct list_head *entry);
+#define   __list_cut_position(list, head, entry)\
 do{\
 	new_first = (entry)->next;\
 	(list)->next = (head)->next;\
@@ -251,8 +258,8 @@ do{\
  * losing its data.
  *
  */
-#define   list_cut_position(list,\
-		head, entry)\
+void list_cut_position(struct list_head *list, struct list_head *head, struct list_head *entry);
+#define   list_cut_position(list, head, entry)\
 do{\
 	if (list_empty(head))\
 		return;\
@@ -265,9 +272,8 @@ do{\
 		__list_cut_position(list, head, entry);\
 }while(0)
 
-#define   __list_splice( list,\
-				 prevl,\
-				 nextl)\
+void __list_splice(const struct list_head *list, struct list_head *prev, struct list_head *next);
+#define   __list_splice( list, prevl, nextl)\
 do{\
 	first = (list)->next;\
 	last = (list)->prev;\
@@ -284,8 +290,8 @@ do{\
  * @list: the new list to add.
  * @head: the place to add it in the first list.
  */
-#define   list_splice( list,\
-				head)\
+void list_splice(const struct list_head *list, struct list_head *head);
+#define   list_splice( list, head)\
 do{\
 	if (!list_empty(list))\
 		__list_splice(list, head, (head)->next);\
@@ -296,8 +302,8 @@ do{\
  * @list: the new list to add.
  * @head: the place to add it in the first list.
  */
-#define   list_splice_tail(list,\
-				head)\
+void list_splice_tail(struct list_head *list, struct list_head *head);
+#define   list_splice_tail(list, head)\
 do{\
 	if (!list_empty(list))\
 		__list_splice(list, (head)->prev, head);\
@@ -310,8 +316,8 @@ do{\
  *
  * The list at @list is reinitialised
  */
-#define   list_splice_init(list,\
-				    head)\
+void list_splice_init(struct list_head *list, struct list_head *head);
+#define   list_splice_init(list, head)\
 do{\
 	if (!list_empty(list)) {\
 		__list_splice(list, head, (head)->next);\
@@ -327,8 +333,8 @@ do{\
  * Each of the lists is a queue.
  * The list at @list is reinitialised
  */
-#define   list_splice_tail_init(list,\
-					 head)\
+void list_splice_tail_init(struct list_head *list, struct list_head *head);
+#define   list_splice_tail_init(list, head)\
 do{\
 	if (!list_empty(list)) {\
 		__list_splice(list, (head)->prev, head);\
@@ -621,22 +627,26 @@ do{\
 #define HLIST_HEAD_INIT { .first = NULL }
 #define HLIST_HEAD(name) struct hlist_head name = {  .first = NULL }
 #define INIT_HLIST_HEAD(ptr) ((ptr)->first = NULL)
+void INIT_HLIST_NODE(struct hlist_node *h);
 #define   INIT_HLIST_NODE(h)\
 do{\
 	(h)->next = NULL;\
 	(h)->pprevl = NULL;\
 }while(0)
 
+int hlist_unhashed(const struct hlist_node *h);
 #define   hlist_unhashed( h)\
 do{\
 	return !(h)->pprevl;\
 }while(0)
 
+int hlist_empty(const struct hlist_head *h);
 #define   hlist_empty( h)\
 do{\
 	return !READ_ONCE((h)->first);\
 }while(0)
 
+void __hlist_del(struct hlist_node *n);
 #define   __hlist_del(n)\
 do{\
 	nextl = (n)->next;\
@@ -647,6 +657,7 @@ do{\
 		(nextl)->pprevl = pprevl;\
 }while(0)
 
+void hlist_del(struct hlist_node *n);
 #define   hlist_del(n)\
 do{\
 	__hlist_del(n);\
@@ -654,6 +665,7 @@ do{\
 	(n)->pprevl = LIST_POISON2;\
 }while(0)
 
+void hlist_del_init(struct hlist_node *n);
 #define   hlist_del_init(n)\
 do{\
 	if (!hlist_unhashed(n)) {\
@@ -662,6 +674,7 @@ do{\
 	}\
 }while(0)
 
+void hlist_add_head(struct hlist_node *n, struct hlist_head *h);
 #define   hlist_add_head(n, h)\
 do{\
 	first = (h)->first;\
@@ -673,8 +686,8 @@ do{\
 }while(0)
 
 /* next must be != NULL */
-#define   hlist_add_before(n,\
-					nextl)\
+void hlist_add_before(struct hlist_node *n, struct hlist_node *next);
+#define   hlist_add_before(n, nextl)\
 do{\
 	(n)->pprevl = (nextl)->pprevl;\
 	(n)->next = nextl;\
@@ -682,8 +695,8 @@ do{\
 	WRITE_ONCE(*((n)->pprevl), n);\
 }while(0)
 
-#define   hlist_add_behind(n,\
-				    prevl)\
+void hlist_add_behind(struct hlist_node *n, struct hlist_node *prev);
+#define   hlist_add_behind(n, prevl)\
 do{\
 	(n)->next = (prevl)->next;\
 	WRITE_ONCE((prevl)->next, n);\
@@ -694,11 +707,13 @@ do{\
 }while(0)
 
 /* after that we'll appear to be on some hlist and hlist_del will work */
+void hlist_add_fake(struct hlist_node *n);
 #define   hlist_add_fake(n)\
 do{\
 	(n)->pprevl = &(n)->next;\
 }while(0)
 
+bool hlist_fake(struct hlist_node *h);
 #define   hlist_fake(h)\
 do{\
 	return (h)->pprevl == &(h)->next;\
@@ -708,8 +723,8 @@ do{\
  * Check whether the node is the only node of the head without
  * accessing head:
  */
-#define \
-hlist_is_singular_node(n, h)\
+bool hlist_is_singular_node(struct hlist_node *n, struct hlist_head *h);
+#define   hlist_is_singular_node(n, h)\
 do{\
 	return !(n)->next && (n)->pprevl == &(h)->first;\
 }while(0)
@@ -718,8 +733,8 @@ do{\
  * Move a list from one list head to another. Fixup the pprev
  * reference of the first entry if it exists.
  */
-#define   hlist_move_list(old,\
-				   new)\
+void hlist_move_list(struct hlist_head *old, struct hlist_head *new);
+#define   hlist_move_list(old, new)\
 do{\
 	(new)->first = (old)->first;\
 	if ((new)->first)\
@@ -727,7 +742,8 @@ do{\
 	(old)->first = NULL;\
 }while(0)
 
-#define hlist_entry(struct, ptr, type, member) container_of(ptr,type,member)
+#define hlist_entry(struct, ptr, type, member) \
+		container_of(ptr,type,member)
 
 #define hlist_for_each(pos, head) \
 	for (pos = (head)->first; pos ; pos = pos->next)

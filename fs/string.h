@@ -8,7 +8,7 @@
 #ifndef _STRING_H_
 #define _STRING_H_ 1
 
-//void *memcpy(void *s1, const void *s2, register int n);
+//void *memcpy(void *s1, const void *s2, int n);
 int strcmp(const char *s1, const char *s2);
 //int strlen(const char *s);
 char *strcpy(char *dest,const char *src);

@@ -25,7 +25,7 @@
  * When signal is to be delivered, it first checks if the signal is set to 
  * default or ignored. If it is, then the kernel choose the default action 
  * according to the signal. Currently, if handler is default, it simply kills the 
- * process. If it's ignored, register $pc moves to the next instruction
+ * process. If it's ignored, $pc moves to the next instruction
  *
  * if neither of those two are set, the signal context will
  * be built on the user stack. The reason we do that is to simulate calling methods
@@ -91,33 +91,53 @@ PRIVATE int build_signal_ctx(struct proc *who, int signum){
  *                return ERR if the user needs to handle the signal
  */
 PRIVATE int sys_sig_handler(struct proc *who, int signum){
-
     if(who->sig_table[signum].sa_handler == SIG_DFL){
-        
-        who->sig_status = signum;
-        KDEBUG(("Signal %d: kill process \"%s [%d]\"\n",signum,who->name,who->pid));
-        
-        if(in_interrupt()){
-            //if we are in interrupt, send an exit syscall to the kernel, 
-            //and set current_proc to NULL so the scheduler picks the next proc
 
-            struct message* em = get_exception_m();
-            em->type = EXIT;
-            em->m1_i1 = 0;
-            em->m1_i2 = signum;
-            em->src = who->proc_nr;
-            interrupt_send(SYSTEM, em);
-            if(current_proc == who)
-                current_proc = NULL;
+        switch(signum){
+            case SIGCONT:
+                if(who->state & STOPPING){
+                    who->state &= ~STOPPING;
+                    enqueue_schedule(who);
+                }
+                break;
+
+            case SIGTSTP:
+            case SIGSTOP:
+                who->state |= STOPPING;
+                who->sig_status = signum;
+                check_waiting(who);
+                break;
             
-        }else{
-            exit_proc(who, 0, signum);
+            default:
+                KDEBUG(("Signal %d: kill process \"%s [%d]\"\n",signum,who->name,who->pid));
+                exit_proc(who, 0, signum);
         }
         return OK;
     }
     //if it's ignored
-    if(who->sig_table[signum].sa_handler == SIG_IGN){
+    else if(who->sig_table[signum].sa_handler == SIG_IGN){
+        struct proc* mp;
         KDEBUG(("Signal %d ignored by process \"%s [%d]\"\n",signum,who->name,who->pid));
+        switch(signum){
+            case SIGILL:
+            case SIGABRT:
+            case SIGFPE:
+            case SIGSEGV:
+                exit_proc(who, 0, signum);
+                break;
+                
+            case SIGCHLD:
+                foreach_child(mp, who){
+                    if(mp->flags & ZOMBIE){
+                        release_zombie(mp);
+                        break;
+                    }
+                }
+                break;
+
+            default:
+                break;
+        }
         return OK;
     }
     return ERR;

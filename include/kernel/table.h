@@ -34,7 +34,7 @@ int do_brk(struct proc* who, struct message* m);
 int do_alarm(struct proc* who, struct message* m);
 int do_sigaction(struct proc* who, struct message* m);
 int do_sigreturn(struct proc* who, struct message* m);
-int do_wait(struct proc* who, struct message* m);
+int do_waitpid(struct proc* who, struct message* m);
 int do_kill(struct proc* who, struct message* m);
 int do_getpid(struct proc* who, struct message* m);
 int do_winfo(struct proc* who, struct message* m);

@@ -198,7 +198,7 @@ PRIVATE void syscall_handler() {
     m = (struct message *)get_physical_addr(*(sp+ 2), current_proc);  //Message is the third parameter
     m->src = current_proc->proc_nr;            //Don't trust the who to specify their own source process number
 
-    retval = (int*)&current_proc->regs[0];        //Result is returned in register $1
+    retval = (int*)&current_proc->regs[0];        //Result is returned in $1
 
     //Decode operation
     switch(operation) {

@@ -35,6 +35,7 @@
 #include <string.h>
 
 #include <kernel/proc.h>
+#include <kernel/exception.h>
 #include <winix/comm.h>
 #include <winix/compiler.h>
 #include <winix/type.h>
@@ -43,6 +44,7 @@
 #include <winix/sys_stdio.h>
 #include <winix/wini_ipc.h>
 #include <kernel/system.h>
+#include <winix/slab.h>
 
 #define FREE_MEM_END    0x1ffff
 

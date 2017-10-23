@@ -31,8 +31,8 @@ inode_t* read_inode(int num){
 }
 
 inode_t* get_inode(int num){
-    register inode_t* rep;
-    register int i=0;
+    inode_t* rep;
+    int i=0;
     buf_t *imap;
     char val;
     for(rep = &inode_table[0]; rep < &inode_table[NR_INODES]; rep++ ){
@@ -139,7 +139,7 @@ void free_inode(inode_t *inode){
 }
 
 void init_inode(){
-    register inode_t* rep;
+    inode_t* rep;
     for(rep = &inode_table[0]; rep < &inode_table[NR_INODES]; rep++ ){
         rep->i_num = 0;
     }

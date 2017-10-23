@@ -3,8 +3,8 @@
 static filp_t fd_table[NR_FILPS];
 
 int get_fd(struct proc *curr,int start, int *k, filp_t **fpt){
-    register int i = -1;
-    register filp_t *f;
+    int i = -1;
+    filp_t *f;
 
     for( i=start; i< OPEN_MAX; i++){
         if(current_proc->fp_filp[i] == NIL_FILP){
@@ -44,7 +44,7 @@ filp_t *find_filp(inode_t *inode){
 }
 
 filp_t *get_free_filp(){
-    register filp_t* rep;
+    filp_t* rep;
     for(rep = &fd_table[0]; rep < &fd_table[NR_FILPS]; rep++ ){
         if(rep->filp_ino = NIL_INODE){
             return rep;
@@ -53,7 +53,7 @@ filp_t *get_free_filp(){
 }
 
 void init_filp(){
-    register filp_t* rep;
+    filp_t* rep;
     int i = 0;
     for(rep = &fd_table[0]; rep < &fd_table[NR_FILPS]; rep++ ){
         rep->filp_ino = NIL_INODE;

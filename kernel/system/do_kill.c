@@ -38,5 +38,11 @@ int do_kill(struct proc *who, struct message *m){
 
         cause_sig(to, signum);
     }
-    return OK;
+
+    //if the process sends a signal to itself and its invoking
+    //the user signal handler, don't reply
+    if(who->flags & IN_SIG_HANDLER)
+        return DONTREPLY;
+    else
+        return OK;
 }

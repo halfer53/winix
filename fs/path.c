@@ -17,8 +17,8 @@ char dot2[3] = "..";    /* permissions for . and ..            */
 * //usr///ast and /usr/ast/ are all equivalent.
 */
 char *get_name(char *old_name, char string[NAME_MAX]){
-    register int c;
-    register char *np, *rnp;
+    int c;
+    char *np, *rnp;
 
     np = string;            /* 'np' points to current position */
     rnp = old_name;        /* 'rnp' points to unparsed string */
@@ -51,7 +51,7 @@ char *get_name(char *old_name, char string[NAME_MAX]){
 //given a directory and a name component, lookup in the directory
 //and find the corresponding inode
 inode_t *advance(inode_t *dirp, char string[NAME_MAX]){
-    register char *str;
+    char *str;
     int i,inum  = 0;
     buf_t *buffer;
     
@@ -77,8 +77,8 @@ inode_t *advance(inode_t *dirp, char string[NAME_MAX]){
  
 
 inode_t *last_dir(char *path, char string[DIRSIZ]){
-    register inode_t *rip, *new_rip;
-    register char *component_name;
+    inode_t *rip, *new_rip;
+    char *component_name;
 
     rip = *path == '/' ? current_proc->fp_rootdir : current_proc->fp_workdir;
 

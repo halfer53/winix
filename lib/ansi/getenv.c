@@ -10,8 +10,8 @@ extern const char **_environ;
 
 char *getenv(const char *name)
 {
-	register const char **v;
-    register const char *p, *q;
+	const char **v;
+    const char *p, *q;
     
     if(_environ == NULL)
         init_environ();

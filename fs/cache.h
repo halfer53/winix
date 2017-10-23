@@ -30,7 +30,7 @@ int put_bmap();
 int put_block(buf_t *buffer, mode_t mode);
 buf_t *get_block(block_t blocknr);
 buf_t* dequeue_buf();
-void enqueue_buf(register buf_t *tbuf);
+void enqueue_buf(buf_t *tbuf);
 void init_buf();
 
 #endif

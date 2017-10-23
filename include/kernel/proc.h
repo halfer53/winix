@@ -82,15 +82,15 @@
 #define WAITING                    	0x0004    /* process blocked wait(2) */
 #define PAUSING                 	0x0008    /* process blocked by sigsuspend(2) or pause(2) */
 #define VFORKING                   	0x0010    /* parent is blocked by vfork(2) */
+#define STOPPING                    0x0020    /* Stopped by SIGSTOP or SIGTSTP */
 
 //Process Information flags
 #define IN_USE                    	0x0001      /* process slot is in use */
 #define RUNNABLE                	0x0002      /* Running in the system */
 #define ZOMBIE                    	0x0004      /* Zombie process */
-#define STOPPED                    	0x0008      /* Stopped by signals */
-#define BILLABLE                	0x0010      /* Set when user is invoking a system call */
-#define DISABLE_FIRST_PAGE          0x0020      /* Set when the first page of the user address space is disabled */
-#define IN_SIG_HANDLER              0x0040      /* Set if user is in the signal handler */
+#define BILLABLE                	0x0008      /* Set when user is invoking a system call */
+#define DISABLE_FIRST_PAGE          0x0010      /* Set when the first page of the user address space is disabled */
+#define IN_SIG_HANDLER              0x0020      /* Set if user is in the signal handler */
 
 //alloc_proc_mem flags
 #define PROC_SET_SP                	1
@@ -108,7 +108,7 @@
  **/
 typedef struct proc {
     /* Process State */
-    reg_t regs[NUM_REGS];        	//Register values
+    reg_t regs[NUM_REGS];        	//values
     reg_t *sp;
     reg_t *ra;
     void (*pc)();
@@ -158,6 +158,7 @@ typedef struct proc {
     pid_t pid;                    	//Process id
     pid_t procgrp;                	//Pid of the process group (used for signals)
     pid_t wpid;                    	//pid this process is waiting for
+    int woptions;                   //waiting options
     int parent;                    	//proc_index of parent
     int flags;                	//information flags
 
@@ -217,7 +218,11 @@ for(curr = proc_table - NUM_TASKS + 1; curr <= proc_table + NUM_PROCS; curr++)\
 
 #define foreach_blocked_proc(curr)\
 for(curr = proc_table + 1; curr <= proc_table + NUM_PROCS; curr++)\
-    if(IS_INUSE(curr) && curr->state)
+    if(IS_INUSE(curr) && curr->state > 0)
+
+#define foreach_child(curr, parent_proc)\
+for(curr = proc_table + 1; curr <= proc_table + NUM_PROCS; curr++)\
+    if(IS_INUSE(curr) && (curr)->parent == (parent_proc)->proc_nr)
 
 
 void* get_pc_ptr(struct proc* who);

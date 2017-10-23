@@ -1,10 +1,10 @@
 #include <lib.h>
 #include <string.h>
 
-void *memcpy(void *s1, const void *s2, register size_t n)
+void *memcpy(void *s1, const void *s2, size_t n)
 {
-    register char *p1 = s1;
-    register const char *p2 = s2;
+    char *p1 = s1;
+    const char *p2 = s2;
 
     if (n) {
         n++;

@@ -18,4 +18,16 @@ typedef unsigned int reg_t;
 typedef unsigned int ptr_t;  //physical address
 typedef unsigned int vptr_t; //virtual address
 
+struct list_head {
+    struct list_head *next, *prev;
+};
+
+struct hlist_head {
+	struct hlist_node *first;
+};
+
+struct hlist_node {
+	struct hlist_node *next, **pprev;
+};
+
 #endif

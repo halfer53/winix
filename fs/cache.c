@@ -57,7 +57,7 @@ buf_t* dequeue_buf() {
     return rear;
 }
 
-void enqueue_buf(register buf_t *tbuf) {
+void enqueue_buf(buf_t *tbuf) {
 
     if (lru_cache[FRONT] == NULL) {
         tbuf = lru_cache[REAR] = lru_cache[FRONT] = &buf_table[0];
@@ -94,7 +94,7 @@ int put_block(buf_t *tbuf, mode_t mode) {
 }
 
 buf_t *get_block(block_t blocknr){
-    register buf_t *tbuf;
+    buf_t *tbuf;
     int ret;
     if(hash_buf[blocknr] != NULL){
         tbuf = hash_buf[blocknr];
@@ -133,8 +133,8 @@ int put_bmap(){
 
 void init_buf(){
     int i=0;
-    register buf_t *tbuf = NULL, *prevbuf = NULL;
-    register char *val;
+    buf_t *tbuf = NULL, *prevbuf = NULL;
+    char *val;
     for(tbuf = &buf_table[0];tbuf< &buf_table[LRU_LEN];tbuf++){
         if(prevbuf == NULL){
             lru_cache[FRONT] = lru_cache[REAR] = tbuf;

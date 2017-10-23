@@ -150,7 +150,7 @@ int do_notify(int src, int dest, struct message *m) {
             kprintf("\nNOTIFY %d from %d type %d| ",dest, src ,m->type);
             
         //If destination is waiting, deliver message immediately.
-        if (pDest->state & RECEIVING) {
+        if (pDest->state == RECEIVING) {
 
             //Copy message to destination
             *(pDest->message) = *m;
@@ -180,16 +180,5 @@ int winix_notify(int dest, struct message *m) {
 int syscall_reply(int reply, int dest,struct message* m){
     m->reply_res = reply;
     return do_notify(SYSTEM, dest,m);
-}
-
-//send used by interrupt
-int interrupt_send(int dest, struct message* pm){
-    if(!in_interrupt())
-        return ERR;
-
-    //curr proc is the process that generated exception
-    //most likely segmentation fault or float fault
-    current_proc->state |= RECEIVING;
-    return do_send(dest, pm);
 }
 

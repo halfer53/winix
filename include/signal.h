@@ -49,8 +49,6 @@ typedef void (*sighandler_t)(int);
 #define SIG_ERR    ((sighandler_t) -1)    /* error return */
 #define SIG_DFL       ((sighandler_t)  0)    /* default signal handling */
 #define SIG_IGN       ((sighandler_t)  1)    /* ignore signal */
-#define SIG_HOLD   ((sighandler_t)  2)    /* block signal */
-#define SIG_CATCH  ((sighandler_t)  3)    /* catch signal */
 
 #ifdef _POSIX_SOURCE
 struct sigaction {

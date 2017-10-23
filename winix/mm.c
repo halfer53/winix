@@ -34,7 +34,7 @@ PRIVATE int bss_page_end;
  * @param  addr 
  * @return      
  */
-bool is_addr_accessible( vptr_t* addr, struct proc* who){
+bool is_vaddr_ok( vptr_t* addr, struct proc* who){
     int page;
     ptr_t* paddr;
 

@@ -21,6 +21,9 @@ def main():
         inblock = False
         inDef = False
         for line in f:
+            if(line.startswith("static inline")):
+                defline = re.sub("static inline ([^ ]+)(.+)\n", r'\1' + r'\2' , line)
+                output.append(defline + ";\n")
             line = re.sub("static inline [^ ]+", "#define  ", line)
             params = []
             if("#define  " in line):

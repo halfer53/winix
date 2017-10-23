@@ -17,7 +17,7 @@
 PRIVATE unsigned int mask[BITMASK_NR];
 
 void init_bitmap(){
-    register int i;
+    int i;
     mask[BITMASK_NR-1] = 1;
     for(i=BITMASK_NR-2;i>=0;i--){
         mask[i] = mask[i+1] << 1;
@@ -46,7 +46,7 @@ int get_mask(int i){
  * @return         
  */
 int bitmap_clear(unsigned int *map, int map_len){
-    register int i;
+    int i;
     for (i=0; i < map_len; ++i)
     {
         map[i] = 0;
@@ -61,7 +61,7 @@ int bitmap_clear(unsigned int *map, int map_len){
  * @return         
  */
 int bitmap_fill(unsigned int *map, int map_len){
-    register int i;
+    int i;
     for (i=0; i < map_len; ++i)
     {
         map[i] = 0xffffffff;
@@ -77,7 +77,7 @@ int bitmap_fill(unsigned int *map, int map_len){
  * @return         bit found
  */
 int bitmap_search_from(unsigned int *map, int map_len, int start, int num){
-    register int i,j;
+    int i,j;
     int count = 0;
 
     if(num >= map_len * 32 || start >= map_len * 32)
@@ -115,7 +115,7 @@ int bitmap_search_from(unsigned int *map, int map_len, int start, int num){
  *                 or -1 if failed
  */
 int bitmap_search_reverse(unsigned int *map, int map_len, int num){
-    register int i,j;
+    int i,j;
     int count = 0;
 
     if(num >= map_len * 32 )
@@ -161,7 +161,7 @@ int bitmap_set_bit(unsigned int *map, int map_len,int start){
  * @return         
  */
 int bitmap_set_nbits(unsigned int *map, int map_len,int start, int len){
-    register int i;
+    int i;
     int inum;
     if(start + len >= map_len * 32)    
         return ERR;
@@ -181,7 +181,7 @@ int bitmap_set_nbits(unsigned int *map, int map_len,int start, int len){
  * @return         
  */
 int bitmap_clear_nbits(unsigned int *map, int map_len,int start, int len){
-    register int i;
+    int i;
     int inum;
     if(start + len >= map_len * 32)    
         return ERR;
