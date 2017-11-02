@@ -105,11 +105,13 @@ PRIVATE int sys_sig_handler(struct proc *who, int signum){
             case SIGSTOP:
                 who->state |= STOPPING;
                 who->sig_status = signum;
+                dequeue_schedule(who);
                 check_waiting(who);
                 break;
             
             default:
-                KDEBUG(("Signal %d: kill process \"%s [%d]\"\n",signum,who->name,who->pid));
+                KDEBUG(("Signal %d: terminate process \"%s [%d]\"\n"
+                                        ,signum,who->name,who->pid));
                 exit_proc(who, 0, signum);
         }
         return OK;
@@ -117,14 +119,14 @@ PRIVATE int sys_sig_handler(struct proc *who, int signum){
     //if it's ignored
     else if(who->sig_table[signum].sa_handler == SIG_IGN){
         struct proc* mp;
-        KDEBUG(("Signal %d ignored by process \"%s [%d]\"\n",signum,who->name,who->pid));
         switch(signum){
-            case SIGILL:
             case SIGABRT:
-            case SIGFPE:
-            case SIGSEGV:
                 exit_proc(who, 0, signum);
                 break;
+            
+            // case SIGSEGV:
+            //     who->sig_table[SIGSEGV].sa_handler = SIG_DFL;
+            //     break;
                 
             case SIGCHLD:
                 foreach_child(mp, who){
@@ -136,6 +138,8 @@ PRIVATE int sys_sig_handler(struct proc *who, int signum){
                 break;
 
             default:
+                KDEBUG(("Signal %d ignored by process \"%s [%d]\"\n"
+                                ,signum,who->name,who->pid));
                 break;
         }
         return OK;
@@ -146,10 +150,12 @@ PRIVATE int sys_sig_handler(struct proc *who, int signum){
 int cause_sig(struct proc *who, int signum){
     struct sigaction* act;
 
+    //if this signal is blocked
     if(sigismember(&who->sig_mask, signum)){
         if(signum != SIGKILL && signum != SIGSTOP){
             int ret = 0;
             // kdebug("sig %d pending\n", signum);
+            
             //if a signal is ignored and blocked by the process
             //it is quietly ignored, and not pended
             if(who->sig_table[signum].sa_handler != SIG_DFL){

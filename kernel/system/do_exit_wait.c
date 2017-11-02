@@ -193,9 +193,6 @@ void exit_proc(struct proc *who, int status, int signum){
     struct message* mesg;
     struct proc* parent;
 
-    KDEBUG(("%s[%d] exit status %d signal %d\n",who->name, who->pid, 
-                                              status, who->sig_status));
-
     if(in_interrupt()){
         exit_proc_in_interrupt(who, status, signum);
         return;
@@ -228,13 +225,14 @@ void exit_proc(struct proc *who, int status, int signum){
     }
     
     //if No process is waiting for this process, send SIGCHLD to parent
-    if(!check_waiting(who))
-        cause_sig(parent, SIGCHLD);
+    check_waiting(who);
+    cause_sig(parent, SIGCHLD);
 }
 
 int do_exit(struct proc *who, struct message *m){
     int status = m->m1_i1;
     int signum = m->m1_i2;
+    struct proc* parent = get_proc(who->parent);
     
     //if exit_magic, this means process is returned
     //from main, and exit syscall is triggered by
@@ -244,7 +242,11 @@ int do_exit(struct proc *who, struct message *m){
         status = who->regs[0];
     }
 
+    KDEBUG(("%s[%d] exit status %d signal %d\n",who->name, who->pid, 
+                        status, signum));
+    
     exit_proc(who, status, signum);
+    
     return SUSPEND;
 }
 

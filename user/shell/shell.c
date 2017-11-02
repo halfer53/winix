@@ -172,6 +172,7 @@ int cmd_kill(int argc, char **argv){
     }else{
         pid = atoi(argv[1]);
     }
+
     if(kill(pid,signum))
         perror("kill ");
     return 0;

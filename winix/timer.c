@@ -31,7 +31,7 @@ void kreport_timers(){
     kinfo("next timeout %d\n",next_timeout);
 }
 
-int new_timer(struct proc* from, struct timer* curr, clock_t timeout, timerhandler_t watchdog){
+int new_timer(int procnr_from, struct timer* curr, clock_t timeout, timerhandler_t watchdog){
 
     if(timeout <= 0)
         return ERR;
@@ -40,7 +40,7 @@ int new_timer(struct proc* from, struct timer* curr, clock_t timeout, timerhandl
         curr->flags |= TIMER_INUSE;
         curr->time_out = get_uptime() + timeout;
         curr->handler = watchdog;
-        curr->proc_nr = from->proc_nr;
+        curr->proc_nr = procnr_from;
         curr->next = NULL;
         insert_timer(curr);
         return OK;

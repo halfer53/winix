@@ -49,15 +49,8 @@
 #define DECLARE_SYSCALL(function, params, syscall_num, passing_codes)\
 function params{\
     struct message m;\
-    int __ret;\
-    m.type = syscall_num;\
     passing_codes;\
-    __ret = winix_sendrec(SYSTEM,&m);\
-    if(m.reply_res < 0){\
-        __errno = -m.reply_res;\
-        return -1;\
-    }\
-    return m.reply_res;\
+    return _syscall(syscall_num,&m);\
 }\
 
 

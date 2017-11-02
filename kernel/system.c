@@ -89,9 +89,14 @@ void syscall_region_begin(){
     //Bill the user proc's sys_used_time while executing syscall
     //on behalf of the user process
     set_bill_ptr(who);
-    who->flags |= RECEIVING;
     get_proc(SYSTEM)->flags |= BILLABLE;
     curr_syscall = m.type;
+
+    //the following two are defensive statements
+    //to ensure the caller is suspended while the system
+    //is handling the system call
+    who->flags |= RECEIVING;
+    dequeue_schedule(who);
 
     //Make sure system doesn't send a message to itself
     ASSERT(who != NULL && who_proc_nr != SYSTEM); 

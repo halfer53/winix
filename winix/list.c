@@ -6,7 +6,22 @@ struct kool_list{
 	struct list_head list;
 	int from;
 };
-    
+	
+
+/*
+ * Insert a new entry between two known consecutive entries.
+ *
+ * This is only for internal list manipulation where we know
+ * the prev/next entries already!
+ */
+void do___list_add(struct list_head *new, struct list_head *prev, struct list_head *next)
+{
+	next->prev = new;
+	new->next = next;
+	new->prev = prev;
+	WRITE_ONCE(prev->next, new);
+}
+
 void test_list(){
     struct kool_list *tmp, *tmp2;
 	struct list_head *pos, *q;
@@ -33,12 +48,16 @@ void test_list(){
 
         tmp->to = rand();
         tmp->from = rand();
-
+do_list_add:
 		/* add the new item 'tmp' to the list of items in mylist */
-        list_add(&tmp->list, &mylist.list);
+		list_add(&tmp->list, &mylist.list);
+		
+		do___list_add(&tmp->list,&mylist.list, (&mylist.list)->next);
 		/* you can also use list_add_tail() which adds new items to
 		 * the tail end of the list
 		 */
+
+		list_del(&tmp->list);
 	}
     kprintf("\n");
     
@@ -86,4 +105,30 @@ void test_list(){
          list_del(pos);
 		 kfree(tmp);
 	}
+}
+
+
+
+
+
+/**
+ * list_replace - replace old entry by new one
+ * @old : the element to be replaced
+ * @new : the new element to insert
+ *
+ * If @old was empty, it will be overwritten.
+ */
+void do_list_replace(struct list_head *old, struct list_head *new)
+{
+	new->next = old->next;
+	new->next->prev = new;
+	new->prev = old->prev;
+	new->prev->next = new;
+}
+
+
+void do___list_del(struct list_head * prev, struct list_head * next)
+{
+	next->prev = prev;
+	WRITE_ONCE(prev->next, next);
 }

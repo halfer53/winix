@@ -1,12 +1,11 @@
 
 .global vfork
 vfork:
-	subui $sp, $sp, 13	# 13 = 5 + 8
-						# 5 is the function scope stack
-						# 8 is sizeof(struct message)
-	sw $ra, 4($sp)
-	sw $3, 3($sp)
-	addi $3, $sp, 5		# $3 points to struct message used for syscall
+	subui $sp, $sp, 3	# 3 is the function scope stack
+	la $1, vfork_stack		# store ra and $3
+	sw $ra, 0($1)
+	sw $3, 1($1)	
+	la $3, mesg			# $3 points to struct message used for syscall
 
 invoke_vfork:
 	addui $1, $0, 4		# 4 is the syscall number for vfork
@@ -21,19 +20,18 @@ invoke_vfork:
 
 	la $3, _pid
 	sw $0, 0($3)		# invalidate pid cache
-	
-	beqz $1, is_vfork_child		#if reply is 0
 
-is_vfork_parent:
-	lw $ra, 4($sp)
-	lw $3, 3($sp)
-	addui $sp, $sp, 13	# pop the function stack and message
+do_return:
+	la $3, vfork_stack		# restore ra and $3
+	lw $ra, 0($3)
+	lw $3, 1($3)
+	addui $sp, $sp, 3	# pop the function stack and message
 	jr $ra
 
-is_vfork_child:			# in child, we do not modify the stack.
-						# stack is only popped when parent returns
-	lw $ra, 4($sp)
-	lw $3, 3($sp)
-	jr $ra
-
+#private
+.bss
+mesg:
+	.space	8			# note this conforms strickly to sizeof(struct message)
+vfork_stack:
+	.space 2
 .extern	_pid 1

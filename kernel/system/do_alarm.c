@@ -37,7 +37,7 @@ int do_alarm(struct proc *who, struct message *m){
     
     //if seconds is 0, any pending alarm is canceled
     if(seconds > 0){
-        new_timer(who, alarm, seconds * get_hz(), deliver_alarm);
+        new_timer(who->proc_nr, alarm, seconds * get_hz(), deliver_alarm);
     }
 
     return prev_timeout;
