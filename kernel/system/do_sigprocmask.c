@@ -56,7 +56,6 @@ int do_sigprocmask(struct proc* who, struct message* m){
             return EINVAL;
     }
 
-    check_sigpending(who);
     return OK;
 }
 

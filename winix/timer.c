@@ -58,15 +58,14 @@ int new_timer(int procnr_from, struct timer* curr, clock_t timeout, timerhandler
 struct timer* dequeue_alarm(){
     struct timer* mq;
     mq = pending_timers;
-    if(mq){
-        pending_timers = mq->next;
-        if(pending_timers)
-            next_timeout = pending_timers->time_out;
-        else
-            next_timeout = TIMER_NEVER;
-    }else{
+    if(!mq)
         PANIC("No alarm in the queue");
-    }
+    
+    pending_timers = mq->next;
+    if(pending_timers)
+        next_timeout = pending_timers->time_out;
+    else
+        next_timeout = TIMER_NEVER;
     mq->flags &= ~TIMER_INUSE;
     mq->next = NULL;
     return mq;

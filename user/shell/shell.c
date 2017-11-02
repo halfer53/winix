@@ -56,6 +56,7 @@ void testfoo(){
 void init_shell(){
     signal(SIGINT, SIG_IGN);
     signal(SIGTERM, SIG_IGN);
+    signal(SIGTSTP, SIG_IGN);
 }
 
 

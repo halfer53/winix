@@ -16,7 +16,7 @@
 
 #ifndef _GCC_DEBUG
 int kputc(const int c);
-int kgetc();
+int kgetc(struct proc* who);
 int kprintf(const char *format, ...);
 int kerror(const char *format, ...);
 int kinfo(const char *format, ...);

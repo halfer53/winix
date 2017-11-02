@@ -172,20 +172,14 @@ do{\
  * @head: the head of the list
  */
 int list_is_last(const struct list_head *list, const struct list_head *head);
-#define   list_is_last( list,  head)\
-do{\
-	return (list)->next == head;\
-}while(0)
+#define   list_is_last( list,  head)	((list)->next == head)
 
 /**
  * list_empty - tests whether a list is empty
  * @head: the list to test.
  */
 int list_empty(const struct list_head *head);
-#define   list_empty( head)\
-do{\
-	return READ_ONCE((head)->next) == head;\
-}while(0)
+#define   list_empty(head)	(READ_ONCE((head)->next) == head)
 
 /**
  * list_empty_careful - tests whether a list is empty and not being modified
@@ -201,11 +195,7 @@ do{\
  * if another CPU could re-list_add() it.
  */
 int list_empty_careful(const struct list_head *head);
-#define   list_empty_careful( head)\
-do{\
-	nextl = (head)->next;\
-	return (nextl == head) && (nextl == (head)->prev);\
-}while(0)
+#define   list_empty_careful( head)		(head->next == head) && (head->next == head->prev)
 
 /**
  * list_rotate_left - rotate the list to the left
@@ -214,11 +204,8 @@ do{\
 void list_rotate_left(struct list_head *head);
 #define   list_rotate_left(head)\
 do{\
-	first;\
-\
 	if (!list_empty(head)) {\
-		first = (head)->next;\
-		list_move_tail(first, head);\
+		list_move_tail(head->next, head);\
 	}\
 }while(0)
 
@@ -227,21 +214,17 @@ do{\
  * @head: the list to test.
  */
 int list_is_singular(const struct list_head *head);
-#define   list_is_singular( head)\
-do{\
-	return !list_empty(head) && ((head)->next == (head)->prev);\
-}while(0)
+#define   list_is_singular(head)	(!list_empty(head) && (head->next == head->prev))
 
 void __list_cut_position(struct list_head *list, struct list_head *head, struct list_head *entry);
 #define   __list_cut_position(list, head, entry)\
 do{\
-	new_first = (entry)->next;\
-	(list)->next = (head)->next;\
-	(list)->(next)->prev = list;\
-	(list)->prev = entry;\
-	(entry)->next = list;\
-	(head)->next = new_first;\
-	(new_first)->prev = head;\
+	list->next = head->next;\
+	list->next->prev = list;\
+	list->prev = entry;\
+	head->next = entry->next;\
+	entry->next = list;\
+	head->next->prev = head;\
 }while(0)
 
 /**
@@ -262,10 +245,10 @@ void list_cut_position(struct list_head *list, struct list_head *head, struct li
 #define   list_cut_position(list, head, entry)\
 do{\
 	if (list_empty(head))\
-		return;\
+		break;\
 	if (list_is_singular(head) &&\
 		((head)->next != entry && head != entry))\
-		return;\
+		break;\
 	if (entry == head)\
 		INIT_LIST_HEAD(list);\
 	else\
@@ -275,14 +258,10 @@ do{\
 void __list_splice(const struct list_head *list, struct list_head *prev, struct list_head *next);
 #define   __list_splice( list, prevl, nextl)\
 do{\
-	first = (list)->next;\
-	last = (list)->prev;\
-\
-	(first)->prev = prevl;\
-	(prevl)->next = first;\
-\
-	(last)->next = nextl;\
-	(nextl)->prev = last;\
+	list->next->prev = prev;\
+	prev->next = list->next;\
+	list->prev->next = next;\
+	next->prev = list->prev;\
 }while(0)
 
 /**
@@ -635,10 +614,7 @@ do{\
 }while(0)
 
 int hlist_unhashed(const struct hlist_node *h);
-#define   hlist_unhashed( h)\
-do{\
-	return !(h)->pprevl;\
-}while(0)
+#define   hlist_unhashed( h)	!(h)->pprevl;\
 
 int hlist_empty(const struct hlist_head *h);
 #define   hlist_empty( h)\

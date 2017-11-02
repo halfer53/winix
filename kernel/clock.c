@@ -57,11 +57,6 @@ void deliver_alarm(int proc_nr, clock_t time){
     struct proc* who = get_proc(proc_nr);
 
     send_sig(who,SIGALRM);
-    //SIGALRM will temporarily wake up the process
-    // if(who->state){
-    //     who->state = 0;//reset flags
-    //     enqueue_schedule(who);
-    // }
 }
 
 clock_t get_uptime(){

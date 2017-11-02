@@ -22,7 +22,7 @@
 
 int send_sig(struct proc *who, int signum);
 int cause_sig(struct proc *who, int signum);
-int check_sigpending(struct proc* who);
+int is_sigpending(struct proc* who);
 
 #define SIG_FRAME_CODE_LEN  (2)
 

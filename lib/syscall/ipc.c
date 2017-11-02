@@ -34,20 +34,22 @@ int wramp_syscall(int operation, ...);
 }
 
 
-static int winix_send_comm(int type,int dest, struct message *m){
-    int ret = wramp_syscall(type, dest, m);
-    if(ret < 0){
-        __set_errno(-ret);
-        return -1;
-    }
-    return ret;
-}
+#define winix_send_comm(type, dest, m, ret)\
+do{\
+    ret = wramp_syscall(type, dest, m);\
+    if(ret < 0){\
+        __set_errno(-ret);\
+        return -1;\
+    }\
+}while(0)
 
 /**
  * Sends a message to the destination process
  **/
 int winix_send(int dest, struct message *m) {
-    return winix_send_comm(WINIX_SEND, dest, m);
+    int ret;
+    winix_send_comm(WINIX_SEND, dest, m, ret);
+    return ret;
 }
 
 /**
@@ -56,5 +58,7 @@ int winix_send(int dest, struct message *m) {
  * Note: overwrites m with the reply message.
  **/
 int winix_sendrec(int dest, struct message *m) {
-    return winix_send_comm(WINIX_SENDREC, dest, m);
+    int ret;
+    winix_send_comm(WINIX_SENDREC, dest, m,ret);
+    return ret;
 }

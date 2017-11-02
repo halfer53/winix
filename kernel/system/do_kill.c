@@ -37,7 +37,7 @@ int do_kill(struct proc *who, struct message *m){
         if(signum == 0)
             return OK;
 
-        cause_sig(to, signum);
+        send_sig(to, signum);
 	    valid_targets++;
     }
 

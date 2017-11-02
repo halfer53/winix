@@ -16,12 +16,12 @@
 #include <ctype.h>
 
 
-#define IS_VALID_SERIAL_CODE(c) (isprint(c) || c - 7 < 6)
+#define IS_SERIAL_CODE(c) (isprint(c) || c - 7 < 6)
 /**
  * Writes a character to serial port 1.
  **/
 int kputc(const int c) {
-    if(IS_VALID_SERIAL_CODE(c)){
+    if(IS_SERIAL_CODE(c)){
         while(!(RexSp1->Stat & 2));
         RexSp1->Tx = c;
         return c;
@@ -39,10 +39,22 @@ int kputc2(const int c) {
 /**
  * Reads a character from serial port 1.
  **/
-int kgetc() {
-    //TODO: user interrupt-driven I/O
-    //Use thread
-    while(!(RexSp1->Stat & 1));
+//TODO: user interrupt-driven I/O
+
+#define TRIES   (32)
+
+int kgetc(struct proc* who) {
+    int try = TRIES;
+    while(1){
+        while(!(RexSp1->Stat & 1) && --try);
+        
+        if(is_sigpending(who))
+            return EINTR;
+        
+        if(try)
+            break;
+        try = TRIES;
+    }
     return RexSp1->Rx;
 }
 

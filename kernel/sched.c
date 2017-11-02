@@ -80,16 +80,10 @@ struct proc *pick_proc() {
  *   Context of the new proc is loaded.
  **/
 void sched() {
+    int signum;
     //irq count is increased for each exception being called, and cleared on exiting
     //exception
     reset_irq_count();
-
-#ifdef _DEBUG
-    
-    //Check exception stack
-    if(*(get_exception_stack_top()) != STACK_MAGIC)
-        PANIC("Exception stack overflow\n");
-#endif
 
     if (current_proc && !current_proc->state) {
 
@@ -115,6 +109,15 @@ void sched() {
     if (current_proc->ticks_left <= 0) {
         current_proc->ticks_left = current_proc->quantum;
     }
+
+    if(signum = is_sigpending(current_proc))
+        handle_sig(current_proc, signum);
+
+#ifdef _DEBUG
+    //Check exception stack
+    if(*(get_exception_stack_top()) != STACK_MAGIC)
+        PANIC("Exception stack overflow\n");
+#endif
 
     //Load context and run
     wramp_load_context();

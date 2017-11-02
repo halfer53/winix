@@ -110,16 +110,16 @@ void syscall_region_end(){
     curr_syscall = 0;
 }
 
-/**
- * interrupt the current executing system call
- * and start receiving syscalls again
- */
-void intr_syscall(){
-    if(who_proc_nr){
-        syscall_reply(EINTR, who_proc_nr, &m);
-        setcontext(&recv_ctx);
-    }
-}
+// /**
+//  * interrupt the current executing system call
+//  * and start receiving syscalls again
+//  */
+// void intr_syscall(){
+//     if(who_proc_nr){
+//         syscall_reply(EINTR, who_proc_nr, &m);
+//         setcontext(&recv_ctx);
+//     }
+// }
 
 int no_syscall(struct proc* who, struct message* m){
     KDEBUG(("Process \"%s (%d)\" performed unknown system call %d\r\n", 

@@ -1,7 +1,7 @@
 
 INCLUDE_DIR = ../include
 
-PROGS = main proc system exception idle clock sched table
+PROGS = main proc system exception idle clock sched table signal wini_ipc
 SOURCES = $(PROGS:=.c)
 ASSEMBLY = $(PROGS:=.s)
 OBJECT = $(PROGS:=.o)

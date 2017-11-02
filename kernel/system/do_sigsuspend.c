@@ -21,8 +21,10 @@ int do_sigsuspend(struct proc* who, struct message* m){
     sigdelset(&mask, SIGSTOP);
     who->sig_mask2 = who->sig_mask;
     who->sig_mask = mask;
+    if(is_sigpending(who))
+        return EINTR;
+    
     who->state |= PAUSING;
-    check_sigpending(who);
     return SUSPEND;
 }
 

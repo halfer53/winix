@@ -36,7 +36,7 @@ int do_sigreturn(struct proc *who, struct message *m){
 
     if(signum == SIGABRT){
         who->sig_table[SIGABRT].sa_handler = SIG_DFL;
-        cause_sig(who, SIGABRT);
+        send_sig(who, SIGABRT);
         goto end;
     }
 
@@ -47,8 +47,6 @@ int do_sigreturn(struct proc *who, struct message *m){
     //add it to scheduling queue if necessary
     if(!who->state)
         enqueue_schedule(who);
-
-    check_sigpending(who);
     
 end:
     if(who->state & RECEIVING)

@@ -147,9 +147,39 @@ PRIVATE int sys_sig_handler(struct proc *who, int signum){
     return ERR;
 }
 
-int cause_sig(struct proc *who, int signum){
+/**
+ * don't invoke this unless the signal is checked by
+ * is_sigpending()
+ */
+int handle_sig(struct proc* who, int signum){
     struct sigaction* act;
+    
+    sigdelset(&who->sig_pending, signum);
+    //if the system can handle the signal
+    if(sys_sig_handler(who,signum) == OK)
+        return OK;
 
+    act = &who->sig_table[signum];
+
+    if(act->sa_flags & SA_NODEFER)
+        sigaddset(&act->sa_mask, signum);
+    else
+        sigdelset(&act->sa_mask, signum);
+
+    build_signal_ctx(who,signum);
+
+    if(act->sa_flags & SA_RESETHAND){
+        act->sa_handler = SIG_DFL;
+    }
+
+    return OK;
+}
+
+int send_sig(struct proc *who, int signum){
+
+    if(!IS_USER_PROC(who))
+        return EINVAL;
+    
     //if this signal is blocked
     if(sigismember(&who->sig_mask, signum)){
         if(signum != SIGKILL && signum != SIGSTOP){
@@ -171,46 +201,42 @@ int cause_sig(struct proc *who, int signum){
     if(who->state & PAUSING ){
         struct message m;
         // kdebug("wakeup %d\n", who->proc_nr);
+        m.type = 0;
         who->state &= ~PAUSING;
         syscall_reply(EINTR, who->proc_nr, &m);
     }
 
-    //if the system can handle the signal
-    if(sys_sig_handler(who,signum) == OK)
-        return OK;
-
-    act = &who->sig_table[signum];
-
-    if(act->sa_flags & SA_NODEFER)
-        sigaddset(&act->sa_mask, signum);
-    else
-        sigdelset(&act->sa_mask, signum);
-
-    build_signal_ctx(who,signum);
-    
-    if(act->sa_flags & SA_RESETHAND){
-        act->sa_handler = SIG_DFL;
-    }
-        
+    // add it the list of pending signals
+    // whenever the scheduler is called, it checks if the
+    // process to be sched have any pending signals. This is
+    // when handle_sig will be called.
+    sigaddset(&who->sig_pending, signum);
     return OK;
 }
 
 
-int check_sigpending(struct proc* who){
-    int i;
-    sigset_t* pendings = &who->sig_pending;
-    sigset_t* blocked = &who->sig_mask;
+
+int is_sigpending(struct proc* who){
+    int i, sigmask;
+    sigset_t pendings = who->sig_pending;
+    sigset_t blocked = who->sig_mask;
 
     if(who->sig_pending){
         for(i = 1; i < _NSIG; i++){
-            if(sigismember(pendings, i) && !sigismember(blocked, i)){
-                sigdelset(pendings, i);
-                cause_sig(who, i);
+            sigmask = 1 << i;
+            if(pendings & sigmask && !(blocked & sigmask)){
                 return i;
             }
         }
     }
     return 0;
+}
+
+int handle_pendingsig(struct proc* who){
+    int signum = is_sigpending(who);
+    if(signum)
+        return handle_sig(who, signum);
+    return ERR;
 }
 
 /**
@@ -220,19 +246,19 @@ int check_sigpending(struct proc* who){
  * @param  signum 
  * @return        
  */
-int send_sig(struct proc *who, int signum){
+// int send_sig(struct proc *who, int signum){
 
-    if(who->sig_table[signum].sa_handler != SIG_IGN &&
-         is_in_syscall(who)){
-        if(IS_SYSTEM(current_proc)){
-            struct message m;
-            syscall_reply(EINTR, who->proc_nr,&m);
-        }else{
-            get_proc(SYSTEM)->pc = &intr_syscall;
-        }
-    }
+//     if(who->sig_table[signum].sa_handler != SIG_IGN &&
+//          is_in_syscall(who)){
+//         if(IS_SYSTEM(current_proc)){
+//             struct message m;
+//             syscall_reply(EINTR, who->proc_nr,&m);
+//         }else{
+//             get_proc(SYSTEM)->pc = &intr_syscall;
+//         }
+//     }
 
-    cause_sig(who,signum);
-    return OK;
-}
+//     send_sig(who,signum);
+//     return OK;
+// }
 

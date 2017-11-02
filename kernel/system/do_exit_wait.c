@@ -109,26 +109,6 @@ void clear_sending_mesg(struct proc *who){
     }
 }
 
-/**
- * return error to all the process who are waiting for messages 
- * for the current process
- * This is not triggered since this is really a user space problem
- * But we just keep it here for future use
- * @param who 
- */
-void clear_receiving_mesg(struct proc *who){
-    struct proc *xp;
-    struct message m;
-
-    if(who->state & RECEIVING){
-        xp = who->sender_q;
-        while(xp){
-            memset(&m,-1,sizeof( struct message));
-            syscall_reply(-1, xp->proc_nr,&m);
-            xp = xp->next_sender;
-        }
-    }
-}
 
 void clear_proc_mesg(struct proc *who){
     clear_sending_mesg(who);
@@ -151,7 +131,8 @@ int check_waiting(struct proc* who){
                 //stopped process is only reported if WUNTRACED is set
                 if(who->state & STOPPING && !(mp->woptions & WUNTRACED))
                     continue;
-
+                
+                mesg->type = WAITPID;
                 mesg->m1_i2 = get_wstats(who);
                 mp->state &= ~WAITING;
                 syscall_reply(who->pid, mp->proc_nr, mesg);
@@ -214,6 +195,7 @@ void exit_proc(struct proc *who, int status, int signum){
     if(parent->state & VFORKING){
         //parent is blocked by vfork(2)
         parent->state &= ~VFORKING;
+        mesg->type = VFORK;
         syscall_reply(who->pid, parent->proc_nr, mesg);
     }else{
         release_proc_mem(who);
@@ -226,7 +208,7 @@ void exit_proc(struct proc *who, int status, int signum){
     
     //if No process is waiting for this process, send SIGCHLD to parent
     check_waiting(who);
-    cause_sig(parent, SIGCHLD);
+    send_sig(parent, SIGCHLD);
 }
 
 int do_exit(struct proc *who, struct message *m){

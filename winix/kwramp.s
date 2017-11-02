@@ -114,12 +114,11 @@ handler:
 	
 	#Note: the C handler doesn't necessarily return here.
 	#It may go direct to wramp_load_context instead.
-	j wramp_load_context
+	j sched
 	
 .data
 # Function pointer for the main exception handler
 handler_address: .word 0
-stack_ov_mesg:	.ascii "Exception stack overflow"
 
 # .bss
 # # Stack used while handling exceptions.
