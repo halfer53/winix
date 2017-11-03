@@ -39,22 +39,20 @@ int kputc2(const int c) {
 /**
  * Reads a character from serial port 1.
  **/
-//TODO: user interrupt-driven I/O
+// TODO: user interrupt-driven I/O
 
 #define TRIES   (32)
 
 int kgetc(struct proc* who) {
-    int try = TRIES;
-    while(1){
+    int try;
+    do{
+        try = TRIES;
         while(!(RexSp1->Stat & 1) && --try);
         
         if(is_sigpending(who))
             return EINTR;
-        
-        if(try)
-            break;
-        try = TRIES;
-    }
+
+    }while(try == 0);
     return RexSp1->Rx;
 }
 
@@ -104,7 +102,7 @@ PRIVATE int kputx_buf(int n,char *buf) {
 PRIVATE int kputd_buf(int n, char *buf) {
     int place = 1000000000;
     int count = 0;
-    //zero?
+    // zero?
     if(n == 0) {
         // kputc('0');
         *buf++ = '0';
@@ -112,7 +110,7 @@ PRIVATE int kputd_buf(int n, char *buf) {
         return 1;
     }
 
-    //negative?
+    // negative?
     if(n < 0) {
         // kputc('-');
         *buf++ = '-';
@@ -120,12 +118,12 @@ PRIVATE int kputd_buf(int n, char *buf) {
         n *= -1;
     }
 
-    //find first digit of number
+    // find first digit of number
     while(place > n) {
         place /= 10;
     }
 
-    //print the rest
+    // print the rest
     while(place) {
         int d = n / place;
         // kputc(d % 10 + '0');
@@ -204,7 +202,7 @@ int kprintf_vm(const char *format, void *arg, ptr_t *who_rbase){
             padding_direction = LEFT_PADDING;
             buf = buffer;
             
-            //decode padding options
+            // decode padding options
             if(*format == '-'){
                 format++;
                 padding_direction = RIGHT_PADDING;
@@ -253,7 +251,7 @@ int kprintf_vm(const char *format, void *arg, ptr_t *who_rbase){
             padding_len -= buf_len;
             count += buf_len;
 
-            //left padding
+            // left padding
             if(padding_direction == LEFT_PADDING && padding_len > 0){ 
                 if(prev == 'x' || prev == 'd')
                     token = ZERO;
@@ -261,13 +259,13 @@ int kprintf_vm(const char *format, void *arg, ptr_t *who_rbase){
             }
 
             count += kputs(buf);
-            //right padding
+            // right padding
             if(padding_direction == RIGHT_PADDING && padding_len > 0)
                 count += kput_token(token, padding_len);
             
         }else {
-            //if this is a normal character, simply print it to 
-            //serial port 1
+            // if this is a normal character, simply print it to 
+            // serial port 1
             if(kputc(*format++)!= EOF)
                 count++;
         }

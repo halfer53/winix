@@ -18,10 +18,10 @@
 #include <kernel/exception.h>
 #include <winix/rex.h>
 
-//System uptime, stored as number of timer interrupts since boot
+// System uptime, stored as number of timer interrupts since boot
 PRIVATE clock_t system_uptime = 0;
 
-//Global variable for the next timeout event
+// Global variable for the next timeout event
 PUBLIC clock_t next_timeout = 0;
 
 PRIVATE struct proc* bill_ptr;
@@ -78,10 +78,10 @@ clock_t get_uptime(){
 void clock_handler(){
     RexTimer->Iack = 0;
 
-    //Increment uptime, and check if there is any alarm
+    // Increment uptime, and check if there is any alarm
     system_uptime++;
 
-    //Accounting
+    // Accounting
     current_proc->time_used++;
     current_proc->ticks_left--;
 
@@ -92,11 +92,11 @@ void clock_handler(){
     if(next_timeout <= system_uptime){
         struct message* m = get_exception_m();
         m->type = DO_CLOCKTICK;
-        //Since we are in exception context, 
-        //send a message from INTERRUPT to CLOCK
-        //to do_clockticks
+        // Since we are in exception context, 
+        // send a message from INTERRUPT to CLOCK
+        // to do_clockticks
         do_notify(INTERRUPT, CLOCK, m);
-        //in winix, kernel tasks are preemptible
+        // in winix, kernel tasks are preemptible
         preempt_currproc();
     }
     sched();

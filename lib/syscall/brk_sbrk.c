@@ -1,7 +1,7 @@
 #include <sys/syscall.h>
 #include <stddef.h>
 
-static char* _brk = NULL; //data segment break cache
+static char* _brk = NULL; // data segment break cache
 
 int brk(void *addr){
     struct message m;
@@ -18,7 +18,7 @@ void *sbrk(int incr){
     char *newsize, *oldsize;
 
     if(_brk == NULL){
-        brk((void *)0xffffffff); //initialise _brk
+        brk((void *)0xffffffff); // initialise _brk
     }
 
     oldsize = _brk;

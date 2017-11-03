@@ -8,11 +8,11 @@ typedef struct s_block {
     struct s_block *next;
     struct s_block *prev;
     int free;
-    void *ptr; //a pointer to the allocated block
-    char data[1]; //the pointer where the real data is pointed at. b->data is what malloc returns
-    //The reason we use data[1] is that c returns the address of array by default, 
-    //whereas if we were to use ```char data;```, b-> returns the data instead of the address.
-    //note that data is just put there, it lies directly in the memory block where malloc starts.
+    void *ptr; // a pointer to the allocated block
+    char data[1]; // the pointer where the real data is pointed at. b->data is what malloc returns
+    // The reason we use data[1] is that c returns the address of array by default, 
+    // whereas if we were to use ```char data;```, b-> returns the data instead of the address.
+    // note that data is just put there, it lies directly in the memory block where malloc starts.
 }block_t;
 
 static void *base = NULL;

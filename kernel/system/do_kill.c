@@ -17,7 +17,6 @@
 
 int do_kill(struct proc *who, struct message *m){
     struct proc *to;
-    int ret = OK;
     int valid_targets = 0;
     pid_t pid = m->m1_i1, pgid;
     int signum = m->m1_i2;
@@ -37,14 +36,22 @@ int do_kill(struct proc *who, struct message *m){
         if(signum == 0)
             return OK;
 
+        /*
+         * if the process to which we are sending 
+         * is blocked, we will need to temporarily unblock it
+         * so that the scheduler will trigger the signal handling
+         */
+        
         send_sig(to, signum);
+        if(to != who && to->state)
+            handle_pendingsig(to);
+        
+        
 	    valid_targets++;
     }
 
     if(!valid_targets)
 	    return ESRCH;
 
-    //if the process sends a signal to itself and its invoking
-    //the user signal handler, don't reply
-    return ret;
+    return OK;
 }

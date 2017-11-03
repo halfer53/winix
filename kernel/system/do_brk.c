@@ -35,9 +35,9 @@
  */
     
 
-//sbrk function
-//NB sbrk() is implemented as a user wrapper function, that internally uses brk() syscall
-//This function is just an internal kernel function for extending heaps
+// sbrk function
+// NB sbrk() is implemented as a user wrapper function, that internally uses brk() syscall
+// This function is just an internal kernel function for extending heaps
 void* sys_sbrk(struct proc *who, int size){
     ptr_t* next_page;
     void* oheap;
@@ -46,14 +46,14 @@ void* sys_sbrk(struct proc *who, int size){
     if(size == 0)
         return get_virtual_addr(who->heap_break, who);
     
-    //residual is the remaining unused heap by the user
+    // residual is the remaining unused heap by the user
     residual = who->heap_bottom - who->heap_break;
     if(residual >= size){
         who->heap_break += size;
         return get_virtual_addr(who->heap_break, who);
     }
 
-    //extend the heap bottom if needed
+    // extend the heap bottom if needed
     next_page = who->heap_bottom + 1;
     request_size = size - residual; 
     if(user_get_free_pages_from(who,next_page, request_size ) == ERR)
@@ -66,10 +66,10 @@ void* sys_sbrk(struct proc *who, int size){
     return get_virtual_addr(who->heap_break,who);
 }
 
-//syscall for brk()
-//in contrast to the user space sbrk(), system call brk() returns the new heap break 
-//to the user space, and then user space sbrk() will return the saved previous break. 
-//same applies to brk(), which checks the syscall return is valid, and return 0 or 1
+// syscall for brk()
+// in contrast to the user space sbrk(), system call brk() returns the new heap break 
+// to the user space, and then user space sbrk() will return the saved previous break. 
+// same applies to brk(), which checks the syscall return is valid, and return 0 or 1
 int do_brk(struct proc *who, struct message *m){
     int size;
     ptr_t* new_brk;

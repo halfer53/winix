@@ -14,7 +14,7 @@
 #define CMD_PROTOTYPE(name)    int name(int argc, char**argv)
 
 
-//Maps strings to function pointers
+// Maps strings to function pointers
 struct cmd_internal {
     int (*handle)(int argc, char **argv);
     char *name;

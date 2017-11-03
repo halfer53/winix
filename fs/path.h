@@ -1,7 +1,7 @@
 #ifndef _FS_PATH_H_
 #define _FS_PATH_H_ 1
 
-//each direct occupies 32 bytes, with 8 bytes for d_ino, and 24 bytes for directory name
+// each direct occupies 32 bytes, with 8 bytes for d_ino, and 24 bytes for directory name
 #ifndef DIRSIZ
 #define DIRSIZ    32
 #endif

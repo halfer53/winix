@@ -29,7 +29,7 @@ int wramp_syscall(int operation, ...);
  * Receives a message.
  **/
  int winix_receive(struct message *m) {
-    //Note: second parameter is currently unused, but is included to simplify kernel code.
+    // Note: second parameter is currently unused, but is included to simplify kernel code.
     return wramp_syscall(WINIX_RECEIVE, NULL, m);
 }
 

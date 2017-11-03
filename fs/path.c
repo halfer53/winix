@@ -13,8 +13,8 @@ char dot2[3] = "..";    /* permissions for . and ..            */
 * the name as yet unparsed is returned.  Roughly speaking,
 * 'get_name' = 'old_name' - 'string'.
 *
-* This routine follows the standard convention that /usr/ast, /usr//ast,
-* //usr///ast and /usr/ast/ are all equivalent.
+* This routine follows the standard convention that /usr/ast, /usr// ast,
+* // usr/// ast and /usr/ast/ are all equivalent.
 */
 char *get_name(char *old_name, char string[NAME_MAX]){
     int c;
@@ -48,18 +48,18 @@ char *get_name(char *old_name, char string[NAME_MAX]){
     return(rnp);
 }
 
-//given a directory and a name component, lookup in the directory
-//and find the corresponding inode
+// given a directory and a name component, lookup in the directory
+// and find the corresponding inode
 inode_t *advance(inode_t *dirp, char string[NAME_MAX]){
     char *str;
     int i,inum  = 0;
     buf_t *buffer;
     
 
-    //currently only reads the first block
+    // currently only reads the first block
     if( (buffer = get_block(dirp->i_zone[0])) != NULL){
         for(str = (char *)&buffer->block[0]; str < &buffer->block[BLOCK_SIZE]; str+= DIRSIZ){
-          str += 8; //skip inode
+          str += 8; // skip inode
           if(strcmp(str,string) == 0){
               inum = hexstr2int(str-8,8);
               break;
@@ -92,14 +92,14 @@ inode_t *last_dir(char *path, char string[DIRSIZ]){
 
     while(1){
         if((component_name = get_name(path,string)) == (char *)0){
-            return NIL_INODE; //bad parsing
+            return NIL_INODE; // bad parsing
         }
 
         if(component_name == '\0'){
             if(rip->i_mode & S_IFDIR)
                 return rip;
             else{
-                return NIL_INODE; //bad parsing
+                return NIL_INODE; // bad parsing
             }
         }
         

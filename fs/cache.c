@@ -6,9 +6,9 @@ static buf_t buf_table[LRU_LEN];
 
 static buf_t *lru_cache[2];
 
-static buf_t imap;//inode map is assumed to be 1 block in length
+static buf_t imap;// inode map is assumed to be 1 block in length
 
-static buf_t bmap; //block map is also assumed to be 1 block in length
+static buf_t bmap; // block map is also assumed to be 1 block in length
 
 // The lru is illustrated as below
 // REAR -> next -> .... -> next -> FRONT
@@ -88,7 +88,7 @@ int put_block(buf_t *tbuf, mode_t mode) {
         buf_move_to_front(tbuf);
         return dev_io(tbuf->block, tbuf->b_blocknr, DEV_WRITE);
     }
-    else { //mode = ONE_SHOT
+    else { // mode = ONE_SHOT
         buf_move_to_rear(tbuf);
     }
 }
@@ -103,7 +103,7 @@ buf_t *get_block(block_t blocknr){
         return tbuf;
     }
 
-    //not in memory
+    // not in memory
     tbuf = dequeue_buf();
     if(tbuf && tbuf->b_dirt)
         put_block(tbuf,WRITE_IMMED);

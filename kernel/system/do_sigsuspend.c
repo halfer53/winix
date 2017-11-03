@@ -24,7 +24,7 @@ int do_sigsuspend(struct proc* who, struct message* m){
     if(is_sigpending(who))
         return EINTR;
     
-    who->state |= PAUSING;
+    who->state |= STATE_PAUSING;
     return SUSPEND;
 }
 

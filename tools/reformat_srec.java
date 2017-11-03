@@ -18,13 +18,13 @@ public class reformat_srec{
     try{
       long wordsCount = 0;
      wordsCount = LoadSrec(filename);
-     //System.out.println("words loaded "+wordsCount);
+     // System.out.println("words loaded "+wordsCount);
      String newcontent = "";
      int byteCount = 0;
      int checksum = 0;
      String wordsCountdata = Long.toHexString(wordsCount).toUpperCase();
 
-     //System.out.println(wordsCountdata);
+     // System.out.println(wordsCountdata);
      wordsCountdata = AddZeroToFrontToFormPairsMin4(wordsCountdata);
 
      byteCount = wordsCountdata.length() /2 +1;
@@ -34,12 +34,12 @@ public class reformat_srec{
 
        checksum = ~checksum;
        checksum = checksum & 0xff;
-       //System.out.println(AddZeroToFrontToFormPairs(checksum));
+       // System.out.println(AddZeroToFrontToFormPairs(checksum));
      }
      newcontent += ("S6" + AddZeroToFrontToFormPairs(byteCount) + wordsCountdata + AddZeroToFrontToFormPairs(checksum)) + "\n";
 
-     //System.out.print(newcontent);
-     //System.out.print(content);
+     // System.out.print(newcontent);
+     // System.out.print(content);
 
      File rewritefile = new File(filename);
      FileOutputStream fos = new FileOutputStream(rewritefile,false);
@@ -74,7 +74,7 @@ public class reformat_srec{
     if (s.length() % 2 != 0) {
       s = new StringBuilder(s).insert(0,"0").toString();
     }
-    //convert it to hex string
+    // convert it to hex string
     return s;
   }
 
@@ -86,9 +86,9 @@ public class reformat_srec{
             String line = "";
             long linesCount = 0;
             StringBuilder sb = new StringBuilder();
-            //Note: All hex values are big endian.
+            // Note: All hex values are big endian.
 
-            //Read records
+            // Read records
             while ((line = br.readLine()) != null)
             {
                 sb.append(line + "\n");
@@ -97,11 +97,11 @@ public class reformat_srec{
                 int index = 0;
                 int checksum = 0;
 
-                //Start code, always 'S'
+                // Start code, always 'S'
                 if (linec[index++] != 'S')
                     throw new Exception("Expecting 'S'");
 
-                //Record type, 1 digit, 0-9, defining the data field
+                // Record type, 1 digit, 0-9, defining the data field
                 //0: Vendor-specific data
                 //1: 16-bit data sequence
                 //2: 24 bit data sequence
@@ -137,12 +137,12 @@ public class reformat_srec{
                         throw new Exception("Unknown record type");
                 }
 
-                //Byte count, 2 digits, number of bytes (2 hex digits) that follow (in address, data, checksum)
+                // Byte count, 2 digits, number of bytes (2 hex digits) that follow (in address, data, checksum)
                 int byteCount = Integer.parseInt(line.substring(index, index+2), 16);
                 index += 2;
                 checksum += byteCount;
 
-                //Address, 4, 6 or 8 hex digits determined by the record type
+                // Address, 4, 6 or 8 hex digits determined by the record type
                 for (int i = 0; i < addressLength; i++)
                 {
                     String ch = line.substring(index + i * 2, (index+ i * 2)+ 2);
@@ -152,24 +152,24 @@ public class reformat_srec{
                 int address = Integer.parseInt(line.substring(index, index+ addressLength * 2), 16);
                 index += addressLength * 2;
                 byteCount -= addressLength;
-                //Data, a sequence of bytes.
-                //java byte doesn't support unisnged byte, so we use int here
+                // Data, a sequence of bytes.
+                // java byte doesn't support unisnged byte, so we use int here
                 int[] data = new int[byteCount - 1];
                 for (int i = 0; i < data.length; i++)
                 {
                     data[i] = Integer.decode("0x"+line.substring(index, index+ 2).toLowerCase());
-                    //System.out.println(Integer.decode("0x"+line.substring(index, index+ 2).toLowerCase()));
+                    // System.out.println(Integer.decode("0x"+line.substring(index, index+ 2).toLowerCase()));
                     index += 2;
                     checksum += data[i];
                 }
 
-                //Checksum, two hex digits. Inverted LSB of the sum of values, including byte count, address and all data.
+                // Checksum, two hex digits. Inverted LSB of the sum of values, including byte count, address and all data.
                 int readChecksum = (byte)Integer.parseInt(line.substring(index, index+ 2), 16);
                 checksum = (~checksum & 0xFF);
 
                 switch (recordType)
                 {
-                    case 3: //data intended to be stored in memory.
+                    case 3: // data intended to be stored in memory.
                         int localcount = 0;
                         for (int i = 0; i < data.length; i += 4)
                         {
@@ -177,23 +177,23 @@ public class reformat_srec{
                             for (int j = i; j < i + 4; j++)
                             {
                                 val <<= 8;
-                                //System.out.println(data[j]);
-                                //System.out.println(tempbyte);
+                                // System.out.println(data[j]);
+                                // System.out.println(tempbyte);
                                 val |= data[j];
 
                             }
                             localcount++;
                             val &= 0xffffffff;
-                            //System.out.println(String.format("%08d",val));
-                            //System.out.println(Integer.toHexString(val));
+                            // System.out.println(String.format("%08d",val));
+                            // System.out.println(Integer.toHexString(val));
                         }
 
                         wordsLoaded += localcount;
                         break;
 
-                    case 7: //entry point for the program.
+                    case 7: // entry point for the program.
                         // CPU.PC = (long)address;
-                        //System.out.println("pc "+address);
+                        // System.out.println("pc "+address);
                         break;
                 }
             }

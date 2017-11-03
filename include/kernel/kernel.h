@@ -64,7 +64,7 @@
 
 #define STR_MALLEN(x) (strlen(x) + 1)
 
-//Memory limits
+// Memory limits
 extern unsigned int TEXT_BEGIN, DATA_BEGIN, BSS_BEGIN;
 extern unsigned int TEXT_END, DATA_END, BSS_END;
 

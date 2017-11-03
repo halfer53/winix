@@ -34,7 +34,7 @@ int strcmp(const char *s1, const char *s2) {
 /**
  * Calculates the length of a string.
  **/
-//int strlen(const char *s) {
+// int strlen(const char *s) {
 //    int len = 0;
 //
 //    while (*s++) {

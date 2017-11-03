@@ -35,7 +35,7 @@
 
 #define    DIRBLKSIZ    1024    /* size of directory block */
 
-//each direct occupies 32 bytes, with 8 bytes for d_ino, and 24 bytes for directory name
+// each direct occupies 32 bytes, with 8 bytes for d_ino, and 24 bytes for directory name
 #ifndef DIRSIZ
 #define DIRSIZ    32
 #endif

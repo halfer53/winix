@@ -21,52 +21,52 @@
 #include <winix/timer.h>
 #include <winix/kwramp.h>
 
-//Init
+// Init
 #define INIT                   		1
 #define INTERRUPT                   -30
 
-//Kernel Process
-//Plz do make sure IDLE has the lowest process number
+// Kernel Process
+// Plz do make sure IDLE has the lowest process number
 #define NUM_TASKS                   3
 #define IDLE                    	-2
 #define CLOCK                    	-1
 #define SYSTEM                      0
 
-//Number of User procs
+// Number of User procs
 #define NUM_PROCS               	8
 
-//Total number of procs
+// Total number of procs
 #define NUM_PROCS_AND_TASKS         (NUM_TASKS + NUM_PROCS)
 
-//Scheduling
+// Scheduling
 #define NUM_QUEUES              	5
 #define MAX_PRIORITY            	0
 #define MIN_PRIORITY            	4
 
-//Max string len for a process name 
+// Max string len for a process name 
 //(including NULL terminator)
 #define PROC_NAME_LEN           	16
 
-//min bss segment size
+// min bss segment size
 #define MIN_BSS_SIZE            	200
 
-//stack
+// stack
 #define STACK_MAGIC             	0x12345678
 #define USER_STACK_SIZE         	1024
 #define KERNEL_STACK_SIZE       	1024
 
-//heap
+// heap
 #define USER_HEAP_SIZE          	2048
 
-//Signal PCB Context
+// Signal PCB Context
 #define SIGNAL_CTX_LEN          	21
 
-//Process Defaults
+// Process Defaults
 #define DEFAULT_FLAGS            	0
 #define PTABLE_LEN               	32
 #define DEFAULT_CCTRL            	0xff9
 #define DEFAULT_STACK_POINTER    	0x00000
-#define USER_CCTRL               	0x8 //OKU is set to 0
+#define USER_CCTRL               	0x8 // OKU is set to 0
 #define DEFAULT_RBASE            	0x00000
 #define DEFAULT_PTABLE           	0x00000
 #define DEFAULT_KERNEL_QUANTUM   	64
@@ -76,27 +76,26 @@
 #define DEFAULT_RETURN_ADDR        	0x00000000
 #define DEFAULT_PROGRAM_COUNTER    	0x00000000
 
-//Process Scheduling Flags state, process is runnable when state == 0
-#define SENDING                    	0x0001    /* process blocked trying to SEND */
-#define RECEIVING                	0x0002    /* process blocked trying to RECEIVE */
-#define WAITING                    	0x0004    /* process blocked wait(2) */
-#define PAUSING                 	0x0008    /* process blocked by sigsuspend(2) or pause(2) */
-#define VFORKING                   	0x0010    /* parent is blocked by vfork(2) */
-#define STOPPING                    0x0020    /* Stopped by SIGSTOP or SIGTSTP */
+// Process Scheduling Flags state, process is runnable when state == 0
+#define STATE_RUNNING              0x0000    /* Process is running or in the ready queue */
+#define STATE_SENDING               0x0001    /* process blocked trying to SEND */
+#define STATE_RECEIVING             0x0002    /* process blocked trying to RECEIVE */
+#define STATE_WAITING               0x0004    /* process blocked wait(2) */
+#define STATE_PAUSING               0x0008    /* process blocked by sigsuspend(2) or pause(2) */
+#define STATE_VFORKING              0x0010    /* parent is blocked by vfork(2) */
+#define STATE_STOPPED               0x0020    /* Stopped by SIGSTOP or SIGTSTP */
+#define STATE_ZOMBIE                0x0040    /* Zombie process */
 
-//Process Information flags
+// Process Information flags
 #define IN_USE                    	0x0001      /* process slot is in use */
-#define RUNNABLE                	0x0002      /* Running in the system */
-#define ZOMBIE                    	0x0004      /* Zombie process */
-#define BILLABLE                	0x0008      /* Set when user is invoking a system call */
-#define DISABLE_FIRST_PAGE          0x0010      /* Set when the first page of the user address space is disabled */
-#define IN_SIG_HANDLER              0x0020      /* Set if user is in the signal handler */
+#define BILLABLE                	0x0002      /* Set when user is invoking a system call */
+#define DISABLE_FIRST_PAGE          0x0004      /* Set when the first page of the user address space is disabled */
 
-//alloc_proc_mem flags
+// alloc_proc_mem flags
 #define PROC_SET_SP                	1
 #define PROC_SET_HEAP            	2
 
-//proc_memctll flags
+// proc_memctll flags
 #define PROC_ACCESS                	1
 #define PROC_NO_ACCESS            	0
 
@@ -108,62 +107,62 @@
  **/
 typedef struct proc {
     /* Process State */
-    reg_t regs[NUM_REGS];        	//values
+    reg_t regs[NUM_REGS];        	// values
     reg_t *sp;
     reg_t *ra;
     void (*pc)();
     reg_t *rbase;
     reg_t *ptable;
-    reg_t cctrl;                  	//len 19 words
+    reg_t cctrl;                  	// len 19 words
 
     /* IPC messages */
-    int state;                 	//schedling flags
-    struct message* message;    	//Message Buffer
-                                	//len 21 words
-                                	//DO NOT MODIFY or CHANGE the order of the above
-                                    //fields unless you know what you are doing
+    int state;                      // schedling flags
+    struct message* message;    	// Message Buffer
+                                	// len 21 words
+                                	// DO NOT MODIFY or CHANGE the order of the above
+                                    // fields unless you know what you are doing
     
 
     /* Heap and Stack*/
-    ptr_t* stack_top;             	//Stack_top is the physical address
-    ptr_t* heap_break;             	//Heap_break is also the physical address of the curr
-                                	//Brk, retrived by syscall brk(2)
-    ptr_t* heap_bottom;         	//Bottom of the process image
+    ptr_t* stack_top;             	// Stack_top is the physical address
+    ptr_t* heap_break;             	// Heap_break is also the physical address of the curr
+                                	// Brk, retrived by syscall brk(2)
+    ptr_t* heap_bottom;         	// Bottom of the process image
 
     /* Protection */
     reg_t protection_table[PTABLE_LEN];
 
     /* IPC queue */
-    struct proc *sender_q;        	//Head of process queue waiting to send to this process
-    struct proc *next_sender;     	//Link to next sender in the queue
+    struct proc *sender_q;        	// Head of process queue waiting to send to this process
+    struct proc *next_sender;     	// Link to next sender in the queue
 
     /* Pending messages, used by winix_notify */
-    unsigned int notify_pending;	//bitmap for masking list of pending messages by system proc
+    unsigned int notify_pending;	// bitmap for masking list of pending messages by system proc
 
     /* Scheduling */
-    struct proc *next;            	//Next pointer
-    int priority;                	//Priority
-    int quantum;                	//Timeslice length
-    int ticks_left;                	//Timeslice remaining
+    struct proc *next;            	// Next pointer
+    int priority;                	// Priority
+    int quantum;                	// Timeslice length
+    int ticks_left;                	// Timeslice remaining
 
     /* Accounting */
-    clock_t time_used;            	//CPU time used
-    clock_t sys_time_used;        	//system time used while the system is executing on behalf 
-                                	//of this proc
+    clock_t time_used;            	// CPU time used
+    clock_t sys_time_used;        	// system time used while the system is executing on behalf 
+                                	// of this proc
 
     /* Metadata */
-    char name[PROC_NAME_LEN];    	//Process name
-    int exit_status;            	//Storage for status when process exits
-    int sig_status;                	//Storage for siginal status when process exits
-    pid_t pid;                    	//Process id
-    pid_t procgrp;                	//Pid of the process group (used for signals)
-    pid_t wpid;                    	//pid this process is waiting for
-    int woptions;                   //waiting options
-    int parent;                    	//proc_index of parent
-    int flags;                	//information flags
+    char name[PROC_NAME_LEN];    	// Process name
+    int exit_status;            	// Storage for status when process exits
+    int sig_status;                	// Storage for siginal status when process exits
+    pid_t pid;                    	// Process id
+    pid_t procgrp;                	// Pid of the process group (used for signals)
+    pid_t wpid;                    	// pid this process is waiting for
+    int woptions;                   // waiting options
+    int parent;                    	// proc_index of parent
+    int flags;                	// information flags
 
     /* Process Table Index */
-    int proc_nr;                	//Index in the process table
+    int proc_nr;                	// Index in the process table
 
     /* Signal Information */
     sigset_t sig_pending;
@@ -193,7 +192,9 @@ extern struct proc *block_q[2];
 #define IS_IDLE(p)                      ((p)->proc_nr == IDLE)
 #define IS_SYSTEM(p)                    ((p)->proc_nr == SYSTEM)
 #define IS_INUSE(p)                     ((p)->flags & IN_USE)
-#define IS_RUNNABLE(p)                  (((p)->flags & (IN_USE | RUNNABLE)) == (IN_USE | RUNNABLE))
+#define IS_RUNNING(p)                   ((p)->state == STATE_RUNNING)
+#define IS_RUNNABLE(p)                  (IN_USE(p) && (p)->state ^ STATE_ZOMBIE)
+#define IS_BLOCKED(p)                   ((p)->state > 0)
 
 #define CHECK_STACK(p)                  (*((p)->stack_top) == STACK_MAGIC)
 #define GET_DEF_STACK_SIZE(who)         (IS_USER_PROC(who) ? USER_STACK_SIZE : KERNEL_STACK_SIZE)
@@ -203,8 +204,8 @@ extern struct proc *block_q[2];
 #define SID_TO_TASK_NR(sid)             (-sid + 1)
 
 
-//proc_table points at index zero of the process table, so proc_table + INIT
-//simply starts at init
+// proc_table points at index zero of the process table, so proc_table + INIT
+// simply starts at init
 #define foreach_proc(curr)\
 for(curr = proc_table + INIT; curr <= proc_table + NUM_PROCS ; curr++)\
     if(IS_INUSE(curr))

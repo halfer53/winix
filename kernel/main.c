@@ -55,8 +55,9 @@ void init_kernel_tasks(){
 void start_init(){
     struct proc* init = get_proc(INIT);
     proc_set_default(init);
-    init->flags |= IN_USE | RUNNABLE;
-    init->pid = INIT;
+    init->state = STATE_RUNNING;
+    init->flags = IN_USE;
+    init->pid = 1;
     if(exec_proc(init,init_code,init_code_length,init_pc,init_offset,"init"))
         PANIC("init");
     add_free_mem(init_code, init_code_length);
@@ -65,6 +66,6 @@ void start_init(){
 void start_bins(){
     struct proc* p;
     p = start_user_proc(shell_code,shell_code_length, shell_pc, shell_offset,"shell");
-    p->parent = INIT;//hack 
+    p->parent = INIT;// hack 
     add_free_mem(shell_code,shell_code_length);
 }

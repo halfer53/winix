@@ -16,18 +16,18 @@
 #include <winix/mm.h>
 #include <winix/srec.h>
 
-//Linked lists are defined by a head and tail pointer.
+// Linked lists are defined by a head and tail pointer.
 
-//Process table
+// Process table
 PRIVATE struct proc _proc_table[NUM_PROCS + NUM_TASKS];
 
-//Pointer to proc table, public system wise
+// Pointer to proc table, public system wise
 PUBLIC struct proc *proc_table;
 
-//Scheduling queues
+// Scheduling queues
 PUBLIC struct proc *ready_q[NUM_QUEUES][2];
 
-//The currently-running process
+// The currently-running process
 PUBLIC struct proc *current_proc;
 
 
@@ -205,10 +205,10 @@ struct proc *dequeue(struct proc **q) {
     if (p == NULL)
         return NULL;
 
-    if (q[HEAD] == q[TAIL]) { //Last item
+    if (q[HEAD] == q[TAIL]) { // Last item
         q[HEAD] = q[TAIL] = NULL;
     }
-    else { //At least one remaining item
+    else { // At least one remaining item
         q[HEAD] = p->next;
     }
     p->next = NULL;
@@ -252,7 +252,6 @@ int dequeue_schedule( struct proc *h) {
  * @param p 
  */
 void enqueue_schedule(struct proc* p) {
-    p->flags |= RUNNABLE;
     enqueue_tail(ready_q[p->priority], p);
 }
 
@@ -262,8 +261,7 @@ void enqueue_schedule(struct proc* p) {
  * @param p 
  */
 void zombify(struct proc *p){
-    p->flags &= ~RUNNABLE;
-    p->flags |= ZOMBIE;
+    p->state |= STATE_ZOMBIE;
     dequeue_schedule(p);
 }
 
@@ -273,7 +271,7 @@ void zombify(struct proc *p){
  * @param p 
  */
 void release_zombie(struct proc *p){
-    if(p->flags & ZOMBIE){
+    if(p->state & STATE_ZOMBIE){
         p->flags = 0;
         p->pid = 0;
         p->state = -1;
@@ -291,8 +289,8 @@ struct proc *get_free_proc_slot() {
         who = &proc_table[i];
         if(!IS_INUSE(who)){
             proc_set_default(who);
-            who->state = 0;
-            who->flags |= IN_USE | RUNNABLE;
+            who->state = STATE_RUNNING;
+            who->flags = IN_USE;
             who->pid = get_next_pid();
             return who;
         }
@@ -308,6 +306,7 @@ void proc_set_default(struct proc *p) {
     int pnr_bak = p->proc_nr;
     memset(p, 0, sizeof(struct proc));
     p->proc_nr = pnr_bak;
+    p->state = -1;
 
     memset(p->regs, -1, NUM_REGS);
     p->cctrl = DEFAULT_CCTRL;
@@ -393,6 +392,7 @@ struct proc *start_kernel_proc(void (*entry)(), int proc_nr, const char *name, i
         who->sp = alloc_kstack(who);
         who->priority = priority;
         who->pid = 0;
+        who->state = STATE_RUNNING;
         enqueue_schedule(who);
     }
     return who;
@@ -425,7 +425,7 @@ struct proc *start_user_proc(size_t *lines, size_t length, size_t entry, int opt
  * @return           
  */
 int proc_memctl(struct proc* who ,vptr_t* page_addr, int flags){
-    int paged = PADDR_TO_PAGED(get_physical_addr(page_addr, who)); //get page descriptor
+    int paged = PADDR_TO_PAGED(get_physical_addr(page_addr, who)); // get page descriptor
     
     if(flags == PROC_ACCESS){
         return bitmap_set_bit(who->ptable, PTABLE_LEN, paged);
@@ -450,21 +450,21 @@ int alloc_proc_mem(struct proc *who, int text_data_length, int stack_size, int h
     ptr_t *bss_start;
     int bss_size;
 
-    //make sizes page aligned
-    //text_Data_length is the length of text plus data.
-    //Since srec file does not include the size of bss segment by
-    //default, so we have to manually set it. By default, bss segment
-    //extends from the end of the data segment. So the initial bss 
-    //size is simply aligned size minus exact size
+    // make sizes page aligned
+    // text_Data_length is the length of text plus data.
+    // Since srec file does not include the size of bss segment by
+    // default, so we have to manually set it. By default, bss segment
+    // extends from the end of the data segment. So the initial bss 
+    // size is simply aligned size minus exact size
     td_aligned = align_page(text_data_length);
     bss_size = td_aligned - text_data_length;
 
     stack_size = align_page(stack_size);
     heap_size = align_page(heap_size);
     
-    //give bss an extra page if its not enough. not that if bss size 
-    //is not enough, it could extend to the stack segment, which could
-    //potentially corrupt the stack 
+    // give bss an extra page if its not enough. not that if bss size 
+    // is not enough, it could extend to the stack segment, which could
+    // potentially corrupt the stack 
     if(bss_size < MIN_BSS_SIZE)
         bss_size += PAGE_LEN;
 
@@ -473,12 +473,12 @@ int alloc_proc_mem(struct proc *who, int text_data_length, int stack_size, int h
     if(who->rbase == NULL)
         return ERR;
 
-    //set bss segment to 0
+    // set bss segment to 0
     bss_start = who->rbase + text_data_length;
     memset(bss_start, 0, bss_size);
 
-    //for information on how process memory are structured, 
-    //look at the first line of this file
+    // for information on how process memory are structured, 
+    // look at the first line of this file
     if(flags & PROC_SET_SP){
         who->stack_top = who->rbase + text_data_length + bss_size;
         who->sp = get_virtual_addr(who->stack_top + stack_size - 1,who);
@@ -528,14 +528,14 @@ void init_proc() {
     int i, procnr_offset;
     struct proc *p;
     int preset_pnr;
-    //Initialise queues
+    // Initialise queues
 
     for (i = 0; i < NUM_QUEUES; i++) {
         ready_q[i][HEAD]  = ready_q[i][TAIL] = NULL;
     }
 
     procnr_offset = NUM_TASKS - 1;
-    //Add all proc structs to the free list
+    // Add all proc structs to the free list
     for ( i = 0; i < NUM_PROCS + NUM_TASKS; i++) {
         p = &_proc_table[i];
         proc_set_default(p);

@@ -24,19 +24,19 @@ typedef struct __iobuf {
 	unsigned char	*_ptr;
 } FILE;
 
-#define	_IOFBF		0x000   //file buffered
-#define	_IOREAD		0x001   //can read
-#define	_IOWRITE	0x002   //can write
-#define _IORW       0x003   //can read and write
-#define	_IONBF		0x004   //not buffered
-#define	_IOMYBUF	0x008   //custised buffer
-#define	_IOEOF		0x010   //end of file is reached
-#define	_IOERR		0x020   //IO error
-#define	_IOLBF		0x040   //line buffered
-#define	_IOREADING	0x080   //reading
-#define	_IOWRITING	0x100   //writing
-#define	_IOAPPEND	0x200   //can append
-#define _IOFIFO		0x400   //not used
+#define	_IOFBF		0x000   // file buffered
+#define	_IOREAD		0x001   // can read
+#define	_IOWRITE	0x002   // can write
+#define _IORW       0x003   // can read and write
+#define	_IONBF		0x004   // not buffered
+#define	_IOMYBUF	0x008   // custised buffer
+#define	_IOEOF		0x010   // end of file is reached
+#define	_IOERR		0x020   // IO error
+#define	_IOLBF		0x040   // line buffered
+#define	_IOREADING	0x080   // reading
+#define	_IOWRITING	0x100   // writing
+#define	_IOAPPEND	0x200   // can append
+#define _IOFIFO		0x400   // not used
 
 
 #ifndef SEEK_SET
@@ -52,7 +52,7 @@ typedef struct __iobuf {
 
 #define	FOPEN_MAX	20
 
-//C89/C99 requires them to be macros, so satisfy them
+// C89/C99 requires them to be macros, so satisfy them
 #define	stdin		stdin
 #define	stdout		stdout
 #define	stderr		stderr

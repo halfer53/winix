@@ -35,8 +35,8 @@ void _panic(const char* str, const char* file) {
         
     while(1) {
         RexParallel->Ctrl = 0;
-        RexParallel->LeftSSD = 0x79;  //E
-        RexParallel->RightSSD = 0x50; //r
+        RexParallel->LeftSSD = 0x79;  // E
+        RexParallel->RightSSD = 0x50; // r
     }
 }
 

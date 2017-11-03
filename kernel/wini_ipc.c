@@ -31,15 +31,15 @@
 int do_send(int dest, struct message *m) {
     struct proc *pDest;
 
-    current_proc->message = m; //save for later
+    current_proc->message = m; // save for later
     pDest = IS_USER_PROC(current_proc) ? get_proc_by_pid(dest) : get_runnable_proc(dest);
     
-    //Is the destination valid?
+    // Is the destination valid?
     if (pDest) {
 
-        //if the destination is waiting for the curr proc
-        //avoid deadlock
-        if(pDest->state & SENDING){
+        // if the destination is waiting for the curr proc
+        // avoid deadlock
+        if(pDest->state & STATE_SENDING){
             struct proc* xp = current_proc->sender_q;
             while(xp){
                 if(xp == pDest){
@@ -49,26 +49,26 @@ int do_send(int dest, struct message *m) {
             }
         }
         
-        if (pDest->state & RECEIVING) {
+        if (pDest->state & STATE_RECEIVING) {
             *(pDest->message) = *m;
 
-            //Unblock receiver
-            pDest->state &= ~RECEIVING;
+            // Unblock receiver
+            pDest->state &= ~STATE_RECEIVING;
             pDest->regs[0] = m->reply_res;
             enqueue_head(ready_q[pDest->priority], pDest);
         }else {
-            
-            //Otherwise, block current process and add it to
+            if(is_debugging_ipc()){
+                kprintf("\nIPC: SEND to %d from %d blocked| ",
+                            dest, current_proc->proc_nr,m->type);
+            }
+            // Otherwise, block current process and add it to
             // head of sending queue of the destination.
-            current_proc->state |= SENDING;
+            current_proc->state |= STATE_SENDING;
             current_proc->next_sender = pDest->sender_q;
             pDest->sender_q = current_proc;
         }
 
-        if(is_debugging_syscall()){
-            if(dest == SYSTEM)
-                kprintf_syscall_request(m->type, m->src);
-        }else if(is_debugging_ipc()){
+        if(is_debugging_ipc()){
             kprintf("\nIPC: SEND to %d from %d type %d| ",
                         dest, current_proc->proc_nr,m->type);
         }
@@ -102,29 +102,29 @@ int do_receive(struct message *m) {
     }
     
     p = current_proc->sender_q;
-    //If a process is waiting to send to this process, deliver it immediately.
+    // If a process is waiting to send to this process, deliver it immediately.
     if (p != NULL) {
         
-        //Dequeue head node
+        // Dequeue head node
         current_proc->sender_q = p->next_sender;
         
 
-        //Copy message to this process
+        // Copy message to this process
         *m = *(p->message);
 
-        //Unblock sender
-        p->state &= ~SENDING;
-        if(!p->state && p->flags & RUNNABLE)
+        // Unblock sender
+        p->state &= ~STATE_SENDING;
+        if(p->state == STATE_RUNNING)
             enqueue_head(ready_q[p->priority], p);
         
-        if(is_debugging_ipc()){
+        if(is_debugging_ipc())
             kprintf("\nIPC: %d REC from %d type %d| ",current_proc->proc_nr, m->src ,m->type);
-        }
+        
         return OK;
     }
 
     current_proc->message = m;
-    current_proc->state |= RECEIVING;
+    current_proc->state |= STATE_RECEIVING;
     return OK;
 }
 /**
@@ -140,30 +140,27 @@ int do_receive(struct message *m) {
 int do_notify(int src, int dest, struct message *m) {
     struct proc *pDest, *pSrc;
 
-    //Is the destination valid?
+    // Is the destination valid?
     if (pDest = get_runnable_proc(dest)) {
 
-        if(is_debugging_syscall()){
-            if(IS_USER_PROC(pDest))
-                kprintf_syscall_reply(m->reply_res);
-        }else if(is_debugging_ipc())
+        if(is_debugging_ipc())
             kprintf("\nNOTIFY %d from %d type %d| ",dest, src ,m->type);
             
-        //If destination is waiting, deliver message immediately.
-        if (pDest->state == RECEIVING) {
+        // If destination is waiting, deliver message immediately.
+        if (pDest->state == STATE_RECEIVING) {
 
-            //Copy message to destination
+            // Copy message to destination
             *(pDest->message) = *m;
 
-            //Unblock receiver
-            pDest->state &= ~RECEIVING;
+            // Unblock receiver
+            pDest->state &= ~STATE_RECEIVING;
             pDest->regs[0] = m->reply_res;
             enqueue_head(ready_q[pDest->priority], pDest);
         }else{
             int sid = TASK_NR_TO_SID(src);
             set_bit(pDest->notify_pending, sid);
         }
-        //do nothing if it's not waiting
+        // do nothing if it's not waiting
         return OK;
     }
     return ESRCH;
@@ -175,10 +172,5 @@ int do_notify(int src, int dest, struct message *m) {
  **/
 int winix_notify(int dest, struct message *m) {
     return wramp_syscall(WINIX_NOTIFY, dest, m);
-}
-
-int syscall_reply(int reply, int dest,struct message* m){
-    m->reply_res = reply;
-    return do_notify(SYSTEM, dest,m);
 }
 

@@ -23,11 +23,11 @@ typedef struct {
   int i_nindirs;        /* # indirect zones per indirect block */
   struct super_block *i_sp;    /* pointer to super block for inode's device */
   unsigned int flags;
-  //char i_dirt;            /* CLEAN or DIRTY */
-  //char i_pipe;            /* set to I_PIPE if pipe */
-  //char i_mount;            /* this bit is set if file mounted on */
-  //char i_seek;            /* set on LSEEK, cleared on READ/WRITE */
-  //char i_update;        /* the ATIME, CTIME, and MTIME bits are here */
+  // char i_dirt;            /* CLEAN or DIRTY */
+  // char i_pipe;            /* set to I_PIPE if pipe */
+  // char i_mount;            /* this bit is set if file mounted on */
+  // char i_seek;            /* set on LSEEK, cleared on READ/WRITE */
+  // char i_update;        /* the ATIME, CTIME, and MTIME bits are here */
 }inode_t;
 
 extern inode_t inode_table[NR_INODES];

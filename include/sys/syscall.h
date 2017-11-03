@@ -23,7 +23,7 @@
 /**
  * System Call Numbers
  **/
-#define NONE            0   //not used
+#define NONE            0   // not used
 #define TIMES           1
 #define EXIT            2
 #define FORK            3

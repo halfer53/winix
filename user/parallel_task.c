@@ -13,7 +13,7 @@
 */
 
 #include <winix/rex.h>
-//TODO: remove rex.h include
+// TODO: remove rex.h include
 
 /**
  * What base should we display the number as?
@@ -47,14 +47,14 @@ void printDec(int n) {
  * Main entry point.
  **/
 void parallel_main() {
-    RexParallel->Ctrl = 1; //HEX-SSD decoding on
+    RexParallel->Ctrl = 1; // HEX-SSD decoding on
     
     while(1) {
         
-        //Load switch value
+        // Load switch value
         int n = 100 / RexParallel->Switches;
         
-        //Change display mode?
+        // Change display mode?
         switch(RexParallel->Buttons) {
             case 1:
                 _mode = HEX;
@@ -66,10 +66,10 @@ void parallel_main() {
             
             case 3:
                 exit(0);
-                return; //exit
+                return; // exit
         }
         
-        //Display the number
+        // Display the number
         switch(_mode) {
             case HEX:
                 printHex(n);

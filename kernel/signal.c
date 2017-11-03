@@ -59,7 +59,7 @@
 PRIVATE int build_signal_ctx(struct proc *who, int signum){
     struct sigframe sframe;
     struct sigframe* frame = &sframe;
-    //pcb context are saved onto the user stack, and will be restored after sigreturn syscall
+    // pcb context are saved onto the user stack, and will be restored after sigreturn syscall
     copyto_user_stack(who,who,SIGNAL_CTX_LEN);
 
     frame->signum = signum;
@@ -69,17 +69,17 @@ PRIVATE int build_signal_ctx(struct proc *who, int signum){
     frame->s_base.m.m1_i1 = signum;
     frame->s_base.m.type = SIGRET;
 
-    //signum is sitting on top of the stack
+    // signum is sitting on top of the stack
     copyto_user_stack(who, frame, sizeof(struct sigframe));
 
     who->pc = (void (*)())who->sig_table[signum].sa_handler;
     who->ra = (reg_t*)who->sa_restorer;
 
-    //backup sig mask
+    // backup sig mask
     who->sig_mask2 = who->sig_mask;
     who->sig_mask = who->sig_table[signum].sa_mask;
 
-    who->flags |= IN_SIG_HANDLER;
+    who->state = STATE_RUNNING;
     return OK;
 }
 
@@ -95,15 +95,15 @@ PRIVATE int sys_sig_handler(struct proc *who, int signum){
 
         switch(signum){
             case SIGCONT:
-                if(who->state & STOPPING){
-                    who->state &= ~STOPPING;
+                if(who->state & STATE_STOPPED){
+                    who->state &= ~STATE_STOPPED;
                     enqueue_schedule(who);
                 }
                 break;
 
             case SIGTSTP:
             case SIGSTOP:
-                who->state |= STOPPING;
+                who->state |= STATE_STOPPED;
                 who->sig_status = signum;
                 dequeue_schedule(who);
                 check_waiting(who);
@@ -116,7 +116,7 @@ PRIVATE int sys_sig_handler(struct proc *who, int signum){
         }
         return OK;
     }
-    //if it's ignored
+    // if it's ignored
     else if(who->sig_table[signum].sa_handler == SIG_IGN){
         struct proc* mp;
         switch(signum){
@@ -130,7 +130,7 @@ PRIVATE int sys_sig_handler(struct proc *who, int signum){
                 
             case SIGCHLD:
                 foreach_child(mp, who){
-                    if(mp->flags & ZOMBIE){
+                    if(mp->state & STATE_ZOMBIE){
                         release_zombie(mp);
                         break;
                     }
@@ -155,7 +155,7 @@ int handle_sig(struct proc* who, int signum){
     struct sigaction* act;
     
     sigdelset(&who->sig_pending, signum);
-    //if the system can handle the signal
+    // if the system can handle the signal
     if(sys_sig_handler(who,signum) == OK)
         return OK;
 
@@ -180,15 +180,15 @@ int send_sig(struct proc *who, int signum){
     if(!IS_USER_PROC(who))
         return EINVAL;
     
-    //if this signal is blocked
+    // if this signal is blocked
     if(sigismember(&who->sig_mask, signum)){
         if(signum != SIGKILL && signum != SIGSTOP){
             int ret = 0;
             // kdebug("sig %d pending\n", signum);
             
-            //if a signal is ignored and blocked by the process
-            //it is quietly ignored, and not pended
-            if(who->sig_table[signum].sa_handler != SIG_DFL){
+            // if a signal is ignored and blocked by the process
+            // it is quietly ignored, and not pended
+            if(who->sig_table[signum].sa_handler != SIG_IGN){
                 ret = sigaddset(&who->sig_pending, signum);
             }
             return ret;
@@ -196,13 +196,13 @@ int send_sig(struct proc *who, int signum){
     }
     // kdebug("send sig %d to %d\n", signum, who->pid);
 
-    //Unpause the process if it was blocked by pause(2)
-    //or sigsuspend(2)
-    if(who->state & PAUSING ){
+    // Unpause the process if it was blocked by pause(2)
+    // or sigsuspend(2)
+    if(who->state & STATE_PAUSING ){
         struct message m;
         // kdebug("wakeup %d\n", who->proc_nr);
         m.type = 0;
-        who->state &= ~PAUSING;
+        who->state &= ~STATE_PAUSING;
         syscall_reply(EINTR, who->proc_nr, &m);
     }
 
@@ -211,6 +211,8 @@ int send_sig(struct proc *who, int signum){
     // process to be sched have any pending signals. This is
     // when handle_sig will be called.
     sigaddset(&who->sig_pending, signum);
+    
+    
     return OK;
 }
 
@@ -221,7 +223,7 @@ int is_sigpending(struct proc* who){
     sigset_t pendings = who->sig_pending;
     sigset_t blocked = who->sig_mask;
 
-    if(who->sig_pending){
+    if(pendings && pendings != blocked){
         for(i = 1; i < _NSIG; i++){
             sigmask = 1 << i;
             if(pendings & sigmask && !(blocked & sigmask)){
@@ -234,31 +236,12 @@ int is_sigpending(struct proc* who){
 
 int handle_pendingsig(struct proc* who){
     int signum = is_sigpending(who);
-    if(signum)
-        return handle_sig(who, signum);
-    return ERR;
+    if(signum){
+        handle_sig(who, signum);
+        if(who->state == STATE_RUNNING)
+            enqueue_schedule(who);
+    }
+    return signum;
 }
 
-/**
- * send the signal, signal handler will be invoked next time the 
- * process is scheduled
- * @param  who    
- * @param  signum 
- * @return        
- */
-// int send_sig(struct proc *who, int signum){
-
-//     if(who->sig_table[signum].sa_handler != SIG_IGN &&
-//          is_in_syscall(who)){
-//         if(IS_SYSTEM(current_proc)){
-//             struct message m;
-//             syscall_reply(EINTR, who->proc_nr,&m);
-//         }else{
-//             get_proc(SYSTEM)->pc = &intr_syscall;
-//         }
-//     }
-
-//     send_sig(who,signum);
-//     return OK;
-// }
 

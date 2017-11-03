@@ -14,10 +14,10 @@
 
 #include "shell.h"
 
-//Input buffer & tokeniser
+// Input buffer & tokeniser
 static char buf[MAX_LINE];
 
-//Prototypes
+// Prototypes
 CMD_PROTOTYPE(ps);
 CMD_PROTOTYPE(uptime);
 CMD_PROTOTYPE(cmd_kill);
@@ -32,7 +32,7 @@ CMD_PROTOTYPE(printenv);
 CMD_PROTOTYPE(cmd_bash);
 
 
-//Command handling
+// Command handling
 struct cmd_internal builtin_commands[] = {
     { test_general, "test"},
     { printenv, "printenv" },
@@ -71,9 +71,9 @@ int main() {
     while(1) {
         printf("WINIX> ");
         c = buf;
-        //Read line from terminal
+        // Read line from terminal
         while( c < end_buf) {
-            ret = getchar();     //read
+            ret = getchar();     // read
             
             if(ret == EOF){
                 if(errno == EINTR){
@@ -83,12 +83,12 @@ int main() {
                 continue;
             }
             
-            if(ret == '\r'){//test for end
+            if(ret == '\r'){// test for end
                 break;
             }
                     
 
-            if ((int)ret == 8) { //backspace
+            if ((int)ret == 8) { // backspace
                 if(c > buf){
                     putchar(ret);
                     c--;
@@ -98,9 +98,9 @@ int main() {
             
             if(isprint(ret)){
                 *c++ = ret;
-                putchar(ret);         //echo
+                putchar(ret);         // echo
             }else{
-                putchar(7);            //beep
+                putchar(7);            // beep
             }
             
         }
@@ -123,7 +123,7 @@ int exec_cmd(char *line, int tpipe[2]){
 
     ret = parse(line,&cmd);
 
-    if(cmd.env && cmd.env_val){ //if a new environment variable is set
+    if(cmd.env && cmd.env_val){ // if a new environment variable is set
         buf = malloc(MAX_LINE);
         parse_quotes(cmd.env_val, buf);
         
@@ -135,12 +135,12 @@ int exec_cmd(char *line, int tpipe[2]){
         return 0;
     }
 
-    //Decode command
+    // Decode command
     handler = builtin_commands;
     while(handler->name != NULL && strcmp(cmd.argv[0], handler->name)) {
         handler++;
     }
-    //Run it
+    // Run it
     handler->handle(cmd.argc, cmd.argv);
     return 0;
 }
@@ -216,29 +216,29 @@ int help(int argc, char** argv){
     return 0;
 }
 
-//Print the user space heap
+// Print the user space heap
 int mall_info(int argc, char** argv){
     print_heap();
     return 0;
 }
 
-//Print the system wise memory info
+// Print the system wise memory info
 int mem_info(int argc, char** argv){
     return sys_meminfo();
 }
 
-//current pid
+// current pid
 int print_pid(int argc, char **argv){
     printf("%d\n",getpid());
     return 0;
 }
 
-//list all the processes in the system
+// list all the processes in the system
 int ps(int argc, char **argv){
     return sys_ps();
 }
 
-//start a new bash shell, parent shell is blocked until child shell exits
+// start a new bash shell, parent shell is blocked until child shell exits
 int cmd_bash(int argc, char **argv){
     pid_t child_pid;
     if(child_pid = fork()){
@@ -268,7 +268,7 @@ int cmd_exit(int argc, char **argv){
  * Handles any unknown command.
  **/
 int generic(int argc, char **argv) {
-    //Quietly ignore empty file paths
+    // Quietly ignore empty file paths
     if(argc == 0)
         return 0;
 

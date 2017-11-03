@@ -8,7 +8,7 @@ void _ctx_end(ucontext_t *ucp){
         exit(EXIT_SUCCESS);
     setcontext(ucp->uc_link);
 
-    //should never get here
+    // should never get here
     exit(EXIT_FAILURE);
 }
 
@@ -23,9 +23,9 @@ void makecontext(ucontext_t *ucp, void (*  func)(), int argc, ...){
         
 
     ucp->uc_mcontext.pc = (void (*)())&_ctx_start;
-    ucp->uc_mcontext.regs[7] = (unsigned int)&_ctx_end; //reg 8
+    ucp->uc_mcontext.regs[7] = (unsigned int)&_ctx_end; // reg 8
 
-    //allocate stack for the ucp context
+    // allocate stack for the ucp context
     sp = (unsigned int*)ucp->uc_stack.ss_sp + ucp->uc_stack.ss_size - 1;
     sp -= argc + 3;
     ucp->uc_mcontext.sp = sp;

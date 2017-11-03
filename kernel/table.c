@@ -17,7 +17,7 @@ struct boot_image boot_table[NUM_TASKS] = {
     {"SYSTEM", system_main,         SYSTEM, 64, MAX_PRIORITY,},
 };
 
-//IDLE's process number must be the lowest
+// IDLE's process number must be the lowest
 BUILD_BUG_ON_FALSE(IDLE == -NUM_TASKS + 1); 
 
 char *initial_env[] = {

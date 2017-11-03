@@ -26,8 +26,8 @@ int pattern[] = { 0x1000, 0x2000, 0x0100, 0x0001, 0x0002, 0x0004, 0x0008, 0x0800
  * IDLE entry point
  **/
 void idle_main() {
-    //TODO: this task should just loop forever, with no side effects.
-    //Currently, a test pattern is shown on the SSDs.
+    // TODO: this task should just loop forever, with no side effects.
+    // Currently, a test pattern is shown on the SSDs.
     
     int i = 0;
     unsigned int delay = 0;

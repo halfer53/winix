@@ -82,14 +82,14 @@ int test_signal(int argc, char **argv){
     int i;
     sigset_t set, prevset;
 
-    //Check out what would happen after changing
+    // Check out what would happen after changing
     // the following sigemptyset to sigfillset
-    //explain why
+    // explain why
 
     sigemptyset(&sa.sa_mask);
     sa.sa_flags = 0;
     
-    //setup signal handlers
+    // setup signal handlers
     sa.sa_handler = usr_handler;
     sigaction(SIGUSR1, &sa, NULL);
     sa.sa_handler = usr2_handler;
@@ -102,19 +102,19 @@ int test_signal(int argc, char **argv){
     sigfillset(&set);
     sigprocmask(SIG_SETMASK, &set, &prevset);
 
-    //send SIGUSR1 to itself
-    //since SIGUSR1 is currently blocked by sigprocmask
-    //SIGUSR1 will be pended until sigsuspend
+    // send SIGUSR1 to itself
+    // since SIGUSR1 is currently blocked by sigprocmask
+    // SIGUSR1 will be pended until sigsuspend
     raise(SIGUSR1);
 
-    //check pending signals
+    // check pending signals
     sigpending(&set);
     printf("pending sigs %x\n",set);
 
     if(sigismember(&set, SIGUSR1))
         printf("SIGUSR1 is pending\n");
 
-    //unblock all pending signals
+    // unblock all pending signals
     printf("signal handler usr1 should be called after this\n");
     sigsuspend(&prevset);
     return 0;
@@ -175,7 +175,7 @@ int test_general(int argc, char **argv){
     while(handler->name != NULL && strcmp(argv[1], handler->name)) {
         handler++;
     }
-    //Run it
+    // Run it
     handler->handle(argc-1, argv+1);
     return 0;
 }
@@ -201,7 +201,7 @@ void stack_overflow(int a){
 }
 
 int test_so(int argc, char **argv){
-    if(!fork()){//child
+    if(!fork()){// child
         printf("Generating stack overflow ....\n");
         stack_overflow(1);
     }else{
@@ -285,19 +285,19 @@ int test_thread(int argc, char **argv){
 
     if(argc > 1)
         num = atoi(argv[1]);
-    //ucontext represents the context for each thread
+    // ucontext represents the context for each thread
     threads = malloc(sizeof(ucontext_t) * num);
     if(threads == NULL)
         goto err;
     
-    //thread_stack_op saves the original pointer returned by malloc
-    //so later we can use it to free the malloced memory
+    // thread_stack_op saves the original pointer returned by malloc
+    // so later we can use it to free the malloced memory
     thread_stack_op = malloc(sizeof(int) * num);
     if(thread_stack_op == NULL)
         goto err_free_threads;
         
     cthread = threads;
-    //Allocate stack for each thread
+    // Allocate stack for each thread
     for( i = 0; i < num; i++){
         if ((thread_stack_op[i] =  malloc(THREAD_STACK_SIZE)) != NULL) {
             cthread->uc_stack.ss_sp = thread_stack_op[i];
@@ -315,10 +315,10 @@ int test_thread(int argc, char **argv){
     putchar('\n');
     
     cthread = threads;
-    //scheduling the threads
-    //note that we are using user thread library, 
-    //so we have to manually schedule all the threads.
-    //Currently the scheduling algorithm is just simple a round robin
+    // scheduling the threads
+    // note that we are using user thread library, 
+    // so we have to manually schedule all the threads.
+    // Currently the scheduling algorithm is just simple a round robin
     for( i = 0; i < num; i++){
         swapcontext(&mcontext,cthread++);
     }

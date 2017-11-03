@@ -42,7 +42,7 @@ inode_t* get_inode(int num){
     
     imap = get_imap();
     val = imap->block[num/32];
-    if((0x80000000 >> (num%32))){ //if it is a inode
+    if((0x80000000 >> (num%32))){ // if it is a inode
         rep = read_inode(num);
         rep->i_num = num;
         return rep;
@@ -65,7 +65,7 @@ int put_inode(inode_t *inode){
 
     buf_t *buffer = get_block(blocknr);
     char *buf = &buffer->block[0];
-    //offset in terms of byte index, each sector in inode table contains four inode
+    // offset in terms of byte index, each sector in inode table contains four inode
     int i;
 
     buf += inode_block_offset; 
@@ -98,22 +98,22 @@ int put_inode(inode_t *inode){
 
 
 inode_t* alloc_inode(){
-    int inum = sb->s_ninode; //next free inode
+    int inum = sb->s_ninode; // next free inode
     block_t iblock = sb->s_nblock;
     buf_t *imap, *bmap;
     inode_t *inode;
     int i;
 
-    //TODO: if inum is negative, (no inode available), return NULL
+    // TODO: if inum is negative, (no inode available), return NULL
     for(inode = &inode_table[0]; inode < &inode_table[NR_INODES]; inode++){
-        if(inode->i_num == 0){ //if inode is free
+        if(inode->i_num == 0){ // if inode is free
             break;
         }
     }
 
     imap = get_imap();
 
-    //allocate new inode and block
+    // allocate new inode and block
 
     imap->block[inum/32] |= (0x80000000) >> (inum%32);
     if(put_imap(imap) == 0){

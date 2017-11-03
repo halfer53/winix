@@ -8,4 +8,4 @@
 #include "fs.h"
 
 int sys_open(char *path, mode_t mode);
-#endif //FS_OPEN_H
+#endif // FS_OPEN_H

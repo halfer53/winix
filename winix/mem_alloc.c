@@ -18,14 +18,14 @@
 
 PRIVATE struct hole hole_table[NUM_HOLES];
 
-//Entries to the list of unallocated memory space in RAM
+// Entries to the list of unallocated memory space in RAM
 PRIVATE struct hole *unused_holes[2];
 
-//ENtries in the holes that are not in use, but can be added to the holes list
+// ENtries in the holes that are not in use, but can be added to the holes list
 PRIVATE struct hole *pending_holes[2];
 
 PRIVATE struct hole *used_holes[2];
-//Linked lists are defined by a head and tail pointer.
+// Linked lists are defined by a head and tail pointer.
 
 PRIVATE char initial_free_sysmem[INITIAL_SYSFREEMEM_LEN];
 
@@ -81,10 +81,10 @@ PRIVATE struct hole *hole_dequeue(struct hole **q) {
     if (hole == NULL)
         return NULL;
 
-    if (q[HEAD] == q[TAIL]) { //Last item
+    if (q[HEAD] == q[TAIL]) { // Last item
         q[HEAD] = q[TAIL] = NULL;
     }
-    else { //At least one remaining item
+    else { // At least one remaining item
         q[HEAD] = hole->next;
     }
     hole->next = NULL;
@@ -120,10 +120,10 @@ PRIVATE void hole_delete(struct hole **q, struct hole *h) {
 }
 
 
-//allocate a new chunk of memory given the size in the memory
-//if loops through the existing holes, and try to find a hole that can fit
-//if it can't, sbrk is called to allocate a new memory space
-//a new used hole of given size is added to the used hole list
+// allocate a new chunk of memory given the size in the memory
+// if loops through the existing holes, and try to find a hole that can fit
+// if it can't, sbrk is called to allocate a new memory space
+// a new used hole of given size is added to the used hole list
 //
 void *kmalloc(size_t size) {
     struct hole *prev = NULL;
@@ -138,12 +138,12 @@ void *kmalloc(size_t size) {
         prev = h;
         h = h->next;
     }
-    //if there is a hole that is big enough to fit
+    // if there is a hole that is big enough to fit
     if (h != NULL) {
-        //if we've found a hole taht is big enough
+        // if we've found a hole taht is big enough
         old_base = h->start;
-        //if the hole simply equal to the size required,
-        //simply move it from unused holes to used holes
+        // if the hole simply equal to the size required,
+        // simply move it from unused holes to used holes
         if (h->length == size) {
             hole_delete2(unused_holes, prev, h);
             hole_enqueue_head(used_holes, h);
@@ -157,8 +157,8 @@ void *kmalloc(size_t size) {
         }
         return (void *)old_base;
     } else {
-        //if no hole size  that is big enough is found in the unused_holes list,
-        //it's gonna call sbrk to allocate a new chunk of memory
+        // if no hole size  that is big enough is found in the unused_holes list,
+        // it's gonna call sbrk to allocate a new chunk of memory
         if (p_start_addr = get_free_pages(align_page(size), GFP_HIGH)) {
             if (h = hole_dequeue(pending_holes)) {
                 h->start = p_start_addr;
@@ -166,18 +166,18 @@ void *kmalloc(size_t size) {
                 hole_enqueue_head(used_holes, h);
                 return p_start_addr;
             }
-        }//else if system out of memory
+        }// else if system out of memory
     }
     return NULL;
 }
 
-//TODO release big enough unused holes to free pages
+// TODO release big enough unused holes to free pages
 PRIVATE int merge_holes(struct hole **merging_holes_list, struct hole *h) {
     
         struct hole *curr = merging_holes_list[HEAD];
     
         while (curr != NULL) {
-            //if there is hole that is adjacent to the hole to be merged
+            // if there is hole that is adjacent to the hole to be merged
             if (curr->start + curr->length == h->start) {
                 curr->length += h->length;
                 break;
@@ -189,23 +189,23 @@ PRIVATE int merge_holes(struct hole **merging_holes_list, struct hole *h) {
             curr = curr->next;
         }
     
-    //if curr is not null, that means it is merged with other holes, whose size is increased by the size of h
-    //so we simply add h to the pending_holes list
+    // if curr is not null, that means it is merged with other holes, whose size is increased by the size of h
+    // so we simply add h to the pending_holes list
         if (curr != NULL) {
             hole_enqueue_head(pending_holes, h);
             return OK;
         } else {
-            //if curr is null, that means it can't merge with any holes
+            // if curr is null, that means it can't merge with any holes
             hole_enqueue_head(unused_holes, h);
             return ERR;
         }
     }
 
-//equivalent to free()
-//it loops through the used holes list, and find any starting address of the
-//used hole that matches the parameter.
-//hole is deleted from used holes, and added to the unused holes, if it finds it
-//if it can't find any matching holes, it does nothing
+// equivalent to free()
+// it loops through the used holes list, and find any starting address of the
+// used hole that matches the parameter.
+// hole is deleted from used holes, and added to the unused holes, if it finds it
+// if it can't find any matching holes, it does nothing
 void kfree(void *ptr_parameter) {
     size_t *p = (size_t *)ptr_parameter;
     struct hole *h = used_holes[HEAD];
@@ -223,7 +223,7 @@ void kfree(void *ptr_parameter) {
         // }
 
         hole_delete(used_holes, h);
-        //try to merge the newly deleted hole with exiting unused holes
+        // try to merge the newly deleted hole with exiting unused holes
         merge_holes(unused_holes, h);
     }
 }

@@ -31,9 +31,9 @@ int copy_pcb(struct proc* parent, struct proc* child){
     *child = *parent;
     child->proc_nr = pbak;
     child->pid = pidbak;
-    //child's pending signals are cleared
+    // child's pending signals are cleared
     child->sig_pending = 0;
-    //ptable points to its own protection table
+    // ptable points to its own protection table
     child->ptable = child->protection_table;
     return OK;
 }
@@ -122,14 +122,14 @@ int do_fork(struct proc *who, struct message *m){
     child_pr = sys_fork(who);
     
     
-    //if an error is encounted
+    // if an error is encounted
     if(child_pr < 0)
         return child_pr;
     
-    //send 0 to child
+    // send 0 to child
     syscall_reply(0, child_pr, m);
 
-    //send the child pid to parent
+    // send the child pid to parent
     return get_proc(child_pr)->pid;
 }
 

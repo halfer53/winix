@@ -17,7 +17,7 @@
 #include <kernel/exception.h>
 
 
-//a linked list of pending timers to be alarmed
+// a linked list of pending timers to be alarmed
 PRIVATE struct timer *pending_timers = NULL;
 
 void kreport_timers(){

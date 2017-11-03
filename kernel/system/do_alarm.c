@@ -16,9 +16,9 @@
 #include <kernel/kernel.h>
 #include <kernel/clock.h>
 
-//alarm syscall
-//input     m.m1_i1    seconds
-//output    m.reply_res    previous timeout
+// alarm syscall
+// input     m.m1_i1    seconds
+// output    m.reply_res    previous timeout
 int do_alarm(struct proc *who, struct message *m){
     clock_t seconds;
     struct timer *alarm;
@@ -29,13 +29,13 @@ int do_alarm(struct proc *who, struct message *m){
 
     seconds = (clock_t )m->m1_i1; 
     alarm = &who->alarm;
-    prev_timeout = alarm->time_out; //return previous alarm
+    prev_timeout = alarm->time_out; // return previous alarm
 
     if(alarm->flags & TIMER_INUSE){
         remove_timer(alarm);
     }
     
-    //if seconds is 0, any pending alarm is canceled
+    // if seconds is 0, any pending alarm is canceled
     if(seconds > 0){
         new_timer(who->proc_nr, alarm, seconds * get_hz(), deliver_alarm);
     }

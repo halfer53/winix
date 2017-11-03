@@ -52,7 +52,7 @@ struct proc *pick_proc() {
     int i;
     struct proc* mp;
 
-    //Find the highest-priority non-empty queue
+    // Find the highest-priority non-empty queue
     for (i = 0; i < NUM_QUEUES; i++){
         if(mp = dequeue(ready_q[i])){
             if(is_debugging_sched()){
@@ -81,8 +81,8 @@ struct proc *pick_proc() {
  **/
 void sched() {
     int signum;
-    //irq count is increased for each exception being called, and cleared on exiting
-    //exception
+    // irq count is increased for each exception being called, and cleared on exiting
+    // exception
     reset_irq_count();
 
     if (current_proc && !current_proc->state) {
@@ -91,10 +91,10 @@ void sched() {
             enqueue_head(ready_q[current_proc->priority], current_proc);
         }
         else {
-            //move the proc down to the lower ready queue, unless this proc
-            //if already at the lowest ready queue, for every REBALANCE_TIMEOUT timer interrupts
-            //rebalance_queue is called which bumps every processes in the top
-            //ready queue
+            // move the proc down to the lower ready queue, unless this proc
+            // if already at the lowest ready queue, for every REBALANCE_TIMEOUT timer interrupts
+            // rebalance_queue is called which bumps every processes in the top
+            // ready queue
             if(IS_USER_PROC(current_proc) && current_proc->priority < MIN_PRIORITY ){
                 current_proc->priority++;
             }
@@ -103,23 +103,27 @@ void sched() {
         }
     }
 
-    current_proc = pick_proc();    
+    do{
+        current_proc = pick_proc();    
+        
+        if(signum = is_sigpending(current_proc))
+            handle_sig(current_proc, signum);
+            
+    }while(current_proc == NULL);
+    
 
-    //Reset quantum if needed
+    // Reset quantum if needed
     if (current_proc->ticks_left <= 0) {
         current_proc->ticks_left = current_proc->quantum;
     }
 
-    if(signum = is_sigpending(current_proc))
-        handle_sig(current_proc, signum);
-
 #ifdef _DEBUG
-    //Check exception stack
+    // Check exception stack
     if(*(get_exception_stack_top()) != STACK_MAGIC)
         PANIC("Exception stack overflow\n");
 #endif
 
-    //Load context and run
+    // Load context and run
     wramp_load_context();
 }
 

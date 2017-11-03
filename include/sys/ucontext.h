@@ -6,7 +6,7 @@
 #define REGS_NR 13
 
 typedef struct mcontext{
-    unsigned int regs[REGS_NR];    //values
+    unsigned int regs[REGS_NR];    // values
     unsigned int *sp;
     void *ra;
     void (*pc)();

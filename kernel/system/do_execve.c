@@ -38,11 +38,11 @@ int exec_proc(struct proc *who,size_t *lines, size_t length, size_t entry, int o
         return ERR;
     }
 
-    //set the first page unaccessible if offset is set
-    //Normally, for each user address space, NULL pointer, which is a macro 
-    //for (void *)0, is set to return invalid value. For this reason, the
-    //first page of the user process is disabled, so that dereferencing
-    //NULL pointer will immediately trigger segfault.
+    // set the first page unaccessible if offset is set
+    // Normally, for each user address space, NULL pointer, which is a macro 
+    // for (void *)0, is set to return invalid value. For this reason, the
+    // first page of the user process is disabled, so that dereferencing
+    // NULL pointer will immediately trigger segfault.
     if(offset){
         proc_memctl(who, (void *)0, PROC_NO_ACCESS);
         who->flags |= DISABLE_FIRST_PAGE;
@@ -67,28 +67,28 @@ int build_initial_stack(struct proc* who, int argc, char** argv, char** env, str
     env = (char **)get_physical_addr(env, srcproc);
     env_ptr = env;
 
-    //get the length of environment variables
+    // get the length of environment variables
     while(*env_ptr++)   env_len++;
-    env_len++; //for the last null terminator
+    env_len++; // for the last null terminator
 
-    //malloc the pointer for each environment variable
+    // malloc the pointer for each environment variable
     env_ptr_list = (unsigned int *)kmalloc(env_len);
     p = env_ptr_list;
 
-    //copy each of the environment to the user stack
+    // copy each of the environment to the user stack
     env_ptr = env;
     while((v = *env_ptr++) != NULL){
         v = (char *)get_physical_addr(v, srcproc);
         *p++ = (unsigned int)copyto_user_heap(who, v, strlen(v)+1);
-        //save the pointer of the environment as well
+        // save the pointer of the environment as well
     }
     *p = 0;
 
-    //copy the pointers of environment to the user stack
+    // copy the pointers of environment to the user stack
     copyto_user_stack(who, env_ptr_list, env_len);
 
     *sp_btm = (unsigned int)who->sp;
-    //setup argc and argv before
+    // setup argc and argv before
     who->ra = who->sp - sizeof(ASM_SYSCALL);
 
     pstack->i_base.operation = WINIX_SENDREC;

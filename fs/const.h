@@ -27,7 +27,7 @@ typedef unsigned int mode_t;
 typedef unsigned int uid_t;
 typedef unsigned int gid_t;
 typedef unsigned int off_t;
-//typedef unsigned int time_t;
+// typedef unsigned int time_t;
 typedef unsigned int nlink_t;
 typedef unsigned int block_t;
 typedef unsigned int sector_t;

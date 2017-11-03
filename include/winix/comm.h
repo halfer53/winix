@@ -14,9 +14,9 @@
 #ifndef _W_COMM_H_
 #define _W_COMM_H_ 1
 
-//status to suspend caller, reply later
+// status to suspend caller, reply later
 #define SUSPEND         -998     
-//Don't reply back to the sender
+// Don't reply back to the sender
 #define DONTREPLY       -997
 
 #define INT_MAX         0x7FFFFFFF
@@ -29,15 +29,15 @@
 
 #define EXIT_MAGIC      0x10293847
 
-//Major and minor version numbers for WINIX.
+// Major and minor version numbers for WINIX.
 #define MAJOR_VERSION 2
 #define MINOR_VERSION 0
 
-//Predefined, wramp board has 1024 pages in total,
-//which equals to 4 * 32
+// Predefined, wramp board has 1024 pages in total,
+// which equals to 4 * 32
 #define MEM_MAP_LEN    4
 
-//Number of words per page
+// Number of words per page
 #define PAGE_LEN    1024
 
 #define get_hz()    (60)
@@ -45,7 +45,7 @@
 
 #define DO_CLOCKTICK    (1)
 
-//Asm assembly binaries
+// Asm assembly binaries
 #define ASM_ADDUI_SP_SP_1       (0x1ee10001)
 #define ASM_SYSCALL             (0x200d0000)
 

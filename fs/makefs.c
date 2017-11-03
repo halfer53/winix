@@ -18,7 +18,7 @@ int makefs()
     int sb = 1024;
     int blockmap = 1024;
     int inodemap = 1024;
-    int inode_tablesize = 496*128; //at 64th block
+    int inode_tablesize = 496*128; // at 64th block
     int first_free_block = (sb + blockmap + inodemap + inode_tablesize) / 1024 +1;
     long remaining = totalsize - sb - blockmap - inodemap - inode_tablesize;
     int i=0;
@@ -35,23 +35,23 @@ int makefs()
     // printf("%d %d %d %d\n",strlen(super_block),strlen(block_bitmap), strlen(block_bitmap2),strlen(inode_bitmap) );
     // printf("%s%s%s%s",super_block,block_bitmap,block_bitmap2,inode_bitmap);
     for(;i<inode_tablesize;i++){
-        if(i==128){ //the first one is left as empty deliberately
-            sprintf(pdisk,"%08x",0x41c0); //drwx------
+        if(i==128){ // the first one is left as empty deliberately
+            sprintf(pdisk,"%08x",0x41c0); // drwx------
             pdisk += 8;
-            for( int j=0; j< 3; j++){ //nlink gid uid set to 0
+            for( int j=0; j< 3; j++){ // nlink gid uid set to 0
                 sprintf(pdisk,"%08x", 0);
                 pdisk += 8;
             }
-            sprintf(pdisk, "%08x", 64); //i_size
+            sprintf(pdisk, "%08x", 64); // i_size
             pdisk += 8;
-            for( int j=0; j< 3; j++){ //atime mtime ctime set to 0
+            for( int j=0; j< 3; j++){ // atime mtime ctime set to 0
                 sprintf(pdisk,"%08x", 0);
                 pdisk += 8;
             }
             // printf("first free inode %d\n",first_free_block+1);
             sprintf(pdisk, "%08x",first_free_block);
             pdisk+=8;
-            for( int j=0; j< 7; j++){ //remaining zones
+            for( int j=0; j< 7; j++){ // remaining zones
                 sprintf(pdisk,"%08x", 0);
                 pdisk += 8;
             }
@@ -61,7 +61,7 @@ int makefs()
         }
         *pdisk++ = 0;
     }
-    //block for inode 1, which is the root directory
+    // block for inode 1, which is the root directory
     sprintf(pdisk,"%08x",1);
     pdisk += 8;
     *pdisk++ = '.';

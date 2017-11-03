@@ -19,7 +19,7 @@ char* remove_extension(char *mystr)
         *lastdot = '\0';
     lastdot = strchr(mystr, '/');
     if(lastdot != NULL)
-        return lastdot + 1;//skip slashes
+        return lastdot + 1;// skip slashes
     return mystr;
 }
 
@@ -174,8 +174,8 @@ int winix_load_srec_words_length(char *line)
 
     index = 0;
     checksum = 0;
-    //printf("loop %d\n",linecount );
-    //Start code, always 'S'
+    // printf("loop %d\n",linecount );
+    // Start code, always 'S'
     if (line[index++] != 'S')
     {
         printf("Expection S\n");
@@ -189,30 +189,30 @@ int winix_load_srec_words_length(char *line)
         return 0;
     }
     tempBufferCount = substring(buffer, line, index, 2);
-    //printf("record value %s, value in base 10: %d,length %d\r\n",buffer,hex2int(buffer,tempBufferCount),tempBufferCount);
+    // printf("record value %s, value in base 10: %d,length %d\r\n",buffer,hex2int(buffer,tempBufferCount),tempBufferCount);
     byteCount = hex2int(buffer, tempBufferCount);
     index += 2;
     checksum += byteCount;
     tempBufferCount = substring(buffer, line, index, (byteCount - 1) * 2);
-    //printf("temp byte value %s, value in base 10: %d,length %d\r\n",buffer,hex2int(buffer,tempBufferCount),tempBufferCount);
+    // printf("temp byte value %s, value in base 10: %d,length %d\r\n",buffer,hex2int(buffer,tempBufferCount),tempBufferCount);
     data = hex2int(buffer, tempBufferCount);
-    //printf("data %d\n", data);
+    // printf("data %d\n", data);
     index += (byteCount - 1) * 2;
     checksum += data;
 
-    //Checksum, two hex digits. Inverted LSB of the sum of values, including byte count, address and all data.
-    //readChecksum = (byte)Convert.ToInt32(line.substring(index, 2), 16);
-    //printf("checksum %d\n",checksum );
+    // Checksum, two hex digits. Inverted LSB of the sum of values, including byte count, address and all data.
+    // readChecksum = (byte)Convert.ToInt32(line.substring(index, 2), 16);
+    // printf("checksum %d\n",checksum );
     tempBufferCount = substring(buffer, line, index, 2);
-    //printf("read checksum value %s, value in base 10: %d,length %d\r\n",buffer,hex2int(buffer,tempBufferCount),tempBufferCount);
+    // printf("read checksum value %s, value in base 10: %d,length %d\r\n",buffer,hex2int(buffer,tempBufferCount),tempBufferCount);
     readChecksum = hex2int(buffer, tempBufferCount);
     // printf("readChecksum %d\n",readChecksum );
     // printf("checksum %d\n",checksum );
-    //printf("checksum %d\r\n",checksum );
+    // printf("checksum %d\r\n",checksum );
     if (checksum > 255)
     {
         byteCheckSum = (byte)(checksum & 0xFF);
-        //printf("checksum %d\r\n",byteCheckSum );
+        // printf("checksum %d\r\n",byteCheckSum );
         byteCheckSum = ~byteCheckSum;
     }
     else
@@ -220,7 +220,7 @@ int winix_load_srec_words_length(char *line)
         byteCheckSum = ~byteCheckSum;
         byteCheckSum = checksum;
     }
-    //printf("checksum %d\r\n",byteCheckSum );
+    // printf("checksum %d\r\n",byteCheckSum );
     if (readChecksum != byteCheckSum)
     {
         printf("failed checksum\r\n");
@@ -249,16 +249,16 @@ int winix_load_srec_mem_val(char *line, size_t *memory_values, int start_index, 
     int j = 0;
     static int debug = 1;
 
-    //printf("%s\r\n",line);
-    //printf("loop %d\n",linecount );
-    //Start code, always 'S'
+    // printf("%s\r\n",line);
+    // printf("loop %d\n",linecount );
+    // Start code, always 'S'
     if (line[index++] != 'S')
     {
         printf("Expection S\n");
         goto err_end;
     }
 
-    //Record type, 1 digit, 0-9, defining the data field
+    // Record type, 1 digit, 0-9, defining the data field
     //0: Vendor-specific data
     //1: 16-bit data sequence
     //2: 24 bit data sequence
@@ -298,52 +298,52 @@ int winix_load_srec_mem_val(char *line, size_t *memory_values, int start_index, 
     }
 
     tempBufferCount = substring(buffer, line, index, 2);
-    //printf("record value %s, value in base 10: %d,length %d\r\n",buffer,hex2int(buffer,tempBufferCount),tempBufferCount);
+    // printf("record value %s, value in base 10: %d,length %d\r\n",buffer,hex2int(buffer,tempBufferCount),tempBufferCount);
     byteCount = hex2int(buffer, tempBufferCount);
     index += 2;
     checksum += byteCount;
 
-    //byteCount = ((int)line[index++])*10 + ((int)line[index++]);
-    //int byteCount = Convert.ToInt32(line.substring(index, 2), 16);
-    //printf("byteCount %d\r\n",byteCount);
+    // byteCount = ((int)line[index++])*10 + ((int)line[index++]);
+    // int byteCount = Convert.ToInt32(line.substring(index, 2), 16);
+    // printf("byteCount %d\r\n",byteCount);
 
-    //Address, 4, 6 or 8 hex digits determined by the record type
+    // Address, 4, 6 or 8 hex digits determined by the record type
     for (i = 0; i < addressLength; i++)
     {
         tempBufferCount = substring(buffer, line, index + i * 2, 2);
-        //printf("temp byte value %s, value in base 10: %d,length %d\r\n",buffer,hex2int(buffer,tempBufferCount),tempBufferCount);
+        // printf("temp byte value %s, value in base 10: %d,length %d\r\n",buffer,hex2int(buffer,tempBufferCount),tempBufferCount);
         checksum += hex2int(buffer, tempBufferCount);
-        //string ch = line.substring(index + i * 2, 2);
-        //checksum += Convert.ToInt32(ch, 16);
+        // string ch = line.substring(index + i * 2, 2);
+        // checksum += Convert.ToInt32(ch, 16);
     }
     if (addressLength != 0)
     {
         tempBufferCount = substring(buffer, line, index, addressLength * 2);
-        //printf("temp address value %s, value in base 10: %d,length %d\r\n",buffer,hex2int(buffer,tempBufferCount),tempBufferCount);
+        // printf("temp address value %s, value in base 10: %d,length %d\r\n",buffer,hex2int(buffer,tempBufferCount),tempBufferCount);
         address = hex2int(buffer, tempBufferCount);
     }
 
-    //address = Convert.ToInt32(line.substring(index, addressLength * 2), 16);
-    //printf("index %d\n",index );
+    // address = Convert.ToInt32(line.substring(index, addressLength * 2), 16);
+    // printf("index %d\n",index );
     index += addressLength * 2;
-    //printf("index %d\n",index );
+    // printf("index %d\n",index );
     byteCount -= addressLength;
-    //printf("byteCount %d\n",byteCount );
-    //Data, a sequence of bytes.
-    //data.length = 255
+    // printf("byteCount %d\n",byteCount );
+    // Data, a sequence of bytes.
+    // data.length = 255
 
     for (i = 0; i < byteCount - 1; i++)
     {
         tempBufferCount = substring(buffer, line, index, 2);
-        //printf("temp byte value %s, value in base 10: %d,length %d\r\n",buffer,hex2int(buffer,tempBufferCount),tempBufferCount);
+        // printf("temp byte value %s, value in base 10: %d,length %d\r\n",buffer,hex2int(buffer,tempBufferCount),tempBufferCount);
         data[i] = hex2int(buffer, tempBufferCount);
-        //data[i] = (byte)Convert.ToInt32(line.substring(index, 2), 16);
+        // data[i] = (byte)Convert.ToInt32(line.substring(index, 2), 16);
         index += 2;
         checksum += data[i];
     }
 
-    //Checksum, two hex digits. Inverted LSB of the sum of values, including byte count, address and all data.
-    //readChecksum = (byte)Convert.ToInt32(line.substring(index, 2), 16);
+    // Checksum, two hex digits. Inverted LSB of the sum of values, including byte count, address and all data.
+    // readChecksum = (byte)Convert.ToInt32(line.substring(index, 2), 16);
 
     tempBufferCount = substring(buffer, line, index, 2);
     // printf("read checksum value %s, value in base 10: %d,length %d\r\n",buffer,hex2int(buffer,tempBufferCount),tempBufferCount);
@@ -359,18 +359,18 @@ int winix_load_srec_mem_val(char *line, size_t *memory_values, int start_index, 
         goto err_end;
     }
 
-    //Put in memory
+    // Put in memory
     if ((byteCount - 1) % 4 != 0)
     {
         printf("Data should only contain full 32-bit words.\n");
     }
 
-    //printf("recordType %d\n", recordType);
-    //printf("%lu\n",(size_t)data[0] );
-    //printf("byteCount %d\n",byteCount );
+    // printf("recordType %d\n", recordType);
+    // printf("%lu\n",(size_t)data[0] );
+    // printf("byteCount %d\n",byteCount );
     switch (recordType)
     {
-        case 3: //data intended to be stored in memory.
+        case 3: // data intended to be stored in memory.
 
             for (i = 0; i < byteCount - 1; i += 4)
             {
@@ -383,12 +383,12 @@ int winix_load_srec_mem_val(char *line, size_t *memory_values, int start_index, 
                 }
 
                 wordsLoaded++;
-                //memory_values[start_index + wordsLoaded] = memVal;
+                // memory_values[start_index + wordsLoaded] = memVal;
                 printf("0x%08x,\n", (unsigned int)memVal);
             }
             break;
 
-        case 7: //entry point for the program.
+        case 7: // entry point for the program.
             printf("\n};\n#define %s_pc\t0x%08x\n", filename, (unsigned int)address);
             return 0;
     }

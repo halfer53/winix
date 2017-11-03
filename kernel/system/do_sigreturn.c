@@ -21,17 +21,16 @@ int do_sigreturn(struct proc *who, struct message *m){
     struct proc *systask;
     int signum = m->m1_i1;
 
-    who->flags &= ~IN_SIG_HANDLER;
     sp = get_physical_addr(who->sp,who);
 
     sp += sizeof(struct syscall_frame_comm);
 
-    //Copy the previous pcb saved on the user stack back
-    //to system proc struct, information includes registers
-    //scheduling flags, and messages
+    // Copy the previous pcb saved on the user stack back
+    // to system proc struct, information includes registers
+    // scheduling flags, and messages
     memcpy(who,sp,SIGNAL_CTX_LEN);
 
-    //restore mask
+    // restore mask
     who->sig_mask = who->sig_mask2;
 
     if(signum == SIGABRT){
@@ -40,16 +39,36 @@ int do_sigreturn(struct proc *who, struct message *m){
         goto end;
     }
 
-    //Normall after invoking a system call, the process
-    //will be blocked on RECEIVING reply from the system
-    //But since we have restored the pcb context before
-    //the signal handler, so double check process state,
-    //add it to scheduling queue if necessary
-    if(!who->state)
+    // Normall after invoking a system call, the process
+    // will be blocked on STATE_RECEIVING reply from the system
+    // But since we have restored the pcb context before
+    // the signal handler, so double check process state,
+    // add it to scheduling queue if necessary
+    if(who->state == STATE_RUNNING)
         enqueue_schedule(who);
     
 end:
-    if(who->state & RECEIVING)
+    /**
+     * This is a nasty corner case here, if the signal handler
+     * is invoked while the process is blocked e.g. by wait(2),
+     * the state of the blocked process would be
+     *  (STATE_RECEIVING | STATE_WAITING).
+     * if we would simply do syscall_reply(EINTR, pnr, m), then
+     * only STATE_RECEIVING is cleared, STATE_WAITING is not. Since
+     * a process is only runnable if state == 0, the user space still
+     * wouldn't get the response.
+     * 
+     * since we want to return EINTR to the user, thus state has to be
+     * cleared, or equal to STATE_RUNNING, thus both RECEIVING AND WAITING
+     * need to be cleared. 
+     * 
+     * by making who->state = STATE_RECEIVING, we are ensuring that EINTR
+     * is returned to the user space, and no other state info is blocking our way
+     */
+    if(who->state & STATE_RECEIVING){
+        who->state = STATE_RECEIVING;
         return EINTR;
+    }
+        
     return DONTREPLY;
 }

@@ -38,9 +38,9 @@ void system_main() {
     kreport_sysinfo();
     getcontext(&recv_ctx);
     
-    //Receive message, do work, repeat.
+    // Receive message, do work, repeat.
     while(true) {
-        //get a message
+        // get a message
         winix_receive(mesg);
         who_proc_nr = mesg->src;
         who = get_proc(who_proc_nr);
@@ -81,45 +81,38 @@ void system_main() {
     kprintf("BSS Segment:  0x%08x - 0x%08x\r\n", &BSS_BEGIN, &BSS_END);
     kprintf("Unallocated:  0x%08x - 0x%08x\r\n", free_mem_begin, mem_end);
     kprintf("%d kWords Free\r\n", 
-    ((unsigned int)(mem_end - free_mem_begin + PAGE_LEN)) / PAGE_LEN); //inclusive
+    ((unsigned int)(mem_end - free_mem_begin + PAGE_LEN)) / PAGE_LEN); // inclusive
 }
 
 void syscall_region_begin(){
 
-    //Bill the user proc's sys_used_time while executing syscall
-    //on behalf of the user process
+    // Bill the user proc's sys_used_time while executing syscall
+    // on behalf of the user process
     set_bill_ptr(who);
     get_proc(SYSTEM)->flags |= BILLABLE;
     curr_syscall = m.type;
 
-    //the following two are defensive statements
-    //to ensure the caller is suspended while the system
-    //is handling the system call
-    who->flags |= RECEIVING;
+    // the following two are defensive statements
+    // to ensure the caller is suspended while the system
+    // is handling the system call
+    who->state |= STATE_RECEIVING;
     dequeue_schedule(who);
 
-    //Make sure system doesn't send a message to itself
+    if(is_debugging_syscall())
+        if(m.type >= 1 && m.type <= _NSYSCALL)
+            kprintf_syscall_request(m.type, m.src);
+    
+    // Make sure system doesn't send a message to itself
     ASSERT(who != NULL && who_proc_nr != SYSTEM); 
 }
 
 void syscall_region_end(){
     get_proc(SYSTEM)->flags &= ~BILLABLE;
-    //reset messages
+    // reset messages
     memset(&m, 0, sizeof(struct message));
     who_proc_nr = 0;
     curr_syscall = 0;
 }
-
-// /**
-//  * interrupt the current executing system call
-//  * and start receiving syscalls again
-//  */
-// void intr_syscall(){
-//     if(who_proc_nr){
-//         syscall_reply(EINTR, who_proc_nr, &m);
-//         setcontext(&recv_ctx);
-//     }
-// }
 
 int no_syscall(struct proc* who, struct message* m){
     KDEBUG(("Process \"%s (%d)\" performed unknown system call %d\r\n", 
@@ -140,7 +133,19 @@ int curr_syscall_num(){
 }
 
 bool is_in_syscall(struct proc* who){
-    return who->state & RECEIVING && who_proc_nr == who->proc_nr;
+    return who->state & STATE_RECEIVING && who_proc_nr == who->proc_nr;
+}
+
+int syscall_reply(int reply, int dest,struct message* m){
+    struct proc* pDest = get_proc(dest);
+    if(pDest){
+        if(is_debugging_syscall()){
+            kprintf_syscall_reply(reply);
+        }
+        m->reply_res = reply;
+        return do_send( dest,m);
+    }
+    return ERR;
 }
 
 

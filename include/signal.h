@@ -78,10 +78,10 @@ typedef struct stack{
   size_t ss_size;   /* Number of bytes in stack */
 } stack_t;
 
-//define signal
+// define signal
 void (*signal(int sig, void (*func)(int)))(int);
 
-//currently the minisal sigframe size is 35 words, we add an extra 10 for flexibility
+// currently the minisal sigframe size is 35 words, we add an extra 10 for flexibility
 #define MINSIGSTKSZ 45
 
 int sigaddset(sigset_t *, int);

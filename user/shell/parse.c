@@ -127,7 +127,7 @@ int parse(char *input_line, struct cmdLine *sc)
             sc->argv[argc++] = line;
             sc->env_val = sc->argv[argc -1]; 
 
-            //skip strings inside double quotes or single quotes
+            // skip strings inside double quotes or single quotes
             if(*line == '"')
                 symbol = *line;
             if(*line == '\'')
@@ -188,9 +188,9 @@ int parse_quotes(char *input, char* buffer){
         if(*in == '"' || *in == '\'')
             *in = '\0';
 
-        if(*in == '$'){ //if env
+        if(*in == '$'){ // if env
             int bak_char;
-            char *envval, *val_start = ++in;//one for '$'
+            char *envval, *val_start = ++in;// one for '$'
             while(*in && (isupper(*in) || islower(*in))){
                 in++;
             }
@@ -199,15 +199,15 @@ int parse_quotes(char *input, char* buffer){
             
             // printf("search %s\n", val_start);
             
-            //insert the environment value at the $
+            // insert the environment value at the $
             envval = getenv(val_start);
             if(envval == NULL){
                 *in = bak_char;
                 continue;
             }
 
-            //concatenate the environment value to the output 
-            //buffer
+            // concatenate the environment value to the output 
+            // buffer
             *out = '\0';
             strcat(out,envval);
             out += strlen(envval) - 1;

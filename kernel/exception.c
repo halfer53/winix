@@ -22,10 +22,10 @@ PRIVATE struct message m;
 PRIVATE int _expt_stack[EXCEPTION_STACK_SIZE];
 PRIVATE int* _expt_stack_ptr;
 
-//Number of exception sources
+// Number of exception sources
 #define NUM_HANDLERS 16
 
-//Handler prototypes
+// Handler prototypes
 PRIVATE void button_handler();
 PRIVATE void parallel_handler();
 PRIVATE void serial1_handler();
@@ -36,25 +36,25 @@ PRIVATE void break_handler();
 PRIVATE void arith_handler();
 PRIVATE void no_handler();
 
-//Table of all handlers.
-//Position in the table corresponds to relevant bit of $estat
+// Table of all handlers.
+// Position in the table corresponds to relevant bit of $estat
 PRIVATE expt_handler_t handlers[NUM_HANDLERS] = {
-    no_handler,         //Undefined
-    no_handler,         //Undefined
-    no_handler,         //Undefined
-    no_handler,         //Undefined
-    no_handler,         //IRQ0
-    button_handler,     //IRQ1
-    clock_handler,         //IRQ2
-    parallel_handler,     //IRQ3
-    serial1_handler,     //IRQ4
-    serial2_handler,     //IRQ5
-    no_handler,         //IRQ6
-    no_handler,         //IRQ7
-    gpf_handler,         //GPF
-    syscall_handler,     //SYSCALL
-    break_handler,         //BREAK
-    arith_handler         //ARITH
+    no_handler,         // Undefined
+    no_handler,         // Undefined
+    no_handler,         // Undefined
+    no_handler,         // Undefined
+    no_handler,         // IRQ0
+    button_handler,     // IRQ1
+    clock_handler,         // IRQ2
+    parallel_handler,     // IRQ3
+    serial1_handler,     // IRQ4
+    serial2_handler,     // IRQ5
+    no_handler,         // IRQ6
+    no_handler,         // IRQ7
+    gpf_handler,         // GPF
+    syscall_handler,     // SYSCALL
+    break_handler,         // BREAK
+    arith_handler         // ARITH
 };
 
 // counts the number of irqs during exception
@@ -133,7 +133,7 @@ PRIVATE void serial2_handler() {
 PRIVATE void gpf_handler() {
     ptr_t* sp;
     ptr_t* pc;
-    //is the current process a valid one?
+    // is the current process a valid one?
     ASSERT(IS_PROCN_OK(current_proc->proc_nr));
     
     if(!CHECK_STACK(current_proc))
@@ -176,7 +176,7 @@ PRIVATE void gpf_handler() {
     if(IS_KERNEL_PROC(current_proc))
         _panic("kernel crashed",NULL);
 
-    //Kill process and call scheduler.
+    // Kill process and call scheduler.
     send_sig(current_proc,SIGSEGV);
     sched();
 }
@@ -193,23 +193,23 @@ PRIVATE void syscall_handler() {
 
     sp = get_physical_addr(current_proc->sp, current_proc);
 
-    operation = *(sp);                //Operation is the first parameter on the stack
-    dest = *(sp+1);                //Destination is second parameter on the stack
-    m = (struct message *)get_physical_addr(*(sp+ 2), current_proc);  //Message is the third parameter
-    m->src = current_proc->proc_nr;            //Don't trust the who to specify their own source process number
+    operation = *(sp);                // Operation is the first parameter on the stack
+    dest = *(sp+1);                // Destination is second parameter on the stack
+    m = (struct message *)get_physical_addr(*(sp+ 2), current_proc);  // Message is the third parameter
+    m->src = current_proc->proc_nr;            // Don't trust the who to specify their own source process number
 
-    retval = (int*)&current_proc->regs[0];        //Result is returned in $1
+    retval = (int*)&current_proc->regs[0];        // Result is returned in $1
 
-    //Decode operation
+    // Decode operation
     switch(operation) {
         case WINIX_SENDREC:
-            current_proc->state |= RECEIVING;
-            //fall through to send
+            current_proc->state |= STATE_RECEIVING;
+            // fall through to send
 
         case WINIX_SEND:
             *retval = do_send(dest, m);
             if(*retval < 0)
-                current_proc->state &= ~RECEIVING;
+                current_proc->state &= ~STATE_RECEIVING;
             break;
 
         case WINIX_RECEIVE:
@@ -225,8 +225,8 @@ PRIVATE void syscall_handler() {
             break;
     }
 
-    //A system call could potentially make a high-priority process runnable.
-    //Run scheduler.
+    // A system call could potentially make a high-priority process runnable.
+    // Run scheduler.
     sched();
 }
 
@@ -266,7 +266,7 @@ PRIVATE void no_handler() {
 PRIVATE void exception_handler(int estat) {
     int i;
     _irq_count = 0;
-    //Loop through $estat and call all relevant handlers.
+    // Loop through $estat and call all relevant handlers.
     for(i = NUM_HANDLERS; i >= 0; i--) {
         if(estat & (1 << i)) {
             _irq_count++;
@@ -288,6 +288,6 @@ void init_exceptions() {
     _expt_stack_ptr += EXCEPTION_STACK_SIZE - 1;
 
     wramp_set_handler(exception_handler);
-    RexTimer->Load = 2400 / get_hz(); //currently 60 Hz
+    RexTimer->Load = 2400 / get_hz(); // currently 60 Hz
     enable_interrupt();
 }

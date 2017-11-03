@@ -10,8 +10,8 @@ pid_t getpid(){
     return _pid;
 }
 
-//ppid may change through init adoption, so it's not a
-//good idea to cache it
+// ppid may change through init adoption, so it's not a
+// good idea to cache it
 pid_t getppid(){
     struct message m;
     _syscall(GETPID,&m);

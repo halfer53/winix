@@ -14,7 +14,7 @@
 #ifndef _K_CLOCK_H_
 #define _K_CLOCK_H_ 1
 
-//System uptime, in ticks.
+// System uptime, in ticks.
 clock_t get_uptime();
 
 extern clock_t next_timeout;

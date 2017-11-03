@@ -1,5 +1,5 @@
 
-//note hexstr must use capital letters
+// note hexstr must use capital letters
 int hexstr2int(char *a, int len)
 {
     int i;
@@ -19,7 +19,7 @@ char hexstr2char(char A){
     return (char)(A > '9')? (A &~ 0x20) - 'A' + 10: (A - '0');
 }
 
-//bytenr number of bytes in n
+// bytenr number of bytes in n
 void int2hexstr(char *buffer,int n, int bytenr) {
     int i;
     for(i = bytenr * 4 - 4; i >= 0; i -= 4) {
