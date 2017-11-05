@@ -79,7 +79,7 @@ PRIVATE int build_signal_ctx(struct proc *who, int signum){
     who->sig_mask2 = who->sig_mask;
     who->sig_mask = who->sig_table[signum].sa_mask;
 
-    who->state = STATE_RUNNING;
+    who->state = STATE_RUNNABLE;
     return OK;
 }
 
@@ -238,7 +238,7 @@ int handle_pendingsig(struct proc* who){
     int signum = is_sigpending(who);
     if(signum){
         handle_sig(who, signum);
-        if(who->state == STATE_RUNNING)
+        if(who->state == STATE_RUNNABLE)
             enqueue_schedule(who);
     }
     return signum;

@@ -44,7 +44,7 @@ int do_sigreturn(struct proc *who, struct message *m){
     // But since we have restored the pcb context before
     // the signal handler, so double check process state,
     // add it to scheduling queue if necessary
-    if(who->state == STATE_RUNNING)
+    if(who->state == STATE_RUNNABLE)
         enqueue_schedule(who);
     
 end:
@@ -59,7 +59,7 @@ end:
      * wouldn't get the response.
      * 
      * since we want to return EINTR to the user, thus state has to be
-     * cleared, or equal to STATE_RUNNING, thus both RECEIVING AND WAITING
+     * cleared, or equal to STATE_RUNNABLE, thus both RECEIVING AND WAITING
      * need to be cleared. 
      * 
      * by making who->state = STATE_RECEIVING, we are ensuring that EINTR

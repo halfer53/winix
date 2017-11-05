@@ -53,9 +53,9 @@ void init_kernel_tasks(){
 }
 
 void start_init(){
-    struct proc* init = get_proc(INIT);
+    struct proc* init = proc_table + INIT;
     proc_set_default(init);
-    init->state = STATE_RUNNING;
+    init->state = STATE_RUNNABLE;
     init->flags = IN_USE;
     init->pid = 1;
     if(exec_proc(init,init_code,init_code_length,init_pc,init_offset,"init"))

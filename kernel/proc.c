@@ -133,9 +133,10 @@ struct proc* get_proc_by_pid(pid_t pid){
  * Returns:            The relevant process, or NULL if it does not exist.
  **/
 struct proc *get_proc(int proc_nr) {
-    if (IS_PROCN_OK(proc_nr)){
-        return proc_table + proc_nr;
-    }
+    struct proc* who;
+    if (IS_PROCN_OK(proc_nr))
+        if(IS_INUSE(who = proc_table + proc_nr))
+            return who;
     return NULL;
 }
 
@@ -289,7 +290,7 @@ struct proc *get_free_proc_slot() {
         who = &proc_table[i];
         if(!IS_INUSE(who)){
             proc_set_default(who);
-            who->state = STATE_RUNNING;
+            who->state = STATE_RUNNABLE;
             who->flags = IN_USE;
             who->pid = get_next_pid();
             return who;
@@ -382,7 +383,7 @@ void set_proc(struct proc *p, void (*entry)(), const char *name) {
 struct proc *start_kernel_proc(void (*entry)(), int proc_nr, const char *name, int quantum, int priority) {
     struct proc *who = NULL;
     
-    if(who = get_proc(proc_nr)){
+    if(who = proc_table + proc_nr){
         proc_set_default(who);
         who->flags |= IN_USE;
 
@@ -392,7 +393,7 @@ struct proc *start_kernel_proc(void (*entry)(), int proc_nr, const char *name, i
         who->sp = alloc_kstack(who);
         who->priority = priority;
         who->pid = 0;
-        who->state = STATE_RUNNING;
+        who->state = STATE_RUNNABLE;
         enqueue_schedule(who);
     }
     return who;
@@ -410,9 +411,8 @@ struct proc *start_kernel_proc(void (*entry)(), int proc_nr, const char *name, i
 struct proc *start_user_proc(size_t *lines, size_t length, size_t entry, int options, const char *name){
     struct proc *p;
     if(p = get_free_proc_slot()){
-        if(exec_proc(p,lines,length,entry,options,name))
-            return NULL;
-        return p;
+        if(!exec_proc(p,lines,length,entry,options,name))
+            return p;
     }
     return NULL;
 }

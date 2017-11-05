@@ -32,7 +32,7 @@ int do_send(int dest, struct message *m) {
     struct proc *pDest;
 
     current_proc->message = m; // save for later
-    pDest = IS_USER_PROC(current_proc) ? get_proc_by_pid(dest) : get_runnable_proc(dest);
+    pDest = IS_USER_PROC(current_proc) ? get_proc_by_pid(dest) : get_proc(dest);
     
     // Is the destination valid?
     if (pDest) {
@@ -114,7 +114,7 @@ int do_receive(struct message *m) {
 
         // Unblock sender
         p->state &= ~STATE_SENDING;
-        if(p->state == STATE_RUNNING)
+        if(p->state == STATE_RUNNABLE)
             enqueue_head(ready_q[p->priority], p);
         
         if(is_debugging_ipc())
@@ -141,7 +141,7 @@ int do_notify(int src, int dest, struct message *m) {
     struct proc *pDest, *pSrc;
 
     // Is the destination valid?
-    if (pDest = get_runnable_proc(dest)) {
+    if (pDest = get_proc(dest)) {
 
         if(is_debugging_ipc())
             kprintf("\nNOTIFY %d from %d type %d| ",dest, src ,m->type);
