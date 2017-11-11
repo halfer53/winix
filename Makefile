@@ -1,19 +1,22 @@
 REFORMAT = reformat_srec
 GEN_BIN = gen_bin_code
+srctree := $(shell pwd)
+includes := $(shell find include -name "*.h")
+.PHONY := kbuild all clean
 
-export CFLAGS = -D_DEBUG
-RELEASE_FLAGS = 
+include tools/Kbuild.include
 
 # List of user libraries used by the kernel
-KLIB = syscall/wramp_syscall syscall/ipc ansi/string util/util \
-		gen/ucontext stdlib/atoi util/debug stdlib/errno posix/_sigset\
-		ansi/rand
+KLIB_O = lib/syscall/wramp_syscall.o lib/syscall/errno.o lib/syscall/ipc.o \
+		lib/ansi/string.o lib/util/util.o lib/gen/ucontext.o lib/stdlib/atoi.o\
+		lib/util/debug.o lib/posix/_sigset.o lib/ansi/rand.o
 
 L_HEAD = winix/limits/limits_head.o
 L_TAIL = winix/limits/limits_tail.o
 KERNEL_O = winix/*.o kernel/system/*.o kernel/*.o
 KMAIN = kernel/main.s kernel/main.o 
-KLIB_O = $(addprefix lib/, $(KLIB:=.o))
+alldir = winix lib init user kernel
+
 
 # Check if V options is set by user, if V=1, debug mode is set
 # e.g. make V=1 produces all the commands being executed through
@@ -37,15 +40,11 @@ endif
 export KBUILD_VERBOSE
 export Q
 export quiet
+export srctree
+export includes
+export CFLAGS = -D_DEBUG
 
-all:
-	$(Q)-rm -f $(KMAIN)
-	$(Q)$(MAKE) -C tools
-	$(Q)$(MAKE) -C lib
-	$(Q)$(MAKE) -C user
-	$(Q)$(MAKE) -C winix
-	$(Q)$(MAKE) -C init
-	$(Q)$(MAKE) -C kernel
+all:| tool kbuild
 	$(Q)wlink $(LDFLAGS) -Ttext 1024 -v -o winix.srec \
 			$(L_HEAD) $(KERNEL_O) $(KLIB_O) $(L_TAIL) \
 							> tools/kdbg_srec/winix.kdbg
@@ -53,24 +52,20 @@ ifeq ($(KBUILD_VERBOSE),0)
 	@echo "LD \t winix.srec"
 endif
 
-d-verbose:
-	$(MAKE) all CFLAGS=-D_DEBUG=2
+tool: 
+	$(Q)-rm -f $(KMAIN)
+	$(Q)$(MAKE) -C tools
 
-release: 
-	$(MAKE) clean
-	$(MAKE) all CFLAGS=$(RELEASE_FLAGS)
+kbuild: $(alldir)
+$(alldir): FORCE
+	$(Q)$(MAKE) $(build)=$@
 
 clean:
-	$(Q)$(MAKE) -C kernel clean
-	$(Q)$(MAKE) -C lib clean
-	$(Q)$(MAKE) -C winix clean
-	$(Q)$(MAKE) -C user clean
-	$(Q)$(MAKE) -C init clean
-	$(Q)-rm -f winix.srec
-ifeq ($(KBUILD_VERBOSE),0)
-	@echo "RM \t shell.srec"
-	@echo "RM \t winix.srec"
-endif
+	$(Q)$(MAKE) $(cleanall)='$(alldir)'
+
+
+d-verbose:
+	$(MAKE) all CFLAGS=-D_DEBUG=2
 
 stat:
 	@echo "C Lines: "
@@ -82,6 +77,8 @@ stat:
 
 test:
 	gcc -D_GCC_DEBUG -I./include test.c winix/bitmap.c winix/mm.c
+
+FORCE:
 
 .DELETE_ON_ERROR:
 

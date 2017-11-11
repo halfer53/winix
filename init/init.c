@@ -1,5 +1,6 @@
-#include <unistd.h>
+#include <sys/syscall.h>
 #include <stdio.h>
+#include <signal.h>
 
 void init_init(){
   sigset_t mask;

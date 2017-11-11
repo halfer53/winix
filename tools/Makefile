@@ -1,7 +1,10 @@
 REFORMAT = reformat_srec
 GEN_BIN = gen_bin_code
 
-tools: $(REFORMAT).class $(GEN_BIN) 
+tools: __tools
+	@echo > /dev/null
+	
+__tools:$(REFORMAT).class $(GEN_BIN) 
 $(REFORMAT).class $(GEN_BIN): $(REFORMAT).java $(GEN_BIN).c
 	$(Q)javac $(REFORMAT).java
 	$(Q)gcc $(GEN_BIN).c -o $(GEN_BIN)

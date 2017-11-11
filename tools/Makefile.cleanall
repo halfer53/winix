@@ -1,0 +1,23 @@
+# SPDX-License-Identifier: GPL-2.0
+# ==========================================================================
+# Building
+# ==========================================================================
+
+include tools/Kbuild.include
+
+PHONY := all __clean
+
+all: __cleanall
+	@echo > /dev/null
+
+__cleanall: $(obj)
+$(obj): FORCE
+	$(Q)$(MAKE) $(clean)=$@
+
+
+FORCE:
+
+.DELETE_ON_ERROR:
+
+
+

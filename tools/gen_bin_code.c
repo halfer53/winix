@@ -17,10 +17,12 @@ char* remove_extension(char *mystr)
     lastdot = strrchr(mystr, '.');
     if (lastdot != NULL)
         *lastdot = '\0';
-    lastdot = strchr(mystr, '/');
-    if(lastdot != NULL)
-        return lastdot + 1;// skip slashes
-    return mystr;
+    while(lastdot != mystr && *lastdot != '/') 
+        lastdot--;
+    if(lastdot == mystr)
+        return mystr;
+    else
+        return lastdot + 1;
 }
 
 int toUpperCase(char *to, char *src)
@@ -71,10 +73,14 @@ int decode_srec(char *filename, int offset)
     char *upperfilename;
 
     fp = fopen(filename, "r");
-    if (fp == NULL)
+    if (fp == NULL){
+        fprintf(stderr, "%s is unkonwn\n", filename);
+        perror("");  
         exit(EXIT_FAILURE);
+    }
     
     filename = remove_extension(filename);
+    // fprintf(stderr, "%s is filename\n", filename);
     upperfilename = malloc(strlen(filename) + 1);
     toUpperCase(upperfilename, filename);
 

@@ -15,8 +15,8 @@
 #include <kernel/kernel.h>
 #include <kernel/table.h>
 #include <winix/bitmap.h>
-#include <init_bin.c>
-#include <shell_bin.c>
+#include <init.c>
+#include <shell.c>
 
 void init_kernel_tasks();
 void start_init();

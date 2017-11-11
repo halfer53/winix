@@ -1,7 +1,7 @@
 #include <lib.h>
 
 
-const char *_sys_errlist[_NERROR] = {
+const char *_errlist[_NERROR] = {
     0,			/* EGENERIC */
     "Not owner",			/* EPERM */
     "No such file or directory",	/* ENOENT */

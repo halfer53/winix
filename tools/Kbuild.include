@@ -1,0 +1,36 @@
+####
+# kbuild: Generic definitions
+
+# Winix build tools
+###
+# Shorthand for python3 tools/libs_linker.py 
+# Usage:
+# $(shell $(get_libs) source) 
+get_libs := python3 tools/libs_linker.py 
+
+# Convenient variables
+comma   := ,
+quote   := "
+squote  := '
+empty   :=
+space   := $(empty) $(empty)
+space_escape := _-_SPACE_-_
+
+###
+# Shorthand for $(Q)$(MAKE) -f tools/Makefile.build obj=
+# Usage:
+# $(Q)$(MAKE) $(build)=dir
+build := -f $(srctree)/tools/Makefile.build obj
+
+###
+# Shorthand for $(Q)$(MAKE) -f tools/Makefile.clean obj=
+# Usage:
+# $(Q)$(MAKE) $(clean)=dir
+clean := -f $(srctree)/tools/Makefile.clean obj
+
+###
+# Shorthand for $(Q)$(MAKE) -f tools/Makefile.cleanall obj=
+# Usage:
+# $(Q)$(MAKE) $(cleanall)=dir
+cleanall := -f $(srctree)/tools/Makefile.cleanall obj
+

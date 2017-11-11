@@ -77,14 +77,14 @@
 #define DEFAULT_PROGRAM_COUNTER    	0x00000000
 
 // Process Scheduling Flags state, process is runnable when state == 0
-#define STATE_RUNNABLE              0x0000    /* Process is running or in the ready queue */
-#define STATE_SENDING               0x0001    /* process blocked trying to SEND */
-#define STATE_RECEIVING             0x0002    /* process blocked trying to RECEIVE */
-#define STATE_WAITING               0x0004    /* process blocked wait(2) */
-#define STATE_PAUSING               0x0008    /* process blocked by sigsuspend(2) or pause(2) */
-#define STATE_VFORKING              0x0010    /* parent is blocked by vfork(2) */
-#define STATE_STOPPED               0x0020    /* Stopped by SIGSTOP or SIGTSTP */
-#define STATE_ZOMBIE                0x8000    /* Zombie process */
+#define STATE_RUNNABLE              0x00000000    /* Process is running or in the ready queue */
+#define STATE_SENDING               0x00000001    /* process blocked trying to SEND */
+#define STATE_RECEIVING             0x00000002    /* process blocked trying to RECEIVE */
+#define STATE_WAITING               0x00000004    /* process blocked wait(2) */
+#define STATE_PAUSING               0x00000008    /* process blocked by sigsuspend(2) or pause(2) */
+#define STATE_VFORKING              0x00000010    /* parent is blocked by vfork(2) */
+#define STATE_STOPPED               0x00000020    /* Stopped by SIGSTOP or SIGTSTP */
+#define STATE_ZOMBIE                0x80000000    /* Zombie process */
 
 // Process Information flags
 #define IN_USE                    	0x0001      /* process slot is in use */

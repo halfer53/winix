@@ -1,0 +1,84 @@
+# SPDX-License-Identifier: GPL-2.0
+# ==========================================================================
+# Building
+# ==========================================================================
+
+src := $(obj)
+srcdepend := $(src)/.depend
+
+# Init all relevant variables used in kbuild files so
+# 1) they have correct type
+# 2) they do not inherit any value from the environment
+obj-y :=
+asm-y :=
+srec-y :=
+srecobj :=
+objects :=
+assembly :=
+source :=
+targets :=
+subdir-y :=
+EXTRA_AFLAGS   :=
+EXTRA_CFLAGS   :=
+EXTRA_LDFLAGS  :=
+asflags-y  :=
+ccflags-y  :=
+ldflags-y  :=
+
+-include $(src)/Makefile
+include tools/Kbuild.include
+
+# The filename Kbuild has precedence over Makefile
+
+subdir-y := $(addprefix $(src)/, $(patsubst %/,%, $(filter %/,$(obj-y))))
+obj-y := $(filter-out %/,$(obj-y))
+
+objects := $(addprefix $(src)/, $(obj-y) $(asm-y:%.s=%.o))
+assembly := $(addprefix $(src)/, $(obj-y:%.o=%.s))
+source := $(addprefix $(src)/, $(obj-y:%.o=%.c))
+srecobj := $(addprefix $(src)/, $(srec-y))
+
+libs := $(shell find lib -name "*.o")
+
+PHONY := all __build
+
+all: __build
+	@echo > /dev/null
+
+__build: $(objects) $(srcdepend) $(subdir-y) $(srecobj) $(includes)
+$(assembly): %.s: %.c $(includes)
+	$(Q)wcc $(CFLAGS) -S -N -I./include -o $@ $<
+ifeq ($(KBUILD_VERBOSE),0)
+	@echo "CC \t $<"
+endif
+
+$(objects): %.o: %.s
+	$(Q)wasm $< -o $@
+ifeq ($(KBUILD_VERBOSE),0)
+	@echo "AS \t $<"
+endif
+
+$(srcdepend): $(source) $(includes)
+	$(Q)makedepend -o.s -f- -I./include $(source) > $(srcdepend)
+
+$(subdir-y): FORCE
+	$(Q)$(MAKE) $(build)=$@
+
+$(srecobj): $(objects) $(includes)
+	$(eval $@_SRC := $(addprefix $(src)/,$($(notdir $@):.o=.c)))
+	$(eval $@_OBJ := $(addprefix $(src)/,$($(notdir $@))))
+	$(eval $@_FILE := $(notdir $(@:.srec=)))
+	$(Q)wlink -v -o $@ $($@_OBJ) $(shell $(get_libs) $($@_SRC)) > tools/kdbg_srec/$($@_FILE).kdbg
+	$(Q)java -cp tools reformat_srec $@
+	$(Q)./tools/gen_bin_code $@ > include/$($@_FILE).c
+ifeq ($(KBUILD_VERBOSE),0)
+	@echo "LD \t $($@_FILE).srec"
+endif
+
+FORCE:
+
+.DELETE_ON_ERROR:
+-include $(src)/.depend
+
+
+
