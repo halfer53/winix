@@ -40,13 +40,10 @@ srecobj := $(addprefix $(src)/, $(srec-y))
 
 libs := $(shell find lib -name "*.o")
 
-PHONY := all __build
+PHONY := __build
 
-all: __build
-	@echo > /dev/null
-
-__build: $(objects) $(srcdepend) $(subdir-y) $(srecobj) $(includes)
-$(assembly): %.s: %.c $(includes)
+__build: $(objects) $(srcdepend) $(subdir-y) $(srecobj)
+$(assembly): %.s: %.c 
 	$(Q)wcc $(CFLAGS) -S -N -I./include -o $@ $<
 ifeq ($(KBUILD_VERBOSE),0)
 	@echo "CC \t $<"
@@ -64,7 +61,7 @@ $(srcdepend): $(source) $(includes)
 $(subdir-y): FORCE
 	$(Q)$(MAKE) $(build)=$@
 
-$(srecobj): $(objects) $(includes)
+$(srecobj): $(objects)
 	$(eval $@_SRC := $(addprefix $(src)/,$($(notdir $@):.o=.c)))
 	$(eval $@_OBJ := $(addprefix $(src)/,$($(notdir $@))))
 	$(eval $@_FILE := $(notdir $(@:.srec=)))

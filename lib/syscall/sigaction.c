@@ -5,10 +5,10 @@ void __sigreturn(void);
 
 int sigaction(int signum, const struct sigaction *act, struct sigaction *oldact){
     struct message m;
-    m.m1_i1 = signum;
-    m.m1_p1 = (char *)act;
-    m.m1_p2 = (char *)oldact;
-    m.m1_p3 = (char *)(__sigreturn);
+    m.m3_i1 = signum;
+    m.m3_p1 = (char *)act;
+    m.m3_p2 = (char *)oldact;
+    m.m3_f1 = __sigreturn;
     return _syscall(SIGACTION, &m);
 }
 

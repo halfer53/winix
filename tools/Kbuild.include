@@ -31,6 +31,6 @@ clean := -f $(srctree)/tools/Makefile.clean obj
 ###
 # Shorthand for $(Q)$(MAKE) -f tools/Makefile.cleanall obj=
 # Usage:
-# $(Q)$(MAKE) $(cleanall)=dir
+# $(Q)$(MAKE) $(cleanall)=dirs
 cleanall := -f $(srctree)/tools/Makefile.cleanall obj
 

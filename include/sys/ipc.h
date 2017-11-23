@@ -20,6 +20,7 @@
 
 typedef struct {int m1i1, m1i2, m1i3; void *m1p1, *m1p2, *m1p3;} mess_1;
 typedef struct {long m2l1, m2l2, m2l3, m2l4, m2l5, m2l6;} mess_2;
+typedef struct {int m3i1, m3i2; void *m3p1, *m3p2; void(*m3f1)(void), *m3f2; } mess_3;
 
 /**
  * The message structure for IPC
@@ -35,6 +36,7 @@ typedef struct message{
     union {
         mess_1 m_m1;
         mess_2 m_m2;
+        mess_3 m_m3;
     } m_u;
     /**
      * Add anything after this
@@ -55,6 +57,13 @@ typedef struct message{
 #define m2_l4  m_u.m_m2.m2l4
 #define m2_l5  m_u.m_m2.m2l5
 #define m2_l6  m_u.m_m2.m2l6
+
+#define m3_i1  m_u.m_m3.m3i1
+#define m3_i2  m_u.m_m3.m3i2
+#define m3_p1  m_u.m_m3.m3p1
+#define m3_p2  m_u.m_m3.m3p2
+#define m3_f1  m_u.m_m3.m3f1
+#define m3_f2  m_u.m_m3.m3f2
 
 #define reply_res	type
 

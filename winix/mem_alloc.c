@@ -14,7 +14,6 @@
 #include <winix/mem_alloc.h>
 #include <winix/mm.h>
 
-#define INITIAL_SYSFREEMEM_LEN     64
 
 PRIVATE struct hole hole_table[NUM_HOLES];
 
@@ -26,8 +25,6 @@ PRIVATE struct hole *pending_holes[2];
 
 PRIVATE struct hole *used_holes[2];
 // Linked lists are defined by a head and tail pointer.
-
-PRIVATE char initial_free_sysmem[INITIAL_SYSFREEMEM_LEN];
 
 /**
  * Adds a hole to the tail of a list.
@@ -150,20 +147,27 @@ void *kmalloc(size_t size) {
         } else {
             h->start += size;
             h->length -= size;
-            h = hole_dequeue(pending_holes);
-            h->start = old_base;
-            h->length = size;
-            hole_enqueue_head(used_holes, h);
+            if(h = hole_dequeue(pending_holes)){
+                h->start = old_base;
+                h->length = size;
+                hole_enqueue_head(used_holes, h);
+            }
         }
         return (void *)old_base;
     } else {
+        int alignedsize = align_page(size);
         // if no hole size  that is big enough is found in the unused_holes list,
         // it's gonna call sbrk to allocate a new chunk of memory
-        if (p_start_addr = get_free_pages(align_page(size), GFP_HIGH)) {
+        if (p_start_addr = get_free_pages(alignedsize, GFP_HIGH)) {
             if (h = hole_dequeue(pending_holes)) {
                 h->start = p_start_addr;
                 h->length = size;
                 hole_enqueue_head(used_holes, h);
+                if(h = hole_dequeue(pending_holes)){
+                    h->start = p_start_addr + size;
+                    h->length = alignedsize - size;
+                    hole_enqueue_head(unused_holes, h);
+                }
                 return p_start_addr;
             }
         }// else if system out of memory
@@ -272,5 +276,4 @@ void init_holes() {
         h->next = NULL;
         hole_enqueue_head(pending_holes, h);
     }
-    add_free_mem(initial_free_sysmem, INITIAL_SYSFREEMEM_LEN);
 }

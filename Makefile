@@ -1,9 +1,6 @@
-REFORMAT = reformat_srec
-GEN_BIN = gen_bin_code
-srctree := $(shell pwd)
-includes := $(shell find include -name "*.h")
 .PHONY := kbuild all clean
 
+srctree := $(shell pwd)
 include tools/Kbuild.include
 
 # List of user libraries used by the kernel
@@ -22,27 +19,29 @@ alldir = winix lib init user kernel
 # e.g. make V=1 produces all the commands being executed through
 # the building process
 ifeq ("$(origin V)", "command line")
-	  KBUILD_VERBOSE = $(V)
+	KBUILD_VERBOSE = $(V)
 endif
 ifndef KBUILD_VERBOSE
-	  KBUILD_VERBOSE = 0
+	KBUILD_VERBOSE = 0
 endif
 
 ifeq ($(KBUILD_VERBOSE),1)
-	  quiet =
-	  Q =
+	quiet =
+	Q =
 else
-	MAKEFLAGS += --no-print-directory
-	  quiet=quiet_
-	  Q = @
+	MAKEFLAGS += --no-print-directory -s
+	quiet=quiet_
+	Q = @
 endif
 
 export KBUILD_VERBOSE
 export Q
 export quiet
-export srctree
-export includes
-export CFLAGS = -D_DEBUG
+export srctree \\
+export includes := $(shell find include -name "*.h")
+export CFLAGS := -D_DEBUG
+
+
 
 all:| tool kbuild
 	$(Q)wlink $(LDFLAGS) -Ttext 1024 -v -o winix.srec \
@@ -61,6 +60,7 @@ $(alldir): FORCE
 	$(Q)$(MAKE) $(build)=$@
 
 clean:
+	$(Q)$(MAKE) -C tools clean
 	$(Q)$(MAKE) $(cleanall)='$(alldir)'
 
 

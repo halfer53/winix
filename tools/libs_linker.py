@@ -5,6 +5,7 @@ ANSI = "lib/ansi/*.o"
 STDLIB = "lib/stdlib/*.o"
 GEN = "lib/gen/*.o"
 POSIX = "lib/posix/*.o"
+SIGNAL = "lib/posix/_sigset.o"
 UTIL ="lib/util/*.o"
 STDIO ="lib/stdio/*.o"
 SYSCALL = "lib/syscall/*.o"
@@ -14,7 +15,7 @@ DEBUG = "lib/util/debug.o"
 built_in = {
 	"stdlib.h": {STDLIB, ANSI},
 	"string.h": {STRING},
-	"signal.h": {"lib/posix/_sigset.o"},
+	"signal.h": {SIGNAL},
 	"ucontext.h": {GEN},
 	"unistd.h": {POSIX, ANSI, STDLIB},
 	"util.h":	{UTIL},
@@ -79,8 +80,12 @@ def main():
 	for i in range(1,len(sys.argv)):
 		tlib = do_include_search(sys.argv[i])
 		libs.update(tlib)
+
 	if STRING in libs and ANSI in libs:
 		libs.remove(STRING)
+	if SIGNAL in libs and POSIX in libs:
+		libs.remove(SIGNAL)
+		
 	for lib in libs:
 		print(lib)
 
