@@ -30,6 +30,7 @@ Click ```Quick Load```, select ```winix.srec```
  - Kernel Memory Management: visual memory, page mapping, kmalloc() kfree()
  - Process Management: Kernel thread, process creation
  - Interrupt Handler
+ - A Bourne shell 
  - User memory management: malloc() free()
  - User coroutine 
  - Stacktrace dump, Segfault analysis
