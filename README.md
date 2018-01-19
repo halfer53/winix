@@ -25,6 +25,15 @@ Run ```Rexsimulator.exe```
 
 Click ```Quick Load```, select ```winix.srec```
 
+## Features
+
+ - Kernel Memory Management: visual memory, page mapping, kmalloc() kfree()
+ - Process Management: Kernel thread, process creation
+ - Interrupt Handler
+ - User memory management: malloc() free()
+ - User coroutine 
+ - Stacktrace dump, Segfault analysis
+
 ## List of Commands
 
 ### Built_in commands
