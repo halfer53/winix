@@ -26,16 +26,16 @@ int do_exec(struct proc *who, struct message *m){
     return OK;
 }
 
-
 /**
 * malloc a new memory and write the values of lines into that address
 * the process is updated
 **/
 int exec_proc(struct proc *who,size_t *lines, size_t length, size_t entry, int offset, const char *name){
+    int err;
+    unsigned int* first_word;
     set_proc(who, (void (*)())entry, name);
-    if(alloc_proc_mem(who, length + offset, USER_STACK_SIZE , USER_HEAP_SIZE, 
-                         PROC_SET_SP | PROC_SET_HEAP) != OK){
-        return ERR;
+    if(err = alloc_proc_mem(who, length + 1024, USER_STACK_SIZE , USER_HEAP_SIZE)){
+        return err;
     }
 
     // set the first page unaccessible if offset is set
@@ -49,7 +49,11 @@ int exec_proc(struct proc *who,size_t *lines, size_t length, size_t entry, int o
     }
 
     build_initial_stack(who, 0, NULL, initial_env, get_proc(SYSTEM));
+
     memcpy(who->ctx.rbase + offset, lines , length);
+    first_word = who->ctx.rbase + offset;
+    X_PRINT(*first_word);
+
     enqueue_schedule(who);
     return OK;
 }

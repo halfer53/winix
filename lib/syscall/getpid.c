@@ -6,7 +6,7 @@ pid_t getpid(){
     if(_pid != 0){
         return _pid;
     }
-    _pid = _syscall(GETPID,&m);
+    _pid = _syscall(GETPID, &m);
     return _pid;
 }
 
@@ -14,6 +14,6 @@ pid_t getpid(){
 // good idea to cache it
 pid_t getppid(){
     struct message m;
-    _syscall(GETPID,&m);
+    _syscall(GETPID, &m);
     return m.m1_i2;
 }

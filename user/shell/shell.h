@@ -5,7 +5,7 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <string.h>
-#include <debug.h>
+#include <sys/debug.h>
 #include <ucontext.h>
 #include <sys/times.h>
 #include "parse.h"

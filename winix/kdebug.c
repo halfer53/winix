@@ -87,7 +87,7 @@ void kprintf_syscall_reply(int reply){
 
 void kprintf_syscall_request(int type, pid_t from){
     if(_debug_syscall > 0){
-        kprintf("\n%s\t from  %d |", syscall_str[type], from);
+        kprintf("\n%s\t from %d |", syscall_str[type], from);
         _debug_syscall--;
     }
     

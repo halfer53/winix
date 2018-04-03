@@ -171,13 +171,15 @@ int test_deadlock(int argc, char **argv){
 
 int test_general(int argc, char **argv){
     struct cmd_internal* handler;
+    if(!argv[1])
+        return test_nohandler(argc-1, argv+1);
+
     handler = test_commands;
     while(handler->name != NULL && strcmp(argv[1], handler->name)) {
         handler++;
     }
     // Run it
-    handler->handle(argc-1, argv+1);
-    return 0;
+    return handler->handle(argc-1, argv+1);
 }
 
 void usr1h(int sig){

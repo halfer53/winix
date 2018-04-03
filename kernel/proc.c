@@ -411,7 +411,7 @@ struct proc *start_kernel_proc(void (*entry)(), int proc_nr, const char *name, i
 struct proc *start_user_proc(size_t *lines, size_t length, size_t entry, int options, const char *name){
     struct proc *p;
     if(p = get_free_proc_slot()){
-        if(!exec_proc(p,lines,length,entry,options,name))
+        if(exec_proc(p,lines,length,entry,options,name) == OK)
             return p;
     }
     return NULL;
@@ -444,7 +444,8 @@ int proc_memctl(struct proc* who ,vptr_t* page_addr, int flags){
  * @param  flags      PROC_SET_SP or/and PROC_SET_HEAP    
  * @return            
  */
-int alloc_proc_mem(struct proc *who, int text_data_length, int stack_size, int heap_size, int flags){
+int alloc_proc_mem(struct proc *who, int text_data_length, int stack_size, int heap_size){
+    const int vm_offset = PAGE_LEN;
     int proc_len;
     int td_aligned;
     ptr_t *bss_start;
@@ -468,27 +469,24 @@ int alloc_proc_mem(struct proc *who, int text_data_length, int stack_size, int h
     if(bss_size < MIN_BSS_SIZE)
         bss_size += PAGE_LEN;
 
-    proc_len = text_data_length + bss_size + stack_size + heap_size;
+    proc_len = vm_offset + stack_size + text_data_length + bss_size + heap_size;
     who->ctx.rbase = user_get_free_pages(who, proc_len, GFP_NORM);
     if(who->ctx.rbase == NULL)
-        return ERR;
-
-    // set bss segment to 0
-    bss_start = who->ctx.rbase + text_data_length;
-    memset(bss_start, 0, bss_size);
+        return ENOMEM;
 
     // for information on how process memory are structured, 
     // look at the first line of this file
-    if(flags & PROC_SET_SP){
-        who->stack_top = who->ctx.rbase + text_data_length + bss_size;
-        who->ctx.m.sp = get_virtual_addr(who->stack_top + stack_size - 1,who);
-        *(who->stack_top) = STACK_MAGIC;
-    }
+    who->stack_top = who->ctx.rbase + vm_offset;
+    who->ctx.m.sp = get_virtual_addr(who->stack_top + stack_size - 1,who);
+    *(who->stack_top) = STACK_MAGIC;
 
-    if(flags & PROC_SET_HEAP){
-        who->heap_break = who->ctx.rbase + text_data_length + bss_size + stack_size;
-        who->heap_bottom = who->heap_break + heap_size - 1;
-    }
+    // set bss segment to 0
+    bss_start = who->ctx.rbase + vm_offset + stack_size + text_data_length;
+    memset(bss_start, 0, bss_size);
+
+    who->heap_break = who->ctx.rbase + vm_offset + stack_size + text_data_length + bss_size;
+    who->heap_bottom = who->heap_break + heap_size - 1;
+    
     return OK;
 }
 

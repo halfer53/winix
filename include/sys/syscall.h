@@ -19,6 +19,7 @@
 #include <sys/ipc.h>
 #include <sys/types.h>
 
+
 #define _NSYSCALL               22
 /**
  * System Call Numbers
@@ -50,14 +51,13 @@
 function params{\
     struct message m;\
     passing_codes;\
-    return _syscall(syscall_num,&m);\
+    return _syscall(syscall_num, &m);\
 }\
 
 
 #define WINFO_PS    1
 #define WINFO_MEM   2
 #define WINFO_SLAB  4
-
 
 int _syscall(int syscall_num, struct message *m);
 int _exit(int status);

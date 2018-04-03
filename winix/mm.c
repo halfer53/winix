@@ -128,17 +128,15 @@ ptr_t* user_get_free_pages(struct proc* who, int length, int flags){
  * @return      
  */
 int get_free_pages_from(ptr_t* addr, int size){
+    int ret;
     int paged, page_num;
 
     if(!is_pages_free_from(addr, size))
-        return ERR;
+        return ENOMEM;
     
     paged = PADDR_TO_PAGED(addr);
     page_num = PADDR_TO_NUM_PAGES(size);
-    if(bitmap_set_nbits(mem_map, MEM_MAP_LEN, paged, page_num) == ERR)
-        return ERR;
-
-    return OK;
+    return bitmap_set_nbits(mem_map, MEM_MAP_LEN, paged, page_num);
 }
 
 /**
@@ -150,17 +148,17 @@ int get_free_pages_from(ptr_t* addr, int size){
  */
 int user_get_free_pages_from(struct proc* who, ptr_t* addr, int size){
     int index;
-    int ret;
+    int error;
     int page_num;
 
-    ret = get_free_pages_from(addr,size);
-    if(ret == ERR)
-        return ERR;
+    error = get_free_pages_from(addr,size);
+
+    if(error)
+        return error;
     index = PADDR_TO_PAGED(addr);
     page_num = PADDR_TO_NUM_PAGES(size);
-    if(bitmap_set_nbits(who->ctx.ptable, PTABLE_LEN, index, page_num) == ERR)
-        return ERR;
-    return OK;
+    kprintf("addr %x idx %d\n", addr, index);
+    return bitmap_set_nbits(who->ctx.ptable, PTABLE_LEN, index, page_num);
 }
 
 /**

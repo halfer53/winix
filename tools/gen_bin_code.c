@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
     int i = 1;
     int offset = 0;
 
-    if(strcmp("-offset", argv[i]) == 0){
+    if(strcmp("-t", argv[i]) == 0){
         i++;
         offset = atoi(argv[i++]);
     }

@@ -92,8 +92,10 @@ block_t *extend_heap(block_t *last , size_t s)
     b = sbrk (0);
     sb = sbrk(BLOCK_SIZE+s);
 
-    if ((int)sb < 0)
+    if ((int)sb < 0){
+        perror("");
         return (NULL);
+    }
         
     b->size = s;
     b->next = NULL;

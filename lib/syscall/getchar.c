@@ -4,5 +4,5 @@
 
 int getchar(){
     struct message m;
-    return _syscall(GETC,&m);
+    return _syscall(GETC, &m);
 }

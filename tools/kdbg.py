@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import sys
 import subprocess
 import os
@@ -83,19 +84,23 @@ def main():
     with tmpdir() as basedir:
         tmp_filename = basedir + "/" + str(uuid.uuid4())
 
-        if(in_file in userfile_dir):
-            filename = userfile_dir[in_file] + filename
+        # if(in_file in userfile_dir):
+        #     filename = userfile_dir[in_file] + filename
 
         wcc_cmd = ["wcc","-N", "-g", "-S", "-I"+main_path+"/include",\
                         "-o",tmp_filename, main_path+"/"+filename, ]
 
-        result = subprocess.call(wcc_cmd)
+        # print(" ".join(wcc_cmd))
+        result = subprocess.call(wcc_cmd, stderr=sys.stderr)
         if(result != 0):
             tmpfilename = filename.replace(".c",".s")
             if(os.path.isfile(main_path+"/" +  tmpfilename)):
                 print("Line " + str(target_line_num) + \
                             " in file "+tmpfilename)
                 return 0
+            else:
+                print('Err')
+                return 1
 
         loc = "0"
         curr_count = 0
@@ -107,7 +112,7 @@ def main():
         curr_seg = ""
         seg_types = [".text\n", ".data\n", ".bss\n"]
         
-        with open(tmp_filename) as f:
+        with open(tmp_filename, 'r') as f:
             for line in f:
                 if(line[-2] == ':' and "L." not in line):
                     prev_name = line

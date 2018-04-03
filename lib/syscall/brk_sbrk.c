@@ -7,7 +7,7 @@ int brk(void *addr){
     struct message m;
     int ret = 0;
     m.m1_p1 = addr;
-    ret = _syscall(BRK,&m);
+    ret = _syscall(BRK, &m);
     _brk = m.m1_p1;
     if(ret < 0)
         return -1;

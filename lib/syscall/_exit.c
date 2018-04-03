@@ -12,7 +12,7 @@
     // but since the process is exiting normally,
     // its set to 0
     m.m1_i2 = 0;
-    return _syscall(EXIT,&m);
+    return _syscall(EXIT, &m);
 }
 
 int exit(int status){

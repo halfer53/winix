@@ -56,11 +56,12 @@ void* sys_sbrk(struct proc *who, int size){
     // extend the heap bottom if needed
     next_page = who->heap_bottom + 1;
     request_size = size - residual; 
+    kreport_bitmap(who->ctx.ptable, 4);
     if(user_get_free_pages_from(who,next_page, request_size ) == ERR)
         return NULL;
-    // kinfo("extending heap size %d oheap %x newheap %x\n", size, who->heap_break, 
-    //                                                         (who->heap_break + size));
-    
+    // kinfo("extending heap size %d oheap %x newheap %x\n", request_size, who->heap_break, 
+                                                            // (who->heap_break + size));
+    kreport_bitmap(who->ctx.ptable, 4);    
     who->heap_break += size;
     who->heap_bottom += align_page(request_size);
     return get_virtual_addr(who->heap_break,who);
@@ -77,7 +78,9 @@ int do_brk(struct proc *who, struct message *m){
     ptr_t* addr = get_physical_addr(m->m1_p1, who);
     ptr_t* heap_top;
 
+    
     m->m1_p1 = get_virtual_addr(who->heap_break, who);
+    // kprintf("req brk %x brk %x curr btm %x ", vaddr, m->m1_p1, get_virtual_addr(who->heap_bottom, who) );
     if(addr < who->heap_break){
         heap_top = GET_HEAP_TOP(who);
         if(addr < heap_top){

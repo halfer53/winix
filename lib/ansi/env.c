@@ -5,6 +5,6 @@
 const char** _environ = NULL;
 
 void init_environ(){
-    _environ = *((const char ***)ALIGN1K(get_sp()));
+    _environ = *((const char ***)ALIGN1K((int)get_sp()));
     // printf("env %x \n", (unsigned int)_environ + 0x5800);
 }

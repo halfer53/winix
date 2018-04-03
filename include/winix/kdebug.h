@@ -24,7 +24,7 @@ void stop_debug_scheduling();
 void stop_debug_ipc();
 void stop_debug_syscall();
 void kprintf_syscall_reply(int reply);
-void kprintf_syscall_request(int type, pid_t from);
+void kprintf_syscall_request(int,pid_t);
 
 #ifdef _DEBUG
     #define KDEBUG(token)   kinfo token

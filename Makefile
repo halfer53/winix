@@ -6,7 +6,7 @@ include tools/Kbuild.include
 # List of user libraries used by the kernel
 KLIB_O = lib/syscall/wramp_syscall.o lib/syscall/errno.o lib/syscall/ipc.o \
 		lib/ansi/string.o lib/util/util.o lib/gen/ucontext.o lib/stdlib/atoi.o\
-		lib/util/debug.o lib/posix/_sigset.o lib/ansi/rand.o
+		lib/syscall/debug.o lib/posix/_sigset.o lib/ansi/rand.o
 
 L_HEAD = winix/limits/limits_head.o
 L_TAIL = winix/limits/limits_tail.o

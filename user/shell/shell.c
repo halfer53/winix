@@ -66,6 +66,7 @@ int main() {
     char *end_buf;
 
     init_shell();
+
     c = buf;
     end_buf = c + MAX_LINE -2;
     while(1) {
@@ -114,6 +115,7 @@ int main() {
 }
 
 
+
 int exec_cmd(char *line, int tpipe[2]){
     struct cmdLine cmd;
     int ret;
@@ -135,14 +137,16 @@ int exec_cmd(char *line, int tpipe[2]){
         return 0;
     }
 
+    if(!cmd.argv[0])
+        return generic(cmd.argc, cmd.argv);
+
     // Decode command
     handler = builtin_commands;
     while(handler->name != NULL && strcmp(cmd.argv[0], handler->name)) {
         handler++;
     }
     // Run it
-    handler->handle(cmd.argc, cmd.argv);
-    return 0;
+    return handler->handle(cmd.argc, cmd.argv);
 }
 
 
@@ -250,7 +254,10 @@ int cmd_bash(int argc, char **argv){
         child_pid = wait(NULL);
         // printf("parent shell %d awakened by child shell %d\n",getpid(),child_pid);
     }else{
-        // printf("Child shell %d [parent %d] start:\n",getpid(),getppid());
+        int* err = NULL;
+        *err = 1;
+        
+        printf("Child shell %d [parent %d] start:\n",getpid(),getppid());
     }
     return 0;
 }

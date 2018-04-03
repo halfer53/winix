@@ -92,10 +92,6 @@
 #define BILLABLE                	0x0002      /* Set when user is invoking a system call */
 #define DISABLE_FIRST_PAGE          0x0004      /* Set when the first page of the user address space is disabled */
 
-// alloc_proc_mem flags
-#define PROC_SET_SP                	1
-#define PROC_SET_HEAP            	2
-
 // proc_memctll flags
 #define PROC_ACCESS                	1
 #define PROC_NO_ACCESS            	0
@@ -108,6 +104,30 @@ struct k_context{
     reg_t cctrl;                  	// len 19 words
 };
 
+struct proc_vm{
+    vptr_t* text;
+    vptr_t* data;
+    vptr_t* bss;
+    vptr_t* stack_top;
+    vptr_t* heap_break;             // Heap_break is also the physical address of the curr
+                                	// Brk, retrived by syscall brk(2)
+    vptr_t* heap_bottom;         	// Bottom of the process image
+};
+
+
+struct proc_sched{
+    /* Scheduling */
+    struct proc *next;            	// Next pointer
+    int priority;                	// Priority
+    int quantum;                	// Timeslice length
+    int ticks_left;                	// Timeslice remaining
+
+    /* Accounting */
+    clock_t time_used;            	// CPU time used
+    clock_t sys_time_used;        	// system time used while the system is executing on behalf 
+                                	// of this proc
+};
+
 /**
  * Process structure for use in the process table.
  *
@@ -115,14 +135,6 @@ struct k_context{
  *             updating the definitions in "wramp.s"
  **/
 typedef struct proc {
-    /* Process State */
-    // reg_t regs[NUM_REGS];        	// values
-    // reg_t *sp;
-    // reg_t *ra;
-    // void (*pc)();
-    // reg_t *rbase;
-    // reg_t *ptable;
-    // reg_t cctrl;                  	// len 19 words
     struct k_context ctx;
 
     /* IPC messages */
@@ -249,7 +261,7 @@ void set_proc(struct proc *p, void (*entry)(), const char *name);
 struct proc *start_kernel_proc(void (*entry)(), int proc_nr, const char *name,int quantum, int priority);
 struct proc *start_user_proc(size_t *lines, size_t length, size_t entry, int priority, const char *name);
 struct proc *get_free_proc_slot();
-int alloc_proc_mem(struct proc *who, int tdb_length, int stack_size, int heap_size, int flags);
+int alloc_proc_mem(struct proc *who, int tdb_length, int stack_size, int heap_size);
 void enqueue_schedule(struct proc* p);
 reg_t* alloc_kstack(struct proc *who);
 int proc_memctl(struct proc* who ,vptr_t* page_addr, int flags);
