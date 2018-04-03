@@ -21,7 +21,7 @@ int do_sigreturn(struct proc *who, struct message *m){
     struct proc *systask;
     int signum = m->m1_i1;
 
-    sp = get_physical_addr(who->sp,who);
+    sp = get_physical_addr(who->ctx.m.sp,who);
 
     sp += sizeof(struct syscall_frame_comm);
 

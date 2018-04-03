@@ -143,32 +143,32 @@ PRIVATE void gpf_handler() {
     kinfo("General Protection Fault: \"%s (%d)\" Rbase=0x%x \n",
         current_proc->name,
         current_proc->pid,
-        current_proc->rbase);
+        current_proc->ctx.rbase);
     pc = get_physical_addr(get_pc_ptr(current_proc),current_proc);
 
     kinfo("Virtual  ");
     PRINT_DEBUG_REG(get_virtual_addr(pc,current_proc),
-                                    current_proc->sp,
-                                    current_proc->ra);
+                                    current_proc->ctx.m.sp,
+                                    current_proc->ctx.m.ra);
 
     kinfo("Physical ");
     PRINT_DEBUG_REG(pc, 
-        get_physical_addr(current_proc->sp, current_proc),
-        get_physical_addr(current_proc->ra, current_proc));    
+        get_physical_addr(current_proc->ctx.m.sp, current_proc),
+        get_physical_addr(current_proc->ctx.m.ra, current_proc));    
 
     kinfo("Current Instruction: 0x%08x\n",*pc);
 
 #if _DEBUG == 2
-    kinfo("$1: 0x%08x, $2, 0x%08x, $3, 0x%08x\n",current_proc->regs[0],
-                            current_proc->regs[1],current_proc->regs[2]);
-    kinfo("$4: 0x%08x, $5, 0x%08x, $6, 0x%08x\n",current_proc->regs[3],
-                            current_proc->regs[4],current_proc->regs[5]);
-    kinfo("$7: 0x%08x, $8, 0x%08x, $9, 0x%08x\n",current_proc->regs[6],
-                            current_proc->regs[7],current_proc->regs[8]);
-    kinfo("$10: 0x%08x, $11, 0x%08x, $12, 0x%08x\n",current_proc->regs[9],
-                            current_proc->regs[10],current_proc->regs[11]);
-    kinfo("$13: 0x%08x, $sp, 0x%08x, $ra, 0x%08x\n",current_proc->regs[12],
-                            current_proc->regs[13],current_proc->regs[14]);
+    kinfo("$1: 0x%08x, $2, 0x%08x, $3, 0x%08x\n",current_proc->ctx.m.regs[0],
+                            current_proc->ctx.m.regs[1],current_proc->ctx.m.regs[2]);
+    kinfo("$4: 0x%08x, $5, 0x%08x, $6, 0x%08x\n",current_proc->ctx.m.regs[3],
+                            current_proc->ctx.m.regs[4],current_proc->ctx.m.regs[5]);
+    kinfo("$7: 0x%08x, $8, 0x%08x, $9, 0x%08x\n",current_proc->ctx.m.regs[6],
+                            current_proc->ctx.m.regs[7],current_proc->ctx.m.regs[8]);
+    kinfo("$10: 0x%08x, $11, 0x%08x, $12, 0x%08x\n",current_proc->ctx.m.regs[9],
+                            current_proc->ctx.m.regs[10],current_proc->ctx.m.regs[11]);
+    kinfo("$13: 0x%08x, $sp, 0x%08x, $ra, 0x%08x\n",current_proc->ctx.m.regs[12],
+                            current_proc->ctx.m.regs[13],current_proc->ctx.m.regs[14]);
 #endif
 #endif
 
@@ -191,14 +191,14 @@ PRIVATE void syscall_handler() {
     int *retval;
     ptr_t *sp;
 
-    sp = get_physical_addr(current_proc->sp, current_proc);
+    sp = get_physical_addr(current_proc->ctx.m.sp, current_proc);
 
     operation = *(sp);                // Operation is the first parameter on the stack
     dest = *(sp+1);                // Destination is second parameter on the stack
     m = (struct message *)get_physical_addr(*(sp+ 2), current_proc);  // Message is the third parameter
     m->src = current_proc->proc_nr;            // Don't trust the who to specify their own source process number
 
-    retval = (int*)&current_proc->regs[0];        // Result is returned in $1
+    retval = (int*)&current_proc->ctx.m.regs[0];        // Result is returned in $1
 
     // Decode operation
     switch(operation) {
@@ -244,7 +244,7 @@ PRIVATE void break_handler() {
  **/
 PRIVATE void arith_handler() {
     KDEBUG(("Arith Exception: \"%s (%d)\" PC=0x%08x.\r\n", 
-        current_proc->name, current_proc->pid, current_proc->pc));
+        current_proc->name, current_proc->pid, current_proc->ctx.m.pc));
     send_sig(current_proc,SIGFPE);
     sched();
 }

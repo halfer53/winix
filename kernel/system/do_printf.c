@@ -41,5 +41,5 @@ int do_printf(struct proc *who, struct message *m){
         return EFAULT;
     ptr = get_physical_addr(vp1,who);
     ptr2 = get_physical_addr(vp2,who);
-    return kprintf_vm(ptr,ptr2,who->rbase);
+    return kprintf_vm(ptr,ptr2,who->ctx.rbase);
 }

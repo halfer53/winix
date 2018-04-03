@@ -15,6 +15,7 @@
 #ifndef _W_PROC_H_
 #define _W_PROC_H_ 1
 
+#include <sys/ucontext.h>
 #include <sys/types.h>
 #include <signal.h>
 #include <winix/type.h>
@@ -99,6 +100,14 @@
 #define PROC_ACCESS                	1
 #define PROC_NO_ACCESS            	0
 
+
+struct k_context{
+    mcontext_t m;
+    reg_t *rbase;
+    reg_t *ptable;
+    reg_t cctrl;                  	// len 19 words
+};
+
 /**
  * Process structure for use in the process table.
  *
@@ -107,13 +116,14 @@
  **/
 typedef struct proc {
     /* Process State */
-    reg_t regs[NUM_REGS];        	// values
-    reg_t *sp;
-    reg_t *ra;
-    void (*pc)();
-    reg_t *rbase;
-    reg_t *ptable;
-    reg_t cctrl;                  	// len 19 words
+    // reg_t regs[NUM_REGS];        	// values
+    // reg_t *sp;
+    // reg_t *ra;
+    // void (*pc)();
+    // reg_t *rbase;
+    // reg_t *ptable;
+    // reg_t cctrl;                  	// len 19 words
+    struct k_context ctx;
 
     /* IPC messages */
     int state;                      // schedling flags
@@ -186,9 +196,9 @@ extern struct proc *block_q[2];
 
 #define IS_PROCN_OK(i)                  ((i)> -NUM_TASKS && (i) <= NUM_PROCS)
 #define IS_PRIORITY_OK(priority)        (0 <= (priority) && (priority) < NUM_QUEUES)
-#define IS_KERNEL_PROC(p)               ((p)->rbase == NULL)
+#define IS_KERNEL_PROC(p)               ((p)->ctx.rbase == NULL)
 #define IS_KERNELN(n)                   ((n)<= 0 && (n)> -NUM_TASKS)
-#define IS_USER_PROC(p)                 ((p)->rbase != NULL)
+#define IS_USER_PROC(p)                 ((p)->ctx.rbase != NULL)
 
 #define IS_IDLE(p)                      ((p)->proc_nr == IDLE)
 #define IS_SYSTEM(p)                    ((p)->proc_nr == SYSTEM)
@@ -259,3 +269,4 @@ int build_initial_stack(struct proc* who, int argc, char** argv, char** env, str
 #define release_proc_slot(p)    release_zombie(p)
 
 #endif
+

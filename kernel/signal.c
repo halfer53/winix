@@ -65,15 +65,15 @@ PRIVATE int build_signal_ctx(struct proc *who, int signum){
     frame->signum = signum;
     frame->s_base.operation = WINIX_SENDREC;
     frame->s_base.dest = SYSTEM_TASK;
-    frame->s_base.pm = (struct message*)(who->sp - sizeof(struct message));
+    frame->s_base.pm = (struct message*)(who->ctx.m.sp - sizeof(struct message));
     frame->s_base.m.m1_i1 = signum;
     frame->s_base.m.type = SIGRET;
 
     // signum is sitting on top of the stack
     copyto_user_stack(who, frame, sizeof(struct sigframe));
 
-    who->pc = (void (*)())who->sig_table[signum].sa_handler;
-    who->ra = (reg_t*)who->sa_restorer;
+    who->ctx.m.pc = (void (*)())who->sig_table[signum].sa_handler;
+    who->ctx.m.ra = (reg_t*)who->sa_restorer;
 
     // backup sig mask
     who->sig_mask2 = who->sig_mask;

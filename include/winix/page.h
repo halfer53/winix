@@ -17,8 +17,8 @@
 #define align4(x)                       (((((x)-1)>>2)<<2)+4)
 #define ALIGN1K_LB(x)                   ((((((int)x)-1)>>10)<<10))
 
-#define get_physical_addr(va,proc)      (((ptr_t*)(va))+(unsigned int)(proc)->rbase)
-#define get_virtual_addr(pa,proc)       (((ptr_t*)(pa))-(unsigned int)(proc)->rbase)
+#define get_physical_addr(va,proc)      (((ptr_t*)(va))+(unsigned int)(proc)->ctx.rbase)
+#define get_virtual_addr(pa,proc)       (((ptr_t*)(pa))-(unsigned int)(proc)->ctx.rbase)
 
 #define PAGE_TO_PADDR(_index)           ((ptr_t *)((_index) * PAGE_LEN))
 #define PADDR_TO_PAGED(addr)            ((int)(addr) / PAGE_LEN)

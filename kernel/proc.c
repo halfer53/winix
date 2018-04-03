@@ -80,17 +80,17 @@ void kreport_all_procs() {
  * Report the proc's info
 **/
 void kreport_proc(struct proc* curr) {
-    int ptable_idx = PADDR_TO_PAGED(curr->rbase)/32;
+    int ptable_idx = PADDR_TO_PAGED(curr->ctx.rbase)/32;
     kprintf("%-08s %-03d %-04d 0x%08x 0x%08x 0x%08x 0x%08x %d 0x%08x %d\n",
             curr->name,
             curr->pid,
             get_proc(curr->parent)->pid,
-            curr->rbase,
+            curr->ctx.rbase,
             get_physical_addr(get_pc_ptr(curr),curr),
-            get_physical_addr(curr->sp,curr),
+            get_physical_addr(curr->ctx.m.sp,curr),
             curr->heap_break,
             ptable_idx,
-            curr->ptable[ptable_idx],
+            curr->ctx.ptable[ptable_idx],
             curr->state);
 }
 
@@ -309,11 +309,11 @@ void proc_set_default(struct proc *p) {
     p->proc_nr = pnr_bak;
     p->state = -1;
 
-    memset(p->regs, -1, NUM_REGS);
-    p->cctrl = DEFAULT_CCTRL;
+    memset(p->ctx.m.regs, -1, NUM_REGS);
+    p->ctx.cctrl = DEFAULT_CCTRL;
 
     p->quantum = DEFAULT_USER_QUANTUM;
-    p->ptable = p->protection_table;
+    p->ctx.ptable = p->protection_table;
     p->alarm.proc_nr = p->proc_nr;
     p->sig_table[SIGCHLD].sa_handler = SIG_IGN;
 }
@@ -343,7 +343,7 @@ reg_t* alloc_kstack(struct proc *who){
  * set corressponding fields of struct pro
  */
 void set_proc(struct proc *p, void (*entry)(), const char *name) {
-    p->pc = entry;
+    p->ctx.m.pc = entry;
     strncpy(p->name, name, PROC_NAME_LEN - 1);
 }
 
@@ -359,8 +359,8 @@ void set_proc(struct proc *p, void (*entry)(), const char *name) {
  */
  void kset_ptable(struct proc* who){
     if(IS_KERNEL_PROC(who)){
-        bitmap_fill(who->ptable, PTABLE_LEN);
-        bitmap_clear_bit(who->ptable, PTABLE_LEN, 0);
+        bitmap_fill(who->ctx.ptable, PTABLE_LEN);
+        bitmap_clear_bit(who->ctx.ptable, PTABLE_LEN, 0);
     }
 }
 
@@ -390,7 +390,7 @@ struct proc *start_kernel_proc(void (*entry)(), int proc_nr, const char *name, i
         set_proc(who, entry, name);
         kset_ptable(who);
         who->quantum = quantum;
-        who->sp = alloc_kstack(who);
+        who->ctx.m.sp = alloc_kstack(who);
         who->priority = priority;
         who->pid = 0;
         who->state = STATE_RUNNABLE;
@@ -428,9 +428,9 @@ int proc_memctl(struct proc* who ,vptr_t* page_addr, int flags){
     int paged = PADDR_TO_PAGED(get_physical_addr(page_addr, who)); // get page descriptor
     
     if(flags == PROC_ACCESS){
-        return bitmap_set_bit(who->ptable, PTABLE_LEN, paged);
+        return bitmap_set_bit(who->ctx.ptable, PTABLE_LEN, paged);
     }else if(flags == PROC_NO_ACCESS){
-        return bitmap_clear_bit(who->ptable, PTABLE_LEN, paged);
+        return bitmap_clear_bit(who->ctx.ptable, PTABLE_LEN, paged);
     }
     return ERR;
 }
@@ -469,24 +469,24 @@ int alloc_proc_mem(struct proc *who, int text_data_length, int stack_size, int h
         bss_size += PAGE_LEN;
 
     proc_len = text_data_length + bss_size + stack_size + heap_size;
-    who->rbase = user_get_free_pages(who, proc_len, GFP_NORM);
-    if(who->rbase == NULL)
+    who->ctx.rbase = user_get_free_pages(who, proc_len, GFP_NORM);
+    if(who->ctx.rbase == NULL)
         return ERR;
 
     // set bss segment to 0
-    bss_start = who->rbase + text_data_length;
+    bss_start = who->ctx.rbase + text_data_length;
     memset(bss_start, 0, bss_size);
 
     // for information on how process memory are structured, 
     // look at the first line of this file
     if(flags & PROC_SET_SP){
-        who->stack_top = who->rbase + text_data_length + bss_size;
-        who->sp = get_virtual_addr(who->stack_top + stack_size - 1,who);
+        who->stack_top = who->ctx.rbase + text_data_length + bss_size;
+        who->ctx.m.sp = get_virtual_addr(who->stack_top + stack_size - 1,who);
         *(who->stack_top) = STACK_MAGIC;
     }
 
     if(flags & PROC_SET_HEAP){
-        who->heap_break = who->rbase + text_data_length + bss_size + stack_size;
+        who->heap_break = who->ctx.rbase + text_data_length + bss_size + stack_size;
         who->heap_bottom = who->heap_break + heap_size - 1;
     }
     return OK;
@@ -500,10 +500,10 @@ int alloc_proc_mem(struct proc *who, int text_data_length, int stack_size, int h
  * @return     
  */
 int copyto_user_stack(struct proc *who, void *src, size_t len){
-    reg_t *sp = get_physical_addr(who->sp,who);
+    reg_t *sp = get_physical_addr(who->ctx.m.sp,who);
     sp -= len;
     memcpy(sp,src,len);
-    who->sp = get_virtual_addr(sp,who);
+    who->ctx.m.sp = get_virtual_addr(sp,who);
     return OK;
 }
 

@@ -34,7 +34,7 @@ int copy_pcb(struct proc* parent, struct proc* child){
     // child's pending signals are cleared
     child->sig_pending = 0;
     // ptable points to its own protection table
-    child->ptable = child->protection_table;
+    child->ctx.ptable = child->protection_table;
     return OK;
 }
 
@@ -49,16 +49,16 @@ int copy_mm(struct proc* parent, struct proc* child){
     ptr_t *src, *dest;
     int j;
 
-    bitmap_clear(child->ptable, PTABLE_LEN);
-    child->rbase = dup_vm(parent,child);
-    if(child->rbase == NULL)
+    bitmap_clear(child->ctx.ptable, PTABLE_LEN);
+    child->ctx.rbase = dup_vm(parent,child);
+    if(child->ctx.rbase == NULL)
         return ERR;
 
     if(parent->flags & DISABLE_FIRST_PAGE){
         proc_memctl(child, NULL, PROC_NO_ACCESS);
     }
-    src = (ptr_t *)parent->rbase;
-    dest = (ptr_t *)child->rbase;
+    src = (ptr_t *)parent->ctx.rbase;
+    dest = (ptr_t *)child->ctx.rbase;
     while(src < parent->heap_bottom){
         copy_page(dest, src);
         src += PAGE_LEN;
@@ -78,7 +78,7 @@ int copy_mm(struct proc* parent, struct proc* child){
  */
 int copy_pregs(struct proc* parent, struct proc* child){
     ptr_t *sp;
-    sp = get_physical_addr(parent->sp,parent);
+    sp = get_physical_addr(parent->ctx.m.sp,parent);
     child->message = (struct message *)get_physical_addr(*( sp + 2 ), child);
     child->heap_break = get_physical_addr(get_virtual_addr(parent->heap_break, parent), child);
     child->heap_bottom = get_physical_addr(get_virtual_addr(parent->heap_bottom, parent), child);

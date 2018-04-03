@@ -40,7 +40,7 @@ bool is_vaddr_ok( vptr_t* addr, struct proc* who){
 
     paddr = get_physical_addr(addr, who);
     page = PADDR_TO_PAGED(paddr);
-    return is_bit_on(who->ptable, PTABLE_LEN, page);
+    return is_bit_on(who->ctx.ptable, PTABLE_LEN, page);
 }
 
 /**
@@ -116,7 +116,7 @@ ptr_t* user_get_free_pages(struct proc* who, int length, int flags){
         return NULL;
     index = PADDR_TO_PAGED(p);
     page_num = PADDR_TO_NUM_PAGES(length);
-    if(bitmap_set_nbits(who->ptable, PTABLE_LEN, index, page_num) == ERR)
+    if(bitmap_set_nbits(who->ctx.ptable, PTABLE_LEN, index, page_num) == ERR)
         return NULL;
     return p;
 }
@@ -158,7 +158,7 @@ int user_get_free_pages_from(struct proc* who, ptr_t* addr, int size){
         return ERR;
     index = PADDR_TO_PAGED(addr);
     page_num = PADDR_TO_NUM_PAGES(size);
-    if(bitmap_set_nbits(who->ptable, PTABLE_LEN, index, page_num) == ERR)
+    if(bitmap_set_nbits(who->ctx.ptable, PTABLE_LEN, index, page_num) == ERR)
         return ERR;
     return OK;
 }
@@ -194,7 +194,7 @@ int user_free_pages(struct proc* who, ptr_t* page, int len){
     if(free_pages(page,len) != OK)
         return ERR;
     index = PADDR_TO_PAGED(page);
-    return bitmap_clear_nbits(who->ptable, PTABLE_LEN, index, len);
+    return bitmap_clear_nbits(who->ctx.ptable, PTABLE_LEN, index, len);
 }
 
 /**
@@ -208,11 +208,11 @@ int user_free_pages(struct proc* who, ptr_t* page, int len){
 void* dup_vm(struct proc* parent, struct proc* child){
     int len;
 
-    len = parent->heap_bottom + 1 - parent->rbase;
+    len = parent->heap_bottom + 1 - parent->ctx.rbase;
     
     return user_get_free_pages(child, len, GFP_NORM);
     // int index;
-    // if(bitmap_extract_pattern(parent->ptable, MEM_MAP_LEN, (int)child->heap_break, ptn) == ERR)
+    // if(bitmap_extract_pattern(parent->ctx.ptable, MEM_MAP_LEN, (int)child->heap_break, ptn) == ERR)
     //     return NULL;
     
     // index = bitmap_search_pattern(mem_map, MEM_MAP_LEN, ptn->pattern, ptn->size);
@@ -220,7 +220,7 @@ void* dup_vm(struct proc* parent, struct proc* child){
     //     return NULL;
 
     // bitmap_set_pattern(mem_map, MEM_MAP_LEN, index, ptn->pattern, ptn->size);
-    // bitmap_set_pattern(child->ptable, PTABLE_LEN, index, ptn->pattern, ptn->size);
+    // bitmap_set_pattern(child->ctx.ptable, PTABLE_LEN, index, ptn->pattern, ptn->size);
 
     // return PAGE_TO_PADDR(index);
 }
@@ -230,12 +230,12 @@ void* dup_vm(struct proc* parent, struct proc* child){
  * @param who 
  */
 void release_proc_mem(struct proc *who){
-    bitmap_xor(mem_map,who->ptable,MEM_MAP_LEN);
-    bitmap_clear(who->ptable, PTABLE_LEN);
+    bitmap_xor(mem_map,who->ctx.ptable,MEM_MAP_LEN);
+    bitmap_clear(who->ctx.ptable, PTABLE_LEN);
 }
 
 void kreport_ptable(struct proc* who){
-    kreport_bitmap(who->ptable, MEM_MAP_LEN);
+    kreport_bitmap(who->ctx.ptable, MEM_MAP_LEN);
 }
 
 void kreport_sysmap(){

@@ -54,7 +54,7 @@ int do_send(int dest, struct message *m) {
 
             // Unblock receiver
             pDest->state &= ~STATE_RECEIVING;
-            pDest->regs[0] = m->reply_res;
+            pDest->ctx.m.regs[0] = m->reply_res;
             enqueue_head(ready_q[pDest->priority], pDest);
         }else {
             if(is_debugging_ipc()){
@@ -154,7 +154,7 @@ int do_notify(int src, int dest, struct message *m) {
 
             // Unblock receiver
             pDest->state &= ~STATE_RECEIVING;
-            pDest->regs[0] = m->reply_res;
+            pDest->ctx.m.regs[0] = m->reply_res;
             enqueue_head(ready_q[pDest->priority], pDest);
         }else{
             int sid = TASK_NR_TO_SID(src);

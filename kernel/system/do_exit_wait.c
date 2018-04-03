@@ -216,7 +216,7 @@ int do_exit(struct proc *who, struct message *m){
     // prologue ( see system/execve.c). The return value
     // in winix is stored in 1
     if(status == EXIT_MAGIC){
-        status = who->regs[0];
+        status = who->ctx.m.regs[0];
     }
 
     KDEBUG(("%s[%d] exit status %d signal %d\n",who->name, who->pid, 

@@ -49,7 +49,7 @@ int exec_proc(struct proc *who,size_t *lines, size_t length, size_t entry, int o
     }
 
     build_initial_stack(who, 0, NULL, initial_env, get_proc(SYSTEM));
-    memcpy(who->rbase + offset, lines , length);
+    memcpy(who->ctx.rbase + offset, lines , length);
     enqueue_schedule(who);
     return OK;
 }
@@ -58,7 +58,7 @@ int exec_proc(struct proc *who,size_t *lines, size_t length, size_t entry, int o
 int build_initial_stack(struct proc* who, int argc, char** argv, char** env, struct proc* srcproc){
     struct initial_frame init_stack;
     struct initial_frame* pstack = &init_stack;
-    ptr_t* sp_btm = get_physical_addr(who->sp,who);
+    ptr_t* sp_btm = get_physical_addr(who->ctx.m.sp,who);
     int env_len = 0;
     char **env_ptr;
     char *v;
@@ -87,13 +87,13 @@ int build_initial_stack(struct proc* who, int argc, char** argv, char** env, str
     // copy the pointers of environment to the user stack
     copyto_user_stack(who, env_ptr_list, env_len);
 
-    *sp_btm = (unsigned int)who->sp;
+    *sp_btm = (unsigned int)who->ctx.m.sp;
     // setup argc and argv before
-    who->ra = who->sp - sizeof(ASM_SYSCALL);
+    who->ctx.m.ra = who->ctx.m.sp - sizeof(ASM_SYSCALL);
 
     pstack->i_base.operation = WINIX_SENDREC;
     pstack->i_base.dest = SYSTEM;
-    pstack->i_base.pm = (struct message*)(who->sp - sizeof(ASM_SYSCALL) - sizeof(struct message));
+    pstack->i_base.pm = (struct message*)(who->ctx.m.sp - sizeof(ASM_SYSCALL) - sizeof(struct message));
     pstack->i_base.m.type = EXIT;
     pstack->i_base.m.m1_i1 = EXIT_MAGIC;
     pstack->i_code = ASM_SYSCALL;
