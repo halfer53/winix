@@ -1,7 +1,7 @@
 # WINIX
 A UNIX-style Operating System for the Waikato RISC Architecture Microprocessor (WRAMP)
 
-NB Due to bugs in the kernel, the feature of redirection and multiple pipes for Bourne Shell have been moved to a separate project [TBash](https:// github.com/halfer53/TBash)
+NB Due to bugs in the kernel, the feature of redirection and multiple pipes for Bourne Shell have been moved to a separate project [TBash](https://github.com/halfer53/TBash)
 
 ## Prerequisite
 
@@ -19,11 +19,21 @@ NB Due to bugs in the kernel, the feature of redirection and multiple pipes for 
 
 ## How to Run
 
-Download the Rexsimulator from [Here](https:// github.com/halfer53/rexsimulator/releases/tag/2.0.1)
+Download the Rexsimulator from [Here](https://github.com/halfer53/rexsimulator/releases/tag/2.0.1)
 
 Run ```Rexsimulator.exe```
 
 Click ```Quick Load```, select ```winix.srec```
+
+## Features
+
+ - Kernel Memory Management: visual memory, page mapping, kmalloc() kfree()
+ - Process Management: Kernel thread, process creation
+ - Interrupt Handler
+ - A Bourne shell 
+ - User memory management: malloc() free()
+ - User coroutine 
+ - Stacktrace dump, Segfault analysis
 
 ## List of Commands
 
@@ -71,7 +81,7 @@ Click ```Quick Load```, select ```winix.srec```
 
 ## Demo
 
-[Demo](https:// github.com/halfer53/Winix2/blob/master/Documentations/demo.md)
+[Demo](https://github.com/halfer53/Winix2/blob/master/Documentations/demo.md)
 
 ## Debug tips
 
@@ -102,4 +112,4 @@ gcc *.c
 ```
 
 ## Credits
-[Paul Monigatti](https:// nz.linkedin.com/in/paulmonigatti)
+[Paul Monigatti](https://nz.linkedin.com/in/paulmonigatti)
