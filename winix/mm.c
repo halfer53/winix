@@ -24,6 +24,7 @@
 */
 #include <kernel/kernel.h>
 #include <winix/mm.h>
+#include <winix/bitmap.h>
 
 PRIVATE unsigned int mem_map[MEM_MAP_LEN];
 PRIVATE int bss_page_end;
@@ -152,12 +153,11 @@ int user_get_free_pages_from(struct proc* who, ptr_t* addr, int size){
     int page_num;
 
     error = get_free_pages_from(addr,size);
-
     if(error)
         return error;
+
     index = PADDR_TO_PAGED(addr);
     page_num = PADDR_TO_NUM_PAGES(size);
-    kprintf("addr %x idx %d\n", addr, index);
     return bitmap_set_nbits(who->ctx.ptable, PTABLE_LEN, index, page_num);
 }
 
@@ -228,7 +228,9 @@ void* dup_vm(struct proc* parent, struct proc* child){
  * @param who 
  */
 void release_proc_mem(struct proc *who){
-    bitmap_xor(mem_map,who->ctx.ptable,MEM_MAP_LEN);
+    int page_len = (int)(who->heap_bottom + 1 - who->ctx.rbase) / PAGE_LEN;
+    int start_page = (int)who->ctx.rbase / PAGE_LEN;
+    bitmap_clear_nbits(mem_map, MEM_MAP_LEN, start_page, page_len );
     bitmap_clear(who->ctx.ptable, PTABLE_LEN);
 }
 
@@ -248,7 +250,7 @@ void kreport_sysmap(){
         flags = i == 0 ? ZERO_BITS : ONE_BITS;
         pages = count_bits(mem_map, MEM_MAP_LEN, flags);
         str = i == 0 ? free_str : used_str;
-        kprintf("%s pages: %03d\t",str, pages, pages);
+        kprintf(" %s pages: %03d\t",str, pages, pages);
     }
     kprintf("\n");
 }

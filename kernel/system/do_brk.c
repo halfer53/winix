@@ -40,6 +40,7 @@
 // This function is just an internal kernel function for extending heaps
 void* sys_sbrk(struct proc *who, int size){
     ptr_t* next_page;
+    int err;
     void* oheap;
     int residual, request_size;
 
@@ -56,12 +57,12 @@ void* sys_sbrk(struct proc *who, int size){
     // extend the heap bottom if needed
     next_page = who->heap_bottom + 1;
     request_size = size - residual; 
-    kreport_bitmap(who->ctx.ptable, 4);
-    if(user_get_free_pages_from(who,next_page, request_size ) == ERR)
-        return NULL;
-    // kinfo("extending heap size %d oheap %x newheap %x\n", request_size, who->heap_break, 
-                                                            // (who->heap_break + size));
-    kreport_bitmap(who->ctx.ptable, 4);    
+    err = user_get_free_pages_from(who,next_page, request_size );
+    if(err)
+        return NULL;        
+    
+    // kinfo("extending heap size %d oheap %x newheap %x btm %x\n", size, who->heap_break, 
+    //                                                         (who->heap_break + size), who->heap_bottom);                                  
     who->heap_break += size;
     who->heap_bottom += align_page(request_size);
     return get_virtual_addr(who->heap_break,who);

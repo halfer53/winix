@@ -52,7 +52,6 @@ int exec_proc(struct proc *who,size_t *lines, size_t length, size_t entry, int o
 
     memcpy(who->ctx.rbase + offset, lines , length);
     first_word = who->ctx.rbase + offset;
-    X_PRINT(*first_word);
 
     enqueue_schedule(who);
     return OK;

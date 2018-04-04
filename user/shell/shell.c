@@ -67,6 +67,11 @@ int main() {
 
     init_shell();
 
+    if(fork() == 0)
+        exit(0);
+    else
+        wait(NULL);
+    // test_malloc(0, NULL);
     c = buf;
     end_buf = c + MAX_LINE -2;
     while(1) {
@@ -254,9 +259,6 @@ int cmd_bash(int argc, char **argv){
         child_pid = wait(NULL);
         // printf("parent shell %d awakened by child shell %d\n",getpid(),child_pid);
     }else{
-        int* err = NULL;
-        *err = 1;
-        
         printf("Child shell %d [parent %d] start:\n",getpid(),getppid());
     }
     return 0;
