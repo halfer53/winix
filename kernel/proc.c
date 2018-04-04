@@ -450,6 +450,7 @@ int alloc_proc_mem(struct proc *who, int text_data_length, int stack_size, int h
     int td_aligned;
     ptr_t *bss_start;
     int bss_size;
+    ptr_t* mem_start;
 
     // make sizes page aligned
     // text_Data_length is the length of text plus data.
@@ -470,9 +471,10 @@ int alloc_proc_mem(struct proc *who, int text_data_length, int stack_size, int h
         bss_size += PAGE_LEN;
 
     proc_len = vm_offset + stack_size + text_data_length + bss_size + heap_size;
-    who->ctx.rbase = user_get_free_pages(who, proc_len, GFP_NORM);
-    if(who->ctx.rbase == NULL)
+    mem_start = user_get_free_pages(who, proc_len, GFP_NORM);
+    if(mem_start == NULL)
         return ENOMEM;
+    who->ctx.rbase = mem_start - vm_offset;
 
     // for information on how process memory are structured, 
     // look at the first line of this file

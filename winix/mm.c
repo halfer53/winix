@@ -228,9 +228,10 @@ void* dup_vm(struct proc* parent, struct proc* child){
  * @param who 
  */
 void release_proc_mem(struct proc *who){
-    int page_len = (int)(who->heap_bottom + 1 - who->ctx.rbase) / PAGE_LEN;
-    int start_page = (int)who->ctx.rbase / PAGE_LEN;
-    bitmap_clear_nbits(mem_map, MEM_MAP_LEN, start_page, page_len );
+    // int page_len = (int)(who->heap_bottom + 1 - who->ctx.rbase) / PAGE_LEN;
+    // int start_page = (int)who->ctx.rbase / PAGE_LEN;
+    // bitmap_clear_nbits(mem_map, MEM_MAP_LEN, start_page, page_len );
+    bitmap_xor(mem_map, who->ctx.ptable, MEM_MAP_LEN);
     bitmap_clear(who->ctx.ptable, PTABLE_LEN);
 }
 

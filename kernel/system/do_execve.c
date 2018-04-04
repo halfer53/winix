@@ -34,7 +34,7 @@ int exec_proc(struct proc *who,size_t *lines, size_t length, size_t entry, int o
     int err;
     unsigned int* first_word;
     set_proc(who, (void (*)())entry, name);
-    if(err = alloc_proc_mem(who, length + 1024, USER_STACK_SIZE , USER_HEAP_SIZE)){
+    if(err = alloc_proc_mem(who, length, USER_STACK_SIZE , USER_HEAP_SIZE)){
         return err;
     }
 

@@ -53,11 +53,11 @@
 
 // stack
 #define STACK_MAGIC             	0x12345678
-#define USER_STACK_SIZE         	1024
-#define KERNEL_STACK_SIZE       	1024
+#define USER_STACK_SIZE         	PAGE_LEN
+#define KERNEL_STACK_SIZE       	PAGE_LEN
 
 // heap
-#define USER_HEAP_SIZE          	2048
+#define USER_HEAP_SIZE          	PAGE_LEN
 
 // Signal PCB Context
 #define SIGNAL_CTX_LEN          	21
