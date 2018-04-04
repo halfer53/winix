@@ -19,7 +19,6 @@
 #include <kernel/clock.h>
 
 PRIVATE struct message m;
-PRIVATE int _expt_stack[EXCEPTION_STACK_SIZE];
 PRIVATE int* _expt_stack_ptr;
 
 // Number of exception sources
@@ -76,7 +75,7 @@ void reset_irq_count(){
 }
 
 int* get_exception_stack_top(){
-    return _expt_stack;
+    return (int*)0;
 }
 
 int* get_exception_stack_bottom(){
@@ -283,9 +282,12 @@ PRIVATE void exception_handler(int estat) {
  *   Timer is configured to generate regular interrupts.
  **/
 void init_exceptions() {
-    _expt_stack_ptr = _expt_stack;
+    /**
+     * Exception use the first page as the stack
+     */
+    _expt_stack_ptr = (int *)0;
     *_expt_stack_ptr = STACK_MAGIC;
-    _expt_stack_ptr += EXCEPTION_STACK_SIZE - 1;
+    _expt_stack_ptr += EXCEPTION_STACK_SIZE;
 
     wramp_set_handler(exception_handler);
     RexTimer->Load = 2400 / get_hz(); // currently 60 Hz

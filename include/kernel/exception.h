@@ -30,7 +30,7 @@ void preempt_currproc();
 #define in_interrupt()  (irq_count())
 #define enable_interrupt()  RexTimer->Ctrl = 3
 #define disable_interrupt() RexTimer->Ctrl = 0
-#define EXCEPTION_STACK_SIZE    300
+#define EXCEPTION_STACK_SIZE    (PAGE_LEN - 1)
 
 
 #endif
