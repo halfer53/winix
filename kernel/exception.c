@@ -135,7 +135,7 @@ PRIVATE void gpf_handler() {
     // is the current process a valid one?
     ASSERT(IS_PROCN_OK(current_proc->proc_nr));
     
-    if(!CHECK_STACK(current_proc))
+    if(*current_proc->ctx.stack_top != STACK_MAGIC)
         kinfo("Stack Overflow\n");
     
 #ifdef _DEBUG

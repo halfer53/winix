@@ -102,6 +102,7 @@ struct k_context{
     reg_t *rbase;
     reg_t *ptable;
     reg_t cctrl;                  	// len 19 words
+    ptr_t* stack_top;             	// Stack_top is the physical address
 };
 
 struct proc_vm{
@@ -146,7 +147,7 @@ typedef struct proc {
     
 
     /* Heap and Stack*/
-    ptr_t* stack_top;             	// Stack_top is the physical address
+    ptr_t* heap_top;                // 
     ptr_t* heap_break;             	// Heap_break is also the physical address of the curr
                                 	// Brk, retrived by syscall brk(2)
     ptr_t* heap_bottom;         	// Bottom of the process image
@@ -219,10 +220,6 @@ extern struct proc *block_q[2];
 #define IS_RUNNABLE(p)                  ((p)->state == STATE_RUNNABLE)
 #define IS_ZOMBIE(p)                    (IS_INUSE(p) && (p)->state & STATE_ZOMBIE)
 #define IS_BLOCKED(p)                   (IS_INUSE(p) && (p)->state > 0)
-
-#define CHECK_STACK(p)                  (*((p)->stack_top) == STACK_MAGIC)
-#define GET_DEF_STACK_SIZE(who)         (IS_USER_PROC(who) ? USER_STACK_SIZE : KERNEL_STACK_SIZE)
-#define GET_HEAP_TOP(who)               ((who)->stack_top + GET_DEF_STACK_SIZE(who))
 
 #define TASK_NR_TO_SID(tnr)             (tnr <= 0 ? -tnr + 1 : tnr)
 #define SID_TO_TASK_NR(sid)             (-sid + 1)

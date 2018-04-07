@@ -335,7 +335,7 @@ reg_t* alloc_kstack(struct proc *who){
     
     addr = stack_top + KERNEL_STACK_SIZE - 1;
     *stack_top = STACK_MAGIC;
-    who->stack_top = stack_top;
+    who->ctx.stack_top = stack_top;
     return get_virtual_addr(addr, who);
 }
 
@@ -474,19 +474,20 @@ int alloc_proc_mem(struct proc *who, int text_data_length, int stack_size, int h
     mem_start = user_get_free_pages(who, proc_len, GFP_NORM);
     if(mem_start == NULL)
         return ENOMEM;
-    who->ctx.rbase = mem_start - vm_offset;
+    who->ctx.rbase = mem_start;
 
     // for information on how process memory are structured, 
     // look at the first line of this file
-    who->stack_top = who->ctx.rbase + vm_offset;
-    who->ctx.m.sp = get_virtual_addr(who->stack_top + stack_size - 1,who);
-    *(who->stack_top) = STACK_MAGIC;
+    who->ctx.stack_top = who->ctx.rbase + vm_offset;
+    who->ctx.m.sp = get_virtual_addr(who->ctx.stack_top + stack_size - 1,who);
+    *(who->ctx.stack_top) = STACK_MAGIC;
 
     // set bss segment to 0
-    bss_start = who->ctx.rbase + vm_offset + stack_size + text_data_length;
+    bss_start = who->ctx.stack_top + stack_size + text_data_length;
     memset(bss_start, 0, bss_size);
 
-    who->heap_break = who->ctx.rbase + vm_offset + stack_size + text_data_length + bss_size;
+    who->heap_top = bss_start + bss_size;
+    who->heap_break = who->heap_top;
     who->heap_bottom = who->heap_break + heap_size - 1;
     
     return OK;

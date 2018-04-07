@@ -68,10 +68,12 @@ bool is_pages_free_from(ptr_t* addr, int size){
     int paged = PADDR_TO_PAGED(addr);
     int page_num = PADDR_TO_NUM_PAGES(size);
 
+    // kprintf("is page free from 0x%x %d with lenth %d\n", addr, paged, page_num);
     for(i = 0; i < page_num; i++){
-        if(is_bit_on(mem_map, MEM_MAP_LEN, paged++)){
+        if(is_bit_on(mem_map, MEM_MAP_LEN, paged)){
             return false;
         }
+        paged++;
     }
     return true;
 }
@@ -132,9 +134,10 @@ int get_free_pages_from(ptr_t* addr, int size){
     int ret;
     int paged, page_num;
 
+    // kprintf("extending from 0x%x with size %d\n", addr, size);
+    // kreport_sysmap();
     if(!is_pages_free_from(addr, size))
         return ENOMEM;
-    
     paged = PADDR_TO_PAGED(addr);
     page_num = PADDR_TO_NUM_PAGES(size);
     return bitmap_set_nbits(mem_map, MEM_MAP_LEN, paged, page_num);
@@ -228,10 +231,10 @@ void* dup_vm(struct proc* parent, struct proc* child){
  * @param who 
  */
 void release_proc_mem(struct proc *who){
-    // int page_len = (int)(who->heap_bottom + 1 - who->ctx.rbase) / PAGE_LEN;
-    // int start_page = (int)who->ctx.rbase / PAGE_LEN;
-    // bitmap_clear_nbits(mem_map, MEM_MAP_LEN, start_page, page_len );
-    bitmap_xor(mem_map, who->ctx.ptable, MEM_MAP_LEN);
+    int page_len = (int)(who->heap_bottom + 1 - who->ctx.rbase) / PAGE_LEN;
+    int start_page = (int)who->ctx.rbase / PAGE_LEN;
+    bitmap_clear_nbits(mem_map, MEM_MAP_LEN, start_page, page_len );
+    // bitmap_xor(mem_map, who->ctx.ptable, MEM_MAP_LEN);
     bitmap_clear(who->ctx.ptable, PTABLE_LEN);
 }
 

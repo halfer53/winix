@@ -83,8 +83,7 @@ int do_brk(struct proc *who, struct message *m){
     m->m1_p1 = get_virtual_addr(who->heap_break, who);
     // kprintf("req brk %x brk %x curr btm %x ", vaddr, m->m1_p1, get_virtual_addr(who->heap_bottom, who) );
     if(addr < who->heap_break){
-        heap_top = GET_HEAP_TOP(who);
-        if(addr < heap_top){
+        if(addr < who->heap_top){
             return EINVAL;
         }
         
