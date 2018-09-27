@@ -3,6 +3,44 @@ A UNIX-style Operating System for the Waikato RISC Architecture Microprocessor (
 
 NB Due to bugs in the kernel, the feature of redirection and multiple pipes for Bourne Shell have been moved to a separate project [TBash](https://github.com/halfer53/TBash)
 
+## Supported System Call
+
+```
+Name        Syscall Number
+
+TIMES           1
+EXIT            2
+FORK            3
+VFORK           4
+EXECVE          5
+BRK             6
+ALARM           7
+SIGACTION       8
+SIGRET          9
+WAITPID         10
+KILL            11
+GETPID          12
+WINFO           13
+GETC            14
+PRINTF          15
+SYSCONF         16
+SIGSUSPEND      17
+SIGPENDING      18
+SIGPROCMASK     19
+SETPGID         20
+GETPGID         21
+```
+
+## Features
+
+ - Kernel Memory Management: visual memory, page mapping, kmalloc() kfree()
+ - Process Management: Kernel thread, process creation
+ - Interrupt Handler
+ - A Bourne shell 
+ - User memory management: malloc() free()
+ - User coroutine 
+ - Stacktrace dump, Segfault analysis
+
 ## Prerequisite
 
 ```sudo apt-get install xutils-dev```
@@ -24,16 +62,6 @@ Download the Rexsimulator from [Here](https://github.com/halfer53/rexsimulator/r
 Run ```Rexsimulator.exe```
 
 Click ```Quick Load```, select ```winix.srec```
-
-## Features
-
- - Kernel Memory Management: visual memory, page mapping, kmalloc() kfree()
- - Process Management: Kernel thread, process creation
- - Interrupt Handler
- - A Bourne shell 
- - User memory management: malloc() free()
- - User coroutine 
- - Stacktrace dump, Segfault analysis
 
 ## List of Commands
 
