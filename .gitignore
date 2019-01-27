@@ -35,6 +35,7 @@ RexSimulatorGui.exe
 !lib/gen/ucontext.s
 !lib/syscall/wramp_syscall.s
 !lib/util/debug.s
+!lib/syscall/debug.s
 !lib/syscall/vfork.s
 !lib/syscall/__sigreturn.s
 !winix/kwramp.s
