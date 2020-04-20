@@ -21,6 +21,9 @@
 #include <winix/type.h>
 #include <winix/timer.h>
 #include <winix/kwramp.h>
+#include <fs/type.h>
+#include <fs/inode.h>
+#include <fs/filp.h>
 
 // Init
 #define INIT                   		1
@@ -47,6 +50,7 @@
 // Max string len for a process name 
 //(including NULL terminator)
 #define PROC_NAME_LEN           	16
+#define PROC_FILEP_NR               16
 
 // min bss segment size
 #define MIN_BSS_SIZE            	200
@@ -175,6 +179,8 @@ typedef struct proc {
 
     /* Metadata */
     char name[PROC_NAME_LEN];    	// Process name
+    uid_t uid;
+    gid_t gid;
     int exit_status;            	// Storage for status when process exits
     int sig_status;                	// Storage for siginal status when process exits
     pid_t pid;                    	// Process id
@@ -196,6 +202,10 @@ typedef struct proc {
 
     /* Alarm */
     struct timer alarm;
+
+    filp_t* fp_filp[PROC_FILEP_NR];
+    inode_t *fp_rootdir;
+    inode_t *fp_workdir;
 } proc_t;
 
 /**

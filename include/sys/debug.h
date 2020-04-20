@@ -19,6 +19,7 @@ void* fcn_to_ptr(void(*)());
 #endif
 
 #ifdef _DEBUG
+//    #define XDEBUG(token) printf("%d in file %s ", __LINE__, __FILE__); printf token
     #define XDEBUG(token) printf token
 #else
     #define XDEBUG(token)

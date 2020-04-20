@@ -1,6 +1,8 @@
 #ifndef _FS_FILP_H_
 #define _FS_FILP_H_ 1
 
+#include <fs/inode.h>
+
 #define OPEN_MAX  8
 
 typedef struct filp {
@@ -17,5 +19,15 @@ typedef struct filp {
 }filp_t;
 
 #define NIL_FILP (filp_t *) 0    /* indicates absence of a filp slot */
+
+struct filp_operations{
+    int (*lseek) (struct filp *, off_t, int);
+    int (*read) (struct filp *, char *, size_t, off_t *);
+    int (*write) (struct filp *, const char *, size_t, off_t *);
+    int (*readdir) (struct filp *, void *);
+    int (*open) (struct inode *, struct filp *);
+    int (*flush) (struct filp *);
+    int (*close) (struct inode *, struct filp *);
+};
 
 #endif

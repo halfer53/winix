@@ -1,6 +1,8 @@
 #ifndef _FS_INODE_H_
 #define _FS_INODE_H_ 1
 
+#include <sys/types.h>
+#include <fs/type.h>
 
 typedef struct inode {
   mode_t i_mode;        /* file type, protection, etc. */ //8 bytes

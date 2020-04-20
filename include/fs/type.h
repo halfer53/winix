@@ -28,15 +28,17 @@ typedef unsigned int sector_t;
 typedef int          dev_t;       /* holds (major|minor) device pair */
 typedef unsigned int bitchunk_t; /* collection of bits in a bitmap */
 
-/* The sighandler_t type is not allowed unless _POSIX_SOURCE is defined. */
-// typedef void _PROTOTYPE( (*sighandler_t), (int) );
-typedef void (*sighandler_t)(int);
-
 typedef unsigned int disk_word_t;
+
+#define MAKEDEV(dmajor, dminor) ((((unsigned int)dmajor << 8) & 0xFF00U) | ((unsigned int)dminor & 0xFFFF00FFU))
+#define DEV_MAJOR(devnum)           (((unsigned int)devnum & 0xFF00U) >> 8)
+#define DEV_MINOR(devnum)           ((unsigned int)devnum & 0xFFFF00FFU)
 
 #define READING 1
 #define WRITING 2
 
+#ifndef PRIVATE
 #define PRIVATE static
+#endif
 
 #endif

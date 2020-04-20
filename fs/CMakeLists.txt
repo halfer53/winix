@@ -6,25 +6,22 @@ set(CMAKE_CXX_STANDARD 11)
 set(SOURCE_FILES
         cache.c
         cache.h
-        close.c
-        const.h
+        open_close.c
         dev.c
         dev.h
-        file.h
         filp.c
-        filp.h
         fs.h
         fs_main.c
         inode.c
-        inode.h
         makefs.c
-        makefs.h
-        open.c
         path.c
         path.h
-        proc.h
-        read.c
+        read_write.c
         super.h
-        util.c string.c string.h read.h open.h close.h)
+        util.c string.c string.h fs_test.c util_cmake.h disk.c bitmap.c)
+
+include_directories(../include)
+add_compile_definitions(FS_CMAKE)
+add_compile_definitions(_DEBUG)
 
 add_executable(fs ${SOURCE_FILES})

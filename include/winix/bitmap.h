@@ -14,6 +14,8 @@
 #ifndef _BITMAP_H_
 #define _BITMAP_H_ 1
 
+#include <stdbool.h>
+
 #define BITMASK_NR    32
 
 struct bit_pattern{

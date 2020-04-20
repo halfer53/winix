@@ -1,6 +1,4 @@
 #include "fs.h"
-#include "proc.h"
-#include "inode.h"
 
 char dot1[2] = ".";    /* used for search_dir to bypass the access */
 char dot2[3] = "..";    /* permissions for . and ..            */
@@ -51,27 +49,25 @@ char *get_name(char *old_name, char string[NAME_MAX]){
 // given a directory and a name component, lookup in the directory
 // and find the corresponding inode
 inode_t *advance(inode_t *dirp, char string[NAME_MAX]){
-    char *str;
     int i,inum  = 0;
-    buf_t *buffer;
-    
+    block_buffer_t *buffer;
+    struct dirent* dir;
 
     // currently only reads the first block
-    if( (buffer = get_block(dirp->i_zone[0])) != NULL){
-        for(str = (char *)&buffer->block[0]; str < &buffer->block[BLOCK_SIZE]; str+= DIRSIZ){
-          str += 8; // skip inode
-          if(strcmp(str,string) == 0){
-              inum = hexstr2int(str-8,8);
-              break;
-          }
+    for(i = 0; i < NR_TZONES; i++){
+        if(dirp->i_zone > 0 && (buffer = get_block_buffer(dirp->i_zone[i], dirp->i_dev)) != NULL){
+            dir = (struct dirent*)buffer->block;
+            for(; dir < (struct dirent* )&buffer->block[BLOCK_SIZE]; dir++ ){
+                if(strcmp(dir->d_name, string) == 0){
+                    inum = dir->d_ino;
+                    put_block_buffer(buffer);
+                    return get_inode(inum, dirp->i_dev);
+                }
+            }
+            put_block_buffer(buffer);
         }
     }
-
-    if(!inum)
-        return NIL_INODE;
-    
-    return get_inode(inum);
-    
+    return NIL_INODE;
 }
 
  
@@ -95,27 +91,69 @@ inode_t *last_dir(char *path, char string[DIRSIZ]){
             return NIL_INODE; // bad parsing
         }
 
-        if(component_name == '\0'){
-            if(rip->i_mode & S_IFDIR)
+        if(*component_name == '\0') {
+            if (rip->i_mode & S_IFDIR){
                 return rip;
-            else{
+            }else{
                 return NIL_INODE; // bad parsing
             }
         }
         
         new_rip = advance(rip,string);
-        if(new_rip == NIL_INODE)
+        if(new_rip == NIL_INODE) {
             return NIL_INODE;
-
+        }
         rip = new_rip;
         path = component_name;
     }
 }
 
-inode_t* eat_path(char *path){
-    inode_t *inode;
-    char string[DIRSIZ];
+inode_t* eat_path(char *path, inode_t** lastd, char string[DIRSIZ]){
+    inode_t *inode, *lastdir;
+    int inum, lnum;
+    struct dirent* curr, *end;
+    int i, j;
+    block_t bnr;
+    struct block_buffer* buf;
+    struct superblock* sb;
 
-    inode = last_dir(path,string);
-    return inode;
+    lastdir = last_dir(path, string);
+    if(lastdir == NULL)
+        return NULL;
+    *lastd = lastdir;
+
+    for(i = 0; i < NR_TZONES; i++){
+        bnr = lastdir->i_zone[i];
+        if(bnr == 0){
+            continue;
+        }
+        buf = get_block_buffer(bnr, lastdir->i_dev);
+        sb = get_sb(lastdir->i_dev);
+        end = (struct dirent*)&buf->block[BLOCK_SIZE];
+        curr = (struct dirent*)buf->block;
+        while (curr < end){
+            if(strcmp(curr->d_name, string) == 0){
+                inode = get_inode(curr->d_ino, lastdir->i_dev);
+                inum = inode == NULL ? 0 : inode->i_num;
+                XDEBUG(("eath path %s return %d\n", path, inum));
+                put_block_buffer(buf);
+                return inode;
+            }
+            curr++;
+        }
+        put_block_buffer(buf);
+    }
+
+
+    return NULL;
+}
+
+bool is_fd_opened_and_valid(struct proc* who, int fd){
+    struct filp* file = who->fp_filp[fd];
+    if(fd < 0 || fd >= OPEN_MAX){
+        return EINVAL;
+    }
+    if(file == NULL){
+        return EINVAL;
+    }
 }

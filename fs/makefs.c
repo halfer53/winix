@@ -1,100 +1,159 @@
+#include "fs.h"
 #include <stdio.h>
 #include <string.h>
-#include "makefs.h"
 
-char disk[totalsize+1];
+//struct superblock superblock = {
+//        0xabcdefab, // magic
+//        "WINIX_ROOTFS", // name
+//        65, // blocks in use
+//        1, // inode in use
+//        16319, // free blocks
+//        495, // free inodes
+//        1024, // block size
+//        128, // inode size
+//        1, // root inode number
+//        1, // block bitmap block index
+//        2, // inode bitmap block index
+//        3, // inode table block index
+//        2, // first free inode number
+//        67, // first free block number
+//        8, // inode per block
+//        NULL, // root inode
+//};
 
-int makefs()
+unsigned int setBits(unsigned int n)
 {
-    char *super_block = "00000077696E697857494E49585F524F4F544653000000000000000000000000000000000000010000000000000000F0000000000000010000000000000001EF0000000000000FEF00000000000001000000000000000080000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
-    char *super_block2 = "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
-    char *block_bitmap = "FFFFFFFFFFFFFFFF0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
-    char *block_bitmap2 = "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
-    char *inode_bitmap = "C0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
-    char *inode_bitmap2 = "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
-    int block_size = 1024;
-    
-    char *pdisk = disk;
-    int sb = 1024;
-    int blockmap = 1024;
-    int inodemap = 1024;
-    int inode_tablesize = 496*128; // at 64th block
-    int first_free_block = (sb + blockmap + inodemap + inode_tablesize) / 1024 +1;
-    long remaining = totalsize - sb - blockmap - inodemap - inode_tablesize;
-    int i=0;
+    unsigned int ret = 0;
+    bitmap_set_nbits(&ret, 1,0,n);
+    return ret;
+}
 
-    strcat(pdisk,super_block);
-    strcat(pdisk,super_block2);
-    strcat(pdisk,block_bitmap);
-    strcat(pdisk,block_bitmap2);
-    strcat(pdisk,inode_bitmap);
-    strcat(pdisk,inode_bitmap2);
-    while(*pdisk++);
-    pdisk--;
+int makefs( disk_word_t* disk_raw, size_t disk_size_words)
+{
+    disk_word_t *pdisk = disk_raw;
+    struct dirent* pdir;
+    struct dirent d1, d2;
+    const time_t now = 1587268254;
+    const int root_inode_num = 1;
+    inode_t root_node;
+    disk_word_t blocks_nr = disk_size_words / 1024;
+    disk_word_t disk_size_in_bytes = disk_size_words * 4;
+    int total_blocks = blocks_nr;
+    block_t sb_block_nr = 0;
+    block_t blockmap_block_nr = 1;
+    block_t inodemap_block_nr = 2;
+    block_t inode_table_block_nr = 3;
+    block_t inode_tablesize = (int)(blocks_nr * 0.05) * BLOCK_SIZE;
+    block_t root_node_block_nr = inode_table_block_nr + (inode_tablesize / BLOCK_SIZE);
+    block_t first_free_block = root_node_block_nr + 1;
+    block_t block_in_use = root_node_block_nr + 1;
+    block_t remaining_blocks = blocks_nr - block_in_use;
+    disk_word_t remaining_words = remaining_blocks * BLOCK_SIZE;
+    int inode_per_block = BLOCK_SIZE / INODE_STRUCT_SIZE;
+    int free_inodes = inode_tablesize / INODE_STRUCT_SIZE - 1;
+    unsigned int bitval = 0;
 
-    // printf("%d %d %d %d\n",strlen(super_block),strlen(block_bitmap), strlen(block_bitmap2),strlen(inode_bitmap) );
-    // printf("%s%s%s%s",super_block,block_bitmap,block_bitmap2,inode_bitmap);
-    for(;i<inode_tablesize;i++){
-        if(i==128){ // the first one is left as empty deliberately
-            sprintf(pdisk,"%08x",0x41c0); // drwx------
-            pdisk += 8;
-            for( int j=0; j< 3; j++){ // nlink gid uid set to 0
-                sprintf(pdisk,"%08x", 0);
-                pdisk += 8;
-            }
-            sprintf(pdisk, "%08x", 64); // i_size
-            pdisk += 8;
-            for( int j=0; j< 3; j++){ // atime mtime ctime set to 0
-                sprintf(pdisk,"%08x", 0);
-                pdisk += 8;
-            }
-            // printf("first free inode %d\n",first_free_block+1);
-            sprintf(pdisk, "%08x",first_free_block);
-            pdisk+=8;
-            for( int j=0; j< 7; j++){ // remaining zones
-                sprintf(pdisk,"%08x", 0);
-                pdisk += 8;
-            }
-            
-            i+= 127;
-            continue;
+    struct superblock superblock = {
+            0xabcdefab, // magic
+        "WINIX_ROOTFS", // name
+        block_in_use, // blocks in use
+        1, // inode in use
+            remaining_blocks, // free blocks
+        free_inodes, // free inodes
+        BLOCK_SIZE, // block size
+        INODE_STRUCT_SIZE, // inode size
+            root_inode_num, // root inode number
+
+        sb_block_nr,
+        BLOCK_SIZE,
+            blockmap_block_nr, // block bitmap block index
+            BLOCK_SIZE,
+            inodemap_block_nr, // inode bitmap block index
+            BLOCK_SIZE,
+        inode_table_block_nr, // inode table block index
+            inode_tablesize,
+            2, // first free inode number
+        first_free_block, // first free block number
+        inode_per_block, // inode per block
+        NULL, // root inode
+    };
+
+    if(blocks_nr < 8){
+        XDEBUG(("block nr %d\n", blocks_nr));
+        return -1;
+    }
+
+    if(block_in_use >= 32){
+        XDEBUG(("block in use %d\n", block_in_use));
+        return -1;
+    }
+
+
+    memset(&root_node, 0, sizeof(inode_t));
+    root_node.i_mode = 0x41c0; // drwx------
+    root_node.i_nlinks = 1;
+    root_node.i_mtime = now;
+    root_node.i_atime = now;
+    root_node.i_ctime = now;
+    root_node.i_mode = S_IFDIR | 0x755;
+    root_node.i_zone[0] = root_node_block_nr;
+    root_node.i_num = root_inode_num; //root node
+
+    root_node.i_ndblock = inode_table_block_nr;
+
+    memcpy(pdisk, &superblock, sizeof(superblock));
+    pdisk += superblock.s_superblock_size;
+
+    bitval = setBits(block_in_use);
+    XDEBUG(("block in use %d block map  %08x\n",block_in_use, bitval));
+    memcpy(pdisk, &bitval, sizeof(unsigned int));
+    pdisk += superblock.s_blockmap_size;
+
+    //inode map, first bit is set for root inode
+    bitval = 0;
+    bitmap_set_nbits(&bitval, 1, 0, 2);
+    XDEBUG(("inode map  %08x\n", bitval));
+    memcpy(pdisk, &bitval , sizeof(unsigned int));
+    pdisk += superblock.s_inodemap_size;
+    //inode table, first one is used by root node
+    memcpy(pdisk + INODE_STRUCT_SIZE, &root_node, sizeof(inode_t));
+    pdisk += superblock.s_inode_table_size;
+    XDEBUG(("curr block idx %d, ptr %08x\n", (pdisk - disk_raw) / BLOCK_SIZE, pdisk));
+
+    disk_word_t *pbak = pdisk;
+    memset(&d1, 0, sizeof(struct dirent));
+    memset(&d2, 0, sizeof(struct dirent));
+
+    d1.d_ino = 1;
+    memcpy(&d1.d_name, ".", 2);
+    d2.d_ino = 1;
+    memcpy(&d2.d_name, "..", 3);
+
+    pdir = (struct dirent*)pdisk;
+    memcpy(pdir, &d1, sizeof(struct dirent));
+    pdir++;
+    memcpy(pdir, &d2, sizeof(struct dirent));
+
+    struct dirent* bak = (struct dirent*)pbak;
+    struct dirent* dir = disk_raw + (6 * BLOCK_SIZE);
+    for(; dir < (struct dirent* )(pbak + BLOCK_SIZE); dir++ ){
+        if(dir->d_ino == 0){
+            break;
         }
-        *pdisk++ = 0;
+        printf("Inode %d %s\n", dir->d_ino, dir->d_name);
     }
-    // block for inode 1, which is the root directory
-    sprintf(pdisk,"%08x",1);
-    pdisk += 8;
-    *pdisk++ = '.';
-    *pdisk++ = '\0';
-    for( int j=0; j<22; j++){
-        *pdisk++ = 0;
-    }
-    sprintf(pdisk,"%08x",1);
-    pdisk += 8;
-    *pdisk++ = '.';
-    *pdisk++ = '.';
-    *pdisk++ = '\0';
-    for( int j=0; j<21; j++){
-        *pdisk++ = 0;
-    }
-    i+=64;
 
-    for(;i<inode_tablesize + remaining;i++){
-        *pdisk++ = 0;
-    }
-    *pdisk = '\0';
-    // printf("%lu, %d\n",pdisk - disk,totalsize);
-    int curr = sb;
+    disk_word_t curr = 0;
     printf("\nsuper block 0 - 0x%08x\n", curr);
-    printf("block map 0x%08x - 0x%08x\n",curr, curr+blockmap );
-    curr += blockmap;
-    printf("inode map 0%08x - 0x%08x\n",curr, curr+inodemap );
-    curr += inodemap;
-    printf("inode table 0x%08x - 0x%08x\n",curr, curr+inode_tablesize );
-    curr += inode_tablesize;
-    printf("data block 0x%08x - 0x%lx\n Number of free blocks %ld\n",curr, curr+remaining, remaining/1024 );
-    curr += remaining;
+    curr += superblock.s_superblock_size;
+    printf("block map 0x%08x - 0x%08x\n",curr, curr+ superblock.s_blockmap_size );
+    curr += superblock.s_blockmap_size;
+    printf("inode map 0%08x - 0x%08x\n",curr, curr+superblock.s_inodemap_size );
+    curr += superblock.s_inodemap_size;
+    printf("inode table 0x%08x - 0x%08x\n",curr, curr+superblock.s_inode_table_size );
+    curr += superblock.s_inode_table_size;
+    printf("data block 0x%08x - 0x%x\n Number of free blocks %d\n",curr, disk_raw + disk_size_words - curr, remaining_blocks );
     
     return 0;
-    // return disk;
+    // return DISK_RAW;
 }

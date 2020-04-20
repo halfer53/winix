@@ -2,13 +2,13 @@
 
 static filp_t fd_table[NR_FILPS];
 
-int get_fd(struct proc *curr,int start, int *k, filp_t **fpt){
+int get_fd(struct proc *curr, int start, int *open_slot, filp_t **fpt){
     int i = -1;
     filp_t *f;
 
     for( i=start; i< OPEN_MAX; i++){
-        if(current_proc->fp_filp[i] == NIL_FILP){
-            *k = i;
+        if(curr->fp_filp[i] == NIL_FILP){
+            *open_slot = i;
             break;
         }
     }

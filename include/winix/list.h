@@ -1,8 +1,13 @@
 #ifndef _LINUX_LIST_H
 #define _LINUX_LIST_H
 
-#include <stddef.h>
+#ifndef NULL
+#define	NULL		((void *)0)
+#endif
 
+#ifndef WRITE_ONCE
+#define WRITE_ONCE(left, right) (left = right)
+#endif
 /*
  * Simple doubly linked list implementation.
  *
@@ -21,12 +26,12 @@
 #define LIST_HEAD(name) \
 	struct list_head name = LIST_HEAD_INIT(name)
 
+
 void INIT_LIST_HEAD(struct list_head *list);
-#define   INIT_LIST_HEAD(list)\
-do{\
-	WRITE_ONCE((list)->next, list);\
+#define INIT_LIST_HEAD(list)    do {\
+	(list)->next = list;\
 	(list)->prev = list;\
-}while(0)
+} while(0)
 
 
 /*
@@ -36,8 +41,7 @@ do{\
  * the prev/next entries already!
  */
 void __list_add(struct list_head *new, struct list_head *prev, struct list_head *next);
-#define   __list_add(new, prevl, nextl)\
-do{\
+#define   __list_add(new, prevl, nextl) do{\
 \
 	(nextl)->prev = new;\
 	(new)->next = nextl;\
@@ -596,187 +600,187 @@ do{\
 #define list_safe_reset_next(struct, pos, n, member)				\
 	n = list_next_entry(struct, pos, member)
 
-/*
- * Double linked lists with a single pointer list head.
- * Mostly useful for hash tables where the two pointer list head is
- * too wasteful.
- * You lose the ability to access the tail in O(1).
- */
+// /*
+//  * Double linked lists with a single pointer list head.
+//  * Mostly useful for hash tables where the two pointer list head is
+//  * too wasteful.
+//  * You lose the ability to access the tail in O(1).
+//  */
 
-#define HLIST_HEAD_INIT { .first = NULL }
-#define HLIST_HEAD(name) struct hlist_head name = {  .first = NULL }
-#define INIT_HLIST_HEAD(ptr) ((ptr)->first = NULL)
-void INIT_HLIST_NODE(struct hlist_node *h);
-#define   INIT_HLIST_NODE(h)\
-do{\
-	(h)->next = NULL;\
-	(h)->pprevl = NULL;\
-}while(0)
+// #define HLIST_HEAD_INIT { .first = NULL }
+// #define HLIST_HEAD(name) struct hlist_head name = {  .first = NULL }
+// #define INIT_HLIST_HEAD(ptr) ((ptr)->first = NULL)
+// void INIT_HLIST_NODE(struct hlist_node *h);
+// #define   INIT_HLIST_NODE(h)\
+// do{\
+// 	(h)->next = NULL;\
+// 	(h)->pprevl = NULL;\
+// }while(0)
 
-int hlist_unhashed(const struct hlist_node *h);
-#define   hlist_unhashed( h)	!(h)->pprevl;\
+// int hlist_unhashed(const struct hlist_node *h);
+// #define   hlist_unhashed( h)	!(h)->pprevl;\
 
-int hlist_empty(const struct hlist_head *h);
-#define   hlist_empty( h)\
-do{\
-	return !READ_ONCE((h)->first);\
-}while(0)
+// int hlist_empty(const struct hlist_head *h);
+// #define   hlist_empty( h)\
+// do{\
+// 	return !READ_ONCE((h)->first);\
+// }while(0)
 
-void __hlist_del(struct hlist_node *n);
-#define   __hlist_del(n)\
-do{\
-	nextl = (n)->next;\
-	*pprevl = (n)->pprevl;\
-\
-	WRITE_ONCE(*pprevl, nextl);\
-	if (nextl)\
-		(nextl)->pprevl = pprevl;\
-}while(0)
+// void __hlist_del(struct hlist_node *n);
+// #define   __hlist_del(n)\
+// do{\
+// 	nextl = (n)->next;\
+// 	*pprevl = (n)->pprevl;\
+// \
+// 	WRITE_ONCE(*pprevl, nextl);\
+// 	if (nextl)\
+// 		(nextl)->pprevl = pprevl;\
+// }while(0)
 
-void hlist_del(struct hlist_node *n);
-#define   hlist_del(n)\
-do{\
-	__hlist_del(n);\
-	(n)->next = LIST_POISON1;\
-	(n)->pprevl = LIST_POISON2;\
-}while(0)
+// void hlist_del(struct hlist_node *n);
+// #define   hlist_del(n)\
+// do{\
+// 	__hlist_del(n);\
+// 	(n)->next = LIST_POISON1;\
+// 	(n)->pprevl = LIST_POISON2;\
+// }while(0)
 
-void hlist_del_init(struct hlist_node *n);
-#define   hlist_del_init(n)\
-do{\
-	if (!hlist_unhashed(n)) {\
-		__hlist_del(n);\
-		INIT_HLIST_NODE(n);\
-	}\
-}while(0)
+// void hlist_del_init(struct hlist_node *n);
+// #define   hlist_del_init(n)\
+// do{\
+// 	if (!hlist_unhashed(n)) {\
+// 		__hlist_del(n);\
+// 		INIT_HLIST_NODE(n);\
+// 	}\
+// }while(0)
 
-void hlist_add_head(struct hlist_node *n, struct hlist_head *h);
-#define   hlist_add_head(n, h)\
-do{\
-	first = (h)->first;\
-	(n)->next = first;\
-	if (first)\
-		(first)->pprevl = &(n)->next;\
-	WRITE_ONCE((h)->first, n);\
-	(n)->pprevl = &(h)->first;\
-}while(0)
+// void hlist_add_head(struct hlist_node *n, struct hlist_head *h);
+// #define   hlist_add_head(n, h)\
+// do{\
+// 	first = (h)->first;\
+// 	(n)->next = first;\
+// 	if (first)\
+// 		(first)->pprevl = &(n)->next;\
+// 	WRITE_ONCE((h)->first, n);\
+// 	(n)->pprevl = &(h)->first;\
+// }while(0)
 
-/* next must be != NULL */
-void hlist_add_before(struct hlist_node *n, struct hlist_node *next);
-#define   hlist_add_before(n, nextl)\
-do{\
-	(n)->pprevl = (nextl)->pprevl;\
-	(n)->next = nextl;\
-	(nextl)->pprevl = &(n)->next;\
-	WRITE_ONCE(*((n)->pprevl), n);\
-}while(0)
+// /* next must be != NULL */
+// void hlist_add_before(struct hlist_node *n, struct hlist_node *next);
+// #define   hlist_add_before(n, nextl)\
+// do{\
+// 	(n)->pprevl = (nextl)->pprevl;\
+// 	(n)->next = nextl;\
+// 	(nextl)->pprevl = &(n)->next;\
+// 	WRITE_ONCE(*((n)->pprevl), n);\
+// }while(0)
 
-void hlist_add_behind(struct hlist_node *n, struct hlist_node *prev);
-#define   hlist_add_behind(n, prevl)\
-do{\
-	(n)->next = (prevl)->next;\
-	WRITE_ONCE((prevl)->next, n);\
-	(n)->pprevl = &(prevl)->next;\
-\
-	if ((n)->next)\
-		(n)->(next)->pprevl  = &(n)->next;\
-}while(0)
+// void hlist_add_behind(struct hlist_node *n, struct hlist_node *prev);
+// #define   hlist_add_behind(n, prevl)\
+// do{\
+// 	(n)->next = (prevl)->next;\
+// 	WRITE_ONCE((prevl)->next, n);\
+// 	(n)->pprevl = &(prevl)->next;\
+// \
+// 	if ((n)->next)\
+// 		(n)->(next)->pprevl  = &(n)->next;\
+// }while(0)
 
-/* after that we'll appear to be on some hlist and hlist_del will work */
-void hlist_add_fake(struct hlist_node *n);
-#define   hlist_add_fake(n)\
-do{\
-	(n)->pprevl = &(n)->next;\
-}while(0)
+// /* after that we'll appear to be on some hlist and hlist_del will work */
+// void hlist_add_fake(struct hlist_node *n);
+// #define   hlist_add_fake(n)\
+// do{\
+// 	(n)->pprevl = &(n)->next;\
+// }while(0)
 
-bool hlist_fake(struct hlist_node *h);
-#define   hlist_fake(h)\
-do{\
-	return (h)->pprevl == &(h)->next;\
-}while(0)
+// bool hlist_fake(struct hlist_node *h);
+// #define   hlist_fake(h)\
+// do{\
+// 	return (h)->pprevl == &(h)->next;\
+// }while(0)
 
-/*
- * Check whether the node is the only node of the head without
- * accessing head:
- */
-bool hlist_is_singular_node(struct hlist_node *n, struct hlist_head *h);
-#define   hlist_is_singular_node(n, h)\
-do{\
-	return !(n)->next && (n)->pprevl == &(h)->first;\
-}while(0)
+// /*
+//  * Check whether the node is the only node of the head without
+//  * accessing head:
+//  */
+// bool hlist_is_singular_node(struct hlist_node *n, struct hlist_head *h);
+// #define   hlist_is_singular_node(n, h)\
+// do{\
+// 	return !(n)->next && (n)->pprevl == &(h)->first;\
+// }while(0)
 
-/*
- * Move a list from one list head to another. Fixup the pprev
- * reference of the first entry if it exists.
- */
-void hlist_move_list(struct hlist_head *old, struct hlist_head *new);
-#define   hlist_move_list(old, new)\
-do{\
-	(new)->first = (old)->first;\
-	if ((new)->first)\
-		(new)->(first)->pprevl = &(new)->first;\
-	(old)->first = NULL;\
-}while(0)
+// /*
+//  * Move a list from one list head to another. Fixup the pprev
+//  * reference of the first entry if it exists.
+//  */
+// void hlist_move_list(struct hlist_head *old, struct hlist_head *new);
+// #define   hlist_move_list(old, new)\
+// do{\
+// 	(new)->first = (old)->first;\
+// 	if ((new)->first)\
+// 		(new)->(first)->pprevl = &(new)->first;\
+// 	(old)->first = NULL;\
+// }while(0)
 
-#define hlist_entry(struct, ptr, type, member) \
-		container_of(ptr,type,member)
+// #define hlist_entry(struct, ptr, type, member) \
+// 		container_of(ptr,type,member)
 
-#define hlist_for_each(pos, head) \
-	for (pos = (head)->first; pos ; pos = pos->next)
+// #define hlist_for_each(pos, head) \
+// 	for (pos = (head)->first; pos ; pos = pos->next)
 
-#define hlist_for_each_safe(pos, n, head) \
-	for (pos = (head)->first; pos && ({ n = pos->next; 1; }); \
-	     pos = n)
+// #define hlist_for_each_safe(pos, n, head) \
+// 	for (pos = (head)->first; pos && ({ n = pos->next; 1; }); \
+// 	     pos = n)
 
-#define hlist_entry_safe(ptr, type, member) \
-	({ typeof(ptr) ____ptr = (ptr); \
-	   ____ptr ? hlist_entry(____ptr, type, member) : NULL; \
-	})
+// #define hlist_entry_safe(ptr, type, member) \
+// 	({ typeof(ptr) ____ptr = (ptr); \
+// 	   ____ptr ? hlist_entry(____ptr, type, member) : NULL; \
+// 	})
 
-/**
- * hlist_for_each_entry	- iterate over list of given type
- * @struct:	typeof(*(pos))
- * @pos:	the type * to use as a loop cursor.
- * @head:	the head for your list.
- * @member:	the name of the hlist_node within the struct.
- */
-#define hlist_for_each_entry(struct, pos, head, member)				\
-	for (pos = hlist_entry_safe((head)->first, struct, member);\
-	     pos;							\
-	     pos = hlist_entry_safe((pos)->member.next, struct, member))
+// /**
+//  * hlist_for_each_entry	- iterate over list of given type
+//  * @struct:	typeof(*(pos))
+//  * @pos:	the type * to use as a loop cursor.
+//  * @head:	the head for your list.
+//  * @member:	the name of the hlist_node within the struct.
+//  */
+// #define hlist_for_each_entry(struct, pos, head, member)				\
+// 	for (pos = hlist_entry_safe((head)->first, struct, member);\
+// 	     pos;							\
+// 	     pos = hlist_entry_safe((pos)->member.next, struct, member))
 
-/**
- * hlist_for_each_entry_continue - iterate over a hlist continuing after current point
- * @struct:	typeof(*(pos))
- * @pos:	the type * to use as a loop cursor.
- * @member:	the name of the hlist_node within the struct.
- */
-#define hlist_for_each_entry_continue(struct, pos, member)			\
-	for (pos = hlist_entry_safe((pos)->member.next, struct, member);\
-	     pos;							\
-	     pos = hlist_entry_safe((pos)->member.next, struct, member))
+// /**
+//  * hlist_for_each_entry_continue - iterate over a hlist continuing after current point
+//  * @struct:	typeof(*(pos))
+//  * @pos:	the type * to use as a loop cursor.
+//  * @member:	the name of the hlist_node within the struct.
+//  */
+// #define hlist_for_each_entry_continue(struct, pos, member)			\
+// 	for (pos = hlist_entry_safe((pos)->member.next, struct, member);\
+// 	     pos;							\
+// 	     pos = hlist_entry_safe((pos)->member.next, struct, member))
 
-/**
- * hlist_for_each_entry_from - iterate over a hlist continuing from current point
- * @struct:	typeof(*(pos))
- * @pos:	the type * to use as a loop cursor.
- * @member:	the name of the hlist_node within the struct.
- */
-#define hlist_for_each_entry_from(struct,pos, member)				\
-	for (; pos;							\
-	     pos = hlist_entry_safe((pos)->member.next, struct, member))
+// /**
+//  * hlist_for_each_entry_from - iterate over a hlist continuing from current point
+//  * @struct:	typeof(*(pos))
+//  * @pos:	the type * to use as a loop cursor.
+//  * @member:	the name of the hlist_node within the struct.
+//  */
+// #define hlist_for_each_entry_from(struct,pos, member)				\
+// 	for (; pos;							\
+// 	     pos = hlist_entry_safe((pos)->member.next, struct, member))
 
-/**
- * hlist_for_each_entry_safe - iterate over list of given type safe against removal of list entry
- * @struct:	typeof(*(pos))
- * @pos:	the type * to use as a loop cursor.
- * @n:		another &struct hlist_node to use as temporary storage
- * @head:	the head for your list.
- * @member:	the name of the hlist_node within the struct.
- */
-#define hlist_for_each_entry_safe(struct, pos, n, head, member) 		\
-	for (pos = hlist_entry_safe((head)->first, struct, member);\
-	     pos && ({ n = pos->member.next; 1; });			\
-	     pos = hlist_entry_safe(n, struct, member))
+// /**
+//  * hlist_for_each_entry_safe - iterate over list of given type safe against removal of list entry
+//  * @struct:	typeof(*(pos))
+//  * @pos:	the type * to use as a loop cursor.
+//  * @n:		another &struct hlist_node to use as temporary storage
+//  * @head:	the head for your list.
+//  * @member:	the name of the hlist_node within the struct.
+//  */
+// #define hlist_for_each_entry_safe(struct, pos, n, head, member) 		\
+// 	for (pos = hlist_entry_safe((head)->first, struct, member);\
+// 	     pos && ({ n = pos->member.next; 1; });			\
+// 	     pos = hlist_entry_safe(n, struct, member))
 
-#endif
+ #endif

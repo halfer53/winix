@@ -172,12 +172,7 @@ int bitmap_set_nbits(unsigned int *map, int map_len,int start, int len){
     return OK;
 }
 
-/**
- * similar to bitmap_set_nbits, but just set those bits to 0
- * @param  map     
- * @param  map_len 
- * @param  start   
- * @param  len     
+/**kprintf
  * @return         
  */
 int bitmap_clear_nbits(unsigned int *map, int map_len,int start, int len){

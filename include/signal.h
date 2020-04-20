@@ -7,12 +7,12 @@
 /* Here are types that are closely associated with signal handling. */
 typedef int sig_atomic_t;
 
-#ifdef _POSIX_SOURCE
+
 #ifndef _SIGSET_T
 #define _SIGSET_T 1
 typedef unsigned int sigset_t;
 #endif
-#endif
+
 
 #define _NSIG             21    /* number of signals used */
 
@@ -50,7 +50,7 @@ typedef void (*sighandler_t)(int);
 #define SIG_DFL       ((sighandler_t)  0)    /* default signal handling */
 #define SIG_IGN       ((sighandler_t)  1)    /* ignore signal */
 
-#ifdef _POSIX_SOURCE
+
 struct sigaction {
   sighandler_t sa_handler;	/* SIG_DFL, SIG_IGN, or pointer to function */
   sigset_t sa_mask;		      /* signals to be blocked during handler */
@@ -70,7 +70,7 @@ struct sigaction {
 #define SIG_BLOCK          0	/* for blocking signals */
 #define SIG_UNBLOCK        1	/* for unblocking signals */
 #define SIG_SETMASK        2	/* for setting the signal mask */
-#endif	/* _POSIX_SOURCE */
+
 
 typedef struct stack{
   void  *ss_sp;     /* address of stack */
