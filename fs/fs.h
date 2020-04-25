@@ -13,7 +13,7 @@
 #include "cache.h"
 #include <fs/dev.h>
 #include "path.h"
-#include "super.h"
+#include <fs/super.h>
 #include <sys/debug.h>
 #include <string.h>
 #include <winix/bitmap.h>
@@ -34,6 +34,7 @@ void init_fs(disk_word_t* disk_raw, disk_word_t disk_size_words);
 
 int get_fd(struct proc *curr, int start, int *open_slot, filp_t **fpt);
 int add_inode_to_directory(inode_t* dir, inode_t* ino, char* string);
+int register_device(struct device* dev, char* name, dev_t id, struct device_operations* dops, struct filp_operations* fops);
 
 filp_t *get_filp(int fd);
 filp_t *find_filp(inode_t *inode);

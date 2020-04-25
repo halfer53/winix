@@ -108,9 +108,9 @@ int block_io(block_buffer_t* tbuf, struct device* dev, int flag){
     off_t off = tbuf->b_blocknr * BLOCK_SIZE;
 
     if(flag == READING){
-        return dev->dev_read(tbuf->block, off, BLOCK_SIZE);
+        return dev->dops->dev_read(tbuf->block, off, BLOCK_SIZE);
     }else if(flag == WRITING){
-        return dev->dev_write(tbuf->block, off, BLOCK_SIZE);
+        return dev->dops->dev_write(tbuf->block, off, BLOCK_SIZE);
     }
     return 0;
 }

@@ -1,9 +1,9 @@
 #ifndef _FS_INODE_H_
 #define _FS_INODE_H_ 1
 
-
 #include <sys/types.h>
 #include <fs/type.h>
+#include <fs/const.h>
 #include <winix/type.h>
 #include <winix/comm.h>
 
@@ -67,3 +67,4 @@ extern inode_t inode_table[NR_INODES];
 #define INODE_FLAG_MEM_DIR    16    // temp dir like /dev
 
 #endif
+

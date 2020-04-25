@@ -8,7 +8,6 @@ set(SOURCE_FILES
         cache.h
         open_close.c
         dev.c
-        dev.h
         filp.c
         fs.h
         fs_main.c
@@ -17,8 +16,7 @@ set(SOURCE_FILES
         path.c
         path.h
         read_write.c
-        super.h
-        util.c string.c string.h fs_test.c util_cmake.h disk.c bitmap.c)
+        util.c string.c string.h fs_test.c util_cmake.h disk.c bitmap.c pipe.c tty.c)
 
 include_directories(../include)
 add_compile_definitions(FS_CMAKE)
