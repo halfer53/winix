@@ -36,7 +36,7 @@ int sys_open(struct proc *who, char *path, int flags, mode_t mode){
     char string[DIRSIZ];
     int inum;
 
-    inode = eat_path(path, &lastdir, string);
+    inode = eat_path(who, path, &lastdir, string);
     if(inode == NIL_INODE){
         if(flags & O_CREAT){
             inode = new_inode_by_dir(who, lastdir, string);

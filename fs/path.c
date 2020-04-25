@@ -72,42 +72,45 @@ ino_t advance(inode_t *dirp, char string[NAME_MAX]){
 
  
 
-inode_t *last_dir(char *path, char string[DIRSIZ]){
+inode_t *__eath_path(struct inode* curr_ino, struct inode** last_dir, char *path, char string[DIRSIZ]){
     inode_t *rip, *new_rip;
     ino_t inum;
     char *component_name;
     struct device* dev;
 
-    rip = *path == '/' ? current_proc->fp_rootdir : current_proc->fp_workdir;
+    rip = curr_ino;
 
     /* If dir has been removed or path is empty, return ENOENT. */
     if (rip->i_nlinks == 0 || *path == '\0') {
         // err_code = ENOENT;
-        return(NIL_INODE);
+        return NULL;
     }
-
-    rip->i_count++;
     dev = rip->i_dev;
 
     while(1){
         if((component_name = get_name(path,string)) == (char *)0){
-            return NIL_INODE; // bad parsing
+            return NULL; // bad parsing
         }
 
         if(*component_name == '\0') {
             if (rip->i_mode & S_IFDIR){
-                return rip;
+                *last_dir = rip;
+                inum = advance(rip, string);
+                if(inum == ERR){
+                    return NULL;
+                }
+                return get_inode(inum, rip->i_dev);
             }else{
-                return NIL_INODE; // bad parsing
+                return NULL; // bad parsing
             }
         }
 
         inum = advance(rip,string);
-        put_inode(rip, false);
         if(inum == ERR) {
-            return NIL_INODE;
+            return NULL;
         }
 
+        put_inode(rip, false);
         new_rip = get_inode(inum, dev);
         rip = new_rip;
         path = component_name;
@@ -115,44 +118,14 @@ inode_t *last_dir(char *path, char string[DIRSIZ]){
     return NULL;
 }
 
-inode_t* eat_path(char *path, inode_t** lastd, char string[DIRSIZ]){
-    inode_t *inode, *lastdir;
-    int inum, lnum;
-    struct dirent* curr, *end;
-    int i, j;
-    block_t bnr;
-    struct block_buffer* buf;
-    struct superblock* sb;
+inode_t* eat_path(struct proc* who, char *path, inode_t** last_dir, char string[DIRSIZ]){
+    inode_t *inode, *curr_dir;
+    curr_dir = (*path == '/') ? who->fp_rootdir : who->fp_workdir;
+    curr_dir->i_count += 1;
 
-    lastdir = last_dir(path, string);
-    if(lastdir == NULL)
-        return NULL;
-    *lastd = lastdir;
+    inode = __eath_path(curr_dir, last_dir, path, string);
 
-    for(i = 0; i < NR_TZONES; i++){
-        bnr = lastdir->i_zone[i];
-        if(bnr == 0){
-            continue;
-        }
-        buf = get_block_buffer(bnr, lastdir->i_dev);
-        sb = get_sb(lastdir->i_dev);
-        end = (struct dirent*)&buf->block[BLOCK_SIZE];
-        curr = (struct dirent*)buf->block;
-        while (curr < end){
-            if(strcmp(curr->d_name, string) == 0){
-                inode = get_inode(curr->d_ino, lastdir->i_dev);
-                inum = inode == NULL ? 0 : inode->i_num;
-                //XDEBUG(("eath path %s return %d\n", path, inum));
-                put_block_buffer(buf);
-                return inode;
-            }
-            curr++;
-        }
-        put_block_buffer(buf);
-    }
-
-
-    return NULL;
+    return inode;
 }
 
 bool is_fd_opened_and_valid(struct proc* who, int fd){

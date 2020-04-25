@@ -32,7 +32,6 @@ void main(){
     memcpy(&sb, DISK_RAW, sizeof(struct superblock));
     disk_word_t *foo = DISK_RAW;
     current_proc = &pcurr;
-    printf("inode disk struct size %d\n", INODE_DISK_SIZE_WORD);
 
     init_fs(DISK_RAW, DISK_SIZE);
     fd = sys_open(current_proc, filename ,O_CREAT | O_RDWR, 0775);

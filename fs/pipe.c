@@ -2,12 +2,12 @@
 // Created by bruce on 25/04/20.
 //
 
-#include "fs.h";
+#include "fs.h"
 
 struct device pipe_dev;
-struct filp_operations fops;
-struct device_operations dops;
-char* name = "PIPE";
+static struct filp_operations fops;
+static struct device_operations dops;
+static char* name = "PIPE";
 
 int pipe_read (struct filp *filp, char *data, size_t count, off_t offset){
     return 0;
