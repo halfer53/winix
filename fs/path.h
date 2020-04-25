@@ -12,7 +12,7 @@
 #define PATH_MAX    128
 
 char *get_name(char *old_name, char string[NAME_MAX]);
-inode_t *advance(inode_t *dirp, char string[NAME_MAX]);
+ino_t advance(inode_t *dirp, char string[NAME_MAX]);
 inode_t *last_dir(char *path, char string[DIRSIZ]);
 inode_t* eat_path(char *path, inode_t**,  char string[DIRSIZ]);
 bool is_fd_opened_and_valid(struct proc* who, int fd);

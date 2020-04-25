@@ -16,7 +16,9 @@ struct device{
     struct list_head list;
     int (*dev_register) ();
     int (*dev_destroy) ();
-    struct filp_operations ops;
+    int (*dev_read) (disk_word_t *buf, off_t off, size_t len);
+    int (*dev_write) (disk_word_t *buf, off_t off, size_t len);
+    struct filp_operations *fops;
 };
 
 struct file_system{
@@ -26,11 +28,9 @@ struct file_system{
     struct list_head list;
 };
 
-extern struct device* devices;
+extern struct device devices;
 
 void init_dev();
 void init_root_fs();
-int dev_io_read(disk_word_t *buf, block_t blocknr);
-int dev_io_write(disk_word_t *buf, block_t blocknr);
 
 #endif

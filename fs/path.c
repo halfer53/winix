@@ -48,33 +48,35 @@ char *get_name(char *old_name, char string[NAME_MAX]){
 
 // given a directory and a name component, lookup in the directory
 // and find the corresponding inode
-inode_t *advance(inode_t *dirp, char string[NAME_MAX]){
+ino_t advance(inode_t *dirp, char string[NAME_MAX]){
     int i,inum  = 0;
     block_buffer_t *buffer;
-    struct dirent* dir;
+    struct dirent* dirstream;
 
     // currently only reads the first block
     for(i = 0; i < NR_TZONES; i++){
-        if(dirp->i_zone > 0 && (buffer = get_block_buffer(dirp->i_zone[i], dirp->i_dev)) != NULL){
-            dir = (struct dirent*)buffer->block;
-            for(; dir < (struct dirent* )&buffer->block[BLOCK_SIZE]; dir++ ){
-                if(strcmp(dir->d_name, string) == 0){
-                    inum = dir->d_ino;
+        if(dirp->i_zone[i] > 0 && (buffer = get_block_buffer(dirp->i_zone[i], dirp->i_dev)) != NULL){
+            dirstream = (struct dirent*)buffer->block;
+            for(; dirstream < (struct dirent* )&buffer->block[BLOCK_SIZE]; dirstream++ ){
+                if(strcmp(dirstream->d_name, string) == 0){
+                    inum = dirstream->d_ino;
                     put_block_buffer(buffer);
-                    return get_inode(inum, dirp->i_dev);
+                    return inum;
                 }
             }
             put_block_buffer(buffer);
         }
     }
-    return NIL_INODE;
+    return ERR;
 }
 
  
 
 inode_t *last_dir(char *path, char string[DIRSIZ]){
     inode_t *rip, *new_rip;
+    ino_t inum;
     char *component_name;
+    struct device* dev;
 
     rip = *path == '/' ? current_proc->fp_rootdir : current_proc->fp_workdir;
 
@@ -85,6 +87,7 @@ inode_t *last_dir(char *path, char string[DIRSIZ]){
     }
 
     rip->i_count++;
+    dev = rip->i_dev;
 
     while(1){
         if((component_name = get_name(path,string)) == (char *)0){
@@ -98,14 +101,18 @@ inode_t *last_dir(char *path, char string[DIRSIZ]){
                 return NIL_INODE; // bad parsing
             }
         }
-        
-        new_rip = advance(rip,string);
-        if(new_rip == NIL_INODE) {
+
+        inum = advance(rip,string);
+        put_inode(rip, false);
+        if(inum == ERR) {
             return NIL_INODE;
         }
+
+        new_rip = get_inode(inum, dev);
         rip = new_rip;
         path = component_name;
     }
+    return NULL;
 }
 
 inode_t* eat_path(char *path, inode_t** lastd, char string[DIRSIZ]){
@@ -135,7 +142,7 @@ inode_t* eat_path(char *path, inode_t** lastd, char string[DIRSIZ]){
             if(strcmp(curr->d_name, string) == 0){
                 inode = get_inode(curr->d_ino, lastdir->i_dev);
                 inum = inode == NULL ? 0 : inode->i_num;
-                XDEBUG(("eath path %s return %d\n", path, inum));
+                //XDEBUG(("eath path %s return %d\n", path, inum));
                 put_block_buffer(buf);
                 return inode;
             }

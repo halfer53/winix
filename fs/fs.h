@@ -4,13 +4,14 @@
 #include <sys/errno.h>
 #include <sys/types.h>
 #include <fs/type.h>
+#include <fs/const.h>
 #include <winix/type.h>
 #include "string.h"
 #include <fs/inode.h>
 #include <fs/filp.h>
 #include <kernel/proc.h>
 #include "cache.h"
-#include "dev.h"
+#include <fs/dev.h>
 #include "path.h"
 #include "super.h"
 #include <sys/debug.h>
@@ -22,10 +23,11 @@
 extern size_t DISK_SIZE;
 extern disk_word_t DISK_RAW[SIZE];
 
-int sys_open(struct proc *who, char *path, mode_t mode);
+int sys_open(struct proc *who, char *path,int flags, mode_t mode);
 int sys_read(struct proc *who, int fd, void *buf, size_t count);
 int sys_write(struct proc *who, int fd, void *buf, size_t count);
 int sys_close(struct proc *who, int fd);
+block_t alloc_block(inode_t *ino, struct device* id);
 
 int makefs( disk_word_t* disk_raw, disk_word_t disk_size_words);
 void init_fs(disk_word_t* disk_raw, disk_word_t disk_size_words);
@@ -38,12 +40,12 @@ filp_t *find_filp(inode_t *inode);
 filp_t *get_free_filp();
 void init_filp();
 
-struct superblock* get_sb(dev_t id);
+struct superblock* get_sb(struct device* id);
 void init_inodetable();
-inode_t* read_inode(int num, dev_t);
-inode_t* get_inode(int num, dev_t);
-int put_inode(inode_t *inode, dev_t);
-inode_t* alloc_inode( dev_t);
+inode_t* read_inode(int num, struct device*);
+inode_t* get_inode(int num, struct device*);
+int put_inode(inode_t *inode, bool is_dirty);
+inode_t* alloc_inode( struct device*);
 void init_inode();
 
 void* kmalloc(unsigned int size);

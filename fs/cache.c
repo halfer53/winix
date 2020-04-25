@@ -12,13 +12,13 @@ static block_buffer_t bmap; // block map is also assumed to be 1 block in length
 // REAR -> next -> .... -> next -> FRONT
 // With the most recently used cache at the front, and least recently used block at the rear
 
-block_buffer_t *get_imap(int num, dev_t id){
+block_buffer_t *get_imap(int num, struct device* id){
     struct superblock* sb = get_sb(id);
     block_buffer_t* buf = get_block_buffer(sb->s_inodemapnr, id);
     return buf;
 }
 
-block_buffer_t *get_inode_table(int num, dev_t id){
+block_buffer_t *get_inode_table(int num, struct device* id){
     struct superblock* sb = get_sb(id);
     block_t bnr = (num * sb->s_inode_size) / BLOCK_SIZE;
     if(bnr * BLOCK_SIZE > sb->s_inode_table_size){
@@ -28,7 +28,7 @@ block_buffer_t *get_inode_table(int num, dev_t id){
     return buf;
 }
 
-block_buffer_t *get_bmap(dev_t id){
+block_buffer_t *get_bmap(struct device* id){
     struct superblock* sb = get_sb(id);
     block_buffer_t* buf = get_block_buffer(sb->s_blockmapnr, id);
     return buf;
@@ -104,10 +104,21 @@ int flush_inode_zones(inode_t *ino){
     return OK;
 }
 
-int put_block_buffer_immed(block_buffer_t* tbuf, dev_t id){
-    XDEBUG(("Buffer %08x %d put immed\n",tbuf, tbuf->b_blocknr));
+int block_io(block_buffer_t* tbuf, struct device* dev, int flag){
+    off_t off = tbuf->b_blocknr * BLOCK_SIZE;
+
+    if(flag == READING){
+        return dev->dev_read(tbuf->block, off, BLOCK_SIZE);
+    }else if(flag == WRITING){
+        return dev->dev_write(tbuf->block, off, BLOCK_SIZE);
+    }
+    return 0;
+}
+
+int put_block_buffer_immed(block_buffer_t* tbuf, struct device* dev){
+    //XDEBUG(("Buffer %08x %d put immed\n",tbuf, tbuf->b_blocknr));
     enqueue_buf(tbuf);
-    if(dev_io_write(tbuf->block, tbuf->b_blocknr) == 0)
+    if(block_io(tbuf, dev, WRITING) == 0)
         return -1;
     tbuf->b_dirt = false;
     tbuf->b_count -= 1;
@@ -123,7 +134,7 @@ int put_block_buffer_dirt(block_buffer_t *tbuf) {
 }
 
 int put_block_buffer(block_buffer_t *tbuf) {
-    XDEBUG(("Buffer %08x %d put\n",tbuf, tbuf->b_blocknr));
+    //XDEBUG(("Buffer %08x %d put\n",tbuf, tbuf->b_blocknr));
 
     enqueue_buf(tbuf);
     tbuf->b_count -= 1;
@@ -133,14 +144,14 @@ int put_block_buffer(block_buffer_t *tbuf) {
     return 0;
 }
 
-block_buffer_t *get_block_buffer(block_t blocknr, dev_t id){
+block_buffer_t *get_block_buffer(block_t blocknr, struct device* dev){
     block_buffer_t *tbuf;
     int ret;
     for(tbuf = &buf_table[0];tbuf< &buf_table[LRU_LEN];tbuf++){
         if(tbuf->b_blocknr == blocknr){
             rm_lru(tbuf);
             tbuf->b_count += 1;
-            XDEBUG(("Buffer %08x %d returned\n",tbuf, blocknr));
+            //XDEBUG(("Buffer %08x %d returned\n",tbuf, blocknr));
             return tbuf;
         }
     }
@@ -148,24 +159,24 @@ block_buffer_t *get_block_buffer(block_t blocknr, dev_t id){
     // not in memory
     tbuf = dequeue_buf();
     if(tbuf && tbuf->b_dirt){
-        dev_io_write(tbuf->block, tbuf->b_blocknr);
-        XDEBUG(("Sync block %08x %d count %d before returning %d\n",tbuf, tbuf->b_blocknr, tbuf->b_count, blocknr));
+        ret = block_io(tbuf, dev, WRITING);
+        tbuf->b_dirt = false;
+        XDEBUG(("Sync block %d count %d before returning %d\n", tbuf->b_blocknr, tbuf->b_count, blocknr));
     }
-
+    tbuf->b_blocknr = blocknr;
+    if (block_io(tbuf, dev, READING) == 0) {
+        XDEBUG(("ERR: flush block, dev io return %d\n", ret));
+        enqueue_buf(tbuf);
+        return NULL;
+    }
 
     tbuf->b_blocknr = blocknr;
     tbuf->next = tbuf->prev = NULL;
     tbuf->b_dirt = 0;
-    tbuf->b_dev = id;
+    tbuf->b_dev = dev;
     tbuf->b_count = 1;
-
-    if (dev_io_read(tbuf->block, blocknr) == 0) {
-        XDEBUG(("flush block, dev io return %d\n", ret));
-        return NULL;
-    }
-
     enqueue_buf(tbuf);
-    XDEBUG(("Buffer %08x %d returned\n",tbuf, blocknr));
+    //XDEBUG(("Buffer %08x %d returned\n",tbuf, blocknr));
     return tbuf;
 }
 

@@ -32,42 +32,27 @@ void main(){
     memcpy(&sb, DISK_RAW, sizeof(struct superblock));
     disk_word_t *foo = DISK_RAW;
     current_proc = &pcurr;
-
+    printf("inode disk struct size %d\n", INODE_DISK_SIZE_WORD);
 
     init_fs(DISK_RAW, DISK_SIZE);
-    fd = sys_open(current_proc, filename ,O_CREAT | O_RDWR);
+    fd = sys_open(current_proc, filename ,O_CREAT | O_RDWR, 0775);
     printf("fd open /foo.txt return fd %d\n", fd);
 
     char abc[] = "abcdefghijklmnopqrstuvwxyz";
     printf("Writing abc\n");
-    sys_write(current_proc, fd, "abc", 4);
+    sys_write(current_proc, fd, "abc", 3);
+    sys_write(current_proc, fd, "def", 4);
     printf("Closing /foo.txt\n");
     sys_close(current_proc, fd);
 
-    fd = sys_open(current_proc, filename ,O_RDONLY);
+    fd = sys_open(current_proc, filename ,O_RDONLY, 0775);
     printf("fd reopen /foo.txt return fd %d\n", fd);
 
-    sys_read(current_proc, fd, buffer, 4);
+    ret = sys_read(current_proc, fd, buffer, 100);
+    printf("Read got %s, ret %d\n", buffer, ret);
+    ret = sys_read(current_proc, fd, buffer, 100);
+    printf("Read got %s, ret %d\n", buffer, ret);
     sys_close(current_proc, fd);
-    printf("Read got %s\n", buffer);
 
-//    char c = 'a';
-//
-//    for (i = 0; i < 2048; i++) {
-//        sys_write(current_proc, fd, &c, 1);
-//        c++;
-//        if (c == 'z')
-//            c = 'a';
-//    }
-//    sys_write(current_proc,fd, "a", 2);
-//    sys_close(current_proc, fd);
-//
-//    char block_buffer[1024];
-//    fd = sys_open(current_proc, "/foo.txt",O_RDONLY);
-//    sys_read(current_proc, fd,block_buffer,2049);
-//    sys_close(current_proc, fd);
-//
-//    printf("\nread foo.txt\n");
-//    printf("Got \"%s\" from foo.txt\n",block_buffer);
 
 }

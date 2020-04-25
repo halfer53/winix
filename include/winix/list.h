@@ -1,6 +1,19 @@
 #ifndef _LINUX_LIST_H
 #define _LINUX_LIST_H
 
+#ifndef container_of
+/**
+ * container_of - cast a member of a structure out to the containing structure
+ * @ptr:        the pointer to the member.
+ * @type:       the type of the container struct this is embedded in.
+ * @member:     the name of the member within the struct.
+ *
+ */
+ #define container_of(ptr, type, member)\
+    ((type *)( (char *)ptr - offsetof(type,member) ))
+
+#endif
+
 #ifndef NULL
 #define	NULL		((void *)0)
 #endif
