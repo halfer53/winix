@@ -30,6 +30,8 @@ PUBLIC struct proc *ready_q[NUM_QUEUES][2];
 // The currently-running process
 PUBLIC struct proc *current_proc;
 
+PUBLIC struct proc *curr_user_proc_in_syscall;
+
 
 /**
  * How is the process image aligned?

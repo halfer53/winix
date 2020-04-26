@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 11)
 set(SOURCE_FILES
         cache.c
         cache.h
-        open_close.c
+        system/open_close.c
         dev.c
         filp.c
         fs.h
@@ -15,8 +15,8 @@ set(SOURCE_FILES
         makefs.c
         path.c
         path.h
-        read_write.c
-        util.c string.c string.h fs_test.c util_cmake.h disk.c bitmap.c pipe.c tty.c)
+        system/read_write.c
+        util_cmake.c fs_test.c util_cmake.h disk.c bitmap.c system/pipe.c tty.c)
 
 include_directories(../include)
 add_compile_definitions(FS_CMAKE)

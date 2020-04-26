@@ -9,19 +9,19 @@ static struct filp_operations fops;
 static struct device_operations dops;
 static char* name = "tty";
 
-int tty_read (struct filp *filp, char *data, size_t count, off_t offset){
+int tty_read ( struct filp *filp, char *data, size_t count, off_t offset){
     return 0;
 }
 
-int tty_write (struct filp *filp, const char *data, size_t count, off_t offset){
+int tty_write ( struct filp *filp, const char *data, size_t count, off_t offset){
     return 0;
 }
 
-int tty_open (struct inode* ino, struct filp *file){
+int tty_open ( struct inode* ino, struct filp *file){
     return 0;
 }
 
-int tty_close (struct inode* ino, struct filp *file){
+int tty_close ( struct inode* ino, struct filp *file){
     return 0;
 }
 

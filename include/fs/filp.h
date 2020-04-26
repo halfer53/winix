@@ -2,6 +2,7 @@
 #define _FS_FILP_H_ 1
 
 #include <fs/inode.h>
+#include <winix/comm.h>
 
 #define OPEN_MAX  8
 
@@ -18,10 +19,12 @@ typedef struct filp {
     /* following are for fd-type-specific select() */
     // int filp_pipe_select_ops;
     int filp_table_index;
+    struct list_head filp_list; // list for all the filp referring to the same underlying inode
+    
 }filp_t;
 
 struct filp_operations{
-    int (*lseek) (struct filp *, off_t, int);
+    int (*lseek) ( struct filp *, off_t, int);
     int (*read) (struct filp *, char *, size_t, off_t );
     int (*write) (struct filp *, const char *, size_t, off_t );
     int (*readdir) (struct filp *, void *);

@@ -1,4 +1,4 @@
-#include "fs.h"
+#include "../fs.h"
 
 
  int sys_close(struct proc *who,int fd){
@@ -48,13 +48,9 @@ int sys_open(struct proc *who, char *path, int flags, mode_t mode){
     if(ret)
         return ret;
 
-    filp->filp_table_index = open_slot;
-    filp->filp_ino = inode;
-    inode->i_count += 1;
-    filp->filp_count += 1;
+    init_filp_by_inode(filp, inode);
     filp->filp_mode = mode;
     filp->filp_flags = flags;
-    filp->filp_dev = inode->i_dev;
     who->fp_filp[open_slot] = filp;
     ret = inode->i_dev->fops->open(inode, filp);
     if(ret)

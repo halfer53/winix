@@ -19,6 +19,7 @@
 #include <sys/types.h>
 #include <signal.h>
 #include <winix/type.h>
+#include <winix/comm.h>
 #include <winix/timer.h>
 #include <winix/kwramp.h>
 #include <fs/type.h>
@@ -206,12 +207,15 @@ typedef struct proc {
     filp_t* fp_filp[PROC_FILEP_NR];
     inode_t *fp_rootdir;
     inode_t *fp_workdir;
+    struct list_head pipe_reading_list;
+    struct list_head pipe_writing_list;
 } proc_t;
 
 /**
 * Pointer to the current process.
 **/
 extern struct proc *current_proc;
+extern struct proc *curr_user_proc_in_syscall;
 
 extern struct proc *proc_table;
 extern struct proc *ready_q[NUM_QUEUES][2];

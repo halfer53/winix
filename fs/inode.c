@@ -6,12 +6,14 @@ struct inode* get_free_inode_slot(){
     inode_t* rep;
     for(rep = inode_table; rep < &inode_table[NR_INODES]; rep++ ){
         if(rep->i_num == 0){
+            memset(rep, 0, sizeof(struct inode));
             return rep;
         }
     }
 
     for(rep = &inode_table[NR_INODES]; rep >= inode_table; rep-- ){
         if(rep->i_count <= 0){
+            memset(rep, 0, sizeof(struct inode));
             return rep;
         }
     }
@@ -83,16 +85,19 @@ int release_block(block_t bnr, struct device* id){
     return put_block_buffer(bmap);
 }
 
-int init_non_disk_inode(struct inode* ino, ino_t num, struct device* dev, struct superblock* sb){
+int init_inode_non_disk(struct inode* ino, ino_t num, struct device* dev, struct superblock* sb){
     block_t bnr;
     ino->i_dev = dev;
     ino->i_sb = sb;
     ino->i_num = num;
-    bnr = (num * sb->s_inode_size) / BLOCK_SIZE;
-    if(bnr * BLOCK_SIZE > sb->s_inode_table_size){
-        return ERR;
+    if(sb){
+        bnr = (num * sb->s_inode_size) / BLOCK_SIZE;
+        if(bnr * BLOCK_SIZE > sb->s_inode_table_size){
+            return ERR;
+        }
+        ino->i_ndblock = bnr;
     }
-    ino->i_ndblock = bnr;
+    return OK;
 }
 
 inode_t* read_inode(int num, struct device* id){
@@ -109,7 +114,7 @@ inode_t* read_inode(int num, struct device* id){
     buffer = get_block_buffer(blocknr, id);
     memcpy(inode, &buffer->block[offset], INODE_DISK_SIZE_BYTE);
     inode->i_count += 1;
-    init_non_disk_inode(inode, num, id, sb);
+    init_inode_non_disk(inode, num, id, sb);
     put_block_buffer(buffer);
     return inode;
 }
@@ -175,7 +180,7 @@ inode_t* alloc_inode(struct device* id){
     put_block_buffer_immed(imap, id);
 
     inode = get_free_inode_slot();
-    init_non_disk_inode(inode,inum, id, sb);
+    init_inode_non_disk(inode, inum, id, sb);
 
     sb->s_free_inodes -= 1;
     sb->s_inode_inuse += 1;

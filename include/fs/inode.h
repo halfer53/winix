@@ -28,6 +28,10 @@ typedef struct inode {
     block_t i_ndblock;        /* # direct block, where the inode info is stored in the inode table */
     struct superblock *i_sb;    /* pointer to super block for inode's device */
     unsigned int flags;
+    struct list_head filp_list;
+    struct list_head pipe_reading_list;
+    struct list_head pipe_writing_list;
+    ptr_t *pip_data;
 
     // char i_dirt;            /* CLEAN or DIRTY */
     // char i_pipe;            /* set to I_PIPE if pipe */

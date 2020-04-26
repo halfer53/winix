@@ -20,7 +20,7 @@
 #include <sys/types.h>
 
 
-#define _NSYSCALL               22
+#define _NSYSCALL               37
 /**
  * System Call Numbers
  **/
@@ -46,6 +46,21 @@
 #define SIGPROCMASK     19
 #define SETPGID         20
 #define GETPGID         21
+#define OPEN            22
+#define READ            23
+#define WRITE           24
+#define CLOSE           25
+#define CREAT           26
+#define PIPE            27
+#define MKNOD           28
+#define CHDIR           29
+#define CHOWN           30
+#define CHMOD           31
+#define STAT            32
+#define FSTAT           33
+#define DUP             34
+#define LINK            35
+#define UNLINK          36
 
 #define DECLARE_SYSCALL(function, params, syscall_num, passing_codes)\
 function params{\
