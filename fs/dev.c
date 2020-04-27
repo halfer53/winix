@@ -224,6 +224,7 @@ void init_root_fs(){
     dev->dops->dev_init();
 
     ino = get_inode(ROOT_INODE_NUM, dev);
+    ino->i_count += 999;
     root_fs.sb->s_iroot = ino;
     current_proc->fp_workdir = current_proc->fp_rootdir = ino;
 }

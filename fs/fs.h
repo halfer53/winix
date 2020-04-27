@@ -41,6 +41,8 @@
 #include <stdbool.h>
 #include <string.h>
 
+#define VERIFY_READ     1
+#define VERIFY_WRITE    2
 #define ROOT_DEV    (0x0101)    /* MAKEDEV(1,1) */
 
 #define SIZE (64 * 1024)
