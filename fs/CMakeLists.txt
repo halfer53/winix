@@ -16,7 +16,7 @@ set(SOURCE_FILES
         path.c
         path.h
         system/read_write.c
-        util_cmake.c fs_test.c util_cmake.h disk.c bitmap.c system/pipe.c tty.c)
+        cmake/cmake_util.c fs_test.c cmake/cmake_util.h disk.c cmake/cmake_bitmap.c system/pipe.c tty.c system/stat.c system/lseek.c)
 
 include_directories(../include)
 add_compile_definitions(FS_CMAKE)

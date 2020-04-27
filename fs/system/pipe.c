@@ -221,7 +221,7 @@ int pipe_dev_init(){
     return 0;
 }
 
-int pipe_dev_destroy(){
+int pip_dev_release(){
     return 0;
 }
 
@@ -230,10 +230,12 @@ void init_pipe(){
     dops.dev_init = pipe_dev_init;
     dops.dev_read = pipe_dev_io_read;
     dops.dev_write = pipe_dev_io_write;
-    dops.dev_destroy = pipe_dev_destroy;
+    dops.dev_release = pip_dev_release;
     fops.open = pipe_open;
     fops.read = pipe_read;
     fops.write = pipe_write;
     fops.close = pipe_close;
-    register_device(&pipe_dev, name, MAKEDEV(2, 1), &dops, &fops);
+    pipe_dev.dops = &dops;
+    pipe_dev.fops = &fops;
+    register_device(&pipe_dev, name, MAKEDEV(2, 1), S_IFIFO);
 }

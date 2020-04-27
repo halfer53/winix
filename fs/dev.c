@@ -4,7 +4,7 @@
 
 
 struct device _root_dev;
-struct device devices;
+struct list_head devices_list;
 struct superblock root_sb;
 static struct file_system root_fs;
 struct device_operations dops;
@@ -80,7 +80,7 @@ int blk_dev_init(){
     return 0;
 }
 
-int blk_dev_destroy(){
+int blk_dev_release(){
     return 0;
 }
 
@@ -178,20 +178,19 @@ int root_fs_close (struct inode* ino, struct filp *file){
 }
 
 void init_dev(){
-    INIT_LIST_HEAD(&devices.list);
+    INIT_LIST_HEAD(&devices_list);
 }
 
-int register_device(struct device* dev, char* name, dev_t id, struct device_operations* dops, struct filp_operations* fops){
+int register_device(struct device* dev, char* name, dev_t id, mode_t type){
     dev->init_name = name;
     dev->dev_id = id;
-    dev->dops = dops;
-    dev->fops = fops;
-    list_add(&dev->list,&devices.list);
+    dev->device_type = type;
+    list_add(&dev->list,&devices_list);
 }
 
 struct device* get_dev(dev_t dev){
     struct device* ret;
-    list_for_each_entry(struct device, ret, &devices.list, list){
+    list_for_each_entry(struct device, ret, &devices_list, list){
         if(ret->dev_id == dev){
             return ret;
         }
@@ -203,14 +202,14 @@ void init_root_fs(){
     struct superblock test;
     struct inode* ino;
     struct device *dev = &_root_dev;
-    devid = MAKEDEV(1, 1);
+    devid = ROOT_DEV;
 
     root_fs.device = dev;
     root_fs.sb = &root_sb;
     root_fs.type = FS_TYPE;
 
     dops.dev_init = blk_dev_init;
-    dops.dev_destroy = blk_dev_destroy;
+    dops.dev_release = blk_dev_release;
     dops.dev_read = blk_dev_io_read;
     dops.dev_write = blk_dev_io_write;
     ops.open = root_fs_open;
@@ -218,7 +217,9 @@ void init_root_fs(){
     ops.read = root_fs_read;
     ops.close = root_fs_close;
 
-    register_device(dev, DEVICE_NAME, devid, &dops, &ops);
+    dev->dops = &dops;
+    dev->fops = &ops;
+    register_device(dev, DEVICE_NAME, devid, S_IFBLK);
 
     dev->dops->dev_init();
 

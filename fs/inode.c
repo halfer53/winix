@@ -85,11 +85,23 @@ int release_block(block_t bnr, struct device* id){
     return put_block_buffer(bmap);
 }
 
+size_t get_inode_total_size_word(struct inode* ino){
+    size_t ret;
+    int i;
+    for(i = 0; i < NR_TZONES; i++){
+        if(ino->i_zone[i] > 0){
+            ret += BLOCK_SIZE;
+        }
+    }
+    return ret;
+}
+
 int init_inode_non_disk(struct inode* ino, ino_t num, struct device* dev, struct superblock* sb){
     block_t bnr;
     ino->i_dev = dev;
     ino->i_sb = sb;
     ino->i_num = num;
+    ino->i_total_size = get_inode_total_size_word(ino);
     if(sb){
         bnr = (num * sb->s_inode_size) / BLOCK_SIZE;
         if(bnr * BLOCK_SIZE > sb->s_inode_table_size){
@@ -253,19 +265,21 @@ int init_dirent(inode_t* dir, inode_t* ino){
             return OK;
         }
     }
-    return ERR;
+    return ENOSPC;
 }
 
 
 
-int add_inode_to_directory( inode_t* dir, inode_t* ino, char* string){
-    if(!(dir->i_mode & S_IFDIR))
-        return ERR;
+int add_inode_to_directory( struct inode* dir, struct inode* ino, char* string){
     int i, j, ret;
     block_t bnr;
     struct dirent* curr, *end;
-    struct superblock* sb = get_sb(dir->i_dev);
     struct block_buffer* buf;
+
+    if(!(dir->i_mode & S_IFDIR))
+        return EINVAL;
+    if(!(dir->i_mode & O_WRONLY))
+        return EACCES;
 
     init_dirent(dir, ino);
     for(i = 0; i < NR_TZONES; i++){
@@ -273,7 +287,7 @@ int add_inode_to_directory( inode_t* dir, inode_t* ino, char* string){
         if(bnr == 0){
             bnr = alloc_block(dir, dir->i_dev);
             dir->i_zone[i] = bnr;
-            dir->i_size += BLOCK_SIZE;
+            dir->i_total_size += BLOCK_SIZE;
         }
         buf = get_block_buffer(bnr, dir->i_dev);
         end = (struct dirent*)&buf->block[BLOCK_SIZE];
@@ -289,7 +303,7 @@ int add_inode_to_directory( inode_t* dir, inode_t* ino, char* string){
         }
         put_block_buffer(buf);
     }
-    return ERR;
+    return ENOSPC;
 }
 
 

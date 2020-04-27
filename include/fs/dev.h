@@ -12,7 +12,7 @@
 
 struct device_operations{
     int (*dev_init) ();
-    int (*dev_destroy) ();
+    int (*dev_release) ();
     int (*dev_read) (disk_word_t *buf, off_t off, size_t len);
     int (*dev_write) (disk_word_t *buf, off_t off, size_t len);
 };
@@ -20,6 +20,7 @@ struct device_operations{
 struct device{
     dev_t dev_id;
     const char* init_name;
+    mode_t device_type;
     struct list_head list;
     struct device_operations *dops;
     struct filp_operations *fops;

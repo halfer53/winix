@@ -38,7 +38,7 @@ int tty_dev_init(){
     return 0;
 }
 
-int tty_dev_destroy(){
+int tty_dev_release(){
     return 0;
 }
 
@@ -47,10 +47,12 @@ void init_tty(){
     dops.dev_init = tty_dev_init;
     dops.dev_read = tty_dev_io_read;
     dops.dev_write = tty_dev_io_write;
-    dops.dev_destroy = tty_dev_destroy;
+    dops.dev_release = tty_dev_release;
     fops.open = tty_open;
     fops.read = tty_read;
     fops.write = tty_write;
     fops.close = tty_close;
-    register_device(&tty_dev, name, MAKEDEV(3, 1), &dops, &fops);
+    tty_dev.dops = &dops;
+    tty_dev.fops = &fops;
+    register_device(&tty_dev, name, MAKEDEV(3, 1), S_IFCHR);
 }

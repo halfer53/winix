@@ -74,5 +74,4 @@ void main(){
     printf("Pipe write ret %d\n", ret);
     ret = sys_write(&pcurr2, pipe_fd[1], "1234", 5);
     printf("Pipe write2 ret %d\n", ret);
-
 }

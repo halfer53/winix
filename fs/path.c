@@ -108,7 +108,7 @@ int __eath_path(struct inode* curr_ino, struct inode** last_dir,
             }
         }
 
-        if(rip->i_mode & S_IFDIR)
+        if(!(rip->i_mode & S_IFDIR))
             return ENOTDIR; //if one of the pathname in the path is not directory
 
         inum = advance(rip,string);
@@ -138,10 +138,11 @@ int eat_path(struct proc* who, char *path, inode_t** last_dir, struct inode** re
 bool is_fd_opened_and_valid(struct proc* who, int fd){
     struct filp* file;
     if(fd < 0 || fd >= OPEN_MAX){
-        return EBADF;
+        return false;
     }
     file = who->fp_filp[fd];
     if(file == NULL){
-        return EBADF;
+        return false;
     }
+    return true;
 }

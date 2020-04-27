@@ -26,6 +26,7 @@ typedef struct inode {
     ino_t i_num;            /* inode number on its (minor) device */
     int i_count;            /* # times inode used; 0 means slot is free */
     block_t i_ndblock;        /* # direct block, where the inode info is stored in the inode table */
+    size_t i_total_size;    
     struct superblock *i_sb;    /* pointer to super block for inode's device */
     unsigned int flags;
     struct list_head filp_list;

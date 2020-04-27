@@ -19,16 +19,78 @@
      return OK;
  }
 
- inode_t* new_inode_by_dir(struct proc *who, struct inode* dir, char* string){
-    inode_t* inode = alloc_inode(dir->i_dev);
-    if(!inode)
-        return NULL;
-//    inode->i_mode = S_IFREG;
-    inode->i_gid = who->gid;
-    inode->i_uid = who->uid;
 
-    add_inode_to_directory(dir, inode, string);
-    return inode;
+
+int _sys_open(struct proc *who, char *path, int flags, mode_t mode, dev_t devid){
+    filp_t *filp;
+    int i,open_slot,ret;
+    inode_t *inode = NULL, *lastdir = NULL;
+    char string[DIRSIZ];
+    struct device* dev;
+
+    dev = get_dev(devid);
+    if(!dev)
+        return ENXIO;
+
+    if(ret = eat_path(who, path, &lastdir, &inode, string))
+        return ret;
+
+    if(inode && (flags & O_EXCL) && (flags & O_CREAT)){
+        ret = EEXIST;
+        goto final;
+    }
+
+
+    if(inode && (inode->i_mode & S_IFDIR) && (flags & O_WRONLY)){
+        ret = EISDIR;
+        goto final;
+    }
+
+    if(ret = get_fd(who, 0, &open_slot, &filp))
+        goto final;
+
+    if(!inode){
+
+        if(!(flags & O_CREAT)){
+            ret = ENOENT;
+            goto final;
+        }
+
+        if(strlen(string) >= DIRNAME_LEN){
+            ret = ENAMETOOLONG;
+            goto final;
+        }
+
+        if(!(lastdir->i_mode & O_WRONLY))
+            return EACCES;
+
+        inode = alloc_inode(dev);
+        if(!inode){
+            ret = ENOSPC;
+            goto final;
+        }
+
+        if(ret = add_inode_to_directory(lastdir, inode, string)){
+            release_inode(inode);
+            goto final;
+        }
+        inode->i_mode = mode;
+    }
+
+    init_filp_by_inode(filp, inode);
+    filp->filp_mode = mode;
+    filp->filp_flags = flags;
+    who->fp_filp[open_slot] = filp;
+    if(ret = inode->i_dev->fops->open(inode, filp))
+        goto final;
+
+    ret = open_slot;
+    KDEBUG(("path %s Last dir %d, ret inode %d\n", path, lastdir->i_num, inode->i_num));
+
+    final:
+    put_inode(lastdir, false);
+    put_inode(inode, false);
+    return ret;
 }
 
 int sys_creat(struct proc* who, char* path, mode_t mode){
@@ -36,53 +98,8 @@ int sys_creat(struct proc* who, char* path, mode_t mode){
 }
 
 int sys_open(struct proc *who, char *path, int flags, mode_t mode){
-    filp_t *filp;
-    int i,open_slot,ret;
-    inode_t *inode = NULL, *lastdir = NULL;
-    char string[DIRSIZ];
-    int inum;
-
-    ret = eat_path(who, path, &lastdir, &inode, string);
-    if(ret)
-        return ret;
-
-    if(!inode){
-        if(flags & O_CREAT){
-
-            if(strlen(string) >= DIRNAME_LEN)
-                return ENAMETOOLONG;
-
-            inode = new_inode_by_dir(who, lastdir, string);
-
-            if(!inode)
-                return ENOSPC;
-
-        } else {
-            return ENOENT;
-        }
-    }
-
-    if(flags & O_EXCL && flags & O_CREAT)
-        return EEXIST;
-
-    if(lastdir && !inode && flags & O_WRONLY)
-        return EISDIR;
-
-    ret = get_fd(who, 0, &open_slot, &filp);
-    if(ret)
-        return ret;
-
-    init_filp_by_inode(filp, inode);
-    filp->filp_mode = mode;
-    filp->filp_flags = flags;
-    who->fp_filp[open_slot] = filp;
-    ret = inode->i_dev->fops->open(inode, filp);
-    if(ret)
-        return ret;
-
-    inum = inode->i_num;
-    KDEBUG(("path %s Last dir %d, ret inode %d\n", path, lastdir->i_num, inum));
-    put_inode(lastdir, false);
-    put_inode(inode, false);
-    return open_slot;
+    return _sys_open(who, path, flags, mode, ROOT_DEV);
+}
+int sys_mknod(struct proc* who, char *pathname, mode_t mode, dev_t devid){
+    return _sys_open(who, pathname, O_CREAT | O_EXCL | O_RDWR, mode, devid);
 }

@@ -7,7 +7,7 @@
 
 #ifdef FS_CMAKE
 
-#include "util_cmake.h"
+#include "cmake/cmake_util.h"
 #define kprintf(...) printf(__VA_ARGS__)
 #define KDEBUG(token)   printf("[SYSTEM] "); printf token
 
@@ -37,10 +37,11 @@
 #include <fs/super.h>
 #include <string.h>
 #include <winix/bitmap.h>
+#include <winix/page.h>
 #include <stdbool.h>
 #include <string.h>
 
-
+#define ROOT_DEV    (0x0101)    /* MAKEDEV(1,1) */
 
 #define SIZE (64 * 1024)
 extern size_t DISK_SIZE;
@@ -62,13 +63,16 @@ int init_inode_non_disk(struct inode* ino, ino_t num, struct device* dev, struct
 void init_pipe();
 int get_fd(struct proc *curr, int start, int *open_slot, filp_t **fpt);
 int add_inode_to_directory(inode_t* dir, inode_t* ino, char* string);
-int register_device(struct device* dev, char* name, dev_t id, struct device_operations* dops, struct filp_operations* fops);
+int register_device(struct device* dev, char* name, dev_t id, mode_t type);
 int release_filp(struct filp* file);
+int release_inode(inode_t *inode);
 filp_t *get_filp(int fd);
 filp_t *find_filp(inode_t *inode);
 filp_t *get_free_filp();
 void init_filp();
 struct inode* get_free_inode_slot();
+struct device* get_dev(dev_t dev);
+int sys_creat(struct proc* who, char* path, mode_t mode);
 
 struct superblock* get_sb(struct device* id);
 void init_inodetable();
