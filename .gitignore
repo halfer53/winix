@@ -41,4 +41,4 @@ RexSimulatorGui.exe
 !winix/limits/limits_head.s
 !winix/limits/limits_tail.s
 !.gitignore
-
+!.vscode/
