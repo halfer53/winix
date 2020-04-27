@@ -38,6 +38,7 @@
 #include <string.h>
 #include <winix/bitmap.h>
 #include <winix/page.h>
+#include <winix/compiler.h>
 #include <stdbool.h>
 #include <string.h>
 
@@ -56,7 +57,11 @@ int sys_read(struct proc *who, int fd, void *buf, size_t count);
 int sys_write(struct proc *who, int fd, void *buf, size_t count);
 int sys_close(struct proc *who, int fd);
 int sys_pipe(struct proc* who, int fd[2]);
+int sys_chmod(struct proc* who, const char *pathname, mode_t mode);
+int sys_chown(struct proc* who, const char *pathname, uid_t owner, gid_t group);
+int sys_chdir(struct proc* who, char* pathname);
 
+int get_inode_by_path(struct proc* who, char *path, struct inode** inode);
 block_t alloc_block(inode_t *ino, struct device* id);
 int makefs( disk_word_t* disk_raw, disk_word_t disk_size_words);
 void init_fs(disk_word_t* disk_raw, disk_word_t disk_size_words);
@@ -75,7 +80,8 @@ void init_filp();
 struct inode* get_free_inode_slot();
 struct device* get_dev(dev_t dev);
 int sys_creat(struct proc* who, char* path, mode_t mode);
-
+size_t get_inode_total_size_word(struct inode* ino);
+blkcnt_t get_inode_blocks(struct inode* ino);
 struct superblock* get_sb(struct device* id);
 void init_inodetable();
 inode_t* read_inode(int num, struct device*);

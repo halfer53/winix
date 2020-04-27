@@ -135,6 +135,16 @@ int eat_path(struct proc* who, char *path, inode_t** last_dir, struct inode** re
     return ret;
 }
 
+int get_inode_by_path(struct proc* who, char *path, struct inode** inode){
+    int ret;
+    inode_t *lastdir = NULL;
+    char string[DIRSIZ];
+
+    ret = eat_path(who, path, &lastdir, &inode, string);
+    put_inode(lastdir, false);
+    return ret;
+}
+
 bool is_fd_opened_and_valid(struct proc* who, int fd){
     struct filp* file;
     if(fd < 0 || fd >= OPEN_MAX){

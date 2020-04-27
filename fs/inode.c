@@ -85,15 +85,20 @@ int release_block(block_t bnr, struct device* id){
     return put_block_buffer(bmap);
 }
 
-size_t get_inode_total_size_word(struct inode* ino){
-    size_t ret;
+blkcnt_t get_inode_blocks(struct inode* ino){
+    blkcnt_t ret;
     int i;
     for(i = 0; i < NR_TZONES; i++){
         if(ino->i_zone[i] > 0){
-            ret += BLOCK_SIZE;
+            ret++;
         }
     }
     return ret;
+}
+
+size_t get_inode_total_size_word(struct inode* ino){
+    blkcnt_t bnum = get_inode_blocks(ino);
+    return BLOCK_SIZE * bnum;
 }
 
 int init_inode_non_disk(struct inode* ino, ino_t num, struct device* dev, struct superblock* sb){
