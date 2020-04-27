@@ -19,7 +19,6 @@ test.c
 a.out
 include/*.c
 
-.vscode/
 fs/cmake-build-debug/
 expri/
 gen_bin_code

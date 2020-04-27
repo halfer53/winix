@@ -1,79 +1,103 @@
-/* The <sys/stat.h> header defines a struct that is used in the stat() and
- * fstat functions.  The information in this struct comes from the i-node of
- * some file.  These calls are the only approved way to inspect i-nodes.
- */
+#ifndef _SYS_STAT_H_
+#define	_SYS_STAT_H_
 
-#ifndef _STAT_H_
-#define _STAT_H_ 1
-
-#ifndef _TYPES_H_
-#include <sys/types.h>
-#endif
+#include <sys/types.h>		/* XXX */
 
 struct stat {
-  dev_t st_dev;            /* major/minor device number */
-  ino_t st_ino;            /* i-node number */
-  mode_t st_mode;        /* file mode, protection bits, etc. */
-  short int st_nlink;        /* # links; TEMPORARY HACK: should be nlink_t*/
-  uid_t st_uid;            /* uid of the file's owner */
-  short int st_gid;        /* gid; TEMPORARY HACK: should be gid_t */
-  dev_t st_rdev;
-  off_t st_size;        /* file size */
-  time_t st_atime;        /* time of last access */
-  time_t st_mtime;        /* time of last data modification */
-  time_t st_ctime;        /* time of last file status change */
+  dev_t     st_dev;               /* inode's device */
+  mode_t    st_mode;              /* inode protection mode */
+  ino_t	st_ino;		      /* inode's number */
+  nlink_t   st_nlink;             /* number of hard links */
+  uid_t     st_uid;               /* user ID of the file's owner */
+  gid_t     st_gid;               /* group ID of the file's group */
+  dev_t     st_rdev;              /* device type */
+  time_t    st_atime;             /* time of last access */
+  int       st_atimensec;         /* nsec of last access */
+  time_t    st_mtime;             /* time of last data modification */
+  int      st_mtimensec;         /* nsec of last data modification */
+  time_t    st_ctime;             /* time of last file status change */
+  int      st_ctimensec;         /* nsec of last file status change */
+  time_t    st_birthtime;         /* time of creation */
+  int      st_birthtimensec;     /* nsec of time of creation */
+  off_t st_size;		/* file size, in bytes */
+  blkcnt_t  st_blocks;		/* blocks allocated for file */
+  blksize_t st_blksize;		/* optimal blocksize for I/O */
+  unsigned int     st_flags;		/* user defined flags for file */
+  unsigned int     st_gen;		/* file generation number */
+  unsigned int     st_spare[2];
 };
 
-/* Traditional mask definitions for st_mode. */
-/* The ugly casts on only some of the definitions are to avoid suprising sign
- * extensions such as S_IFREG != (mode_t) S_IFREG when ints are 32 bits.
- */
-#define S_IFMT  ((mode_t) 0xC000)    /* type of file */
-#define S_IFLNK ((mode_t) 0xA000)    /* symbolic link, not implemented */
-#define S_IFREG ((mode_t) 0x8000)    /* regular */
-#define S_IFBLK 0x006000        /* block special */
-#define S_IFDIR 0x004000      /* directory */
-#define S_IFCHR 0x002000        /* character special */
-#define S_IFIFO 0x001000        /* this is a FIFO */
-#define S_ISUID 0x000800        /* set user id on execution */
-#define S_ISGID 0x000400        /* set group id on execution */
-                /* next is reserved for future use */
-#define S_ISVTX   0x0200        /* save swapped text even after use */
+struct minix_prev_stat {
+  short st_dev;			/* major/minor device number */
+  ino_t st_ino;			/* i-node number */
+  mode_t st_mode;		/* file mode, protection bits, etc. */
+  nlink_t st_nlink;		/* # links; */
+  short st_uid;			/* uid of the file's owner */
+  short int st_gid;		/* gid; TEMPORARY HACK: should be gid_t */
+  short st_rdev;
+  off_t st_size;		/* file size */
+  time_t st_atime;		/* time of last access */
+  time_t st_mtime;		/* time of last data modification */
+  time_t st_ctime;		/* time of last file status change */
+};
 
-/* POSIX masks for st_mode. */
-#define S_IRWXU   0x01c0        /* owner:  rwx------ */
-#define S_IRUSR   0x0100        /* owner:  r-------- */
-#define S_IWUSR   0x0080        /* owner:  -w------- */
-#define S_IXUSR   0x0040        /* owner:  --x------ */
 
-#define S_IRWXG   0x0038        /* group:  ---rwx--- */
-#define S_IRGRP   0x0020        /* group:  ---r----- */
-#define S_IWGRP   0x0010        /* group:  ----w---- */
-#define S_IXGRP   0x0008        /* group:  -----x--- */
+#define	S_ISUID	0004000			/* set user id on execution */
+#define	S_ISGID	0002000			/* set group id on execution */
 
-#define S_IRWXO   0x0007        /* others: ------rwx */
-#define S_IROTH   0x0004        /* others: ------r-- */ 
-#define S_IWOTH   0x0002        /* others: -------w- */
-#define S_IXOTH   0x0001        /* others: --------x */
+#define	S_IRWXU	0000700			/* RWX mask for owner */
+#define	S_IRUSR	0000400			/* R for owner */
+#define	S_IWUSR	0000200			/* W for owner */
+#define	S_IXUSR	0000100			/* X for owner */
 
-/* The following macros test st_mode (from POSIX Sec. 5.6.1.1). */
-#define S_ISREG(m)    (((m) & S_IFMT) == S_IFREG)    /* is a reg file */
-#define S_ISDIR(m)    (((m) & S_IFMT) == S_IFDIR)    /* is a directory */
-#define S_ISCHR(m)    (((m) & S_IFMT) == S_IFCHR)    /* is a char spec */
-#define S_ISBLK(m)    (((m) & S_IFMT) == S_IFBLK)    /* is a block spec */
-#define S_ISFIFO(m)    (((m) & S_IFMT) == S_IFIFO)    /* is a pipe/FIFO */
-#define S_ISLNK(m)      (((m) & S_IFMT) == S_IFLNK)     /* is a sym link */
+#define	S_IRWXG	0000070			/* RWX mask for group */
+#define	S_IRGRP	0000040			/* R for group */
+#define	S_IWGRP	0000020			/* W for group */
+#define	S_IXGRP	0000010			/* X for group */
 
-// /* Function Prototypes. */
-// _PROTOTYPE( int chmod, (const char *_path, _mnx_Mode_t _mode)        );
-// _PROTOTYPE( int fstat, (int _fildes, struct stat *_buf)            );
-// _PROTOTYPE( int mkdir, (const char *_path, _mnx_Mode_t _mode)        );
-// _PROTOTYPE( int mkfifo, (const char *_path, _mnx_Mode_t _mode)        );
-// _PROTOTYPE( int stat, (const char *_path, struct stat *_buf)        );
-// _PROTOTYPE( mode_t umask, (_mnx_Mode_t _cmask)                );
+#define	S_IRWXO	0000007			/* RWX mask for other */
+#define	S_IROTH	0000004			/* R for other */
+#define	S_IWOTH	0000002			/* W for other */
+#define	S_IXOTH	0000001			/* X for other */
 
-// /* Open Group Base Specifications Issue 6 (not complete) */
-// _PROTOTYPE( int lstat, (const char *_path, struct stat *_buf)        );
+#define	_S_IFMT	  0170000		/* type of file mask */
+#define	_S_IFIFO  0010000		/* named pipe (fifo) */
+#define	_S_IFCHR  0020000		/* character special */
+#define	_S_IFDIR  0040000		/* directory */
+#define	_S_IFBLK  0060000		/* block special */
+#define	_S_IFREG  0100000		/* regular */
+#define	_S_IFLNK  0120000		/* symbolic link */
+#define	_S_IFSOCK 0140000		/* socket */
+#define	_S_ISVTX  0001000		/* save swapped text even after use */
 
-#endif /* _STAT_H */
 
+#define	S_IFMT	 _S_IFMT
+#define	S_IFIFO	 _S_IFIFO
+#define	S_IFCHR	 _S_IFCHR
+#define	S_IFDIR	 _S_IFDIR
+#define	S_IFBLK	 _S_IFBLK
+#define	S_IFREG	 _S_IFREG
+#define	S_IFLNK	 _S_IFLNK
+#define	S_ISVTX	 _S_ISVTX
+
+
+#define	S_ISDIR(m)	(((m) & _S_IFMT) == _S_IFDIR)	/* directory */
+#define	S_ISCHR(m)	(((m) & _S_IFMT) == _S_IFCHR)	/* char special */
+#define	S_ISBLK(m)	(((m) & _S_IFMT) == _S_IFBLK)	/* block special */
+#define	S_ISREG(m)	(((m) & _S_IFMT) == _S_IFREG)	/* regular file */
+#define	S_ISFIFO(m)	(((m) & _S_IFMT) == _S_IFIFO)	/* fifo */
+#define	S_ISLNK(m)	(((m) & _S_IFMT) == _S_IFLNK)	/* symbolic link */
+#define	S_ISSOCK(m)	(((m) & _S_IFMT) == _S_IFSOCK)	/* socket */
+
+// int	chmod(const char *, mode_t);
+// int	mkdir(const char *, mode_t);
+// int	mkfifo(const char *, mode_t);
+// int	stat(const char *, struct stat *);
+// int	fstat(int, struct stat *);
+// mode_t	umask(mode_t);
+// int	fchmod(int, mode_t);
+
+// int	lstat(const char *, struct stat *);
+// int	mknod(const char *, mode_t, dev_t);
+
+#endif /* !_SYS_STAT_H_ */

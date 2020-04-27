@@ -29,6 +29,10 @@
     return inode;
 }
 
+int sys_creat(struct proc* who, char* path){
+    
+}
+
 int sys_open(struct proc *who, char *path, int flags, mode_t mode){
     filp_t *filp;
     int i,open_slot,ret;

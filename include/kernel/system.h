@@ -17,6 +17,7 @@
 #define _K_SYSTEM_H_ 1
 
 #include <winix/syscall_ctx.h>
+#include <sys/cdefs.h>
 
 /**
  * Entry point for the system task.
@@ -40,7 +41,7 @@ bool is_in_syscall(struct proc* who);
                     syscall_str[i] = #i
 #else
 #define SYSCALL_MAP(i,fn)   syscall_table[i] = fn;\
-                    syscall_str[i] = _STR(i)
+                    syscall_str[i] = __STRING(i)
 #endif
 
 
