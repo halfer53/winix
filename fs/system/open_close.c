@@ -21,6 +21,8 @@
 
  inode_t* new_inode_by_dir(struct proc *who, struct inode* dir, char* string){
     inode_t* inode = alloc_inode(dir->i_dev);
+    if(!inode)
+        return NULL;
 //    inode->i_mode = S_IFREG;
     inode->i_gid = who->gid;
     inode->i_uid = who->uid;
@@ -30,24 +32,42 @@
 }
 
 int sys_creat(struct proc* who, char* path, mode_t mode){
-    
+    return sys_open(who, path, O_CREAT | O_EXCL | O_RDWR, mode);
 }
 
 int sys_open(struct proc *who, char *path, int flags, mode_t mode){
     filp_t *filp;
     int i,open_slot,ret;
-    inode_t *inode, *lastdir;
+    inode_t *inode = NULL, *lastdir = NULL;
     char string[DIRSIZ];
     int inum;
 
-    inode = eat_path(who, path, &lastdir, string);
-    if(inode == NIL_INODE){
+    ret = eat_path(who, path, &lastdir, &inode, string);
+    if(ret)
+        return ret;
+
+    if(!inode){
         if(flags & O_CREAT){
+
+            if(strlen(string) >= DIRNAME_LEN)
+                return ENAMETOOLONG;
+
             inode = new_inode_by_dir(who, lastdir, string);
-        }else {
-            return EINVAL;
+
+            if(!inode)
+                return ENOSPC;
+
+        } else {
+            return ENOENT;
         }
     }
+
+    if(flags & O_EXCL && flags & O_CREAT)
+        return EEXIST;
+
+    if(lastdir && !inode && flags & O_WRONLY)
+        return EISDIR;
+
     ret = get_fd(who, 0, &open_slot, &filp);
     if(ret)
         return ret;
@@ -63,5 +83,6 @@ int sys_open(struct proc *who, char *path, int flags, mode_t mode){
     inum = inode->i_num;
     KDEBUG(("path %s Last dir %d, ret inode %d\n", path, lastdir->i_num, inum));
     put_inode(lastdir, false);
+    put_inode(inode, false);
     return open_slot;
 }

@@ -72,7 +72,9 @@ ino_t advance(inode_t *dirp, char string[NAME_MAX]){
 
  
 
-inode_t *__eath_path(struct inode* curr_ino, struct inode** last_dir, char *path, char string[DIRSIZ]){
+int __eath_path(struct inode* curr_ino, struct inode** last_dir,
+        struct inode** ret_ino, char *path, char string[DIRSIZ]){
+
     inode_t *rip, *new_rip;
     ino_t inum;
     char *component_name;
@@ -82,14 +84,13 @@ inode_t *__eath_path(struct inode* curr_ino, struct inode** last_dir, char *path
 
     /* If dir has been removed or path is empty, return ENOENT. */
     if (rip->i_nlinks == 0 || *path == '\0') {
-        // err_code = ENOENT;
-        return NULL;
+        return ENOENT;
     }
     dev = rip->i_dev;
 
     while(1){
         if((component_name = get_name(path,string)) == (char *)0){
-            return NULL; // bad parsing
+            return ENOENT; // bad parsing
         }
 
         if(*component_name == '\0') {
@@ -97,17 +98,22 @@ inode_t *__eath_path(struct inode* curr_ino, struct inode** last_dir, char *path
                 *last_dir = rip;
                 inum = advance(rip, string);
                 if(inum == ERR){
-                    return NULL;
+                    return OK;
                 }
-                return get_inode(inum, rip->i_dev);
+                new_rip = get_inode(inum, rip->i_dev);
+                *ret_ino = new_rip;
+                return OK;
             }else{
-                return NULL; // bad parsing
+                return ENOTDIR;
             }
         }
 
+        if(rip->i_mode & S_IFDIR)
+            return ENOTDIR; //if one of the pathname in the path is not directory
+
         inum = advance(rip,string);
         if(inum == ERR) {
-            return NULL;
+            return OK;
         }
 
         put_inode(rip, false);
@@ -115,25 +121,27 @@ inode_t *__eath_path(struct inode* curr_ino, struct inode** last_dir, char *path
         rip = new_rip;
         path = component_name;
     }
-    return NULL;
+    return ENOENT;
 }
 
-inode_t* eat_path(struct proc* who, char *path, inode_t** last_dir, char string[DIRSIZ]){
-    inode_t *inode, *curr_dir;
+int eat_path(struct proc* who, char *path, inode_t** last_dir, struct inode** ret_ino, char string[DIRSIZ]){
+    int ret;
+    inode_t *curr_dir;
     curr_dir = (*path == '/') ? who->fp_rootdir : who->fp_workdir;
     curr_dir->i_count += 1;
 
-    inode = __eath_path(curr_dir, last_dir, path, string);
+    ret = __eath_path(curr_dir, last_dir, ret_ino, path, string);
 
-    return inode;
+    return ret;
 }
 
 bool is_fd_opened_and_valid(struct proc* who, int fd){
-    struct filp* file = who->fp_filp[fd];
+    struct filp* file;
     if(fd < 0 || fd >= OPEN_MAX){
-        return EINVAL;
+        return EBADF;
     }
+    file = who->fp_filp[fd];
     if(file == NULL){
-        return EINVAL;
+        return EBADF;
     }
 }
