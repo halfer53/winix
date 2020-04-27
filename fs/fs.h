@@ -60,6 +60,7 @@ int sys_pipe(struct proc* who, int fd[2]);
 int sys_chmod(struct proc* who, const char *pathname, mode_t mode);
 int sys_chown(struct proc* who, const char *pathname, uid_t owner, gid_t group);
 int sys_chdir(struct proc* who, char* pathname);
+int sys_dup(struct proc* who, int oldfd);
 
 int get_inode_by_path(struct proc* who, char *path, struct inode** inode);
 block_t alloc_block(inode_t *ino, struct device* id);
