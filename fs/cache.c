@@ -116,7 +116,7 @@ int block_io(block_buffer_t* tbuf, struct device* dev, int flag){
 }
 
 int put_block_buffer_immed(block_buffer_t* tbuf, struct device* dev){
-    //XDEBUG(("Buffer %08x %d put immed\n",tbuf, tbuf->b_blocknr));
+    //KDEBUG(("Buffer %08x %d put immed\n",tbuf, tbuf->b_blocknr));
     enqueue_buf(tbuf);
     if(block_io(tbuf, dev, WRITING) == 0)
         return -1;
@@ -134,7 +134,7 @@ int put_block_buffer_dirt(block_buffer_t *tbuf) {
 }
 
 int put_block_buffer(block_buffer_t *tbuf) {
-    //XDEBUG(("Buffer %08x %d put\n",tbuf, tbuf->b_blocknr));
+    //KDEBUG(("Buffer %08x %d put\n",tbuf, tbuf->b_blocknr));
 
     enqueue_buf(tbuf);
     tbuf->b_count -= 1;
@@ -151,7 +151,7 @@ block_buffer_t *get_block_buffer(block_t blocknr, struct device* dev){
         if(tbuf->b_blocknr == blocknr){
             rm_lru(tbuf);
             tbuf->b_count += 1;
-            //XDEBUG(("Buffer %08x %d returned\n",tbuf, blocknr));
+            //KDEBUG(("Buffer %08x %d returned\n",tbuf, blocknr));
             return tbuf;
         }
     }
@@ -161,11 +161,11 @@ block_buffer_t *get_block_buffer(block_t blocknr, struct device* dev){
     if(tbuf && tbuf->b_dirt){
         ret = block_io(tbuf, dev, WRITING);
         tbuf->b_dirt = false;
-        XDEBUG(("Sync block %d count %d before returning %d\n", tbuf->b_blocknr, tbuf->b_count, blocknr));
+        KDEBUG(("Sync block %d count %d before returning %d\n", tbuf->b_blocknr, tbuf->b_count, blocknr));
     }
     tbuf->b_blocknr = blocknr;
     if (block_io(tbuf, dev, READING) == 0) {
-        XDEBUG(("ERR: flush block, dev io return %d\n", ret));
+        KDEBUG(("ERR: flush block, dev io return %d\n", ret));
         enqueue_buf(tbuf);
         return NULL;
     }
@@ -176,7 +176,7 @@ block_buffer_t *get_block_buffer(block_t blocknr, struct device* dev){
     tbuf->b_dev = dev;
     tbuf->b_count = 1;
     enqueue_buf(tbuf);
-    //XDEBUG(("Buffer %08x %d returned\n",tbuf, blocknr));
+    //KDEBUG(("Buffer %08x %d returned\n",tbuf, blocknr));
     return tbuf;
 }
 

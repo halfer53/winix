@@ -55,14 +55,14 @@ block_t alloc_block(inode_t *ino, struct device* id){
             sb->s_block_inuse += 1;
             sb->s_free_blocks -= 1;
             put_block_buffer_immed(bmap, id);
-            XDEBUG(("Alloc block %d for inode %d\n", free_bit, ino->i_num));
+            KDEBUG(("Alloc block %d for inode %d\n", free_bit, ino->i_num));
             return free_bit;
         }
         put_block_buffer(bmap);
         bnr++;
         bmap = get_block_buffer(bnr, id);
     }
-    XDEBUG(("no free block id found for dev %d", id->dev_id));
+    KDEBUG(("no free block id found for dev %d", id->dev_id));
     put_block_buffer(bmap);
     return ERR;
 }
@@ -73,7 +73,7 @@ int release_block(block_t bnr, struct device* id){
     block_buffer_t *bmap;
     int ret;
     if(bnr > sb->s_blockmap_size){
-        XDEBUG(("Invalid block id %d", bnr));
+        KDEBUG(("Invalid block id %d", bnr));
         return -1;
     }
 
@@ -198,7 +198,7 @@ int release_inode(inode_t *inode){
     int i = 0;
     int ret;
     if(!is_inode_in_use(inum, id)){
-        XDEBUG((" inode id %d not in use, cannot be released", inum));
+        KDEBUG((" inode id %d not in use, cannot be released", inum));
         return -1;
     }
 

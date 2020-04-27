@@ -20,7 +20,7 @@ __sigreturn:
 	addui $sp, $sp, 1
 	syscall
 	# Hopefull never get here
-	jal _exit
+	jal ___exit
 
 .extern	_pid 1
 .extern	stderr 1

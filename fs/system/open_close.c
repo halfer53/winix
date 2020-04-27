@@ -29,7 +29,7 @@
     return inode;
 }
 
-int sys_creat(struct proc* who, char* path){
+int sys_creat(struct proc* who, char* path, mode_t mode){
     
 }
 
@@ -61,7 +61,7 @@ int sys_open(struct proc *who, char *path, int flags, mode_t mode){
         return ret;
 
     inum = inode->i_num;
-    XDEBUG(("path %s Last dir %d, ret inode %d\n", path, lastdir->i_num, inum));
+    KDEBUG(("path %s Last dir %d, ret inode %d\n", path, lastdir->i_num, inum));
     put_inode(lastdir, false);
     return open_slot;
 }

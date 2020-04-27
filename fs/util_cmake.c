@@ -1,4 +1,5 @@
 #include <sys/types.h>
+#include <sys/ipc.h>
 #include <stdio.h>
 
 #define MEM_SIZE (32 * 1024)

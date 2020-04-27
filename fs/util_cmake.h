@@ -6,6 +6,7 @@
 #define FS_UTIL_CMAKE_H
 
 #include <sys/types.h>
+#include <sys/ipc.h>
 
 void* kmalloc(unsigned int size);
 void kfree(void *ptr);

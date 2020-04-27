@@ -3,7 +3,7 @@
 /**
  * Exits the current process.
  **/
- int _exit(int status) {
+ int ___exit(int status) {
     struct message m;
     m.m1_i1 = status;
     // if a process is killed by signals
@@ -16,7 +16,7 @@
 }
 
 int exit(int status){
-    _exit(status);
+    ___exit(status);
     // should never get here
     return -1;
 }

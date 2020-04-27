@@ -141,7 +141,7 @@ int pipe_read ( struct filp *filp, char *data, size_t count, off_t offset){
         next->offset = offset;
         next->sys_call_num = READ;
         list_add(&next->list, &ino->pipe_reading_list);
-        XDEBUG(("proc %d reading inode num %d is blocked \n", curr_user_proc_in_syscall->pid, filp->filp_ino->i_num));
+        KDEBUG(("proc %d reading inode num %d is blocked \n", curr_user_proc_in_syscall->pid, filp->filp_ino->i_num));
         return SUSPEND;
     }
     ret = __pipe_read(curr_user_proc_in_syscall, filp, data, count, offset);
@@ -149,10 +149,10 @@ int pipe_read ( struct filp *filp, char *data, size_t count, off_t offset){
         return ret;
     next = get_next_waiting(&ino->pipe_writing_list);
     if(next!= NULL){
-        XDEBUG(("Proc %d is awaken for writing\n", next->who->proc_nr));
+        KDEBUG(("Proc %d is awaken for writing\n", next->who->proc_nr));
         ret2 = __pipe_write(next->who, next->filp, next->data, next->count, next->offset);
         next->who->flags &= ~STATE_WAITING;
-        syscall_reply2(next->sys_call_num, ret2, next->who, &msg);
+        syscall_reply2(next->sys_call_num, ret2, next->who->proc_nr, &msg);
         kfree(next);
     }
     return ret;
@@ -160,7 +160,7 @@ int pipe_read ( struct filp *filp, char *data, size_t count, off_t offset){
 
 
 
-int pipe_write ( struct filp *filp, const char *data, size_t count, off_t offset){
+int pipe_write ( struct filp *filp, char *data, size_t count, off_t offset){
     int ret, ret2;
     struct pipe_waiting* next;
     struct message msg;
@@ -182,16 +182,16 @@ int pipe_write ( struct filp *filp, const char *data, size_t count, off_t offset
         next->offset = offset;
         next->sys_call_num = WRITE;
         list_add(&next->list, &ino->pipe_reading_list);
-        XDEBUG(("proc %d writing inode num %d is blocked \n", curr_user_proc_in_syscall->pid, filp->filp_ino->i_num));
+        KDEBUG(("proc %d writing inode num %d is blocked \n", curr_user_proc_in_syscall->pid, filp->filp_ino->i_num));
         return SUSPEND;
     }
     ret = __pipe_write(curr_user_proc_in_syscall, filp, data, count, offset);
     if(ret == 0)
         return ret;
-    XDEBUG(("proc %d writing %s\n", curr_user_proc_in_syscall->proc_nr, data));
+    KDEBUG(("proc %d writing %s\n", curr_user_proc_in_syscall->proc_nr, data));
     next = get_next_waiting(&ino->pipe_reading_list);
     if(next!= NULL){
-        XDEBUG(("Proc %d is awaken for reading\n", next->who->proc_nr));
+        KDEBUG(("Proc %d is awaken for reading\n", next->who->proc_nr));
         ret2 = __pipe_read(next->who, next->filp, next->data, next->count, next->offset);
         next->who->flags &= ~STATE_WAITING;
         syscall_reply2(next->sys_call_num, ret2, next->who->proc_nr, &msg);

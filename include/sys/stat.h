@@ -4,41 +4,19 @@
 #include <sys/types.h>		/* XXX */
 
 struct stat {
-  dev_t     st_dev;               /* inode's device */
-  mode_t    st_mode;              /* inode protection mode */
-  ino_t	st_ino;		      /* inode's number */
-  nlink_t   st_nlink;             /* number of hard links */
-  uid_t     st_uid;               /* user ID of the file's owner */
-  gid_t     st_gid;               /* group ID of the file's group */
-  dev_t     st_rdev;              /* device type */
-  time_t    st_atime;             /* time of last access */
-  int       st_atimensec;         /* nsec of last access */
-  time_t    st_mtime;             /* time of last data modification */
-  int      st_mtimensec;         /* nsec of last data modification */
-  time_t    st_ctime;             /* time of last file status change */
-  int      st_ctimensec;         /* nsec of last file status change */
-  time_t    st_birthtime;         /* time of creation */
-  int      st_birthtimensec;     /* nsec of time of creation */
-  off_t st_size;		/* file size, in bytes */
-  blkcnt_t  st_blocks;		/* blocks allocated for file */
-  blksize_t st_blksize;		/* optimal blocksize for I/O */
-  unsigned int     st_flags;		/* user defined flags for file */
-  unsigned int     st_gen;		/* file generation number */
-  unsigned int     st_spare[2];
-};
-
-struct minix_prev_stat {
-  short st_dev;			/* major/minor device number */
-  ino_t st_ino;			/* i-node number */
-  mode_t st_mode;		/* file mode, protection bits, etc. */
-  nlink_t st_nlink;		/* # links; */
-  short st_uid;			/* uid of the file's owner */
-  short int st_gid;		/* gid; TEMPORARY HACK: should be gid_t */
-  short st_rdev;
-  off_t st_size;		/* file size */
-  time_t st_atime;		/* time of last access */
-  time_t st_mtime;		/* time of last data modification */
-  time_t st_ctime;		/* time of last file status change */
+    dev_t     st_dev;         /* ID of device containing file */
+    ino_t     st_ino;         /* Inode number */
+    mode_t    st_mode;        /* File type and mode */
+    nlink_t   st_nlink;       /* Number of hard links */
+    uid_t     st_uid;         /* User ID of owner */
+    gid_t     st_gid;         /* Group ID of owner */
+    dev_t     st_rdev;        /* Device ID (if special file) */
+    off_t     st_size;        /* Total size, in bytes */
+    blksize_t st_blksize;     /* Block size for filesystem I/O */
+    blkcnt_t  st_blocks;      /* Number of 512B blocks allocated */
+    time_t st_atime;		/* time of last access */
+    time_t st_mtime;		/* time of last data modification */
+    time_t st_ctime;		/* time of last file status change */
 };
 
 

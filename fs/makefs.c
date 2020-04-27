@@ -79,12 +79,12 @@ int makefs( disk_word_t* disk_raw, size_t disk_size_words)
     };
 
     if(blocks_nr < 8){
-        XDEBUG(("block nr %d\n", blocks_nr));
+        KDEBUG(("block nr %d\n", blocks_nr));
         return -1;
     }
 
     if(block_in_use >= 32){
-        XDEBUG(("block in use %d\n", block_in_use));
+        KDEBUG(("block in use %d\n", block_in_use));
         return -1;
     }
 
@@ -105,7 +105,7 @@ int makefs( disk_word_t* disk_raw, size_t disk_size_words)
     pdisk += superblock.s_superblock_size;
 
     bitval = setBits(block_in_use);
-    XDEBUG(("block in use %d block map  %08x\n",block_in_use, bitval));
+    KDEBUG(("block in use %d block map  %08x\n",block_in_use, bitval));
     memcpy(pdisk, &bitval, sizeof(unsigned int));
     pdisk += superblock.s_blockmap_size;
 

@@ -75,7 +75,7 @@ function params{\
 #define WINFO_SLAB  4
 
 int _syscall(int syscall_num, struct message *m);
-int _exit(int status);
+int ___exit(int status);
 int sys_ps();
 pid_t fork();
 pid_t vfork();

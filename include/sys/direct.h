@@ -1,3 +1,4 @@
+
 #ifndef _DIR_H_
 #define _DIR_H_ 1
 
@@ -5,14 +6,28 @@
 
 #define    DIRBLKSIZ    1024    /* size of directory block */
 
+// each direct occupies 32 bytes, with 8 bytes for d_ino, and 24 bytes for directory name
 #ifndef DIRSIZ
 #define DIRSIZ    32
 #endif
 
-struct direct {
-  ino_t d_ino;
-  char d_name[DIRSIZ];
+#ifndef DIRNAME_LEN
+#define DIRNAME_LEN 29
+#endif
+
+struct dirent {
+    ino_t          d_ino;       /* inode number */
+    unsigned int   d_type;      /* type of file; not supported */
+    char    d_name[DIRNAME_LEN + 1]; /* filename */
 };
 
-#endif /* _DIR_H */
+#define	DT_UNKNOWN	 0
+#define	DT_FIFO		 1
+#define	DT_CHR		 2
+#define	DT_DIR		 4
+#define	DT_BLK		 6
+#define	DT_REG		 8
+#define	DT_LNK		10
+#define	DT_SOCK		12
 
+#endif /* _DIR_H */

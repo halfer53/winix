@@ -26,7 +26,7 @@ typedef struct filp {
 struct filp_operations{
     int (*lseek) ( struct filp *, off_t, int);
     int (*read) (struct filp *, char *, size_t, off_t );
-    int (*write) (struct filp *, const char *, size_t, off_t );
+    int (*write) (struct filp *, char *, size_t, off_t );
     int (*readdir) (struct filp *, void *);
     int (*open) (struct inode *, struct filp *);
     int (*flush) (struct filp *);

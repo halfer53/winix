@@ -13,7 +13,7 @@ int tty_read ( struct filp *filp, char *data, size_t count, off_t offset){
     return 0;
 }
 
-int tty_write ( struct filp *filp, const char *data, size_t count, off_t offset){
+int tty_write ( struct filp *filp, char *data, size_t count, off_t offset){
     return 0;
 }
 

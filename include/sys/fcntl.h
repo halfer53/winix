@@ -88,7 +88,6 @@ struct flock {
 #define	SEEK_END	2	/* set file offset to EOF plus offset */
 #endif
 
-#include <sys/cdefs.h>
 
 
 // int	open(const char *, int, ...);
