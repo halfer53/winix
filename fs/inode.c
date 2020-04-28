@@ -64,7 +64,7 @@ block_t alloc_block(inode_t *ino, struct device* id){
     }
     KDEBUG(("no free block id found for dev %d", id->dev_id));
     put_block_buffer(bmap);
-    return ERR;
+    return ENOSPC;
 }
 
 int release_block(block_t bnr, struct device* id){
@@ -86,7 +86,7 @@ int release_block(block_t bnr, struct device* id){
 }
 
 blkcnt_t get_inode_blocks(struct inode* ino){
-    blkcnt_t ret;
+    blkcnt_t ret = 0;
     int i;
     for(i = 0; i < NR_TZONES; i++){
         if(ino->i_zone[i] > 0){
@@ -155,6 +155,8 @@ int put_inode(inode_t *inode, bool is_dirty){
     int i = 0;
     int inum;
     int inode_block_offset;
+    if(!inode)
+        return EINVAL;
     inode->i_count -= 1;
     if(!is_dirty)
         return OK;
@@ -216,7 +218,7 @@ int release_inode(inode_t *inode){
     int ret;
     if(!is_inode_in_use(inum, id)){
         KDEBUG((" inode id %d not in use, cannot be released", inum));
-        return -1;
+        return EINVAL;
     }
 
     for(i = 0; i < NR_TZONES; i++){
@@ -232,10 +234,10 @@ int release_inode(inode_t *inode){
     bitmap_clear_bit(imap->block, BLOCK_SIZE, inum);
     sb->s_inode_inuse -= 1;
     sb->s_free_inodes += 1;
-    ret = put_block_buffer_immed(imap, id);
+    put_block_buffer_immed(imap, id);
 
     memset(inode, 0, sizeof(struct inode));
-    return ret;
+    return OK;
 }
 
 int fill_dirent(inode_t* ino, struct dirent* curr, char* string){
@@ -263,7 +265,7 @@ int init_dirent(inode_t* dir, inode_t* ino){
         if((bnr = ino->i_zone[i]) > 0){
             buf = get_block_buffer(bnr, ino->i_dev);
             curr = (struct dirent*)buf->block;
-            fill_dirent(ino, curr, ".");
+            fill_dirent( ino, curr, ".");
             curr++;
             fill_dirent(dir, curr, "..");
             put_block_buffer_dirt(buf);
@@ -299,16 +301,44 @@ int add_inode_to_directory( struct inode* dir, struct inode* ino, char* string){
         curr = (struct dirent*)buf->block;
         while(curr < end){
             if(curr->d_name[0] == '\0'){
-                ret = fill_dirent(ino, curr, string);
-                put_block_buffer_immed(buf, dir->i_dev);
+                fill_dirent(ino, curr, string);
+                put_block_buffer_dirt(buf);
                 ino->i_nlinks += 1;
-                return ret;
+                return OK;
             }
             curr++;
         }
         put_block_buffer(buf);
     }
     return ENOSPC;
+}
+
+int remove_inode_from_dir(struct inode* dir, struct inode* target){
+    int i;
+    block_t bnr;
+    struct block_buffer* buf;
+    struct dirent *curr, *end;
+    int ret;
+    for(i = 0; i < NR_TZONES; i++){
+        bnr = dir->i_zone[i];
+        if(bnr == 0)
+            continue;
+        buf = get_block_buffer(bnr, dir->i_dev);
+        end = (struct dirent*)&buf->block[BLOCK_SIZE];
+        curr = (struct dirent*)buf->block;
+        while(curr < end){
+            if(curr->d_ino == target->i_num){
+                curr->d_name[0] = '\0';
+                curr->d_ino = 0;
+                put_block_buffer_dirt(buf);
+                target->i_nlinks -= 1;
+                return OK;
+            }
+            curr++;
+        }
+        put_block_buffer(buf);
+    }
+    return ENOENT;
 }
 
 

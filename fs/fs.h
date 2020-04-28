@@ -69,6 +69,7 @@ void init_fs(disk_word_t* disk_raw, disk_word_t disk_size_words);
 int init_filp_by_inode(struct filp* filp, struct inode* inode);
 int init_inode_non_disk(struct inode* ino, ino_t num, struct device* dev, struct superblock* sb);
 void init_pipe();
+int remove_inode_from_dir(struct inode* dir, struct inode* target);
 int get_fd(struct proc *curr, int start, int *open_slot, filp_t **fpt);
 int add_inode_to_directory(inode_t* dir, inode_t* ino, char* string);
 int register_device(struct device* dev, char* name, dev_t id, mode_t type);
