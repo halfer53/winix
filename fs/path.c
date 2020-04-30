@@ -129,6 +129,8 @@ int eat_path(struct proc* who, char *path, inode_t** last_dir, struct inode** re
     inode_t *curr_dir;
     curr_dir = (*path == '/') ? who->fp_rootdir : who->fp_workdir;
     curr_dir->i_count += 1;
+    *ret_ino = NULL;
+    *last_dir = NULL;
 
     ret = __eath_path(curr_dir, last_dir, ret_ino, path, string);
 

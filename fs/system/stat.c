@@ -3,33 +3,43 @@
 //
 #include "../fs.h"
 
+void set_statbuf(struct inode* inode, struct stat* statbuf){
+    statbuf->st_dev = inode->i_dev->dev_id;
+    statbuf->st_ino = inode->i_num;
+    statbuf->st_mode = inode->i_mode;
+    statbuf->st_nlink = inode->i_nlinks;
+    statbuf->st_uid = inode->i_uid;
+    statbuf->st_gid = inode->i_gid;
+    statbuf->st_rdev = inode->i_zone[0];
+    statbuf->st_size = inode->i_size;
+    statbuf->st_blksize = BLOCK_SIZE;
+    statbuf->st_blocks = get_inode_blocks(inode);
+    statbuf->st_atime = inode->i_atime;
+    statbuf->st_mtime = inode->i_mtime;
+    statbuf->st_ctime = inode->i_ctime;
+}
+
+int sys_fstat(struct proc* who, int fd, struct stat* statbuf){
+    int ret;
+    struct filp* file;
+    if(!is_fd_opened_and_valid(who, fd))
+        return EBADF;
+    file = who->fp_filp[fd];
+    set_statbuf(file->filp_ino, statbuf);
+    return OK;
+}
+
 int sys_stat(struct proc* who, char *pathname, struct stat *statbuf){
     int ret;
-    inode_t *inode = NULL, *lastdir = NULL;
-    struct stat val;
-    char string[DIRSIZ];
+    inode_t *inode = NULL;
 
-    if(ret = eat_path(who, pathname, &lastdir,  &inode, string))
+    if(ret = get_inode_by_path(who, pathname, &inode))
         return ret;
 
     if(!inode)
         return ENOENT;
 
-    val.st_dev = lastdir->i_dev->dev_id;
-    val.st_ino = inode->i_num;
-    val.st_mode = inode->i_mode;
-    val.st_nlink = inode->i_nlinks;
-    val.st_uid = inode->i_uid;
-    val.st_gid = inode->i_gid;
-    val.st_rdev = inode->i_dev->dev_id;
-    val.st_size = inode->i_size;
-    val.st_blksize = BLOCK_SIZE;
-    val.st_blocks = get_inode_blocks(inode);
-    val.st_atime = inode->i_atime;
-    val.st_mtime = inode->i_mtime;
-    val.st_ctime = inode->i_ctime;
-    memcpy(statbuf, &val, sizeof(struct stat));
-    put_inode(lastdir, false);
+    set_statbuf(inode, statbuf);
     put_inode(inode, false);
     return OK;
 }

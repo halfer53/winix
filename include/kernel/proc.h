@@ -204,6 +204,8 @@ typedef struct proc {
     /* Alarm */
     struct timer alarm;
 
+    /* File System */
+    mode_t umask;
     filp_t* fp_filp[PROC_FILEP_NR];
     inode_t *fp_rootdir;
     inode_t *fp_workdir;

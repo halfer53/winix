@@ -74,11 +74,11 @@ int _sys_open(struct proc *who, char *path, int flags, mode_t mode, dev_t devid)
             release_inode(inode);
             goto final;
         }
-        inode->i_mode = mode;
+        inode->i_mode = mode & ~who->umask;
     }
 
     init_filp_by_inode(filp, inode);
-    filp->filp_mode = mode;
+    filp->filp_mode = inode->i_mode;
     filp->filp_flags = flags;
     who->fp_filp[open_slot] = filp;
     if(ret = inode->i_dev->fops->open(inode, filp))
@@ -91,6 +91,11 @@ int _sys_open(struct proc *who, char *path, int flags, mode_t mode, dev_t devid)
     put_inode(lastdir, false);
     put_inode(inode, false);
     return ret;
+}
+
+int sys_umask(struct proc* who, mode_t mask){
+    who->umask = mask & 0x777;
+    return OK;
 }
 
 int sys_creat(struct proc* who, char* path, mode_t mode){

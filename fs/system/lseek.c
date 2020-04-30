@@ -8,7 +8,8 @@ int extend_file(struct filp* file, off_t count){
     int pages, i;
     block_t bnr;
     struct inode* ino = file->filp_ino;
-    if(count < file->filp_ino->i_total_size){
+
+    if( count < file->filp_ino->i_total_size){
         file->filp_pos = count;
         return count;
     }
@@ -45,7 +46,7 @@ int sys_lseek(struct proc* who, int fd, off_t offset, int whence){
             break;
 
         case SEEK_END:
-            ret = extend_file(file, file->filp_ino->i_total_size + offset);
+            ret = extend_file(file, file->filp_ino->i_size + offset);
             break;
 
         default:
