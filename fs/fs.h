@@ -25,6 +25,7 @@
 #include <sys/stat.h>
 #include <sys/fcntl.h>
 #include <sys/direct.h>
+#include <sys/unistd.h>
 #include <fs/type.h>
 #include <fs/const.h>
 #include <winix/type.h>
@@ -63,7 +64,7 @@ int sys_chdir(struct proc* who, char* pathname);
 int sys_dup(struct proc* who, int oldfd);
 int sys_umask(struct proc* who, mode_t mask);
 
-
+bool check_access(struct proc* who, struct inode* ino, int mode);
 int get_inode_by_path(struct proc* who, char *path, struct inode** inode);
 block_t alloc_block(inode_t *ino, struct device* id);
 int makefs( disk_word_t* disk_raw, disk_word_t disk_size_words);
@@ -91,7 +92,7 @@ void init_inodetable();
 inode_t* read_inode(int num, struct device*);
 inode_t* get_inode(int num, struct device*);
 int put_inode(inode_t *inode, bool is_dirty);
-inode_t* alloc_inode( struct device*);
+inode_t* alloc_inode(struct proc* who, struct device*);
 void init_inode();
 
 void* kmalloc(unsigned int size);

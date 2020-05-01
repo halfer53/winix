@@ -1,18 +1,6 @@
 #ifndef _SYS_UNISTD_H_
 #define    _SYS_UNISTD_H_
 
-/* compile-time symbolic constants */
-#define    _POSIX_JOB_CONTROL    /* implementation supports job control */
-#ifdef _NOTYET
-#define    _POSIX_SAVED_IDS    /* saved set-user-ID and set-group-ID */
-#endif
-#define    _POSIX_VERSION        198808L
-
-/* execution-time symbolic constants */
-#define    _POSIX_CHOWN_RESTRICTED    /* chown requires appropriate privileges */
-#define    _POSIX_NO_TRUNC        /* too-long path components generate errors */
-                /* may disable terminal special characters */
-#define    _POSIX_VDISABLE    ((unsigned char)'\377')
 
 /* access function */
 #define    F_OK        0    /* test for existence of file */
@@ -20,17 +8,6 @@
 #define    W_OK        0x02    /* test for write permission */
 #define    R_OK        0x04    /* test for read permission */
 
-/* whence values for lseek(2) */
-#define    SEEK_SET    0    /* set file offset to offset */
-#define    SEEK_CUR    1    /* set file offset to current plus offset */
-#define    SEEK_END    2    /* set file offset to EOF plus offset */
-
-#ifndef _POSIX_SOURCE
-/* whence values for lseek(2); renamed by POSIX 1003.1 */
-#define    L_SET        SEEK_SET
-#define    L_INCR        SEEK_CUR
-#define    L_XTND        SEEK_END
-#endif
 
 /* configurable pathname variables */
 #define    _PC_LINK_MAX        1

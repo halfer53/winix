@@ -64,7 +64,7 @@ int _sys_open(struct proc *who, char *path, int flags, mode_t mode, dev_t devid)
         if(!(lastdir->i_mode & O_WRONLY))
             return EACCES;
 
-        inode = alloc_inode(dev);
+        inode = alloc_inode(who, dev);
         if(!inode){
             ret = ENOSPC;
             goto final;
@@ -91,11 +91,6 @@ int _sys_open(struct proc *who, char *path, int flags, mode_t mode, dev_t devid)
     put_inode(lastdir, false);
     put_inode(inode, false);
     return ret;
-}
-
-int sys_umask(struct proc* who, mode_t mask){
-    who->umask = mask & 0x777;
-    return OK;
 }
 
 int sys_creat(struct proc* who, char* path, mode_t mode){

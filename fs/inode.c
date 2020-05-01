@@ -20,6 +20,22 @@ struct inode* get_free_inode_slot(){
     return NULL;
 }
 
+bool check_access(struct proc* who, struct inode* ino, int mode){
+    if(who->uid == 0)
+        return true;
+    if(who->uid == ino->i_uid && (mode << 8) & ino->i_mode){
+        return true;
+    }
+    if(who->gid == ino->i_gid && (mode << 4) & ino->i_mode){
+        return true;
+    }
+    if(mode & ino->i_mode){
+        return true;
+    }
+    return false;
+
+}
+
 bool is_valid_inode_num(int num, struct device* id){
     struct superblock* sb = get_sb(id);
     if(num <= 0 || num >= NR_INODES)
@@ -170,7 +186,7 @@ int put_inode(inode_t *inode, bool is_dirty){
 }
 
 
-inode_t* alloc_inode(struct device* id){
+inode_t* alloc_inode(struct proc* who, struct device* id){
     struct superblock* sb = get_sb(id);
     int inum = 0, ret = 0;
     block_t imap_end = 0, bnr = 0;
@@ -200,6 +216,8 @@ inode_t* alloc_inode(struct device* id){
 
     inode = get_free_inode_slot();
     init_inode_non_disk(inode, inum, id, sb);
+    inode->i_gid = who->gid;
+    inode->i_uid = who->uid;
 
     sb->s_free_inodes -= 1;
     sb->s_inode_inuse += 1;
