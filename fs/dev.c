@@ -125,9 +125,10 @@ int root_fs_read (struct filp *filp, char *data, size_t count, off_t offset){
 }
 
 int root_fs_write (struct filp *filp, char *data, size_t count, off_t offset){
-    int r, len, j, ret = 0;
+    int r, j, ret = 0;
+    unsigned int len;
     off_t off;
-    int curr_fp_index, fp_limit;
+    unsigned int curr_fp_index, fp_limit;
     block_t bnr;
     inode_t *ino = NULL;
     struct block_buffer* buffer;
@@ -181,7 +182,7 @@ void init_dev(){
     INIT_LIST_HEAD(&devices_list);
 }
 
-int register_device(struct device* dev, char* name, dev_t id, mode_t type){
+int register_device(struct device* dev, const char* name, dev_t id, mode_t type){
     dev->init_name = name;
     dev->dev_id = id;
     dev->device_type = type;

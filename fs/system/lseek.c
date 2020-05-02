@@ -18,7 +18,6 @@ int extend_file(struct filp* file, off_t count){
         bnr = ino->i_zone[i];
         if(bnr == 0 && user_increment > 0){
             bnr = alloc_block(ino, ino->i_dev);
-            ino->i_total_size += BLOCK_SIZE;
             ino->i_zone[i] = bnr;
             allocated += BLOCK_SIZE;
             user_increment -= BLOCK_SIZE;

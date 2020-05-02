@@ -15,11 +15,13 @@ typedef struct filp {
     inode_t *filp_ino;    /* pointer to the inode */
     off_t filp_pos;        /* file position */
     struct device* filp_dev;
+    off_t pipe_read_pos;
 
     /* following are for fd-type-specific select() */
     // int filp_pipe_select_ops;
     int filp_table_index;
     struct list_head filp_list; // list for all the filp referring to the same underlying inode
+
     
 }filp_t;
 

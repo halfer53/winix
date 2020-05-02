@@ -32,7 +32,7 @@ typedef struct inode {
     struct list_head filp_list;
     struct list_head pipe_reading_list;
     struct list_head pipe_writing_list;
-    ptr_t *pip_data;
+    ptr_t *pipe_data;
 
     // char i_dirt;            /* CLEAN or DIRTY */
     // char i_pipe;            /* set to I_PIPE if pipe */

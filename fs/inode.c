@@ -20,7 +20,7 @@ struct inode* get_free_inode_slot(){
     return NULL;
 }
 
-bool check_access(struct proc* who, struct inode* ino, int mode){
+bool check_access(struct proc* who, struct inode* ino, mode_t mode){
     if(who->uid == 0)
         return true;
     if(who->uid == ino->i_uid && (mode << 8) & ino->i_mode){
@@ -38,10 +38,11 @@ bool check_access(struct proc* who, struct inode* ino, int mode){
 
 bool is_valid_inode_num(int num, struct device* id){
     struct superblock* sb = get_sb(id);
+    unsigned int inodes_nr;
     if(num <= 0 || num >= NR_INODES)
         return false;
 
-    int inodes_nr = sb->s_inode_per_block * sb->s_inode_tablenr;
+    inodes_nr = sb->s_inode_per_block * sb->s_inode_tablenr;
     return num <= inodes_nr;
 }
 
@@ -70,6 +71,7 @@ block_t alloc_block(inode_t *ino, struct device* id){
             bitmap_set_bit(bmap->block, BLOCK_SIZE, free_bit);
             sb->s_block_inuse += 1;
             sb->s_free_blocks -= 1;
+            ino->i_total_size += BLOCK_SIZE;
             put_block_buffer_immed(bmap, id);
             KDEBUG(("Alloc block %d for inode %d\n", free_bit, ino->i_num));
             return free_bit;
@@ -312,7 +314,6 @@ int add_inode_to_directory( struct inode* dir, struct inode* ino, char* string){
         if(bnr == 0){
             bnr = alloc_block(dir, dir->i_dev);
             dir->i_zone[i] = bnr;
-            dir->i_total_size += BLOCK_SIZE;
         }
         buf = get_block_buffer(bnr, dir->i_dev);
         end = (struct dirent*)&buf->block[BLOCK_SIZE];

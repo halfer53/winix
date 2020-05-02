@@ -3,8 +3,10 @@
 //
 
 #include "fs.h"
+#include <assert.h>
 #include <stdio.h>
 #include <string.h>
+
 
 struct proc pcurr, pcurr2;
 struct proc *current_proc;
@@ -48,30 +50,43 @@ void main(){
 
     init_fs(DISK_RAW, DISK_SIZE);
     fd = sys_open(current_proc, filename ,O_CREAT | O_RDWR, 0775);
-    printf("fd open /foo.txt return fd %d\n", fd);
+    assert(fd == 0);
 
-    char abc[] = "abcdefghijklmnopqrstuvwxyz";
-    printf("Writing abc\n");
-    sys_write(current_proc, fd, "abc", 3);
-    sys_write(current_proc, fd, "def", 4);
-    printf("Closing /foo.txt\n");
-    sys_close(current_proc, fd);
+    ret = sys_write(current_proc, fd, "abc", 3);
+    assert(ret == 3);
+    ret = sys_write(current_proc, fd, "def", 4);
+    assert(ret == 4);
+    ret = sys_read(current_proc, fd, buffer, 100);
+    assert(ret == 0);
+    ret = sys_lseek(current_proc,fd, 0, SEEK_SET);
+    assert(ret == 0);
+    ret = sys_read(current_proc, fd, buffer, 100);
+    assert(ret == 7);
+    assert(strcmp(buffer, "abcdef") == 0);
+    ret = sys_close(current_proc, fd);
+    assert(ret == 0);
 
     fd = sys_open(current_proc, filename ,O_RDONLY, 0775);
-    printf("fd reopen /foo.txt return fd %d\n", fd);
+    assert(fd == 0);
 
     ret = sys_read(current_proc, fd, buffer, 100);
-    printf("Read got %s, ret %d\n", buffer, ret);
+    assert(ret == 7);
+    assert(strcmp(buffer, "abcdef") == 0);
     ret = sys_read(current_proc, fd, buffer, 100);
-    printf("Read got %s, ret %d\n", buffer, ret);
+    assert(ret == 0);
 //    sys_close(current_proc, fd);
 
     ret = sys_pipe(&pcurr, pipe_fd);
-    printf("Pipe ret %d, fd %d %d\n", ret, pipe_fd[0], pipe_fd[1]);
+    assert(ret == 0);
     emulate_fork(&pcurr, &pcurr2);
     ret = sys_read(&pcurr, pipe_fd[0], buffer, 100);
+    assert(ret == SUSPEND);
+    ret = sys_write(&pcurr2, pipe_fd[1], "1234", 4);
+    assert(ret == 4);
+
     ret = sys_write(&pcurr2, pipe_fd[1], "1234", 5);
-    printf("Pipe write ret %d\n", ret);
-    ret = sys_write(&pcurr2, pipe_fd[1], "1234", 5);
-    printf("Pipe write2 ret %d\n", ret);
+    assert(ret == 5);
+    ret = sys_read(&pcurr, pipe_fd[0], buffer, 100);
+    assert(ret == 5);
+    assert(strcmp(buffer, "1234") == 0);
 }

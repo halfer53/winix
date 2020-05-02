@@ -8,7 +8,7 @@ int sys_chdir(struct proc* who, char* pathname){
     int ret;
     inode_t *inode = NULL, *curr_working;
 
-    if(ret = get_inode_by_path(who, pathname, &inode))
+    if((ret = get_inode_by_path(who, pathname, &inode)))
         return ret;
 
     if(!inode)

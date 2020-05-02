@@ -12,7 +12,7 @@ int sys_chmod(struct proc* who, const char *pathname, mode_t mode){
     int ret;
     inode_t *inode = NULL;
 
-    if(ret = get_inode_by_path(who, pathname, &inode))
+    if((ret = get_inode_by_path(who, pathname, &inode)))
         return ret;
 
     if(!inode)

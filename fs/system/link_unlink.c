@@ -9,10 +9,10 @@ int sys_link(struct proc* who, char *oldpath, char *newpath){
     char string[DIRSIZ];
     int ret;
 
-    if(ret = get_inode_by_path(who, oldpath, &oldinode))
+    if((ret = get_inode_by_path(who, oldpath, &oldinode)))
         goto failed_1;
 
-    if(ret = eat_path(who, newpath, &lastdir, &newinode, string))
+    if((ret = eat_path(who, newpath, &lastdir, &newinode, string)))
         goto final;
 
     if(newinode){

@@ -53,7 +53,7 @@ filp_t *find_filp(inode_t *inode){
 filp_t *get_free_filp(){
     filp_t* rep;
     for(rep = &fd_table[0]; rep < &fd_table[NR_FILPS]; rep++ ){
-        if(rep->filp_ino = NIL_INODE){
+        if(rep->filp_ino == NULL){
             return rep;
         }
     }
