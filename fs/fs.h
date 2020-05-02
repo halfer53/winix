@@ -64,6 +64,12 @@ int sys_chdir(struct proc* who, char* pathname);
 int sys_dup(struct proc* who, int oldfd);
 int sys_umask(struct proc* who, mode_t mask);
 int sys_lseek(struct proc* who, int fd, off_t offset, int whence);
+int sys_mkdir(struct proc* who, char* pathname, mode_t mode);
+int sys_access(struct proc* who, char* pathname, int mode);
+int sys_stat(struct proc* who, char *pathname, struct stat *statbuf);
+int sys_fstat(struct proc* who, int fd, struct stat* statbuf);
+int sys_link(struct proc* who, char *oldpath, char *newpath);
+int sys_unlink(struct proc* who, char *path);
 
 bool check_access(struct proc* who, struct inode* ino, mode_t mode);
 int get_inode_by_path(struct proc* who, char *path, struct inode** inode);

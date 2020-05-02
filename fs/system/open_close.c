@@ -27,6 +27,7 @@ int _sys_open(struct proc *who, char *path, int flags, mode_t mode, dev_t devid)
     inode_t *inode = NULL, *lastdir = NULL;
     char string[DIRSIZ];
     struct device* dev;
+    mode_t file_mode;
 
     dev = get_dev(devid);
     if(!dev)
@@ -74,7 +75,7 @@ int _sys_open(struct proc *who, char *path, int flags, mode_t mode, dev_t devid)
             release_inode(inode);
             goto final;
         }
-        inode->i_mode = mode & ~who->umask;
+        inode->i_mode = dev->device_type | ( mode & ~who->umask);
     }
 
     init_filp_by_inode(filp, inode);

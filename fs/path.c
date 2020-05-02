@@ -124,7 +124,7 @@ int __eath_path(struct inode* curr_ino, struct inode** last_dir,
     return ENOENT;
 }
 
-int eat_path(struct proc* who, char *path, inode_t** last_dir, struct inode** ret_ino, char string[DIRSIZ]){
+int eat_path(struct proc* who, char *path, struct inode** last_dir, struct inode** ret_ino, char string[DIRSIZ]){
     int ret;
     inode_t *curr_dir;
     curr_dir = (*path == '/') ? who->fp_rootdir : who->fp_workdir;

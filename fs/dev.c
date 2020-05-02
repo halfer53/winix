@@ -220,7 +220,7 @@ void init_root_fs(){
 
     dev->dops = &dops;
     dev->fops = &ops;
-    register_device(dev, DEVICE_NAME, devid, S_IFBLK);
+    register_device(dev, DEVICE_NAME, devid, S_IFREG);
 
     dev->dops->dev_init();
 
