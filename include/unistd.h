@@ -8,7 +8,7 @@
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/unistd.h>
-#include <sys/direct.h>
+#include <sys/dirent.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
 #include <sys/syscall.h>

@@ -1,7 +1,7 @@
 #include "fs.h"
 
-char dot1[2] = ".";    /* used for search_dir to bypass the access */
-char dot2[3] = "..";    /* permissions for . and ..            */
+char* dot1 = ".";    /* used for search_dir to bypass the access */
+char* dot2 = "..";    /* permissions for . and ..            */
 
 
 
@@ -48,10 +48,13 @@ char *get_name(char *old_name, char string[NAME_MAX]){
 
 // given a directory and a name component, lookup in the directory
 // and find the corresponding inode
-ino_t advance(inode_t *dirp, char string[NAME_MAX]){
+int advance(inode_t *dirp, char string[NAME_MAX]){
     int i,inum  = 0;
     block_buffer_t *buffer;
     struct dirent* dirstream;
+
+    if(*string == '\0')
+        return ERR;
 
     // currently only reads the first block
     for(i = 0; i < NR_TZONES; i++){

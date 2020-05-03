@@ -90,7 +90,7 @@ int makefs( disk_word_t* disk_raw, size_t disk_size_words)
 
 
     memset(&root_node, 0, sizeof(inode_t));
-    root_node.i_mode = 0x41c0; // drwx------
+    root_node.i_mode = S_IFDIR | 0x755;
     root_node.i_nlinks = 1;
     root_node.i_mtime = now;
     root_node.i_atime = now;
@@ -98,8 +98,8 @@ int makefs( disk_word_t* disk_raw, size_t disk_size_words)
     root_node.i_mode = S_IFDIR | 0x755;
     root_node.i_zone[0] = root_node_block_nr;
     root_node.i_num = ROOT_INODE_NUM; //root node
-
     root_node.i_ndblock = inode_table_block_nr;
+    root_node.i_size = BLOCK_SIZE;
 
     memcpy(pdisk, &superblock, sizeof(superblock));
     pdisk += superblock.s_superblock_size;
@@ -122,22 +122,21 @@ int makefs( disk_word_t* disk_raw, size_t disk_size_words)
     memset(&d2, 0, sizeof(struct dirent));
 
     d1.d_ino = 1;
-    memcpy(&d1.d_name, ".", 2);
+    strcpy(&d1.d_name, ".");
     d2.d_ino = 1;
-    memcpy(&d2.d_name, "..", 3);
+    strcpy(&d2.d_name, "..");
 
     pdir = (struct dirent*)pdisk;
     memcpy(pdir, &d1, sizeof(struct dirent));
     pdir++;
     memcpy(pdir, &d2, sizeof(struct dirent));
 
-    struct dirent* bak = (struct dirent*)pbak;
     struct dirent* dir = (struct dirent* )(disk_raw + (6 * BLOCK_SIZE));
     for(; dir < (struct dirent* )(pbak + BLOCK_SIZE); dir++ ){
         if(dir->d_ino == 0){
             break;
         }
-        printf("Inode %d %s\n", dir->d_ino, dir->d_name);
+        printf("Inode num %d addr %d %s\n",  dir->d_ino, ((disk_word_t*)dir - disk_raw), dir->d_name);
     }
 
     disk_word_t curr = 0;

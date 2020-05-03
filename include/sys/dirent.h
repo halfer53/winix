@@ -1,12 +1,12 @@
 
-#ifndef _DIR_H_
-#define _DIR_H_ 1
+#ifndef _SYS_DIR_H_
+#define _SYS_DIR_H_ 1
 
 #include <sys/types.h>
 
 #define    DIRBLKSIZ    1024    /* size of directory block */
 
-// each direct occupies 32 bytes, with 8 bytes for d_ino, and 24 bytes for directory name
+// each direct occupies 32 words
 #ifndef DIRSIZ
 #define DIRSIZ    32
 #endif
@@ -18,7 +18,7 @@
 struct dirent {
     ino_t          d_ino;       /* inode number */
     unsigned int   d_type;      /* type of file; not supported */
-    char    d_name[DIRNAME_LEN + 1]; /* filename */
+    char32_t    d_name[DIRNAME_LEN + 1]; /* filename */
 };
 
 #define	DT_UNKNOWN	 0

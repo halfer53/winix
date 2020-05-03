@@ -145,6 +145,8 @@ inode_t* read_inode(int num, struct device* id){
 
     if(!is_inode_in_use(num, id))
         return NULL;
+    if(num == 0)
+        return NULL;
 
     buffer = get_block_buffer(blocknr, id);
     memcpy(inode, &buffer->block[offset], INODE_DISK_SIZE_BYTE);

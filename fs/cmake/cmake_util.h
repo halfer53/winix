@@ -11,7 +11,7 @@
 void* kmalloc(unsigned int size);
 void kfree(void *ptr);
 
-
+int do_ps(char* pathname);
 int syscall_reply(int reply, int dest, struct message* m);
 int syscall_reply2(int syscall_num, int reply, int dest,  struct message* m);
 

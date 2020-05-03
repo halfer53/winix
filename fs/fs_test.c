@@ -89,4 +89,8 @@ void main(){
     ret = sys_read(&pcurr, pipe_fd[0], buffer, 100);
     assert(ret == 5);
     assert(strcmp(buffer, "1234") == 0);
+
+    ret = sys_mkdir(current_proc, "/dev", 0x755);
+    assert(ret == 0);
+    do_ps("/");
 }

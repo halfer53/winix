@@ -19,9 +19,6 @@ typedef struct inode {
     time_t i_ctime;        /* when was inode itself changed (V2 only)*/ //8
     block_t i_zone[NR_TZONES]; /* zone numbers for data blocks */
 
-    /* The following items are not present on the DISK_RAW. */
-    int disk_split;
-
     struct device* i_dev;            /* which device is the inode on */
     ino_t i_num;            /* inode number on its (minor) device */
     int i_count;            /* # times inode used; 0 means slot is free */

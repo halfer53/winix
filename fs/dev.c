@@ -86,7 +86,7 @@ int blk_dev_release(){
 
 int root_fs_read (struct filp *filp, char *data, size_t count, off_t offset){
     int ret = 0, r, len, j;
-    off_t off, ino_size;
+    off_t off, ino_size, end_in_block;
     int curr_fp_index, fp_limit;
     block_t bnr;
     inode_t *ino = NULL;
@@ -107,11 +107,12 @@ int root_fs_read (struct filp *filp, char *data, size_t count, off_t offset){
 
         r = 0;
         buffer = get_block_buffer(bnr, filp->filp_dev);
-        for (j = off; j< off + len && j < BLOCK_SIZE && j < ino_size; j++) {
+        end_in_block = (off + len) < ino->i_size ? (off + len) : ino->i_size;
+        for (j = off; j < end_in_block; j++) {
             *data++ = buffer->block[j];
             r++;
         }
-        KDEBUG(("file read for block %d, off %d len %d\n", curr_fp_index, off, r));
+        KDEBUG(("file read for block %d, off %d len %d\n", bnr, off, r));
         put_block_buffer(buffer);
         if (r == 0)
             break;

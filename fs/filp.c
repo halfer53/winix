@@ -1,4 +1,4 @@
-#include "fs.h"NULLNULL
+#include "fs.h"
 
 static filp_t fd_table[NR_FILPS];
 

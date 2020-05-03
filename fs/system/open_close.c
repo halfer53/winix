@@ -50,7 +50,7 @@ int _sys_open(struct proc *who, char *path, int flags, mode_t mode, dev_t devid)
     if(ret = get_fd(who, 0, &open_slot, &filp))
         goto final;
 
-    if(!inode){
+    if(!inode && *string != '\0'){
 
         if(!(flags & O_CREAT)){
             ret = ENOENT;
@@ -78,11 +78,15 @@ int _sys_open(struct proc *who, char *path, int flags, mode_t mode, dev_t devid)
         inode->i_mode = dev->device_type | ( mode & ~who->umask);
     }
 
+    if(!inode && *string == '\0'){
+        inode = lastdir;
+    }
+
     init_filp_by_inode(filp, inode);
     filp->filp_mode = inode->i_mode;
     filp->filp_flags = flags;
     who->fp_filp[open_slot] = filp;
-    if(ret = inode->i_dev->fops->open(inode, filp))
+    if((ret = inode->i_dev->fops->open(inode, filp)))
         goto final;
 
     ret = open_slot;

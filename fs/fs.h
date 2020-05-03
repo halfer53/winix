@@ -5,17 +5,7 @@
 #define _SYSTEM
 #endif
 
-#ifdef FS_CMAKE
 
-#include "cmake/cmake_util.h"
-#define kprintf(...) printf(__VA_ARGS__)
-#define KDEBUG(token)   printf("[SYSTEM] "); printf token
-
-#else
-
-#include <winix/kdebug.h>
-
-#endif
 
 #include <curses.h>
 #include <sys/errno.h>
@@ -24,7 +14,7 @@
 #include <sys/syscall.h>
 #include <sys/stat.h>
 #include <sys/fcntl.h>
-#include <sys/direct.h>
+#include <sys/dirent.h>
 #include <sys/unistd.h>
 #include <fs/type.h>
 #include <fs/const.h>
@@ -41,7 +31,9 @@
 #include <winix/page.h>
 #include <winix/compiler.h>
 #include <stdbool.h>
-#include <string.h>
+
+
+
 
 #define VERIFY_READ     1
 #define VERIFY_WRITE    2
@@ -70,6 +62,7 @@ int sys_stat(struct proc* who, char *pathname, struct stat *statbuf);
 int sys_fstat(struct proc* who, int fd, struct stat* statbuf);
 int sys_link(struct proc* who, char *oldpath, char *newpath);
 int sys_unlink(struct proc* who, char *path);
+int sys_mkdir(struct proc* who, char* pathname, mode_t mode);
 
 bool check_access(struct proc* who, struct inode* ino, mode_t mode);
 int get_inode_by_path(struct proc* who, char *path, struct inode** inode);
@@ -102,10 +95,19 @@ int put_inode(inode_t *inode, bool is_dirty);
 inode_t* alloc_inode(struct proc* who, struct device*);
 void init_inode();
 
-void* kmalloc(unsigned int size);
-void kfree(void *ptr);
-int kprintf(const char *format, ...);
+#ifdef FS_CMAKE
 
+#include <string.h>
+#include <stdio.h>
+#include "cmake/cmake_util.h"
+#define kprintf(...) printf(__VA_ARGS__)
+#define KDEBUG(token)   printf("[SYSTEM] "); printf token
+
+#else
+
+#include <winix/kdebug.h>
+
+#endif
 
 #endif
 
