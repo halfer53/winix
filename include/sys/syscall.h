@@ -20,7 +20,7 @@
 #include <sys/types.h>
 
 
-#define _NSYSCALL               37
+#define _NSYSCALL               38
 /**
  * System Call Numbers
  **/
@@ -61,6 +61,7 @@
 #define DUP             34
 #define LINK            35
 #define UNLINK          36
+#define GETDENT         37
 
 #define DECLARE_SYSCALL(function, params, syscall_num, passing_codes)\
 function params{\

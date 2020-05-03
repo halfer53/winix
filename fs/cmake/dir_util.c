@@ -42,12 +42,10 @@ DIR *opendir(const char *pathname){
 struct dirent *readdir(DIR *directory){
     struct dirent* dir;
     int ret;
-    do{
-        ret = sys_read(current_proc, directory->fd, directory->buffer, DIRSIZ);
-        if(ret <= 0)
-            return NULL;
-        dir = (struct dirent*)directory->buffer;
-    }while(dir->d_ino == 0);
+    ret = sys_getdent(current_proc, directory->fd, &directory->buffer);
+    if(ret < 0)
+        return NULL;
+    dir = &directory->buffer;
     return dir;
 }
 

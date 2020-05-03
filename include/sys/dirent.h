@@ -18,7 +18,7 @@
 struct dirent {
     ino_t          d_ino;       /* inode number */
     unsigned int   d_type;      /* type of file; not supported */
-    char32_t    d_name[DIRNAME_LEN + 1]; /* filename */
+    char   d_name[DIRNAME_LEN + 1]; /* filename */
 };
 
 #define	DT_UNKNOWN	 0

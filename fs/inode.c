@@ -264,7 +264,8 @@ int release_inode(inode_t *inode){
 
 int fill_dirent(inode_t* ino, struct dirent* curr, char* string){
     mode_t mode = ino->i_mode;
-    strcpy(curr->d_name, string);
+    char *dname = curr->d_name;
+    KSTRCPY(dname, string);
     curr->d_ino = ino->i_num;
 
     if(mode & S_IFDIR){
@@ -282,6 +283,8 @@ int init_dirent(inode_t* dir, inode_t* ino){
     struct block_buffer* buf;
     block_t bnr;
     int i;
+    if(!S_ISDIR(ino->i_mode))
+        return ENOTDIR;
 
     for (int i = 0; i < NR_TZONES; ++i) {
         if((bnr = ino->i_zone[i]) > 0){
@@ -305,7 +308,7 @@ int add_inode_to_directory( struct inode* dir, struct inode* ino, char* string){
     struct dirent* curr, *end;
     struct block_buffer* buf;
 
-    if(!(dir->i_mode & S_IFDIR))
+    if(!(S_ISDIR(dir->i_mode)))
         return EINVAL;
     if(!(dir->i_mode & O_WRONLY))
         return EACCES;

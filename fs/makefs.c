@@ -117,19 +117,12 @@ int makefs( disk_word_t* disk_raw, size_t disk_size_words)
     //inode table, first one is used by root node
     memcpy(pdisk + INODE_DISK_SIZE_WORD, &root_node, INODE_DISK_SIZE_BYTE);
     pdisk += superblock.s_inode_table_size;
+
     disk_word_t *pbak = pdisk;
-    memset(&d1, 0, sizeof(struct dirent));
-    memset(&d2, 0, sizeof(struct dirent));
-
-    d1.d_ino = 1;
-    strcpy(&d1.d_name, ".");
-    d2.d_ino = 1;
-    strcpy(&d2.d_name, "..");
-
     pdir = (struct dirent*)pdisk;
-    memcpy(pdir, &d1, sizeof(struct dirent));
+    fill_dirent(&root_node, pdir, ".");
     pdir++;
-    memcpy(pdir, &d2, sizeof(struct dirent));
+    fill_dirent(&root_node, pdir, "..");
 
     struct dirent* dir = (struct dirent* )(disk_raw + (6 * BLOCK_SIZE));
     for(; dir < (struct dirent* )(pbak + BLOCK_SIZE); dir++ ){

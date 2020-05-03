@@ -16,7 +16,7 @@ set(SOURCE_FILES
         path.c
         path.h
         system/read_write.c
-        cmake/cmake_util.c fs_test.c cmake/cmake_util.h disk.c cmake/cmake_bitmap.c system/pipe.c tty.c system/stat.c system/lseek.c system/chdir_mkdir.c miscellaneous.c system/chown_chmod.c system/dup.c system/link_unlink.c system/umask_access.c cmake/dir_util.c)
+        cmake/cmake_util.c fs_test.c cmake/cmake_util.h disk.c cmake/cmake_bitmap.c system/pipe.c tty.c system/stat.c system/lseek.c system/chdir_mkdir.c miscellaneous.c system/chown_chmod.c system/dup.c system/link_unlink.c system/umask_access.c cmake/dir_util.c system/getdent.c)
 
 include_directories(../include)
 add_compile_definitions(FS_CMAKE)

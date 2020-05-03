@@ -6,3 +6,5 @@
 bool has_file_access(int type, struct proc* who, struct inode* ino){
     return true;
 }
+
+

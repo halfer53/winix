@@ -7,7 +7,7 @@
 struct __dir{
     int fd;
     int pos;
-    char32_t buffer[DIRSIZ];
+    struct dirent buffer;
 };
 
 typedef struct __dir DIR;
