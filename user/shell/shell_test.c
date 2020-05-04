@@ -127,7 +127,7 @@ int test_vfork(int argc, char **argv){
         signal(SIGINT, SIG_DFL);
         signal(SIGTERM, SIG_DFL);
         signal(SIGTSTP, SIG_DFL);
-        _exit(0);
+        exit(0);
     }
     printf("parent awaken\n");
     return 0;

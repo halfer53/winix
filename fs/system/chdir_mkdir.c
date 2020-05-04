@@ -2,7 +2,7 @@
 // Created by bruce on 27/04/20.
 //
 
-#include "../fs.h"
+#include <fs/fs.h>
 
 int sys_chdir(struct proc* who, char* pathname){
     int ret = OK;
@@ -14,7 +14,7 @@ int sys_chdir(struct proc* who, char* pathname){
     if(!inode)
         return EEXIST;
 
-    if(!(inode->i_mode & S_IFDIR)){
+    if(!(S_ISDIR(inode->i_mode))){
         ret = ENOTDIR;
         goto error;
     }
@@ -33,6 +33,7 @@ int sys_mkdir(struct proc* who, char* pathname, mode_t mode){
     struct inode *lastdir = NULL, *ino = NULL;
     int ret = OK;
     bool is_dirty = false;
+    block_t bnr;
 
     ret = eat_path(who, pathname, &lastdir, &ino, string);
     if(ret)
@@ -47,6 +48,8 @@ int sys_mkdir(struct proc* who, char* pathname, mode_t mode){
         goto final;
     }
     ino->i_mode = S_IFDIR | (mode & ~who->umask);
+    ino->i_zone[0] = alloc_block(ino, lastdir->i_dev);
+    init_dirent(lastdir, ino);
     ret = add_inode_to_directory(lastdir, ino, string);
     if(ret){
         release_inode(ino);
@@ -59,4 +62,14 @@ int sys_mkdir(struct proc* who, char* pathname, mode_t mode){
     final_dir:
     put_inode(lastdir, is_dirty);
     return ret;
+}
+
+int do_chdir(struct proc* who, struct message* msg){
+    char* path = (char *) get_physical_addr(msg->m1_p1, who);
+    return sys_chdir(who, path);
+}
+
+int do_mkdir(struct proc* who, struct message* msg){
+    char* path = (char *) get_physical_addr(msg->m1_p1, who);
+    return sys_mkdir(who, path, msg->m1_i1);
 }

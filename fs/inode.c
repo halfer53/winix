@@ -1,4 +1,4 @@
-#include "fs.h"
+#include <fs/fs.h>
 
 inode_t inode_table[NR_INODES];
 
@@ -313,13 +313,14 @@ int add_inode_to_directory( struct inode* dir, struct inode* ino, char* string){
     if(!(dir->i_mode & O_WRONLY))
         return EACCES;
 
-    init_dirent(dir, ino);
+
     for(i = 0; i < NR_TZONES; i++){
         bnr = dir->i_zone[i];
         if(bnr == 0){
             bnr = alloc_block(dir, dir->i_dev);
             dir->i_zone[i] = bnr;
         }
+
         buf = get_block_buffer(bnr, dir->i_dev);
         end = (struct dirent*)&buf->block[BLOCK_SIZE];
         curr = (struct dirent*)buf->block;

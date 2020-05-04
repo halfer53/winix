@@ -172,6 +172,16 @@ void init_syscall_table(){
     SYSCALL_MAP(SIGPROCMASK, do_sigprocmask);
     SYSCALL_MAP(SETPGID, do_setpgid);
     SYSCALL_MAP(GETPGID, do_getpgid);
+    SYSCALL_MAP(OPEN, do_open);
+    SYSCALL_MAP(CREAT, do_creat);
+    SYSCALL_MAP(CLOSE, do_close);
+    SYSCALL_MAP(READ, do_read);
+    SYSCALL_MAP(WRITE, do_write);
+    SYSCALL_MAP(PIPE, do_pipe);
+    SYSCALL_MAP(ACCESS, do_access);
+    SYSCALL_MAP(CHDIR, do_chdir);
+    SYSCALL_MAP(MKDIR, do_mkdir);
+    SYSCALL_MAP(GETDENT, do_getdent);
 }
 
 

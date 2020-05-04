@@ -57,56 +57,56 @@ int parse(char *input_line, struct cmdLine *sc)
         
         switch(*line)
         {
-        // case '|':
-        //     /* terminate the previous argument and bump to next character */
-        //     *line++ = '\0';
-        //     sc->argv[argc++] = NULL;    /* terminate the command */
-        //     /* the next command will start at this position */
-        //     sc->cmdStart[++sc->numCommands] = argc;
-        //     continue;   /* go back to the top of the while loop */
+        case '|':
+            /* terminate the previous argument and bump to next character */
+            *line++ = '\0';
+            sc->argv[argc++] = NULL;    /* terminate the command */
+            /* the next command will start at this position */
+            sc->cmdStart[++sc->numCommands] = argc;
+            continue;   /* go back to the top of the while loop */
 
-        // case '<':
-        //     *line++ = '\0'; /* terminate argument and go to next character */
-        //     while(isspace(*line))   /* skip whitespace */
-        //         ++line;
-        //     sc->infile = line;
-        //     break;
+        case '<':
+            *line++ = '\0'; /* terminate argument and go to next character */
+            while(isspace(*line))   /* skip whitespace */
+                ++line;
+            sc->infile = line;
+            break;
 
-        // case '>':
-        //     *line++ = '\0'; /* terminate the argument */
-        //     if(*line == '>') /* second '>' means append */
-        //     {
-        //         sc->append = 1;
-        //         line++;
-        //     }
-        //     while(isspace(*line))   /* skip whitespace */
-        //         ++line;
-        //     sc->outfile = line;
-        //     break;
-        // case '&':
-        //     sc->background = 1;
-        //     break;
-        // case '\\':
-        //     sc->argv[argc++] = ++line;
-        //     line++;
-        //     break;
-        // case '\'':
-        //     sc->argv[argc++] = ++line;
-        //     while(*line != '\''){line++;}
-        //     *line = '\0';
-        //     break;
-        // case '"':
-        //     sc->argv[argc++] = line++;
-        //     while(*line != '"'){line++;}
-        //     *++line = '\0';
-        //         line++;
-        //         continue;
-        // case '`':
-        //     sc->argv[argc++] = line++;
-        //     while(*line != '`'){line++;}
-        //     *++line = '\0';
-        //         line++;
-        //         continue;
+        case '>':
+            *line++ = '\0'; /* terminate the argument */
+            if(*line == '>') /* second '>' means append */
+            {
+                sc->append = 1;
+                line++;
+            }
+            while(isspace(*line))   /* skip whitespace */
+                ++line;
+            sc->outfile = line;
+            break;
+        case '&':
+            sc->background = 1;
+            break;
+        case '\\':
+            sc->argv[argc++] = ++line;
+            line++;
+            break;
+        case '\'':
+            sc->argv[argc++] = ++line;
+            while(*line != '\''){line++;}
+            *line = '\0';
+            break;
+        case '"':
+            sc->argv[argc++] = line++;
+            while(*line != '"'){line++;}
+            *++line = '\0';
+                line++;
+                continue;
+        case '`':
+            sc->argv[argc++] = line++;
+            while(*line != '`'){line++;}
+            *++line = '\0';
+                line++;
+                continue;
         /*
         ** Here would be a good place to check for other special characters
         ** (quotes, '&', etc) and do something clever.

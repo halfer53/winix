@@ -3,7 +3,7 @@
 /**
  * block structure
  */
-typedef struct s_block {
+struct s_block {
     size_t size;
     struct s_block *next;
     struct s_block *prev;
@@ -13,7 +13,7 @@ typedef struct s_block {
     // The reason we use data[1] is that c returns the address of array by default, 
     // whereas if we were to use ```char data;```, b-> returns the data instead of the address.
     // note that data is just put there, it lies directly in the memory block where malloc starts.
-}block_t;
+};
 
 static void *base = NULL;
 static int count = 0;
@@ -22,7 +22,7 @@ static int count = 0;
 #define align4(x) 	(((((x)-1)>>2)<<2)+4)
 #define ALIGN1K(x) 	(((((x)-1)>>10)<<10)+1024)
 
-void printblock(block_t *b) {
+void printblock(struct s_block *b) {
     printf("0x%04x size %04d prev 0x%04x next 0x%04x %s\n",
         b, 
         b->size, 
@@ -34,7 +34,7 @@ void printblock(block_t *b) {
 void print_heap() {
     int frees = 0;
     int used = 0;
-    block_t *b = base;
+    struct s_block *b = base;
     
     if(!b){
         printf("Heap is empty\n");
@@ -52,8 +52,8 @@ void print_heap() {
 }
 
 
-block_t *find_block(block_t **last , size_t size) {
-    block_t *b = base;
+struct s_block *find_block(struct s_block **last , size_t size) {
+    struct s_block *b = base;
     while (b && !(b->free && b->size >= size)) {
         *last = b;
         b = b->next;
@@ -64,11 +64,11 @@ block_t *find_block(block_t **last , size_t size) {
 
 /* Split block according to size. */
 /* The b block must exist. */
-void split_block(block_t *b, size_t s)
+void split_block(struct s_block *b, size_t s)
 {
-    block_t *new;
+    struct s_block *new;
     // printf("data 0x%08x new 0x%08x\n", b->data,new);
-    new = (block_t *)(b->data + s);
+    new = (struct s_block *)(b->data + s);
     new->size = b->size - s - BLOCK_SIZE;
     new->next = b->next;
     new->prev = b;
@@ -84,10 +84,10 @@ void split_block(block_t *b, size_t s)
 
 /* Add a new block at the of heap */
 /* return NULL if things go wrong */
-block_t *extend_heap(block_t *last , size_t s)
+struct s_block *extend_heap(struct s_block *last , size_t s)
 {
     int *sb;
-    block_t *b, *b2;
+    struct s_block *b, *b2;
     
     b = sbrk (0);
     sb = sbrk(BLOCK_SIZE+s);
@@ -109,7 +109,7 @@ block_t *extend_heap(block_t *last , size_t s)
 
 void *malloc(size_t size) {
 
-    block_t *b, *last;
+    struct s_block *b, *last;
     size_t s;
 
     count++;
@@ -142,14 +142,14 @@ void *malloc(size_t size) {
 }
 
 /* Get the block from and addr */
-block_t *get_block(void *p){
+struct s_block *get_block(void *p){
     return (void *)((int *)p - BLOCK_SIZE);
 }
 
 /* Valid addr for free */
 int valid_addr(void *p)
 {
-    block_t *b;
+    struct s_block *b;
     if (base)
     {
         if ( p > base && p < (void *)sbrk (0))
@@ -162,8 +162,8 @@ int valid_addr(void *p)
     return (0);
 }
 
-block_t *fusion(block_t *b) {
-    block_t* next = b->next;
+struct s_block *fusion(struct s_block *b) {
+    struct s_block* next = b->next;
     if (next && next->free && ((int)(b->ptr) + b->size == (int)next)) {
         b->size += BLOCK_SIZE + next->size;
         b->next = next->next;
@@ -177,7 +177,7 @@ block_t *fusion(block_t *b) {
 /* See free(3) */
 void free(void *p)
 {
-    block_t *b;
+    struct s_block *b;
     if (valid_addr(p))
     {
         b = get_block(p);
@@ -208,7 +208,7 @@ void *calloc(size_t number , size_t size) {
 
 
 /* Copy data from block to block */
-void copy_block(block_t *src, block_t *dst)
+void copy_block(struct s_block *src, struct s_block *dst)
 {
     memcpy(dst->ptr, src->ptr, src->size);
 }
@@ -218,7 +218,7 @@ void copy_block(block_t *src, block_t *dst)
 void *realloc(void *p, size_t size)
 {
     size_t s;
-    block_t *b, *new, *next;
+    struct s_block *b, *new, *next;
     void *newp;
     if (!p)
         return (malloc(size));

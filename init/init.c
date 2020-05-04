@@ -1,5 +1,5 @@
 #include <sys/syscall.h>
-#include <stdio.h>
+#include <winix_stdio.h>
 #include <signal.h>
 
 void init_init(){

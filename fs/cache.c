@@ -1,40 +1,40 @@
-#include "fs.h"
+#include <fs/fs.h>
 
-static block_buffer_t buf_table[LRU_LEN];
+static struct block_buffer buf_table[LRU_LEN];
 
-static block_buffer_t *lru_cache[2];
+static struct block_buffer *lru_cache[2];
 
-static block_buffer_t imap;// inode map is assumed to be 1 block in length
+static struct block_buffer imap;// inode map is assumed to be 1 block in length
 
-static block_buffer_t bmap; // block map is also assumed to be 1 block in length
+static struct block_buffer bmap; // block map is also assumed to be 1 block in length
 
 // The lru is illustrated as below
 // REAR -> next -> .... -> next -> FRONT
 // With the most recently used cache at the front, and least recently used block at the rear
 
-block_buffer_t *get_imap(int num, struct device* id){
+struct block_buffer *get_imap(int num, struct device* id){
     struct superblock* sb = get_sb(id);
-    block_buffer_t* buf = get_block_buffer(sb->s_inodemapnr, id);
+    struct block_buffer* buf = get_block_buffer(sb->s_inodemapnr, id);
     return buf;
 }
 
-block_buffer_t *get_inode_table(int num, struct device* id){
+struct block_buffer *get_inode_table(int num, struct device* id){
     struct superblock* sb = get_sb(id);
     block_t bnr = (num * sb->s_inode_size) / BLOCK_SIZE;
     if(bnr * BLOCK_SIZE > sb->s_inode_table_size){
         return NULL;
     }
-    block_buffer_t* buf = get_block_buffer(sb->s_inode_tablenr + bnr, id);
+    struct block_buffer* buf = get_block_buffer(sb->s_inode_tablenr + bnr, id);
     return buf;
 }
 
-block_buffer_t *get_bmap(struct device* id){
+struct block_buffer *get_bmap(struct device* id){
     struct superblock* sb = get_sb(id);
-    block_buffer_t* buf = get_block_buffer(sb->s_blockmapnr, id);
+    struct block_buffer* buf = get_block_buffer(sb->s_blockmapnr, id);
     return buf;
 }
 
-void rm_lru(block_buffer_t *buffer){
+void rm_lru(struct block_buffer *buffer){
     if(buffer->prev)
         buffer->prev->next = buffer->next;
 
@@ -48,7 +48,7 @@ void rm_lru(block_buffer_t *buffer){
         lru_cache[FRONT] = buffer->prev;
 }
 
-PRIVATE void buf_move_to_front(block_buffer_t *buffer){
+PRIVATE void buf_move_to_front(struct block_buffer *buffer){
     if(lru_cache[FRONT] == buffer)
         return;
     
@@ -56,8 +56,8 @@ PRIVATE void buf_move_to_front(block_buffer_t *buffer){
     enqueue_buf(buffer);
 }
 
-block_buffer_t* dequeue_buf() {
-    block_buffer_t *rear = lru_cache[REAR];
+struct block_buffer* dequeue_buf() {
+    struct block_buffer *rear = lru_cache[REAR];
     if (!rear)
         return NULL;
 
@@ -67,7 +67,7 @@ block_buffer_t* dequeue_buf() {
     return rear;
 }
 
-void enqueue_buf(block_buffer_t *tbuf) {
+void enqueue_buf(struct block_buffer *tbuf) {
 
     if (lru_cache[FRONT] == NULL) {
         tbuf = lru_cache[REAR] = lru_cache[FRONT] = &buf_table[0];
@@ -81,7 +81,7 @@ void enqueue_buf(block_buffer_t *tbuf) {
 
 }
 
-PRIVATE void buf_move_to_rear(block_buffer_t *buffer){
+PRIVATE void buf_move_to_rear(struct block_buffer *buffer){
     if(lru_cache[REAR] == buffer)
         return;
 
@@ -104,7 +104,7 @@ int flush_inode_zones(inode_t *ino){
     return OK;
 }
 
-int block_io(block_buffer_t* tbuf, struct device* dev, int flag){
+int block_io(struct block_buffer* tbuf, struct device* dev, int flag){
     off_t off = tbuf->b_blocknr * BLOCK_SIZE;
 
     if(flag == READING){
@@ -115,7 +115,7 @@ int block_io(block_buffer_t* tbuf, struct device* dev, int flag){
     return 0;
 }
 
-int put_block_buffer_immed(block_buffer_t* tbuf, struct device* dev){
+int put_block_buffer_immed(struct block_buffer* tbuf, struct device* dev){
     //KDEBUG(("Buffer %08x %d put immed\n",tbuf, tbuf->b_blocknr));
     enqueue_buf(tbuf);
     if(block_io(tbuf, dev, WRITING) == 0)
@@ -128,12 +128,12 @@ int put_block_buffer_immed(block_buffer_t* tbuf, struct device* dev){
     return OK;
 }
 
-int put_block_buffer_dirt(block_buffer_t *tbuf) {
+int put_block_buffer_dirt(struct block_buffer *tbuf) {
     tbuf->b_dirt = true;
     return put_block_buffer(tbuf);
 }
 
-int put_block_buffer(block_buffer_t *tbuf) {
+int put_block_buffer(struct block_buffer *tbuf) {
     //KDEBUG(("Buffer %08x %d put\n",tbuf, tbuf->b_blocknr));
 
     enqueue_buf(tbuf);
@@ -144,8 +144,8 @@ int put_block_buffer(block_buffer_t *tbuf) {
     return 0;
 }
 
-block_buffer_t *get_block_buffer(block_t blocknr, struct device* dev){
-    block_buffer_t *tbuf;
+struct block_buffer *get_block_buffer(block_t blocknr, struct device* dev){
+    struct block_buffer *tbuf;
     int ret;
     for(tbuf = &buf_table[0];tbuf< &buf_table[LRU_LEN];tbuf++){
         if(tbuf->b_blocknr == blocknr){
@@ -182,7 +182,7 @@ block_buffer_t *get_block_buffer(block_t blocknr, struct device* dev){
 
 void init_buf(){
     int i=0;
-    block_buffer_t *tbuf = NULL, *prevbuf = NULL;
+    struct block_buffer *tbuf = NULL, *prevbuf = NULL;
     char *val;
     for(tbuf = &buf_table[0];tbuf< &buf_table[LRU_LEN];tbuf++){
         memset(tbuf, 0, sizeof(struct block_buffer));

@@ -46,6 +46,16 @@ int do_sigpending(struct proc* who, struct message* m);
 int do_sigprocmask(struct proc* who, struct message* m);
 int do_getpgid(struct proc* who, struct message* m);
 int do_setpgid(struct proc* who, struct message* m);
+int do_open(struct proc* who, struct message* msg);
+int do_creat(struct proc* who, struct message* msg);
+int do_close(struct proc* who, struct message* msg);
+int do_read(struct proc* who, struct message* msg);
+int do_write(struct proc* who, struct message* msg);
+int do_pipe(struct proc* who, struct message* msg);
+int do_access(struct proc* who, struct message* msg);
+int do_chdir(struct proc* who, struct message* msg);
+int do_mkdir(struct proc* who, struct message* msg);
+int do_getdent(struct proc* who, struct message* msg);
 
 #endif
 

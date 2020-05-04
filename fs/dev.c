@@ -1,6 +1,5 @@
-#include "fs.h"
+#include <fs/fs.h>
 #include <winix/list.h>
-#include <string.h>
 
 
 struct device _root_dev;
@@ -29,23 +28,23 @@ void sync_sb(struct superblock* sb){
 }
 
 
-void report_sb(struct superblock* sb){
-    disk_word_t curr = 0;
-    printf("\nsuper block 0 - 0x%08x\n", curr);
-    curr += sb->s_superblock_size;
-    printf("block map 0x%08x - 0x%08x\n",curr, curr+ sb->s_blockmap_size );
-    curr += sb->s_blockmap_size;
-    printf("inode map 0%08x - 0x%08x\n",curr, curr+sb->s_inodemap_size );
-    curr += sb->s_inodemap_size;
-    printf("inode table 0x%08x - 0x%08x\n",curr, curr+sb->s_inode_table_size );
-    curr += sb->s_inode_table_size;
-    printf("data block 0x%08x - 0x%p\n Number of free blocks %d\n",curr, _disk + _disk_size - curr, sb->s_free_blocks );
+// void report_sb(struct superblock* sb){
+//     disk_word_t curr = 0;
+//     printf("\nsuper block 0 - 0x%08x\n", curr);
+//     curr += sb->s_superblock_size;
+//     printf("block map 0x%08x - 0x%08x\n",curr, curr+ sb->s_blockmap_size );
+//     curr += sb->s_blockmap_size;
+//     printf("inode map 0%08x - 0x%08x\n",curr, curr+sb->s_inodemap_size );
+//     curr += sb->s_inodemap_size;
+//     printf("inode table 0x%08x - 0x%08x\n",curr, curr+sb->s_inode_table_size );
+//     curr += sb->s_inode_table_size;
+//     printf("data block 0x%08x - 0x%p\n Number of free blocks %d\n",curr, _disk + _disk_size - curr, sb->s_free_blocks );
 
-    printf("\nNum of blocks in use %d\n", sb->s_block_inuse);
-    printf("First free block num: %d\n", sb->s_nblock);
-    printf("Block size %d\n inode size %d\n", sb->s_block_size, sb->s_inode_size);
-    printf("inode per block %d\n", sb->s_inode_per_block);
-}
+//     printf("\nNum of blocks in use %d\n", sb->s_block_inuse);
+//     printf("First free block num: %d\n", sb->s_nblock);
+//     printf("Block size %d\n inode size %d\n", sb->s_block_size, sb->s_inode_size);
+//     printf("inode per block %d\n", sb->s_inode_per_block);
+// }
 
 int blk_dev_io_read(disk_word_t *buf, off_t off, size_t len){
     disk_word_t *ptr;

@@ -21,7 +21,8 @@ typedef struct filp {
     // int filp_pipe_select_ops;
     int filp_table_index;
     struct list_head filp_list; // list for all the filp referring to the same underlying inode
-
+    zone_t getdent_zone_nr;
+    int getdent_dirstream_nr;
     
 }filp_t;
 

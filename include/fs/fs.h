@@ -6,9 +6,9 @@
 #endif
 
 
-
+#include <stddef.h>
 #include <curses.h>
-#include <sys/errno.h>
+#include <errno.h>
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/syscall.h>
@@ -22,11 +22,10 @@
 #include <fs/inode.h>
 #include <fs/filp.h>
 #include <kernel/proc.h>
-#include "cache.h"
+#include <fs/cache.h>
 #include <fs/dev.h>
-#include "path.h"
+#include <fs/path.h>
 #include <fs/super.h>
-#include <string.h>
 #include <winix/bitmap.h>
 #include <winix/page.h>
 #include <winix/compiler.h>
@@ -64,12 +63,13 @@ int sys_link(struct proc* who, char *oldpath, char *newpath);
 int sys_unlink(struct proc* who, char *path);
 int sys_getdent(struct proc* who, int fd, struct dirent* dirp_dst);
 
+int init_dirent(inode_t* dir, inode_t* ino);
 int fill_dirent(inode_t* ino, struct dirent* curr, char* string);
 bool check_access(struct proc* who, struct inode* ino, mode_t mode);
 int get_inode_by_path(struct proc* who, char *path, struct inode** inode);
 block_t alloc_block(inode_t *ino, struct device* id);
 int makefs( disk_word_t* disk_raw, disk_word_t disk_size_words);
-void init_fs(disk_word_t* disk_raw, disk_word_t disk_size_words);
+void init_fs();
 int init_filp_by_inode(struct filp* filp, struct inode* inode);
 int init_inode_non_disk(struct inode* ino, ino_t num, struct device* dev, struct superblock* sb);
 void init_pipe();
@@ -107,6 +107,7 @@ void init_inode();
 #else
 
 #include <winix/kdebug.h>
+#include <winix_string.h>
 
 #endif
 

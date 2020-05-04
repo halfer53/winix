@@ -31,3 +31,4 @@ struct dirent {
 #define	DT_SOCK		12
 
 #endif /* _DIR_H */
+

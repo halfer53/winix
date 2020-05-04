@@ -2,7 +2,7 @@
 // Created by bruce on 30/04/20.
 //
 
-#include "../fs.h"
+#include <fs/fs.h>
 #include <unistd.h>
 
 int sys_umask(struct proc* who, mode_t mask){
@@ -28,4 +28,9 @@ int sys_access(struct proc* who, char* pathname, int mode){
     final:
     put_inode(ino, false);
     return ret;
+}
+
+int do_access(struct proc* who, struct message* msg){
+    char* buf = (char *) get_physical_addr(msg->m1_p1, who);
+    return sys_access(who, buf, msg->m1_i1);
 }

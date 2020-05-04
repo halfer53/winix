@@ -1,4 +1,4 @@
-#include "../fs.h"
+#include <fs/fs.h>
 
 
  int sys_close(struct proc *who,int fd){
@@ -107,4 +107,18 @@ int sys_open(struct proc *who, char *path, int flags, mode_t mode){
 }
 int sys_mknod(struct proc* who, char *pathname, mode_t mode, dev_t devid){
     return _sys_open(who, pathname, O_CREAT | O_EXCL | O_RDWR, mode, devid);
+}
+
+int do_open(struct proc* who, struct message* msg){
+    char* path = (char *) get_physical_addr(msg->m1_p1, who);
+    return sys_open(who, path, msg->m1_i1, msg->m1_i2);
+}
+
+int do_creat(struct proc* who, struct message* msg){
+    char* path = (char *) get_physical_addr(msg->m1_p1, who);
+    return sys_creat(who, path, msg->m1_i1);
+}
+
+int do_close(struct proc* who, struct message* msg){
+    return sys_chdir(who, msg->m1_i1);
 }

@@ -211,8 +211,7 @@ typedef struct proc {
     inode_t *fp_workdir;
     struct list_head pipe_reading_list;
     struct list_head pipe_writing_list;
-    zone_t getdent_zone_nr;
-    int getdent_dirstream_nr;
+
 } proc_t;
 
 /**

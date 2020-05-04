@@ -4,20 +4,25 @@
 
 #include <dirent.h>
 #include <stddef.h>
-#include "../fs.h"
+#include <fs/fs.h>
 
-int do_ps(char* pathname){
+int do_ls(char* pathname){
     DIR* directory;
     struct dirent* dir;
     int ret;
+    char *slash = "/";
+    char *symbol;
     if(pathname == NULL)
         pathname = ".";
     directory = opendir(pathname);
     if(!directory)
         return -1;
-    printf("Do PS: ");
     while((dir = readdir(directory)) != NULL){
-        printf("%s  ", dir->d_name);
+        if(*dir->d_name == '.'){
+            continue;
+        }
+        symbol = dir->d_type == DT_DIR ? slash : "";
+        printf("%s%s  ", symbol, dir->d_name);
     }
     printf("\n");
     closedir(directory);

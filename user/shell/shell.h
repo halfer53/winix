@@ -3,8 +3,8 @@
 #define _SHELL_H_ 1
 
 #include <unistd.h>
-#include <stdio.h>
-#include <string.h>
+#include <winix_stdio.h>
+#include <winix_string.h>
 #include <sys/debug.h>
 #include <ucontext.h>
 #include <sys/times.h>

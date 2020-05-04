@@ -2,7 +2,7 @@
 // Created by bruce on 19/04/20.
 //
 
-#include "fs.h"
+#include <fs/fs.h>
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
@@ -25,7 +25,7 @@ void emulate_fork(struct proc* p1, struct proc* p2){
     p2->pid = pid;
 }
 
-void main(){
+int do_tests(){
     int ret, fd;
     int pipe_fd[2];
     struct superblock sb;
@@ -42,13 +42,13 @@ void main(){
     ret = makefs(DISK_RAW, DISK_SIZE);
     if(ret){
         printf("makefs failed");
-        return;
+        return 1;
     }
     memcpy(&sb, DISK_RAW, sizeof(struct superblock));
     current_proc = &pcurr;
     curr_user_proc_in_syscall = current_proc;
 
-    init_fs(DISK_RAW, DISK_SIZE);
+    init_fs();
     fd = sys_open(current_proc, filename ,O_CREAT | O_RDWR, 0775);
     assert(fd == 0);
 
@@ -92,5 +92,27 @@ void main(){
 
     ret = sys_mkdir(current_proc, "/dev", 0x755);
     assert(ret == 0);
-    do_ps("/");
+    printf("Do LS: ");
+    do_ls("/");
+
+    ret = sys_access(current_proc, "/dev/bar.txt", F_OK);
+    assert(ret != 0);
+
+    ret = sys_creat(current_proc, "/dev/bar.txt", 0x777);
+    assert(ret > 0);
+
+    ret = sys_access(current_proc, "/dev/bar.txt", F_OK);
+    assert(ret == 0);
+
+    ret = sys_chdir(current_proc, "/dev");
+    assert(ret == 0);
+
+    printf("Do dev LS: ");
+    do_ls("/dev");
+    do_ls(".");
+}
+
+int main(int argc, char** argv){
+
+
 }

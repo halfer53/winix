@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "lib.h": "c",
+        "stat.h": "c"
+    }
+}

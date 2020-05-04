@@ -10,9 +10,9 @@ KLIB_O = lib/syscall/wramp_syscall.o lib/syscall/errno.o lib/syscall/ipc.o \
 
 L_HEAD = winix/limits/limits_head.o
 L_TAIL = winix/limits/limits_tail.o
-KERNEL_O = winix/*.o kernel/system/*.o kernel/*.o
+KERNEL_O = winix/*.o kernel/system/*.o kernel/*.o fs/*.c fs/system/*.o
 KMAIN = kernel/main.s kernel/main.o 
-alldir = winix lib init user kernel
+alldir = winix lib init user kernel fs
 
 
 # Check if V options is set by user, if V=1, debug mode is set

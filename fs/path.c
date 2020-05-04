@@ -1,4 +1,4 @@
-#include "fs.h"
+#include <fs/fs.h>
 
 char* dot1 = ".";    /* used for search_dir to bypass the access */
 char* dot2 = "..";    /* permissions for . and ..            */
@@ -145,7 +145,7 @@ int get_inode_by_path(struct proc* who, char *path, struct inode** inode){
     inode_t *lastdir = NULL;
     char string[DIRSIZ];
 
-    ret = eat_path(who, path, &lastdir, &inode, string);
+    ret = eat_path(who, path, &lastdir, inode, string);
     put_inode(lastdir, false);
     return ret;
 }

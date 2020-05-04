@@ -21,3 +21,4 @@ void           seekdir(DIR *, long int);
 long int       telldir(DIR *);
 
 #endif
+

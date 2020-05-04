@@ -20,7 +20,7 @@
 #include <sys/types.h>
 
 
-#define _NSYSCALL               38
+#define _NSYSCALL               40
 /**
  * System Call Numbers
  **/
@@ -62,6 +62,8 @@
 #define LINK            35
 #define UNLINK          36
 #define GETDENT         37
+#define ACCESS          38
+#define MKDIR           39
 
 #define DECLARE_SYSCALL(function, params, syscall_num, passing_codes)\
 function params{\
@@ -74,6 +76,8 @@ function params{\
 #define WINFO_PS    1
 #define WINFO_MEM   2
 #define WINFO_SLAB  4
+
+#ifndef FS_CMAKE
 
 int _syscall(int syscall_num, struct message *m);
 int ___exit(int status);
@@ -95,5 +99,17 @@ int sigaction(int signum, const struct sigaction *act,
 int sigprocmask(int how, const sigset_t *set, sigset_t *oldset);
 int sigsuspend(const sigset_t *mask);
 int sigpending(sigset_t *set);
+int open(const char *pathname,int flags, mode_t mode);
+int creat(const char *pathname, mode_t mode);
+int close(int fd);
+size_t read(int fd, void *buf, size_t count);
+size_t write(int fd, const void *buf, size_t count);
+int pipe(int pipefd[2]);
+int access(const char *pathname, int mode);
+int chdir(const char *path);
+int mkdir(const char *pathname, mode_t mode);
+int getdent( int fd, struct dirent *dirp);
+
+#endif
 
 #endif

@@ -1,7 +1,7 @@
-#include "fs.h"
+#include <fs/fs.h>
 #include <winix/list.h>
 
-void init_fs(disk_word_t* disk_raw, size_t disk_size_words) {
+void init_fs() {
 
     init_buf();
     init_inode();
