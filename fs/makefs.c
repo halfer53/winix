@@ -112,7 +112,7 @@ int makefs( disk_word_t* disk_raw, size_t disk_size_words)
         if(dir->d_ino == 0){
             break;
         }
-        printf("Inode num %d addr %s\n",  dir->d_ino,  dir->d_name);
+        printf("Inode num %d %ls\n",  dir->d_ino,  dir->d_name);
     }
 
     disk_word_t curr = 0;

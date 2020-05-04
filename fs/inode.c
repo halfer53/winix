@@ -272,7 +272,7 @@ int release_inode(inode_t *inode){
 
 int fill_dirent(inode_t* ino, struct dirent* curr, char* string){
     mode_t mode = ino->i_mode;
-    strcpy(curr->d_name, string);
+    char32_strncpy(curr->d_name, string, DIRNAME_LEN);
     curr->d_ino = ino->i_num;
 
     if(mode & S_IFDIR){

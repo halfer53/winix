@@ -61,7 +61,7 @@ int advance(inode_t *dirp, char string[NAME_MAX]){
         if(dirp->i_zone[i] > 0 && (buffer = get_block_buffer(dirp->i_zone[i], dirp->i_dev)) != NULL){
             dirstream = (struct dirent*)buffer->block;
             for(; dirstream < (struct dirent* )&buffer->block[BLOCK_SIZE]; dirstream++ ){
-                if(strcmp(dirstream->d_name, string) == 0){
+                if(char32_strcmp(dirstream->d_name, string) == 0){
                     inum = dirstream->d_ino;
                     put_block_buffer(buffer);
                     return inum;

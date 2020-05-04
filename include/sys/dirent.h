@@ -12,19 +12,19 @@
 #endif
 
 #ifndef DIRNAME_LEN
-#define DIRNAME_LEN 29
+#define DIRNAME_LEN 30
 #endif
 
 struct dirent {
     ino_t          d_ino;       /* inode number */
     unsigned int   d_type;      /* type of file; not supported */
-    char   d_name[DIRNAME_LEN + 1]; /* filename */
+    char32_t   d_name[DIRNAME_LEN ]; /* filename */
 };
 
 struct wramp_dirent {
     ino_t          d_ino;       /* inode number */
     unsigned int   d_type;      /* type of file; not supported */
-    char32_t  d_name[DIRNAME_LEN + 1]; /* filename */
+    char32_t  d_name[DIRNAME_LEN ]; /* filename */
 };
 
 #define	DT_UNKNOWN	 0
