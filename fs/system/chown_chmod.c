@@ -2,13 +2,13 @@
 // Created by bruce on 27/04/20.
 //
 
-#include <fs/fs.h>
+#include "../fs.h"
 
-int sys_chown(struct proc* who, const char *pathname, uid_t owner, gid_t group){
+int sys_chown(struct proc* who,  char *pathname, uid_t owner, gid_t group){
     return OK;
 }
 
-int sys_chmod(struct proc* who, const char *pathname, mode_t mode){
+int sys_chmod(struct proc* who, char *pathname, mode_t mode){
     int ret;
     inode_t *inode = NULL;
 

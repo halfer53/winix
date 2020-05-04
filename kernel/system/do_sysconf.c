@@ -1,5 +1,5 @@
 #include <kernel/kernel.h>
-#include <unistd.h>
+#include <winix_unistd.h>
 
 int do_sysconf(struct proc* who, struct message *m){
     switch(m->m1_i1){

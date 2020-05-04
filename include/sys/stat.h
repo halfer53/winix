@@ -3,6 +3,7 @@
 
 #include <sys/types.h>		/* XXX */
 
+
 struct stat {
     dev_t     st_dev;         /* ID of device containing file */
     ino_t     st_ino;         /* Inode number */
@@ -18,6 +19,7 @@ struct stat {
     time_t st_mtime;		/* time of last data modification */
     time_t st_ctime;		/* time of last file status change */
 };
+
 
 
 #define	S_ISUID	0004000			/* set user id on execution */

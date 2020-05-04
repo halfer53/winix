@@ -62,6 +62,7 @@ int do_receive(struct message *m);
 int interrupt_send(int dest, struct message* pm);
 
 int syscall_reply(int reply, int dest, struct message* m);
+int syscall_reply2(int syscall_num, int reply, int dest, struct message* m);
 
 
 #endif

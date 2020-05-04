@@ -1,6 +1,5 @@
-#include <fs/fs.h>
+#include "fs.h"
 #include <winix/list.h>
-
 
 struct device _root_dev;
 struct list_head devices_list;

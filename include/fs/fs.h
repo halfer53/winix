@@ -15,7 +15,7 @@
 #include <sys/stat.h>
 #include <sys/fcntl.h>
 #include <sys/dirent.h>
-#include <sys/unistd.h>
+#include <sys/winix_unistd.h>
 #include <fs/type.h>
 #include <fs/const.h>
 #include <winix/type.h>
@@ -49,8 +49,8 @@ int sys_read(struct proc *who, int fd, void *buf, size_t count);
 int sys_write(struct proc *who, int fd, void *buf, size_t count);
 int sys_close(struct proc *who, int fd);
 int sys_pipe(struct proc* who, int fd[2]);
-int sys_chmod(struct proc* who, const char *pathname, mode_t mode);
-int sys_chown(struct proc* who, const char *pathname, uid_t owner, gid_t group);
+int sys_chmod(struct proc* who,  char *pathname, mode_t mode);
+int sys_chown(struct proc* who,  char *pathname, uid_t owner, gid_t group);
 int sys_chdir(struct proc* who, char* pathname);
 int sys_dup(struct proc* who, int oldfd);
 int sys_umask(struct proc* who, mode_t mask);
@@ -67,7 +67,7 @@ int init_dirent(inode_t* dir, inode_t* ino);
 int fill_dirent(inode_t* ino, struct dirent* curr, char* string);
 bool check_access(struct proc* who, struct inode* ino, mode_t mode);
 int get_inode_by_path(struct proc* who, char *path, struct inode** inode);
-block_t alloc_block(inode_t *ino, struct device* id);
+int alloc_block(inode_t *ino, struct device* id);
 int makefs( disk_word_t* disk_raw, disk_word_t disk_size_words);
 void init_fs();
 int init_filp_by_inode(struct filp* filp, struct inode* inode);
@@ -106,6 +106,7 @@ void init_inode();
 
 #else
 
+#include <winix/slab.h>
 #include <winix/kdebug.h>
 #include <winix_string.h>
 

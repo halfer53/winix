@@ -1,4 +1,4 @@
-#include <fs/fs.h>
+#include "fs.h"
 #include <winix/list.h>
 
 void init_fs() {

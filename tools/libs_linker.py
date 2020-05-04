@@ -17,7 +17,7 @@ built_in = {
 	"winix_string.h": {STRING},
 	"signal.h": {SIGNAL},
 	"ucontext.h": {GEN},
-	"unistd.h": {POSIX, ANSI, STDLIB},
+	"winix_unistd.h": {POSIX, ANSI, STDLIB},
 	"util.h":	{UTIL},
 	"winix_stdio.h":	{STDIO},
 	"debug.h":	{DEBUG}

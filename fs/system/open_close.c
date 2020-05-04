@@ -1,4 +1,4 @@
-#include <fs/fs.h>
+#include "../fs.h"
 
 
  int sys_close(struct proc *who,int fd){
@@ -120,5 +120,5 @@ int do_creat(struct proc* who, struct message* msg){
 }
 
 int do_close(struct proc* who, struct message* msg){
-    return sys_chdir(who, msg->m1_i1);
+    return sys_close(who, msg->m1_i1);
 }

@@ -1,4 +1,4 @@
-#include <fs/fs.h>
+#include "fs.h"
 
 static filp_t fd_table[NR_FILPS];
 
@@ -18,7 +18,8 @@ int get_fd(struct proc *curr, int start, int *open_slot, filp_t **fpt){
     if(!found)
         return EMFILE;
 
-     for (f = &fd_table[0]; f < &fd_table[NR_FILPS]; f++) {
+    for(i = 0; i < NR_FILPS; i++ ){
+        f = &fd_table[i];
         if (f->filp_count == 0) {
             memset(f,0, sizeof(struct filp));
             *fpt = f;
@@ -38,6 +39,7 @@ int init_filp_by_inode(struct filp* filp, struct inode* inode){
 
 int release_filp(struct filp* file){
     file->filp_count = 0;
+    return 0;
 }
 
 filp_t *find_filp(inode_t *inode){
@@ -52,17 +54,21 @@ filp_t *find_filp(inode_t *inode){
 
 filp_t *get_free_filp(){
     filp_t* rep;
-    for(rep = &fd_table[0]; rep < &fd_table[NR_FILPS]; rep++ ){
+    int i;
+    for(i = 0; i < NR_FILPS; i++ ){
+        rep = &fd_table[i];
         if(rep->filp_ino == NULL){
             return rep;
         }
     }
+    return NULL;
 }
 
 void init_filp(){
     filp_t* rep;
     int i = 0;
-    for(rep = &fd_table[0]; rep < &fd_table[NR_FILPS]; rep++ ){
+    for(i = 0; i < NR_FILPS; i++ ){
+        rep = &fd_table[i];
         rep->filp_ino = NIL_INODE;
         rep->filp_table_index = i;
         i++;

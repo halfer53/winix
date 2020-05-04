@@ -69,15 +69,15 @@
  * Advisory file segment locking data type -
  * information passed to system by user
  */
-struct flock {
-  short l_type;			/* type: F_RDLCK, F_WRLCK, or F_UNLCK */
-  short l_whence;		/* flag for starting offset */
-  off_t l_start;		/* relative offset in bytes */
-  off_t l_len;			/* size; if 0, then until EOF */
-  pid_t l_pid;			/* process id of the locks' owner */
-};
+// struct flock {
+//   short l_type;			/* type: F_RDLCK, F_WRLCK, or F_UNLCK */
+//   short l_whence;		/* flag for starting offset */
+//   off_t l_start;		/* relative offset in bytes */
+//   off_t l_len;			/* size; if 0, then until EOF */
+//   pid_t l_pid;			/* process id of the locks' owner */
+// };
 
-/* Always ensure that these are consistent with <stdio.h> and <unistd.h>! */
+/* Always ensure that these are consistent with <stdio.h> and <winix_unistd.h>! */
 #ifndef	SEEK_SET
 #define	SEEK_SET	0	/* set file offset to offset */
 #endif

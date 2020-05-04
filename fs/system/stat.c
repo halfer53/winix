@@ -1,7 +1,7 @@
 //
 // Created by bruce on 27/04/20.
 //
-#include <fs/fs.h>
+#include "../fs.h"
 
 void set_statbuf(struct inode* inode, struct stat* statbuf){
     statbuf->st_dev = inode->i_dev->dev_id;

@@ -1,6 +1,6 @@
 
 #include <stdio.h>
-#include <unistd.h>
+#include <winix_unistd.h>
 #include <winix/rex.h>
 #include <kernel/proc.h>
 

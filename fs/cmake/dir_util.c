@@ -4,7 +4,7 @@
 
 #include <dirent.h>
 #include <stddef.h>
-#include <fs/fs.h>
+#include "../fs.h"
 
 int do_ls(char* pathname){
     DIR* directory;

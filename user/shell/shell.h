@@ -2,7 +2,7 @@
 #ifndef _SHELL_H_
 #define _SHELL_H_ 1
 
-#include <unistd.h>
+#include <winix_unistd.h>
 #include <winix_stdio.h>
 #include <winix_string.h>
 #include <sys/debug.h>

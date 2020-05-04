@@ -148,6 +148,11 @@ int syscall_reply(int reply, int dest,struct message* m){
     return ERR;
 }
 
+int syscall_reply2(int syscall_num, int reply, int dest, struct message* m){
+    KDEBUG(("Syscall %d reply %d to Proc %d\n", syscall_num, reply, dest));
+    return syscall_reply(reply, dest, m);
+}
+
 
 void init_syscall_table(){
 

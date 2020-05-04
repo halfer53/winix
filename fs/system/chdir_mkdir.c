@@ -2,7 +2,7 @@
 // Created by bruce on 27/04/20.
 //
 
-#include <fs/fs.h>
+#include "../fs.h"
 
 int sys_chdir(struct proc* who, char* pathname){
     int ret = OK;

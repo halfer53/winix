@@ -2,7 +2,7 @@
 // Created by bruce on 25/04/20.
 //
 
-#include <fs/fs.h>
+#include "../fs.h"
 #include <winix/list.h>
 
 
@@ -35,6 +35,11 @@ int set_filp(struct proc* who, struct filp** _file, struct inode* inode){
     if(ret)
         return ret;
     return open_slot;
+}
+
+int do_pipe(struct proc* who, struct message* msg){
+    int* fds = (int*)get_physical_addr(msg->m1_p1, who);
+    return sys_pipe(who, fds);
 }
 
 int sys_pipe(struct proc* who, int fd[2]){

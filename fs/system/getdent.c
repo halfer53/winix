@@ -2,11 +2,11 @@
 // Created by bruce on 3/05/20.
 //
 
-#include <fs/fs.h>
+#include "../fs.h"
 
 int sys_getdent(struct proc* who, int fd, struct dirent* dirp_dst){
     int i, dirstream_nr;
-    block_buffer_t *buffer;
+    struct block_buffer *buffer;
     struct dirent* dirstream, *endstream;
     struct filp* file;
     struct inode* dirp;

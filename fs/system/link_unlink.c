@@ -2,7 +2,7 @@
 // Created by bruce on 28/04/20.
 //
 
-#include <fs/fs.h>
+#include "../fs.h"
 
 int sys_link(struct proc* who, char *oldpath, char *newpath){
     struct inode* oldinode = NULL, *newinode = NULL, *lastdir = NULL;

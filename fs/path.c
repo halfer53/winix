@@ -1,4 +1,4 @@
-#include <fs/fs.h>
+#include "fs.h"
 
 char* dot1 = ".";    /* used for search_dir to bypass the access */
 char* dot2 = "..";    /* permissions for . and ..            */
@@ -50,7 +50,7 @@ char *get_name(char *old_name, char string[NAME_MAX]){
 // and find the corresponding inode
 int advance(inode_t *dirp, char string[NAME_MAX]){
     int i,inum  = 0;
-    block_buffer_t *buffer;
+    struct block_buffer *buffer;
     struct dirent* dirstream;
 
     if(*string == '\0')
@@ -161,3 +161,4 @@ bool is_fd_opened_and_valid(struct proc* who, int fd){
     }
     return true;
 }
+

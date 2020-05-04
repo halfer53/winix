@@ -1,4 +1,4 @@
-#include <fs/fs.h>
+#include "fs.h"
 
 static struct block_buffer buf_table[LRU_LEN];
 
@@ -148,7 +148,9 @@ int put_block_buffer(struct block_buffer *tbuf) {
 struct block_buffer *get_block_buffer(block_t blocknr, struct device* dev){
     struct block_buffer *tbuf;
     int ret;
-    for(tbuf = &buf_table[0];tbuf< &buf_table[LRU_LEN];tbuf++){
+    int i;
+    for(i = 0; i < LRU_LEN; i++){
+        tbuf = &buf_table[i];
         if(tbuf->b_blocknr == blocknr){
             rm_lru(tbuf);
             tbuf->b_count += 1;
@@ -185,7 +187,8 @@ void init_buf(){
     int i=0;
     struct block_buffer *tbuf = NULL, *prevbuf = NULL;
     char *val;
-    for(tbuf = &buf_table[0];tbuf< &buf_table[LRU_LEN];tbuf++){
+    for(i = 0; i < LRU_LEN; i++){
+        tbuf = &buf_table[i];
         memset(tbuf, 0, sizeof(struct block_buffer));
         if(prevbuf == NULL){
             lru_cache[FRONT] = lru_cache[REAR] = tbuf;
