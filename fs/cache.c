@@ -20,11 +20,12 @@ struct block_buffer *get_imap(int num, struct device* id){
 
 struct block_buffer *get_inode_table(int num, struct device* id){
     struct superblock* sb = get_sb(id);
+    struct block_buffer* buf;
     block_t bnr = (num * sb->s_inode_size) / BLOCK_SIZE;
     if(bnr * BLOCK_SIZE > sb->s_inode_table_size){
         return NULL;
     }
-    struct block_buffer* buf = get_block_buffer(sb->s_inode_tablenr + bnr, id);
+    buf = get_block_buffer(sb->s_inode_tablenr + bnr, id);
     return buf;
 }
 
