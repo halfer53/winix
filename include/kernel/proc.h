@@ -240,7 +240,7 @@ extern struct proc *block_q[2];
 
 #define TASK_NR_TO_SID(tnr)             (tnr <= 0 ? -tnr + 1 : tnr)
 #define SID_TO_TASK_NR(sid)             (-sid + 1)
-
+#define SET_CALLER(pcurr)   (curr_user_proc_in_syscall = pcurr)
 
 // proc_table points at index zero of the process table, so proc_table + INIT
 // simply starts at init

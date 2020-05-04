@@ -1,6 +1,9 @@
 #ifndef _FS_CONST_HEAD_
 #define _FS_CONST_HEAD_
 
+#include <sys/types.h>
+#include <fs/type.h>
+
 #define ROOT_INODE_NUM  1
 
 
@@ -25,6 +28,14 @@
 #ifndef PRIVATE
 #define PRIVATE static
 #endif
+
+#define VERIFY_READ     1
+#define VERIFY_WRITE    2
+#define ROOT_DEV    (0x0101)    /* MAKEDEV(1,1) */
+
+#define SIZE (64 * 1024)
+extern size_t DISK_SIZE;
+extern disk_word_t DISK_RAW[SIZE];
 
 #endif
 

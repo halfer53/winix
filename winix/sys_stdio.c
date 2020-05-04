@@ -214,6 +214,11 @@ int kprintf_vm(const char *format, void *arg, ptr_t *who_rbase){
                 format += 2;
             }
 
+            if(*format == 'l'){
+                format++;
+                //ignore
+            }
+
             prev = *format;
             switch(*format) {
                 

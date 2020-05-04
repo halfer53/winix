@@ -5,7 +5,6 @@
 
 struct superblock {
     int magic;
-    char s_name[32];
     int s_block_inuse;
     int s_inode_inuse;
     int s_free_blocks;
@@ -28,6 +27,7 @@ struct superblock {
 
     int s_inode_per_block;
     inode_t *s_iroot;
+    char32_t s_name[32];
 };
 
 

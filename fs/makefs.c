@@ -2,24 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 
-//struct superblock superblock = {
-//        0xabcdefab, // magic
-//        "WINIX_ROOTFS", // name
-//        65, // blocks in use
-//        1, // inode in use
-//        16319, // free blocks
-//        495, // free inodes
-//        1024, // block size
-//        128, // inode size
-//        1, // root inode number
-//        1, // block bitmap block index
-//        2, // inode bitmap block index
-//        3, // inode table block index
-//        2, // first free inode number
-//        67, // first free block number
-//        8, // inode per block
-//        NULL, // root inode
-//};
+char rootfs_name[] = "WINIX_ROOTFS";
 
 unsigned int setBits(unsigned int n)
 {
@@ -55,7 +38,6 @@ int makefs( disk_word_t* disk_raw, size_t disk_size_words)
 
     struct superblock superblock = {
             0xabcdefab, // magic
-        "WINIX_ROOTFS", // name
         block_in_use, // blocks in use
         1, // inode in use
             remaining_blocks, // free blocks
@@ -77,6 +59,7 @@ int makefs( disk_word_t* disk_raw, size_t disk_size_words)
         inode_per_block, // inode per block
         NULL, // root inode
     };
+    char32_strcpy(superblock.s_name, rootfs_name);
 
     if(blocks_nr < 8){
         KDEBUG(("block nr %d\n", blocks_nr));
@@ -129,7 +112,7 @@ int makefs( disk_word_t* disk_raw, size_t disk_size_words)
         if(dir->d_ino == 0){
             break;
         }
-        printf("Inode num %d addr %d %s\n",  dir->d_ino, ((disk_word_t*)dir - disk_raw), dir->d_name);
+        printf("Inode num %d addr %s\n",  dir->d_ino,  dir->d_name);
     }
 
     disk_word_t curr = 0;

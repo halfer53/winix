@@ -272,8 +272,7 @@ int release_inode(inode_t *inode){
 
 int fill_dirent(inode_t* ino, struct dirent* curr, char* string){
     mode_t mode = ino->i_mode;
-    char *dname = curr->d_name;
-    KSTRCPY(dname, string);
+    strcpy(curr->d_name, string);
     curr->d_ino = ino->i_num;
 
     if(mode & S_IFDIR){
@@ -282,6 +281,8 @@ int fill_dirent(inode_t* ino, struct dirent* curr, char* string){
         curr->d_type = DT_CHR;
     }else if(mode & S_IFREG){
         curr->d_type = DT_REG;
+    }else if(mode & S_IFBLK){
+        curr->d_type = DT_BLK;
     }
     return OK;
 }
