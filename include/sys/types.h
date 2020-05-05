@@ -15,6 +15,8 @@ typedef unsigned int clock_t;
 typedef unsigned int mode_t;
 typedef unsigned int uid_t;
 typedef unsigned int gid_t;
+typedef unsigned int int32_t;
+typedef unsigned int wchar_t;
 
 # ifndef __off_t_defined
 typedef unsigned int off_t;

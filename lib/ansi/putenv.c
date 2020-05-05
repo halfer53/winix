@@ -5,7 +5,7 @@
 /* $Header: /cvsup/minix/src/lib/other/putenv.c,v 1.1.1.1 2005/04/21 14:56:27 beng Exp $ */
 
 #include	<stdlib.h>
-#include	<winix_string.h>
+#include	<string.h>
 
 #define	ENTRY_INC	10
 #define	rounded(x)	(((x / ENTRY_INC) + 1) * ENTRY_INC)

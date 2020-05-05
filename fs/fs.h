@@ -30,13 +30,13 @@
 #include <winix/compiler.h>
 #include <stdbool.h>
 #include <winix/kstring.h>
-#include "fs_methods.h"
+#include <fs/fs_methods.h>
 
-#ifdef FS_CMAKE
+#ifdef FILE_SYSTEM_PROJECT
 
 #include <string.h>
 #include <stdio.h>
-#include "cmake/cmake_util.h"
+#include "excluded_files/cmake_util.h"
 #define kprintf(...) printf(__VA_ARGS__)
 #define KDEBUG(token)   printf("[SYSTEM] "); printf token
 
@@ -44,7 +44,7 @@
 
 #include <winix/slab.h>
 #include <winix/kdebug.h>
-#include <winix_string.h>
+#include <string.h>
 
 #endif
 

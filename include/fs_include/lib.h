@@ -10,8 +10,8 @@
 
 #include <stddef.h>
 #include <stdlib.h>
-#include <winix_stdio.h>
-#include <winix_string.h>
+#include <stdio.h>
+#include <string.h>
 #include <signal.h>
 #include <const.h>
 #include <sys/debug.h>

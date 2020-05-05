@@ -15,7 +15,7 @@
 #include <sys/stat.h>
 #include <sys/fcntl.h>
 #include <sys/dirent.h>
-#include <sys/winix_unistd.h>
+#include <sys/unistd.h>
 #include <fs/type.h>
 #include <fs/const.h>
 #include <winix/type.h>
@@ -108,7 +108,7 @@ void init_inode();
 
 #include <winix/slab.h>
 #include <winix/kdebug.h>
-#include <winix_string.h>
+#include <string.h>
 
 #endif
 

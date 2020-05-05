@@ -77,7 +77,7 @@
 //   pid_t l_pid;			/* process id of the locks' owner */
 // };
 
-/* Always ensure that these are consistent with <stdio.h> and <winix_unistd.h>! */
+/* Always ensure that these are consistent with <stdio.h> and <unistd.h>! */
 #ifndef	SEEK_SET
 #define	SEEK_SET	0	/* set file offset to offset */
 #endif

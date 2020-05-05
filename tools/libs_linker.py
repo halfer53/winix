@@ -14,12 +14,12 @@ DEBUG = "lib/util/debug.o"
 
 built_in = {
 	"stdlib.h": {STDLIB, ANSI},
-	"winix_string.h": {STRING},
+	"string.h": {STRING},
 	"signal.h": {SIGNAL},
 	"ucontext.h": {GEN},
-	"winix_unistd.h": {POSIX, ANSI, STDLIB},
+	"unistd.h": {POSIX, ANSI, STDLIB},
 	"util.h":	{UTIL},
-	"winix_stdio.h":	{STDIO},
+	"stdio.h":	{STDIO},
 	"debug.h":	{DEBUG}
 }
 

@@ -1,7 +1,7 @@
 #ifndef _DEBUG_H_
 #define _DEBUG_H_ 1
 
-#include <winix_stdio.h>
+#include <stdio.h>
 
 void* get_pc();
 void* get_sp();

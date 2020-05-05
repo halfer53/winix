@@ -33,9 +33,8 @@
 #define VERIFY_WRITE    2
 #define ROOT_DEV    (0x0101)    /* MAKEDEV(1,1) */
 
-#define SIZE (64 * 1024)
-extern size_t DISK_SIZE;
-extern disk_word_t DISK_RAW[SIZE];
+#define DISK_SIZE   (49152)// 48 * 1024
+extern disk_word_t DISK_RAW[DISK_SIZE];
 
 #endif
 

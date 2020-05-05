@@ -5,13 +5,13 @@
 #include <fs/const.h>
 #include <kernel/proc.h>
 #include <fs/super.h>
-#include "cmake/cmake_util.h"
+#include "excluded_files/cmake_util.h"
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include "fs_methods.h"
+#include <fs/fs_methods.h>
 
 void init_bitmap();
 
@@ -22,8 +22,7 @@ struct proc *curr_user_proc_in_syscall;
 struct superblock *sb;
 
 
-disk_word_t DISK_RAW[SIZE];
-size_t DISK_SIZE;
+disk_word_t DISK_RAW[DISK_SIZE];
 
 void emulate_fork(struct proc* p1, struct proc* p2){
     int procnr = p2->proc_nr;
@@ -35,16 +34,18 @@ void emulate_fork(struct proc* p1, struct proc* p2){
 
 void write_disk(){
     int fd;
-    int size = SIZE;
-    char str[] = "#include \"fs.h\" \n size_t DISK_SIZE = 65536; disk_word_t DISK_RAW[65536];\n ";
-    char str2[] = "unsigned int shell_code[] = {";
+    int size = DISK_SIZE;
+    char curr_dir[100];
+    char str[] = "#include <fs/type.h>\n ";
+    char str2[] = "disk_word_t DISK_RAW[] = {\n";
     char str3[] = "};\n";
-    FILE *fp = fopen("disk.c", "w");
+    getcwd(curr_dir, 100);
+    FILE *fp = fopen("../../include/disk.c", "w");
     fprintf(fp, "%s%s", str, str2);
 
     for(int i = 0; i < DISK_SIZE; i++){
         unsigned int val = DISK_RAW[i];
-        fprintf(fp, "\t%08x,\n", val);
+        fprintf(fp, "\t0x%08x,\n", val);
     }
     fprintf(fp, "%s\n\n", str3);
     fclose(fp);
@@ -54,7 +55,6 @@ int do_tests(){
     int ret, fd;
     int pipe_fd[2];
     struct superblock sb;
-    DISK_SIZE = SIZE;
     init_bitmap();
     char *filename = "/foo.txt";
     char buffer[100];
@@ -69,8 +69,6 @@ int do_tests(){
         printf("makefs failed");
         return 1;
     }
-    write_disk();
-
 
     current_proc = &pcurr;
     curr_user_proc_in_syscall = current_proc;

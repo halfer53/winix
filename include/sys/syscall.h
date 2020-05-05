@@ -77,7 +77,7 @@ function params{\
 #define WINFO_MEM   2
 #define WINFO_SLAB  4
 
-#ifndef FS_CMAKE
+#ifndef FILE_SYSTEM_PROJECT
 
 int _syscall(int syscall_num, struct message *m);
 int ___exit(int status);

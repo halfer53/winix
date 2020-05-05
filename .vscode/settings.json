@@ -2,6 +2,8 @@
     "files.associations": {
         "lib.h": "c",
         "stat.h": "c",
-        "winix_unistd.h": "c"
+        "unistd.h": "c",
+        "list.h": "c",
+        "string.h": "c"
     }
 }

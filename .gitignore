@@ -12,6 +12,7 @@
 Makefile.bak
 kdbg.py
 tools/kdbg_srec/*.kdbg
+include/commands
 
 tmp.txt
 fs/Debug/

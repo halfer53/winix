@@ -33,7 +33,7 @@
 #include <errno.h>
 #include <stdbool.h>
 #include <curses.h>
-#include <winix_string.h>
+#include <string.h>
 
 #include <kernel/proc.h>
 #include <kernel/exception.h>

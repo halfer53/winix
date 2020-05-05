@@ -1,7 +1,7 @@
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <stdio.h>
-#include <winix_unistd.h>
+#include <unistd.h>
 #include "../fs.h"
 
 #define MEM_SIZE (32 * 1024)
