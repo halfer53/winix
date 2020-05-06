@@ -76,34 +76,34 @@ static error_t parse_opt (int key, char *arg, struct argp_state *state)
 
 /* Our argp parser. */
 static struct argp argp = { options, parse_opt, args_doc, doc };
-
-int main(int argc, char *argv[])
-{
-    char cwd[PATH_MAX];
-    int i = 1;
-    int offset = 2048;
-    struct srec_binary srec_result;
-    struct winix_elf elf_result;
-    struct arguments arguments;
-    memset(&arguments, 0, sizeof(struct arguments));
-    init_srec_binary_struct(&srec_result);
-
-    arguments.debug_file = "";
-    arguments.srec_file = "";
-    /* Parse our arguments; every option seen by parse_opt will
-        be reflected in arguments. */
-    argp_parse (&argp, argc, argv, 0, 0, &arguments);
-    getcwd(cwd, PATH_MAX);
-    printf ("srec file = %s\n"
-            "debug file = %s\n"
-            "offset %d\n"
-            "cwd %s\n",
-            arguments.srec_file, arguments.debug_file, arguments.offset, cwd);
-
-    srec_result.binary_offset = arguments.offset;
-    decode_srec(arguments.srec_file, arguments.offset, &srec_result);
-    return 0;
-}
+//
+//int main(int argc, char *argv[])
+//{
+//    char cwd[PATH_MAX];
+//    int i = 1;
+//    int offset = 2048;
+//    struct srec_binary srec_result;
+//    struct winix_elf elf_result;
+//    struct arguments arguments;
+//    memset(&arguments, 0, sizeof(struct arguments));
+//    init_srec_binary_struct(&srec_result);
+//
+//    arguments.debug_file = "";
+//    arguments.srec_file = "";
+//    /* Parse our arguments; every option seen by parse_opt will
+//        be reflected in arguments. */
+//    argp_parse (&argp, argc, argv, 0, 0, &arguments);
+//    getcwd(cwd, PATH_MAX);
+//    printf ("srec file = %s\n"
+//            "debug file = %s\n"
+//            "offset %d\n"
+//            "cwd %s\n",
+//            arguments.srec_file, arguments.debug_file, arguments.offset, cwd);
+//
+//    srec_result.binary_offset = arguments.offset;
+//    decode_srec(arguments.srec_file, arguments.offset, &srec_result);
+//    return 0;
+//}
 
 void print_srec_result(struct srec_binary* result, char* filename){
     printf("unsigned int %s_code[] = {\n", filename);

@@ -10,10 +10,10 @@ KLIB_O = lib/syscall/wramp_syscall.o lib/syscall/errno.o lib/syscall/ipc.o \
 
 L_HEAD = winix/limits/limits_head.o
 L_TAIL = winix/limits/limits_tail.o
-KERNEL_O = winix/*.o kernel/system/*.o kernel/*.o fs/*.o fs/system/*.o
+KERNEL_O = winix/*.o kernel/system/*.o kernel/*.o fs/*.o fs/system/*.o include/disk.o
 KMAIN = kernel/main.s kernel/main.o 
 alldir = winix lib init user kernel fs
-
+FS_DEPEND = fs/*.c fs/system/*.c fs/excluded_files/*.c 
 
 # Check if V options is set by user, if V=1, debug mode is set
 # e.g. make V=1 produces all the commands being executed through
@@ -43,7 +43,7 @@ export CFLAGS := -D_DEBUG
 
 
 
-all:| tool kbuild
+all:| makedisk kbuild build_disk compile_disk
 	$(Q)wlink $(LDFLAGS) -Ttext 1024 -v -o winix.srec \
 			$(L_HEAD) $(KERNEL_O) $(KLIB_O) $(L_TAIL) \
 							> tools/kdbg_srec/winix.kdbg
@@ -51,13 +51,20 @@ ifeq ($(KBUILD_VERBOSE),0)
 	@echo "LD \t winix.srec"
 endif
 
-tool: 
-	$(Q)-rm -f $(KMAIN)
-	$(Q)$(MAKE) -C tools
+makedisk: $(FS_DEPEND)
+	$(Q)gcc -D FILE_SYSTEM_PROJECT -w -I./include/fs_include -I./include $^ -o makedisk
+	# $(Q)-rm -f $(KMAIN)
+	# $(Q)$(MAKE) -C tools
 
 kbuild: $(alldir)
 $(alldir): FORCE
 	$(Q)$(MAKE) $(build)=$@
+
+build_disk: FORCE
+	$(Q)./makedisk include/disk.c
+
+compile_disk: FORCE
+	$(Q)$(MAKE) $(build)=include
 
 clean:
 	$(Q)$(MAKE) -C tools clean

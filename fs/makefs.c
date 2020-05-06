@@ -88,7 +88,7 @@ int makefs( disk_word_t* disk_raw, size_t disk_size_words)
     pdisk += superblock.s_superblock_size;
 
     bitval = setBits(block_in_use);
-    KDEBUG(("block in use %d block map  %08x\n",block_in_use, bitval));
+//    KDEBUG(("block in use %d block map  %08x\n",block_in_use, bitval));
     memcpy(pdisk, &bitval, sizeof(unsigned int));
     pdisk += superblock.s_blockmap_size;
 
@@ -107,24 +107,24 @@ int makefs( disk_word_t* disk_raw, size_t disk_size_words)
     pdir++;
     fill_dirent(&root_node, pdir, "..");
 
-    struct dirent* dir = (struct dirent* )(disk_raw + (6 * BLOCK_SIZE));
-    for(; dir < (struct dirent* )(pbak + BLOCK_SIZE); dir++ ){
-        if(dir->d_ino == 0){
-            break;
-        }
-        printf("Inode num %d %ls\n",  dir->d_ino,  dir->d_name);
-    }
-
-    disk_word_t curr = 0;
-    printf("\nsuper block 0 - 0x%08x\n", curr);
-    curr += superblock.s_superblock_size;
-    printf("block map 0x%08x - 0x%08x\n",curr, curr+ superblock.s_blockmap_size );
-    curr += superblock.s_blockmap_size;
-    printf("inode map 0%08x - 0x%08x\n",curr, curr+superblock.s_inodemap_size );
-    curr += superblock.s_inodemap_size;
-    printf("inode table 0x%08x - 0x%08x\n",curr, curr+superblock.s_inode_table_size );
-    curr += superblock.s_inode_table_size;
-    printf("data block 0x%08x - 0x%p\n Number of free blocks %d\n\n\n",curr, disk_raw + disk_size_words - curr, remaining_blocks );
+//    struct dirent* dir = (struct dirent* )(disk_raw + (6 * BLOCK_SIZE));
+//    for(; dir < (struct dirent* )(pbak + BLOCK_SIZE); dir++ ){
+//        if(dir->d_ino == 0){
+//            break;
+//        }
+//        printf("Inode num %d %ls\n",  dir->d_ino,  dir->d_name);
+//    }
+//
+//    disk_word_t curr = 0;
+//    printf("\nsuper block 0 - 0x%08x\n", curr);
+//    curr += superblock.s_superblock_size;
+//    printf("block map 0x%08x - 0x%08x\n",curr, curr+ superblock.s_blockmap_size );
+//    curr += superblock.s_blockmap_size;
+//    printf("inode map 0%08x - 0x%08x\n",curr, curr+superblock.s_inodemap_size );
+//    curr += superblock.s_inodemap_size;
+//    printf("inode table 0x%08x - 0x%08x\n",curr, curr+superblock.s_inode_table_size );
+//    curr += superblock.s_inode_table_size;
+//    printf("data block 0x%08x - 0x%p\n Number of free blocks %d\n\n\n",curr, disk_raw + disk_size_words - curr, remaining_blocks );
     
     return 0;
     // return DISK_RAW;

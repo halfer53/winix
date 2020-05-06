@@ -32,16 +32,19 @@ void emulate_fork(struct proc* p1, struct proc* p2){
     p2->pid = pid;
 }
 
-void write_disk(){
+void write_disk(char* path){
     int fd;
     int size = DISK_SIZE;
     char curr_dir[100];
-    char str[] = "#include <fs/type.h>\n ";
-    char str2[] = "disk_word_t DISK_RAW[] = {\n";
+    char filename[] = "disk.c";
+    char str2[] = "unsigned int DISK_RAW[] = {\n";
     char str3[] = "};\n";
+    FILE *fp;
     getcwd(curr_dir, 100);
-    FILE *fp = fopen("../../include/disk.c", "w");
-    fprintf(fp, "%s%s", str, str2);
+
+//    printf("opening %s\n", path);
+    fp = fopen(path, "w");
+    fprintf(fp, "%s", str2);
 
     for(int i = 0; i < DISK_SIZE; i++){
         unsigned int val = DISK_RAW[i];
@@ -49,6 +52,14 @@ void write_disk(){
     }
     fprintf(fp, "%s\n\n", str3);
     fclose(fp);
+}
+
+void make_disk(){
+    int ret = makefs(DISK_RAW, DISK_SIZE);
+    if(ret){
+        printf("makefs failed");
+        _exit(1);
+    }
 }
 
 int do_tests(){
@@ -62,14 +73,6 @@ int do_tests(){
     pcurr.pid = 1;
     pcurr2.proc_nr = 2;
     pcurr2.pid = 2;
-
-
-    ret = makefs(DISK_RAW, DISK_SIZE);
-    if(ret){
-        printf("makefs failed");
-        return 1;
-    }
-
     current_proc = &pcurr;
     curr_user_proc_in_syscall = current_proc;
 
@@ -138,6 +141,15 @@ int do_tests(){
 }
 
 int main(int argc, char** argv){
+    char *path;
+    if(argc != 2){
+        printf("Please provide the destination path\n");
+        return 1;
+    }
+    path = argv[1];
+    make_disk();
+    write_disk(path);
+//    do_tests();
+//    printf("argc %d argv 0 %s \n", argc, argv[0]);
 
-    do_tests();
 }
