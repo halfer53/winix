@@ -1,0 +1,3 @@
+/home/bruce/Github/winix/tools/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/bruce/Github/winix/tools/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/bruce/Github/winix/tools/cmake-build-debug/CMakeFiles/gen.dir

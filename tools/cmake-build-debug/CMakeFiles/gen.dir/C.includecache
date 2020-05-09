@@ -1,0 +1,18 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/bruce/Github/winix/tools/gen_bin_code.c
+stdio.h
+-
+stdlib.h
+-
+string.h
+-
+ctype.h
+-
+

@@ -23,7 +23,7 @@ struct block_buffer
 #define ONE_SHOT      2 /* set if block not likely to be needed soon */
 
 
-struct block_buffer *get_imap(int, struct device* id);
+struct block_buffer *get_imap(struct device* id);
 struct block_buffer *get_bmap(struct device* id);
 struct block_buffer *get_inode_table(int num, struct device* id);
 int put_block_buffer(struct block_buffer *tbuf);

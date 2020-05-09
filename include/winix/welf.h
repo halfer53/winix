@@ -15,7 +15,6 @@ struct winix_elf{
     unsigned int text_size;
     unsigned int data_size;
     unsigned int bss_size;
-
 };
 
 

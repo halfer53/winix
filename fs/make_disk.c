@@ -163,6 +163,8 @@ void write_srec_list(struct list_head* lists){
         assert(ret == elf_size);
         ret = sys_write(current_proc, fd, pos->binary_data, pos->elf.binary_size);
         assert(ret == pos->elf.binary_size);
+        ret = sys_close(current_proc, fd);
+        assert(ret == 0);
         list_del(&pos->list);
         free(pos);
     }

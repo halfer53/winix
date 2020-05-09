@@ -12,7 +12,22 @@ static struct block_buffer bmap; // block map is also assumed to be 1 block in l
 // REAR -> next -> .... -> next -> FRONT
 // With the most recently used cache at the front, and least recently used block at the rear
 
-struct block_buffer *get_imap(int num, struct device* id){
+#define TBUF_NR(tbr)    (tbr - buf_table)
+
+void visualise_lru(){
+    int limit = LRU_LEN;
+    struct block_buffer* buf = lru_cache[FRONT];
+    while(buf != NULL && limit > 0){
+        unsigned int val = TBUF_NR(buf);
+        kprintf("%ld -> ", val);
+        buf = buf->prev;
+        limit--;
+    }
+    kprintf("\n");
+}
+
+
+struct block_buffer *get_imap(struct device* id){
     struct superblock* sb = get_sb(id);
     struct block_buffer* buf = get_block_buffer(sb->s_inodemapnr, id);
     return buf;
@@ -61,23 +76,19 @@ struct block_buffer* dequeue_buf() {
     struct block_buffer *rear = lru_cache[REAR];
     if (!rear)
         return NULL;
-
-    rear->next->prev = NULL;
+    if(rear->next)
+        rear->next->prev = NULL;
     lru_cache[REAR] = rear->next;
-
+    rear->next = NULL;
+    rear->prev = NULL;
     return rear;
 }
 
 void enqueue_buf(struct block_buffer *tbuf) {
-
-    if (lru_cache[FRONT] == NULL) {
-        tbuf = lru_cache[REAR] = lru_cache[FRONT] = &buf_table[0];
-        tbuf->next = tbuf->prev = NULL;
-        return;
-    }
-
-    lru_cache[FRONT]->next = tbuf;
-    tbuf->prev = lru_cache[REAR];
+    struct block_buffer *front = lru_cache[FRONT];
+    tbuf->next = NULL;
+    tbuf->prev = front;
+    front->next = tbuf;
     lru_cache[FRONT] = tbuf;
 
 }
@@ -92,13 +103,18 @@ PRIVATE void buf_move_to_rear(struct block_buffer *buffer){
 }
 
 int flush_inode_zones(inode_t *ino){
-    int i = 0;
+    int i, j;
+    block_t zid;
     struct block_buffer* tbuf;
     for(i = 0; i < NR_TZONES; i++){
-        if(ino->i_zone[i] > 0){
-            tbuf = get_block_buffer(ino->i_zone[i], ino->i_dev);
-            if(tbuf->b_dirt){
-                put_block_buffer_immed(tbuf, ino->i_dev);
+        zid = ino->i_zone[i];
+        if(zid > 0){
+            for(j = 0; j < LRU_LEN; j++){
+                tbuf = &buf_table[j];
+                if(tbuf->b_blocknr == zid && tbuf->b_dirt){
+                    block_io(tbuf, ino->i_dev, WRITING);
+                    tbuf->b_dirt = false;
+                }
             }
         }
     }
@@ -117,16 +133,10 @@ int block_io(struct block_buffer* tbuf, struct device* dev, int flag){
 }
 
 int put_block_buffer_immed(struct block_buffer* tbuf, struct device* dev){
-    //KDEBUG(("Buffer %08x %d put immed\n",tbuf, tbuf->b_blocknr));
-    enqueue_buf(tbuf);
     if(block_io(tbuf, dev, WRITING) == 0)
         return -1;
     tbuf->b_dirt = false;
-    tbuf->b_count -= 1;
-    if(tbuf->b_count <= 0){
-        tbuf->b_count = 0;
-    }
-    return OK;
+    put_block_buffer(tbuf);
 }
 
 int put_block_buffer_dirt(struct block_buffer *tbuf) {
@@ -135,13 +145,14 @@ int put_block_buffer_dirt(struct block_buffer *tbuf) {
 }
 
 int put_block_buffer(struct block_buffer *tbuf) {
-    //KDEBUG(("Buffer %08x %d put\n",tbuf, tbuf->b_blocknr));
+//    KDEBUG(("Buffer %d is dirty %d put\n", tbuf->b_blocknr, tbuf->b_dirt));
 
     enqueue_buf(tbuf);
     tbuf->b_count -= 1;
     if(tbuf->b_count <= 0){
         tbuf->b_count = 0;
     }
+//    visualise_lru();
     return 0;
 }
 
@@ -154,7 +165,7 @@ struct block_buffer *get_block_buffer(block_t blocknr, struct device* dev){
         if(tbuf->b_blocknr == blocknr){
             rm_lru(tbuf);
             tbuf->b_count += 1;
-            //KDEBUG(("Buffer %08x %d returned\n",tbuf, blocknr));
+//            KDEBUG(("Buffer %d cache returned\n", blocknr));
             return tbuf;
         }
     }
@@ -182,8 +193,7 @@ struct block_buffer *get_block_buffer(block_t blocknr, struct device* dev){
     tbuf->b_dirt = 0;
     tbuf->b_dev = dev;
     tbuf->b_count = 1;
-    enqueue_buf(tbuf);
-    //KDEBUG(("Buffer %08x %d returned\n",tbuf, blocknr));
+//    KDEBUG(("Buffer %d get\n", blocknr));
     return tbuf;
 }
 
