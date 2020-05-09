@@ -1,82 +1,23 @@
 //
-// Created by bruce on 19/04/20.
+// Created by bruce on 9/05/20.
 //
-
-#include <fs/const.h>
-#include <kernel/proc.h>
-#include <fs/super.h>
-#include "excluded_files/cmake_util.h"
+#include "fs.h"
 #include <assert.h>
-#include <stdio.h>
-#include <string.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <fs/fs_methods.h>
-
-void init_bitmap();
-
-
-struct proc pcurr, pcurr2;
-struct proc *current_proc;
-struct proc *curr_user_proc_in_syscall;
-struct superblock *sb;
-
-
-disk_word_t DISK_RAW[DISK_SIZE];
-
-void emulate_fork(struct proc* p1, struct proc* p2){
-    int procnr = p2->proc_nr;
-    pid_t pid = p2->pid;
-    *p2 = *p1;
-    p2->proc_nr = procnr;
-    p2->pid = pid;
-}
-
-void write_disk(char* path){
-    int fd;
-    int size = DISK_SIZE;
-    char curr_dir[100];
-    char filename[] = "disk.c";
-    char str2[] = "unsigned int DISK_RAW[] = {\n";
-    char str3[] = "};\n";
-    FILE *fp;
-    getcwd(curr_dir, 100);
-
-//    printf("opening %s\n", path);
-    fp = fopen(path, "w");
-    fprintf(fp, "%s", str2);
-
-    for(int i = 0; i < DISK_SIZE; i++){
-        unsigned int val = DISK_RAW[i];
-        fprintf(fp, "\t0x%08x,\n", val);
-    }
-    fprintf(fp, "%s\n\n", str3);
-    fclose(fp);
-}
-
-void make_disk(){
-    int ret = makefs(DISK_RAW, DISK_SIZE);
-    if(ret){
-        printf("makefs failed");
-        _exit(1);
-    }
-}
 
 int do_tests(){
+    struct proc pcurr2;
     int ret, fd;
     int pipe_fd[2];
     struct superblock sb;
     init_bitmap();
     char *filename = "/foo.txt";
     char buffer[100];
-    pcurr.proc_nr = 1;
-    pcurr.pid = 1;
-    pcurr2.proc_nr = 2;
+
     pcurr2.pid = 2;
-    current_proc = &pcurr;
-    curr_user_proc_in_syscall = current_proc;
+    pcurr2.proc_nr = 2;
 
     init_fs();
+    mock_init_proc();
     fd = sys_open(current_proc, filename ,O_CREAT | O_RDWR, 0775);
     assert(fd == 0);
 
@@ -104,24 +45,24 @@ int do_tests(){
     assert(ret == 0);
 //    sys_close(current_proc, fd);
 
-    ret = sys_pipe(&pcurr, pipe_fd);
+    ret = sys_pipe(current_proc, pipe_fd);
     assert(ret == 0);
-    emulate_fork(&pcurr, &pcurr2);
-    ret = sys_read(&pcurr, pipe_fd[0], buffer, 100);
+    emulate_fork(current_proc, &pcurr2);
+    ret = sys_read(current_proc, pipe_fd[0], buffer, 100);
     assert(ret == SUSPEND);
     ret = sys_write(&pcurr2, pipe_fd[1], "1234", 4);
     assert(ret == 4);
 
     ret = sys_write(&pcurr2, pipe_fd[1], "1234", 5);
     assert(ret == 5);
-    ret = sys_read(&pcurr, pipe_fd[0], buffer, 100);
+    ret = sys_read(current_proc, pipe_fd[0], buffer, 100);
     assert(ret == 5);
     assert(strcmp(buffer, "1234") == 0);
 
     ret = sys_mkdir(current_proc, "/dev", 0x755);
     assert(ret == 0);
     printf("Do LS: ");
-    do_ls("/");
+//    do_ls("/");
 
     ret = sys_access(current_proc, "/dev/bar.txt", F_OK);
     assert(ret != 0);
@@ -136,20 +77,7 @@ int do_tests(){
     assert(ret == 0);
 
     printf("Do dev LS: ");
-    do_ls("/dev");
-    do_ls(".");
-}
-
-int main(int argc, char** argv){
-    char *path;
-    if(argc != 2){
-        printf("Please provide the destination path\n");
-        return 1;
-    }
-    path = argv[1];
-    make_disk();
-    write_disk(path);
-//    do_tests();
-//    printf("argc %d argv 0 %s \n", argc, argv[0]);
-
+//    do_ls("/dev");
+//    do_ls(".");
+    return 0;
 }

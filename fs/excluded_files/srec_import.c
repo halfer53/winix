@@ -7,75 +7,60 @@
 #include <libgen.h>
 #include <argp.h>
 #include <winix/welf.h>
+#include "srec_import.h"
 
-struct srec_binary{
-    size_t binary_pc;
-    size_t binary_offset;
-    size_t binary_size;
-    size_t binary_idx;
-    unsigned int* binary_data;
-};
-
-int decode_srec(char *filename, int offset, struct srec_binary* result);
-void init_srec_binary_struct(struct srec_binary* result);
-int winix_load_srec_words_length(char *line);
-int winix_load_srec_mem_val(char *line,  const char* filename, struct srec_binary* result);
 #define TO_UPPER_CHAR(c) (c - 32)
 
-const char *argp_program_version =
-  "argp-ex3 1.0";
-const char *argp_program_bug_address =
-  "<bug-gnu-utils@gnu.org>";
-
-/* Program documentation. */
-static char doc[] =
-  "Generate Winix ELF binary based on srec file";
-
-/* A description of the arguments we accept. */
-static char args_doc[] = "-t [offset] -f [srec file] -d [debug file]";
-
-/* The options we understand. */
-static struct argp_option options[] = {
-  {"offset",  't', "OFFSET1",      0,  "Srec Text Segment Offset" },
-  {"srec",   'f', "FILE", 0, "Srec File" },
-  {"debug",   'd', "DEBUG", 0, "Srec Debug Output" }
-};
-
-/* Used by main to communicate with parse_opt. */
-struct arguments
-{
-  char *srec_file;
-  char *debug_file;
-  int offset;
-};
-
-/* Parse a single option. */
-static error_t parse_opt (int key, char *arg, struct argp_state *state)
-{
-  /* Get the input argument from argp_parse, which we
-     know is a pointer to our arguments structure. */
-  struct arguments *arguments = state->input;
-
-  switch (key)
-    {
-    case 't':
-        arguments->offset = arg ? atoi(arg) : 2048;
-        break;
-    case 'f':
-        arguments->srec_file = arg;
-        break;
-    case 'd':
-        arguments->debug_file = arg;
-        break;
-
-    default:
-      return 0;
-    }
-  return 0;
-}
-
-/* Our argp parser. */
-static struct argp argp = { options, parse_opt, args_doc, doc };
+//
+///* Program documentation. */
+//static char doc[] =
+//  "Generate Winix ELF binary based on srec file";
+//
+///* A description of the arguments we accept. */
+//static char args_doc[] = "-t [offset] -f [srec file] -d [debug file]";
+//
+///* The options we understand. */
+//static struct argp_option options[] = {
+//  {"offset",  't', "OFFSET1",      0,  "Srec Text Segment Offset" },
+//  {"srec",   'f', "FILE", 0, "Srec File" },
+//  {"debug",   'd', "DEBUG", 0, "Srec Debug Output" }
+//};
+//
+///* Used by main to communicate with parse_opt. */
+//struct arguments
+//{
+//  char *srec_file;
+//  char *debug_file;
+//  int offset;
+//};
+//
+///* Parse a single option. */
+//static error_t parse_opt (int key, char *arg, struct argp_state *state)
+//{
+//  /* Get the input argument from argp_parse, which we
+//     know is a pointer to our arguments structure. */
+//  struct arguments *arguments = state->input;
+//
+//  switch (key)
+//    {
+//    case 't':
+//        arguments->offset = arg ? atoi(arg) : 2048;
+//        break;
+//    case 'f':
+//        arguments->srec_file = arg;
+//        break;
+//    case 'd':
+//        arguments->debug_file = arg;
+//        break;
+//
+//    default:
+//      return 0;
+//    }
+//  return 0;
+//}
+//
+///* Our argp parser. */
+//static struct argp argp = { options, parse_opt, args_doc, doc };
 //
 //int main(int argc, char *argv[])
 //{
@@ -138,7 +123,7 @@ int toUpperCase(char *to, char *src)
 
 
 int srec_add_binary(struct srec_binary* srec_result, unsigned int item){
-    printf("%ld %x\n", srec_result->binary_idx, item);
+//    printf("%ld %x\n", srec_result->binary_idx, item);
     srec_result->binary_data[srec_result->binary_idx] = item;
     srec_result->binary_idx++;
     if(srec_result->binary_idx >= srec_result->binary_size){
@@ -158,40 +143,69 @@ void init_srec_binary_struct(struct srec_binary* result){
     result->binary_data = (unsigned int*)calloc(result->binary_size, sizeof(unsigned int) );
 }
 
+static char text_size[] = ".text segment size = 0x";
+static char data_size[] = ".data segment size = 0x";
+static char bss_size[] = ".bss segment size = 0x";
+
+int decode_segment_size(size_t* val, char* prefix, char* line){
+    int len = strlen(prefix);
+    char *strvalue = &line[len];
+    if(strvalue[strlen(strvalue) - 1] == '\n'){
+        strvalue[strlen(strvalue) - 1] = '\0';
+    }
+    while(*strvalue && *strvalue == '0'){
+        strvalue++;
+    }
+    *val = hex2int(strvalue, strlen(strvalue));
+//    printf(" size %s | %d %x\n",  strvalue, *val, *val);
+    return 0;
+}
+
+int decode_srec_debug(char* filepath, struct srec_debug* result){
+    FILE* f = fopen(filepath, "r");
+    char *filename = remove_extension(filepath);
+    if(!f)
+        return -1;
+    char *line = malloc(1024);
+    if(!line){
+        fclose(f);
+        return -1;
+    }
+    strcpy(result->name, filename);
+    while(fgets(line, 1024, f)){
+        if(strstr(line, text_size)){
+            decode_segment_size(&result->text_size, text_size, line);
+        }
+        else if(strstr(line, data_size)){
+            decode_segment_size(&result->data_size, data_size, line);
+        }
+        else if(strstr(line, bss_size)){
+            decode_segment_size(&result->bss_size, bss_size, line);
+        }
+    }
+    free(line);
+    return 0;
+}
+
 int decode_srec(char *path, int offset, struct srec_binary* result)
 {
-
-    int i = 0;
-    int length = 0;
-    int wordslength = 0;
     int temp = 0;
-    int recordtype = 0;
-    int success = 0;
-    int counter = 0;
     size_t *memory_values;
     size_t wordsLoaded = 0;
     FILE *fp;
     char *line = NULL;
     size_t len = 10240;
-    size_t read;
-    char *upperfilename, *filename;
-
-    printf("path = '%s'\n", path);
-    fp = fopen(path, "rw");
+    char *filename;
+    init_srec_binary_struct(result);
+    fp = fopen(path, "r");
     if (fp == NULL){
         perror("Path cannot be found ");
         exit(EXIT_FAILURE);
     }
     line = malloc(len);
-    
     filename = remove_extension(path);
-    printf("filename is '%s' path = '%s'\n", filename, path);
-//    upperfilename = malloc(strlen(filename) + 1);
-//    toUpperCase(upperfilename, filename);
-    // printf("#ifndef _%s_H_\n", upperfilename);
-    // printf("#define _%s_H_\n", upperfilename);
-    // printf("unsigned int %s_code[] = {\n", filename);
-
+//    printf("filename is '%s' path = '%s'\n", filename, path);
+    strcpy(result->name, filename);
     while(fgets(line, len, fp)){
         temp = winix_load_srec_mem_val(line, filename, result);
         wordsLoaded += temp;
@@ -199,8 +213,7 @@ int decode_srec(char *path, int offset, struct srec_binary* result)
     free(line);
 
     result->binary_offset = offset;
-
-    print_srec_result(result, filename);
+//    print_srec_result(result, filename);
     return 0;
 }
 
@@ -220,14 +233,17 @@ int hex2int(char *a, int len)
 
     for (i = 0; i < len; i++)
     {
-        if (a[i] <= 57)
+        if (a[i] <= '9')
         {
             val += (a[i] - 48) * (1 << (4 * (len - 1 - i)));
         }
 
-        else
+        else if (a[i] <= 'F')
         {
             val += (a[i] - 55) * (1 << (4 * (len - 1 - i)));
+        }
+        else if(a[i] <= 'f'){
+            val += (a[i] - 87) * (1 << (4 * (len - 1 - i)));
         }
     }
 
@@ -252,23 +268,23 @@ int winix_load_srec_mem_val(char *line,  const char* filename, struct srec_binar
 {
     int wordsLoaded = 0;
     int index = 0;
-    int checksum = 0;
+    unsigned int checksum = 0;
     char byteCheckSum = 0;
     int recordType = 0;
     int addressLength = 0;
     int byteCount = 0;
     char buffer[128];
-    char tempBufferCount = 0;
+    int tempBufferCount = 0;
     int address = 0;
     char data[255];
     char readChecksum = 0;
     int datalength = 0;
-    size_t memVal = 0;
+    unsigned int memVal = 0;
     int i = 0;
     int j = 0;
     static int debug = 1;
 
-     printf("decoding %s\n",line);
+//     printf("decoding %s\n",line);
     // printf("loop %d\n",linecount );
     // Start code, always 'S'
     if (line[index++] != 'S')
@@ -355,7 +371,7 @@ int winix_load_srec_mem_val(char *line,  const char* filename, struct srec_binar
     {
         tempBufferCount = substring(buffer, line, index, 2);
         // printf("temp byte value %s, value in base 10: %d,length %d\r\n",buffer,hex2int(buffer,tempBufferCount),tempBufferCount);
-        data[i] = hex2int(buffer, tempBufferCount);
+        data[i] = (char)(hex2int(buffer, tempBufferCount) & 0xff);
         // data[i] = (byte)Convert.ToInt32(line.substring(index, 2), 16);
         index += 2;
         checksum += data[i];
@@ -403,7 +419,7 @@ int winix_load_srec_mem_val(char *line,  const char* filename, struct srec_binar
                 // memory_values[start_index + wordsLoaded] = memVal;
                 srec_add_binary(result, memVal);
                 wordsLoaded++;
-                // printf("0x%08x,\n", (unsigned int)memVal);
+                printf("0x%08x,\n", (unsigned int)memVal);
             }
             break;
 
@@ -411,85 +427,12 @@ int winix_load_srec_mem_val(char *line,  const char* filename, struct srec_binar
             // printf("\n};\n#define %s_pc\t0x%08x\n", filename, (unsigned int)address);
             result->binary_pc = address;
             wordsLoaded++;
+
+        default:
+            return 0;
     }
 
     final:
     return wordsLoaded;
 
-}
-
-
-
-
-int winix_load_srec_words_length(char *line)
-{
-    int i = 0;
-
-    int index = 0;
-    int checksum = 0;
-    char byteCheckSum = 0;
-    int recordType = 0;
-    int byteCount = 0;
-    char buffer[128];
-    char tempBufferCount = 0;
-    int wordsCount = 0;
-    int length = 0;
-    int readChecksum = 0;
-    int data = 0;
-
-    index = 0;
-    checksum = 0;
-    // printf("loop %d\n",linecount );
-    // Start code, always 'S'
-    if (line[index++] != 'S')
-    {
-        printf("Expection S\n");
-    }
-
-    recordType = line[index++] - '0';
-    if (recordType != 6)
-    {
-        printf("recordType %d\n", recordType);
-        printf("format is incorrect\n");
-        return 0;
-    }
-    tempBufferCount = substring(buffer, line, index, 2);
-    // printf("record value %s, value in base 10: %d,length %d\r\n",buffer,hex2int(buffer,tempBufferCount),tempBufferCount);
-    byteCount = hex2int(buffer, tempBufferCount);
-    index += 2;
-    checksum += byteCount;
-    tempBufferCount = substring(buffer, line, index, (byteCount - 1) * 2);
-    // printf("temp byte value %s, value in base 10: %d,length %d\r\n",buffer,hex2int(buffer,tempBufferCount),tempBufferCount);
-    data = hex2int(buffer, tempBufferCount);
-    // printf("data %d\n", data);
-    index += (byteCount - 1) * 2;
-    checksum += data;
-
-    // Checksum, two hex digits. Inverted LSB of the sum of values, including byte count, address and all data.
-    // readChecksum = (byte)Convert.ToInt32(line.substring(index, 2), 16);
-    // printf("checksum %d\n",checksum );
-    tempBufferCount = substring(buffer, line, index, 2);
-    // printf("read checksum value %s, value in base 10: %d,length %d\r\n",buffer,hex2int(buffer,tempBufferCount),tempBufferCount);
-    readChecksum = hex2int(buffer, tempBufferCount);
-    // printf("readChecksum %d\n",readChecksum );
-    // printf("checksum %d\n",checksum );
-    // printf("checksum %d\r\n",checksum );
-    if (checksum > 255)
-    {
-        byteCheckSum = (char)(checksum & 0xFF);
-        // printf("checksum %d\r\n",byteCheckSum );
-        byteCheckSum = ~byteCheckSum;
-    }
-    else
-    {
-        byteCheckSum = ~byteCheckSum;
-        byteCheckSum = checksum;
-    }
-    // printf("checksum %d\r\n",byteCheckSum );
-    if (readChecksum != byteCheckSum)
-    {
-        printf("failed checksum\r\n");
-        return 0;
-    }
-    return data;
 }

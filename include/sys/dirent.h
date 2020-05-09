@@ -1,10 +1,11 @@
 
-#ifndef _SYS_DIR_H_
-#define _SYS_DIR_H_ 1
+#ifndef	_SYS_DIRENT_H
+#define _SYS_DIRENT_H 1
 
 #include <sys/types.h>
 
 #define    DIRBLKSIZ    1024    /* size of directory block */
+
 
 // each direct occupies 32 words
 #ifndef DIRSIZ
@@ -27,6 +28,14 @@ struct wramp_dirent {
     char32_t  d_name[DIRNAME_LEN ]; /* filename */
 };
 
+struct __dir{
+    int fd;
+    int pos;
+    struct dirent buffer;
+};
+
+typedef struct __dir DIR;
+
 #define	DT_UNKNOWN	 0
 #define	DT_FIFO		 1
 #define	DT_CHR		 2
@@ -35,6 +44,14 @@ struct wramp_dirent {
 #define	DT_REG		 8
 #define	DT_LNK		10
 #define	DT_SOCK		12
+
+int            closedir(DIR *);
+DIR           *opendir(const char *);
+struct dirent *readdir(DIR *);
+int            readdir_r(DIR *, struct dirent *, struct dirent **);
+void           rewinddir(DIR *);
+void           seekdir(DIR *, long int);
+long int       telldir(DIR *);
 
 #endif /* _DIR_H */
 

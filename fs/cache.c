@@ -161,7 +161,11 @@ struct block_buffer *get_block_buffer(block_t blocknr, struct device* dev){
 
     // not in memory
     tbuf = dequeue_buf();
-    if(tbuf && tbuf->b_dirt){
+    if(!tbuf){
+        return NULL;
+    }
+
+    if(tbuf->b_dirt){
         ret = block_io(tbuf, dev, WRITING);
         tbuf->b_dirt = false;
         KDEBUG(("Sync block %d count %d before returning %d\n", tbuf->b_blocknr, tbuf->b_count, blocknr));

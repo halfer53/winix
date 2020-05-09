@@ -9,7 +9,6 @@
 #include <sys/types.h>
 #include <fs/type.h>
 #include <stdbool.h>
-#include <sys/dirent.h>
 
 int sys_open(struct proc *who, char *path,int flags, mode_t mode);
 int sys_read(struct proc *who, int fd, void *buf, size_t count);

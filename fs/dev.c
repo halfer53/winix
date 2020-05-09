@@ -83,9 +83,10 @@ int blk_dev_release(){
 }
 
 int root_fs_read (struct filp *filp, char *data, size_t count, off_t offset){
-    int ret = 0, r, len, j;
+    int ret = 0, r, j;
+    unsigned int len;
     off_t off, ino_size, end_in_block;
-    int curr_fp_index, fp_limit;
+    unsigned int curr_fp_index, fp_limit;
     block_t bnr;
     inode_t *ino = NULL;
     struct block_buffer* buffer;
@@ -166,7 +167,7 @@ int root_fs_write (struct filp *filp, char *data, size_t count, off_t offset){
         filp->filp_ino->i_size += r;
         off = 0;
     }
-    return r;
+    return ret;
 }
 
 int root_fs_open (struct inode* ino, struct filp *file){

@@ -10,7 +10,7 @@
 
 typedef struct filp {
     mode_t filp_mode;        /* RW bits, telling how file is opened */
-    int filp_flags;        /* flags from open and fcntl */
+    unsigned int filp_flags;        /* flags from open and fcntl */
     int filp_count;        /* how many file descriptors share this slot?*/
     inode_t *filp_ino;    /* pointer to the inode */
     off_t filp_pos;        /* file position */

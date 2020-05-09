@@ -21,7 +21,7 @@
 
 
 
-int _sys_open(struct proc *who, char *path, int flags, mode_t mode, dev_t devid){
+int _sys_open(struct proc *who, char *path, unsigned int flags, mode_t mode, dev_t devid){
     filp_t *filp;
     int i,open_slot,ret;
     inode_t *inode = NULL, *lastdir = NULL;
@@ -33,7 +33,7 @@ int _sys_open(struct proc *who, char *path, int flags, mode_t mode, dev_t devid)
     if(!dev)
         return ENXIO;
 
-    if(ret = eat_path(who, path, &lastdir, &inode, string))
+    if((ret = eat_path(who, path, &lastdir, &inode, string)))
         return ret;
 
     if(inode && (flags & O_EXCL) && (flags & O_CREAT)){
@@ -47,7 +47,7 @@ int _sys_open(struct proc *who, char *path, int flags, mode_t mode, dev_t devid)
         goto final;
     }
 
-    if(ret = get_fd(who, 0, &open_slot, &filp))
+    if((ret = get_fd(who, 0, &open_slot, &filp)))
         goto final;
 
     if(!inode && *string != '\0'){
@@ -71,7 +71,7 @@ int _sys_open(struct proc *who, char *path, int flags, mode_t mode, dev_t devid)
             goto final;
         }
 
-        if(ret = add_inode_to_directory(lastdir, inode, string)){
+        if((ret = add_inode_to_directory(lastdir, inode, string))){
             release_inode(inode);
             goto final;
         }

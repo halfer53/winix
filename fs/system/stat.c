@@ -10,7 +10,7 @@ void set_statbuf(struct inode* inode, struct stat* statbuf){
     statbuf->st_nlink = inode->i_nlinks;
     statbuf->st_uid = inode->i_uid;
     statbuf->st_gid = inode->i_gid;
-    statbuf->st_rdev = inode->i_zone[0];
+    statbuf->st_rdev = S_ISREG(inode->i_mode) ? inode->i_zone[0] : inode->i_dev->dev_id;
     statbuf->st_size = inode->i_size;
     statbuf->st_blksize = BLOCK_SIZE;
     statbuf->st_blocks = get_inode_blocks(inode);
