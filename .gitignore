@@ -21,7 +21,7 @@ test.c
 a.out
 include/*.c
 
-fs/cmake-build-debug/
+cmake-build-debug
 expri/
 gen_bin_code
 reformat_srec.class

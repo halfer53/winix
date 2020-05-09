@@ -1,1 +1,0 @@
-/usr/bin/cc -g  -rdynamic CMakeFiles/gen.dir/gen_bin_code.c.o  -o gen 
