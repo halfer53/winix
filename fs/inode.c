@@ -46,7 +46,7 @@ bool is_valid_inode_num(int num, struct device* id){
         return false;
 
     inodes_nr = sb->s_inode_per_block * (sb->s_inode_table_size / BLOCK_SIZE);
-    KDEBUG(("is valid inode num: %d, inode per block %d, inodes_nr %d\n", num, sb->s_inode_per_block, inodes_nr));
+//    KDEBUG(("is valid inode num: %d, inode per block %d, inodes_nr %d\n", num, sb->s_inode_per_block, inodes_nr));
     return num <= inodes_nr;
 }
 
@@ -55,13 +55,13 @@ bool is_inode_in_use(int num, struct device* id){
     struct superblock* sb = get_sb(id);
     struct block_buffer *buf;
     unsigned int *map_ptr;
-    KDEBUG(("is inode in use %d, inode map nr %d\n", num, sb->s_inodemapnr));
+//    KDEBUG(("is inode in use %d, inode map nr %d\n", num, sb->s_inodemapnr));
     if(!is_valid_inode_num(num, id)){
         return false;
     }
     buf = get_block_buffer(sb->s_inodemapnr, id);
     map_ptr = (unsigned int*)buf->block;
-    KDEBUG(("inode map %08x for inode %d\n", *map_ptr, num));
+//    KDEBUG(("inode map %08x for inode %d\n", *map_ptr, num));
     ret = is_bit_on((unsigned int*)buf->block, (int)TO_WORD_SIZE(sb->s_inodemap_size), num);
     put_block_buffer(buf);
     return ret;
@@ -136,8 +136,9 @@ int init_inode_non_disk(struct inode* ino, ino_t num, struct device* dev, struct
     ino->i_num = num;
     ino->i_total_size = get_inode_total_size_word(ino);
     if(sb){
-        bnr = ((num * sb->s_inode_size) / BLOCK_SIZE) + sb->s_inodemapnr;
-        if(bnr * BLOCK_SIZE > sb->s_inode_table_size){
+        bnr = ((num * sb->s_inode_size) / BLOCK_SIZE) + sb->s_inode_tablenr;
+        if(bnr * BLOCK_SIZE >= sb->s_inode_tablenr * BLOCK_SIZE + sb->s_inode_table_size){
+            KDEBUG(("ino %d exceeding\n", num));
             return ERR;
         }
         ino->i_ndblock = bnr;
@@ -145,13 +146,13 @@ int init_inode_non_disk(struct inode* ino, ino_t num, struct device* dev, struct
     return OK;
 }
 
-int read_inode(int num, struct inode* inode, struct device* id){
+int read_inode(int num, struct inode** ret_ino, struct device* id){
     struct superblock* sb = get_sb(id);
     block_t inode_block_nr = (num * sb->s_inode_size) / BLOCK_SIZE;
     unsigned int offset = (num * sb->s_inode_size) % BLOCK_SIZE;
     block_t blocknr = sb->s_inode_tablenr + inode_block_nr;
     struct block_buffer *buffer;
-    inode = get_free_inode_slot();
+    struct inode* inode = get_free_inode_slot();
 
     if(!inode)
         return ENOSPC;
@@ -162,9 +163,12 @@ int read_inode(int num, struct inode* inode, struct device* id){
 
     buffer = get_block_buffer(blocknr, id);
     memcpy(inode, &buffer->block[offset], INODE_DISK_SIZE);
+
     inode->i_count += 1;
     init_inode_non_disk(inode, num, id, sb);
     put_block_buffer(buffer);
+    *ret_ino = inode;
+//    KDEBUG(("read inode %d blk %d off %d zone %d\n", num, blocknr, offset, inode->i_zone[0]));
     return OK;
 }
 
@@ -174,14 +178,15 @@ inode_t* get_inode(int num, struct device* id){
     for(i = 0; i < NR_INODES; i++ ){
         rep = &inode_table[i];
         if(rep->i_num == num){
+//            KDEBUG(("found ino %d in cache\n", num));
             rep->i_count += 1;
             return rep;
         }
     }
 
-    ret = read_inode(num, rep, id);
+    ret = read_inode(num, &rep, id);
     if(ret){
-        KDEBUG(("read inode return %d\n", ret));
+        KDEBUG(("ERR: read inode return %d\n", ret));
     }
 
     return rep;
@@ -205,6 +210,7 @@ int put_inode(inode_t *inode, bool is_dirty){
     buffer = get_block_buffer(inode->i_ndblock, inode->i_dev);
     memcpy(buffer->block + inode_block_offset, inode, INODE_DISK_SIZE);
     put_block_buffer_immed(buffer, inode->i_dev);
+    KDEBUG(("put inode %d blk %d offset %d\n", inode->i_num, inode->i_ndblock, inode_block_offset));
     return flush_inode_zones(inode);
 }
 
@@ -242,6 +248,7 @@ inode_t* alloc_inode(struct proc* who, struct device* id){
     inode->i_gid = who->gid;
     inode->i_uid = who->uid;
     inode->i_count += 1;
+    inode->i_ctime = INODE_MOCK_UTC_TIME;
 
     sb->s_free_inodes -= 1;
     sb->s_inode_inuse += 1;
@@ -402,6 +409,7 @@ void init_inode(){
     for(i = 0; i < NR_INODES; i++){
         rep = &inode_table[i];
         rep->i_num = 0;
+        rep->i_count = 0;
     }
 }
 

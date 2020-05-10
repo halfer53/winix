@@ -50,6 +50,7 @@ int blk_dev_io_read(char *buf, off_t off, size_t len){
     int count = len;
     if(off + len > _disk_size)
         return 0;
+//    KDEBUG(("dev read blk %d %d\n", off / BLOCK_SIZE, len));
     ptr = _disk + off;
     while(count-- > 0){
         *buf++ = *ptr++;
@@ -62,6 +63,7 @@ int blk_dev_io_write(char *buf, off_t off, size_t len){
     int count = len;
     if(off + len > _disk_size)
         return 0;
+//    KDEBUG(("dev write blk %d %d\n", off / BLOCK_SIZE, len));
     ptr = _disk + off;
     while(count-- > 0){
         *ptr++ = *buf++;

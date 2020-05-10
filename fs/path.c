@@ -56,19 +56,22 @@ int advance(inode_t *dirp, char string[NAME_MAX]){
     if(*string == '\0')
         return ERR;
 
-    // currently only reads the first block
+//    KDEBUG(("advancing %s in inode %d\n", string, dirp->i_num));
     for(i = 0; i < NR_TZONES; i++){
-        if(dirp->i_zone[i] > 0 && (buffer = get_block_buffer(dirp->i_zone[i], dirp->i_dev)) != NULL){
-            dirstream = (struct dirent*)buffer->block;
-            for(; dirstream < (struct dirent* )&buffer->block[BLOCK_SIZE]; dirstream++ ){
-                if(char32_strcmp(dirstream->d_name, string) == 0){
-                    inum = dirstream->d_ino;
-                    put_block_buffer(buffer);
-                    return inum;
+        if(dirp->i_zone[i] > 0 ){
+            if((buffer = get_block_buffer(dirp->i_zone[i], dirp->i_dev)) != NULL){
+                dirstream = (struct dirent*)buffer->block;
+                for(; dirstream < (struct dirent* )&buffer->block[BLOCK_SIZE]; dirstream++ ){
+                    if(char32_strcmp(dirstream->d_name, string) == 0){
+                        inum = dirstream->d_ino;
+                        put_block_buffer(buffer);
+                        return inum;
+                    }
                 }
+                put_block_buffer(buffer);
             }
-            put_block_buffer(buffer);
         }
+
     }
     return ERR;
 }
@@ -113,7 +116,7 @@ int __eath_path(struct inode* curr_ino, struct inode** last_dir,
 
         if(!(rip->i_mode & S_IFDIR))
             return ENOTDIR; //if one of the pathname in the path is not directory
-
+//        KDEBUG(("path advance %d %s\n", rip->i_num, string));
         inum = advance(rip,string);
         if(inum == ERR) {
             return OK;
@@ -121,6 +124,7 @@ int __eath_path(struct inode* curr_ino, struct inode** last_dir,
 
         put_inode(rip, false);
         new_rip = get_inode(inum, dev);
+//        KDEBUG(("got new rip %d ret %d\n", inum, new_rip->i_num));
         rip = new_rip;
         path = component_name;
     }

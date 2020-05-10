@@ -33,7 +33,9 @@ void test_fs(){
     char buf[256];
     struct winix_elf* elf;
     fd = sys_open(current_proc, "/bin/init", O_RDONLY, 0);
+    kprintf("open return %d\n", fd);
     ASSERT(fd >= 0);
+    kprintf("init opened\n");
     ret = sys_read(current_proc, fd, buf, sizeof(struct winix_elf));
     elf = (struct winix_elf*)buf;
     ASSERT(ret > 0);

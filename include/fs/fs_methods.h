@@ -56,7 +56,7 @@ size_t get_inode_total_size_word(struct inode* ino);
 blkcnt_t get_inode_blocks(struct inode* ino);
 struct superblock* get_sb(struct device* id);
 void init_inodetable();
-int read_inode(int num, inode_t *inode, struct device*);
+int read_inode(int num, inode_t **inode, struct device*);
 inode_t* get_inode(int num, struct device*);
 int put_inode(inode_t *inode, bool is_dirty);
 inode_t* alloc_inode(struct proc* who, struct device*);

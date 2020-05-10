@@ -119,7 +119,7 @@ int flush_inode_zones(struct inode *ino){
 
 int block_io(struct block_buffer* tbuf, struct device* dev, int flag){
     off_t off = tbuf->b_blocknr * BLOCK_SIZE;
-
+//    KDEBUG(("block io blk %d off %d mode %s\n", tbuf->b_blocknr, off, flag == READING ? "read" : "write"));
     if(flag == READING){
         return dev->dops->dev_read(tbuf->block, off, BLOCK_SIZE);
     }else if(flag == WRITING){

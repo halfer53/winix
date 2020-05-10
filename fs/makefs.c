@@ -16,7 +16,7 @@ int makefs( char* disk_raw, size_t disk_size_words)
     char *pdisk = disk_raw;
     struct dirent* pdir;
     struct dirent d1, d2;
-    const time_t now = 1587268254;
+    const time_t now = INODE_MOCK_UTC_TIME;
     const int root_inode_num = 1;
     inode_t root_node;
     unsigned int blocks_nr = disk_size_words / BLOCK_SIZE;

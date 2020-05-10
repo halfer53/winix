@@ -68,7 +68,7 @@ void init_filp(){
     int i = 0;
     for(i = 0; i < NR_FILPS; i++ ){
         rep = &fd_table[i];
-        rep->filp_ino = NIL_INODE;
+        rep->filp_count = 0;
         rep->filp_table_index = i;
         i++;
     }
