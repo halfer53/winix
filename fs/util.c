@@ -3,10 +3,6 @@
 //
 #include "fs.h"
 
-bool has_file_access(int type, struct proc* who, struct inode* ino){
-    return true;
-}
-
 char32_t *char32_strcpy(char32_t *dest, const char *src) {
     char32_t *saved = dest;
     while ((*dest++ = *src++));

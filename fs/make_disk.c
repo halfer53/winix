@@ -3,6 +3,7 @@
 //
 
 #include <fs/const.h>
+#include <fs/cache.h>
 #include <kernel/proc.h>
 #include <fs/super.h>
 #include "excluded_files/cmake_util.h"
@@ -24,8 +25,7 @@ void init_bitmap();
 char DISK_RAW[DISK_SIZE];
 
 /* Program documentation. */
-static char doc[] =
-        "Generate FS Disk";
+static char doc[] = "Generate FS Disk";
 
 /* A description of the arguments we accept. */
 static char args_doc[] = "-d -s [Source Path] -o [Output Path]";
@@ -35,7 +35,8 @@ static struct argp_option options[] = {
         {"offset",  't', "OFFSET1",      0,  "Srec Text Segment Offset" },
         {"debug",  'd', 0,      OPTION_ARG_OPTIONAL,  "Is Debugging" },
         {"output",   'o', "OUTPUT", 0, "Output Path" },
-        {"source",   's', "SOURCE", 0, "Source Path" }
+        {"source",   's', "SOURCE", 0, "Source Path" },
+        {0}
 };
 
 /* Used by main to communicate with parse_opt. */
@@ -44,6 +45,7 @@ struct arguments
     char *output_path;
     char *source_path;
     int debug;
+    int do_unit_test;
     int offset;
 };
 
@@ -80,12 +82,11 @@ static struct argp argp = { options, parse_opt, args_doc, doc };
 
 
 void write_disk(char* path){
-    int fd;
-    int size = DISK_SIZE;
     char curr_dir[100];
     char filename[] = "disk.c";
     char str2[] = "unsigned int DISK_RAW[] = {\n";
     char str3[] = "};\n";
+    unsigned int *val = (unsigned int*)DISK_RAW;
     FILE *fp;
     getcwd(curr_dir, 100);
 
@@ -93,9 +94,8 @@ void write_disk(char* path){
     fp = fopen(path, "w");
     fprintf(fp, "%s", str2);
 
-    for(int i = 0; i < DISK_SIZE; i++){
-        unsigned int val = DISK_RAW[i];
-        fprintf(fp, "\t0x%08x,\n", val);
+    for(int i = 0; i < DISK_SIZE_WORD; i++){
+        fprintf(fp, "\t0x%08x,\n", *val++);
     }
     fprintf(fp, "%s\n\n", str3);
     fclose(fp);
@@ -148,26 +148,28 @@ void write_srec_list(struct list_head* lists){
     struct winix_elf_list *pos, *tmp;
     char path[256];
     int ret, fd, size;
-    int elf_size = sizeof(struct winix_elf) / 4;
+    int elf_size = sizeof(struct winix_elf);
     ret = sys_mkdir(current_proc, bin_path, 0x755);
     assert(ret == 0);
     list_for_each_entry_safe(struct winix_elf_list, pos, tmp, lists, list){
         strcpy(path, bin_path);
         strcat(path, "/");
         strcat(path, pos->name);
-        printf("writing %s %x %x\n", pos->name, pos->binary_data[0], pos->binary_data[1]);
+//        printf("writing %s %x %x\n", pos->name, pos->binary_data[0], pos->binary_data[1]);
 
         fd = sys_creat(current_proc, path, 0x755);
         assert(fd >= 0);
         ret = sys_write(current_proc, fd, &pos->elf, elf_size);
         assert(ret == elf_size);
-        ret = sys_write(current_proc, fd, pos->binary_data, pos->elf.binary_size);
+        ret = sys_write(current_proc, fd, pos->binary_data, pos->elf.binary_size );
         assert(ret == pos->elf.binary_size);
         ret = sys_close(current_proc, fd);
         assert(ret == 0);
         list_del(&pos->list);
         free(pos);
     }
+    flush_all_buffer();
+    flush_super_block(get_dev(ROOT_DEV));
 }
 
 int write_srec_to_disk(char* path, struct arguments* arguments){
@@ -211,20 +213,16 @@ int write_srec_to_disk(char* path, struct arguments* arguments){
     }
     combine_srec_binary_and_debug_list(&srec_list, &srec_binary_list, &srec_debug_list);
     write_srec_list(&srec_list);
-//    decode_srec(arguments->source_path, arguments->offset, &srec_result);
+    return 0;
 }
 
 int main(int argc, char** argv){
     struct arguments arguments;
     memset(&arguments, 0, sizeof(struct arguments));
 
-    arguments.source_path = NULL;
-    arguments.output_path = NULL;
     arguments.debug = false;
     arguments.offset = 2048;
-
     argp_parse (&argp, argc, argv, 0, 0, &arguments);
-
     if( arguments.source_path == NULL && arguments.output_path == NULL && arguments.debug == false){
         fprintf(stderr,"Format ERROR: source file = %s\n"
                        "output file = %s\n"
@@ -233,17 +231,20 @@ int main(int argc, char** argv){
                 arguments.source_path, arguments.output_path, arguments.debug, arguments.offset);
         return 1;
     }
-    if(arguments.source_path && arguments.output_path){
-        mock_init_proc();
-        init_bitmap();
-        init_disk();
-        init_fs();
 
+
+    mock_init_proc();
+    init_bitmap();
+    init_disk();
+    init_fs();
+    if(arguments.source_path && arguments.output_path){
         write_srec_to_disk(arguments.source_path, &arguments);
         write_disk(arguments.output_path);
+    }else if(arguments.debug){
+        unit_test1();
     }
 
 //    do_tests();
 //    printf("argc %d argv 0 %s \n", argc, argv[0]);
-
+    return 0;
 }

@@ -4,13 +4,19 @@
  int sys_close(struct proc *who,int fd){
      filp_t *filp;
      int ret;
+     struct inode* ino;
      if(!is_fd_opened_and_valid(who, fd))
-        return EINVAL;
+        return EBADF;
 
      filp = who->fp_filp[fd];
+     ino = filp->filp_ino;
      filp->filp_count -= 1;
+
      if(filp->filp_count == 0){
          put_inode(filp->filp_ino, true);
+         if(ino->i_count == 0 && ino->i_nlinks == 0){
+             release_inode(ino);
+         }
      }
      ret = filp->filp_dev->fops->close(filp->filp_ino, filp);
      if(ret)
@@ -71,7 +77,7 @@ int _sys_open(struct proc *who, char *path, unsigned int flags, mode_t mode, dev
             goto final;
         }
 
-        if((ret = add_inode_to_directory(lastdir, inode, string))){
+        if((ret = add_inode_to_directory(who, lastdir, inode, string))){
             release_inode(inode);
             goto final;
         }
@@ -94,7 +100,6 @@ int _sys_open(struct proc *who, char *path, unsigned int flags, mode_t mode, dev
 
     final:
     put_inode(lastdir, false);
-    put_inode(inode, false);
     return ret;
 }
 
@@ -122,3 +127,4 @@ int do_creat(struct proc* who, struct message* msg){
 int do_close(struct proc* who, struct message* msg){
     return sys_close(who, msg->m1_i1);
 }
+

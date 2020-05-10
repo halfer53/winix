@@ -19,3 +19,8 @@ int sys_dup(struct proc* who, int oldfd){
     oldfile->filp_count += 1;
     return open_slot;
 }
+
+int do_dup(struct proc* who, struct message* msg){
+    return sys_dup(who, msg->m1_i1);
+}
+

@@ -51,8 +51,6 @@ struct inode_disk {
 };
 
 
-#define INODE_DISK_SIZE_WORD (sizeof(struct inode_disk))
-#define INODE_DISK_SIZE_BYTE (sizeof(struct inode_disk))
 #define INODE_DISK_SIZE (sizeof(struct inode_disk))
 
 

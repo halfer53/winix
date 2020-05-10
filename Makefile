@@ -39,20 +39,20 @@ export Q
 export quiet
 export srctree \\
 export includes := $(shell find include -name "*.h")
-export CFLAGS := -D_DEBUG
+export CFLAGS := -D_DEBUG -D__wramp__
 
 
 
 all:| makedisk kbuild build_disk compile_disk
 	$(Q)wlink $(LDFLAGS) -Ttext 1024 -v -o winix.srec \
 			$(L_HEAD) $(KERNEL_O) $(KLIB_O) $(L_TAIL) \
-							> tools/kdbg_srec/winix.kdbg
+							> include/commands/winix.verbose
 ifeq ($(KBUILD_VERBOSE),0)
 	@echo "LD \t winix.srec"
 endif
 
 makedisk: $(FS_DEPEND)
-	$(Q)gcc -D FILE_SYSTEM_PROJECT -w -I./include/fs_include -I./include $^ -o makedisk
+	$(Q)gcc -g -D FILE_SYSTEM_PROJECT -w -I./include/fs_include -I./include $^ -o makedisk
 	# $(Q)-rm -f $(KMAIN)
 	# $(Q)$(MAKE) -C tools
 
@@ -61,7 +61,10 @@ $(alldir): FORCE
 	$(Q)$(MAKE) $(build)=$@
 
 build_disk: FORCE
-	$(Q)./makedisk include/disk.c
+	$(Q)./makedisk -t 2048 -o include/disk.c -s include/commands
+ifeq ($(KBUILD_VERBOSE),0)
+	@echo "LD \t disk.c"
+endif
 
 compile_disk: FORCE
 	$(Q)$(MAKE) $(build)=include
@@ -86,8 +89,5 @@ test:
 	gcc -D_GCC_DEBUG -I./include test.c winix/bitmap.c winix/mm.c
 
 FORCE:
-
-.DELETE_ON_ERROR:
-
 
 # DO NOT DELETE

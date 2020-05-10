@@ -28,6 +28,7 @@
 #include <winix/bitmap.h>
 #include <winix/page.h>
 #include <winix/compiler.h>
+#include <winix/mm.h>
 #include <stdbool.h>
 #include <winix/kstring.h>
 #include <fs/fs_methods.h>
@@ -38,10 +39,20 @@
 #include <stdio.h>
 #include "excluded_files/cmake_util.h"
 #define kprintf(...) printf(__VA_ARGS__)
-#define KDEBUG(token)   printf("[SYSTEM] "); printf token
+
+#ifdef _DEBUG
+    #define KDEBUG(token)   \
+    do{\
+    printf("[SYSTEM] "); \
+    printf token; \
+    }while(0)
+#else
+    #define KDEBUG(token)
+#endif
 
 #else
 
+#include <winix/sys_stdio.h>
 #include <winix/slab.h>
 #include <winix/kdebug.h>
 #include <string.h>

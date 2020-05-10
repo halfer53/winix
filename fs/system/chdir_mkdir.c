@@ -50,7 +50,7 @@ int sys_mkdir(struct proc* who, char* pathname, mode_t mode){
     ino->i_mode = S_IFDIR | (mode & ~who->umask);
     ino->i_zone[0] = alloc_block(ino, lastdir->i_dev);
     init_dirent(lastdir, ino);
-    ret = add_inode_to_directory(lastdir, ino, string);
+    ret = add_inode_to_directory(who, lastdir, ino, string);
     if(ret){
         release_inode(ino);
         goto final_dir;
@@ -66,10 +66,14 @@ int sys_mkdir(struct proc* who, char* pathname, mode_t mode){
 
 int do_chdir(struct proc* who, struct message* msg){
     char* path = (char *) get_physical_addr(msg->m1_p1, who);
+    if(!is_addr_accessible(path, who))
+        return EFAULT;
     return sys_chdir(who, path);
 }
 
 int do_mkdir(struct proc* who, struct message* msg){
     char* path = (char *) get_physical_addr(msg->m1_p1, who);
+    if(!is_addr_accessible(path, who))
+        return EFAULT;
     return sys_mkdir(who, path, msg->m1_i1);
 }

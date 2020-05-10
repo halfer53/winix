@@ -64,14 +64,6 @@ void rm_lru(struct block_buffer *buffer){
         lru_cache[FRONT] = buffer->prev;
 }
 
-PRIVATE void buf_move_to_front(struct block_buffer *buffer){
-    if(lru_cache[FRONT] == buffer)
-        return;
-    
-    rm_lru(buffer);
-    enqueue_buf(buffer);
-}
-
 struct block_buffer* dequeue_buf() {
     struct block_buffer *rear = lru_cache[REAR];
     if (!rear)
@@ -93,16 +85,20 @@ void enqueue_buf(struct block_buffer *tbuf) {
 
 }
 
-PRIVATE void buf_move_to_rear(struct block_buffer *buffer){
-    if(lru_cache[REAR] == buffer)
-        return;
-
-    rm_lru(buffer);
-    buffer->next = lru_cache[REAR];
-    lru_cache[REAR] = buffer;
+int flush_all_buffer(){
+    int j, ret;
+    struct block_buffer* tbuf;
+    for(j = 0; j < LRU_LEN; j++){
+        tbuf = &buf_table[j];
+        if(tbuf->b_dirt){
+            block_io(tbuf, tbuf->b_dev, WRITING);
+            tbuf->b_dirt = false;
+        }
+    }
+    return OK;
 }
 
-int flush_inode_zones(inode_t *ino){
+int flush_inode_zones(struct inode *ino){
     int i, j;
     block_t zid;
     struct block_buffer* tbuf;
@@ -134,9 +130,9 @@ int block_io(struct block_buffer* tbuf, struct device* dev, int flag){
 
 int put_block_buffer_immed(struct block_buffer* tbuf, struct device* dev){
     if(block_io(tbuf, dev, WRITING) == 0)
-        return -1;
+        return EIO;
     tbuf->b_dirt = false;
-    put_block_buffer(tbuf);
+    return put_block_buffer(tbuf);
 }
 
 int put_block_buffer_dirt(struct block_buffer *tbuf) {
@@ -153,7 +149,7 @@ int put_block_buffer(struct block_buffer *tbuf) {
         tbuf->b_count = 0;
     }
 //    visualise_lru();
-    return 0;
+    return OK;
 }
 
 struct block_buffer *get_block_buffer(block_t blocknr, struct device* dev){
@@ -195,6 +191,18 @@ struct block_buffer *get_block_buffer(block_t blocknr, struct device* dev){
     tbuf->b_count = 1;
 //    KDEBUG(("Buffer %d get\n", blocknr));
     return tbuf;
+}
+
+void flush_super_block(struct device* dev){
+//    struct superblock sb1, sb2;
+    struct superblock* sb = get_sb(dev);
+    dearch_superblock(sb);
+    sb->s_iroot = NULL;
+    dev->dops->dev_write((char*)sb, 0, sizeof(struct superblock));
+
+//    dev->dops->dev_read((char*)&sb1, 0, sizeof(struct superblock));
+//    memcpy(&sb2, DISK_RAW, sizeof(struct superblock));
+//    KDEBUG(("sb %d %d %d \n", sb1.s_inode_per_block, sb2.s_inode_per_block, sb->s_inode_per_block));
 }
 
 void init_buf(){

@@ -77,6 +77,7 @@ int sys_pipe(struct proc* who, int fd[2]){
 
     inode->pipe_data = ptr;
     inode->flags |= INODE_FLAG_PIPE;
+    inode->i_count = 1;
     inode->i_nlinks = 1;
     init_inode_non_disk(inode, get_next_ino(), &pipe_dev, NULL);
     init_filp_by_inode(file1, inode);

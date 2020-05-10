@@ -50,5 +50,8 @@ int sys_getdent(struct proc* who, int fd, struct dirent* dirp_dst){
 
 int do_getdent(struct proc* who, struct message* msg){
     struct dirent* path = (struct dirent *) get_physical_addr(msg->m1_p1, who);
+    if(!is_addr_accessible(path, who))
+        return EACCES;
     return sys_getdent(who, msg->m1_i1, path);
 }
+

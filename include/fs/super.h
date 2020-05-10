@@ -20,15 +20,15 @@ struct superblock {
     block_t s_inodemapnr; // inode map block index
     unsigned int  s_inodemap_size;
     block_t s_inode_tablenr; // inode map block index
-    block_t s_inode_table_size;
-
-    int s_ninode; // first free inode number
-    int s_nblock; // first free block number
+    unsigned int s_inode_table_size;
 
     int s_inode_per_block;
     inode_t *s_iroot;
     char32_t s_name[32];
 };
+
+void arch_superblock(struct superblock* sb);
+void dearch_superblock(struct superblock* sb);
 
 
 #endif

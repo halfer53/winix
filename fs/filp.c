@@ -31,7 +31,6 @@ int get_fd(struct proc *curr, int start, int *open_slot, filp_t **fpt){
 
 int init_filp_by_inode(struct filp* filp, struct inode* inode){
     filp->filp_ino = inode;
-    inode->i_count += 1;
     filp->filp_count += 1;
     filp->filp_dev = inode->i_dev;
     return OK;

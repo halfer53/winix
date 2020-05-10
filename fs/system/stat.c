@@ -43,3 +43,4 @@ int sys_stat(struct proc* who, char *pathname, struct stat *statbuf){
     put_inode(inode, false);
     return OK;
 }
+

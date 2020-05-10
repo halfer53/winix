@@ -20,7 +20,7 @@ int sys_link(struct proc* who, char *oldpath, char *newpath){
         goto final;
     }
 
-    ret = add_inode_to_directory(lastdir, oldinode, string);
+    ret = add_inode_to_directory(who, lastdir, oldinode, string);
 
     final:
     if(newinode)
@@ -48,11 +48,11 @@ int sys_unlink(struct proc* who, char *path){
         goto final;
     }
 
-    ret = remove_inode_from_dir(lastdir, ino);
+    ret = remove_inode_from_dir(who, lastdir, ino, string);
     if(ret)
         goto remove_failed;
 
-    if(ino->i_nlinks == 0){
+    if(ino->i_nlinks == 0 && ino->i_count == 0){
         ret = release_inode(ino);
     }
 
@@ -63,3 +63,4 @@ int sys_unlink(struct proc* who, char *path){
     put_inode(lastdir, false);
     return ret;
 }
+

@@ -24,15 +24,16 @@ int makefs( char* disk_raw, size_t disk_size_words)
     block_t blockmap_block_nr = 1;
     block_t inodemap_block_nr = 2;
     block_t inode_table_block_nr = 3;
-    block_t inode_tablesize = (int)(blocks_nr * 0.05) * BLOCK_SIZE;
+    unsigned int inode_tablesize = (int)(blocks_nr * 0.05) * BLOCK_SIZE;
     block_t root_node_block_nr = inode_table_block_nr + (inode_tablesize / BLOCK_SIZE);
     block_t first_free_block = root_node_block_nr + 1;
     block_t block_in_use = root_node_block_nr + 1;
     block_t remaining_blocks = blocks_nr - block_in_use;
     unsigned int remaining_words = remaining_blocks * BLOCK_SIZE;
-    int inode_per_block = BLOCK_SIZE / INODE_DISK_SIZE_WORD;
-    unsigned int free_inodes = inode_tablesize / INODE_DISK_SIZE_WORD - 1;
+    int inode_per_block = BLOCK_SIZE / INODE_DISK_SIZE;
+    unsigned int free_inodes = inode_tablesize / INODE_DISK_SIZE - 1;
     unsigned int bitval = 0;
+    struct superblock s2;
 
     struct superblock superblock = {
             SUPER_BLOCK_MAGIC, // magic
@@ -41,7 +42,7 @@ int makefs( char* disk_raw, size_t disk_size_words)
             remaining_blocks, // free blocks
         free_inodes, // free inodes
         BLOCK_SIZE, // block size
-            INODE_DISK_SIZE_WORD, // inode size
+            INODE_DISK_SIZE, // inode size
             root_inode_num, // root inode number
 
         sb_block_nr,
@@ -52,8 +53,6 @@ int makefs( char* disk_raw, size_t disk_size_words)
             BLOCK_SIZE,
         inode_table_block_nr, // inode table block index
             inode_tablesize,
-            2, // first free inode number
-        first_free_block, // first free block number
         inode_per_block, // inode per block
         NULL, // root inode
     };
@@ -81,7 +80,9 @@ int makefs( char* disk_raw, size_t disk_size_words)
     root_node.i_ndblock = inode_table_block_nr;
     root_node.i_size = BLOCK_SIZE;
 
-    memcpy(pdisk, &superblock, sizeof(superblock));
+    memcpy(&s2, &superblock, sizeof(struct superblock));
+    dearch_superblock(&s2);
+    memcpy(pdisk, &s2, sizeof(superblock));
     pdisk += superblock.s_superblock_size;
 
     bitval = setBits(block_in_use);
@@ -95,7 +96,7 @@ int makefs( char* disk_raw, size_t disk_size_words)
     memcpy(pdisk, &bitval , sizeof(unsigned int));
     pdisk += superblock.s_inodemap_size;
     //inode table, first one is used by root node
-    memcpy(pdisk + INODE_DISK_SIZE_WORD, &root_node, INODE_DISK_SIZE_BYTE);
+    memcpy(pdisk + INODE_DISK_SIZE, &root_node, INODE_DISK_SIZE);
     pdisk += superblock.s_inode_table_size;
 
     char *pbak = pdisk;
@@ -104,25 +105,6 @@ int makefs( char* disk_raw, size_t disk_size_words)
     pdir++;
     fill_dirent(&root_node, pdir, "..");
 
-//    struct dirent* dir = (struct dirent* )(disk_raw + (6 * BLOCK_SIZE));
-//    for(; dir < (struct dirent* )(pbak + BLOCK_SIZE); dir++ ){
-//        if(dir->d_ino == 0){
-//            break;
-//        }
-//        printf("Inode num %d %ls\n",  dir->d_ino,  dir->d_name);
-//    }
-//
-//    char curr = 0;
-//    printf("\nsuper block 0 - 0x%08x\n", curr);
-//    curr += superblock.s_superblock_size;
-//    printf("block map 0x%08x - 0x%08x\n",curr, curr+ superblock.s_blockmap_size );
-//    curr += superblock.s_blockmap_size;
-//    printf("inode map 0%08x - 0x%08x\n",curr, curr+superblock.s_inodemap_size );
-//    curr += superblock.s_inodemap_size;
-//    printf("inode table 0x%08x - 0x%08x\n",curr, curr+superblock.s_inode_table_size );
-//    curr += superblock.s_inode_table_size;
-//    printf("data block 0x%08x - 0x%p\n Number of free blocks %d\n\n\n",curr, disk_raw + disk_size_words - curr, remaining_blocks );
-    
     return 0;
     // return DISK_RAW;
 }

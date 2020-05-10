@@ -70,12 +70,41 @@ int blk_dev_io_write(char *buf, off_t off, size_t len){
 }
 
 int blk_dev_init(){
+    struct superblock* sb;
     _disk_size = DISK_SIZE;
     _disk = DISK_RAW;
-
+#ifdef __wramp__
+    ASSERT(DISK_RAW[0] == SUPER_BLOCK_MAGIC);
+#endif
     memcpy(root_fs.sb, _disk, sizeof(struct superblock));
+    sb = root_fs.sb;
+    arch_superblock(sb);
+    ASSERT(root_fs.sb->magic == SUPER_BLOCK_MAGIC);
+    KDEBUG(("sb block in use %d inode table size %d\n", sb->s_block_inuse, sb->s_inode_table_size));
     root_fs.sb->s_iroot = NULL;
     return 0;
+}
+
+void arch_superblock(struct superblock* sb){
+#ifdef __wramp__
+    sb->s_inode_size /= 4;
+    sb->s_block_size /= 4;
+    sb->s_superblock_size /= 4;
+    sb->s_blockmap_size /= 4;
+    sb->s_inodemap_size /= 4;
+    sb->s_inode_table_size /= 4;
+#endif
+}
+
+void dearch_superblock(struct superblock* sb){
+#ifdef __wramp__
+    sb->s_inode_size *= 4;
+    sb->s_block_size *= 4;
+    sb->s_superblock_size *= 4;
+    sb->s_blockmap_size *= 4;
+    sb->s_inodemap_size *= 4;
+    sb->s_inode_table_size *= 4;
+#endif
 }
 
 int blk_dev_release(){
@@ -187,6 +216,7 @@ int register_device(struct device* dev, const char* name, dev_t id, mode_t type)
     dev->dev_id = id;
     dev->device_type = type;
     list_add(&dev->list,&devices_list);
+    return OK;
 }
 
 struct device* get_dev(dev_t dev){
@@ -225,9 +255,8 @@ void init_root_fs(){
     dev->dops->dev_init();
 
     ino = get_inode(ROOT_INODE_NUM, dev);
-    ino->i_count += 999;
+    ASSERT(ino != NULL);
     root_fs.sb->s_iroot = ino;
-    current_proc->fp_workdir = current_proc->fp_rootdir = ino;
 }
 
 

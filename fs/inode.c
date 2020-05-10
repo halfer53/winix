@@ -23,7 +23,7 @@ struct inode* get_free_inode_slot(){
     return NULL;
 }
 
-bool check_access(struct proc* who, struct inode* ino, mode_t mode){
+bool has_file_access(struct proc* who, struct inode* ino, mode_t mode){
     if(who->uid == 0)
         return true;
     if(who->uid == ino->i_uid && (mode << 8) & ino->i_mode){
@@ -45,7 +45,8 @@ bool is_valid_inode_num(int num, struct device* id){
     if(num <= 0 || num >= NR_INODES)
         return false;
 
-    inodes_nr = sb->s_inode_per_block * sb->s_inode_tablenr;
+    inodes_nr = sb->s_inode_per_block * (sb->s_inode_table_size / BLOCK_SIZE);
+    KDEBUG(("is valid inode num: %d, inode per block %d, inodes_nr %d\n", num, sb->s_inode_per_block, inodes_nr));
     return num <= inodes_nr;
 }
 
@@ -53,11 +54,15 @@ bool is_inode_in_use(int num, struct device* id){
     bool ret;
     struct superblock* sb = get_sb(id);
     struct block_buffer *buf;
+    unsigned int *map_ptr;
+    KDEBUG(("is inode in use %d, inode map nr %d\n", num, sb->s_inodemapnr));
     if(!is_valid_inode_num(num, id)){
         return false;
     }
     buf = get_block_buffer(sb->s_inodemapnr, id);
-    ret = is_bit_on(buf->block, sb->s_inodemap_size, num);
+    map_ptr = (unsigned int*)buf->block;
+    KDEBUG(("inode map %08x for inode %d\n", *map_ptr, num));
+    ret = is_bit_on((unsigned int*)buf->block, (int)TO_WORD_SIZE(sb->s_inodemap_size), num);
     put_block_buffer(buf);
     return ret;
 }
@@ -71,9 +76,9 @@ int alloc_block(inode_t *ino, struct device* id){
     int ret;
 
     while(bmap->b_blocknr < bmap_end){
-        free_bit = bitmap_search_from(bmap->block, BLOCK_SIZE, 0, 1);
+        free_bit = bitmap_search_from((unsigned int*) bmap->block, BLOCK_SIZE_WORD, 0, 1);
         if(free_bit > 0){
-            bitmap_set_bit(bmap->block, BLOCK_SIZE, free_bit);
+            bitmap_set_bit((unsigned int*)bmap->block, BLOCK_SIZE_WORD, free_bit);
             sb->s_block_inuse += 1;
             sb->s_free_blocks -= 1;
             ino->i_total_size += BLOCK_SIZE;
@@ -102,7 +107,7 @@ int release_block(block_t bnr, struct device* id){
 
     bmap = get_block_buffer(bmap_nr, id);
 
-    bitmap_clear_bit(bmap->block, BLOCK_SIZE, bnr);
+    bitmap_clear_bit((unsigned int*)bmap->block, BLOCK_SIZE_WORD, bnr);
     sb->s_block_inuse -= 1;
     sb->s_free_blocks += 1;
     return put_block_buffer(bmap);
@@ -140,30 +145,32 @@ int init_inode_non_disk(struct inode* ino, ino_t num, struct device* dev, struct
     return OK;
 }
 
-inode_t* read_inode(int num, struct device* id){
+int read_inode(int num, struct inode* inode, struct device* id){
     struct superblock* sb = get_sb(id);
     block_t inode_block_nr = (num * sb->s_inode_size) / BLOCK_SIZE;
     unsigned int offset = (num * sb->s_inode_size) % BLOCK_SIZE;
     block_t blocknr = sb->s_inode_tablenr + inode_block_nr;
     struct block_buffer *buffer;
-    inode_t *inode = get_free_inode_slot();
+    inode = get_free_inode_slot();
 
+    if(!inode)
+        return ENOSPC;
     if(!is_inode_in_use(num, id))
-        return NULL;
+        return EINVAL;
     if(num == 0)
-        return NULL;
+        return EINVAL;
 
     buffer = get_block_buffer(blocknr, id);
-    memcpy(inode, &buffer->block[offset], INODE_DISK_SIZE_BYTE);
+    memcpy(inode, &buffer->block[offset], INODE_DISK_SIZE);
     inode->i_count += 1;
     init_inode_non_disk(inode, num, id, sb);
     put_block_buffer(buffer);
-    return inode;
+    return OK;
 }
 
 inode_t* get_inode(int num, struct device* id){
-    inode_t* rep;
-    int i;
+    inode_t* rep = NULL;
+    int i, ret;
     for(i = 0; i < NR_INODES; i++ ){
         rep = &inode_table[i];
         if(rep->i_num == num){
@@ -172,7 +179,11 @@ inode_t* get_inode(int num, struct device* id){
         }
     }
 
-    rep = read_inode(num, id);
+    ret = read_inode(num, rep, id);
+    if(ret){
+        KDEBUG(("read inode return %d\n", ret));
+    }
+
     return rep;
 }
 
@@ -181,7 +192,7 @@ int put_inode(inode_t *inode, bool is_dirty){
     struct superblock* sb;
     int i = 0;
     int inum;
-    int inode_block_offset;
+    unsigned int inode_block_offset;
     struct block_buffer *buffer;
     if(!inode)
         return EINVAL;
@@ -192,7 +203,7 @@ int put_inode(inode_t *inode, bool is_dirty){
     inum = inode->i_num;
     inode_block_offset = (inum * sb->s_inode_size) % BLOCK_SIZE;;
     buffer = get_block_buffer(inode->i_ndblock, inode->i_dev);
-    memcpy(buffer->block + inode_block_offset, inode, INODE_DISK_SIZE_BYTE);
+    memcpy(buffer->block + inode_block_offset, inode, INODE_DISK_SIZE);
     put_block_buffer_immed(buffer, inode->i_dev);
     return flush_inode_zones(inode);
 }
@@ -210,7 +221,7 @@ inode_t* alloc_inode(struct proc* who, struct device* id){
     imap = get_imap(id);
     imap_end = imap->b_blocknr + (sb->s_blockmap_size / BLOCK_SIZE);
     while(imap->b_blocknr < imap_end){
-        inum = bitmap_search_from(imap->block, BLOCK_SIZE, 0, 1);
+        inum = bitmap_search_from((unsigned int*)imap->block, BLOCK_SIZE_WORD, 0, 1);
         if(inum > 0){
             found = true;
             break;
@@ -223,13 +234,14 @@ inode_t* alloc_inode(struct proc* who, struct device* id){
         put_block_buffer(imap);
         return NULL;
     }
-    bitmap_set_bit(imap->block, BLOCK_SIZE, inum);
+    bitmap_set_bit((unsigned int*)imap->block, BLOCK_SIZE_WORD, inum);
     put_block_buffer_immed(imap, id);
 
     inode = get_free_inode_slot();
     init_inode_non_disk(inode, inum, id, sb);
     inode->i_gid = who->gid;
     inode->i_uid = who->uid;
+    inode->i_count += 1;
 
     sb->s_free_inodes -= 1;
     sb->s_inode_inuse += 1;
@@ -250,6 +262,11 @@ int release_inode(inode_t *inode){
         KDEBUG((" inode id %d not in use, cannot be released", inum));
         return EINVAL;
     }
+    inode->i_count -= 1;
+    if(inode->i_count != 0){
+        kprintf("[ERROR]: %d is in use before releasing\n", inum);
+    }
+
 
     for(i = 0; i < NR_TZONES; i++){
         zone_id = inode->i_zone[i];
@@ -260,8 +277,7 @@ int release_inode(inode_t *inode){
     }
 
     imap = get_block_buffer(imap_nr, id);
-
-    bitmap_clear_bit(imap->block, BLOCK_SIZE, inum);
+    bitmap_clear_bit((unsigned int*)imap->block, BLOCK_SIZE_WORD, inum);
     sb->s_inode_inuse -= 1;
     sb->s_free_inodes += 1;
     put_block_buffer_immed(imap, id);
@@ -311,7 +327,7 @@ int init_dirent(inode_t* dir, inode_t* ino){
 
 
 
-int add_inode_to_directory( struct inode* dir, struct inode* ino, char* string){
+int add_inode_to_directory(struct proc* who, struct inode* dir, struct inode* ino, char* string){
     int i, j, ret;
     block_t bnr;
     struct dirent* curr, *end;
@@ -319,9 +335,8 @@ int add_inode_to_directory( struct inode* dir, struct inode* ino, char* string){
 
     if(!(S_ISDIR(dir->i_mode)))
         return EINVAL;
-    if(!(dir->i_mode & O_WRONLY))
+    if(!has_file_access(who, dir, W_OK))
         return EACCES;
-
 
     for(i = 0; i < NR_TZONES; i++){
         bnr = dir->i_zone[i];
@@ -347,12 +362,16 @@ int add_inode_to_directory( struct inode* dir, struct inode* ino, char* string){
     return ENOSPC;
 }
 
-int remove_inode_from_dir(struct inode* dir, struct inode* target){
+int remove_inode_from_dir(struct proc* who, struct inode* dir, struct inode* target, char* name){
     int i;
     block_t bnr;
     struct block_buffer* buf;
     struct dirent *curr, *end;
     int ret;
+
+    if(!has_file_access(who, dir, W_OK))
+        return EACCES;
+
     for(i = 0; i < NR_TZONES; i++){
         bnr = dir->i_zone[i];
         if(bnr == 0)
@@ -361,7 +380,7 @@ int remove_inode_from_dir(struct inode* dir, struct inode* target){
         end = (struct dirent*)&buf->block[BLOCK_SIZE];
         curr = (struct dirent*)buf->block;
         while(curr < end){
-            if(curr->d_ino == target->i_num){
+            if(curr->d_ino == target->i_num && char32_strcmp(curr->d_name, name) == 0){
                 curr->d_name[0] = '\0';
                 curr->d_ino = 0;
                 put_block_buffer_dirt(buf);

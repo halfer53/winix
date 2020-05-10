@@ -1,6 +1,10 @@
 #ifndef _FS_LRU_H_
 #define _FS_LRU_H_ 1
 
+#include <sys/types.h>
+#include <fs/const.h>
+#include <fs/inode.h>
+
 struct block_buffer
 {
     char block[BLOCK_SIZE];
@@ -33,7 +37,9 @@ int put_block_buffer_dirt(struct block_buffer *tbuf);
 struct block_buffer* dequeue_buf();
 void enqueue_buf(struct block_buffer *tbuf);
 void init_buf();
-int flush_inode_zones(inode_t *ino);
+int flush_inode_zones(struct inode *ino);
 int block_io(struct block_buffer* tbuf, struct device* dev, int flag);
+int flush_all_buffer();
+void flush_super_block(struct device* dev);
 
 #endif

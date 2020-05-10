@@ -15,6 +15,7 @@
 #include <kernel/kernel.h>
 #include <kernel/table.h>
 #include <winix/bitmap.h>
+#include <fs/fs_methods.h>
 #include <init.c>
 #include <shell.c>
 
@@ -32,6 +33,7 @@ void main() {
     init_holes();
     init_sched();
     init_syscall_table();
+    init_fs();
 
     init_kernel_tasks();
     start_init();

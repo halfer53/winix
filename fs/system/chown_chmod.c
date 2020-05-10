@@ -5,7 +5,7 @@
 #include "../fs.h"
 
 int sys_chown(struct proc* who,  char *pathname, uid_t owner, gid_t group){
-    return OK;
+    return EINVAL;
 }
 
 int sys_chmod(struct proc* who, char *pathname, mode_t mode){
@@ -22,4 +22,11 @@ int sys_chmod(struct proc* who, char *pathname, mode_t mode){
     put_inode(inode, true);
     return OK;
 }
+
+//int do_chmod(struct proc* who, struct message* msg){
+//    char* path = (char *) get_physical_addr(msg->m1_p1, who);
+//    if(!is_addr_accessible(path, who))
+//        return EFAULT;
+//    return sys_chmod(who, path, msg->m1_i1);
+//}
 

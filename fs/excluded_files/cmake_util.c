@@ -27,6 +27,10 @@ void emulate_fork(struct proc* p1, struct proc* p2){
     p2->pid = pid;
 }
 
+bool is_vaddr_ok(vptr_t* addr,struct proc* who){
+    return true;
+}
+
 void* kmalloc(unsigned int size){
     void* ret = &mem[curr];
     curr += size;
@@ -46,7 +50,7 @@ int syscall_reply2(int syscall_num, int reply, int dest, struct message* m){
 
 void _assert(int expression, int line, char* filename) {
     if(!expression) {
-        printf("\nAssert Failed at line %d in %s",line,filename);
+        printf("\nAssert Failed at line %d in %s\n",line,filename);
         _exit(1);
     }
 }

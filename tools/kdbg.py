@@ -9,8 +9,8 @@ import tempfile
 from contextlib import contextmanager
 
 userfile_dir = {
-    "shell.kdbg":"user/",
-    "init.kdbg":"init/"
+    "shell.verbose":"user/",
+    "init.verbose":"init/"
 }
 
 @contextmanager
@@ -30,22 +30,20 @@ def main():
         return 0
 
     main_path = os.path.dirname(os.path.realpath(__file__)) + "/.."
-    rpath = "tools/kdbg_srec"
-    in_file = "winix.kdbg"
-
-    if(len(sys.argv) == 3):
-        in_file = sys.argv[2] + ".kdbg"
-        if(not os.path.isfile(main_path + "/tools/kdbg_srec/" + in_file)):
-            print(in_file + " is not found in tools/kdbg_srec")
-            return 0
+    rpath = "include/commands"
+    in_file = "winix.verbose"
     
+    if(len(sys.argv) == 3):
+        in_file = sys.argv[2] + ".verbose"
+            
+    filepath = main_path + "/" + rpath + "/" + in_file
     target = int(sys.argv[1],16)
 
     prevfile = ""
     target_segment = ""
     target_line_num = 0
     addr = 0
-    with open( rpath + "/" + in_file) as f:
+    with open( filepath) as f:
         for line in f:
             if("file" in line):
                 target_segment = "." + line.split(", .",1)[1]\
@@ -87,7 +85,7 @@ def main():
         # if(in_file in userfile_dir):
         #     filename = userfile_dir[in_file] + filename
 
-        wcc_cmd = ["wcc","-N", "-g", "-S", "-I"+main_path+"/include",\
+        wcc_cmd = ["wcc","-N", "-g", "-S", "-I" + main_path + "/include/posix_include", "-I" + main_path + "/include",\
                         "-o",tmp_filename, main_path+"/"+filename, ]
 
         # print(" ".join(wcc_cmd))

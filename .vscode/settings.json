@@ -4,6 +4,8 @@
         "stat.h": "c",
         "unistd.h": "c",
         "list.h": "c",
-        "string.h": "c"
+        "string.h": "c",
+        "fcntl.h": "c",
+        "welf.h": "c"
     }
 }

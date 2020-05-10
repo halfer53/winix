@@ -22,7 +22,7 @@ int sys_access(struct proc* who, char* pathname, int mode){
         goto final;
     }
 
-    has_access = check_access(who, ino, mode);
+    has_access = has_file_access(who, ino, mode);
     ret = has_access ? OK : EACCES;
 
     final:
@@ -34,3 +34,4 @@ int do_access(struct proc* who, struct message* msg){
     char* buf = (char *) get_physical_addr(msg->m1_p1, who);
     return sys_access(who, buf, msg->m1_i1);
 }
+

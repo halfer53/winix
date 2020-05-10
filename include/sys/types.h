@@ -29,7 +29,7 @@ typedef int pid_t;
 typedef unsigned int blksize_t;
 typedef unsigned int blkcnt_t;
 typedef unsigned int zone_t;
-typedef unsigned int ino_t;
+typedef int ino_t;
 typedef unsigned int block_t;
 typedef unsigned int sector_t;
 typedef unsigned int dev_t;       /* holds (major|minor) device pair */

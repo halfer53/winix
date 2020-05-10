@@ -189,7 +189,7 @@ typedef struct proc {
     pid_t wpid;                    	// pid this process is waiting for
     int woptions;                   // waiting options
     int parent;                    	// proc_index of parent
-    unsigned int flags;                	// information flags
+    int flags;                	// information flags
 
     /* Process Table Index */
     int proc_nr;                	// Index in the process table

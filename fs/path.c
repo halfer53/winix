@@ -130,6 +130,10 @@ int __eath_path(struct inode* curr_ino, struct inode** last_dir,
 int eat_path(struct proc* who, char *path, struct inode** last_dir, struct inode** ret_ino, char string[DIRSIZ]){
     int ret;
     inode_t *curr_dir;
+    if(who->fp_workdir == NULL || who->fp_rootdir == NULL){
+        curr_dir = get_inode(ROOT_INODE_NUM, get_dev(ROOT_DEV));
+        who->fp_workdir = who->fp_rootdir = curr_dir;
+    }
     curr_dir = (*path == '/') ? who->fp_rootdir : who->fp_workdir;
     curr_dir->i_count += 1;
     *ret_ino = NULL;

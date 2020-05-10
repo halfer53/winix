@@ -26,6 +26,8 @@ int user_free_pages(struct proc* who, ptr_t* page, int len);
 ptr_t* user_get_free_pages(struct proc* who, int length, int flags);
 bool is_vaddr_ok(vptr_t* addr,struct proc* who);
 
+
+#define is_addr_accessible(addr, who) is_vaddr_ok((vptr_t*)addr, who)
 #define free_page(page)         (free_pages((page),1))
 #define get_free_page(flags)    (get_free_pages(1,(flags)))
 #define user_get_free_page(who,flags)   (user_get_free_pages((who),1,(flags)))
