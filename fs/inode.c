@@ -143,7 +143,7 @@ int init_inode_non_disk(struct inode* ino, ino_t num, struct device* dev, struct
 inode_t* read_inode(int num, struct device* id){
     struct superblock* sb = get_sb(id);
     block_t inode_block_nr = (num * sb->s_inode_size) / BLOCK_SIZE;
-    int offset = (num * sb->s_inode_size) % BLOCK_SIZE;
+    unsigned int offset = (num * sb->s_inode_size) % BLOCK_SIZE;
     block_t blocknr = sb->s_inode_tablenr + inode_block_nr;
     struct block_buffer *buffer;
     inode_t *inode = get_free_inode_slot();

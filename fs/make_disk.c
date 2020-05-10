@@ -21,7 +21,7 @@
 
 void init_bitmap();
 
-disk_word_t DISK_RAW[DISK_SIZE];
+char DISK_RAW[DISK_SIZE];
 
 /* Program documentation. */
 static char doc[] =

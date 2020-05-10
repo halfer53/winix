@@ -38,10 +38,6 @@
 #define VERIFY_WRITE    2
 #define ROOT_DEV    (0x0101)    /* MAKEDEV(1,1) */
 
-#define SIZE (64 * 1024)
-extern size_t DISK_SIZE;
-extern disk_word_t DISK_RAW[SIZE];
-
 #define SET_CALLER(pcurr)   (curr_user_proc_in_syscall = pcurr)
 
 int sys_open(struct proc *who, char *path,int flags, mode_t mode);
@@ -68,7 +64,7 @@ int fill_dirent(inode_t* ino, struct dirent* curr, char* string);
 bool check_access(struct proc* who, struct inode* ino, mode_t mode);
 int get_inode_by_path(struct proc* who, char *path, struct inode** inode);
 int alloc_block(inode_t *ino, struct device* id);
-int makefs( disk_word_t* disk_raw, disk_word_t disk_size_words);
+int makefs( char* disk_raw, size_t disk_size_words);
 void init_fs();
 int init_filp_by_inode(struct filp* filp, struct inode* inode);
 int init_inode_non_disk(struct inode* ino, ino_t num, struct device* dev, struct superblock* sb);

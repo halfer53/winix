@@ -12,8 +12,8 @@ dev_t devid = 0;
 char* DEVICE_NAME = "sda";
 char* FS_TYPE = "wfs";
 
-disk_word_t* _disk;
-size_t _disk_size;
+static char* _disk;
+static size_t _disk_size;
 
 
 struct superblock* get_sb(struct device* id){
@@ -28,7 +28,7 @@ void sync_sb(struct superblock* sb){
 
 
 // void report_sb(struct superblock* sb){
-//     disk_word_t curr = 0;
+//     char curr = 0;
 //     printf("\nsuper block 0 - 0x%08x\n", curr);
 //     curr += sb->s_superblock_size;
 //     printf("block map 0x%08x - 0x%08x\n",curr, curr+ sb->s_blockmap_size );
@@ -45,8 +45,8 @@ void sync_sb(struct superblock* sb){
 //     printf("inode per block %d\n", sb->s_inode_per_block);
 // }
 
-int blk_dev_io_read(disk_word_t *buf, off_t off, size_t len){
-    disk_word_t *ptr;
+int blk_dev_io_read(char *buf, off_t off, size_t len){
+    char *ptr;
     int count = len;
     if(off + len > _disk_size)
         return 0;
@@ -57,8 +57,8 @@ int blk_dev_io_read(disk_word_t *buf, off_t off, size_t len){
     return len;
 }
 
-int blk_dev_io_write(disk_word_t *buf, off_t off, size_t len){
-    disk_word_t *ptr;
+int blk_dev_io_write(char *buf, off_t off, size_t len){
+    char *ptr;
     int count = len;
     if(off + len > _disk_size)
         return 0;

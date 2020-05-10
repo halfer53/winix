@@ -5,10 +5,15 @@
 #include <fs/type.h>
 
 #define ROOT_INODE_NUM  1
+#define DISK_PAGE_NR    (48)
 
-
+#ifdef __x86_64__
 #define SECTOR_SIZE 512
+#define BLOCK_SIZE  4096
+#else
+#define SECTOR_SIZE 80
 #define BLOCK_SIZE  1024
+#endif
 
 #define INODE_NUM   496
 #define NR_TZONES   8
@@ -33,8 +38,10 @@
 #define VERIFY_WRITE    2
 #define ROOT_DEV    (0x0101)    /* MAKEDEV(1,1) */
 
-#define DISK_SIZE   (49152)// 48 * 1024
-extern disk_word_t DISK_RAW[DISK_SIZE];
+#define SUPER_BLOCK_MAGIC   (0xabcdefff)
+
+#define DISK_SIZE   (DISK_PAGE_NR * BLOCK_SIZE)
+extern char DISK_RAW[DISK_SIZE];
 
 #endif
 

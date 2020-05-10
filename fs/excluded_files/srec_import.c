@@ -128,7 +128,7 @@ int decode_srec(char *path, int offset, struct srec_binary* result)
 //    printf("filename is '%s' path = '%s'\n", filename, path);
     strcpy(result->name, filename);
     while(fgets(line, len, fp)){
-        temp = _winix_load_srec_mem_val(line, result);
+        temp = winix_load_srec_mem_val(line, result);
         wordsLoaded += temp;
     };
     free(line);
@@ -184,7 +184,7 @@ int substring(char *buffer, char *original, int start_index, int length)
     return count;
 }
 
-int _winix_load_srec_mem_val(char *line, struct srec_binary* result)
+int winix_load_srec_mem_val(char *line, struct srec_binary* result)
 {
     int wordsLoaded = 0;
     int index = 0;

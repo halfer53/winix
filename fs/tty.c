@@ -26,11 +26,11 @@ int tty_close ( struct inode* ino, struct filp *file){
 }
 
 
-int tty_dev_io_read(disk_word_t *buf, off_t off, size_t len){
+int tty_dev_io_read(char *buf, off_t off, size_t len){
     return 0;
 }
 
-int tty_dev_io_write(disk_word_t *buf, off_t off, size_t len){
+int tty_dev_io_write(char *buf, off_t off, size_t len){
     return 0;
 }
 

@@ -51,13 +51,10 @@ struct inode_disk {
 };
 
 
-#ifdef FS_CMAKE
-#define INODE_DISK_SIZE_WORD (sizeof(struct inode_disk) / 4)
-#define INODE_DISK_SIZE_BYTE (sizeof(struct inode_disk))
-#else
 #define INODE_DISK_SIZE_WORD (sizeof(struct inode_disk))
 #define INODE_DISK_SIZE_BYTE (sizeof(struct inode_disk))
-#endif
+#define INODE_DISK_SIZE (sizeof(struct inode_disk))
+
 
 extern inode_t inode_table[NR_INODES];
 

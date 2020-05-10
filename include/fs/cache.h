@@ -3,7 +3,7 @@
 
 struct block_buffer
 {
-    disk_word_t block[BLOCK_SIZE];
+    char block[BLOCK_SIZE];
     struct block_buffer *prev, *next;
     block_t b_blocknr; // block number for this buffer
     struct device* b_dev;            /* major | minor device where block resides */
