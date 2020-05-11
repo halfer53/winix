@@ -32,7 +32,6 @@ int main(int argc, char **argv){
     printf("exec failed %d\n", errno);
     return 0;
   }
-  return 0;
   while(1){
     pid = wait(&status);
     if(pid == -1){
