@@ -1,4 +1,9 @@
 # WINIX
+
+TODO
+- change rbase to use mem_start instead
+- add mem_start, text_size, data_size, bss_size to struct proc
+
 A UNIX-style Operating System for the Waikato RISC Architecture Microprocessor (WRAMP)
 
 NB Due to bugs in the kernel, the feature of redirection and multiple pipes for Bourne Shell have been moved to a separate project [TBash](https://github.com/halfer53/TBash)
