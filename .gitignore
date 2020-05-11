@@ -12,7 +12,8 @@
 Makefile.bak
 kdbg.py
 tools/kdbg_srec/*.kdbg
-include/commands
+include/srec/*.verbose
+include/srec/*.srec
 makedisk
 
 tmp.txt
@@ -32,6 +33,7 @@ RexSimulatorGui.exe
 
 !tools/kdbg.py
 !tools/kdbg_srec/.gitkeep
+!include/srec/.gitkeep
 !kernel/winix/kwramp.s
 !lib/gen/ucontext.s
 !lib/syscall/wramp_syscall.s

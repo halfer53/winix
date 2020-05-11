@@ -46,7 +46,7 @@ export CFLAGS := -D_DEBUG -D__wramp__
 all:| makedisk kbuild build_disk compile_disk
 	$(Q)wlink $(LDFLAGS) -Ttext 1024 -v -o winix.srec \
 			$(L_HEAD) $(KERNEL_O) $(KLIB_O) $(L_TAIL) \
-							> include/commands/winix.verbose
+							> include/srec/winix.verbose
 ifeq ($(KBUILD_VERBOSE),0)
 	@echo "LD \t winix.srec"
 endif
@@ -61,7 +61,7 @@ $(alldir): FORCE
 	$(Q)$(MAKE) $(build)=$@
 
 build_disk: FORCE
-	$(Q)./makedisk -t 2048 -o include/disk.c -s include/commands
+	$(Q)./makedisk -t 2048 -o include/disk.c -s include/srec
 ifeq ($(KBUILD_VERBOSE),0)
 	@echo "LD \t disk.c"
 endif

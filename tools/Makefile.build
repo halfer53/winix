@@ -67,7 +67,7 @@ $(srecobj): $(objects)
 	$(eval $@_SRC := $(addprefix $(src)/,$($(notdir $@):.o=.c)))
 	$(eval $@_OBJ := $(addprefix $(src)/,$($(notdir $@))))
 	$(eval $@_FILE := $(notdir $(@:.srec=)))
-	$(Q)wlink -Ttext 2048 -v -o include/commands/$@ $($@_OBJ) $(shell $(get_libs) $($@_SRC)) > include/commands/$($@_FILE).verbose
+	$(Q)wlink -Ttext 2048 -v -o include/srec/$@ $($@_OBJ) $(shell $(get_libs) $($@_SRC)) > include/srec/$($@_FILE).verbose
 #	$(Q)java -cp tools reformat_srec $@
 #	$(Q)./tools/gen_bin_code -t 2048 $@ > include/$($@_FILE).c
 ifeq ($(KBUILD_VERBOSE),0)
