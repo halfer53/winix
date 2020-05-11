@@ -20,6 +20,13 @@ struct boot_image boot_table[NUM_TASKS] = {
 // IDLE's process number must be the lowest
 BUILD_BUG_ON_FALSE(IDLE == -NUM_TASKS + 1); 
 
+char INIT_PATH[] = "/bin/init";
+
+char *init_argv[] = {
+    INIT_PATH,
+    NULL
+};
+
 char *initial_env[] = {
     "HOME=/",
     "PATH=/bin",

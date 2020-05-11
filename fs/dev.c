@@ -82,7 +82,7 @@ int blk_dev_init(){
     sb = root_fs.sb;
     arch_superblock(sb);
     ASSERT(root_fs.sb->magic == SUPER_BLOCK_MAGIC);
-    KDEBUG(("sb block in use %d inode table size %d\n", sb->s_block_inuse, sb->s_inode_table_size));
+    // KDEBUG(("sb block in use %d inode table size %d\n", sb->s_block_inuse, sb->s_inode_table_size));
     root_fs.sb->s_iroot = NULL;
     return 0;
 }
@@ -116,7 +116,7 @@ int blk_dev_release(){
 int root_fs_read (struct filp *filp, char *data, size_t count, off_t offset){
     int ret = 0, r, j;
     unsigned int len;
-    off_t off, ino_size, end_in_block;
+    off_t off, end_in_block;
     unsigned int curr_fp_index, fp_limit;
     block_t bnr;
     inode_t *ino = NULL;
@@ -126,14 +126,12 @@ int root_fs_read (struct filp *filp, char *data, size_t count, off_t offset){
     off = offset % BLOCK_SIZE;
     fp_limit = (filp->filp_pos + count ) / BLOCK_SIZE;
     ino = filp->filp_ino;
-    ino_size = ino->i_size;
 
     for( ; curr_fp_index <= fp_limit; curr_fp_index++){
         len = ((BLOCK_SIZE - off) > count) ? count : BLOCK_SIZE - off;
         bnr = ino->i_zone[curr_fp_index];
-        if(bnr == 0){
-            break;
-        }
+        if(bnr == 0)
+            continue;
 
         r = 0;
         buffer = get_block_buffer(bnr, filp->filp_dev);
@@ -142,14 +140,15 @@ int root_fs_read (struct filp *filp, char *data, size_t count, off_t offset){
             *data++ = buffer->block[j];
             r++;
         }
-        KDEBUG(("file read for block %d, off %d len %d\n", bnr, off, r));
-        put_block_buffer(buffer);
-        if (r == 0)
-            break;
 
         count -= len;
         ret += r;
         filp->filp_pos += r;
+        // KDEBUG(("file read for block %d, off %d len %d remaining %d\n", bnr, off, r, count));
+
+        put_block_buffer(buffer);
+        if (r == 0)
+            break;
         off = 0;
     }
     return ret;
@@ -186,7 +185,7 @@ int root_fs_write (struct filp *filp, char *data, size_t count, off_t offset){
             buffer->block[j] = *data++;
             r++;
         }
-        KDEBUG(("file write for block %d, off %d len %d\n", curr_fp_index, off, r));
+        // KDEBUG(("file write for block %d, off %d len %d\n", curr_fp_index, off, r));
         put_block_buffer_dirt(buffer);
         /* Read or write 'chunk' bytes. */
         if (r == 0)

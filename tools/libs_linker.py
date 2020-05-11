@@ -1,14 +1,15 @@
 import sys
 import os
 
-ANSI = "lib/ansi/*.o"
-STDLIB = "lib/stdlib/*.o"
-GEN = "lib/gen/*.o"
-POSIX = "lib/posix/*.o"
+ENVIRON = "lib/ansi/env.o"
+ANSI = "lib/ansi/"
+STDLIB = "lib/stdlib/"
+GEN = "lib/gen/"
+POSIX = "lib/posix/"
 SIGNAL = "lib/posix/_sigset.o"
-UTIL ="lib/util/*.o"
-STDIO ="lib/stdio/*.o"
-SYSCALL = "lib/syscall/*.o"
+UTIL ="lib/util/"
+STDIO ="lib/stdio/"
+SYSCALL = "lib/syscall/"
 STRING = "lib/ansi/string.o"
 DEBUG = "lib/util/debug.o"
 
@@ -24,6 +25,17 @@ built_in = {
 }
 
 dir_path = ""
+
+def get_all_files(libs):
+	ret = ''
+	for lib in libs:
+		if lib.endswith("/"):
+			for file in os.listdir(lib):
+				if file.endswith(".o") and 'env.o' != file:
+					ret += lib + file + ' '
+		else:
+			ret += lib + ' '
+	return ret
 
 def include_iterate(start, end,line):
 	i = 0
@@ -76,7 +88,7 @@ def do_include_search(filename):
 def main():
 	if(len(sys.argv) < 2):
 		return -1
-	libs = {SYSCALL}
+	libs = {ENVIRON, SYSCALL }
 	for i in range(1,len(sys.argv)):
 		tlib = do_include_search(sys.argv[i])
 		libs.update(tlib)
@@ -86,8 +98,7 @@ def main():
 	if SIGNAL in libs and POSIX in libs:
 		libs.remove(SIGNAL)
 		
-	for lib in libs:
-		print(lib)
+	print(get_all_files(libs), end='')
 
 if __name__ == '__main__':
 	main()

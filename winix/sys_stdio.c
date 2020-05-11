@@ -227,6 +227,7 @@ int kprintf_vm(const char *format, void *arg, ptr_t *who_rbase){
                     goto arg_end;
 
                 case 'x':
+                case 'p':
                     buf_len = kputx_buf(*((int*)arg),buf);
                     padding_direction = LEFT_PADDING;
                     goto arg_end;

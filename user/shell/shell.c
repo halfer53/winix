@@ -67,10 +67,6 @@ int main() {
 
     init_shell();
 
-    if(fork() == 0)
-        exit(0);
-    else
-        wait(NULL);
     // test_malloc(0, NULL);
     c = buf;
     end_buf = c + MAX_LINE -2;

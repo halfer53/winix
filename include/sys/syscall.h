@@ -18,9 +18,10 @@
 
 #include <sys/ipc.h>
 #include <sys/types.h>
+#include <sys/dirent.h>
 
 
-#define _NSYSCALL               40
+#define _NSYSCALL               41
 /**
  * System Call Numbers
  **/
@@ -64,6 +65,7 @@
 #define GETDENT         37
 #define ACCESS          38
 #define MKDIR           39
+#define SYNC            40
 
 #define DECLARE_SYSCALL(function, params, syscall_num, passing_codes)\
 function params{\
@@ -110,7 +112,8 @@ int access(const char *pathname, int mode);
 int chdir(const char *path);
 int mkdir(const char *pathname, mode_t mode);
 int getdent( int fd, struct dirent *dirp);
-
+int execve(const char *pathname, char *const argv[],char *const envp[]);
+int execv(const char *path, char *const argv[]);
 #endif
 
 #endif

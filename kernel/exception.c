@@ -155,7 +155,7 @@ PRIVATE void gpf_handler() {
         get_physical_addr(current_proc->ctx.m.sp, current_proc),
         get_physical_addr(current_proc->ctx.m.ra, current_proc));    
 
-    kinfo("Current Instruction: 0x%08x\n",*pc);
+    // kinfo("Current Instruction: 0x%08x\n",*pc);
 
 #if _DEBUG == 2
     kinfo("$1: 0x%08x, $2, 0x%08x, $3, 0x%08x\n",current_proc->ctx.m.regs[0],
@@ -175,6 +175,7 @@ PRIVATE void gpf_handler() {
     if(IS_KERNEL_PROC(current_proc))
         _panic("kernel crashed",NULL);
 
+    PANIC("foo");
     // Kill process and call scheduler.
     send_sig(current_proc,SIGSEGV);
     sched();

@@ -96,7 +96,7 @@ int _sys_open(struct proc *who, char *path, unsigned int flags, mode_t mode, dev
         goto final;
 
     ret = open_slot;
-    KDEBUG(("path %s Last dir %d, ret inode %d\n", path, lastdir->i_num, inode->i_num));
+    // KDEBUG(("path %s Last dir %d, ret inode %d\n", path, lastdir->i_num, inode->i_num));
 
     final:
     put_inode(lastdir, false);

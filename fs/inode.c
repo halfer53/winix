@@ -146,6 +146,18 @@ int init_inode_non_disk(struct inode* ino, ino_t num, struct device* dev, struct
     return OK;
 }
 
+void arch_inode(struct inode* ino){
+#ifdef __wramp__
+    ino->i_size /= 4;
+#endif
+}
+
+void dearch_inode(struct inode* ino){
+#ifdef __wramp__
+    ino->i_size *= 4;
+#endif
+}
+
 int read_inode(int num, struct inode** ret_ino, struct device* id){
     struct superblock* sb = get_sb(id);
     block_t inode_block_nr = (num * sb->s_inode_size) / BLOCK_SIZE;
@@ -163,6 +175,7 @@ int read_inode(int num, struct inode** ret_ino, struct device* id){
 
     buffer = get_block_buffer(blocknr, id);
     memcpy(inode, &buffer->block[offset], INODE_DISK_SIZE);
+    arch_inode(inode);
 
     inode->i_count += 1;
     init_inode_non_disk(inode, num, id, sb);
@@ -208,6 +221,7 @@ int put_inode(inode_t *inode, bool is_dirty){
     inum = inode->i_num;
     inode_block_offset = (inum * sb->s_inode_size) % BLOCK_SIZE;;
     buffer = get_block_buffer(inode->i_ndblock, inode->i_dev);
+    dearch_inode(inode);
     memcpy(buffer->block + inode_block_offset, inode, INODE_DISK_SIZE);
     put_block_buffer_immed(buffer, inode->i_dev);
     KDEBUG(("put inode %d blk %d offset %d\n", inode->i_num, inode->i_ndblock, inode_block_offset));

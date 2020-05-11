@@ -6,6 +6,10 @@
         "list.h": "c",
         "string.h": "c",
         "fcntl.h": "c",
-        "welf.h": "c"
+        "welf.h": "c",
+        "kernel.h": "c",
+        "typeinfo": "c",
+        "syscall.h": "c",
+        "errno.h": "c"
     }
 }

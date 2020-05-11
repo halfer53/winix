@@ -15,6 +15,7 @@
 #include <kernel/kernel.h>
 #include <winix/mm.h>
 #include <winix/srec.h>
+#include <winix/welf.h>
 
 // Linked lists are defined by a head and tail pointer.
 
@@ -71,7 +72,7 @@ PUBLIC struct proc *curr_user_proc_in_syscall;
 **/
 void kreport_all_procs() {
     struct proc *curr;
-    kprintf("NAME    PID PPID RBASE      PC         STACK      HEAP       PROTECTION   FLAGS\n");
+    kprintf("PID PPID RBASE      PC         STACK      HEAP       PROTECTION   FLAG NAME    \n");
 
     foreach_proc(curr){
         kreport_proc(curr);
@@ -83,8 +84,7 @@ void kreport_all_procs() {
 **/
 void kreport_proc(struct proc* curr) {
     int ptable_idx = PADDR_TO_PAGED(curr->ctx.rbase)/32;
-    kprintf("%-08s %-03d %-04d 0x%08x 0x%08x 0x%08x 0x%08x %d 0x%08x %d\n",
-            curr->name,
+    kprintf("%-03d %-04d 0x%08x 0x%08x 0x%08x 0x%08x %d 0x%08x %-04d %s\n",
             curr->pid,
             get_proc(curr->parent)->pid,
             curr->ctx.rbase,
@@ -93,7 +93,8 @@ void kreport_proc(struct proc* curr) {
             curr->heap_break,
             ptable_idx,
             curr->ctx.ptable[ptable_idx],
-            curr->state);
+            curr->state,
+            curr->name);
 }
 
 /**
@@ -438,6 +439,49 @@ int proc_memctl(struct proc* who ,vptr_t* page_addr, int flags){
     return ERR;
 }
 
+int alloc_mem_welf(struct proc* who, struct winix_elf* elf, int stack_size, int heap_size){
+    int vm_offset = elf->binary_offset;
+    int proc_len;
+    int td_aligned;
+    ptr_t *bss_start;
+    int bss_size;
+    ptr_t* mem_start;
+
+    if(elf->magic != WINIX_ELF_MAGIC)
+        return EINVAL;
+    if(elf->binary_offset < stack_size)
+        return EINVAL;
+    if(elf->binary_size != elf->text_size + elf->data_size)
+        return EINVAL;
+
+    
+    td_aligned = align_page(elf->binary_size + elf->bss_size);
+    proc_len = stack_size + td_aligned + heap_size;
+    mem_start = user_get_free_pages(who, proc_len, GFP_NORM);
+    if(mem_start == NULL)
+        return ENOMEM;
+    who->ctx.rbase = mem_start + stack_size - vm_offset;
+
+    // for information on how process memory are structured, 
+    // look at the first line of this file
+    who->ctx.stack_top = mem_start;
+    who->ctx.m.sp = get_virtual_addr(mem_start+ stack_size - 1, who);
+    *(who->ctx.stack_top) = STACK_MAGIC;
+
+    // set bss segment to 0
+    bss_start = mem_start + stack_size + elf->binary_size;
+    memset(bss_start, 0, elf->bss_size);
+    memset(who->ctx.stack_top, 0, stack_size);
+
+    who->heap_top = mem_start + stack_size + td_aligned;
+    who->heap_break = who->heap_top;
+    who->heap_bottom = who->heap_break + heap_size - 1;
+    memset(who->heap_top, 0, heap_size);
+
+    KDEBUG(("%d alloc from %p to %p\n", who->pid, mem_start, who->heap_bottom));
+    return OK;
+}
+
 /**
  * allocate memory for the given process
  * @param  who        
@@ -473,7 +517,7 @@ int alloc_proc_mem(struct proc *who, int text_data_length, int stack_size, int h
     if(bss_size < MIN_BSS_SIZE)
         bss_size += PAGE_LEN;
 
-    proc_len = vm_offset + stack_size + text_data_length + bss_size + heap_size;
+    proc_len = vm_offset + stack_size + td_aligned + heap_size;
     mem_start = user_get_free_pages(who, proc_len, GFP_NORM);
     if(mem_start == NULL)
         return ENOMEM;
@@ -513,8 +557,12 @@ int copyto_user_stack(struct proc *who, void *src, size_t len){
 
 vptr_t* copyto_user_heap(struct proc* who, void *src, size_t len){
     vptr_t* addr = get_virtual_addr(who->heap_break, who);
+    if(who->heap_break + len >= who->heap_bottom){
+        return NULL;
+    }
     memcpy(who->heap_break, src, len);
     who->heap_break += len;
+    // KDEBUG(("copy to proc %d heap len %d ret %p\n", who->pid, len, addr));
     return addr;
 }
 

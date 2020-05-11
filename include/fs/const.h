@@ -12,10 +12,12 @@
 #define SECTOR_SIZE 512
 #define BLOCK_SIZE  4096
 #define TO_WORD_SIZE(x) (x / 4)
+#define TO_CHAR_SIZE(x) (x * 4)
 #else
 #define SECTOR_SIZE 80
 #define BLOCK_SIZE  1024
 #define TO_WORD_SIZE(x) (x)
+#define TO_CHAR_SIZE(x) (x)
 #endif
 
 #define INODE_NUM   496

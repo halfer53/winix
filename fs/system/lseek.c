@@ -45,7 +45,7 @@ int sys_lseek(struct proc* who, int fd, off_t offset, int whence){
             break;
 
         case SEEK_END:
-            ret = extend_file(file, file->filp_ino->i_size + offset);
+            ret = extend_file(file, file->filp_ino->i_total_size + offset);
             break;
 
         default:

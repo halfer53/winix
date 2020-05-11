@@ -30,7 +30,7 @@ def main():
         return 0
 
     main_path = os.path.dirname(os.path.realpath(__file__)) + "/.."
-    rpath = "include/commands"
+    rpath = "include/srec"
     in_file = "winix.verbose"
     
     if(len(sys.argv) == 3):
@@ -86,9 +86,9 @@ def main():
         #     filename = userfile_dir[in_file] + filename
 
         wcc_cmd = ["wcc","-N", "-g", "-S", "-I" + main_path + "/include/posix_include", "-I" + main_path + "/include",\
-                        "-o",tmp_filename, main_path+"/"+filename, ]
+                        "-D__wramp__", "-D_DEBUG","-o",tmp_filename, main_path+"/"+filename, ]
 
-        # print(" ".join(wcc_cmd))
+        print(" ".join(wcc_cmd))
         result = subprocess.call(wcc_cmd, stderr=sys.stderr)
         if(result != 0):
             tmpfilename = filename.replace(".c",".s")
@@ -139,8 +139,9 @@ def main():
                         next_incr = 1
                         if(curr_seg == target_segment and \
                                 curr_count == target_line_num):
-                                print("Assembly: \n"\
-                                     + line + "Line: "+ loc + " in file "+filename)
+                                print("Assembly: \n" + line , end="")
+                                print("Line: " + str(curr_count) + " in assembly file")
+                                print("Line: "+ loc + " in file "+filename)
                                 break
                         
                     elif(curr_seg == ".data"):
@@ -171,7 +172,7 @@ def main():
                                         str(index_offset) + "\n\tTotal number of words: " + \
                                         str(bss_len) + "\nin file " + filename)
                                     break
-                    
+                    print(str(curr_count), line, end='')
                     prev_name_index += 1
                     curr_count += next_incr
 

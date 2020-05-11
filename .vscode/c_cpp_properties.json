@@ -3,6 +3,7 @@
         {
             "name": "Linux",
             "includePath": [
+                "${workspaceFolder}/include/posix_include",
                 "${workspaceFolder}/include",
                 "${workspaceFolder}/**"
             ],

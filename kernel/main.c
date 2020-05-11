@@ -19,7 +19,7 @@
 #include <init.c>
 #include <shell.c>
 
-void init_kernel_tasks();
+// void init_kernel_tasks();
 void start_init();
 void start_bins();
 
@@ -27,6 +27,7 @@ void start_bins();
  * Entry point for WINIX.
  **/
 void main() {
+    *((unsigned int*)1) = 0;
     init_bitmap();
     init_mem_table();
     init_proc();
@@ -37,7 +38,7 @@ void main() {
 
     init_kernel_tasks();
     start_init();
-    start_bins();
+    // start_bins();
 
     init_exceptions();
     sched();
@@ -55,14 +56,20 @@ void init_kernel_tasks(){
 }
 
 void start_init(){
+    int ret;
     struct proc* init = proc_table + INIT;
     proc_set_default(init);
     init->state = STATE_RUNNABLE;
     init->flags = IN_USE;
     init->pid = 1;
-    if(exec_proc(init,init_code,init_code_length,init_pc,init_offset,"init"))
+    // if(exec_proc(init,init_code,init_code_length,init_pc,init_offset,"init"))
+    //     PANIC("init");
+    // add_free_mem(init_code, init_code_length);
+    ret = exec_welf(init, INIT_PATH, init_argv, initial_env, true);
+    if(ret != OK && ret != DONTREPLY){
+        kerror("%d\n", ret);
         PANIC("init");
-    add_free_mem(init_code, init_code_length);
+    }
 }
 
 void start_bins(){

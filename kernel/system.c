@@ -28,23 +28,6 @@ PRIVATE struct proc *who;
 
 PRIVATE ucontext_t recv_ctx;
 
-void test_fs(){
-    int fd, ret;
-    char buf[256];
-    struct winix_elf* elf;
-    fd = sys_open(current_proc, "/bin/init", O_RDONLY, 0);
-    kprintf("open return %d\n", fd);
-    ASSERT(fd >= 0);
-    kprintf("init opened\n");
-    ret = sys_read(current_proc, fd, buf, sizeof(struct winix_elf));
-    elf = (struct winix_elf*)buf;
-    ASSERT(ret > 0);
-    kprintf("elf magic %08x %x %x size: %d %d %d %d\n", elf->magic, elf->binary_offset, elf->binary_pc, elf->binary_size, elf->text_size, elf->data_size, elf->bss_size);
-    ret = sys_read(current_proc, fd, buf, 256);
-    kprintf("text binary %x %x\n", buf[0], buf[1]);
-
-}
-
 
 /**
  * Entry point for system task.
@@ -56,8 +39,6 @@ void system_main() {
 
     kreport_sysinfo();
     getcontext(&recv_ctx);
-    test_fs();
-    
     // Receive message, do work, repeat.
     while(true) {
         // get a message

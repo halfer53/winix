@@ -25,6 +25,8 @@
 #include <fs/type.h>
 #include <fs/inode.h>
 #include <fs/filp.h>
+#include <winix/welf.h>
+#include <stdbool.h>
 
 // Init
 #define INIT                   		1
@@ -290,7 +292,10 @@ void zombify(struct proc *p);
 void release_zombie(struct proc*p);
 int copyto_user_stack(struct proc *who, void *src, size_t len);
 vptr_t* copyto_user_heap(struct proc* who, void *src, size_t len);
-int build_initial_stack(struct proc* who, int argc, char** argv, char** env, struct proc* srcproc);
+int build_initial_stack(struct proc* who, char** argv, char** env, struct proc* srcproc);
+int exec_welf(struct proc* who, char* path, char *argv[], char *envp[], bool is_new);
+void release_proc_mem(struct proc *who);
+int alloc_mem_welf(struct proc* who, struct winix_elf* elf, int stack_size, int heap_size);
 
 #define release_proc_slot(p)    release_zombie(p)
 

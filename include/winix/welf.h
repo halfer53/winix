@@ -6,7 +6,6 @@
 
 #define WINIX_ELF_MAGIC  (0x19960503) // my birthday lol
 
-
 struct winix_elf{
     unsigned int magic;
     unsigned int binary_pc;
