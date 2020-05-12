@@ -209,7 +209,7 @@ int user_free_pages(struct proc* who, ptr_t* page, int len){
 void* dup_vm(struct proc* parent, struct proc* child){
     int len;
 
-    len = parent->heap_bottom + 1 - parent->ctx.rbase;
+    len = parent->heap_bottom + 1 - parent->mem_start;
     
     return user_get_free_pages(child, len, GFP_NORM);
     // int index;

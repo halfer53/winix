@@ -482,6 +482,7 @@ int alloc_mem_welf(struct proc* who, struct winix_elf* elf, int stack_size, int 
     who->data_size = elf->data_size;
     who->text_size = elf->text_size;
     who->bss_size = elf->bss_size;
+    who->rbase_offset = elf->binary_offset - stack_size;
 
     // KDEBUG(("%d alloc from %p to %p\n", who->pid, mem_start, who->heap_bottom));
     return OK;

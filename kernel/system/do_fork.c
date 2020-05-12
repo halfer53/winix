@@ -50,15 +50,17 @@ int copy_mm(struct proc* parent, struct proc* child){
     int j;
 
     bitmap_clear(child->ctx.ptable, PTABLE_LEN);
-    child->ctx.rbase = dup_vm(parent,child);
-    if(child->ctx.rbase == NULL)
+    child->mem_start = dup_vm(parent,child);
+    if(child->mem_start == NULL)
         return ERR;
+    child->ctx.rbase = child->mem_start - child->rbase_offset;
+    child->stack_top = child->mem_start;
 
-    if(parent->flags & DISABLE_FIRST_PAGE){
-        proc_memctl(child, NULL, PROC_NO_ACCESS);
-    }
-    src = (ptr_t *)parent->ctx.rbase;
-    dest = (ptr_t *)child->ctx.rbase;
+    // if(parent->flags & DISABLE_FIRST_PAGE){
+    //     proc_memctl(child, NULL, PROC_NO_ACCESS);
+    // }
+    src = (ptr_t *)parent->mem_start;
+    dest = (ptr_t *)child->mem_start;
     while(src < parent->heap_bottom){
         copy_page(dest, src);
         src += PAGE_LEN;
@@ -82,7 +84,7 @@ int copy_pregs(struct proc* parent, struct proc* child){
     child->message = (struct message *)get_physical_addr(*( sp + 2 ), child);
     child->heap_break = get_physical_addr(get_virtual_addr(parent->heap_break, parent), child);
     child->heap_bottom = get_physical_addr(get_virtual_addr(parent->heap_bottom, parent), child);
-    child->stack_top = get_physical_addr(get_virtual_addr(parent->stack_top, parent), child);
+    // child->stack_top = get_physical_addr(get_virtual_addr(parent->stack_top, parent), child);
     return OK;
 }
 
