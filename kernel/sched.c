@@ -81,6 +81,7 @@ struct proc *pick_proc() {
  **/
 void sched() {
     int signum;
+    bool has_signal = false;
     // irq count is increased for each exception being called, and cleared on exiting
     // exception
     reset_irq_count();
@@ -105,23 +106,22 @@ void sched() {
 
     do{
         current_proc = pick_proc();    
-        
-        if(signum = is_sigpending(current_proc))
+        signum = is_sigpending(current_proc);
+        if(signum){
             handle_sig(current_proc, signum);
+        }
             
     }while(current_proc == NULL);
     
+    if(has_signal){
+        PANIC("signal");
+        kreport_all_procs();
+    }
 
     // Reset quantum if needed
     if (current_proc->ticks_left <= 0) {
         current_proc->ticks_left = current_proc->quantum;
     }
-
-#ifdef _DEBUG
-    // Check exception stack
-    if(*(get_exception_stack_top()) != STACK_MAGIC)
-        PANIC("Exception stack overflow\n");
-#endif
 
     // Load context and run
     wramp_load_context();

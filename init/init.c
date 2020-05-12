@@ -8,6 +8,7 @@
 void init_init(){
   sigset_t mask;
   sigfillset(&mask);
+  sigdelset(&mask, SIGSEGV);
   sigprocmask(SIG_SETMASK, &mask, NULL);
 }
 
@@ -28,10 +29,11 @@ int main(int argc, char **argv){
 
   pid = vfork();
   if(pid == 0){
+    sigset_t mask = 0;
+    sigprocmask(SIG_SETMASK, &mask, NULL);
     i = execv(shell_path, shell_argv);
-    printf("exec failed %d\n", errno);
-    return 0;
   }
+  
   while(1){
     pid = wait(&status);
     if(pid == -1){

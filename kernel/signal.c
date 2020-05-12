@@ -184,7 +184,7 @@ int send_sig(struct proc *who, int signum){
     if(sigismember(&who->sig_mask, signum)){
         if(signum != SIGKILL && signum != SIGSTOP){
             int ret = 0;
-            // kdebug("sig %d pending\n", signum);
+            // kdebug("sig %d pending mask %x\n", signum, who->sig_mask);
             
             // if a signal is ignored and blocked by the process
             // it is quietly ignored, and not pended
