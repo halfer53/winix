@@ -5,7 +5,7 @@
 #include "../fs.h"
 
 int sys_getdent(struct proc* who, int fd, struct dirent* dirp_dst){
-    int i, dirstream_nr;
+    int i, dirstream_nr, ret = 0;
     struct block_buffer *buffer;
     struct dirent* dirstream, *endstream;
     struct filp* file;
@@ -40,17 +40,18 @@ int sys_getdent(struct proc* who, int fd, struct dirent* dirp_dst){
                 continue;
             }
             *dirp_dst = *dirstream;
+            ret += sizeof(struct dirent);
             dirstream_nr++;
             file->getdent_dirstream_nr = dirstream_nr;
-            return put_block_buffer(buffer);
+            put_block_buffer(buffer);
         }
     }
-    return ENOENT;
+    return ret;
 }
 
 int do_getdent(struct proc* who, struct message* msg){
     struct dirent* path = (struct dirent *) get_physical_addr(msg->m1_p1, who);
-    if(!is_addr_accessible(path, who))
+    if(!is_vaddr_accessible(msg->m1_p1, who))
         return EACCES;
     return sys_getdent(who, msg->m1_i1, path);
 }

@@ -1,2 +1,2 @@
 
-obj-y += _sigset.o
+obj-y += _sigset.o dir.o

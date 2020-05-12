@@ -1,6 +1,7 @@
 #ifndef _SYS_UNISTD_H_
-#define    _SYS_UNISTD_H_
+#define _SYS_UNISTD_H_ 1
 
+#include <sys/dirent.h>
 
 /* access function */
 #define    F_OK        0    /* test for existence of file */
@@ -29,5 +30,11 @@
 #define    _SC_JOB_CONTROL        6
 #define    _SC_SAVED_IDS        7
 #define    _SC_VERSION        8
+
+
+DIR *opendir(const char *pathname);
+struct dirent *readdir(DIR *directory);
+int closedir(DIR *directory);
+
 
 #endif /* !_SYS_UNISTD_H_ */

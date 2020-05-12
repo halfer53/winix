@@ -161,7 +161,7 @@ void init_syscall_table(){
     SYSCALL_MAP(EXIT, do_exit);        //2
     SYSCALL_MAP(FORK, do_fork);        //3
     SYSCALL_MAP(VFORK, do_vfork);      //4
-    SYSCALL_MAP(EXECVE, do_exec);      //5
+    SYSCALL_MAP(EXECVE, do_execve);      //5
     SYSCALL_MAP(BRK, do_brk);          //6
     SYSCALL_MAP(ALARM, do_alarm);      //7
     SYSCALL_MAP(SIGACTION, do_sigaction); //8

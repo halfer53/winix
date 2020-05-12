@@ -15,7 +15,7 @@
 #include <signal.h>
 #include <const.h>
 #include <sys/debug.h>
-#include <dirent.h>
+#include <sys/dirent.h>
 
 extern pid_t _pid;
 

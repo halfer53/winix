@@ -219,8 +219,8 @@ int do_exit(struct proc *who, struct message *m){
         status = who->ctx.m.regs[0];
     }
 
-    KDEBUG(("%s[%d] exit status %d signal %d\n",who->name, who->pid, 
-                        status, signum));
+    // KDEBUG(("%s[%d] exit status %d signal %d\n",who->name, who->pid, 
+    //                     status, signum));
     
     exit_proc(who, status, signum);
     

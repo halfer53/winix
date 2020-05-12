@@ -30,6 +30,7 @@ CMD_PROTOTYPE(help);
 CMD_PROTOTYPE(cmd_exit);
 CMD_PROTOTYPE(printenv);
 CMD_PROTOTYPE(cmd_bash);
+CMD_PROTOTYPE(do_cd);
 
 
 // Command handling
@@ -45,6 +46,7 @@ struct cmd_internal builtin_commands[] = {
     { mem_info, "free"},
     { cmd_exit, "exit"},
     { help, "help"},
+    { do_cd, "cd"},
     { generic, NULL }
 };
 
@@ -184,6 +186,14 @@ int cmd_kill(int argc, char **argv){
     return 0;
 }
 
+int do_cd(int argc, char** argv){
+    int ret;
+    if(argc < 2)
+        return -1;
+    ret = chdir(argv[1]);
+    return ret;
+}
+
 int help(int argc, char** argv){
     struct cmd_internal* handler;
     handler = builtin_commands;
@@ -269,13 +279,30 @@ int cmd_exit(int argc, char **argv){
     return exit(status);
 }
 
+
 /**
  * Handles any unknown command.
  **/
 int generic(int argc, char **argv) {
-    // Quietly ignore empty file paths
+    char path[DIRSIZ];
+    int ret;
+    pid_t pid;
+    sigset_t sigmask = 0;
     if(argc == 0)
+        return -1;
+    strcpy(path, "/bin/");
+    strcat(path, argv[0]);
+    ret = access(path, F_OK);
+    if(ret == 0){
+        pid = vfork();
+        if(pid == 0){
+            sigprocmask(SIG_SETMASK, &sigmask, NULL);
+            execv(path, argv);
+        }
+        ret = wait(NULL);
+        // printf("parent awaken\n");
         return 0;
+    }
 
     printf("Unknown command '%s'\r\n", argv[0]);
     return -1;

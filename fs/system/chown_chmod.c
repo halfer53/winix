@@ -23,10 +23,10 @@ int sys_chmod(struct proc* who, char *pathname, mode_t mode){
     return OK;
 }
 
-//int do_chmod(struct proc* who, struct message* msg){
-//    char* path = (char *) get_physical_addr(msg->m1_p1, who);
-//    if(!is_addr_accessible(path, who))
-//        return EFAULT;
-//    return sys_chmod(who, path, msg->m1_i1);
-//}
+int do_chmod(struct proc* who, struct message* msg){
+   char* path = (char *) get_physical_addr(msg->m1_p1, who);
+   if(!is_vaddr_accessible(msg->m1_p1, who))
+       return EFAULT;
+   return sys_chmod(who, path, msg->m1_i1);
+}
 

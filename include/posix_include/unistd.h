@@ -18,8 +18,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 
-int setpgid(pid_t pid, pid_t pgid);
-pid_t getpgid(pid_t pid);
+
 
 
 #endif

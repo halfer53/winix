@@ -1,1 +1,1 @@
-obj-y += shell/
+obj-y += shell/ commands/

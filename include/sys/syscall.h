@@ -101,7 +101,8 @@ int sigaction(int signum, const struct sigaction *act,
 int sigprocmask(int how, const sigset_t *set, sigset_t *oldset);
 int sigsuspend(const sigset_t *mask);
 int sigpending(sigset_t *set);
-
+int setpgid(pid_t pid, pid_t pgid);
+pid_t getpgid(pid_t pid);
 int open(const char *pathname,int flags, mode_t mode);
 int creat(const char *pathname, mode_t mode);
 int close(int fd);

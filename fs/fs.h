@@ -39,7 +39,6 @@
 #include <stdio.h>
 #include "excluded_files/cmake_util.h"
 #define kprintf(...) printf(__VA_ARGS__)
-
 #ifdef _DEBUG
     #define KDEBUG(token)   \
     do{\
@@ -50,14 +49,14 @@
     #define KDEBUG(token)
 #endif
 
-#else
+#else // else not FILE_SYSTEM_PROJECT
 
 #include <winix/sys_stdio.h>
 #include <winix/slab.h>
 #include <winix/kdebug.h>
 #include <string.h>
 
-#endif
+#endif // FILE_SYSTEM_PROJECT
 
 #endif
 

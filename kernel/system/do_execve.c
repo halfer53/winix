@@ -43,12 +43,12 @@ struct string_array{
     int size;
 };
 
-int do_exec(struct proc *who, struct message *m){
+int do_execve(struct proc *who, struct message *m){
     char* path = m->m1_p1;
     char** argv = m->m1_p2;
     char** envp = m->m1_p3;
 
-    if(is_addr_accessible(path, who) && is_addr_accessible(argv, who) && is_addr_accessible(envp, who)){
+    if(is_vaddr_accessible(path, who) && is_vaddr_accessible(argv, who) && is_vaddr_accessible(envp, who)){
         path = (char *)get_physical_addr(path, who);
         argv = (char**)get_physical_addr(argv, who);
         envp = (char**)get_physical_addr(envp, who);
