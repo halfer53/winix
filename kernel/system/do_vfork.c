@@ -10,8 +10,7 @@ int do_vfork(struct proc* parent, struct message* m){
         
         syscall_reply(0, child->proc_nr, m);
         
-        kprintf("vfork ");
-        kreport_sysmap();
+        
         parent->state |= STATE_VFORKING;
         return SUSPEND;
     }

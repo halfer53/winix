@@ -235,8 +235,6 @@ int exec_welf(struct proc* who, char* path, char *argv[], char *envp[], bool is_
             syscall_reply(who->pid, parent->proc_nr, &m);
         }
     }
-    kprintf("execve ");
-    kreport_sysmap();
     return DONTREPLY;
 }
 

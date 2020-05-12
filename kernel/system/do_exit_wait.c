@@ -201,8 +201,6 @@ void exit_proc(struct proc *who, int status, int signum){
         mp->parent = INIT;
     }
     
-    kprintf("exit ");
-    kreport_sysmap();
     // if No process is waiting for this process, send SIGCHLD to parent
     check_waiting(who);
     send_sig(parent, SIGCHLD);
