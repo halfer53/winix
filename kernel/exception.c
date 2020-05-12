@@ -135,7 +135,7 @@ PRIVATE void gpf_handler() {
     // is the current process a valid one?
     ASSERT(IS_PROCN_OK(current_proc->proc_nr));
     
-    if(*current_proc->ctx.stack_top != STACK_MAGIC)
+    if(*current_proc->stack_top != STACK_MAGIC)
         kinfo("Stack Overflow\n");
     
 #ifdef _DEBUG
@@ -157,18 +157,18 @@ PRIVATE void gpf_handler() {
 
     // kinfo("Current Instruction: 0x%08x\n",*pc);
 
-#if _DEBUG == 2
-    kinfo("$1: 0x%08x, $2, 0x%08x, $3, 0x%08x\n",current_proc->ctx.m.regs[0],
-                            current_proc->ctx.m.regs[1],current_proc->ctx.m.regs[2]);
-    kinfo("$4: 0x%08x, $5, 0x%08x, $6, 0x%08x\n",current_proc->ctx.m.regs[3],
-                            current_proc->ctx.m.regs[4],current_proc->ctx.m.regs[5]);
-    kinfo("$7: 0x%08x, $8, 0x%08x, $9, 0x%08x\n",current_proc->ctx.m.regs[6],
-                            current_proc->ctx.m.regs[7],current_proc->ctx.m.regs[8]);
-    kinfo("$10: 0x%08x, $11, 0x%08x, $12, 0x%08x\n",current_proc->ctx.m.regs[9],
-                            current_proc->ctx.m.regs[10],current_proc->ctx.m.regs[11]);
-    kinfo("$13: 0x%08x, $sp, 0x%08x, $ra, 0x%08x\n",current_proc->ctx.m.regs[12],
-                            current_proc->ctx.m.regs[13],current_proc->ctx.m.regs[14]);
-#endif
+// #if _DEBUG == 2
+//     kinfo("$1: 0x%08x, $2, 0x%08x, $3, 0x%08x\n",current_proc->ctx.m.regs[0],
+//                             current_proc->ctx.m.regs[1],current_proc->ctx.m.regs[2]);
+//     kinfo("$4: 0x%08x, $5, 0x%08x, $6, 0x%08x\n",current_proc->ctx.m.regs[3],
+//                             current_proc->ctx.m.regs[4],current_proc->ctx.m.regs[5]);
+//     kinfo("$7: 0x%08x, $8, 0x%08x, $9, 0x%08x\n",current_proc->ctx.m.regs[6],
+//                             current_proc->ctx.m.regs[7],current_proc->ctx.m.regs[8]);
+//     kinfo("$10: 0x%08x, $11, 0x%08x, $12, 0x%08x\n",current_proc->ctx.m.regs[9],
+//                             current_proc->ctx.m.regs[10],current_proc->ctx.m.regs[11]);
+//     kinfo("$13: 0x%08x, $sp, 0x%08x, $ra, 0x%08x\n",current_proc->ctx.m.regs[12],
+//                             current_proc->ctx.m.regs[13],current_proc->ctx.m.regs[14]);
+// #endif
 #endif
 
     

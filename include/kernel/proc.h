@@ -109,31 +109,6 @@ struct k_context{
     reg_t *rbase;
     reg_t *ptable;
     reg_t cctrl;                  	// len 19 words
-    ptr_t* stack_top;             	// Stack_top is the physical address
-};
-
-struct proc_vm{
-    vptr_t* text;
-    vptr_t* data;
-    vptr_t* bss;
-    vptr_t* stack_top;
-    vptr_t* heap_break;             // Heap_break is also the physical address of the curr
-                                	// Brk, retrived by syscall brk(2)
-    vptr_t* heap_bottom;         	// Bottom of the process image
-};
-
-
-struct proc_sched{
-    /* Scheduling */
-    struct proc *next;            	// Next pointer
-    int priority;                	// Priority
-    int quantum;                	// Timeslice length
-    int ticks_left;                	// Timeslice remaining
-
-    /* Accounting */
-    clock_t time_used;            	// CPU time used
-    clock_t sys_time_used;        	// system time used while the system is executing on behalf 
-                                	// of this proc
 };
 
 /**
@@ -154,10 +129,16 @@ typedef struct proc {
     
 
     /* Heap and Stack*/
+    ptr_t* stack_top;
+    ptr_t* mem_start;
     ptr_t* heap_top;                // 
     ptr_t* heap_break;             	// Heap_break is also the physical address of the curr
                                 	// Brk, retrived by syscall brk(2)
     ptr_t* heap_bottom;         	// Bottom of the process image
+
+    size_t text_size;
+    size_t data_size;
+    size_t bss_size;
 
     /* Protection */
     reg_t protection_table[PTABLE_LEN];

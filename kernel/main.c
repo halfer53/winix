@@ -16,8 +16,6 @@
 #include <kernel/table.h>
 #include <winix/bitmap.h>
 #include <fs/fs_methods.h>
-#include <init.c>
-#include <shell.c>
 
 // void init_kernel_tasks();
 void start_init();
@@ -38,7 +36,6 @@ void main() {
 
     init_kernel_tasks();
     start_init();
-    // start_bins();
 
     init_exceptions();
     sched();
@@ -72,9 +69,9 @@ void start_init(){
     }
 }
 
-void start_bins(){
-    struct proc* p;
-    p = start_user_proc(shell_code,shell_code_length, shell_pc, shell_offset,"shell");
-    p->parent = INIT;// hack 
-    add_free_mem(shell_code,shell_code_length);
-}
+// void start_bins(){
+//     struct proc* p;
+//     p = start_user_proc(shell_code,shell_code_length, shell_pc, shell_offset,"shell");
+//     p->parent = INIT;// hack 
+//     add_free_mem(shell_code,shell_code_length);
+// }

@@ -224,7 +224,7 @@ int put_inode(inode_t *inode, bool is_dirty){
     dearch_inode(inode);
     memcpy(buffer->block + inode_block_offset, inode, INODE_DISK_SIZE);
     put_block_buffer_immed(buffer, inode->i_dev);
-    KDEBUG(("put inode %d blk %d offset %d\n", inode->i_num, inode->i_ndblock, inode_block_offset));
+    // KDEBUG(("put inode %d blk %d offset %d\n", inode->i_num, inode->i_ndblock, inode_block_offset));
     return flush_inode_zones(inode);
 }
 

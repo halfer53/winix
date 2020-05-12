@@ -339,7 +339,7 @@ reg_t* alloc_kstack(struct proc *who){
     
     addr = stack_top + KERNEL_STACK_SIZE - 1;
     *stack_top = STACK_MAGIC;
-    who->ctx.stack_top = stack_top;
+    who->stack_top = stack_top;
     return get_virtual_addr(addr, who);
 }
 
@@ -403,23 +403,23 @@ struct proc *start_kernel_proc(void (*entry)(), int proc_nr, const char *name, i
     return who;
 }
 
-/**
- * start a new user process
- * @param  lines    array containing the binary image of the process
- * @param  length   length of the lines
- * @param  entry    entry point of the process
- * @param  priority 
- * @param  name     
- * @return          
- */
-struct proc *start_user_proc(size_t *lines, size_t length, size_t entry, int options, const char *name){
-    struct proc *p;
-    if(p = get_free_proc_slot()){
-        if(exec_proc(p,lines,length,entry,options,name) == OK)
-            return p;
-    }
-    return NULL;
-}
+// /**
+//  * start a new user process
+//  * @param  lines    array containing the binary image of the process
+//  * @param  length   length of the lines
+//  * @param  entry    entry point of the process
+//  * @param  priority 
+//  * @param  name     
+//  * @return          
+//  */
+// struct proc *start_user_proc(size_t *lines, size_t length, size_t entry, int options, const char *name){
+//     struct proc *p;
+//     if(p = get_free_proc_slot()){
+//         if(exec_proc(p,lines,length,entry,options,name) == OK)
+//             return p;
+//     }
+//     return NULL;
+// }
 
 /**
  * process memory control, 
@@ -464,21 +464,26 @@ int alloc_mem_welf(struct proc* who, struct winix_elf* elf, int stack_size, int 
 
     // for information on how process memory are structured, 
     // look at the first line of this file
-    who->ctx.stack_top = mem_start;
+    who->stack_top = mem_start;
+    who->mem_start = mem_start;
     who->ctx.m.sp = get_virtual_addr(mem_start+ stack_size - 1, who);
-    *(who->ctx.stack_top) = STACK_MAGIC;
+    *(who->stack_top) = STACK_MAGIC;
 
     // set bss segment to 0
     bss_start = mem_start + stack_size + elf->binary_size;
     memset(bss_start, 0, elf->bss_size);
-    memset(who->ctx.stack_top, 0, stack_size);
+    memset(who->stack_top, 0, stack_size);
 
     who->heap_top = mem_start + stack_size + td_aligned;
     who->heap_break = who->heap_top;
     who->heap_bottom = who->heap_break + heap_size - 1;
     memset(who->heap_top, 0, heap_size);
 
-    KDEBUG(("%d alloc from %p to %p\n", who->pid, mem_start, who->heap_bottom));
+    who->data_size = elf->data_size;
+    who->text_size = elf->text_size;
+    who->bss_size = elf->bss_size;
+
+    // KDEBUG(("%d alloc from %p to %p\n", who->pid, mem_start, who->heap_bottom));
     return OK;
 }
 
@@ -525,12 +530,12 @@ int alloc_proc_mem(struct proc *who, int text_data_length, int stack_size, int h
 
     // for information on how process memory are structured, 
     // look at the first line of this file
-    who->ctx.stack_top = who->ctx.rbase + vm_offset;
-    who->ctx.m.sp = get_virtual_addr(who->ctx.stack_top + stack_size - 1,who);
-    *(who->ctx.stack_top) = STACK_MAGIC;
+    who->stack_top = who->ctx.rbase + vm_offset;
+    who->ctx.m.sp = get_virtual_addr(who->stack_top + stack_size - 1,who);
+    *(who->stack_top) = STACK_MAGIC;
 
     // set bss segment to 0
-    bss_start = who->ctx.stack_top + stack_size + text_data_length;
+    bss_start = who->stack_top + stack_size + text_data_length;
     memset(bss_start, 0, bss_size);
 
     who->heap_top = bss_start + bss_size;

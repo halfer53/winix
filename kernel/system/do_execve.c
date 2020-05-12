@@ -140,7 +140,7 @@ int build_user_stack(struct proc* who, struct string_array* argv, struct string_
             copy_sarray_to_heap(who, argv, argv_ptr);
             init_stack.argc = argv->size - 1;
             init_stack.argv = (char**)copyto_user_heap(who, argv_ptr, argv->size);
-            KDEBUG(("%d argc %d argv %p\n", who->pid, init_stack.argc, init_stack.argv));
+            // KDEBUG(("%d argc %d argv %p\n", who->pid, init_stack.argc, init_stack.argv));
             kfree(argv_ptr);
         }
     }
@@ -149,7 +149,7 @@ int build_user_stack(struct proc* who, struct string_array* argv, struct string_
         if(env_ptr){
             copy_sarray_to_heap(who, argv, env_ptr);
             *sp_btm = (vptr_t)copyto_user_heap(who, env_ptr, env->size);
-            KDEBUG(("build stack env %p \n", *sp_btm));
+            // KDEBUG(("build stack env %p \n", *sp_btm));
             kfree(env_ptr);
         }
     }
@@ -183,9 +183,9 @@ int exec_welf(struct proc* who, char* path, char *argv[], char *envp[], bool is_
 
     memset(&m, 0, sizeof(m));
     copy_stirng_array(&argv_copy, argv, who, is_new);
-    KDEBUG(("copy argv string %d\n", argv_copy.size));
+    // KDEBUG(("copy argv string %d\n", argv_copy.size));
     copy_stirng_array(&envp_copy, envp, who, is_new);
-    KDEBUG(("copy env string %d\n", envp_copy.size));
+    // KDEBUG(("copy env string %d\n", envp_copy.size));
 
     if(!is_new){
         who->sig_pending = 0;
@@ -194,7 +194,7 @@ int exec_welf(struct proc* who, char* path, char *argv[], char *envp[], bool is_
         if(parent->flags | STATE_VFORKING){
             bitmap_clear(who->ctx.ptable, PTABLE_LEN);
         }else{
-            KDEBUG(("releasing memory %d\n", who->pid));
+            // KDEBUG(("releasing memory %d\n", who->pid));
             release_proc_mem(who);
         }
     }
@@ -209,7 +209,8 @@ int exec_welf(struct proc* who, char* path, char *argv[], char *envp[], bool is_
         goto final;
 
     ino = who->fp_filp[fd]->filp_ino;
-    // KDEBUG(("elf %s %x %x size: %d %d %d %d\n", path, elf.binary_offset, elf.binary_pc, elf.binary_size, elf.text_size, elf.data_size, elf.bss_size));
+    // KDEBUG(("elf %s %x %x size: %d %d %d %d\n", path, elf.binary_offset, elf.binary_pc,
+        // elf.binary_size, elf.text_size, elf.data_size, elf.bss_size));
     // KDEBUG(("inode size %d %d \n", ino->i_size, ino->i_total_size ));
 
     ret = sys_read(who, fd, who->ctx.rbase + elf.binary_offset, elf.binary_size);
@@ -238,86 +239,86 @@ int exec_welf(struct proc* who, char* path, char *argv[], char *envp[], bool is_
     return DONTREPLY;
 }
 
-/**
-* malloc a new memory and write the values of lines into that address
-* the process is updated
-**/
-int exec_proc(struct proc *who,size_t *lines, size_t length, size_t entry, int offset, const char *name){
-    int err;
-    unsigned int* first_word;
-    set_proc(who, (void (*)())entry, name);
-    if(err = alloc_proc_mem(who, length, USER_STACK_SIZE , USER_HEAP_SIZE)){
-        return err;
-    }
+// /**
+// * malloc a new memory and write the values of lines into that address
+// * the process is updated
+// **/
+// int exec_proc(struct proc *who,size_t *lines, size_t length, size_t entry, int offset, const char *name){
+//     int err;
+//     unsigned int* first_word;
+//     set_proc(who, (void (*)())entry, name);
+//     if(err = alloc_proc_mem(who, length, USER_STACK_SIZE , USER_HEAP_SIZE)){
+//         return err;
+//     }
 
-    // set the first page unaccessible if offset is set
-    // Normally, for each user address space, NULL pointer, which is a macro 
-    // for (void *)0, is set to return invalid value. For this reason, the
-    // first page of the user process is disabled, so that dereferencing
-    // NULL pointer will immediately trigger segfault.
-    if(offset){
-        proc_memctl(who, (void *)0, PROC_NO_ACCESS);
-        who->flags |= DISABLE_FIRST_PAGE;
-    }
+//     // set the first page unaccessible if offset is set
+//     // Normally, for each user address space, NULL pointer, which is a macro 
+//     // for (void *)0, is set to return invalid value. For this reason, the
+//     // first page of the user process is disabled, so that dereferencing
+//     // NULL pointer will immediately trigger segfault.
+//     if(offset){
+//         proc_memctl(who, (void *)0, PROC_NO_ACCESS);
+//         who->flags |= DISABLE_FIRST_PAGE;
+//     }
 
-    build_initial_stack(who, NULL, initial_env, get_proc(SYSTEM));
+//     build_initial_stack(who, NULL, initial_env, get_proc(SYSTEM));
 
-    memcpy(who->ctx.rbase + offset, lines , length);
-    first_word = who->ctx.rbase + offset;
+//     memcpy(who->ctx.rbase + offset, lines , length);
+//     first_word = who->ctx.rbase + offset;
 
-    enqueue_schedule(who);
-    return OK;
-}
+//     enqueue_schedule(who);
+//     return OK;
+// }
 
 
-int build_initial_stack(struct proc* who, char** argv, char** env, struct proc* srcproc){
-    struct initial_frame init_stack;
-    struct initial_frame* pstack = &init_stack;
-    ptr_t* sp_btm = get_physical_addr(who->ctx.m.sp,who);
-    int env_len = 0;
-    char **env_ptr;
-    char *v;
-    unsigned int *env_ptr_list, *p;
+// int build_initial_stack(struct proc* who, char** argv, char** env, struct proc* srcproc){
+//     struct initial_frame init_stack;
+//     struct initial_frame* pstack = &init_stack;
+//     ptr_t* sp_btm = get_physical_addr(who->ctx.m.sp,who);
+//     int env_len = 0;
+//     char **env_ptr;
+//     char *v;
+//     unsigned int *env_ptr_list, *p;
 
-    env = (char **)get_physical_addr(env, srcproc);
-    env_ptr = env;
+//     env = (char **)get_physical_addr(env, srcproc);
+//     env_ptr = env;
 
-    // get the length of environment variables
-    while(*env_ptr++)   env_len++;
-    env_len++; // for the last null terminator
+//     // get the length of environment variables
+//     while(*env_ptr++)   env_len++;
+//     env_len++; // for the last null terminator
 
-    // malloc the pointer for each environment variable
-    env_ptr_list = (unsigned int *)kmalloc(env_len);
-    p = env_ptr_list;
+//     // malloc the pointer for each environment variable
+//     env_ptr_list = (unsigned int *)kmalloc(env_len);
+//     p = env_ptr_list;
 
-    // copy each of the environment to the user stack
-    env_ptr = env;
-    while((v = *env_ptr++) != NULL){
-        v = (char *)get_physical_addr(v, srcproc);
-        *p++ = (unsigned int)copyto_user_heap(who, v, strlen(v)+1);
-        // save the pointer of the environment as well
-    }
-    *p = 0;
+//     // copy each of the environment to the user stack
+//     env_ptr = env;
+//     while((v = *env_ptr++) != NULL){
+//         v = (char *)get_physical_addr(v, srcproc);
+//         *p++ = (unsigned int)copyto_user_heap(who, v, strlen(v)+1);
+//         // save the pointer of the environment as well
+//     }
+//     *p = 0;
 
-    // copy the pointers of environment to the user stack
-    copyto_user_stack(who, env_ptr_list, env_len);
-    // sp_btm points to the start of the environment
-    *sp_btm = (unsigned int)who->ctx.m.sp;
-    // setup argc and argv before
-    who->ctx.m.ra = who->ctx.m.sp - sizeof(struct exit_code);
+//     // copy the pointers of environment to the user stack
+//     copyto_user_stack(who, env_ptr_list, env_len);
+//     // sp_btm points to the start of the environment
+//     *sp_btm = (unsigned int)who->ctx.m.sp;
+//     // setup argc and argv before
+//     who->ctx.m.ra = who->ctx.m.sp - sizeof(struct exit_code);
 
-    pstack->i_base.operation = WINIX_SENDREC;
-    pstack->i_base.dest = SYSTEM;
-    pstack->i_base.pm = (struct message*)(who->ctx.m.sp - sizeof(struct exit_code) - sizeof(struct message));
-    pstack->i_base.m.type = EXIT;
-    pstack->i_base.m.m1_i1 = EXIT_MAGIC;
-    pstack->i_base.m.m1_i2 = 0;
-    pstack->code.i_code1 = ASM_ADDUI_SP_SP_2;
-    pstack->code.i_code2 = ASM_SYSCALL;
+//     pstack->i_base.operation = WINIX_SENDREC;
+//     pstack->i_base.dest = SYSTEM;
+//     pstack->i_base.pm = (struct message*)(who->ctx.m.sp - sizeof(struct exit_code) - sizeof(struct message));
+//     pstack->i_base.m.type = EXIT;
+//     pstack->i_base.m.m1_i1 = EXIT_MAGIC;
+//     pstack->i_base.m.m1_i2 = 0;
+//     pstack->code.i_code1 = ASM_ADDUI_SP_SP_2;
+//     pstack->code.i_code2 = ASM_SYSCALL;
     
-    copyto_user_stack(who, pstack, sizeof(struct initial_frame));
+//     copyto_user_stack(who, pstack, sizeof(struct initial_frame));
 
-    kfree(env_ptr_list);
-    return OK;
-}
+//     kfree(env_ptr_list);
+//     return OK;
+// }
 

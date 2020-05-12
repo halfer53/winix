@@ -81,7 +81,6 @@ struct proc *pick_proc() {
  **/
 void sched() {
     int signum;
-    bool has_signal = false;
     // irq count is increased for each exception being called, and cleared on exiting
     // exception
     reset_irq_count();
@@ -113,10 +112,6 @@ void sched() {
             
     }while(current_proc == NULL);
     
-    if(has_signal){
-        PANIC("signal");
-        kreport_all_procs();
-    }
 
     // Reset quantum if needed
     if (current_proc->ticks_left <= 0) {

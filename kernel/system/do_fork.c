@@ -82,7 +82,7 @@ int copy_pregs(struct proc* parent, struct proc* child){
     child->message = (struct message *)get_physical_addr(*( sp + 2 ), child);
     child->heap_break = get_physical_addr(get_virtual_addr(parent->heap_break, parent), child);
     child->heap_bottom = get_physical_addr(get_virtual_addr(parent->heap_bottom, parent), child);
-    child->ctx.stack_top = get_physical_addr(get_virtual_addr(parent->ctx.stack_top, parent), child);
+    child->stack_top = get_physical_addr(get_virtual_addr(parent->stack_top, parent), child);
     return OK;
 }
 
