@@ -175,7 +175,6 @@ PRIVATE void gpf_handler() {
     if(IS_KERNEL_PROC(current_proc))
         _panic("kernel crashed",NULL);
 
-    PANIC("foo");
     // Kill process and call scheduler.
     send_sig(current_proc,SIGSEGV);
     sched();
