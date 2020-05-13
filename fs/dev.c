@@ -120,7 +120,7 @@ int root_fs_read (struct filp *filp, char *data, size_t count, off_t offset){
     unsigned int curr_fp_index, fp_limit;
     block_t bnr;
     inode_t *ino = NULL;
-    struct block_buffer* buffer;
+    struct block_buffer* buffer = NULL;
 
     curr_fp_index = offset / BLOCK_SIZE;
     off = offset % BLOCK_SIZE;
@@ -134,19 +134,24 @@ int root_fs_read (struct filp *filp, char *data, size_t count, off_t offset){
             continue;
 
         r = 0;
-        buffer = get_block_buffer(bnr, filp->filp_dev);
-        end_in_block = (off + len) < ino->i_size ? (off + len) : ino->i_size;
-        for (j = off; j < end_in_block; j++) {
-            *data++ = buffer->block[j];
-            r++;
+        if(filp->filp_flags & O_DIRECT){
+            r = filp->filp_dev->dops->dev_read(data, off, len);
+        }else{
+            char *p;
+            buffer = get_block_buffer(bnr, filp->filp_dev);
+            p = &buffer->block[off];
+            end_in_block = (off + len) < ino->i_size ? (off + len) : ino->i_size;
+            for (j = off; j < end_in_block; j++) {
+                *data++ = *p++;
+                r++;
+            }
+            put_block_buffer(buffer);
         }
 
         count -= len;
         ret += r;
         filp->filp_pos += r;
         // KDEBUG(("file read for block %d, off %d len %d remaining %d\n", bnr, off, r, count));
-
-        put_block_buffer(buffer);
         if (r == 0)
             break;
         off = 0;
@@ -161,7 +166,7 @@ int root_fs_write (struct filp *filp, char *data, size_t count, off_t offset){
     unsigned int curr_fp_index, fp_limit;
     block_t bnr;
     inode_t *ino = NULL;
-    struct block_buffer* buffer;
+    struct block_buffer* buffer = NULL;
 
     curr_fp_index = offset / BLOCK_SIZE;
     off = offset % BLOCK_SIZE;
@@ -178,15 +183,21 @@ int root_fs_write (struct filp *filp, char *data, size_t count, off_t offset){
                 return ENOSPC;
             }
         }
-        buffer = get_block_buffer(bnr, filp->filp_dev);
 
         r = 0;
-        for (j = off; j< off + len && j < BLOCK_SIZE; j++) {
-            buffer->block[j] = *data++;
-            r++;
+        if(filp->filp_flags & O_DIRECT){
+            r = filp->filp_dev->dops->dev_write(data, off, len);
+        } else{
+            char *p;
+            buffer = get_block_buffer(bnr, filp->filp_dev);
+            p = &buffer->block[off];
+            for (j = off; j< off + len && j < BLOCK_SIZE; j++) {
+                *p++ = *data++;
+                r++;
+            }
+            put_block_buffer_dirt(buffer);
         }
         // KDEBUG(("file write for block %d, off %d len %d\n", curr_fp_index, off, r));
-        put_block_buffer_dirt(buffer);
         /* Read or write 'chunk' bytes. */
         if (r == 0)
             break;
