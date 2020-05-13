@@ -135,6 +135,7 @@ int root_fs_read (struct filp *filp, char *data, size_t count, off_t offset){
 
         r = 0;
         if(filp->filp_flags & O_DIRECT){
+            len = (off + len) < ino->i_size ? len : ino->i_size - off;
             r = filp->filp_dev->dops->dev_read(data, off, len);
         }else{
             char *p;
