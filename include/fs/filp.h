@@ -6,7 +6,11 @@
 
 #define OPEN_MAX  8
 
-
+struct filp_pipe{
+    char* data;
+    int mode;
+    off_t pos;
+};
 
 typedef struct filp {
     mode_t filp_mode;        /* RW bits, telling how file is opened */
@@ -15,12 +19,13 @@ typedef struct filp {
     inode_t *filp_ino;    /* pointer to the inode */
     off_t filp_pos;        /* file position */
     struct device* filp_dev;
-    off_t pipe_read_pos;
+//    off_t pipe_read_pos;
+    int pipe_mode;
+    struct filp_pipe* pipe;
 
     /* following are for fd-type-specific select() */
     // int filp_pipe_select_ops;
     int filp_table_index;
-    struct list_head filp_list; // list for all the filp referring to the same underlying inode
     zone_t getdent_zone_nr;
     int getdent_dirstream_nr;
     
@@ -38,7 +43,8 @@ struct filp_operations{
 
 #define NIL_FILP (filp_t *) 0    /* indicates absence of a filp slot */
 
-
+#define FILP_PIPE_READ  (2)
+#define FILP_PIPE_WRITE (0)
 
 #endif
 

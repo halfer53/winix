@@ -4,7 +4,7 @@
 
 #include "../fs.h"
 #include <winix/list.h>
-
+#include <winix/sigsend.h>
 
 struct device pipe_dev;
 static struct filp_operations fops;
@@ -46,24 +46,39 @@ int sys_pipe(struct proc* who, int fd[2]){
     int ret1, ret2, ret = 0;
     struct filp *file1, *file2;
     struct inode* inode;
-    ptr_t* ptr;
+    struct filp_pipe* pipe;
+    char* ptr;
 
     ptr = kmalloc(PIPE_LIMIT);
     if(!ptr)
         return ENOMEM;
 
+    pipe = kmalloc(sizeof(struct filp_pipe));
+    if(!pipe){
+        ret = ENOMEM;
+        goto failed_filp_pipe;
+    }
+    pipe->data = ptr;
+    pipe->pos = 0;
+
     inode = get_free_inode_slot();
     if(!inode){
         ret = EMFILE;
-        goto failed_inode;
+        goto failed_filp_slot;
     }
+    inode->flags |= INODE_FLAG_PIPE;
+    inode->i_count = 2;
+    inode->i_nlinks = 1;
+    init_inode_non_disk(inode, get_next_ino(), &pipe_dev, NULL);
 
     ret1 = set_filp(who, &file1, inode);
     if(ret1 < 0){
         ret = ret1;
         goto failed_filp1;
     }
-
+    file1->pipe_mode = FILP_PIPE_READ;
+    file1->pipe = pipe;
+    init_filp_by_inode(file1, inode);
     who->fp_filp[ret1] = file1;
     fd[0] = ret1;
 
@@ -72,16 +87,12 @@ int sys_pipe(struct proc* who, int fd[2]){
         ret = ret2;
         goto failed_filp2;
     }
+    file2->pipe_mode = FILP_PIPE_WRITE;
+    file2->pipe = pipe;
+    init_filp_by_inode(file2, inode);
     who->fp_filp[ret2] = file2;
     fd[1] = ret2;
 
-    inode->pipe_data = ptr;
-    inode->flags |= INODE_FLAG_PIPE;
-    inode->i_count = 1;
-    inode->i_nlinks = 1;
-    init_inode_non_disk(inode, get_next_ino(), &pipe_dev, NULL);
-    init_filp_by_inode(file1, inode);
-    init_filp_by_inode(file2, inode);
     INIT_LIST_HEAD(&inode->pipe_writing_list);
     INIT_LIST_HEAD(&inode->pipe_reading_list);
     return OK;
@@ -93,7 +104,10 @@ int sys_pipe(struct proc* who, int fd[2]){
     failed_filp1:
     inode->i_count = 0;
 
-    failed_inode:
+    failed_filp_slot:
+    kfree(pipe);
+
+    failed_filp_pipe:
     kfree(ptr);
     return ret;
 }
@@ -108,8 +122,8 @@ struct pipe_waiting* get_next_waiting(struct list_head *waiting_list){
 }
 
 void shift_pipe_data(struct filp* file, off_t i){
-    ptr_t *data = file->filp_ino->pipe_data;
-    off_t j = 0, k, end = file->filp_pos;
+    char *data = file->pipe->data;
+    off_t j = 0, k, end = file->pipe->pos;
     while(i < end){
         data[j] = data[i];
         data[i] = '\0';
@@ -120,14 +134,14 @@ void shift_pipe_data(struct filp* file, off_t i){
     while(k < end){
         data[k++] = '\0';
     }
-    file->filp_pos = j;
+    file->pipe->pos = j;
 }
 
 static int _pipe_read(struct proc* who, struct filp *filp, char *data, size_t count, off_t offset){
     int ret;
     off_t i;
-    ptr_t *pipe_data = filp->filp_ino->pipe_data;
-    off_t end = count < filp->filp_pos ? count : filp->filp_pos;
+    char *pipe_data = filp->pipe->data;
+    off_t end = count < filp->pipe->pos ? count : filp->pipe->pos;
     for(i = 0; i < end; i++){
         *data++ = pipe_data[i];
     }
@@ -138,14 +152,14 @@ static int _pipe_read(struct proc* who, struct filp *filp, char *data, size_t co
 
 static int _pipe_write(struct proc* who, struct filp *filp, char *data, size_t count, off_t offset){
     int ret, i;
-    ptr_t *data_start = filp->filp_ino->pipe_data;
-    off_t off = filp->filp_pos, end;
+    char *data_start = filp->pipe->data;
+    off_t off = filp->pipe->pos, end;
     end = (off + count) < PIPE_LIMIT ? (off + count) : PIPE_LIMIT;
     for(i = off; i < end; i++){
         data_start[i] = *data++;
     }
     ret = (int)(i - off);
-    filp->filp_pos += ret;
+    filp->pipe->pos += ret;
     return ret;
 }
 
@@ -155,8 +169,13 @@ int pipe_read ( struct filp *filp, char *data, size_t count, off_t offset){
     struct message msg;
     struct inode* ino = filp->filp_ino;
 
+    if(filp->pipe_mode == FILP_PIPE_WRITE)
+        return 0;
+    if(filp->filp_ino->i_count == 1) // write end is closed
+        return 0;
+
     offset = 0; //Pipe always read from start
-    if(filp->filp_pos == 0){
+    if(filp->pipe->pos == 0){
         next = (struct pipe_waiting*)kmalloc(sizeof(struct pipe_waiting));
         if(!next)
             return ENOMEM;
@@ -193,10 +212,23 @@ int pipe_write ( struct filp *filp, char *data, size_t count, off_t offset){
     struct message msg;
     struct inode* ino = filp->filp_ino;
 
+    if(filp->pipe_mode == FILP_PIPE_READ){
+        return 0;
+    }
+
+    if(filp->filp_ino->i_count == 1) {
+        int signum = SIGPIPE;
+        if(curr_user_proc_in_syscall->sig_table[signum].sa_handler == SIG_IGN){
+            return EPIPE;
+        }
+        send_sig(curr_user_proc_in_syscall, signum);
+        return SUSPEND;
+    }
+
     if(count > PIPE_LIMIT)
         return ENOSPC;
 
-    if(count > (PIPE_LIMIT - filp->filp_pos)){
+    if(count > (PIPE_LIMIT - filp->pipe->pos)){
         next = (struct pipe_waiting*)kmalloc(sizeof(struct pipe_waiting));
         if(!next)
             return ENOMEM;
@@ -208,7 +240,7 @@ int pipe_write ( struct filp *filp, char *data, size_t count, off_t offset){
         next->count = count;
         next->offset = offset;
         next->sys_call_num = WRITE;
-        list_add(&next->list, &ino->pipe_reading_list);
+        list_add(&next->list, &ino->pipe_writing_list);
         KDEBUG(("proc %d writing inode num %d is blocked \n",
                 curr_user_proc_in_syscall->pid, filp->filp_ino->i_num));
         return SUSPEND;
@@ -216,8 +248,8 @@ int pipe_write ( struct filp *filp, char *data, size_t count, off_t offset){
     ret = _pipe_write(curr_user_proc_in_syscall, filp, data, count, offset);
     if(ret == 0)
         return ret;
-    KDEBUG(("proc %d writing %s ret %d filp_pos %d\n",
-            curr_user_proc_in_syscall->proc_nr, data, ret, filp->filp_pos));
+    KDEBUG(("proc %d writing %s ret %d pipe->pos %d\n",
+            curr_user_proc_in_syscall->proc_nr, data, ret, filp->pipe->pos));
     next = get_next_waiting(&ino->pipe_reading_list);
     if(next!= NULL){
         KDEBUG(("Proc %d is awaken for reading\n", next->who->proc_nr));
@@ -234,17 +266,17 @@ int pipe_open ( struct inode* ino, struct filp *file){
 }
 
 int pipe_close ( struct inode* ino, struct filp *file){
+    file->filp_count -= 1;
+    if(file->filp_count == 0){
+        ino->i_count -= 1;
+        if(ino->i_count == 0){
+            kfree(file->pipe->data);
+            kfree(file->pipe);
+        }
+    }
     return 0;
 }
 
-
-int pipe_dev_io_read(char *buf, off_t off, size_t len){
-    return 0;
-}
-
-int pipe_dev_io_write(char *buf, off_t off, size_t len){
-    return 0;
-}
 
 int pipe_dev_init(){
     return 0;
@@ -257,8 +289,6 @@ int pip_dev_release(){
 
 void init_pipe(){
     dops.dev_init = pipe_dev_init;
-    dops.dev_read = pipe_dev_io_read;
-    dops.dev_write = pipe_dev_io_write;
     dops.dev_release = pip_dev_release;
     fops.open = pipe_open;
     fops.read = pipe_read;

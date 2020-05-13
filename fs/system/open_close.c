@@ -9,15 +9,7 @@
         return EBADF;
 
      filp = who->fp_filp[fd];
-     ino = filp->filp_ino;
-     filp->filp_count -= 1;
 
-     if(filp->filp_count == 0){
-         put_inode(filp->filp_ino, true);
-         if(ino->i_count == 0 && ino->i_nlinks == 0){
-             release_inode(ino);
-         }
-     }
      ret = filp->filp_dev->fops->close(filp->filp_ino, filp);
      if(ret)
          return ret;
@@ -27,7 +19,7 @@
 
 
 
-int _sys_open(struct proc *who, char *path, unsigned int flags, mode_t mode, dev_t devid){
+int _sys_open(struct proc *who, char *path,  int flags, mode_t mode, dev_t devid){
     filp_t *filp;
     int i,open_slot,ret;
     inode_t *inode = NULL, *lastdir = NULL;
@@ -52,9 +44,6 @@ int _sys_open(struct proc *who, char *path, unsigned int flags, mode_t mode, dev
         ret = EISDIR;
         goto final;
     }
-
-    if((ret = get_fd(who, 0, &open_slot, &filp)))
-        goto final;
 
     if(!inode && *string != '\0'){
 
@@ -84,6 +73,12 @@ int _sys_open(struct proc *who, char *path, unsigned int flags, mode_t mode, dev
         inode->i_mode = dev->device_type | ( mode & ~who->umask);
     }
 
+    if(flags & KO_NO_FD)
+        return OK;
+
+    if((ret = get_fd(who, 0, &open_slot, &filp)))
+        goto final;
+
     if(!inode && *string == '\0'){
         inode = lastdir;
     }
@@ -104,14 +99,14 @@ int _sys_open(struct proc *who, char *path, unsigned int flags, mode_t mode, dev
 }
 
 int sys_creat(struct proc* who, char* path, mode_t mode){
-    return sys_open(who, path, O_CREAT | O_EXCL | O_RDWR, mode);
+    return sys_open(who, path, O_CREAT | O_EXCL , mode);
 }
 
 int sys_open(struct proc *who, char *path, int flags, mode_t mode){
     return _sys_open(who, path, flags, mode, ROOT_DEV);
 }
 int sys_mknod(struct proc* who, char *pathname, mode_t mode, dev_t devid){
-    return _sys_open(who, pathname, O_CREAT | O_EXCL | O_RDWR, mode, devid);
+    return _sys_open(who, pathname, O_CREAT | O_EXCL | KO_NO_FD , mode, devid);
 }
 
 int do_open(struct proc* who, struct message* msg){

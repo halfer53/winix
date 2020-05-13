@@ -204,8 +204,15 @@ int root_fs_open (struct inode* ino, struct filp *file){
     return 0;
 }
 
-int root_fs_close (struct inode* ino, struct filp *file){
-    return 0;
+int root_fs_close (struct inode* ino, struct filp *filp){
+    filp->filp_count -= 1;
+    if(filp->filp_count == 0){
+        put_inode(filp->filp_ino, true);
+        if(ino->i_count == 0 && ino->i_nlinks == 0){
+            release_inode(ino);
+        }
+    }
+    return OK;
 }
 
 void init_dev(){

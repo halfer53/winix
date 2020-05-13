@@ -7,7 +7,7 @@
 int sys_getdent(struct proc* who, int fd, struct dirent* dirp_dst){
     int i, dirstream_nr, ret = 0;
     struct block_buffer *buffer;
-    struct dirent* dirstream, *endstream;
+    struct winix_dirent* dirstream, *endstream;
     struct filp* file;
     struct inode* dirp;
     block_t bnr;
@@ -27,10 +27,10 @@ int sys_getdent(struct proc* who, int fd, struct dirent* dirp_dst){
         bnr = dirp->i_zone[i];
         if(bnr > 0){
             buffer = get_block_buffer(bnr, dirp->i_dev);
-            endstream = (struct dirent*)&buffer->block[BLOCK_SIZE];
-            dirstream = (struct dirent*)buffer->block;
+            endstream = (struct winix_dirent*)&buffer->block[BLOCK_SIZE];
+            dirstream = (struct winix_dirent*)buffer->block;
             dirstream += dirstream_nr;
-            while(dirstream->d_ino == 0 && dirstream < endstream){
+            while(dirstream->dirent.d_ino == 0 && dirstream < endstream){
                 dirstream++;
                 dirstream_nr++;
             }
@@ -39,7 +39,7 @@ int sys_getdent(struct proc* who, int fd, struct dirent* dirp_dst){
                 put_block_buffer(buffer);
                 continue;
             }
-            *dirp_dst = *dirstream;
+            memcpy(dirp_dst, &dirstream->dirent, sizeof(struct dirent));
             ret += sizeof(struct dirent);
             dirstream_nr++;
             file->getdent_dirstream_nr = dirstream_nr;

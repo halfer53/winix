@@ -20,11 +20,19 @@ void mock_init_proc(){
 }
 
 void emulate_fork(struct proc* p1, struct proc* p2){
+    int i;
+    struct filp* file;
     int procnr = p2->proc_nr;
     pid_t pid = p2->pid;
     *p2 = *p1;
     p2->proc_nr = procnr;
     p2->pid = pid;
+    for (int i = 0; i < OPEN_MAX; ++i) {
+        file = p2->fp_filp[i];
+        if(file){
+            file->filp_count += 1;
+        }
+    }
 }
 
 bool is_vaddr_ok(vptr_t* addr,struct proc* who){
@@ -46,6 +54,10 @@ int syscall_reply(int reply, int dest, struct message* m){
 
 int syscall_reply2(int syscall_num, int reply, int dest, struct message* m){
     KDEBUG(("Syscall %d reply %d to Proc %d\n", syscall_num, reply, dest));
+}
+
+int send_sig(struct proc *who, int signum){
+    KDEBUG(("signal %d sent to %d\n", signum, who->proc_nr));
 }
 
 void _assert(int expression, int line, char* filename) {

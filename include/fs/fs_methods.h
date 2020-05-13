@@ -27,10 +27,11 @@ int sys_stat(struct proc* who, char *pathname, struct stat *statbuf);
 int sys_fstat(struct proc* who, int fd, struct stat* statbuf);
 int sys_link(struct proc* who, char *oldpath, char *newpath);
 int sys_unlink(struct proc* who, char *path);
+int sys_mknod(struct proc* who, char *pathname, mode_t mode, dev_t devid);
 int sys_getdent(struct proc* who, int fd, struct dirent* dirp_dst);
 
 int init_dirent(inode_t* dir, inode_t* ino);
-int fill_dirent(inode_t* ino, struct dirent* curr, char* string);
+int fill_dirent(inode_t* ino, struct winix_dirent* curr, char* string);
 bool has_file_access(struct proc* who, struct inode* ino, mode_t mode);
 int get_inode_by_path(struct proc* who, char *path, struct inode** inode);
 int alloc_block(inode_t *ino, struct device* id);

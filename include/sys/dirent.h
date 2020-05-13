@@ -22,10 +22,9 @@ struct dirent {
     char32_t   d_name[DIRNAME_LEN ]; /* filename */
 };
 
-struct wramp_dirent {
-    ino_t          d_ino;       /* inode number */
-    unsigned int   d_type;      /* type of file; not supported */
-    char32_t  d_name[DIRNAME_LEN ]; /* filename */
+struct winix_dirent {
+    struct dirent dirent;
+    dev_t dev;
 };
 
 struct __dir{

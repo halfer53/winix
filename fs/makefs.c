@@ -14,8 +14,7 @@ unsigned int setBits(unsigned int n)
 int makefs( char* disk_raw, size_t disk_size_words)
 {
     char *pdisk = disk_raw;
-    struct dirent* pdir;
-    struct dirent d1, d2;
+    struct winix_dirent* pdir;
     const time_t now = INODE_MOCK_UTC_TIME;
     const int root_inode_num = 1;
     inode_t root_node;
@@ -100,7 +99,7 @@ int makefs( char* disk_raw, size_t disk_size_words)
     pdisk += superblock.s_inode_table_size;
 
     char *pbak = pdisk;
-    pdir = (struct dirent*)pdisk;
+    pdir = (struct winix_dirent*)pdisk;
     fill_dirent(&root_node, pdir, ".");
     pdir++;
     fill_dirent(&root_node, pdir, "..");

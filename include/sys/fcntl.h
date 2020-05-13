@@ -40,6 +40,7 @@
 #define	O_RSYNC		0x00020000	/* read: I/O completion as for write */
 #define	O_ALT_IO	0x00040000	/* use alternate i/o semantics */
 #define	O_DIRECT	0x00080000	/* direct I/O hint */
+#define KO_NO_FD    0x00100000  /* do not return fd */
 
 /*
  * Constants used for fcntl(2)

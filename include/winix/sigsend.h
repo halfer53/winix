@@ -14,6 +14,7 @@
 #ifndef _W_SIGNAL_H_
 #define _W_SIGNAL_H_ 1
 
+#include <winix/syscall_ctx.h>
 #include <signal.h>
 
 // By POSIX convention, if a process is killed by a signal, its exit status code is 128 + signum

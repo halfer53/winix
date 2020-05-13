@@ -51,7 +51,7 @@ char *get_name(char *old_name, char string[NAME_MAX]){
 int advance(inode_t *dirp, char string[NAME_MAX]){
     int i,inum  = 0;
     struct block_buffer *buffer;
-    struct dirent* dirstream;
+    struct winix_dirent* dirstream;
 
     if(*string == '\0')
         return ERR;
@@ -60,10 +60,10 @@ int advance(inode_t *dirp, char string[NAME_MAX]){
     for(i = 0; i < NR_TZONES; i++){
         if(dirp->i_zone[i] > 0 ){
             if((buffer = get_block_buffer(dirp->i_zone[i], dirp->i_dev)) != NULL){
-                dirstream = (struct dirent*)buffer->block;
-                for(; dirstream < (struct dirent* )&buffer->block[BLOCK_SIZE]; dirstream++ ){
-                    if(char32_strcmp(dirstream->d_name, string) == 0){
-                        inum = dirstream->d_ino;
+                dirstream = (struct winix_dirent*)buffer->block;
+                for(; dirstream < (struct winix_dirent* )&buffer->block[BLOCK_SIZE]; dirstream++ ){
+                    if(char32_strcmp(dirstream->dirent.d_name, string) == 0){
+                        inum = dirstream->dirent.d_ino;
                         put_block_buffer(buffer);
                         return inum;
                     }

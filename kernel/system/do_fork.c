@@ -24,7 +24,8 @@
  * @return        
  */
 int copy_pcb(struct proc* parent, struct proc* child){
-    int pbak;
+    int pbak, i;
+    struct filp* file;
     pid_t pidbak;
     pbak = child->proc_nr;
     pidbak = child->pid;
@@ -35,6 +36,13 @@ int copy_pcb(struct proc* parent, struct proc* child){
     child->sig_pending = 0;
     // ptable points to its own protection table
     child->ctx.ptable = child->protection_table;
+
+    for (i = 0; i < OPEN_MAX; ++i) {
+        file = child->fp_filp[i];
+        if(file){
+            file->filp_count += 1;
+        }
+    }
     return OK;
 }
 

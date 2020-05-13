@@ -4,14 +4,23 @@
 #include "fs.h"
 #include <assert.h>
 
+const char * dirent_array[] = {
+        ".",
+        "..",
+        "bar.txt",
+        "bar2.txt"
+};
+
+
 int unit_test1(){
     struct proc pcurr2;
-    int ret, fd, fd2;
+    int ret, fd, fd2, fd3, fd4;
     int pipe_fd[2];
     struct stat statbuf, statbuf2;
     init_bitmap();
     char *filename = "/foo.txt";
-    char buffer[100];
+    char buffer[BLOCK_SIZE];
+    char b2[BLOCK_SIZE];
 
     pcurr2.pid = 2;
     pcurr2.proc_nr = 2;
@@ -55,14 +64,49 @@ int unit_test1(){
     emulate_fork(current_proc, &pcurr2);
     ret = sys_read(current_proc, pipe_fd[0], buffer, 100);
     assert(ret == SUSPEND);
-    ret = sys_write(&pcurr2, pipe_fd[1], "1234", 4);
-    assert(ret == 4);
+    ret = sys_write(&pcurr2, pipe_fd[1], "1234", 5);
+    assert(ret == 5);
+    assert(strcmp(buffer, "1234") == 0);
+    buffer[0] = 0;
 
     ret = sys_write(&pcurr2, pipe_fd[1], "1234", 5);
     assert(ret == 5);
     ret = sys_read(current_proc, pipe_fd[0], buffer, 100);
     assert(ret == 5);
     assert(strcmp(buffer, "1234") == 0);
+
+    memset(buffer, 'a', BLOCK_SIZE - 1);
+    buffer[BLOCK_SIZE - 1] = 0;
+    ret = sys_write(&pcurr2, pipe_fd[1], buffer, BLOCK_SIZE);
+    assert(ret == BLOCK_SIZE);
+    ret = sys_write(&pcurr2, pipe_fd[1], "abc", 4);
+    assert(ret == SUSPEND);
+    ret = sys_read(current_proc, pipe_fd[0], b2, BLOCK_SIZE);
+    assert(ret == BLOCK_SIZE);
+    assert(strcmp(buffer, b2) == 0);
+    ret = sys_read(current_proc, pipe_fd[0], b2, BLOCK_SIZE);
+    assert(ret == 4);
+    assert(strcmp(b2, "abc") == 0);
+
+    sys_close(current_proc, pipe_fd[0]);
+    ret = sys_write(&pcurr2, pipe_fd[1], "a", 2);
+    assert(ret == 2);
+
+    sys_close(&pcurr2, pipe_fd[0]);
+    ret = sys_write(&pcurr2, pipe_fd[1], "a", 2);
+    assert(ret == SUSPEND);
+
+    pcurr2.sig_table[SIGPIPE].sa_handler = SIG_IGN;
+    ret = sys_write(&pcurr2, pipe_fd[1], "a", 2);
+    assert(ret == EPIPE);
+
+    sys_close(current_proc, pipe_fd[0]);
+    sys_close(&pcurr2, pipe_fd[0]);
+//    ret = sys_write(&pcurr2, pipe_fd[1], "abc", 4);
+//    ret = sys_close(&pcurr2, pipe_fd[1]);
+//    assert(ret == 0);
+//    ret = sys_read(current_proc, pipe_fd[0], buffer, BLOCK_SIZE);
+//    assert(ret == 0);
 
     ret = sys_access(current_proc, "/dev", F_OK);
     assert(ret != 0);
@@ -105,6 +149,18 @@ int unit_test1(){
     assert(statbuf.st_nlink == 2);
     assert(statbuf.st_mode == 0x777);
 
+    fd3 = sys_open(current_proc, "/dev", O_RDONLY, 0);
+    assert(fd3 >= 0);
+    struct dirent dir;
+
+    for (int i = 0; i < 4; ++i) {
+        ret = sys_getdent(current_proc, fd3, &dir);
+        assert(ret == sizeof(struct dirent));
+        assert(char32_strcmp(dir.d_name, dirent_array[i]) == 0);
+    }
+    ret = sys_getdent(current_proc, fd3, &dir);
+    assert(ret == 0);
+
     ret = sys_unlink(current_proc, "/dev/bar2.txt");
     assert(ret == 0);
 
@@ -132,6 +188,8 @@ int unit_test1(){
 
     ret = sys_close(current_proc, fd2);
     assert(ret == 0);
+
+    ret = sys_mknod(current_proc, "/dev/tty", O_RDWR, 0x755);
 
     return 0;
 }

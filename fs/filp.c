@@ -3,7 +3,7 @@
 static filp_t fd_table[NR_FILPS];
 
 int get_fd(struct proc *curr, int start, int *open_slot, filp_t **fpt){
-    int i;
+    int i, idx_bak;
     bool found = false;
     filp_t *f;
 
@@ -22,6 +22,7 @@ int get_fd(struct proc *curr, int start, int *open_slot, filp_t **fpt){
         f = &fd_table[i];
         if (f->filp_count == 0) {
             memset(f,0, sizeof(struct filp));
+            f->filp_table_index = i;
             *fpt = f;
             return(OK);
         }

@@ -10,11 +10,13 @@ static struct device_operations dops;
 static char* name = "tty";
 
 int tty_read ( struct filp *filp, char *data, size_t count, off_t offset){
-    return 0;
+    memset(data, 't', count);
+    data[count - 1] = '\0';
+    return count;
 }
 
 int tty_write ( struct filp *filp, char *data, size_t count, off_t offset){
-    return 0;
+    return count;
 }
 
 int tty_open ( struct inode* ino, struct filp *file){
