@@ -34,14 +34,17 @@ int do_sigaction(struct proc *who, struct message *m){
     if(signum == SIGKILL || signum == SIGSTOP)
         return EINVAL;
 
+    act = (struct sigaction*)get_physical_addr(act, who);
+    if(act->sa_handler == SIG_IGN){
+        if(signum == SIGSEGV)
+            return EINVAL;
+
+        sigdelset(&who->sig_pending, signum);
+    }
+
     if(oact){
         oact = (struct sigaction*)get_physical_addr(oact, who);
         memcpy(oact, &who->sig_table[signum], sizeof(struct sigaction));
-    }
-
-    act = (struct sigaction*)get_physical_addr(act, who);
-    if(act->sa_handler == SIG_IGN){
-        sigdelset(&who->sig_pending, signum);
     }
 
     sigdelset(&act->sa_mask, SIGKILL);

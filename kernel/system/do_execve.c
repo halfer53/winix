@@ -199,7 +199,7 @@ int exec_welf(struct proc* who, char* path, char *argv[], char *envp[], bool is_
         }
     }
 
-    fd = sys_open(who, path, O_RDONLY | O_DIRECT, 0);
+    fd = sys_open(who, path, O_RDONLY, 0);
     if(fd < 0)
         return fd;
 
