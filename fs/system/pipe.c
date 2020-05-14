@@ -179,18 +179,18 @@ int pipe_read ( struct filp *filp, char *data, size_t count, off_t offset){
         next = (struct pipe_waiting*)kmalloc(sizeof(struct pipe_waiting));
         if(!next)
             return ENOMEM;
-        curr_user_proc_in_syscall->flags |= STATE_WAITING;
-        next->who = curr_user_proc_in_syscall;
+        curr_user->flags |= STATE_WAITING;
+        next->who = curr_user;
         next->filp = filp;
         next->data = data;
         next->count = count;
         next->offset = offset;
         next->sys_call_num = READ;
         list_add(&next->list, &ino->pipe_reading_list);
-        KDEBUG(("proc %d reading inode num %d is blocked \n", curr_user_proc_in_syscall->pid, filp->filp_ino->i_num));
+        KDEBUG(("proc %d reading inode num %d is blocked \n", curr_user->pid, filp->filp_ino->i_num));
         return SUSPEND;
     }
-    ret = _pipe_read(curr_user_proc_in_syscall, filp, data, count, offset);
+    ret = _pipe_read(curr_user, filp, data, count, offset);
     if(ret == 0)
         return ret;
     next = get_next_waiting(&ino->pipe_writing_list);
@@ -218,10 +218,10 @@ int pipe_write ( struct filp *filp, char *data, size_t count, off_t offset){
 
     if(filp->filp_ino->i_count == 1) {
         int signum = SIGPIPE;
-        if(curr_user_proc_in_syscall->sig_table[signum].sa_handler == SIG_IGN){
+        if(curr_user->sig_table[signum].sa_handler == SIG_IGN){
             return EPIPE;
         }
-        send_sig(curr_user_proc_in_syscall, signum);
+        send_sig(curr_user, signum);
         return SUSPEND;
     }
 
@@ -233,8 +233,8 @@ int pipe_write ( struct filp *filp, char *data, size_t count, off_t offset){
         if(!next)
             return ENOMEM;
 
-        curr_user_proc_in_syscall->flags |= STATE_WAITING;
-        next->who = curr_user_proc_in_syscall;
+        curr_user->flags |= STATE_WAITING;
+        next->who = curr_user;
         next->filp = filp;
         next->data = data;
         next->count = count;
@@ -242,14 +242,14 @@ int pipe_write ( struct filp *filp, char *data, size_t count, off_t offset){
         next->sys_call_num = WRITE;
         list_add(&next->list, &ino->pipe_writing_list);
         KDEBUG(("proc %d writing inode num %d is blocked \n",
-                curr_user_proc_in_syscall->pid, filp->filp_ino->i_num));
+                curr_user->pid, filp->filp_ino->i_num));
         return SUSPEND;
     }
-    ret = _pipe_write(curr_user_proc_in_syscall, filp, data, count, offset);
+    ret = _pipe_write(curr_user, filp, data, count, offset);
     if(ret == 0)
         return ret;
     KDEBUG(("proc %d writing %s ret %d pipe->pos %d\n",
-            curr_user_proc_in_syscall->proc_nr, data, ret, filp->pipe->pos));
+            curr_user->proc_nr, data, ret, filp->pipe->pos));
     next = get_next_waiting(&ino->pipe_reading_list);
     if(next!= NULL){
         KDEBUG(("Proc %d is awaken for reading\n", next->who->proc_nr));

@@ -103,6 +103,7 @@ void syscall_region_begin(){
         if(m.type >= 1 && m.type <= _NSYSCALL)
             kprintf_syscall_request(m.type, m.src);
     
+    SET_CALLER(who);
     // Make sure system doesn't send a message to itself
     ASSERT(who != NULL && who_proc_nr != SYSTEM); 
 }

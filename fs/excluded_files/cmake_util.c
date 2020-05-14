@@ -10,13 +10,13 @@ int curr;
 
 struct proc pcurr;
 struct proc *current_proc;
-struct proc *curr_user_proc_in_syscall;
+struct proc *curr_user;
 
 void mock_init_proc(){
     pcurr.proc_nr = 1;
     pcurr.pid = 1;
     current_proc = &pcurr;
-    curr_user_proc_in_syscall = current_proc;
+    curr_user = current_proc;
 }
 
 void emulate_fork(struct proc* p1, struct proc* p2){

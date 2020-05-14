@@ -38,7 +38,7 @@
 #define VERIFY_WRITE    2
 #define ROOT_DEV    (0x0101)    /* MAKEDEV(1,1) */
 
-#define SET_CALLER(pcurr)   (curr_user_proc_in_syscall = pcurr)
+#define SET_CALLER(pcurr)   (curr_user = pcurr)
 
 int sys_open(struct proc *who, char *path,int flags, mode_t mode);
 int sys_read(struct proc *who, int fd, void *buf, size_t count);
