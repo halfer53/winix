@@ -48,8 +48,14 @@ void sync_sb(struct superblock* sb){
 int blk_dev_io_read(char *buf, off_t off, size_t len){
     char *ptr;
     int count = len;
-    if(off + len > _disk_size)
+    if(off >= _disk_size)
         return 0;
+
+    if(off + len > _disk_size){
+        count = _disk_size - off;
+        len = count;
+    }
+        
 //    KDEBUG(("dev read blk %d %d\n", off / BLOCK_SIZE, len));
     ptr = _disk + off;
     while(count-- > 0){
@@ -61,8 +67,13 @@ int blk_dev_io_read(char *buf, off_t off, size_t len){
 int blk_dev_io_write(char *buf, off_t off, size_t len){
     char *ptr;
     int count = len;
-    if(off + len > _disk_size)
+    if(off >= _disk_size)
         return 0;
+
+    if(off + len > _disk_size){
+        count = _disk_size - off;
+        len = count;
+    }
 //    KDEBUG(("dev write blk %d %d\n", off / BLOCK_SIZE, len));
     ptr = _disk + off;
     while(count-- > 0){
@@ -135,8 +146,11 @@ int root_fs_read (struct filp *filp, char *data, size_t count, off_t offset){
 
         r = 0;
         if(filp->filp_flags & O_DIRECT){
+            
             len = (off + len) < ino->i_size ? len : ino->i_size - off;
+            off += bnr * BLOCK_SIZE;
             r = filp->filp_dev->dops->dev_read(data, off, len);
+            data += r;
         }else{
             char *p;
             buffer = get_block_buffer(bnr, filp->filp_dev);
@@ -187,6 +201,7 @@ int root_fs_write (struct filp *filp, char *data, size_t count, off_t offset){
 
         r = 0;
         if(filp->filp_flags & O_DIRECT){
+            off += bnr * BLOCK_SIZE;
             r = filp->filp_dev->dops->dev_write(data, off, len);
         } else{
             char *p;
