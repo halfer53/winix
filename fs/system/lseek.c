@@ -53,3 +53,9 @@ int sys_lseek(struct proc* who, int fd, off_t offset, int whence){
     }
     return ret;
 }
+
+
+int do_lseek(struct proc* who, struct message* msg){
+    return sys_lseek(who, msg->m1_i1, msg->m1_i2, msg->m1_i3);
+}
+

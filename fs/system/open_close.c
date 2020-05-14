@@ -39,7 +39,6 @@ int _sys_open(struct proc *who, char *path,  int flags, mode_t mode, dev_t devid
         goto final;
     }
 
-
     if(inode && (inode->i_mode & S_IFDIR) && (flags & O_WRONLY)){
         ret = EISDIR;
         goto final;
@@ -52,15 +51,7 @@ int _sys_open(struct proc *who, char *path,  int flags, mode_t mode, dev_t devid
             goto final;
         }
 
-        if(strlen(string) >= DIRNAME_LEN){
-            ret = ENAMETOOLONG;
-            goto final;
-        }
-
-        if(!(lastdir->i_mode & O_WRONLY))
-            return EACCES;
-
-        inode = alloc_inode(who, dev);
+        inode = alloc_inode(who, dev, dev);
         if(!inode){
             ret = ENOSPC;
             goto final;
@@ -72,9 +63,6 @@ int _sys_open(struct proc *who, char *path,  int flags, mode_t mode, dev_t devid
         }
         inode->i_mode = dev->device_type | ( mode & ~who->umask);
     }
-
-    if(flags & KO_NO_FD)
-        return OK;
 
     if((ret = get_fd(who, 0, &open_slot, &filp)))
         goto final;
@@ -104,9 +92,6 @@ int sys_creat(struct proc* who, char* path, mode_t mode){
 
 int sys_open(struct proc *who, char *path, int flags, mode_t mode){
     return _sys_open(who, path, flags, mode, ROOT_DEV);
-}
-int sys_mknod(struct proc* who, char *pathname, mode_t mode, dev_t devid){
-    return _sys_open(who, pathname, O_CREAT | O_EXCL | KO_NO_FD , mode, devid);
 }
 
 int do_open(struct proc* who, struct message* msg){

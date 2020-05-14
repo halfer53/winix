@@ -6,21 +6,49 @@
 
 int sys_dup(struct proc* who, int oldfd){
     int ret, open_slot;
-    struct filp* oldfile, *newfile;
+    struct filp* file1, *file2;
     if(!is_fd_opened_and_valid(who, oldfd))
         return EBADF;
 
-    ret = get_fd(who, 0, &open_slot, &newfile);
+    ret = get_fd(who, 0, &open_slot, &file2);
     if(ret)
         return ret;
 
-    oldfile = who->fp_filp[oldfd];
-    who->fp_filp[open_slot] = oldfile;
-    oldfile->filp_count += 1;
+    file1 = who->fp_filp[oldfd];
+    who->fp_filp[open_slot] = file1;
+    file1->filp_count += 1;
     return open_slot;
+}
+
+int sys_dup2(struct proc* who, int oldfd, int newfd){
+    int ret, open_slot;
+    struct filp* file1, *file2;
+    if(!is_fd_opened_and_valid(who, oldfd))
+        return EBADF;
+
+    if(newfd < 0 || newfd >= OPEN_MAX)
+        return EBADF;
+    
+    ret = get_fd(who, 0, &open_slot, &file2);
+    if(ret)
+        return ret;
+    if(who->fp_filp[newfd]){
+        ret = sys_close(who, newfd);
+        if(ret)
+            return ret;
+    }
+
+    file1 = who->fp_filp[oldfd];
+    who->fp_filp[newfd] = file1;
+    file1->filp_count += 1;
+    return newfd;
 }
 
 int do_dup(struct proc* who, struct message* msg){
     return sys_dup(who, msg->m1_i1);
+}
+
+int do_dup2(struct proc* who, struct message* msg){
+    return sys_dup2(who, msg->m1_i1, msg->m1_i2);
 }
 

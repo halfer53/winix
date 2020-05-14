@@ -100,8 +100,10 @@ int unit_test1(){
     ret = sys_write(&pcurr2, pipe_fd[1], "a", 2);
     assert(ret == EPIPE);
 
-    sys_close(current_proc, pipe_fd[0]);
-    sys_close(&pcurr2, pipe_fd[0]);
+    ret = sys_close(current_proc, pipe_fd[1]);
+    assert(ret == 0);
+    ret = sys_close(&pcurr2, pipe_fd[1]);
+    assert(ret == 0);
 //    ret = sys_write(&pcurr2, pipe_fd[1], "abc", 4);
 //    ret = sys_close(&pcurr2, pipe_fd[1]);
 //    assert(ret == 0);
@@ -183,13 +185,36 @@ int unit_test1(){
     fd2 = sys_dup(current_proc, fd);
     assert(fd2 >= 0);
 
+
+
+    ret = sys_mknod(current_proc, "/dev/tty", O_RDWR, MAKEDEV(3, 1));
+    assert(ret == 0);
+
+    fd3 = sys_open(current_proc, "/dev/tty", O_RDWR, 0);
+    assert(fd >= 0);
+
+    ret = sys_read(current_proc, fd3, buffer, 3);
+    assert(ret == 3);
+    assert(strcmp(buffer, "tt") == 0);
+
+    fd4 = sys_dup2(current_proc, fd3, fd2);
+    assert(fd4 == fd2);
+
+    ret = sys_read(current_proc, fd4, buffer, 4);
+    assert(ret == 4);
+    assert(strcmp(buffer, "ttt") == 0);
+
     ret = sys_close(current_proc, fd);
     assert(ret == 0);
 
     ret = sys_close(current_proc, fd2);
     assert(ret == 0);
 
-    ret = sys_mknod(current_proc, "/dev/tty", O_RDWR, 0x755);
+    ret = sys_close(current_proc, fd3);
+    assert(ret == 0);
+
+    ret = sys_close(current_proc, fd4);
+    assert(ret == EBADF);
 
     return 0;
 }

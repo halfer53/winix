@@ -43,17 +43,82 @@ int pipe(int pipefd[2]){
     return _syscall(PIPE, &m);
 }
 
-int access(const char *pathname, int mode){
+int mknod(const char *pathname, mode_t mode, dev_t dev){
     struct message m;
     m.m1_p1 = (void*)pathname;
     m.m1_i1 = mode;
-    return _syscall(ACCESS, &m);
+    m.m1_i2 = dev;
+    return _syscall(MKNOD, &m);
 }
 
 int chdir(const char *path){
     struct message m;
     m.m1_p1 = (void*)path;
     return _syscall(CHDIR, &m);
+}
+
+int chown(const char *pathname, uid_t owner, gid_t group){
+    struct message m;
+    m.m1_p1 = (void*)pathname;
+    m.m1_i1 = owner;
+    m.m1_i2 = group;
+    return _syscall(CHOWN, &m);
+}
+
+int chmod(const char *pathname, mode_t mode){
+    struct message m;
+    m.m1_p1 = (void*)pathname;
+    m.m1_i1 = mode;
+    return _syscall(CHMOD, &m);
+}
+
+int stat(const char *pathname, struct stat *statbuf){
+    struct message m;
+    m.m1_p1 = (void*)pathname;
+    m.m1_p2 = (void*)statbuf;
+    return _syscall(STAT, &m);
+}
+
+int fstat(int fd, struct stat *statbuf){
+    struct message m;
+    m.m1_i1 = fd;
+    m.m1_p1 = (void*)statbuf;
+    return _syscall(FSTAT, &m);
+}
+
+int dup(int oldfd){
+    struct message m;
+    m.m1_i1 = oldfd;
+    return _syscall(DUP, &m);
+}
+
+int dup2(int oldfd, int newfd){
+    struct message m;
+    m.m1_i1 = oldfd;
+    m.m1_i2 = newfd;
+    return _syscall(DUP2, &m);
+}
+
+int link(const char *oldpath, const char *newpath){
+    struct message m;
+    m.m1_p1 = (void*)oldpath;
+    m.m1_p2 = (void*)newpath;
+    return _syscall(LINK, &m);
+}
+
+int unlink(const char *pathname){
+    struct message m;
+    m.m1_p1 = (void*)pathname;
+    return _syscall(UNLINK, &m);
+}
+
+
+
+int access(const char *pathname, int mode){
+    struct message m;
+    m.m1_p1 = (void*)pathname;
+    m.m1_i1 = mode;
+    return _syscall(ACCESS, &m);
 }
 
 int mkdir(const char *pathname, mode_t mode){
@@ -69,3 +134,23 @@ int getdent( int fd, struct dirent *dirp){
     m.m1_p1 = (void*)dirp;
     return _syscall(GETDENT, &m);
 }
+
+int sync(){
+    struct message m;
+    return _syscall(SYNC, &m);
+}
+
+off_t lseek(int fd, off_t offset, int whence){
+    struct message m;
+    m.m1_i1 = fd;
+    m.m1_i2 = offset;
+    m.m1_i3 = whence;
+    return (off_t)_syscall(LSEEK, &m);
+}
+
+mode_t umask(mode_t mask){
+    struct message m;
+    m.m1_i1 = mask;
+    return (mode_t)_syscall(UMASK, &m);
+}
+

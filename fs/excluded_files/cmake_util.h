@@ -17,5 +17,7 @@ int syscall_reply2(int syscall_num, int reply, int dest,  struct message* m);
 void emulate_fork(struct proc* p1, struct proc* p2);
 void mock_init_proc();
 void _assert(int expression, int line, char* filename);
+void init_tty();
+
 
 #endif //FS_CMAKE_UTIL_H

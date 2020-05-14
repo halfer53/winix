@@ -19,6 +19,7 @@ int sys_chmod(struct proc* who,  char *pathname, mode_t mode);
 int sys_chown(struct proc* who,  char *pathname, uid_t owner, gid_t group);
 int sys_chdir(struct proc* who, char* pathname);
 int sys_dup(struct proc* who, int oldfd);
+int sys_dup2(struct proc* who, int oldfd, int newfd);
 int sys_umask(struct proc* who, mode_t mask);
 int sys_lseek(struct proc* who, int fd, off_t offset, int whence);
 int sys_mkdir(struct proc* who, char* pathname, mode_t mode);
@@ -60,7 +61,7 @@ void init_inodetable();
 int read_inode(int num, inode_t **inode, struct device*);
 inode_t* get_inode(int num, struct device*);
 int put_inode(inode_t *inode, bool is_dirty);
-inode_t* alloc_inode(struct proc* who, struct device*);
+inode_t* alloc_inode(struct proc* who, struct device*, struct device*);
 void init_inode();
 int unit_test1();
 

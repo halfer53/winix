@@ -15,7 +15,7 @@ set(SOURCE_FILES
         path.c
         system/read_write.c
         excluded_files/srec_import.c
-        excluded_files/cmake_util.c make_disk.c excluded_files/cmake_util.h excluded_files/cmake_bitmap.c system/pipe.c tty.c system/stat.c system/lseek.c system/chdir_mkdir.c util.c system/chown_chmod.c system/dup.c system/link_unlink.c system/umask_access.c excluded_files/dir_util.c system/getdent.c excluded_files/srec_import.h unit_test.c system/sync.c)
+        excluded_files/cmake_util.c make_disk.c excluded_files/cmake_util.h excluded_files/cmake_bitmap.c system/pipe.c excluded_files/tty.c system/stat.c system/lseek.c system/chdir_mkdir.c util.c system/chown_chmod.c system/dup.c system/link_unlink.c system/umask_access.c excluded_files/dir_util.c system/getdent.c excluded_files/srec_import.h unit_test.c system/sync.c system/mknod.c)
 
 include_directories(../include/fs_include)
 include_directories(../include)

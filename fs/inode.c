@@ -229,16 +229,16 @@ int put_inode(inode_t *inode, bool is_dirty){
 }
 
 
-inode_t* alloc_inode(struct proc* who, struct device* id){
-    struct superblock* sb = get_sb(id);
+inode_t* alloc_inode(struct proc* who, struct device* parentdev, struct device* inodev){
+    struct superblock* sb;
     int inum = 0, ret = 0;
     block_t imap_end = 0, bnr = 0;
     struct block_buffer *imap, *ino_table_buffer;
     inode_t *inode;
     bool found = false;
 
-
-    imap = get_imap(id);
+    sb = get_sb(parentdev);
+    imap = get_imap(parentdev);
     imap_end = imap->b_blocknr + (sb->s_blockmap_size / BLOCK_SIZE);
     while(imap->b_blocknr < imap_end){
         inum = bitmap_search_from((unsigned int*)imap->block, BLOCK_SIZE_WORD, 0, 1);
@@ -248,17 +248,17 @@ inode_t* alloc_inode(struct proc* who, struct device* id){
         }
         put_block_buffer(imap);
         bnr++;
-        imap = get_block_buffer(bnr, id);
+        imap = get_block_buffer(bnr, parentdev);
     }
     if(!found){
         put_block_buffer(imap);
         return NULL;
     }
     bitmap_set_bit((unsigned int*)imap->block, BLOCK_SIZE_WORD, inum);
-    put_block_buffer_immed(imap, id);
+    put_block_buffer_immed(imap, parentdev);
 
     inode = get_free_inode_slot();
-    init_inode_non_disk(inode, inum, id, sb);
+    init_inode_non_disk(inode, inum, inodev, sb);
     inode->i_gid = who->gid;
     inode->i_uid = who->uid;
     inode->i_count += 1;
@@ -321,7 +321,6 @@ int fill_dirent(inode_t* ino, struct winix_dirent* curr, char* string){
     }else if(mode & S_IFBLK){
         curr->dirent.d_type = DT_BLK;
     }
-    curr->dev = 0;
     return OK;
 }
 
@@ -359,6 +358,8 @@ int add_inode_to_directory(struct proc* who, struct inode* dir, struct inode* in
         return EINVAL;
     if(!has_file_access(who, dir, W_OK))
         return EACCES;
+    if(strlen(string) >= DIRNAME_LEN)
+        return ENAMETOOLONG;
 
     for(i = 0; i < NR_TZONES; i++){
         bnr = dir->i_zone[i];
@@ -373,8 +374,9 @@ int add_inode_to_directory(struct proc* who, struct inode* dir, struct inode* in
         while(curr < end){
             if(curr->dirent.d_name[0] == '\0'){
                 fill_dirent(ino, curr, string);
-                put_block_buffer_dirt(buf);
+                curr->dev = ino->i_dev->dev_id;
                 ino->i_nlinks += 1;
+                put_block_buffer_dirt(buf);
                 return OK;
             }
             curr++;

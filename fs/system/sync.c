@@ -3,7 +3,11 @@
 //
 #include "../fs.h"
 
-int sys_sync(struct proc* who){
-    return flush_all_buffer();
+int do_sync(struct proc* who, struct message* msg){
+    flush_all_buffer();
+    flush_super_block(get_dev(ROOT_DEV));
+    return OK;
 }
+
+
 

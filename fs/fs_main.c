@@ -9,6 +9,8 @@ void init_fs() {
     init_dev();
     init_root_fs();
     init_pipe();
-
+#ifdef FILE_SYSTEM_PROJECT
+    init_tty();
+#endif
 }
 

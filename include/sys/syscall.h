@@ -19,9 +19,10 @@
 #include <sys/ipc.h>
 #include <sys/types.h>
 #include <sys/dirent.h>
+#include <sys/stat.h>
 
 
-#define _NSYSCALL               41
+#define _NSYSCALL               44
 /**
  * System Call Numbers
  **/
@@ -60,12 +61,15 @@
 #define STAT            32
 #define FSTAT           33
 #define DUP             34
-#define LINK            35
-#define UNLINK          36
-#define GETDENT         37
-#define ACCESS          38
-#define MKDIR           39
-#define SYNC            40
+#define DUP2            35
+#define LINK            36
+#define UNLINK          37
+#define GETDENT         38
+#define ACCESS          39
+#define MKDIR           40
+#define SYNC            41
+#define LSEEK           42
+#define UMASK           43
 
 #define DECLARE_SYSCALL(function, params, syscall_num, passing_codes)\
 function params{\
@@ -115,6 +119,21 @@ int mkdir(const char *pathname, mode_t mode);
 int getdent( int fd, struct dirent *dirp);
 int execve(const char *pathname, char *const argv[],char *const envp[]);
 int execv(const char *path, char *const argv[]);
+off_t lseek(int fd, off_t offset, int whence);
+mode_t umask(mode_t mask);
+int sync();
+int getdent( int fd, struct dirent *dirp);
+int unlink(const char *pathname);
+int link(const char *oldpath, const char *newpath);
+int dup2(int oldfd, int newfd);
+int dup(int oldfd);
+int fstat(int fd, struct stat *statbuf);
+int stat(const char *pathname, struct stat *statbuf);
+int chmod(const char *pathname, mode_t mode);
+int chown(const char *pathname, uid_t owner, gid_t group);
+int mknod(const char *pathname, mode_t mode, dev_t dev);
+
+
 #endif
 
 #endif

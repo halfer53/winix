@@ -8,6 +8,13 @@ int sys_chown(struct proc* who,  char *pathname, uid_t owner, gid_t group){
     return EINVAL;
 }
 
+int do_chown(struct proc* who, struct message* msg){
+   char* path = (char *) get_physical_addr(msg->m1_p1, who);
+   if(!is_vaddr_accessible(msg->m1_p1, who))
+       return EFAULT;
+   return sys_chown(who, path, msg->m1_i1, msg->m1_i2);
+}
+
 int sys_chmod(struct proc* who, char *pathname, mode_t mode){
     int ret;
     inode_t *inode = NULL;

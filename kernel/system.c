@@ -184,10 +184,23 @@ void init_syscall_table(){
     SYSCALL_MAP(READ, do_read);
     SYSCALL_MAP(WRITE, do_write);
     SYSCALL_MAP(PIPE, do_pipe);
-    SYSCALL_MAP(ACCESS, do_access);
+    SYSCALL_MAP(MKNOD, do_mknod);
     SYSCALL_MAP(CHDIR, do_chdir);
-    SYSCALL_MAP(MKDIR, do_mkdir);
+    SYSCALL_MAP(CHOWN, do_chown);
+    SYSCALL_MAP(CHMOD, do_chmod);
+    SYSCALL_MAP(STAT, do_stat);
+    SYSCALL_MAP(FSTAT, do_fstat);
+    SYSCALL_MAP(DUP, do_dup);
+    SYSCALL_MAP(DUP2, do_dup2);
+    SYSCALL_MAP(LINK, do_link);
+    SYSCALL_MAP(UNLINK, do_unlink);
     SYSCALL_MAP(GETDENT, do_getdent);
+    SYSCALL_MAP(ACCESS, do_access);
+    SYSCALL_MAP(MKDIR, do_mkdir);
+    SYSCALL_MAP(SYNC, do_sync);
+    SYSCALL_MAP(LSEEK, do_lseek);
+    SYSCALL_MAP(UMASK, do_umask);
+    
 }
 
 

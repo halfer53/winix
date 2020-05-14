@@ -42,7 +42,7 @@ int sys_mkdir(struct proc* who, char* pathname, mode_t mode){
         ret = EEXIST;
         goto final;
     }
-    ino = alloc_inode(who, lastdir->i_dev);
+    ino = alloc_inode(who, lastdir->i_dev, lastdir->i_dev);
     if(!ino){
         ret = ENOSPC;
         goto final;

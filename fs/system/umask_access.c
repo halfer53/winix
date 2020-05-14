@@ -6,8 +6,13 @@
 #include <sys/unistd.h>
 
 int sys_umask(struct proc* who, mode_t mask){
+    mode_t prev = who->umask;
     who->umask = mask & 0x777;
-    return OK;
+    return prev;
+}
+
+int do_umask(struct proc* who, struct message* msg){
+    return sys_umask(who, msg->m1_i1);
 }
 
 int sys_access(struct proc* who, char* pathname, int mode){
