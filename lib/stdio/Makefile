@@ -1,2 +1,2 @@
 
-obj-y += stdio.o errlist.o
+obj-y += stdio.o 

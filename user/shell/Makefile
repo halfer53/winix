@@ -1,3 +1,3 @@
-obj-y += parse.o shell.o shell_test.o
+obj-y += parse.o shell.o 
 srec-y += shell.srec
-shell.srec = parse.o shell.o shell_test.o
+shell.srec = parse.o shell.o

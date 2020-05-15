@@ -21,7 +21,6 @@ static char buf[MAX_LINE];
 CMD_PROTOTYPE(ps);
 CMD_PROTOTYPE(uptime);
 CMD_PROTOTYPE(cmd_kill);
-CMD_PROTOTYPE(test_general);
 CMD_PROTOTYPE(print_pid);
 CMD_PROTOTYPE(mem_info);
 CMD_PROTOTYPE(mall_info);
@@ -35,7 +34,6 @@ CMD_PROTOTYPE(do_cd);
 
 // Command handling
 struct cmd_internal builtin_commands[] = {
-    { test_general, "test"},
     { printenv, "printenv" },
     { mall_info, "printheap"},
     { cmd_bash, "bash"},
@@ -49,11 +47,6 @@ struct cmd_internal builtin_commands[] = {
     { do_cd, "cd"},
     { generic, NULL }
 };
-
-void testfoo(){
-    int n = 100;
-    int m = 32;
-}
 
 void init_shell(){
     signal(SIGINT, SIG_IGN);
@@ -168,7 +161,6 @@ int help(int argc, char** argv){
         printf(" * %s\n",handler->name);
         handler++;
     }
-    test_nohandler(0, NULL);
     return 0;
 }
 
