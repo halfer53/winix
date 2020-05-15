@@ -1,0 +1,21 @@
+name: C/C++ CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: path
+      run: echo "::add-path::tools/bin"
+    - name: makedepend
+      run: sudo apt-get install xutils-dev
+    - name: make
+      run: make
