@@ -47,7 +47,7 @@ int sys_mkdir(struct proc* who, char* pathname, mode_t mode){
         ret = ENOSPC;
         goto final;
     }
-    ino->i_mode = S_IFDIR | (mode & ~who->umask);
+    ino->i_mode = S_IFDIR | (mode & ~(who->umask));
     ino->i_zone[0] = alloc_block(ino, lastdir->i_dev);
     init_dirent(lastdir, ino);
     ret = add_inode_to_directory(who, lastdir, ino, string);

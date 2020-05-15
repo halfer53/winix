@@ -1,3 +1,11 @@
+
+
+.global get_sigreturn_func_ptr
+.text
+get_sigreturn_func_ptr:
+	la	$1, __sigreturn
+	jr $ra
+
 .global	__sigreturn
 .text
 __sigreturn:

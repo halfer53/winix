@@ -93,7 +93,6 @@ pid_t vfork();
 int brk(void *addr);
 void *sbrk(int incr);
 void perror(const char *s);
-// int getc();
 unsigned int alarm(unsigned int seconds);
 pid_t wait(int *wstatus);
 pid_t waitpid(pid_t pid, int *wstatus, int options);
@@ -108,7 +107,8 @@ int sigsuspend(const sigset_t *mask);
 int sigpending(sigset_t *set);
 int setpgid(pid_t pid, pid_t pgid);
 pid_t getpgid(pid_t pid);
-int open(const char *pathname,int flags, mode_t mode);
+int open(const char *pathname,int flags, ...);
+// int open(const char *pathname,int flags, mode_t mode);
 int creat(const char *pathname, mode_t mode);
 int close(int fd);
 size_t read(int fd, void *buf, size_t count);
@@ -133,6 +133,7 @@ int stat(const char *pathname, struct stat *statbuf);
 int chmod(const char *pathname, mode_t mode);
 int chown(const char *pathname, uid_t owner, gid_t group);
 int mknod(const char *pathname, mode_t mode, dev_t dev);
+int printf(const char *format, ...);
 
 
 #endif

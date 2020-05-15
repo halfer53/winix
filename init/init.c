@@ -12,7 +12,7 @@ if(!cond){ \
   failed_init(__LINE__); \
 }
 
-int failed_init(int line){
+void failed_init(int line){
   printf("init failed at %d, err %d\n", line, errno);
   
   ___exit(1);
@@ -45,14 +45,11 @@ int main(int argc, char **argv){
   ret = mknod("/dev/tty", 0x755, TTY_DEV);
   CHECK_SYSCALL(ret == 0);
 
-  fd = open("/dev/tty", O_RDONLY, 0x755);
+  fd = open("/dev/tty", O_RDONLY);
   CHECK_SYSCALL(fd == 0);
 
   ret = dup(fd);
-  CHECK_SYSCALL(ret == 1);
-
   ret = dup(fd);
-  CHECK_SYSCALL(ret == 1);
 
   pid = vfork();
   if(pid == 0){
@@ -60,7 +57,7 @@ int main(int argc, char **argv){
   }
 
   init_init();
-  
+
   while(1){
     pid = wait(&status);
     if(pid == -1){

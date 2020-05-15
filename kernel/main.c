@@ -17,7 +17,7 @@
 #include <winix/bitmap.h>
 #include <fs/fs_methods.h>
 
-// void init_kernel_tasks();
+void init_kernel_tasks();
 void start_init();
 void start_bins();
 

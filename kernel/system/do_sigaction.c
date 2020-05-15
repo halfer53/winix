@@ -16,9 +16,9 @@
 #include <kernel/kernel.h>
 
 int do_sigaction(struct proc *who, struct message *m){
-    int signum = m->m3_i1;
-    struct sigaction* act = m->m3_p1;
-    struct sigaction* oact = m->m3_p2;
+    int signum = m->m1_i1;
+    struct sigaction* act = m->m1_p1;
+    struct sigaction* oact = m->m1_p2;
     int flags;
 
 
@@ -51,6 +51,6 @@ int do_sigaction(struct proc *who, struct message *m){
     sigdelset(&act->sa_mask, SIGSTOP);
     memcpy(&who->sig_table[signum], act, sizeof(struct sigaction));
 
-    who->sa_restorer = (sighandler_t)(m->m3_f1);
+    who->sa_restorer = (reg_t*)(m->m1_p3);
     return OK;
 }

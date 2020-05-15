@@ -61,7 +61,7 @@ int _sys_open(struct proc *who, char *path,  int flags, mode_t mode, dev_t devid
             release_inode(inode);
             goto final;
         }
-        inode->i_mode = dev->device_type | ( mode & ~who->umask);
+        inode->i_mode = dev->device_type | ( mode & ~(who->umask));
     }
 
     if((ret = get_fd(who, 0, &open_slot, &filp)))

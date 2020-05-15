@@ -1,10 +1,11 @@
 #include <lib.h>
 
-int open(const char *pathname,int flags, mode_t mode){
+int open(const char *pathname,int flags, ...){
     struct message msg;
+    mode_t mode;
     msg.m1_p1 = (void*)pathname;
     msg.m1_i1 = flags;
-    msg.m1_i2 = mode;
+    msg.m1_i2 = *((int *)&flags+1);
     return _syscall(OPEN, &msg);
 }
 

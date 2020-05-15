@@ -33,6 +33,6 @@ void *sbrk(int incr){
         return(oldsize);
 
     return_err:
-        return( (void *) -1);
+        return( (void *) 0xffffffff);
         
 }

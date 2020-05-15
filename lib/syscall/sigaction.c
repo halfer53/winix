@@ -1,14 +1,14 @@
 #include <sys/syscall.h>
 #include <signal.h>
 
-void __sigreturn(void);
+void* get_sigreturn_func_ptr(void);
 
 int sigaction(int signum, const struct sigaction *act, struct sigaction *oldact){
     struct message m;
-    m.m3_i1 = signum;
-    m.m3_p1 = (char *)act;
-    m.m3_p2 = (char *)oldact;
-    m.m3_f1 = __sigreturn;
+    m.m1_i1 = signum;
+    m.m1_p1 = (char *)act;
+    m.m1_p2 = (char *)oldact;
+    m.m1_p3 = get_sigreturn_func_ptr();
     return _syscall(SIGACTION, &m);
 }
 
