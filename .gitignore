@@ -15,18 +15,10 @@ tools/kdbg_srec/*.kdbg
 include/srec/*.verbose
 include/srec/*.srec
 makedisk
-
-tmp.txt
 fs/Debug/
-test.c
 a.out
 include/*.c
-
 cmake-build-debug
-expri/
-gen_bin_code
-reformat_srec.class
-shell.txt
 
 RexSimulator.dll
 RexSimulatorGui.exe
