@@ -15,5 +15,7 @@ jobs:
     - uses: actions/checkout@v2
     - name: path
       run: echo "::add-path::tools/bin"
+    - name: makedepend
+      run: sudo apt-get install xutils-dev
     - name: make
       run: make
