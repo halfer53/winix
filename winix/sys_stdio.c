@@ -15,7 +15,6 @@
 #include <winix/rex.h>
 #include <ctype.h>
 
-
 #define IS_SERIAL_CODE(c) (isprint(c) || c - 7 < 6)
 /**
  * Writes a character to serial port 1.

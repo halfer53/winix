@@ -74,7 +74,7 @@ int main() {
 
         if(ret == EOF){
             if(errno == EINTR){
-                perror("getc(): ");
+                perror("stdin: ");
                 printf("WINIX> ");
             }
             continue;

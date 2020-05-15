@@ -19,7 +19,6 @@ static struct filp_operations fops;
 static struct device_operations dops;
 static char* name = "tty";
 static char buffer[BUFFER_SIZ];
-static int buffer_idx = 0;
 char *bptr, *buffer_end;
 struct proc* reader = NULL;
 char *read_data;
@@ -72,6 +71,8 @@ void tty1_handler(){
         if (val == 8) { // backspace
             if(bptr > buffer){
                 bptr--;
+                kputc(val);
+                goto end;
             }
         }
 
@@ -80,6 +81,7 @@ void tty1_handler(){
                 val = '\n';
 
             if(isprint(val) || val == '\n'){
+                
                 *bptr++ = val;
                 kputc(val);
             }else{
@@ -96,6 +98,7 @@ void tty1_handler(){
             reader = NULL;
         }
     }
+    end:
     RexSp1->Iack = 0;
 }
 

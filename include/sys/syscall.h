@@ -40,7 +40,7 @@
 #define KILL            11
 #define GETPID          12
 #define WINFO           13
-#define GETC            14
+#define PERROR          14
 #define PRINTF          15
 #define SYSCONF         16
 #define SIGSUSPEND      17
@@ -92,7 +92,7 @@ pid_t fork();
 pid_t vfork();
 int brk(void *addr);
 void *sbrk(int incr);
-int getc();
+// int getc();
 unsigned int alarm(unsigned int seconds);
 pid_t wait(int *wstatus);
 pid_t waitpid(pid_t pid, int *wstatus, int options);

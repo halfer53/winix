@@ -40,7 +40,7 @@ int do_waitpid(struct proc* who, struct message* m);
 int do_kill(struct proc* who, struct message* m);
 int do_getpid(struct proc* who, struct message* m);
 int do_winfo(struct proc* who, struct message* m);
-int do_getc(struct proc* who, struct message* m);
+int do_perror(struct proc* who, struct message* m);
 int do_printf(struct proc* who, struct message* m);
 int do_sysconf(struct proc* who, struct message* m);
 int do_sigsuspend(struct proc* who, struct message* m);

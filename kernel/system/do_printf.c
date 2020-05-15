@@ -17,6 +17,69 @@
 #include <kernel/kernel.h>
 
 
+
+const char *_errlist[_NERROR] = {
+    0,			/* EGENERIC */    
+    "EPERM",    /* EPERM */
+    "ENOENT",    /* ENOENT */
+    "ESRCH",    /* ESRCH */
+    "EINTR",    /* EINTR */
+    "EIO",			/* EIO */    
+    "ENXIO",    /* ENXIO */
+    "E2BIG",    /* E2BIG */
+    "ENOEXEC",    /* ENOEXEC */
+    "EBADF",    /* EBADF */
+    "ECHILD",    /* ECHILD */
+    "EAGAIN",    /* EAGAIN */
+    "ENOMEM",    /* ENOMEM */
+    "EACCES",    /* EACCES */
+    "EFAULT",    /* EFAULT */
+    "ENOTBLK",    /* ENOTBLK */
+    "EBUSY",    /* EBUSY */
+    "EEXIST",    /* EEXIST */
+    "EXDEV",		/* EXDEV */    
+    "ENODEV",    /* ENODEV */
+    "ENOTDIR",    /* ENOTDIR */
+    "EISDIR",    /* EISDIR */
+    "EINVAL",    /* EINVAL */
+    "ENFILE",    /* ENFILE */
+    "EMFILE",    /* EMFILE */
+    "ENOTTY",    /* ENOTTY */
+    "ETXTBSY",    /* ETXTBSY */
+    "EFBIG",    /* EFBIG */
+    "ENOSPC",    /* ENOSPC */
+    "ESPIPE",    /* ESPIPE */
+    "EROFS",	/* EROFS */    
+    "EMLINK",    /* EMLINK */
+    "EPIPE",    /* EPIPE */
+    "EDOM",    /* EDOM */
+    "ERANGE",    /* ERANGE */
+    "EDEADLK",    /* EDEADLK */
+    "ENAMETOOLONG",    /* ENAMETOOLONG */
+    "ENOLCK",    /* ENOLCK */
+    "ENOSYS",    /* ENOSYS */
+    "ENOTEMPTY",    /* ENOTEMPTY */
+};
+
+
+int do_perror(struct proc* who, struct message* msg){
+    char *s;
+    int usr_errno;
+
+    if(!is_vaddr_ok(msg->m1_p1, who))
+        return EACCES;
+    
+    usr_errno = msg->m1_i1;
+    s = (char*)get_physical_addr(msg->m1_p1, who);
+    if(usr_errno < 0 || usr_errno >= _NERROR)
+        return EINVAL;
+    if(s)
+        kprintf("%s",s);
+    
+    kprintf(" %s\n", _errlist[usr_errno]);
+    return 0;
+}
+
 /**
  * printf in winix is a system call, I know it seems rediculous, but let me explain
  * printf is usually a user space function that internally uses write() syscall.
