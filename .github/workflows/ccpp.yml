@@ -14,6 +14,6 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: path
-      run: export PATH=`pwd`/tools/bin:$PATH
+      run: echo "::add-path::tools/bin"
     - name: make
       run: make
