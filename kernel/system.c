@@ -20,6 +20,7 @@
 #include <fs/fs_methods.h>
 #include <sys/fcntl.h>
 #include <winix/welf.h>
+#include <fs/super.h>
 
 PRIVATE struct message m;
 PRIVATE int who_proc_nr;
@@ -74,6 +75,7 @@ void system_main() {
  */
  void kreport_sysinfo(){
     int free_mem_begin, mem_end;
+    struct superblock* sb = get_sb(get_dev(ROOT_DEV));
     free_mem_begin = peek_next_free_page() * PAGE_LEN;
     mem_end = peek_last_free_page() * PAGE_LEN;
     kprintf("\r\nWINIX v%d.%d\r\n", MAJOR_VERSION, MINOR_VERSION);
@@ -81,7 +83,8 @@ void system_main() {
     kprintf("Data Segment: 0x%08x - 0x%08x\r\n", &DATA_BEGIN, &DATA_END);
     kprintf("BSS Segment:  0x%08x - 0x%08x\r\n", &BSS_BEGIN, &BSS_END);
     kprintf("Unallocated:  0x%08x - 0x%08x\r\n", free_mem_begin, mem_end);
-    kprintf("%d kWords Free\r\n", 
+    kprintf("Root Disk %d Blocks Used, %d Remaining\n", sb->s_block_inuse, sb->s_free_blocks);
+    kprintf("%d Pages Free\r\n", 
     ((unsigned int)(mem_end - free_mem_begin + PAGE_LEN)) / PAGE_LEN); // inclusive
 }
 
