@@ -35,6 +35,9 @@
 DIR *opendir(const char *pathname);
 struct dirent *readdir(DIR *directory);
 int closedir(DIR *directory);
+const char **get_environ();
+
+#define environ     (get_environ())
 
 
 #endif /* !_SYS_UNISTD_H_ */

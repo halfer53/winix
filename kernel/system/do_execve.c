@@ -22,6 +22,7 @@
 #include <fs/cache.h>
 #include <winix/mm.h>
 #include <winix/bitmap.h>
+#include <winix/page.h>
 
 #define ASM_ADDUI_SP   (0x1ee10000)
 #define ASM_ADDUI_SP_SP_2   (0x1ee10002)
@@ -128,8 +129,10 @@ void copy_sarray_to_heap(struct proc* who, struct string_array* arr, ptr_t* p){
 
 int build_user_stack(struct proc* who, struct string_array* argv, struct string_array* env){
     struct initial_frame init_stack;
-    ptr_t* sp_btm = get_physical_addr(who->ctx.m.sp,who);
+    ptr_t* sp_btm;
     ptr_t *env_ptr = NULL, *p, *argv_ptr = NULL;
+
+    sp_btm = get_physical_addr(align_page((int)who->ctx.m.sp) - 1,who);
 
     memset(&init_stack, 0, sizeof(init_stack));
 
@@ -147,9 +150,9 @@ int build_user_stack(struct proc* who, struct string_array* argv, struct string_
     if(env->size > 0){
         env_ptr = (ptr_t*)kmalloc(env->size);
         if(env_ptr){
-            copy_sarray_to_heap(who, argv, env_ptr);
+            copy_sarray_to_heap(who, env, env_ptr);
             *sp_btm = (vptr_t)copyto_user_heap(who, env_ptr, env->size);
-            // KDEBUG(("build stack env %p \n", *sp_btm));
+            // KDEBUG(("build stack env %p physical %p\n", *sp_btm , get_physical_addr(*sp_btm, who)));
             kfree(env_ptr);
         }
     }
