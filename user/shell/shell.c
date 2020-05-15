@@ -63,7 +63,8 @@ void init_shell(){
 
 
 int main() {
-    int ret;
+    int read_nr;
+    char ret;
     char *c;
     char *end_buf;
 
@@ -77,8 +78,11 @@ int main() {
         c = buf;
         // Read line from terminal
         while( c < end_buf) {
-            ret = getchar();     // read
+            // ret = getchar();     // read
             
+            read_nr = read(0, &ret, 1);
+            // printf("ret %d err %d addr %p val %d\n",read_nr, errno, &ret, ret);
+
             if(ret == EOF){
                 if(errno == EINTR){
                     perror("getc(): ");

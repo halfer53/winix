@@ -1,6 +1,5 @@
 #include "../fs.h"
-
-
+#include <winix/sys_stdio.h>
 
 int sys_read(struct proc *who,int fd, void *buf, size_t count){
     struct filp* file;
@@ -8,6 +7,7 @@ int sys_read(struct proc *who,int fd, void *buf, size_t count){
     if(!is_fd_opened_and_valid(who, fd))
         return EBADF;
     file = who->fp_filp[fd];
+    // kprintf("call %d, fops %p\n", file->filp_dev->dev_id, file->filp_dev->fops->read);
     return file->filp_dev->fops->read(file, buf, count, file->filp_pos);
 }
 
