@@ -19,3 +19,8 @@ jobs:
       run: sudo apt-get install xutils-dev
     - name: make
       run: make
+    - uses: actions/upload-artifact@v2
+      with:
+        name: winix.srec
+        path: winix.srec
+
