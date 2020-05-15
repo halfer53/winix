@@ -93,7 +93,7 @@ void tty1_handler(){
             *bptr = '\0';
             msg = get_exception_m();
             strncpy(read_data, buffer, read_count);
-            syscall_reply(bptr - buffer, reader->proc_nr, msg);
+            syscall_reply2(READ, bptr - buffer, reader->proc_nr, msg);
             bptr = buffer;
             reader = NULL;
         }

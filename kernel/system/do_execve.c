@@ -235,7 +235,7 @@ int exec_welf(struct proc* who, char* path, char *argv[], char *envp[], bool is_
         if(parent->state | STATE_VFORKING){
             parent->state &= ~STATE_VFORKING;
             m.type = VFORK;
-            syscall_reply(who->pid, parent->proc_nr, &m);
+            syscall_reply2(VFORK, who->pid, parent->proc_nr, &m);
         }
     }
     return DONTREPLY;

@@ -62,7 +62,7 @@ void system_main() {
             case DONTREPLY:
                 break;
             default:
-                syscall_reply(reply, who_proc_nr, mesg);
+                syscall_reply2(mesg->type, reply, who_proc_nr, mesg);
         }
 
         syscall_region_end();
@@ -148,13 +148,14 @@ int syscall_reply(int reply, int dest,struct message* m){
             kprintf_syscall_reply(reply);
         }
         m->reply_res = reply;
-        return do_send( dest,m);
+        return do_notify(SYSTEM, dest,m);
     }
     return ERR;
 }
 
 int syscall_reply2(int syscall_num, int reply, int dest, struct message* m){
-    KDEBUG(("Syscall %d reply %d to Proc %d\n", syscall_num, reply, dest));
+    struct proc* destproc = get_proc(dest);
+    // KDEBUG(("Syscall %s reply %d to Proc %s %d\n", syscall_str[syscall_num], reply,destproc->name, dest));
     return syscall_reply(reply, dest, m);
 }
 

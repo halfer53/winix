@@ -45,7 +45,8 @@ struct cmd_internal builtin_commands[] = {
     { cmd_exit, "exit"},
     { help, "help"},
     { do_cd, "cd"},
-    { generic, NULL }
+    { generic, NULL },
+    {0}
 };
 
 void init_shell(){
@@ -157,7 +158,7 @@ int help(int argc, char** argv){
     struct cmd_internal* handler;
     handler = builtin_commands;
     printf("Available Commands\n");
-    while(handler->name != NULL) {
+    while(handler && handler->name != NULL) {
         printf(" * %s\n",handler->name);
         handler++;
     }

@@ -119,6 +119,8 @@ int check_waiting(struct proc* who){
     struct message* mesg = curr_mesg();
 
     // if this process if waiting for the current to be exited process
+    // kreport_proc(parent);
+    // kreport_proc(who);
     if(parent && parent->state & STATE_WAITING){
         pid_t pid = parent->wpid;
         if( (pid > 0 && pid == who->pid) ||
@@ -133,7 +135,7 @@ int check_waiting(struct proc* who){
             mesg->type = WAITPID;
             mesg->m1_i2 = get_wstats(who);
             parent->state &= ~STATE_WAITING;
-            syscall_reply(who->pid, parent->proc_nr, mesg);
+            syscall_reply2( WAITPID ,who->pid, parent->proc_nr, mesg);
             if(who->state & STATE_ZOMBIE)
                 release_zombie(who);
             return OK;
@@ -191,7 +193,7 @@ void exit_proc(struct proc *who, int status, int signum){
         // parent is blocked by vfork(2)
         parent->state &= ~STATE_VFORKING;
         mesg->type = VFORK;
-        syscall_reply(who->pid, parent->proc_nr, mesg);
+        syscall_reply2(VFORK, who->pid, parent->proc_nr, mesg);
     }else{
         release_proc_mem(who);
     }
@@ -219,8 +221,7 @@ int do_exit(struct proc *who, struct message *m){
         status = who->ctx.m.regs[0];
     }
 
-    // KDEBUG(("%s[%d] exit status %d signal %d\n",who->name, who->pid, 
-    //                     status, signum));
+    // KDEBUG(("%s[%d] exit status %d signal %d\n",who->name, who->pid, status, signum));
     
     exit_proc(who, status, signum);
     
