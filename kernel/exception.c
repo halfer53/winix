@@ -63,6 +63,12 @@ int irq_count(){
     return _irq_count;
 }
 
+void register_irq(int irq, expt_handler_t handler){
+    if( irq < 0 || irq >= 15)
+        return;
+    handlers[irq] = handler;
+}
+
 void preempt_currproc(){
     if(current_proc){
         enqueue_schedule(current_proc);

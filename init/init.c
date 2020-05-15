@@ -37,6 +37,7 @@ int main(int argc, char **argv){
   pid_t pid;
   int status;
   int i, ret, fd, read_nr;
+  char buffer[128];
 
   ret = mkdir("/dev", 0x755);
   CHECK_SYSCALL(ret == 0);

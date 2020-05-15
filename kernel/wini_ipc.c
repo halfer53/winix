@@ -58,8 +58,8 @@ int do_send(int dest, struct message *m) {
             enqueue_head(ready_q[pDest->priority], pDest);
         }else {
             if(is_debugging_ipc()){
-                kprintf("\nIPC: SEND to %d from %d blocked| ",
-                            dest, current_proc->proc_nr,m->type);
+                KDEBUG(("\nIPC: SEND to %d from %d blocked| ",
+                            dest, current_proc->proc_nr,m->type));
             }
             // Otherwise, block current process and add it to
             // head of sending queue of the destination.
@@ -69,8 +69,8 @@ int do_send(int dest, struct message *m) {
         }
 
         if(is_debugging_ipc()){
-            kprintf("\nIPC: SEND to %d from %d type %d| ",
-                        dest, current_proc->proc_nr,m->type);
+            KDEBUG(("\nIPC: SEND to %d from %d type %d| ",
+                        dest, current_proc->proc_nr,m->type));
         }
         return OK;
     }
@@ -118,7 +118,7 @@ int do_receive(struct message *m) {
             enqueue_head(ready_q[p->priority], p);
         
         if(is_debugging_ipc())
-            kprintf("\nIPC: %d REC from %d type %d| ",current_proc->proc_nr, m->src ,m->type);
+            KDEBUG(("\nIPC: %d REC from %d type %d| ",current_proc->proc_nr, m->src ,m->type));
         
         return OK;
     }
@@ -144,7 +144,7 @@ int do_notify(int src, int dest, struct message *m) {
     if (pDest = get_proc(dest)) {
 
         if(is_debugging_ipc())
-            kprintf("\nNOTIFY %d from %d type %d| ",dest, src ,m->type);
+            KDEBUG(("\nNOTIFY %d from %d type %d| ",dest, src ,m->type));
             
         // If destination is waiting, deliver message immediately.
         if (pDest->state == STATE_RECEIVING) {

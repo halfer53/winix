@@ -45,6 +45,9 @@ int kputc2(const int c) {
 
 int kgetc(struct proc* who) {
     int try;
+    if(RexSp1->Ctrl & (1 << 8)){
+        return EOF;
+    }
     do{
         try = TRIES;
         while(!(RexSp1->Stat & 1) && --try);

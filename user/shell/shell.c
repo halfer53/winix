@@ -63,59 +63,24 @@ void init_shell(){
 
 
 int main() {
-    int read_nr;
-    char ret;
+    int ret, len;
     char *c;
-    char *end_buf;
 
     init_shell();
 
-    // test_malloc(0, NULL);
-    c = buf;
-    end_buf = c + MAX_LINE -2;
     while(1) {
         printf("WINIX> ");
-        c = buf;
-        // Read line from terminal
-        while( c < end_buf) {
-            // ret = getchar();     // read
-            
-            read_nr = read(0, &ret, 1);
-            // printf("ret %d err %d addr %p val %d\n",read_nr, errno, &ret, ret);
+        ret = read(0, buf, MAX_LINE);
 
-            if(ret == EOF){
-                if(errno == EINTR){
-                    perror("getc(): ");
-                    printf("WINIX> ");
-                }
-                continue;
+        if(ret == EOF){
+            if(errno == EINTR){
+                perror("getc(): ");
+                printf("WINIX> ");
             }
-            
-            if(ret == '\r'){// test for end
-                break;
-            }
-                    
-
-            if ((int)ret == 8) { // backspace
-                if(c > buf){
-                    putchar(ret);
-                    c--;
-                }
-                continue;
-            }
-            
-            if(isprint(ret)){
-                *c++ = ret;
-                putchar(ret);         // echo
-            }else{
-                putchar(7);            // beep
-            }
-            
+            continue;
         }
-        
-        *c = '\0';
-        putchar('\n');
-        
+        len = strlen(buf);
+        buf[len - 2] = '\0'; // delete end line
         exec_cmd(buf, NULL);     
     }
     return 0;

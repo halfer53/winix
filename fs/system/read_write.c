@@ -22,11 +22,15 @@ int sys_write(struct proc *who,int fd, void *buf, size_t count){
 
 int do_read(struct proc* who, struct message* msg){
     char* buf = (char *) get_physical_addr(msg->m1_p1, who);
+    if(!is_vaddr_accessible(msg->m1_p1, who))
+        return EACCES;
     return sys_read(who, msg->m1_i1, buf, msg->m1_i2);
 }
 
 int do_write(struct proc* who, struct message* msg){
     char* buf = (char *) get_physical_addr(msg->m1_p1, who);
+    if(!is_vaddr_accessible(msg->m1_p1, who))
+        return EACCES;
     return sys_read(who, msg->m1_i1, buf, msg->m1_i2);
 }
 
