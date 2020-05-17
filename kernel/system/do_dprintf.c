@@ -18,22 +18,21 @@
 #include <winix/dev.h>
 #include <fs/path.h>
 
-int do_perror(struct proc* who, struct message* msg){
-    char *s;
-    int usr_errno;
+int do_winix_strerror(struct proc* who, struct message* msg){
+    char *dst;
+    int usr_errno, len;
     struct filp *stderr_file;
 
     if(!is_vaddr_ok(msg->m1_p1, who))
         return EACCES;
-    if(!is_fd_opened_and_valid(who, 2))
-        return EBADF;
-    stderr_file = who->fp_filp[2];
-    usr_errno = msg->m1_i1;
-    s = (char*)get_physical_addr(msg->m1_p1, who);
+    len = msg->m1_i1;
+    usr_errno = msg->m1_i2;
+    
     if(usr_errno < 0 || usr_errno >= _NERROR)
         return EINVAL;
-        
-    return filp_kprint(stderr_file, "%s %s\n", s, kstr_error(usr_errno));
+    dst = (char*)get_physical_addr(msg->m1_p1, who);
+    strncpy(dst, kstr_error(usr_errno), len);
+    return 0;
 }
 
 /**
@@ -49,7 +48,7 @@ int do_perror(struct proc* who, struct message* msg){
  * @param  m   
  * @return     
  */
-int do_dprintf(struct proc *who, struct message *m){
+int do_winix_dprintf(struct proc *who, struct message *m){
     struct filp* stdout_file;
     vptr_t* vp1, *vp2;
     void *ptr, *ptr2;

@@ -40,8 +40,8 @@
 #define KILL            11
 #define GETPID          12
 #define WINFO           13
-#define PERROR          14
-#define DPRINTF          15
+#define WINIX_STRERROR          14
+#define WINIX_DPRINTF          15
 #define SYSCONF         16
 #define SIGSUSPEND      17
 #define SIGPENDING      18

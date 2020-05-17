@@ -75,13 +75,13 @@ void* sys_sbrk(struct proc *who, int size){
 int do_brk(struct proc *who, struct message *m){
     int size;
     ptr_t* new_brk;
-    vptr_t* vaddr = m->m1_p1;
+    vptr_t* vaddr = m->m1_p1, *vheapbrk;
     ptr_t* addr = get_physical_addr(m->m1_p1, who);
     ptr_t* heap_top;
 
     
     m->m1_p1 = get_virtual_addr(who->heap_break, who);
-    // kprintf("req brk %x brk %x curr btm %x ", vaddr, m->m1_p1, get_virtual_addr(who->heap_bottom, who) );
+    // KDEBUG(("proc %d req brk %x curr brk %x \n", who->proc_nr, vaddr, m->m1_p1  ));
     if(addr < who->heap_break){
         if(addr < who->heap_top){
             return EINVAL;
