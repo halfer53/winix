@@ -162,8 +162,9 @@ int tty_write_rex(RexSp_t* rex, char* data, size_t len){
     while(len-- > 0){
         if(IS_SERIAL_CODE(*p)){
             while(!(rex->Stat & 2));
-            rex->Tx = *p++;
+            rex->Tx = *p;
         }
+        p++;
     }
     return p - data;
 }
@@ -180,13 +181,7 @@ int tty_read ( struct filp *filp, char *data, size_t count, off_t offset){
 }
 
 int tty_write ( struct filp *filp, char *data, size_t count, off_t offset){
-    char buffer[32];
     struct tty_state* state = (struct tty_state*)filp->private;
-    // kputs(state->dev->init_name);
-    // kputc('\n');
-    // kputx_buf((int)state->rex, buffer);
-    // kputs(buffer);
-    // kputc('\n');
     return tty_write_rex(state->rex, data, count);
 }
 
