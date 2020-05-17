@@ -52,7 +52,7 @@ ifeq ($(KBUILD_VERBOSE),0)
 endif
 
 makedisk: $(FS_DEPEND)
-	$(Q)gcc -D FILE_SYSTEM_PROJECT -w -I./include/fs_include -I./include $^ -o makedisk
+	$(Q)gcc -g -D FILE_SYSTEM_PROJECT -w -I./include/fs_include -I./include $^ -o makedisk
 	# $(Q)-rm -f $(KMAIN)
 	# $(Q)$(MAKE) -C tools
 

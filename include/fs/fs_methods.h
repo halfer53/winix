@@ -44,7 +44,7 @@ void init_pipe();
 int remove_inode_from_dir(struct proc* who,struct inode* dir, struct inode* target, char* name);
 int get_fd(struct proc *curr, int start, int *open_slot, filp_t **fpt);
 int add_inode_to_directory(struct proc* who,inode_t* dir, inode_t* ino, char* string);
-int register_device(struct device* dev, const char* name, dev_t id, mode_t type);
+int register_device(struct device* dev, const char* name, dev_t id, mode_t type, struct device_operations*, struct filp_operations*);
 int release_filp(struct filp* file);
 int release_inode(inode_t *inode);
 filp_t *get_filp(int fd);

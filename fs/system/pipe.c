@@ -7,8 +7,6 @@
 #include <winix/sigsend.h>
 
 struct device pipe_dev;
-static struct filp_operations fops;
-static struct device_operations dops;
 static char* name = "pipe";
 static ino_t next_inum = 2;
 static dev_t pipe_devid = MAKEDEV(2, 1);
@@ -278,24 +276,13 @@ int pipe_close ( struct device* dev, struct filp *file){
     return 0;
 }
 
-
-int pipe_dev_init(){
+int pipe_dev_open(){
     return 0;
 }
 
-int pip_dev_release(){
-    return 0;
-}
 
+static struct filp_operations pipe_fops = {pipe_open, pipe_read, pipe_write, pipe_close};
 
 void init_pipe(){
-    dops.dev_init = pipe_dev_init;
-    dops.dev_release = pip_dev_release;
-    fops.open = pipe_open;
-    fops.read = pipe_read;
-    fops.write = pipe_write;
-    fops.close = pipe_close;
-    pipe_dev.dops = &dops;
-    pipe_dev.fops = &fops;
-    register_device(&pipe_dev, name, pipe_devid, S_IFIFO);
+    register_device(&pipe_dev, name, pipe_devid, S_IFIFO, NULL, &pipe_fops);
 }

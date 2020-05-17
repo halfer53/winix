@@ -27,10 +27,8 @@ struct tty_state{
 
 struct tty_state tty1_state, tty2_state;
 struct device _tty_dev, _tty2_dev;
-struct device *tty_dev = NULL, *tty2_dev = NULL;
 struct filp *tty1_filp = NULL, *tty2_filp = NULL;
-static struct filp_operations fops;
-static struct device_operations dops, dops2;
+
 static const char* name = "tty";
 static const char* name2 = "tty2";
 
@@ -201,8 +199,6 @@ int tty_close ( struct device* dev, struct filp *file){
     return 0;
 }
 
-
-
 int tty_dev_init(){
     register_irq(8, tty1_handler);
     return __tty_init(RexSp1, &_tty_dev, &tty1_state);
@@ -239,42 +235,24 @@ int tty2_dev_release(){
     return 0;
 }
 
+static struct device_operations dops = {tty_dev_init, tty_dev_io_read, tty_dev_io_write, tty_dev_release};
+static struct device_operations dops2  = {tty2_dev_init, tty2_dev_io_read, tty2_dev_io_write, tty2_dev_release};
+static struct filp_operations fops = {tty_open, tty_read, tty_write, tty_close};
+
+void init_tty_filp(struct filp** _file, struct device* dev, struct tty_state* state){
+    struct filp* file;
+    file = get_free_filp();
+    file->filp_count = 100;
+    file->filp_dev = dev;
+    file->private = (void*)state;
+    *_file = file;
+}
 
 void init_tty(){
-    dops = {tty_dev_init, tty_dev_io_read, tty_dev_io_write, tty_dev_release};
-    // dops.dev_init = tty_dev_init;
-    // dops.dev_read = tty_dev_io_read;
-    // dops.dev_write = tty_dev_io_write;
-    // dops.dev_release = tty_dev_release;
 
-    dops2.dev_init = tty2_dev_init;
-    dops2.dev_read = tty2_dev_io_read;
-    dops2.dev_write = tty2_dev_io_write;
-    dops2.dev_release = tty2_dev_release;
+    init_tty_filp(&tty1_filp, &_tty_dev, &tty1_state);
+    init_tty_filp(&tty2_filp, &_tty2_dev, &tty2_state);
 
-    fops.open = tty_open;
-    fops.read = tty_read;
-    fops.write = tty_write;
-    fops.close = tty_close;
-
-    _tty_dev.dops = &dops;
-    _tty_dev.fops = &fops;
-    _tty2_dev.fops = &fops;
-    _tty2_dev.dops = &dops2;
-
-    tty_dev = &_tty_dev;
-    tty2_dev = &_tty2_dev;
-
-    tty1_filp = get_free_filp();
-    tty1_filp->filp_count = 100;
-    tty1_filp->filp_dev = &_tty_dev;
-    tty1_filp->private = (void*) &tty1_state;
-
-    tty2_filp = get_free_filp();
-    tty2_filp->filp_count = 100;
-    tty2_filp->filp_dev = &_tty2_dev;
-    tty2_filp->private = (void*) &tty2_state;
-
-    register_device(&_tty_dev, name, TTY_DEV_NUM, S_IFCHR);
-    register_device(&_tty2_dev, name2, TTY2_DEV_NUM, S_IFCHR);
+    register_device(&_tty_dev, name, TTY_DEV_NUM, S_IFCHR, &dops, &fops);
+    register_device(&_tty2_dev, name2, TTY2_DEV_NUM, S_IFCHR, &dops2, &fops);
 }

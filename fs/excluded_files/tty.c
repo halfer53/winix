@@ -54,7 +54,5 @@ void init_tty(){
     fops.read = tty_read;
     fops.write = tty_write;
     fops.close = tty_close;
-    tty_dev_static.dops = &dops;
-    tty_dev_static.fops = &fops;
-    register_device(&tty_dev_static, name, MAKEDEV(3, 1), S_IFCHR);
+    register_device(&tty_dev_static, name, MAKEDEV(3, 1), S_IFCHR, &dops, &fops);
 }
