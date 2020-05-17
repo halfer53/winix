@@ -241,10 +241,11 @@ int tty2_dev_release(){
 
 
 void init_tty(){
-    dops.dev_init = tty_dev_init;
-    dops.dev_read = tty_dev_io_read;
-    dops.dev_write = tty_dev_io_write;
-    dops.dev_release = tty_dev_release;
+    dops = {tty_dev_init, tty_dev_io_read, tty_dev_io_write, tty_dev_release};
+    // dops.dev_init = tty_dev_init;
+    // dops.dev_read = tty_dev_io_read;
+    // dops.dev_write = tty_dev_io_write;
+    // dops.dev_release = tty_dev_release;
 
     dops2.dev_init = tty2_dev_init;
     dops2.dev_read = tty2_dev_io_read;

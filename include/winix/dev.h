@@ -14,9 +14,9 @@
 
 struct device_operations{
     int (*dev_init) ();
-    int (*dev_release) ();
     int (*dev_read) (char *buf, off_t off, size_t len);
     int (*dev_write) (char *buf, off_t off, size_t len);
+    int (*dev_release) ();
 };
 
 struct device{
