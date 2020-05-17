@@ -27,7 +27,7 @@ KILL            11
 GETPID          12
 WINFO           13
 GETC            14
-PRINTF          15
+DPRINTF          15
 SYSCONF         16
 SIGSUSPEND      17
 SIGPENDING      18

@@ -235,8 +235,8 @@ PRIVATE void break_handler() {
  *   Current process is killed, and scheduler is called (i.e. this handler does not return).
  **/
 PRIVATE void arith_handler() {
-    KDEBUG(("Arith Exception: \"%s (%d)\" PC=0x%08x.\r\n", 
-        current_proc->name, current_proc->pid, current_proc->ctx.m.pc));
+    kprintf("Arith Exception: \"%s (%d)\" PC=0x%08x.\r\n", 
+        current_proc->name, current_proc->pid, current_proc->ctx.m.pc);
     send_sig(current_proc,SIGFPE);
     sched();
 }

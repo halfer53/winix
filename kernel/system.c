@@ -186,7 +186,7 @@ void init_syscall_table(){
     SYSCALL_MAP(GETPID, do_getpid);    //12
     SYSCALL_MAP(WINFO, do_winfo);      //13
     SYSCALL_MAP(PERROR, do_perror);        //14
-    SYSCALL_MAP(PRINTF, do_printf);    //15
+    SYSCALL_MAP(DPRINTF, do_dprintf);    //15
     SYSCALL_MAP(SYSCONF, do_sysconf);  //16
     SYSCALL_MAP(SIGSUSPEND, do_sigsuspend);
     SYSCALL_MAP(SIGPENDING, do_sigpending);

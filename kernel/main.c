@@ -25,6 +25,7 @@ void start_bins();
  * Entry point for WINIX.
  **/
 void main() {
+    void (*test)() = (void(*)())0;
     int bss_len = &BSS_END - &BSS_BEGIN;
     *((unsigned int*)1) = 0;
     memset(&BSS_BEGIN, 0, bss_len);

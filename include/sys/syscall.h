@@ -41,7 +41,7 @@
 #define GETPID          12
 #define WINFO           13
 #define PERROR          14
-#define PRINTF          15
+#define DPRINTF          15
 #define SYSCONF         16
 #define SIGSUSPEND      17
 #define SIGPENDING      18

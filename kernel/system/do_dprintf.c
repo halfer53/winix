@@ -49,7 +49,7 @@ int do_perror(struct proc* who, struct message* msg){
  * @param  m   
  * @return     
  */
-int do_printf(struct proc *who, struct message *m){
+int do_dprintf(struct proc *who, struct message *m){
     struct filp* stdout_file;
     vptr_t* vp1, *vp2;
     void *ptr, *ptr2;
