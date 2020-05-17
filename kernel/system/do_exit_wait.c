@@ -25,6 +25,9 @@
 #include <kernel/kernel.h>
 #include <winix/list.h>
 #include <sys/wait.h>
+#include <fs/dev.h>
+#include <fs/inode.h>
+#include <fs/fs_methods.h>
 
 int get_wstats(struct proc* child){
     return (child->exit_status << 8) | (child->sig_status & 0x7f);
@@ -167,9 +170,11 @@ void exit_proc_in_interrupt(struct proc* who, int exit_val,int signum){
 
 void exit_proc(struct proc *who, int status, int signum){
     struct proc *mp;
-    int children = 0;
+    int children = 0, i;
+    struct filp* file;
     struct message* mesg;
     struct proc* parent;
+
 
     if(in_interrupt()){
         exit_proc_in_interrupt(who, status, signum);
@@ -202,6 +207,16 @@ void exit_proc(struct proc *who, int status, int signum){
     foreach_child(mp, who){
         mp->parent = INIT;
     }
+
+    for(i = 0; i < OPEN_MAX; i++){
+        file = who->fp_filp[i];
+        if(file){
+            file->filp_dev->fops->close(file->filp_ino, file);
+            who->fp_filp[i] = NULL;
+        }
+    }
+    put_inode(who->fp_workdir, false);
+    put_inode(who->fp_rootdir, false);
     
     // if No process is waiting for this process, send SIGCHLD to parent
     check_waiting(who);

@@ -3,11 +3,6 @@
 static struct block_buffer buf_table[LRU_LEN];
 
 static struct block_buffer *lru_cache[2];
-
-static struct block_buffer imap;// inode map is assumed to be 1 block in length
-
-static struct block_buffer bmap; // block map is also assumed to be 1 block in length
-
 // The lru is illustrated as below
 // REAR -> next -> .... -> next -> FRONT
 // With the most recently used cache at the front, and least recently used block at the rear
