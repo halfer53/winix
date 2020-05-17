@@ -177,7 +177,8 @@ int kputs_vm_buf(char *s, void *who_rbase, char *buf) {
 #define LEFT_PADDING    1
 #define RIGHT_PADDING   2
 
-#define BUFFER_SIZ  (128)
+#define BUFFER_SIZ  (64)
+#define PADDING_BUFFER_SIZ  (20)
 
 int tty_non_init_write(struct filp *file, char *data, size_t len, off_t offset){
     return tty_write_rex(RexSp2, data, len);
@@ -234,6 +235,9 @@ int kprintf_vm( struct filp* file, const char *orignal_format, void *arg, ptr_t 
                 // todo limit it to 20
                 strncpy(buffer, format, 2);
                 padding_len = atoi(buffer);
+                if(padding_len > PADDING_BUFFER_SIZ){
+                    padding_len = PADDING_BUFFER_SIZ;
+                }
                 format += 2;
             }
 
@@ -278,7 +282,7 @@ int kprintf_vm( struct filp* file, const char *orignal_format, void *arg, ptr_t 
             // left padding
             if(padding_len > 0){ 
                 if(padding_direction == LEFT_PADDING ){
-                    char padding_buffer[20];
+                    static char padding_buffer[PADDING_BUFFER_SIZ];
                     char *padding_ptr = padding_buffer;
                     int len = padding_len;
                     if(prev == 'x' || prev == 'd')
@@ -306,6 +310,7 @@ int kprintf_vm( struct filp* file, const char *orignal_format, void *arg, ptr_t 
             buffer[buf_len++] = *format++;
             if(buf_len >= BUFFER_SIZ){
                 count += filp_write(file, buffer, buf_len, 0);
+                buf_len = 0;
             }
         }
     }
