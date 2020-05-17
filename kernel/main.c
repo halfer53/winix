@@ -26,13 +26,14 @@ void start_bins();
  **/
 void main() {
     *((unsigned int*)1) = 0;
+    init_fs();
     init_bitmap();
     init_mem_table();
     init_proc();
     init_holes();
     init_sched();
     init_syscall_table();
-    init_fs();
+    
 
     init_kernel_tasks();
     start_init();

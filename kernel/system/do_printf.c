@@ -15,7 +15,7 @@
  * 
 */
 #include <kernel/kernel.h>
-
+#include <winix/dev.h>
 
 
 const char *_errlist[_NERROR] = {
@@ -104,5 +104,5 @@ int do_printf(struct proc *who, struct message *m){
         return EFAULT;
     ptr = get_physical_addr(vp1,who);
     ptr2 = get_physical_addr(vp2,who);
-    return kprintf_vm(ptr,ptr2,who->ctx.rbase);
+    return kprintf_vm(tty_dev, ptr,ptr2,who->ctx.rbase);
 }

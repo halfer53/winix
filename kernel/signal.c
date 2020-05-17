@@ -184,7 +184,6 @@ int send_sig(struct proc *who, int signum){
     if(sigismember(&who->sig_mask, signum)){
         if(signum != SIGKILL && signum != SIGSTOP){
             int ret = 0;
-            // kdebug("sig %d pending mask %x\n", signum, who->sig_mask);
             
             // if a signal is ignored and blocked by the process
             // it is quietly ignored, and not pended
@@ -194,13 +193,11 @@ int send_sig(struct proc *who, int signum){
             return ret;
         }
     }
-    // kdebug("send sig %d to %d\n", signum, who->pid);
 
     // Unpause the process if it was blocked by pause(2)
     // or sigsuspend(2)
     if(who->state & STATE_PAUSING ){
         struct message m;
-        // kdebug("wakeup %d\n", who->proc_nr);
         m.type = 0;
         who->state &= ~STATE_PAUSING;
         syscall_reply(EINTR, who->proc_nr, &m);

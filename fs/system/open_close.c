@@ -17,7 +17,7 @@
      return OK;
  }
 
-
+int root_fs_write (struct filp *filp, char *data, size_t count, off_t offset);
 
 int _sys_open(struct proc *who, char *path,  int flags, mode_t mode, dev_t devid){
     filp_t *filp;
@@ -79,7 +79,7 @@ int _sys_open(struct proc *who, char *path,  int flags, mode_t mode, dev_t devid
         goto final;
 
     ret = open_slot;
-    // KDEBUG(("path %s Last dir %d, ret inode %d\n", path, lastdir->i_num, inode->i_num));
+    KDEBUG(("Open: path %s Last dir %d, ret inode %d\n", path, lastdir->i_num, inode->i_num));
 
     final:
     put_inode(lastdir, false);

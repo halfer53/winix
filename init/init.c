@@ -8,14 +8,13 @@
 #include <sys/fcntl.h>
 
 #define CHECK_SYSCALL(cond) \
-if(!cond){ \
+if(!(cond)){ \
   failed_init(__LINE__); \
 }
 
 void failed_init(int line){
   printf("init failed at %d, err %d\n", line, errno);
-  
-  ___exit(1);
+  exit(1);
 }
 
 void init_init(){
@@ -42,7 +41,7 @@ int main(int argc, char **argv){
   ret = mkdir("/dev", 0x755);
   CHECK_SYSCALL(ret == 0);
 
-  ret = mknod("/dev/tty", 0x755, TTY_DEV);
+  ret = mknod("/dev/tty", 0x755, TTY_DEV_NUM);
   CHECK_SYSCALL(ret == 0);
 
   fd = open("/dev/tty", O_RDONLY);
@@ -51,17 +50,19 @@ int main(int argc, char **argv){
   ret = dup(fd);
   ret = dup(fd);
 
+  fd = open("/foo", O_CREAT | O_RDWR, 0x755);
+  CHECK_SYSCALL(fd > 0);
+  ret = write(fd, "abcd", 5);
+  CHECK_SYSCALL(ret == 5);
+  ret = close(fd);
+  CHECK_SYSCALL(ret == 0);
+
   pid = vfork();
   if(pid == 0){
     i = execv(shell_path, shell_argv);
   }
 
   init_init();
-
-  fd = open("/foo.txt", O_CREAT | O_RDWR, 0x755);
-  CHECK_SYSCALL(fd > 0);
-  write(fd, "abcd", 5);
-  close(fd);
 
   while(1){
     pid = wait(&status);

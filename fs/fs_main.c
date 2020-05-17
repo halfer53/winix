@@ -9,5 +9,6 @@ void init_fs() {
     init_root_fs();
     init_pipe();
     init_tty();
+    init_all_dev();
 }
 

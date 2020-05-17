@@ -25,7 +25,7 @@
 #include <kernel/kernel.h>
 #include <winix/list.h>
 #include <sys/wait.h>
-#include <fs/dev.h>
+#include <winix/dev.h>
 #include <fs/inode.h>
 #include <fs/fs_methods.h>
 

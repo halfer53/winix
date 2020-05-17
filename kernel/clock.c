@@ -88,17 +88,17 @@ void clock_handler(){
     if(current_proc->flags & BILLABLE){
         bill_ptr->sys_time_used++;
     }
-
-    if(next_timeout <= system_uptime){
-        do_ticks();
-        // struct message* m = get_exception_m();
-        // m->type = DO_CLOCKTICK;
-        // // Since we are in exception context, 
-        // // send a message from INTERRUPT to CLOCK
-        // // to do_clockticks
-        // do_notify(INTERRUPT, CLOCK, m);
-        // // in winix, kernel tasks are preemptible
-        // preempt_currproc();
-    }
+    do_ticks();
+    // if(next_timeout <= system_uptime){
+        
+    //     struct message* m = get_exception_m();
+    //     m->type = DO_CLOCKTICK;
+    //     // Since we are in exception context, 
+    //     // send a message from INTERRUPT to CLOCK
+    //     // to do_clockticks
+    //     do_notify(INTERRUPT, CLOCK, m);
+    //     // in winix, kernel tasks are preemptible
+    //     preempt_currproc();
+    // }
     sched();
 }

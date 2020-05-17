@@ -83,7 +83,7 @@ int alloc_block(inode_t *ino, struct device* id){
             sb->s_free_blocks -= 1;
             ino->i_total_size += BLOCK_SIZE;
             put_block_buffer_immed(bmap, id);
-            // KDEBUG(("Alloc block %d for inode %d\n", free_bit, ino->i_num));
+            KDEBUG(("alloc_block %d for inode %d\n", free_bit, ino->i_num));
             return free_bit;
         }
         put_block_buffer(bmap);

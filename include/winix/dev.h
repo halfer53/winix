@@ -9,6 +9,7 @@
 #include <sys/types.h>
 #include <winix/type.h>
 #include <fs/type.h>
+#include <fs/filp.h>
 
 struct device_operations{
     int (*dev_init) ();
@@ -36,9 +37,12 @@ struct file_system{
 };
 
 extern struct device devices;
+extern struct device *tty_dev;
+extern struct device *tty2_dev;
 
 void init_dev();
 void init_root_fs();
+void init_all_dev();
 
 #endif
 

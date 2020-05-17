@@ -20,7 +20,6 @@ int kgetc(struct proc* who);
 int kprintf(const char *format, ...);
 int kerror(const char *format, ...);
 int kinfo(const char *format, ...);
-int kdebug(const char *format, ...);
 
 
 #endif

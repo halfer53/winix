@@ -155,7 +155,7 @@ int syscall_reply(int reply, int dest,struct message* m){
 
 int syscall_reply2(int syscall_num, int reply, int dest, struct message* m){
     struct proc* destproc = get_proc(dest);
-    // KDEBUG(("Syscall %s reply %d to Proc %s %d\n", syscall_str[syscall_num], reply,destproc->name, dest));
+    KDEBUG(("Syscall %s return %d to Proc %s[%d]\n", syscall_str[syscall_num], reply,destproc->name, dest));
     return syscall_reply(reply, dest, m);
 }
 

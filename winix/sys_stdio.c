@@ -12,51 +12,12 @@
  * 
 */
 #include <kernel/kernel.h>
+#include <kernel/clock.h>
 #include <winix/rex.h>
 #include <ctype.h>
+#include <winix/dev.h>
 
 #define IS_SERIAL_CODE(c) (isprint(c) || c - 7 < 6)
-/**
- * Writes a character to serial port 1.
- **/
-int kputc(const int c) {
-    if(IS_SERIAL_CODE(c)){
-        while(!(RexSp1->Stat & 2));
-        RexSp1->Tx = c;
-        return c;
-    }
-    return EOF;
-}
-
-
-int kputc2(const int c) {
-    while(!(RexSp2->Stat & 2));
-    RexSp2->Tx = c;
-    return c;
-}
-
-/**
- * Reads a character from serial port 1.
- **/
-// TODO: user interrupt-driven I/O
-
-#define TRIES   (32)
-
-int kgetc(struct proc* who) {
-    int try;
-    if(RexSp1->Ctrl & (1 << 8)){
-        return EOF;
-    }
-    do{
-        try = TRIES;
-        while(!(RexSp1->Stat & 1) && --try);
-        
-        if(is_sigpending(who))
-            return EINTR;
-
-    }while(try == 0);
-    return RexSp1->Rx;
-}
 
 /**
  * print value of n in hexadecimal string format
@@ -106,7 +67,6 @@ PRIVATE int kputd_buf(int n, char *buf) {
     int count = 0;
     // zero?
     if(n == 0) {
-        // kputc('0');
         *buf++ = '0';
         *buf = '\0';
         return 1;
@@ -114,7 +74,6 @@ PRIVATE int kputd_buf(int n, char *buf) {
 
     // negative?
     if(n < 0) {
-        // kputc('-');
         *buf++ = '-';
         count++;
         n *= -1;
@@ -128,7 +87,6 @@ PRIVATE int kputd_buf(int n, char *buf) {
     // print the rest
     while(place) {
         int d = n / place;
-        // kputc(d % 10 + '0');
         *buf++ = d % 10 + '0';
         place /= 10;
         count++;
@@ -148,7 +106,6 @@ PRIVATE int kputs_vm_buf(char *s, void *who_rbase, char *buf) {
         
     *buf = '\0';
     return count;
-        // kputc(*sp++);
 }
 
 /**
@@ -187,7 +144,7 @@ int kput_token(char token, int len){
  * @param  who_rbase rbase of the calling process
  * @return           number of bytes being printed
  */
-int kprintf_vm(const char *format, void *arg, ptr_t *who_rbase){
+int kprintf_vm( struct device* dev, const char *format, void *arg, ptr_t *who_rbase){
     static char buffer[64];
     char *buf = buffer;
     int padding_len;
@@ -267,6 +224,8 @@ int kprintf_vm(const char *format, void *arg, ptr_t *who_rbase){
             }
 
             count += kputs(buf);
+            // count += dev->dops->dev_write(buf, 0, strlen(buf));
+            
             // right padding
             if(padding_direction == RIGHT_PADDING && padding_len > 0)
                 count += kput_token(token, padding_len);
@@ -285,31 +244,24 @@ int kprintf(const char *format, ...) {
     void *arg = &format;
     arg = ((char*)arg) + 1;
 
-    return kprintf_vm(format,arg,0);
+    return kprintf_vm(tty2_dev, format, arg, 0);
 }
 
 int kinfo(const char *format, ...){
     void *arg = &format;
     arg = ((char*)arg) + 1;
 
-    kputs("[SYSTEM] ");
-    return kprintf_vm(format,arg,0);
+    kprintf("[%d] ", get_uptime());
+    return kprintf_vm(tty2_dev,format,arg,0);
 }
 
 int kerror(const char *format, ...){
     void *arg = &format;
     arg = ((char*)arg) + 1;
 
-    kputs("[ERROR ] ");
-    return kprintf_vm(format,arg,0);
+    kprintf("[%d] ERROR: ", get_uptime());
+    return kprintf_vm(tty2_dev, format,arg,0);
 }
 
-int kdebug(const char *format, ...){
-    void *arg = &format;
-    arg = ((char*)arg) + 1;
-
-    kputs("[DEBUG ] ");
-    return kprintf_vm(format,arg,0);
-}
 
 

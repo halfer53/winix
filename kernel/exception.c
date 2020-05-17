@@ -118,10 +118,10 @@ PRIVATE void serial1_handler() {
  * Serial Port 2 (IRQ5)
  **/
 PRIVATE void serial2_handler() {
-    int stat = RexSp2->Stat;
-    if(stat & 1){
-        kputc2(RexSp2->Rx);
-    }
+    // int stat = RexSp2->Stat;
+    // if(stat & 1){
+    //     kputc2(RexSp2->Rx);
+    // }
     RexSp2->Iack = 0;
 }
 

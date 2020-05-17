@@ -23,7 +23,7 @@
 #include <fs/filp.h>
 #include <kernel/proc.h>
 #include <fs/cache.h>
-#include <fs/dev.h>
+#include <winix/dev.h>
 #include <fs/path.h>
 #include <fs/super.h>
 #include <winix/bitmap.h>

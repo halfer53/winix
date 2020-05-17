@@ -192,7 +192,7 @@ int root_fs_write (struct filp *filp, char *data, size_t count, off_t offset){
         len = ((BLOCK_SIZE - off) > count) ? count : BLOCK_SIZE - off;
         bnr = ino->i_zone[curr_fp_index];
         if(bnr == 0){
-            if(curr_fp_index < NR_TZONES && (bnr = alloc_block(ino, ino->i_dev)) > 0){
+            if((bnr = alloc_block(ino, ino->i_dev)) > 0){
                 ino->i_zone[curr_fp_index] = bnr;
             }else{
                 return ENOSPC;
@@ -213,7 +213,7 @@ int root_fs_write (struct filp *filp, char *data, size_t count, off_t offset){
             }
             put_block_buffer_dirt(buffer);
         }
-        // KDEBUG(("file write for block %d, off %d len %d\n", curr_fp_index, off, r));
+        KDEBUG(("file write for block %d, off %d len %d\n", curr_fp_index, off, r));
         /* Read or write 'chunk' bytes. */
         if (r == 0)
             break;
@@ -244,6 +244,13 @@ int root_fs_close (struct inode* ino, struct filp *filp){
 
 void init_dev(){
     INIT_LIST_HEAD(&devices_list);
+}
+
+void init_all_dev(){
+    struct device* dev;
+    list_for_each_entry(struct device, dev, &devices_list, list){
+        dev->dops->dev_init();
+    }
 }
 
 int register_device(struct device* dev, const char* name, dev_t id, mode_t type){
@@ -286,8 +293,6 @@ void init_root_fs(){
     dev->dops = &dops;
     dev->fops = &ops;
     register_device(dev, DEVICE_NAME, devid, S_IFREG);
-
-    dev->dops->dev_init();
 
     ino = get_inode(ROOT_INODE_NUM, dev);
     ASSERT(ino != NULL);
