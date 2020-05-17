@@ -211,7 +211,7 @@ void exit_proc(struct proc *who, int status, int signum){
     for(i = 0; i < OPEN_MAX; i++){
         file = who->fp_filp[i];
         if(file){
-            file->filp_dev->fops->close(file->filp_ino, file);
+            file->filp_dev->fops->close(file->filp_dev, file);
             who->fp_filp[i] = NULL;
         }
     }

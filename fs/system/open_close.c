@@ -10,7 +10,7 @@
 
      filp = who->fp_filp[fd];
 
-     ret = filp->filp_dev->fops->close(filp->filp_ino, filp);
+     ret = filp->filp_dev->fops->close(filp->filp_dev, filp);
      if(ret)
          return ret;
      who->fp_filp[fd] = NULL;
@@ -75,7 +75,7 @@ int _sys_open(struct proc *who, char *path,  int flags, mode_t mode, dev_t devid
     filp->filp_mode = inode->i_mode;
     filp->filp_flags = flags;
     who->fp_filp[open_slot] = filp;
-    if((ret = inode->i_dev->fops->open(inode, filp)))
+    if((ret = inode->i_dev->fops->open(inode->i_dev, filp)))
         goto final;
 
     ret = open_slot;

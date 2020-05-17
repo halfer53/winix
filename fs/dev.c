@@ -226,16 +226,16 @@ int root_fs_write (struct filp *filp, char *data, size_t count, off_t offset){
     return ret;
 }
 
-int root_fs_open (struct inode* ino, struct filp *file){
+int root_fs_open (struct device* dev, struct filp *file){
     return 0;
 }
 
-int root_fs_close (struct inode* ino, struct filp *filp){
+int root_fs_close (struct device* dev, struct filp *filp){
     filp->filp_count -= 1;
     if(filp->filp_count == 0){
         put_inode(filp->filp_ino, true);
-        if(ino->i_count == 0 && ino->i_nlinks == 0){
-            release_inode(ino);
+        if(filp->filp_ino->i_count == 0 && filp->filp_ino->i_nlinks == 0){
+            release_inode(filp->filp_ino);
         }
     }
     return OK;

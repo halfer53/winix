@@ -25,6 +25,7 @@ struct device{
     struct list_head list;
     struct device_operations *dops;
     struct filp_operations *fops;
+    void* private;
 };
 
 

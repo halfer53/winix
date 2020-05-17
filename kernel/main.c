@@ -25,7 +25,11 @@ void start_bins();
  * Entry point for WINIX.
  **/
 void main() {
+    int bss_len = &BSS_END - &BSS_BEGIN;
     *((unsigned int*)1) = 0;
+    memset(&BSS_BEGIN, 0, bss_len);
+    
+
     init_dev();
     init_fs();
     init_tty();

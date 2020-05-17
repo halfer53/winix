@@ -17,6 +17,8 @@
 extern const char *errlist[_NERROR];
 const char* kstr_error(int err);
 
+int kputd_buf(int n, char *buf);
+int kputx_buf(int n,char *buf);
 int dev_kprint(struct device* dev, const char* format, ...);
 int kprintf_vm( struct device* dev, const char *orignal_format, void *arg, ptr_t *who_rbase);
 int kputc(const int c);

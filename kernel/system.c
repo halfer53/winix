@@ -154,8 +154,15 @@ int syscall_reply(int reply, int dest,struct message* m){
 }
 
 int syscall_reply2(int syscall_num, int reply, int dest, struct message* m){
+    char buf[32];
+    char* p = buf;
     struct proc* destproc = get_proc(dest);
-    // KDEBUG(("Syscall %s return %d to Proc %s[%d]\n", syscall_str[syscall_num], reply,destproc->name, dest));
+    if(reply < 0){
+        p = (char*)kstr_error(reply);
+    }else{
+        kputd_buf(reply, buf);
+    }
+    KDEBUG(("Syscall %s return %s to Proc %s[%d]\n", syscall_str[syscall_num], p,destproc->name, dest));
     return syscall_reply(reply, dest, m);
 }
 

@@ -82,7 +82,7 @@ const char* kstr_error(int err){
  * @param  buf 
  * @return     OK
  */
-PRIVATE int kputx_buf(int n,char *buf) {
+int kputx_buf(int n,char *buf) {
     int i;
     int v = 0, count = 0;
 
@@ -118,7 +118,7 @@ PRIVATE int kputx_buf(int n,char *buf) {
  * @param  buf 
  * @return     
  */
-PRIVATE int kputd_buf(int n, char *buf) {
+int kputd_buf(int n, char *buf) {
     int place = 1000000000;
     int count = 0;
     // zero?
@@ -151,7 +151,7 @@ PRIVATE int kputd_buf(int n, char *buf) {
     return count;
 }
 
-PRIVATE int kputs_vm_buf(char *s, void *who_rbase, char *buf) {
+int kputs_vm_buf(char *s, void *who_rbase, char *buf) {
     char *sp = s;
     int count = 0;
     sp += (int)who_rbase;

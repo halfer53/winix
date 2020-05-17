@@ -31,8 +31,8 @@
 #define MAKEDEV(dmajor, dminor) ((((unsigned int)dmajor << 8) & 0xFF00U) | ((unsigned int)dminor & 0xFFFF00FFU))
 #define DEV_MAJOR(devnum)           (((unsigned int)devnum & 0xFF00U) >> 8)
 #define DEV_MINOR(devnum)           ((unsigned int)devnum & 0xFFFF00FFU)
-#define TTY_DEV_NUM     (MAKEDEV(3, 1 ))
-#define TTY2_DEV_NUM     (MAKEDEV(3, 2 ))
+#define TTY_DEV_NUM     (0x301)
+#define TTY2_DEV_NUM     (0x302)
 
 #define READING 1
 #define WRITING 2

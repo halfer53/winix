@@ -38,9 +38,9 @@ struct filp_operations{
     int (*read) (struct filp *, char *, size_t, off_t );
     int (*write) (struct filp *, char *, size_t, off_t );
     int (*readdir) (struct filp *, void *);
-    int (*open) (struct inode *, struct filp *);
+    int (*open) (struct device *, struct filp *);
     int (*flush) (struct filp *);
-    int (*close) (struct inode *, struct filp *);
+    int (*close) (struct device *, struct filp *);
 };
 
 #define NIL_FILP (filp_t *) 0    /* indicates absence of a filp slot */

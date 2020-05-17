@@ -261,11 +261,12 @@ int pipe_write ( struct filp *filp, char *data, size_t count, off_t offset){
     return ret;
 }
 
-int pipe_open ( struct inode* ino, struct filp *file){
+int pipe_open ( struct device* dev, struct filp *file){
     return 0;
 }
 
-int pipe_close ( struct inode* ino, struct filp *file){
+int pipe_close ( struct device* dev, struct filp *file){
+    struct inode* ino = file->filp_ino;
     file->filp_count -= 1;
     if(file->filp_count == 0){
         ino->i_count -= 1;
