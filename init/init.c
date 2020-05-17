@@ -58,6 +58,11 @@ int main(int argc, char **argv){
 
   init_init();
 
+  fd = open("/foo.txt", O_CREAT | O_RDWR, 0x755);
+  CHECK_SYSCALL(fd > 0);
+  write(fd, "abcd", 5);
+  close(fd);
+
   while(1){
     pid = wait(&status);
     if(pid == -1){

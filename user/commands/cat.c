@@ -15,6 +15,9 @@ int main(int argc, char *argv[]){
     while((ret = read(fd, buf, 256)) > 0){
         write(1, buf, ret);
     }
+    if(ret < 0){
+        perror("read");
+    }
     return 0;
 }
 
