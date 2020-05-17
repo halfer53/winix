@@ -25,6 +25,10 @@ int do_winfo(struct proc *who, struct message *m){
         case WINFO_MEM:
             kreport_sysmap();
             break;
+
+        case WINFO_TRACE_SYSCALL:
+            break;
+
         default:
             return EINVAL;
     }

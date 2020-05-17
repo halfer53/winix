@@ -33,7 +33,7 @@ int do_perror(struct proc* who, struct message* msg){
     if(usr_errno < 0 || usr_errno >= _NERROR)
         return EINVAL;
         
-    return dev_kprint(stderr_file->filp_dev, "%s %s\n", s, kstr_error(usr_errno));
+    return filp_kprint(stderr_file, "%s %s\n", s, kstr_error(usr_errno));
 }
 
 /**
@@ -62,5 +62,5 @@ int do_printf(struct proc *who, struct message *m){
     stdout_file = who->fp_filp[1];
     ptr = get_physical_addr(vp1,who);
     ptr2 = get_physical_addr(vp2,who);
-    return kprintf_vm(stdout_file->filp_dev, ptr, ptr2, who->ctx.rbase);
+    return kprintf_vm(stdout_file, ptr, ptr2, who->ctx.rbase);
 }

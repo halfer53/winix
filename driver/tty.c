@@ -25,18 +25,14 @@ struct tty_state{
     char buffer[BUFFER_SIZ];
 };
 
-struct tty_state state1, state2;
+struct tty_state tty1_state, tty2_state;
 struct device _tty_dev, _tty2_dev;
 struct device *tty_dev = NULL, *tty2_dev = NULL;
+struct filp *tty1_filp = NULL, *tty2_filp = NULL;
 static struct filp_operations fops;
 static struct device_operations dops, dops2;
 static const char* name = "tty";
 static const char* name2 = "tty2";
-// static char buffer[BUFFER_SIZ];
-// char *bptr, *buffer_end;
-// struct proc* reader = NULL;
-// char *read_data;
-// size_t read_count;
 
 
 #define IS_SERIAL_CODE(c) (isprint(c) || c - 7 < 6)
@@ -112,7 +108,7 @@ void tty_exception_handler(RexSp_t* rex, struct tty_state* state){
             if(val == '\r')
                 val = '\n';
 
-            if(IS_SERIAL_CODE(val) || val == '\n'){
+            if(isprint(val) || val == '\n'){
                 *state->bptr++ = val;
                 __kputc(rex, val);
             }else{
@@ -135,11 +131,11 @@ void tty_exception_handler(RexSp_t* rex, struct tty_state* state){
 
 
 void tty1_handler(){
-    tty_exception_handler(RexSp1, &state1);
+    tty_exception_handler(RexSp1, &tty1_state);
 }
 
 void tty2_handler(){
-    tty_exception_handler(RexSp2, &state2);
+    tty_exception_handler(RexSp2, &tty2_state);
 }
 
 int __tty_init(RexSp_t* rex, struct device* dev, struct tty_state* state){
@@ -163,8 +159,7 @@ int __tty_read(struct tty_state* state, char* data, size_t len){
     return count;
 }
 
-int __tty_write(struct tty_state* state, char* data, size_t len){
-    RexSp_t* rex = state->rex;
+int tty_write_rex(RexSp_t* rex, char* data, size_t len){
     char *p = data;
     while(len-- > 0){
         if(IS_SERIAL_CODE(*p)){
@@ -187,7 +182,14 @@ int tty_read ( struct filp *filp, char *data, size_t count, off_t offset){
 }
 
 int tty_write ( struct filp *filp, char *data, size_t count, off_t offset){
-    return __tty_write((struct tty_state*)filp->private, data, count);
+    char buffer[32];
+    struct tty_state* state = (struct tty_state*)filp->private;
+    // kputs(state->dev->init_name);
+    // kputc('\n');
+    // kputx_buf((int)state->rex, buffer);
+    // kputs(buffer);
+    // kputc('\n');
+    return tty_write_rex(state->rex, data, count);
 }
 
 int tty_open ( struct device* dev, struct filp *file){
@@ -203,15 +205,15 @@ int tty_close ( struct device* dev, struct filp *file){
 
 int tty_dev_init(){
     register_irq(8, tty1_handler);
-    return __tty_init(RexSp1, &_tty_dev, &state1);
+    return __tty_init(RexSp1, &_tty_dev, &tty1_state);
 }
 
 int tty_dev_io_read(char *buf, off_t off, size_t len){
-    return __tty_read(&state1, buf, len);
+    return __tty_read(&tty1_state, buf, len);
 }
 
 int tty_dev_io_write(char *buf, off_t off, size_t len){
-    return __tty_write(&state1, buf, len);
+    return tty_write_rex(RexSp1, buf, len);
 }
 
 int tty_dev_release(){
@@ -222,15 +224,15 @@ int tty_dev_release(){
 
 int tty2_dev_init(){
     register_irq(9, tty2_handler);
-    return __tty_init(RexSp2, &_tty2_dev, &state2);
+    return __tty_init(RexSp2, &_tty2_dev, &tty2_state);
 }
 
 int tty2_dev_io_read(char *buf, off_t off, size_t len){
-    return __tty_read(&state2, buf, len);
+    return __tty_read(&tty2_state, buf, len);
 }
 
 int tty2_dev_io_write(char *buf, off_t off, size_t len){
-    return __tty_write(&state2, buf, len);
+    return tty_write_rex(RexSp2, buf, len);
 }
 
 int tty2_dev_release(){
@@ -253,14 +255,25 @@ void init_tty(){
     fops.read = tty_read;
     fops.write = tty_write;
     fops.close = tty_close;
-    
-    tty_dev = &_tty_dev;
-    tty2_dev = &_tty2_dev;
+
     _tty_dev.dops = &dops;
     _tty_dev.fops = &fops;
     _tty2_dev.fops = &fops;
     _tty2_dev.dops = &dops2;
-    
+
+    tty_dev = &_tty_dev;
+    tty2_dev = &_tty2_dev;
+
+    tty1_filp = get_free_filp();
+    tty1_filp->filp_count = 100;
+    tty1_filp->filp_dev = &_tty_dev;
+    tty1_filp->private = (void*) &tty1_state;
+
+    tty2_filp = get_free_filp();
+    tty2_filp->filp_count = 100;
+    tty2_filp->filp_dev = &_tty2_dev;
+    tty2_filp->private = (void*) &tty2_state;
+
     register_device(&_tty_dev, name, TTY_DEV_NUM, S_IFCHR);
     register_device(&_tty2_dev, name2, TTY2_DEV_NUM, S_IFCHR);
 }

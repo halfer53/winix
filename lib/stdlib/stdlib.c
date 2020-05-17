@@ -1,267 +1,111 @@
 #include <lib.h>
 
-/**
- * block structure
- */
-struct s_block {
-    size_t size;
-    struct s_block *next;
-    struct s_block *prev;
-    int free;
-    void *ptr; // a pointer to the allocated block
-    char data[1]; // the pointer where the real data is pointed at. b->data is what malloc returns
-    // The reason we use data[1] is that c returns the address of array by default, 
-    // whereas if we were to use ```char data;```, b-> returns the data instead of the address.
-    // note that data is just put there, it lies directly in the memory block where malloc starts.
+int has_initialized = 0;
+char *managed_memory_start;
+char *last_valid_address;
+
+void malloc_init() { /* grab the last valid address from the OS*/
+  last_valid_address = sbrk(0);
+  /* we don't have any memory to manage yet, so
+   *just set the beginning to be last_valid_address */
+  managed_memory_start = last_valid_address;
+  /* Okay, we're initialized and ready to go */
+  has_initialized = 1;
+}
+struct mem_control_block {
+  int is_available;
+  int size;
 };
 
-static void *base = NULL;
-static int count = 0;
-
-#define BLOCK_SIZE 	(sizeof(struct s_block) - 1)
-#define align4(x) 	(((((x)-1)>>2)<<2)+4)
-#define ALIGN1K(x) 	(((((x)-1)>>10)<<10)+1024)
-
-void printblock(struct s_block *b) {
-    printf("0x%04x size %04d prev 0x%04x next 0x%04x %s\n",
-        b, 
-        b->size, 
-        b->prev, 
-        b->next, 
-        b->free ? "is free" : "in use");
+void free(void *firstbyte) {
+  char* p = firstbyte;
+  struct mem_control_block *mcb;
+  mcb = (struct mem_control_block*)(p - sizeof(struct mem_control_block));
+  mcb->is_available = 1;
+  return;
 }
 
-void print_heap() {
-    int frees = 0;
-    int used = 0;
-    struct s_block *b = base;
+void *malloc(long numbytes) {
+  /* Holds where we are looking in memory */
+  char *current_location;
+  /* This is the same as current_location, but cast to a * memory_control_block
+   */
+  struct mem_control_block *current_location_mcb;
+  /* This is the memory location we will return.
+     It will * be set to 0 until we find something suitable */
+  char *memory_location;
+  /* Initialize if we haven't already done so */
+  if (!has_initialized) {
+    malloc_init();
+  }
+  /* The memory we search for has to include the memory
+   * control block, but the user of malloc doesn't need
+   * to know this, so we'll just add it in for them. */
+  numbytes = numbytes + sizeof(struct mem_control_block);
+  /* Set memory_location to 0 until we find a suitable * location */
+  memory_location = 0;
+  /* Begin searching at the start of managed memory */
+  current_location = managed_memory_start;
+  /* Keep going until we have searched all allocated space */
+  while (current_location != last_valid_address) {
+    /* current_location and current_location_mcb point
+     * to the same address.  However, current_location_mcb
+     * is of the correct type so we can use it as a struct.
+     * current_location is a void pointer so we can use it
+     * to calculate addresses.
+     */
+    current_location_mcb = (struct mem_control_block *)current_location;
+    if (current_location_mcb->is_available) {
+      if (current_location_mcb->size >= numbytes) {
+        /* Woohoo!  We've found an open, * appropriately-size location.  */
+        /* It is no longer available */
+        current_location_mcb->is_available = 0;
+        /* We own it */
+        memory_location = current_location;
+        /* Leave the loop */
+        break;
+      }
+    }
+    /* If we made it here, it's because the Current memory
+     * block not suitable, move to the next one */
+    current_location = current_location + current_location_mcb->size;
+  }
+  /* If we still don't have a valid location, we'll
+   * have to ask the operating system for more memory */
+  if (!memory_location) {
+    /* Move the program break numbytes further */
+    sbrk(numbytes);
+    /* The new memory will be where the last valid * address left off */
+    memory_location = last_valid_address;
+    /* We'll move the last valid address forward * numbytes */
+    last_valid_address = last_valid_address + numbytes;
+    /* We need to initialize the mem_control_block */
+    current_location_mcb = (struct mem_control_block*) memory_location;
+    current_location_mcb->is_available = 0;
+    current_location_mcb->size = numbytes;
+  }
+  /* Now, no matter what (well, except for error conditions),
+   * memory_location has the address of the memory, including
+   * the mem_control_block */
+  /* Move the pointer past the mem_control_block */
+  memory_location = memory_location + sizeof(struct mem_control_block);
+  /* Return the pointer */
+  return memory_location;
+}
+
+void* realloc(void *p, long size){
+    void* ret;
+    char *ptr = p;
+    struct mem_control_block *mcb;
+    mcb = (struct mem_control_block*)(ptr - sizeof(struct mem_control_block));
+    ret = malloc(size);
+    memcpy(ret, p, mcb->size);
+    free(p);
+    return ret;
+}
+
+void print_heap(){
     
-    if(!b){
-        printf("Heap is empty\n");
-        return;
-    }
-    while (b) {
-        if(b->free)
-            frees += b->size;
-        else
-            used += b->size;
-        printblock(b);
-        b = b->next;
-    }
-    printf("Total free words: %d\nTotal words in use: %d\n", frees, used);
-}
-
-
-struct s_block *find_block(struct s_block **last , size_t size) {
-    struct s_block *b = base;
-    while (b && !(b->free && b->size >= size)) {
-        *last = b;
-        b = b->next;
-    }
-    return (b);
-}
-
-
-/* Split block according to size. */
-/* The b block must exist. */
-void split_block(struct s_block *b, size_t s)
-{
-    struct s_block *new;
-    // printf("data 0x%08x new 0x%08x\n", b->data,new);
-    new = (struct s_block *)(b->data + s);
-    new->size = b->size - s - BLOCK_SIZE;
-    new->next = b->next;
-    new->prev = b;
-    new->free = 1;
-    new->ptr = new->data;
-    b->size = s;
-    // printf("new 0x%08x size %d orisize %d\n", new,new->size,b->size);
-    b->next = new;
-    if (new->next)
-        new->next ->prev = new;
-}
-
-
-/* Add a new block at the of heap */
-/* return NULL if things go wrong */
-struct s_block *extend_heap(struct s_block *last , size_t s)
-{
-    int *sb;
-    struct s_block *b, *b2;
-    
-    b = sbrk (0);
-    sb = sbrk(BLOCK_SIZE+s);
-
-    if ((int)sb < 0){
-        perror("");
-        return (NULL);
-    }
-        
-    b->size = s;
-    b->next = NULL;
-    b->prev = last;
-    b->ptr = b->data;
-    if (last)
-        last->next = b;
-    b->free = 0;
-    return b;
-}
-
-void *malloc(size_t size) {
-
-    struct s_block *b, *last;
-    size_t s;
-
-    count++;
-    s = align4(size);
-
-    if (base) {
-        // printf("finding heap\n");
-        /* First find a block */
-        last = base;
-        b = find_block(&last , s);
-        if (b) {
-            /* can we split */
-            if ((b->size - s) >= (BLOCK_SIZE + 4))
-                split_block(b, s);
-            b->free = 0;
-        } else {
-            /* No fitting block , extend the heap */
-            b = extend_heap(last , s);
-            if (!b)
-                return (NULL);
-        }
-    } else {
-        b = extend_heap(NULL , s);
-        if (!b)
-            return (NULL);
-        base = b;
-    }
-    // printblock(b);
-    return (b->data);
-}
-
-/* Get the block from and addr */
-struct s_block *get_block(void *p){
-    return (void *)((int *)p - BLOCK_SIZE);
-}
-
-/* Valid addr for free */
-int valid_addr(void *p)
-{
-    struct s_block *b;
-    if (base)
-    {
-        if ( p > base && p < (void *)sbrk (0))
-        {
-            return (p == (get_block(p))->ptr);
-        }
-    }
-    // printf("invalid addr %x base %x sbrk %x\n",p, base, sbrk(0));
-    // printblock(p);
-    return (0);
-}
-
-struct s_block *fusion(struct s_block *b) {
-    struct s_block* next = b->next;
-    if (next && next->free && ((int)(b->ptr) + b->size == (int)next)) {
-        b->size += BLOCK_SIZE + next->size;
-        b->next = next->next;
-        if (b->next)
-            b->next->prev = b;
-    }
-    return (b);
-}
-
-/* The free */
-/* See free(3) */
-void free(void *p)
-{
-    struct s_block *b;
-    if (valid_addr(p))
-    {
-        b = get_block(p);
-        b->free = 1;
-        /* fusion with previous if possible */
-        if (b->prev && b->prev->free){
-            // printf("fuse prev %x %x\n", b->prev, b);
-            b = fusion(b->prev);
-        }
-            
-        /* then fusion with next */
-        if (b->next && b->next->free){
-            // printf("fuse next %x %x\n", b->next, b);
-            fusion(b);
-        }
-    }
-    // putchar('\n');
-}
-
-void *calloc(size_t number , size_t size) {
-    size_t *ptr;
-    size_t s4, i;
-    ptr = malloc(number * size);
-    if(ptr)
-        memset(ptr, 0, size);
-    return ptr;
-}
-
-
-/* Copy data from block to block */
-void copy_block(struct s_block *src, struct s_block *dst)
-{
-    memcpy(dst->ptr, src->ptr, src->size);
-}
-
-/* The realloc */
-/* See realloc(3) */
-void *realloc(void *p, size_t size)
-{
-    size_t s;
-    struct s_block *b, *new, *next;
-    void *newp;
-    if (!p)
-        return (malloc(size));
-    if (valid_addr(p))
-    {
-        s = align4(size);
-        b = get_block(p);
-        if (b->size >= s)
-        {
-            if (b->size - s >= (BLOCK_SIZE + 4))
-                split_block(b, s);
-        }
-        else
-        {
-            /* Try fusion with next if possible */
-            next = b->next;
-            if (next && next->free
-                    &&    ((int)(b->ptr) + b->size == (int)next)
-                    && (b->size + BLOCK_SIZE + next->size) >= s)
-            {
-                fusion(b);
-                if (b->size - s >= (BLOCK_SIZE + 4))
-                    split_block(b, s);
-            }
-            else
-            {
-                /* good old realloc with a new block */
-                newp = malloc(s);
-                if (!newp)
-                    /* were doomed ! */
-                    return (NULL);
-                /* I assume this work ! */
-                new = get_block(newp);
-                /* Copy data */
-                copy_block(b, new);
-                /* free the old one */
-                free(p);
-                return (newp);
-            }
-        }
-        return (p);
-    }
-    return NULL;
 }
 
 

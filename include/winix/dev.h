@@ -10,6 +10,7 @@
 #include <winix/type.h>
 #include <fs/type.h>
 #include <fs/filp.h>
+#include <winix/rex.h>
 
 struct device_operations{
     int (*dev_init) ();
@@ -40,11 +41,13 @@ struct file_system{
 extern struct device devices;
 extern struct device *tty_dev;
 extern struct device *tty2_dev;
+extern struct filp *tty2_filp;
+extern struct filp *tty1_filp;
 
 void init_dev();
 void init_root_fs();
 void init_all_dev();
-int tty2_dev_io_write(char *buf, off_t off, size_t len);
+int tty_write_rex(RexSp_t* rex, char* data, size_t len);
 
 #endif
 

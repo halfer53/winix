@@ -14,6 +14,8 @@
 #ifndef _W_COMM_H_
 #define _W_COMM_H_ 1
 
+#include <stdbool.h>
+
 // status to suspend caller, reply later
 #define SUSPEND         -998     
 // Don't reply back to the sender
@@ -68,5 +70,7 @@
  #define container_of(ptr, type, member)\
     ((type *)( (char *)ptr - offsetof(type,member) ))
 #endif
+
+extern bool trace_syscall;
 
 #endif

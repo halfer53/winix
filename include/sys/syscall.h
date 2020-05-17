@@ -82,6 +82,7 @@ function params{\
 #define WINFO_PS    1
 #define WINFO_MEM   2
 #define WINFO_SLAB  4
+#define WINFO_TRACE_SYSCALL (8)
 
 #ifndef FILE_SYSTEM_PROJECT
 

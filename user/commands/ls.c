@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <unistd.h>
+#include <dirent.h>
 
 int do_ls(char* pathname){
    DIR* directory;

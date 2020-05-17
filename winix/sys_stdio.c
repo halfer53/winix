@@ -17,8 +17,6 @@
 #include <ctype.h>
 #include <winix/dev.h>
 
-
-
 const char *errlist[_NERROR] = {
     0,			/* EGENERIC */    
     "EPERM",    /* EPERM */
@@ -164,19 +162,6 @@ int kputs_vm_buf(char *s, void *who_rbase, char *buf) {
     return count;
 }
 
-/**
- * print the string to serial port 1
- * @param s 
- */
-// int kputs(const char *s) {
-//     int count = 0;
-//     while(*s){
-//         if(kputc(*s++) != EOF)
-//             count++;
-//     }
-//     return count;    
-// }
-
 // int kput_token(char token, int len){
 //     int count = 0;
 //     while(len--){
@@ -192,6 +177,10 @@ int kputs_vm_buf(char *s, void *who_rbase, char *buf) {
 #define LEFT_PADDING    1
 #define RIGHT_PADDING   2
 
+int tty_non_init_write(struct filp *file, char *data, size_t len, off_t offset){
+    return tty_write_rex(RexSp2, data, len);
+}
+
 
 /**
  * virtual memory printf, this function is used by both kernel and user process
@@ -200,16 +189,18 @@ int kputs_vm_buf(char *s, void *who_rbase, char *buf) {
  * @param  who_rbase rbase of the calling process
  * @return           number of bytes being printed
  */
-int kprintf_vm( struct device* dev, const char *orignal_format, void *arg, ptr_t *who_rbase){
+int kprintf_vm( struct filp* file, const char *orignal_format, void *arg, ptr_t *who_rbase){
     static char buffer[64];
     char *buf = buffer;
     int padding_len;
     int padding_direction;
     int buf_len;
     int count = 0;
-    int (*dev_write_io)(char*, off_t, size_t);
+    int (*filp_write)(struct filp *, char *, size_t, off_t );
     char* format = (char*)orignal_format;
-    dev_write_io = dev ? dev->dops->dev_write : tty2_dev_io_write;
+    
+    filp_write = file ? file->filp_dev->fops->write : tty_non_init_write;
+
     while(*format) {
         if(*format == '%') {
             char prev;
@@ -263,7 +254,7 @@ int kprintf_vm( struct device* dev, const char *orignal_format, void *arg, ptr_t
                 default:
                     // if(kputc(*format++) != EOF)
                     //     count++;
-                    count += dev_write_io(format++, 0, 1);
+                    count += filp_write(file, format++, 1, 0);
                     break;
                 
                 arg_end:
@@ -283,7 +274,7 @@ int kprintf_vm( struct device* dev, const char *orignal_format, void *arg, ptr_t
                         token = ZERO;
                     // count += kput_token(token, padding_len);
                     while(padding_len-- > 0){
-                        count += dev_write_io(&token, 0, 1);
+                        count += filp_write(file, &token, 1, 0);
                     }
                 }else{
                     char* p = buf + buf_len;
@@ -297,7 +288,7 @@ int kprintf_vm( struct device* dev, const char *orignal_format, void *arg, ptr_t
             }
 
             // count += kputs(buf);
-            count += dev_write_io(buf, 0, buf_len);
+            count += filp_write(file, buf, buf_len, 0);
             
             // right padding
             // if(padding_direction == RIGHT_PADDING && padding_len > 0)
@@ -308,31 +299,31 @@ int kprintf_vm( struct device* dev, const char *orignal_format, void *arg, ptr_t
             // serial port 1
             // if(kputc(*format++)!= EOF)
             //     count++;
-            count += dev_write_io(format++, 0, 1);
+            count += filp_write(file, format++, 1, 0);
         }
     }
     return count;
 }
 
-int dev_kprint(struct device* dev, const char* format, ...){
+int filp_kprint(struct filp* file, const char* format, ...){
     void *arg = &format;
     arg = ((char*)arg) + 1;
 
-    return kprintf_vm(dev, format, arg, 0);
+    return kprintf_vm(file, format, arg, 0);
 }
 
 int kprintf(const char *format, ...) {
     void *arg = &format;
     arg = ((char*)arg) + 1;
 
-    return kprintf_vm(tty_dev, format, arg, 0);
+    return kprintf_vm(tty1_filp, format, arg, 0);
 }
 
 int kprintf2(const char *format, ...) {
     void *arg = &format;
     arg = ((char*)arg) + 1;
 
-    return kprintf_vm(tty2_dev, format, arg, 0);
+    return kprintf_vm(tty2_filp, format, arg, 0);
 }
 
 int klog(const char *format, ...){
@@ -340,7 +331,7 @@ int klog(const char *format, ...){
     arg = ((char*)arg) + 1;
 
     kprintf2("[%d] ", get_uptime());
-    return kprintf_vm(tty2_dev,format, arg, 0);
+    return kprintf_vm(tty2_filp,format, arg, 0);
 }
 
 int kerror(const char *format, ...){
@@ -348,7 +339,7 @@ int kerror(const char *format, ...){
     arg = ((char*)arg) + 1;
 
     kprintf("[%d] ERROR: ", get_uptime());
-    return kprintf_vm(tty2_dev, format, arg, 0);
+    return kprintf_vm(tty2_filp, format, arg, 0);
 }
 
 

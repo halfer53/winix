@@ -21,7 +21,8 @@ built_in = {
 	"unistd.h": {POSIX, ANSI, STDLIB},
 	"util.h":	{UTIL},
 	"stdio.h":	{STDIO},
-	"debug.h":	{DEBUG}
+	"debug.h":	{DEBUG},
+	"dirent.h":	{POSIX, STDLIB, ANSI}
 }
 
 dir_path = ""

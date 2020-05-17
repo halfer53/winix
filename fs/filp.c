@@ -58,7 +58,7 @@ filp_t *get_free_filp(){
     int i;
     for(i = 0; i < NR_FILPS; i++ ){
         rep = &fd_table[i];
-        if(rep->filp_ino == NULL){
+        if(rep->filp_count == 0){
             return rep;
         }
     }

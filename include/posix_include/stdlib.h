@@ -11,10 +11,10 @@
 typedef struct { int quot, rem; } div_t;
 typedef struct { long quot, rem; } ldiv_t;
 
-void* malloc (size_t size);
+void* malloc (long size);
 void free(void *ptr);
-void* realloc(void *p,size_t size);
-void *calloc(size_t number , size_t size);
+void* realloc(void *p,long size);
+void *calloc(long number , long size);
 int exit(int status);
 char *getenv(const char *name);
 int putenv(char *name);
