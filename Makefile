@@ -13,7 +13,7 @@ L_TAIL = winix/limits/limits_tail.o
 KERNEL_O = winix/*.o kernel/system/*.o kernel/*.o fs/*.o fs/system/*.o driver/*.o include/disk.o
 KMAIN = kernel/main.s kernel/main.o 
 alldir = winix lib init user kernel fs driver
-FS_DEPEND = fs/*.c fs/system/*.c fs/excluded_files/*.c 
+FS_DEPEND = fs/*.c fs/system/*.c fs/makefs_only/*.c 
 
 # Check if V options is set by user, if V=1, debug mode is set
 # e.g. make V=1 produces all the commands being executed through
@@ -52,7 +52,7 @@ ifeq ($(KBUILD_VERBOSE),0)
 endif
 
 makedisk: $(FS_DEPEND)
-	$(Q)gcc -g -D FILE_SYSTEM_PROJECT -w -I./include/fs_include -I./include $^ -o makedisk
+	$(Q)gcc -g -D MAKEFS_STANDALONE -w -I./include/fs_include -I./include $^ -o makedisk
 	# $(Q)-rm -f $(KMAIN)
 	# $(Q)$(MAKE) -C tools
 

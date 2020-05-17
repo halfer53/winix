@@ -84,7 +84,7 @@ function params{\
 #define WINFO_SLAB  4
 #define WINFO_TRACE_SYSCALL (8)
 
-#ifndef FILE_SYSTEM_PROJECT
+#ifndef MAKEFS_STANDALONE
 
 int _syscall(int syscall_num, struct message *m);
 int ___exit(int status);

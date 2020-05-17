@@ -14,12 +14,12 @@ set(SOURCE_FILES
         makefs.c
         path.c
         system/read_write.c
-        excluded_files/srec_import.c
-        excluded_files/cmake_util.c make_disk.c excluded_files/cmake_util.h excluded_files/cmake_bitmap.c system/pipe.c excluded_files/tty.c system/stat.c system/lseek.c system/chdir_mkdir.c util.c system/chown_chmod.c system/dup.c system/link_unlink.c system/umask_access.c excluded_files/dir_util.c system/getdent.c excluded_files/srec_import.h unit_test.c system/sync.c system/mknod.c)
+        makefs_only/srec_import.c
+        makefs_only/cmake_util.c make_disk.c makefs_only/cmake_util.h makefs_only/cmake_bitmap.c system/pipe.c makefs_only/tty.c system/stat.c system/lseek.c system/chdir_mkdir.c util.c system/chown_chmod.c system/dup.c system/link_unlink.c system/umask_access.c makefs_only/dir_util.c system/getdent.c makefs_only/srec_import.h unit_test.c system/sync.c system/mknod.c rootfs.c)
 
 include_directories(../include/fs_include)
 include_directories(../include)
-add_compile_definitions(FILE_SYSTEM_PROJECT)
+add_compile_definitions(MAKEFS_STANDALONE)
 add_compile_definitions(_DEBUG)
 
 add_executable(fs ${SOURCE_FILES})

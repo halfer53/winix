@@ -33,11 +33,11 @@
 #include <winix/kstring.h>
 #include <fs/fs_methods.h>
 
-#ifdef FILE_SYSTEM_PROJECT
+#ifdef MAKEFS_STANDALONE
 
 #include <string.h>
 #include <stdio.h>
-#include "excluded_files/cmake_util.h"
+#include "makefs_only/cmake_util.h"
 #define kprintf(...) printf(__VA_ARGS__)
 #ifdef _DEBUG
     #define KDEBUG(token)   \
@@ -49,14 +49,14 @@
     #define KDEBUG(token)
 #endif
 
-#else // else not FILE_SYSTEM_PROJECT
+#else // else not MAKEFS_STANDALONE
 
 #include <winix/sys_stdio.h>
 #include <winix/slab.h>
 #include <winix/kdebug.h>
 #include <string.h>
 
-#endif // FILE_SYSTEM_PROJECT
+#endif // MAKEFS_STANDALONE
 
 #endif
 

@@ -25,11 +25,14 @@ int unit_test1(){
     pcurr2.pid = 2;
     pcurr2.proc_nr = 2;
 
+    init_dev();
     init_fs();
+    init_tty();
+    init_all_dev();
+
     mock_init_proc();
     fd = sys_open(current_proc, filename ,O_CREAT | O_RDWR, 0775);
     assert(fd == 0);
-
     fd2 = sys_dup(current_proc, fd);
     assert(fd2 == fd + 1);
 
@@ -215,7 +218,6 @@ int unit_test1(){
 
     ret = sys_close(current_proc, fd4);
     assert(ret == EBADF);
-
 
 
     return 0;

@@ -199,7 +199,7 @@ inode_t* get_inode(int num, struct device* id){
 
     ret = read_inode(num, &rep, id);
     if(ret){
-        KDEBUG(("ERR: read inode %d return %s\n", num, kstr_error(ret)));
+        KDEBUG(("ERR: read inode %d return %d\n", num, ret));
     }
 
     return rep;

@@ -152,8 +152,10 @@ int __tty_read(struct tty_state* state, char* data, size_t len){
     *state->bptr = '\0';
     buffer_count = state->bptr - state->buffer;
     count = buffer_count < len ? buffer_count : len;
-    strncpy(data, state->buffer, count);
-    state->bptr -= count;
+    if(count > 0){
+        strncpy(data, state->buffer, count);
+        state->bptr -= count;
+    }
     return count;
 }
 
@@ -173,6 +175,9 @@ int tty_read ( struct filp *filp, char *data, size_t count, off_t offset){
     struct tty_state* state = (struct tty_state*)filp->private;
     if(state->reader){
         return EBUSY;
+    }
+    if(filp->filp_flags & O_NONBLOCK){
+        return __tty_read(state, data, count);
     }
     state->read_data = data;
     state->read_count = count;
