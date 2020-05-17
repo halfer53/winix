@@ -19,7 +19,6 @@ static char buf[MAX_LINE];
 
 // Prototypes
 CMD_PROTOTYPE(ps);
-CMD_PROTOTYPE(uptime);
 CMD_PROTOTYPE(cmd_kill);
 CMD_PROTOTYPE(print_pid);
 CMD_PROTOTYPE(mem_info);
@@ -37,7 +36,6 @@ struct cmd_internal builtin_commands[] = {
     { printenv, "printenv" },
     { trace_syscall, "trace"},
     { cmd_bash, "bash"},
-    { uptime, "uptime"},
     { ps, "ps"},
     { cmd_kill, "kill"},
     { print_pid, "pid"},
@@ -162,31 +160,6 @@ int help(int argc, char** argv){
         printf(" * %s\n",handler->name);
         handler++;
     }
-    return 0;
-}
-
-/**
- * Prints the system uptime
- **/
- int uptime(int argc, char **argv) {
-    
-    int ticks, days, hours, minutes, seconds, tick_rate;
-    struct tms tbuf;
-    ticks = times(&tbuf);
-    tick_rate = sysconf(_SC_CLK_TCK);
-    seconds = ticks / tick_rate; 
-    minutes = seconds / 60;
-    hours = minutes / 60;
-    days = hours / 24;
-
-    seconds %= 60;
-    minutes %= 60;
-    hours %= 24;
-
-    printf("Uptime is %dd %dh %dm %d.%02ds\n", days, hours, minutes, seconds, ticks % tick_rate);
-    printf("user time %d.%d seconds, system time %d.%02d seconds\n",
-                            tbuf.tms_utime  / tick_rate , (tbuf.tms_utime) % tick_rate,
-                            tbuf.tms_stime / tick_rate , (tbuf.tms_stime) % tick_rate);
     return 0;
 }
 
