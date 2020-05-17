@@ -18,6 +18,7 @@
 #include <dirent.h>
 #include <fs/fs_methods.h>
 #include <winix/list.h>
+#include <winix/dev.h>
 #include "excluded_files/srec_import.h"
 
 void init_bitmap();
@@ -238,7 +239,10 @@ int main(int argc, char** argv){
     mock_init_proc();
     init_bitmap();
     init_disk();
+    init_dev();
     init_fs();
+    init_all_dev();
+
     if(arguments.source_path && arguments.output_path){
         write_srec_to_disk(arguments.source_path, &arguments);
         write_disk(arguments.output_path);

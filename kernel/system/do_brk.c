@@ -61,7 +61,7 @@ void* sys_sbrk(struct proc *who, int size){
     if(err)
         return NULL;        
     
-    // kinfo("extending heap size %d oheap %x newheap %x btm %x\n", size, who->heap_break, 
+    // klog("extending heap size %d oheap %x newheap %x btm %x\n", size, who->heap_break, 
     //                                                         (who->heap_break + size), who->heap_bottom);                                  
     who->heap_break += size;
     who->heap_bottom += align_page(request_size);

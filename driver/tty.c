@@ -119,8 +119,7 @@ void tty1_handler(){
 
 int tty_read ( struct filp *filp, char *data, size_t count, off_t offset){
     if(reader){
-        kerror("race condition, two proc are reading tty %d %d\n", reader->proc_nr, curr_user->proc_nr);
-        return EIO;
+        return EBUSY;
     }
     read_data = data;
     read_count = count;
@@ -153,11 +152,26 @@ int tty_dev_init(){
 }
 
 int tty_dev_io_read(char *buf, off_t off, size_t len){
-    return 0;
+    size_t buffer_count, count;
+    *bptr = '\0';
+    buffer_count = bptr - buffer;
+    count = buffer_count < len ? buffer_count : len;
+    strncpy(buf, buffer, count);
+    bptr -= count;
+    if(bptr < buffer)
+        bptr = buffer;
+    return count;
 }
 
 int tty_dev_io_write(char *buf, off_t off, size_t len){
-    return 0;
+    char *p = buf;
+    while(len-- > 0){
+        if(IS_SERIAL_CODE(*p)){
+            while(!(RexSp1->Stat & 2));
+            RexSp1->Tx = *p++;
+        }
+    }
+    return p - buf;
 }
 
 int tty_dev_release(){
@@ -168,6 +182,7 @@ int tty_dev_release(){
 /* TTY2: Serial Port 2 handler */
 
 int tty2_dev_init(){
+    RexSp2->Ctrl = 7; // 38400 bits per second
     return 0;
 }
 
@@ -181,12 +196,14 @@ int tty2_dev_io_read(char *buf, off_t off, size_t len){
 }
 
 int tty2_dev_io_write(char *buf, off_t off, size_t len){
-    size_t count = len;
-    while(count-- > 0){
-        while(!(RexSp2->Stat & 2));
-        RexSp2->Tx = *buf++;
+    char *p = buf;
+    while(len-- > 0){
+        if(IS_SERIAL_CODE(*p)){
+            while(!(RexSp2->Stat & 2));
+            RexSp2->Tx = *p++;
+        }
     }
-    return len;
+    return p - buf;
 }
 
 int tty2_dev_release(){

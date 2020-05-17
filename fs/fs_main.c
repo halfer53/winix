@@ -5,10 +5,7 @@ void init_fs() {
     init_buf();
     init_inode();
     init_filp();
-    init_dev();
     init_root_fs();
     init_pipe();
-    init_tty();
-    init_all_dev();
 }
 

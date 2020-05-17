@@ -28,6 +28,8 @@ typedef struct filp {
     int filp_table_index;
     zone_t getdent_zone_nr;
     int getdent_dirstream_nr;
+
+    void* private;
     
 }filp_t;
 

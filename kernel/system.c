@@ -78,13 +78,13 @@ void system_main() {
     struct superblock* sb = get_sb(get_dev(ROOT_DEV));
     free_mem_begin = peek_next_free_page() * PAGE_LEN;
     mem_end = peek_last_free_page() * PAGE_LEN;
-    kprintf("\r\nWINIX v%d.%d\r\n", MAJOR_VERSION, MINOR_VERSION);
-    kprintf("Text Segment: 0x%08x - 0x%08x\r\n", &TEXT_BEGIN, &TEXT_END);
-    kprintf("Data Segment: 0x%08x - 0x%08x\r\n", &DATA_BEGIN, &DATA_END);
-    kprintf("BSS Segment:  0x%08x - 0x%08x\r\n", &BSS_BEGIN, &BSS_END);
-    kprintf("Unallocated:  0x%08x - 0x%08x\r\n", free_mem_begin, mem_end);
+    kprintf("\nWINIX v%d.%d\n", MAJOR_VERSION, MINOR_VERSION);
+    kprintf("Text Segment: 0x%08x - 0x%08x\n", &TEXT_BEGIN, &TEXT_END);
+    kprintf("Data Segment: 0x%08x - 0x%08x\n", &DATA_BEGIN, &DATA_END);
+    kprintf("BSS Segment:  0x%08x - 0x%08x\n", &BSS_BEGIN, &BSS_END);
+    kprintf("Unallocated:  0x%08x - 0x%08x\n", free_mem_begin, mem_end);
     kprintf("Root Disk %d Blocks Used, %d Remaining\n", sb->s_block_inuse, sb->s_free_blocks);
-    kprintf("%d Pages Free\r\n", 
+    kprintf("%d Pages Free\n", 
     ((unsigned int)(mem_end - free_mem_begin + PAGE_LEN)) / PAGE_LEN); // inclusive
 }
 
@@ -155,7 +155,7 @@ int syscall_reply(int reply, int dest,struct message* m){
 
 int syscall_reply2(int syscall_num, int reply, int dest, struct message* m){
     struct proc* destproc = get_proc(dest);
-    KDEBUG(("Syscall %s return %d to Proc %s[%d]\n", syscall_str[syscall_num], reply,destproc->name, dest));
+    // KDEBUG(("Syscall %s return %d to Proc %s[%d]\n", syscall_str[syscall_num], reply,destproc->name, dest));
     return syscall_reply(reply, dest, m);
 }
 

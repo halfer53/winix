@@ -17,6 +17,62 @@
 #include <ctype.h>
 #include <winix/dev.h>
 
+
+
+const char *errlist[_NERROR] = {
+    0,			/* EGENERIC */    
+    "EPERM",    /* EPERM */
+    "ENOENT",    /* ENOENT */
+    "ESRCH",    /* ESRCH */
+    "EINTR",    /* EINTR */
+    "EIO",			/* EIO */    
+    "ENXIO",    /* ENXIO */
+    "E2BIG",    /* E2BIG */
+    "ENOEXEC",    /* ENOEXEC */
+    "EBADF",    /* EBADF */
+    "ECHILD",    /* ECHILD */
+    "EAGAIN",    /* EAGAIN */
+    "ENOMEM",    /* ENOMEM */
+    "EACCES",    /* EACCES */
+    "EFAULT",    /* EFAULT */
+    "ENOTBLK",    /* ENOTBLK */
+    "EBUSY",    /* EBUSY */
+    "EEXIST",    /* EEXIST */
+    "EXDEV",		/* EXDEV */    
+    "ENODEV",    /* ENODEV */
+    "ENOTDIR",    /* ENOTDIR */
+    "EISDIR",    /* EISDIR */
+    "EINVAL",    /* EINVAL */
+    "ENFILE",    /* ENFILE */
+    "EMFILE",    /* EMFILE */
+    "ENOTTY",    /* ENOTTY */
+    "ETXTBSY",    /* ETXTBSY */
+    "EFBIG",    /* EFBIG */
+    "ENOSPC",    /* ENOSPC */
+    "ESPIPE",    /* ESPIPE */
+    "EROFS",	/* EROFS */    
+    "EMLINK",    /* EMLINK */
+    "EPIPE",    /* EPIPE */
+    "EDOM",    /* EDOM */
+    "ERANGE",    /* ERANGE */
+    "EDEADLK",    /* EDEADLK */
+    "ENAMETOOLONG",    /* ENAMETOOLONG */
+    "ENOLCK",    /* ENOLCK */
+    "ENOSYS",    /* ENOSYS */
+    "ENOTEMPTY",    /* ENOTEMPTY */
+};
+
+const char* kstr_error(int err){
+    if(err < 0){
+        err = -err;
+    }
+    if(err < 0 || err >= _NERROR)
+        return (const char*)0;
+    return errlist[err];
+}
+
+
+
 #define IS_SERIAL_CODE(c) (isprint(c) || c - 7 < 6)
 
 /**
@@ -112,23 +168,23 @@ PRIVATE int kputs_vm_buf(char *s, void *who_rbase, char *buf) {
  * print the string to serial port 1
  * @param s 
  */
-int kputs(const char *s) {
-    int count = 0;
-    while(*s){
-        if(kputc(*s++) != EOF)
-            count++;
-    }
-    return count;    
-}
+// int kputs(const char *s) {
+//     int count = 0;
+//     while(*s){
+//         if(kputc(*s++) != EOF)
+//             count++;
+//     }
+//     return count;    
+// }
 
-int kput_token(char token, int len){
-    int count = 0;
-    while(len--){
-        if(kputc(token) != EOF)
-            count++;
-    }
-    return count;
-}
+// int kput_token(char token, int len){
+//     int count = 0;
+//     while(len--){
+//         if(kputc(token) != EOF)
+//             count++;
+//     }
+//     return count;
+// }
 
 #define SPACE    ' '
 #define ZERO    '0'
@@ -144,14 +200,16 @@ int kput_token(char token, int len){
  * @param  who_rbase rbase of the calling process
  * @return           number of bytes being printed
  */
-int kprintf_vm( struct device* dev, const char *format, void *arg, ptr_t *who_rbase){
+int kprintf_vm( struct device* dev, const char *orignal_format, void *arg, ptr_t *who_rbase){
     static char buffer[64];
     char *buf = buffer;
     int padding_len;
     int padding_direction;
     int buf_len;
     int count = 0;
-
+    int (*dev_write_io)(char*, off_t, size_t);
+    char* format = (char*)orignal_format;
+    dev_write_io = dev ? dev->dops->dev_write : tty2_dev_io_write;
     while(*format) {
         if(*format == '%') {
             char prev;
@@ -203,8 +261,9 @@ int kprintf_vm( struct device* dev, const char *format, void *arg, ptr_t *who_rb
                     goto arg_end;
 
                 default:
-                    if(kputc(*format++) != EOF)
-                        count++;
+                    // if(kputc(*format++) != EOF)
+                    //     count++;
+                    count += dev_write_io(format++, 0, 1);
                     break;
                 
                 arg_end:
@@ -216,43 +275,72 @@ int kprintf_vm( struct device* dev, const char *format, void *arg, ptr_t *who_rb
             padding_len -= buf_len;
             count += buf_len;
 
+
             // left padding
-            if(padding_direction == LEFT_PADDING && padding_len > 0){ 
-                if(prev == 'x' || prev == 'd')
-                    token = ZERO;
-                count += kput_token(token, padding_len);
+            if(padding_len > 0){ 
+                if(padding_direction == LEFT_PADDING ){
+                    if(prev == 'x' || prev == 'd')
+                        token = ZERO;
+                    // count += kput_token(token, padding_len);
+                    while(padding_len-- > 0){
+                        count += dev_write_io(&token, 0, 1);
+                    }
+                }else{
+                    char* p = buf + buf_len;
+                    buf_len += padding_len;
+                    while(padding_len-- > 0){
+                        *p++ = token;
+                    }
+                    *p = '\0';
+                }
+                
             }
 
-            count += kputs(buf);
-            // count += dev->dops->dev_write(buf, 0, strlen(buf));
+            // count += kputs(buf);
+            count += dev_write_io(buf, 0, buf_len);
             
             // right padding
-            if(padding_direction == RIGHT_PADDING && padding_len > 0)
-                count += kput_token(token, padding_len);
+            // if(padding_direction == RIGHT_PADDING && padding_len > 0)
+            //     count += kput_token(token, padding_len);
             
         }else {
             // if this is a normal character, simply print it to 
             // serial port 1
-            if(kputc(*format++)!= EOF)
-                count++;
+            // if(kputc(*format++)!= EOF)
+            //     count++;
+            count += dev_write_io(format++, 0, 1);
         }
     }
     return count;
+}
+
+int dev_kprint(struct device* dev, const char* format, ...){
+    void *arg = &format;
+    arg = ((char*)arg) + 1;
+
+    return kprintf_vm(dev, format, arg, 0);
 }
 
 int kprintf(const char *format, ...) {
     void *arg = &format;
     arg = ((char*)arg) + 1;
 
-    return kprintf_vm(tty2_dev, format, arg, 0);
+    return kprintf_vm(tty_dev, format, arg, 0);
 }
 
-int kinfo(const char *format, ...){
+int kprintf2(const char *format, ...) {
     void *arg = &format;
     arg = ((char*)arg) + 1;
 
-    kprintf("[%d] ", get_uptime());
-    return kprintf_vm(tty2_dev,format,arg,0);
+    return kprintf_vm(tty2_dev, format, arg, 0);
+}
+
+int klog(const char *format, ...){
+    void *arg = &format;
+    arg = ((char*)arg) + 1;
+
+    kprintf2("[%d] ", get_uptime());
+    return kprintf_vm(tty2_dev,format, arg, 0);
 }
 
 int kerror(const char *format, ...){
@@ -260,7 +348,7 @@ int kerror(const char *format, ...){
     arg = ((char*)arg) + 1;
 
     kprintf("[%d] ERROR: ", get_uptime());
-    return kprintf_vm(tty2_dev, format,arg,0);
+    return kprintf_vm(tty2_dev, format, arg, 0);
 }
 
 

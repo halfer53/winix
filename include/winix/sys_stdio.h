@@ -14,12 +14,16 @@
 #ifndef _W_SYS_STDIO_H_
 #define _W_SYS_STDIO_H_ 1
 
+extern const char *errlist[_NERROR];
+const char* kstr_error(int err);
 
+int dev_kprint(struct device* dev, const char* format, ...);
+int kprintf_vm( struct device* dev, const char *orignal_format, void *arg, ptr_t *who_rbase);
 int kputc(const int c);
 int kgetc(struct proc* who);
 int kprintf(const char *format, ...);
 int kerror(const char *format, ...);
-int kinfo(const char *format, ...);
+int klog(const char *format, ...);
 
 
 #endif

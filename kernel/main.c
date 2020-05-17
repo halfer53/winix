@@ -26,7 +26,12 @@ void start_bins();
  **/
 void main() {
     *((unsigned int*)1) = 0;
+    init_dev();
     init_fs();
+    init_tty();
+    init_all_dev();
+    kprintf2("\nWINIX v%d.%d\n", MAJOR_VERSION, MINOR_VERSION);
+
     init_bitmap();
     init_mem_table();
     init_proc();

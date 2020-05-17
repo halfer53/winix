@@ -142,39 +142,26 @@ PRIVATE void gpf_handler() {
     ASSERT(IS_PROCN_OK(current_proc->proc_nr));
     
     if(*current_proc->stack_top != STACK_MAGIC)
-        kinfo("Stack Overflow\n");
+        kprintf("Stack Overflow\n");
     
 #ifdef _DEBUG
-    kinfo("General Protection Fault: \"%s (%d)\" Rbase=0x%x \n",
+    kprintf("\nGeneral Protection Fault: \"%s (%d)\" Rbase=0x%x \n",
         current_proc->name,
         current_proc->pid,
         current_proc->ctx.rbase);
     pc = get_physical_addr(get_pc_ptr(current_proc),current_proc);
 
-    kinfo("Virtual  ");
+    kprintf("Virtual  ");
     PRINT_DEBUG_REG(get_virtual_addr(pc,current_proc),
                                     current_proc->ctx.m.sp,
                                     current_proc->ctx.m.ra);
 
-    kinfo("Physical ");
+    kprintf("Physical ");
     PRINT_DEBUG_REG(pc, 
         get_physical_addr(current_proc->ctx.m.sp, current_proc),
         get_physical_addr(current_proc->ctx.m.ra, current_proc));    
 
-    // kinfo("Current Instruction: 0x%08x\n",*pc);
-
-// #if _DEBUG == 2
-//     kinfo("$1: 0x%08x, $2, 0x%08x, $3, 0x%08x\n",current_proc->ctx.m.regs[0],
-//                             current_proc->ctx.m.regs[1],current_proc->ctx.m.regs[2]);
-//     kinfo("$4: 0x%08x, $5, 0x%08x, $6, 0x%08x\n",current_proc->ctx.m.regs[3],
-//                             current_proc->ctx.m.regs[4],current_proc->ctx.m.regs[5]);
-//     kinfo("$7: 0x%08x, $8, 0x%08x, $9, 0x%08x\n",current_proc->ctx.m.regs[6],
-//                             current_proc->ctx.m.regs[7],current_proc->ctx.m.regs[8]);
-//     kinfo("$10: 0x%08x, $11, 0x%08x, $12, 0x%08x\n",current_proc->ctx.m.regs[9],
-//                             current_proc->ctx.m.regs[10],current_proc->ctx.m.regs[11]);
-//     kinfo("$13: 0x%08x, $sp, 0x%08x, $ra, 0x%08x\n",current_proc->ctx.m.regs[12],
-//                             current_proc->ctx.m.regs[13],current_proc->ctx.m.regs[14]);
-// #endif
+    // kprintf("Current Instruction: 0x%08x\n",*pc);
 #endif
 
     

@@ -43,6 +43,7 @@ extern struct device *tty2_dev;
 void init_dev();
 void init_root_fs();
 void init_all_dev();
+int tty2_dev_io_write(char *buf, off_t off, size_t len);
 
 #endif
 

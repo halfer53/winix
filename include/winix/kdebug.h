@@ -27,7 +27,7 @@ void kprintf_syscall_reply(int reply);
 void kprintf_syscall_request(int,pid_t);
 
 #ifdef _DEBUG
-    #define KDEBUG(token)   kinfo token
+    #define KDEBUG(token)   klog token
 #else
     #define KDEBUG(token)
 #endif

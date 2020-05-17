@@ -94,7 +94,6 @@ int blk_dev_init(){
     arch_superblock(sb);
     ASSERT(root_fs.sb->magic == SUPER_BLOCK_MAGIC);
     // KDEBUG(("sb block in use %d inode table size %d\n", sb->s_block_inuse, sb->s_inode_table_size));
-    root_fs.sb->s_iroot = NULL;
     return 0;
 }
 
@@ -294,9 +293,6 @@ void init_root_fs(){
     dev->fops = &ops;
     register_device(dev, DEVICE_NAME, devid, S_IFREG);
 
-    ino = get_inode(ROOT_INODE_NUM, dev);
-    ASSERT(ino != NULL);
-    root_fs.sb->s_iroot = ino;
 }
 
 

@@ -23,7 +23,6 @@ struct superblock {
     unsigned int s_inode_table_size;
 
     int s_inode_per_block;
-    inode_t *s_iroot;
     char32_t s_name[32];
 };
 

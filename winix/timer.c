@@ -25,10 +25,10 @@ void kreport_timers(){
     
     while(mq != NULL)
     {
-        kinfo("timer timeout %d from %d\n",mq->time_out, mq->proc_nr);
+        klog("timer timeout %d from %d\n",mq->time_out, mq->proc_nr);
         mq = mq->next;
     }
-    kinfo("next timeout %d\n",next_timeout);
+    klog("next timeout %d\n",next_timeout);
 }
 
 int new_timer(int procnr_from, struct timer* curr, clock_t timeout, timerhandler_t watchdog){

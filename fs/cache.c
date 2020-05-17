@@ -192,7 +192,6 @@ void flush_super_block(struct device* dev){
 //    struct superblock sb1, sb2;
     struct superblock* sb = get_sb(dev);
     dearch_superblock(sb);
-    sb->s_iroot = NULL;
     dev->dops->dev_write((char*)sb, 0, sizeof(struct superblock));
 
 //    dev->dops->dev_read((char*)&sb1, 0, sizeof(struct superblock));
