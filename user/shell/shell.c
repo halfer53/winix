@@ -23,7 +23,7 @@ CMD_PROTOTYPE(uptime);
 CMD_PROTOTYPE(cmd_kill);
 CMD_PROTOTYPE(print_pid);
 CMD_PROTOTYPE(mem_info);
-CMD_PROTOTYPE(mall_info);
+CMD_PROTOTYPE(trace_syscall);
 CMD_PROTOTYPE(generic);
 CMD_PROTOTYPE(help);
 CMD_PROTOTYPE(cmd_exit);
@@ -35,7 +35,7 @@ CMD_PROTOTYPE(do_cd);
 // Command handling
 struct cmd_internal builtin_commands[] = {
     { printenv, "printenv" },
-    { mall_info, "printheap"},
+    { trace_syscall, "trace"},
     { cmd_bash, "bash"},
     { uptime, "uptime"},
     { ps, "ps"},
@@ -191,14 +191,17 @@ int help(int argc, char** argv){
 }
 
 // Print the user space heap
-int mall_info(int argc, char** argv){
-    print_heap();
-    return 0;
+int trace_syscall(int argc, char** argv){
+    struct message m;
+    m.m1_i1 = WINFO_TRACE_SYSCALL;
+    return _syscall(WINFO, &m);
 }
 
 // Print the system wise memory info
 int mem_info(int argc, char** argv){
-    return sys_meminfo();
+    struct message m;
+    m.m1_i1 = WINFO_MEM;
+    return _syscall(WINFO, &m);
 }
 
 // current pid
@@ -209,7 +212,9 @@ int print_pid(int argc, char **argv){
 
 // list all the processes in the system
 int ps(int argc, char **argv){
-    return sys_ps();
+    struct message m;
+    m.m1_i1 = WINFO_PS;
+    return _syscall(WINFO, &m);
 }
 
 // start a new bash shell, parent shell is blocked until child shell exits
