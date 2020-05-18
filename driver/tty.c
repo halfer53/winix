@@ -98,8 +98,8 @@ void tty_exception_handler(RexSp_t* rex, struct tty_state* state){
             if(state->bptr > state->buffer){
                 state->bptr--;
                 __kputc(rex, val);
-                goto end;
             }
+            goto end;
         }
 
         if(state->bptr < state->buffer_end){
