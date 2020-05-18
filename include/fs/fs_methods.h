@@ -29,7 +29,7 @@ int sys_fstat(struct proc* who, int fd, struct stat* statbuf);
 int sys_link(struct proc* who, char *oldpath, char *newpath);
 int sys_unlink(struct proc* who, char *path);
 int sys_mknod(struct proc* who, char *pathname, mode_t mode, dev_t devid);
-int sys_getdent(struct proc* who, int fd, struct dirent* dirp_dst);
+int sys_getdents(struct proc* who, int fd, struct dirent* dirp_dst, unsigned int count);
 
 int init_dirent(inode_t* dir, inode_t* ino);
 int fill_dirent(inode_t* ino, struct winix_dirent* curr, char* string);

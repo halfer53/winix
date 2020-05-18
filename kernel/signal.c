@@ -200,7 +200,7 @@ int send_sig(struct proc *who, int signum){
         struct message m;
         m.type = 0;
         who->state &= ~STATE_PAUSING;
-        syscall_reply(EINTR, who->proc_nr, &m);
+        syscall_reply2(0, EINTR, who->proc_nr, &m);
     }
 
     // add it the list of pending signals

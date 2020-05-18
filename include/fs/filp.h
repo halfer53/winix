@@ -26,8 +26,8 @@ typedef struct filp {
     /* following are for fd-type-specific select() */
     // int filp_pipe_select_ops;
     int filp_table_index;
-    zone_t getdent_zone_nr;
-    int getdent_dirstream_nr;
+    zone_t getdents_zone_nr;
+    int getdents_dirstream_nr;
 
     void* private;
     

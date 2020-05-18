@@ -27,10 +27,14 @@ struct winix_dirent {
     dev_t dev;
 };
 
+#define DIR_BUFFER_LEN  (3)
+
 struct __dir{
     int fd;
     int pos;
-    struct dirent buffer;
+    int limit;
+    int is_cached;
+    struct dirent buffer[DIR_BUFFER_LEN];
 };
 
 typedef struct __dir DIR;

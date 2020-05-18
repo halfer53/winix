@@ -129,9 +129,10 @@ int mkdir(const char *pathname, mode_t mode){
     return _syscall(MKDIR, &m);
 }
 
-int getdent( int fd, struct dirent *dirp){
+int getdents( int fd, struct dirent *dirp, unsigned int count){
     struct message m;
     m.m1_i1 = fd;
+    m.m1_i2 = count;
     m.m1_p1 = (void*)dirp;
     return _syscall(GETDENT, &m);
 }

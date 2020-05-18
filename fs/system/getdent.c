@@ -4,7 +4,7 @@
 
 #include "../fs.h"
 
-int sys_getdent(struct proc* who, int fd, struct dirent* dirp_dst){
+int sys_getdents(struct proc* who, int fd, struct dirent* dirp_dst, unsigned int count){
     int i, dirstream_nr, ret = 0;
     struct block_buffer *buffer;
     struct winix_dirent* dirstream, *endstream;
@@ -21,8 +21,8 @@ int sys_getdent(struct proc* who, int fd, struct dirent* dirp_dst){
     if(!S_ISDIR(dirp->i_mode))
         return ENOTDIR;
 
-    dirstream_nr = file->getdent_dirstream_nr;
-    i = file->getdent_zone_nr;
+    dirstream_nr = file->getdents_dirstream_nr;
+    i = file->getdents_zone_nr;
     for(; i < NR_TZONES; i++){
         bnr = dirp->i_zone[i];
         if(bnr > 0){
@@ -30,29 +30,34 @@ int sys_getdent(struct proc* who, int fd, struct dirent* dirp_dst){
             endstream = (struct winix_dirent*)&buffer->block[BLOCK_SIZE];
             dirstream = (struct winix_dirent*)buffer->block;
             dirstream += dirstream_nr;
-            while(dirstream->dirent.d_ino == 0 && dirstream < endstream){
+
+            while(dirstream < endstream){
+                if(!count)
+                    break;
+
+                if(dirstream->dirent.d_ino > 0) {
+                    memcpy(dirp_dst++, &dirstream->dirent, sizeof(struct dirent));
+                    ret += sizeof(struct dirent);
+                    file->getdents_dirstream_nr = dirstream_nr + 1;
+                    count--;
+                }
                 dirstream++;
                 dirstream_nr++;
             }
-            if(dirstream >= endstream){
-                file->getdent_zone_nr++;
-                put_block_buffer(buffer);
-                continue;
+            if(count){
+                file->getdents_zone_nr++;
+                dirstream_nr = 0;
             }
-            memcpy(dirp_dst, &dirstream->dirent, sizeof(struct dirent));
-            ret += sizeof(struct dirent);
-            dirstream_nr++;
-            file->getdent_dirstream_nr = dirstream_nr;
             put_block_buffer(buffer);
         }
     }
     return ret;
 }
 
-int do_getdent(struct proc* who, struct message* msg){
+int do_getdents(struct proc* who, struct message* msg){
     struct dirent* path = (struct dirent *) get_physical_addr(msg->m1_p1, who);
     if(!is_vaddr_accessible(msg->m1_p1, who))
         return EACCES;
-    return sys_getdent(who, msg->m1_i1, path);
+    return sys_getdents(who, msg->m1_i1, path, msg->m1_i2);
 }
 

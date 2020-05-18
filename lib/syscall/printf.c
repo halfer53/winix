@@ -2,7 +2,7 @@
 #include <errno.h>
 #include <stddef.h>
 
-#define ESTR_SIZ    (32)
+#define ESTR_SIZ    (16)
 
 static char estr[ESTR_SIZ];
 

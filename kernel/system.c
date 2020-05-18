@@ -209,7 +209,7 @@ void init_syscall_table(){
     SYSCALL_MAP(DUP2, do_dup2);
     SYSCALL_MAP(LINK, do_link);
     SYSCALL_MAP(UNLINK, do_unlink);
-    SYSCALL_MAP(GETDENT, do_getdent);
+    SYSCALL_MAP(GETDENT, do_getdents);
     SYSCALL_MAP(ACCESS, do_access);
     SYSCALL_MAP(MKDIR, do_mkdir);
     SYSCALL_MAP(SYNC, do_sync);

@@ -156,14 +156,14 @@ int unit_test1(){
 
     fd3 = sys_open(current_proc, "/dev", O_RDONLY, 0);
     assert(fd3 >= 0);
-    struct dirent dir;
+    struct dirent dir[4];
 
+    ret = sys_getdents(current_proc, fd3, dir, 5);
+    assert(ret == sizeof(struct dirent) * 4);
     for (int i = 0; i < 4; ++i) {
-        ret = sys_getdent(current_proc, fd3, &dir);
-        assert(ret == sizeof(struct dirent));
-        assert(char32_strcmp(dir.d_name, dirent_array[i]) == 0);
+        assert(char32_strcmp(dir[i].d_name, dirent_array[i]) == 0);
     }
-    ret = sys_getdent(current_proc, fd3, &dir);
+    ret = sys_getdents(current_proc, fd3, dir, 10);
     assert(ret == 0);
 
     ret = sys_unlink(current_proc, "/dev/bar2.txt");

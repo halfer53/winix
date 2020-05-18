@@ -64,7 +64,7 @@ int do_dup(struct proc* who, struct message* msg);
 int do_dup2(struct proc* who, struct message* msg);
 int do_link(struct proc* who, struct message* msg);
 int do_unlink(struct proc* who, struct message* msg);
-int do_getdent(struct proc* who, struct message* msg);
+int do_getdents(struct proc* who, struct message* msg);
 int do_access(struct proc* who, struct message* msg);
 int do_mkdir(struct proc* who, struct message* msg);
 int do_sync(struct proc* who, struct message* msg);
