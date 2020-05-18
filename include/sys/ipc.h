@@ -16,12 +16,10 @@
 #ifndef _WINIX_IPC_H_
 #define _WINIX_IPC_H_ 1
 
-#include <signal.h>
 
 typedef struct {int m1i1, m1i2, m1i3; void *m1p1, *m1p2, *m1p3;} mess_1;
 typedef struct {long m2l1, m2l2, m2l3, m2l4, m2l5, m2l6;} mess_2;
 typedef struct {int m3i1, m3i2; void *m3p1, *m3p2; void(*m3f1)(void), *m3f2; } mess_3;
-
 /**
  * The message structure for IPC
  * IMPORTANT: the length of struct message and
