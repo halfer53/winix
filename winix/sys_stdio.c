@@ -207,16 +207,18 @@ int kprintf_vm( struct filp* file, const char *orignal_format, void *arg, ptr_t 
     int count = 0;
     int (*filp_write)(struct filp *, char *, size_t, off_t );
     char* format = (char*)orignal_format;
+    char prev;
+    char token = SPACE;
+    int format_len;
     
     filp_write = file ? file->filp_dev->fops->write : tty_non_init_write;
 
     while(*format) {
 
         if(*format == '%') {
-            char prev;
-            char token = SPACE;
             format++;
             padding_len = 0;
+            format_len = 0;
             padding_direction = LEFT_PADDING;
             buf = buffer;
 
@@ -256,7 +258,6 @@ int kprintf_vm( struct filp* file, const char *orignal_format, void *arg, ptr_t 
                 case 'x':
                 case 'p':
                     buf_len = kputx_buf(*((int*)arg),buf);
-                    padding_direction = LEFT_PADDING;
                     break;
 
                 case 's':
@@ -273,7 +274,6 @@ int kprintf_vm( struct filp* file, const char *orignal_format, void *arg, ptr_t 
             }
             arg = ((char *)arg) + 1;
             format++;
-            
 
             padding_len -= buf_len;
             count += buf_len;
@@ -282,7 +282,7 @@ int kprintf_vm( struct filp* file, const char *orignal_format, void *arg, ptr_t 
             // left padding
             if(padding_len > 0){ 
                 if(padding_direction == LEFT_PADDING ){
-                    static char padding_buffer[PADDING_BUFFER_SIZ];
+                    char padding_buffer[PADDING_BUFFER_SIZ];
                     char *padding_ptr = padding_buffer;
                     int len = padding_len;
                     if(prev == 'x' || prev == 'd')
@@ -317,8 +317,6 @@ int kprintf_vm( struct filp* file, const char *orignal_format, void *arg, ptr_t 
     if(buf_len > 0){
         count += filp_write(file, buffer, buf_len, 0);
     }
-    //reset buffer
-    buffer[0] = 0;
     return count;
 }
 
