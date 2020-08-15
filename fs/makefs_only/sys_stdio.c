@@ -180,8 +180,10 @@ int kputs_vm_buf(char *s, void *who_rbase, char *buf) {
 #define BUFFER_SIZ  (64)
 #define PADDING_BUFFER_SIZ  (20)
 
+
+
 int tty_non_init_write(struct filp *file, char *data, size_t len, off_t offset){
-    return tty_write_rex(RexSp2, data, len);
+    return 0;
 }
 
 void add_to_buffer(char* buf, int *buf_len, char c){
@@ -224,8 +226,7 @@ int kprintf_vm( struct filp* file, const char *orignal_format, void *arg, ptr_t 
 
             // flush the buffer
             if(buf_len > 0){
-                count += filp_write(file, buffer, buf_len, count);
-                buf_len = 0;
+                count += filp_write(file, buffer, buf_len, 0);
             }
             
             // decode padding options
@@ -277,7 +278,7 @@ int kprintf_vm( struct filp* file, const char *orignal_format, void *arg, ptr_t 
             format++;
 
             padding_len -= buf_len;
-            // count += buf_len;
+            count += buf_len;
 
 
             // left padding
@@ -292,7 +293,7 @@ int kprintf_vm( struct filp* file, const char *orignal_format, void *arg, ptr_t 
                         *padding_ptr++ = token;
                         // count += filp_write(file, &token, 1 , 0);
                     }
-                    count += filp_write(file, padding_buffer, padding_len , count);
+                    count += filp_write(file, padding_buffer, padding_len , 0);
                 }else{
                     char* p = buf + buf_len;
                     buf_len += padding_len;
@@ -302,7 +303,7 @@ int kprintf_vm( struct filp* file, const char *orignal_format, void *arg, ptr_t 
                     *p = '\0';
                 }
             }
-            count += filp_write(file, buf, buf_len, count);
+            count += filp_write(file, buf, buf_len, 0);
             buf_len = 0;
         }else {
             // if this is a normal character, simply print it to 
@@ -310,13 +311,13 @@ int kprintf_vm( struct filp* file, const char *orignal_format, void *arg, ptr_t 
             // count += filp_write(file, format++, 1, 0);
             buffer[buf_len++] = *format++;
             if(buf_len >= BUFFER_SIZ){
-                count += filp_write(file, buffer, buf_len, count);
+                count += filp_write(file, buffer, buf_len, 0);
                 buf_len = 0;
             }
         }
     }
     if(buf_len > 0){
-        count += filp_write(file, buffer, buf_len, count);
+        count += filp_write(file, buffer, buf_len, 0);
     }
     return count;
 }
@@ -328,34 +329,11 @@ int filp_kprint(struct filp* file, const char* format, ...){
     return kprintf_vm(file, format, arg, 0);
 }
 
-int kprintf(const char *format, ...) {
+int dkprintf(struct proc* who, int fd, const char* format, ...){
     void *arg = &format;
     arg = ((char*)arg) + 1;
-
-    return kprintf_vm(tty1_filp, format, arg, 0);
-}
-
-int kprintf2(const char *format, ...) {
-    void *arg = &format;
-    arg = ((char*)arg) + 1;
-
-    return kprintf_vm(tty2_filp, format, arg, 0);
-}
-
-int klog(const char *format, ...){
-    void *arg = &format;
-    arg = ((char*)arg) + 1;
-
-    kprintf2("[%d] ", get_uptime());
-    return kprintf_vm(tty2_filp,format, arg, 0);
-}
-
-int kerror(const char *format, ...){
-    void *arg = &format;
-    arg = ((char*)arg) + 1;
-
-    kprintf("[%d] ERROR: ", get_uptime());
-    return kprintf_vm(tty2_filp, format, arg, 0);
+    struct filp* file = who->fp_filp[fd];
+    return kprintf_vm(file, format, arg, 0);
 }
 
 

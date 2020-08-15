@@ -1,6 +1,8 @@
 #include "fs.h"
 
+#define INODE_ARC_MAP_LEN   (8)
 inode_t inode_table[NR_INODES];
+unsigned int inode_arch_map[INODE_ARC_MAP_LEN];
 
 struct inode* get_free_inode_slot(){
     inode_t* rep;
@@ -147,15 +149,21 @@ int init_inode_non_disk(struct inode* ino, ino_t num, struct device* dev, struct
 }
 
 void arch_inode(struct inode* ino){
+    
 #ifdef __wramp__
-    ino->i_size /= 4;
+    if(!is_bit_on(inode_arch_map, INODE_ARC_MAP_LEN, ino->i_num)){
+        ino->i_size /= 4;
+        bitmap_set_bit(inode_arch_map, INODE_ARC_MAP_LEN, ino->i_num);
+    }
+    
 #endif
 }
 
 void dearch_inode(struct inode* ino){
-#ifdef __wramp__
-    ino->i_size *= 4;
-#endif
+
+// #ifdef __wramp__
+//     ino->i_size *= 4;
+// #endif
 }
 
 int read_inode(int num, struct inode** ret_ino, struct device* id){
@@ -263,6 +271,7 @@ inode_t* alloc_inode(struct proc* who, struct device* parentdev, struct device* 
     inode->i_uid = who->uid;
     inode->i_count += 1;
     inode->i_ctime = INODE_MOCK_UTC_TIME;
+    bitmap_set_bit(inode_arch_map, INODE_ARC_MAP_LEN, inum);
 
     sb->s_free_inodes -= 1;
     sb->s_inode_inuse += 1;
@@ -428,6 +437,7 @@ void init_inode(){
         rep->i_num = 0;
         rep->i_count = 0;
     }
+    bitmap_clear(inode_arch_map, INODE_ARC_MAP_LEN);
 }
 
 

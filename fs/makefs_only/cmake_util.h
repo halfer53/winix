@@ -19,5 +19,5 @@ void mock_init_proc();
 void _assert(int expression, int line, char* filename);
 void init_tty();
 
-
+int dkprintf(struct proc* who, int fd, const char* format, ...);
 #endif //FS_CMAKE_UTIL_H

@@ -1,12 +1,12 @@
 #include <stdio.h>
 #include <sys/syscall.h>
 #include <sys/fcntl.h>
-#include <stdio.h>
+#include <string.h>
 
 int main(int argc, char *argv[]){
     if(argc < 2)
         return -1;
-    dprintf(2, "%s\n", argv[1]);
+    dprintf(2, "%s %d\n", argv[1], strlen(argv[1]));
     printf("%s\n", argv[1]);
     return 0;
 }

@@ -11,6 +11,11 @@ const char * dirent_array[] = {
         "bar2.txt"
 };
 
+int file_size(struct proc* who, int fd){
+    struct stat statbuf;
+    int ret = sys_fstat(who, fd, &statbuf);
+    return statbuf.st_size;
+}
 
 int unit_test1(){
     struct proc pcurr2;
@@ -42,7 +47,7 @@ int unit_test1(){
     assert(ret == 4);
     ret = sys_read(current_proc, fd, buffer, 100);
     assert(ret == 0);
-    ret = sys_lseek(current_proc,fd2, 0, SEEK_SET);
+    ret = sys_lseek(current_proc, fd2, 0, SEEK_SET);
     assert(ret == 0);
     ret = sys_read(current_proc, fd, buffer, 100);
     assert(ret == 7);
@@ -52,9 +57,10 @@ int unit_test1(){
     ret = sys_close(current_proc, fd2);
     assert(ret == 0);
 
-    fd = sys_open(current_proc, filename ,O_RDONLY, 0775);
-    assert(fd == 0);
 
+    fd = sys_open(current_proc, filename ,O_RDONLY, 0x0775);
+    assert(fd == 0);
+    assert(file_size(current_proc, fd) == 7);
     ret = sys_read(current_proc, fd, buffer, 100);
     assert(ret == 7);
     assert(strcmp(buffer, "abcdef") == 0);
