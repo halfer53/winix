@@ -23,7 +23,6 @@ CMD_PROTOTYPE(cmd_kill);
 CMD_PROTOTYPE(print_pid);
 CMD_PROTOTYPE(mem_info);
 CMD_PROTOTYPE(trace_syscall);
-CMD_PROTOTYPE(generic);
 CMD_PROTOTYPE(help);
 CMD_PROTOTYPE(cmd_exit);
 CMD_PROTOTYPE(printenv);
@@ -43,8 +42,7 @@ struct cmd_internal builtin_commands[] = {
     { cmd_exit, "exit"},
     { help, "help"},
     { do_cd, "cd"},
-    { generic, NULL },
-    {0}
+    { 0, NULL}
 };
 
 void init_shell(){
@@ -78,7 +76,63 @@ int main() {
     return 0;
 }
 
+int search_path(char* path, char* name){
+    strcpy(path, "/bin/");
+    strcat(path, name);
+    return access(path, F_OK);
+}
 
+/**
+ * Handles any unknown command.
+ **/
+int _exec_cmd(char *line, struct cmdLine *cmd) {
+    char buffer[128];
+    int status;
+    int ret;
+    pid_t pid;
+    sigset_t sigmask = 0;
+    int saved_stdin, saved_stdout;
+    int sin = STDIN_FILENO, sout = STDOUT_FILENO;
+
+    if(cmd->argc == 0)
+        return -1;
+    if(*line == '#')
+        return 0;
+    
+    if(cmd->outfile){ //if redirecting output
+        int mode = O_WRONLY | O_CREAT;
+        saved_stdout = dup(STDOUT_FILENO); //backup stdout
+        if(cmd->append) //if append
+            mode |= O_APPEND;
+        else //else replace theoriginal document
+            mode |= O_TRUNC;
+        sout = open(cmd->outfile, mode, 0644);
+        dup2(sout,STDOUT_FILENO);
+        close(sout);
+    }
+    
+    if(search_path(buffer, cmd->argv[0]) == 0){
+        pid = vfork();
+        if(pid == 0){
+            sigprocmask(SIG_SETMASK, &sigmask, NULL);
+            execv(buffer, cmd->argv);
+            perror("execv");
+            return -1;
+        }
+        ret = wait(&status);
+        // printf("parent awaken\n");
+    }else{
+        fprintf(stderr, "Unknown command '%s'\r\n", cmd->argv[0]);
+        return -1;
+    }
+
+    if(cmd->outfile){
+        dup2(saved_stdout,STDOUT_FILENO);
+        close(saved_stdout);
+    }
+
+    return 0;
+}
 
 int exec_cmd(char *line, int tpipe[2]){
     struct cmdLine cmd;
@@ -101,16 +155,16 @@ int exec_cmd(char *line, int tpipe[2]){
         return 0;
     }
 
-    if(!cmd.argv[0])
-        return generic(cmd.argc, cmd.argv);
-
     // Decode command
     handler = builtin_commands;
-    while(handler->name != NULL && strcmp(cmd.argv[0], handler->name)) {
+    while(handler && handler->name && strcmp(cmd.argv[0], handler->name)) {
         handler++;
     }
     // Run it
-    return handler->handle(cmd.argc, cmd.argv);
+    if(handler->name){
+        return handler->handle(cmd.argc, cmd.argv);
+    }
+    return _exec_cmd(line, &cmd);
 }
 
 
@@ -216,34 +270,6 @@ int cmd_exit(int argc, char **argv){
     return exit(status);
 }
 
-
-/**
- * Handles any unknown command.
- **/
-int generic(int argc, char **argv) {
-    char path[DIRSIZ];
-    int ret;
-    pid_t pid;
-    sigset_t sigmask = 0;
-    if(argc == 0)
-        return -1;
-    strcpy(path, "/bin/");
-    strcat(path, argv[0]);
-    ret = access(path, F_OK);
-    if(ret == 0){
-        pid = vfork();
-        if(pid == 0){
-            sigprocmask(SIG_SETMASK, &sigmask, NULL);
-            execv(path, argv);
-        }
-        ret = wait(NULL);
-        // printf("parent awaken\n");
-        return 0;
-    }
-
-    printf("Unknown command '%s'\r\n", argv[0]);
-    return -1;
-}
 
 
 

@@ -20,6 +20,7 @@
 #include <sys/types.h>
 #include <sys/dirent.h>
 #include <sys/stat.h>
+#include <signal.h>
 
 
 #define _NSYSCALL               44
@@ -133,7 +134,7 @@ int stat(const char *pathname, struct stat *statbuf);
 int chmod(const char *pathname, mode_t mode);
 int chown(const char *pathname, uid_t owner, gid_t group);
 int mknod(const char *pathname, mode_t mode, dev_t dev);
-int printf(const char *format, ...);
+
 
 
 #endif

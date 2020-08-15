@@ -57,6 +57,10 @@ typedef struct __iobuf {
 #define	stdout		stdout
 #define	stderr		stderr
 
+#define STDIN_FILENO	(0)
+#define STDOUT_FILENO	(1)
+#define STDERR_FILENO	(2)
+
 #define	BUFSIZ		1024
 #ifndef NULL
 #define	NULL		((void *)0)
@@ -64,7 +68,7 @@ typedef struct __iobuf {
 #define	EOF		(-1)
 
 
-// #include <sys/dir.h>
+#include <sys/dirent.h>
 #define	FILENAME_MAX	DIRSIZ
 
 #define	TMP_MAX		999
@@ -79,6 +83,8 @@ typedef unsigned int	size_t;		/* type returned by sizeof */
 #endif /* _SIZE_T */
 
 int printf(const char *format, ...);
+int dprintf(int fd, const char *format, ...);
+int fprintf(FILE *stream, const char *format, ...);
 int putchar(const char c);
 int getchar();
 

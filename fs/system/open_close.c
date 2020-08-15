@@ -15,7 +15,7 @@
          return ret;
      who->fp_filp[fd] = NULL;
      return OK;
- }
+}
 
 int root_fs_write (struct filp *filp, char *data, size_t count, off_t offset);
 

@@ -49,17 +49,19 @@ int do_winix_strerror(struct proc* who, struct message* msg){
  * @return     
  */
 int do_winix_dprintf(struct proc *who, struct message *m){
-    struct filp* stdout_file;
+    struct filp* file;
+    int fd;
     vptr_t* vp1, *vp2;
     void *ptr, *ptr2;
+    fd = m->m1_i1;
     vp1 = m->m1_p1;
     vp2 = m->m1_p2;
     if(!is_vaddr_ok(vp1, who) || !is_vaddr_ok(vp2, who))
         return EFAULT;
-    if(!is_fd_opened_and_valid(who, 1))
+    if(!is_fd_opened_and_valid(who, fd))
         return EBADF;
-    stdout_file = who->fp_filp[1];
+    file = who->fp_filp[fd];
     ptr = get_physical_addr(vp1,who);
     ptr2 = get_physical_addr(vp2,who);
-    return kprintf_vm(stdout_file, ptr, ptr2, who->ctx.rbase);
+    return kprintf_vm(file, ptr, ptr2, who->ctx.rbase);
 }

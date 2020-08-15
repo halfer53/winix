@@ -1,6 +1,7 @@
 #include <sys/syscall.h>
 #include <errno.h>
 #include <stddef.h>
+#include <stdio.h>
 
 #define ESTR_SIZ    (16)
 
@@ -17,6 +18,10 @@ int __dprintf(int fd, const char *format, void* args){
 int dprintf(int fd, const char *format, ...){
     
     return __dprintf(fd, format, (int*)&format + 1);
+}
+
+int fprintf(FILE *stream, const char *format, ...){
+    return __dprintf(stream->_fd, format, (int*)&format + 1);
 }
 
 int printf(const char *format, ...) {
