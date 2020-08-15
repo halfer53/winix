@@ -19,7 +19,6 @@ int do_ls(char* pathname){
        symbol = dir->d_type == DT_DIR ? slash : "";
         printf("%s%ls  ", symbol, dir->d_name);
    }
-   printf("\n");
    closedir(directory);
    return 0;
 }

@@ -70,6 +70,7 @@ int do_mkdir(struct proc* who, struct message* msg);
 int do_sync(struct proc* who, struct message* msg);
 int do_lseek(struct proc* who, struct message* msg);
 int do_umask(struct proc* who, struct message* msg);
+int do_fcntl(struct proc* who, struct message* msg);
 
 #endif
 

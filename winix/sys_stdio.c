@@ -262,7 +262,7 @@ int kprintf_vm( struct filp* file, const char *orignal_format, void *arg, ptr_t 
                     break;
 
                 case 's':
-                    buf = *(char **)arg+ (int)who_rbase;
+                    buf = *(char **)arg + (int)who_rbase;
                     buf_len = strlen(buf);
                     break;
 
@@ -296,7 +296,7 @@ int kprintf_vm( struct filp* file, const char *orignal_format, void *arg, ptr_t 
                 }else{
                     char* p = buf + buf_len;
                     buf_len += padding_len;
-                    while(padding_len-- > 0){
+                    while(padding_len-- > 0){ 
                         *p++ = token;
                     }
                     *p = '\0';

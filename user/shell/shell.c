@@ -130,7 +130,7 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
         dup2(saved_stdout,STDOUT_FILENO);
         close(saved_stdout);
     }
-
+    printf("\n");
     return 0;
 }
 
