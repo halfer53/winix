@@ -71,7 +71,7 @@ const char* kstr_error(int err){
 
 
 
-#define IS_SERIAL_CODE(c) (isprint(c) || c - 7 < 6)
+#define IS_SERIAL_CODE(c) (c >= 0 && c <= 127)
 
 /**
  * print value of n in hexadecimal string format
