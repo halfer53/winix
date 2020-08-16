@@ -139,7 +139,13 @@ void tty2_handler(){
 int __tty_init(RexSp_t* rex, struct device* dev, struct tty_state* state){
     char* buf;
     dev->private = (void*)state;
-    rex->Ctrl = (1 << 8) | 7; // 38400 bits per second, interrupt enabled for serial port 1
+    // rex->Ctrl = (1 << 8) | 7; // 38400 bits per second, interrupt enabled for serial port 2
+    if(rex == RexSp1){
+        rex->Ctrl = (1 << 8) | 1; // interrupt enabled for serial port 1
+    }else{
+        rex->Ctrl = (1 << 8) | 7; // 38400 bits per second, interrupt enabled for serial port 2
+    }
+    
     buf = state->buffer;
     state->bptr = buf;
     state->buffer_end = buf + BUFFER_SIZ - 1;

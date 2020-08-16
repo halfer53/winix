@@ -304,11 +304,83 @@ int kprintf_vm( struct filp* file, const char *orignal_format, void *arg, ptr_t 
             }
             count += filp_write(file, buf, buf_len, count);
             buf_len = 0;
+
+        }else if(*format == '\\'){
+            char outchar;
+            format++;
+
+            switch (*format)
+            {
+            case 'a':
+                outchar = 0x7;
+                break;
+            case 'b':
+                outchar = 0x8;
+                break;
+            case 'e':
+                outchar = 0x1b;
+                break;
+            case 'n':
+                outchar = 0xa;
+                break;
+            case 'r':
+                outchar = 0xd;
+                break;
+            case 't':
+                outchar = 0x9;
+                break;
+            
+            default:
+                outchar = *format;
+                break;
+            }
+            KDEBUG(("escape char %x\n", outchar));
+            buffer[buf_len++] = outchar;
+            format++;
+
         }else {
+
+            char outchar = *format;
+
+            // switch (*format)
+            // {
+            // case '\\':
+            //     outchar = '!';
+            //     break;
+            // case '\a':
+            //     outchar = 0x7;
+            //     break;
+            // case '\b':
+            //     outchar = 0x8;
+            //     break;
+            // case 0x1b:
+            //     outchar = '!';
+            //     break;
+            // case 'e':
+            //     outchar = '!';
+            //     break;
+            // case '\n':
+            //     outchar = 0xa;
+            //     break;
+            // case '\r':
+            //     outchar = 0xd;
+            //     break;
+            // case '\t':
+            //     outchar = 0x9;
+            //     break;
+            
+            // default:
+            //     outchar = *format;
+            //     break;
+            // }
+            
+            format++;
+            buffer[buf_len++] = outchar;
+
             // if this is a normal character, simply print it to 
             // serial port 1
             // count += filp_write(file, format++, 1, 0);
-            buffer[buf_len++] = *format++;
+            // buffer[buf_len++] = *format++;
             if(buf_len >= BUFFER_SIZ){
                 count += filp_write(file, buffer, buf_len, count);
                 buf_len = 0;

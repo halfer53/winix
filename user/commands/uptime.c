@@ -5,6 +5,7 @@
  * Prints the system uptime
  **/
 int main(int argc, char **argv) {
+    // char out[] = "\e[1;1H\e[2J";
 
     int ticks, days, hours, minutes, seconds, tick_rate;
     struct tms tbuf;
@@ -23,6 +24,7 @@ int main(int argc, char **argv) {
     printf("user time %d.%d seconds, system time %d.%02d seconds\n",
                             tbuf.tms_utime  / tick_rate , (tbuf.tms_utime) % tick_rate,
                             tbuf.tms_stime / tick_rate , (tbuf.tms_stime) % tick_rate);
+    
     return 0;
 }
 
