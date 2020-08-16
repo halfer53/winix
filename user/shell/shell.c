@@ -28,6 +28,7 @@ CMD_PROTOTYPE(cmd_exit);
 CMD_PROTOTYPE(printenv);
 CMD_PROTOTYPE(cmd_bash);
 CMD_PROTOTYPE(do_cd);
+CMD_PROTOTYPE(do_cls);
 
 
 // Command handling
@@ -42,6 +43,7 @@ struct cmd_internal builtin_commands[] = {
     { cmd_exit, "exit"},
     { help, "help"},
     { do_cd, "cd"},
+    { do_cls, "clear"},
     { 0, NULL}
 };
 
@@ -214,6 +216,14 @@ int help(int argc, char** argv){
         printf(" * %s\n",handler->name);
         handler++;
     }
+    return 0;
+}
+
+// byte stream for \e[1;1H\e[2J
+char cls[] = {0x1b, 0x5b, 0x31, 0x3b, 0x31, 0x48, 0x1b, 0x5b, 0x32, 0x4a, 0};
+
+int do_cls(int argc, char** argv){
+    printf("%s", cls);
     return 0;
 }
 

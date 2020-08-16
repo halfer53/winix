@@ -231,9 +231,10 @@ int kprintf_vm( struct filp* file, const char *orignal_format, void *arg, ptr_t 
             }
             
             if(*format >= '0' && *format <= '9'){
+                char buf2[3];
                 // todo limit it to 20
-                strncpy(buffer, format, 2);
-                padding_len = atoi(buffer);
+                strncpy(buf2, format, 2);
+                padding_len = atoi(buf2);
                 if(padding_len > PADDING_BUFFER_SIZ){
                     padding_len = PADDING_BUFFER_SIZ;
                 }
@@ -264,8 +265,8 @@ int kprintf_vm( struct filp* file, const char *orignal_format, void *arg, ptr_t 
 
                 case 'c':
                 default:
-                    buffer[0] = *(int *)arg;
-                    buffer[1] = '\0';
+                    *buf++ = *(int *)arg;
+                    *buf = '\0';
                     buf_len = 1;
                     break;
             }
