@@ -69,10 +69,6 @@ const char* kstr_error(int err){
     return errlist[err];
 }
 
-
-
-#define IS_SERIAL_CODE(c) (c >= 0 && c <= 127)
-
 /**
  * print value of n in hexadecimal string format
  * into the buffer

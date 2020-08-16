@@ -33,7 +33,7 @@ static const char* name = "tty";
 static const char* name2 = "tty2";
 
 
-#define IS_SERIAL_CODE(c) (isprint(c) || c - 7 < 6)
+#define IS_SERIAL_CODE(c) (c >= 0 && c <= 127)
 
 int __kputc(RexSp_t* rex, const int c) {
     if(IS_SERIAL_CODE(c)){
