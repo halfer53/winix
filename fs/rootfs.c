@@ -188,7 +188,7 @@ int root_fs_write (struct filp *filp, char *data, size_t count, off_t offset){
             r += (int)len;
             put_block_buffer_dirt(buffer);
         }
-        KDEBUG(("file write for block %d, off %d len %d, size %d\n", curr_fp_index, off, r, filp->filp_ino->i_size + r));
+        // KDEBUG(("file write for block %d, off %d len %d, size %d\n", curr_fp_index, off, r, filp->filp_ino->i_size + r));
         /* Read or write 'chunk' bytes. */
         if (r == 0)
             break;
