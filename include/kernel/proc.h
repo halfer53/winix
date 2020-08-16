@@ -170,6 +170,7 @@ typedef struct proc {
     int sig_status;                	// Storage for siginal status when process exits
     pid_t pid;                    	// Process id
     pid_t procgrp;                	// Pid of the process group (used for signals)
+    pid_t session_id;               // Session id
     pid_t wpid;                    	// pid this process is waiting for
     int woptions;                   // waiting options
     int parent;                    	// proc_index of parent

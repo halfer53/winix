@@ -156,3 +156,11 @@ mode_t umask(mode_t mask){
     return (mode_t)_syscall(UMASK, &m);
 }
 
+int ioctl(int fd, unsigned long request, ...){
+    struct message m;
+    m.m1_i1 = fd;
+    m.m1_i2 = request;
+    m.m1_p1 = (int *)&request + 1;
+    return _syscall(IOCTL, &m);
+}
+

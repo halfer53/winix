@@ -8,3 +8,8 @@ int setpgid(pid_t pid, pid_t pgid){
     m.m1_i2 = pgid;
     return _syscall(SETPGID, &m);
 }
+
+pid_t setsid(void){
+    struct message m;
+    return _syscall(SETSID, &m);
+}

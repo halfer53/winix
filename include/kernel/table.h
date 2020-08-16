@@ -71,6 +71,8 @@ int do_sync(struct proc* who, struct message* msg);
 int do_lseek(struct proc* who, struct message* msg);
 int do_umask(struct proc* who, struct message* msg);
 int do_fcntl(struct proc* who, struct message* msg);
+int do_setsid(struct proc* who, struct message* m);
+int do_ioctl(struct proc* who, struct message* m);
 
 #endif
 

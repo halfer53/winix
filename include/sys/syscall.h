@@ -23,7 +23,7 @@
 #include <signal.h>
 
 
-#define _NSYSCALL               45
+#define _NSYSCALL               47
 /**
  * System Call Numbers
  **/
@@ -72,6 +72,8 @@
 #define LSEEK           42
 #define UMASK           43
 #define FCNTL           44
+#define IOCTL           45
+#define SETSID          46
 
 #define DECLARE_SYSCALL(function, params, syscall_num, passing_codes)\
 function params{\
@@ -136,7 +138,8 @@ int chmod(const char *pathname, mode_t mode);
 int chown(const char *pathname, uid_t owner, gid_t group);
 int mknod(const char *pathname, mode_t mode, dev_t dev);
 int fcntl(int fd, int cmd, ... /* arg */ );
-
+pid_t setsid(void);
+int ioctl(int fd, unsigned long request, ...);
 
 #endif
 
