@@ -216,6 +216,8 @@ void init_syscall_table(){
     SYSCALL_MAP(LSEEK, do_lseek);
     SYSCALL_MAP(UMASK, do_umask);
     SYSCALL_MAP(FCNTL, do_fcntl);
+    SYSCALL_MAP(IOCTL, do_ioctl);
+    SYSCALL_MAP(SETSID, do_setsid);
 }
 
 
