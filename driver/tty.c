@@ -88,6 +88,9 @@ void tty_exception_handler(RexSp_t* rex, struct tty_state* state){
         if (val == 8) { // backspace
             if(state->bptr > state->buffer){
                 state->bptr--;
+                if(state->bptr <= state->read_ptr){
+                    state->read_ptr--;
+                }
                 __kputc(rex, val);
             }
             goto end;
@@ -106,7 +109,9 @@ void tty_exception_handler(RexSp_t* rex, struct tty_state* state){
 
             if(isprint(val) || val == '\n'){
                 *state->bptr++ = val;
-                __kputc(rex, val);
+                if(state->is_echoing){
+                    __kputc(rex, val);
+                }
             }else{
                 __kputc(rex, 7);            // beep
             }
@@ -142,19 +147,25 @@ int __tty_init(RexSp_t* rex, struct device* dev, struct tty_state* state){
     state->bptr = buf;
     state->buffer_end = buf + TTY_BUFFER_SIZ - 1;
     state->rex = rex;
+    state->is_echoing = true;
+    state->read_ptr = buf;
     return 0;
 }
 
 int __tty_read(struct tty_state* state, char* data, size_t len){
     size_t buffer_count, count;
-    *state->bptr = '\0';
     buffer_count = state->bptr - state->buffer;
     count = buffer_count < len ? buffer_count : len;
-    if(count > 0){
-        strncpy(data, state->buffer, count);
-        state->bptr -= count;
+    
+    if(count > 0 && state->bptr > state->read_ptr){
+        *state->bptr = '\0';
+        strncpy(data, state->read_ptr, count);
+        buffer_count -= count;
+        state->read_ptr += count;
+        // KDEBUG(("count %d buffer %d, ptr %x %x\n", count, buffer_count, state->bptr, state->read_ptr));
+        return count;
     }
-    return count;
+    return 0;
 }
 
 int tty_write_rex(RexSp_t* rex, char* data, size_t len){

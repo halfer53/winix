@@ -19,6 +19,7 @@
 #include <fs/fs_methods.h>
 #include <winix/list.h>
 #include <winix/dev.h>
+#include <fs/super.h>
 #include "makefs_only/srec_import.h"
 
 void init_bitmap();
@@ -122,7 +123,7 @@ void combine_srec_binary_debug(struct winix_elf_list* elf_list, struct srec_bina
 }
 
 void combine_srec_binary_and_debug_list(struct list_head* lists,
-        struct list_head *srec_binary_list, struct list_head *srec_debug_list){
+    struct list_head *srec_binary_list, struct list_head *srec_debug_list){
     struct srec_binary *b1, *b2;
     struct srec_debug *d1, *d2;
     char *name;
@@ -142,6 +143,11 @@ void combine_srec_binary_and_debug_list(struct list_head* lists,
             }
         }
     }
+}
+
+void debug_super_block(char* str){
+    struct superblock *sb = get_sb(get_dev(ROOT_DEV));
+    printf("in use %d, remaining %d after %s\n", sb->s_block_inuse, sb->s_free_blocks, str);
 }
 
 void write_srec_list(struct list_head* lists){
@@ -169,6 +175,7 @@ void write_srec_list(struct list_head* lists){
         ret = sys_close(current_proc, fd);
         assert(ret == 0);
         list_del(&pos->list);
+        // debug_super_block(pos->name);
         free(pos);
     }
     flush_all_buffer();

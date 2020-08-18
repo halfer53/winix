@@ -9,13 +9,14 @@
 struct tty_state{
     struct device* dev;
     RexSp_t* rex;
-    char *bptr, *buffer_end;
+    char *bptr, *buffer_end, *read_ptr;
     struct proc* reader;
     char *read_data;
     size_t read_count;
     char buffer[TTY_BUFFER_SIZ];
     pid_t foreground_group;
     pid_t controlling_session;
+    bool is_echoing;
 };
 
 #endif

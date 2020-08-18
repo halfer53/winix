@@ -1,6 +1,8 @@
 #ifndef _LINUX_LIST_H
 #define _LINUX_LIST_H
 
+#include <winix/type.h>
+
 #ifndef container_of
 /**
  * container_of - cast a member of a structure out to the containing structure

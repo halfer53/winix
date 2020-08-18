@@ -25,4 +25,7 @@
 #define TIOCSCTTY   18
 #define TIOCNOTTY   19
 
+#define TIOCDISABLEECHO 20
+#define TIOCENABLEECHO  21
+
 #endif

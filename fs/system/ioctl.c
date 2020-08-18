@@ -25,6 +25,12 @@ int _sys_ioctl(struct proc* who, int fd, int request, void* arg){
     case TIOCSCTTY:
         tty_data->controlling_session = who->session_id;
         break;
+    case TIOCDISABLEECHO:
+        tty_data->is_echoing = false;
+        break;
+    case TIOCENABLEECHO:
+        tty_data->is_echoing = true;
+        break;
 
     default:
         return EINVAL;

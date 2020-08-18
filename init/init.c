@@ -41,10 +41,13 @@ int main(int argc, char **argv){
   ret = mkdir("/dev", 0x755);
   CHECK_SYSCALL(ret == 0);
 
-  ret = mknod("/dev/tty", 0x755, TTY_DEV_NUM);
+  ret = mknod("/dev/tty1", 0x755, TTY_DEV_NUM);
   CHECK_SYSCALL(ret == 0);
 
-  fd = open("/dev/tty", O_RDONLY);
+  ret = mknod("/dev/tty2", 0x755, TTY2_DEV_NUM);
+  CHECK_SYSCALL(ret == 0);
+
+  fd = open("/dev/tty1", O_RDONLY);
   CHECK_SYSCALL(fd == 0);
 
   ret = dup(fd);

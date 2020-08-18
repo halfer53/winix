@@ -26,7 +26,7 @@ PRIVATE struct message m;
 PRIVATE int who_proc_nr;
 PRIVATE int curr_syscall;
 PRIVATE struct proc *who;
-bool trace_syscall = true;
+bool trace_syscall = false;
 
 PRIVATE ucontext_t recv_ctx;
 
