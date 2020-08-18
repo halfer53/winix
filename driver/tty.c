@@ -1,29 +1,20 @@
 //
 // Created by bruce on 25/04/20.
 //
+#include <kernel/kernel.h>
 #include <sys/fcntl.h>
 #include <fs/const.h>
 #include <fs/cache.h>
 #include <fs/filp.h>
 #include <winix/dev.h>
 #include <fs/fs_methods.h>
-#include <kernel/kernel.h>
+
 #include <winix/rex.h>
 #include <winix/list.h>
 #include <string.h>
 #include <ctype.h>
+#include <winix/tty.h>
 
-#define BUFFER_SIZ  (64)
-
-struct tty_state{
-    struct device* dev;
-    RexSp_t* rex;
-    char *bptr, *buffer_end;
-    struct proc* reader;
-    char *read_data;
-    size_t read_count;
-    char buffer[BUFFER_SIZ];
-};
 
 struct tty_state tty1_state, tty2_state;
 struct device _tty_dev, _tty2_dev;
@@ -102,6 +93,13 @@ void tty_exception_handler(RexSp_t* rex, struct tty_state* state){
             goto end;
         }
 
+        if(val == 3){ // Control C
+            if(state->controlling_session > 0 && state->foreground_group > 0){
+                int ret = sys_kill(get_proc(SYSTEM), -(state->foreground_group), SIGINT);
+            }
+            goto end;
+        }
+
         if(state->bptr < state->buffer_end){
             if(val == '\r')
                 val = '\n';
@@ -142,7 +140,7 @@ int __tty_init(RexSp_t* rex, struct device* dev, struct tty_state* state){
     rex->Ctrl = (1 << 8) | 7; // 38400 bits per second, interrupt enabled for serial port
     buf = state->buffer;
     state->bptr = buf;
-    state->buffer_end = buf + BUFFER_SIZ - 1;
+    state->buffer_end = buf + TTY_BUFFER_SIZ - 1;
     state->rex = rex;
     return 0;
 }

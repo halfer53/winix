@@ -15,12 +15,9 @@
 */
 #include <kernel/kernel.h>
 
-int do_kill(struct proc *who, struct message *m){
-    struct proc *to;
+int sys_kill(struct proc* who, pid_t pid, int signum){
+    struct proc* to;
     int valid_targets = 0;
-    pid_t pid = m->m1_i1, pgid;
-    int signum = m->m1_i2;
-
     if(signum < 0 || signum >= _NSIG)
         return EINVAL;
 
@@ -54,4 +51,10 @@ int do_kill(struct proc *who, struct message *m){
 	    return ESRCH;
 
     return OK;
+}
+
+int do_kill(struct proc *who, struct message *m){
+    pid_t pid = m->m1_i1;
+    int signum = m->m1_i2;
+    return sys_kill(who, pid, signum);
 }

@@ -260,7 +260,13 @@ int kprintf_vm( struct filp* file, const char *orignal_format, void *arg, ptr_t 
 
                 case 's':
                     buf = *(char **)arg + (int)who_rbase;
-                    buf_len = strlen(buf);
+                    if(buf){
+                        buf_len = strlen(buf);
+                    }else{
+                        buf = buffer;
+                        *buf = '\0';
+                    }
+                    
                     break;
 
                 case 'c':

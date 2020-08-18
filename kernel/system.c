@@ -26,7 +26,7 @@ PRIVATE struct message m;
 PRIVATE int who_proc_nr;
 PRIVATE int curr_syscall;
 PRIVATE struct proc *who;
-bool trace_syscall = false;
+bool trace_syscall = true;
 
 PRIVATE ucontext_t recv_ctx;
 
@@ -157,12 +157,9 @@ int syscall_reply2(int syscall_num, int reply, int dest, struct message* m){
         }else{
             kputd_buf(reply, buf);
         }
-        KDEBUG(("Syscall %s return %s to Proc %s[%d]\n", syscall_str[syscall_num], p, pDest->name, dest));
+        KDEBUG(("Syscall %s return %s to Proc %s[%d]\n",syscall_str[syscall_num] , p, pDest->name, dest));
     }
     if(pDest){
-        if(is_debugging_syscall()){
-            kprintf_syscall_reply(reply);
-        }
         m->reply_res = reply;
         return do_notify(SYSTEM, dest,m);
     }

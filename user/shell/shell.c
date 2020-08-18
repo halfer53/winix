@@ -48,9 +48,13 @@ struct cmd_internal builtin_commands[] = {
 };
 
 void init_shell(){
+    pid_t pid;
     signal(SIGINT, SIG_IGN);
     signal(SIGTERM, SIG_IGN);
     signal(SIGTSTP, SIG_IGN);
+    pid = setsid();
+    ioctl(STDIN_FILENO, TIOCSCTTY);
+    ioctl(STDIN_FILENO, TIOCSPGRP, pid);
 }
 
 
@@ -116,7 +120,11 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
     if(search_path(buffer, cmd->argv[0]) == 0){
         pid = vfork();
         if(pid == 0){
+            pid_t pgid;
             sigprocmask(SIG_SETMASK, &sigmask, NULL);
+            setpgid(0, 0);
+            pgid = getpgid(0);
+            ioctl(STDIN_FILENO, TIOCSPGRP, pgid);
             execv(buffer, cmd->argv);
             perror("execv");
             return -1;

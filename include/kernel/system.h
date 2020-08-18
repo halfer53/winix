@@ -35,6 +35,8 @@ void kreport_sysinfo();
 void init_syscall_table();
 bool is_in_syscall(struct proc* who);
 
+int sys_kill(struct proc* who, pid_t pid, int signum);
+
 #ifdef _DEBUG
 #define SYSCALL_MAP(i,fn)   syscall_table[i] = fn;\
                     syscall_str[i] = #i

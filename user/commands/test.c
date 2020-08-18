@@ -39,6 +39,7 @@ CMD_PROTOTYPE(test_vfork);
 CMD_PROTOTYPE(test_deadlock);
 CMD_PROTOTYPE(test_ipc);
 CMD_PROTOTYPE(test_signal);
+CMD_PROTOTYPE(test_sleep);
 
 struct cmd_internal test_commands[] = {
     { test_malloc, "malloc"}, 
@@ -51,6 +52,7 @@ struct cmd_internal test_commands[] = {
     { test_deadlock, "deadlock"},
     { test_ipc, "ipc"},
     { test_signal, "signal"},
+    { test_sleep, "sleep"},
     { test_nohandler, NULL},
     {0}
 };
@@ -79,6 +81,11 @@ int test_nohandler(int argc, char** argv){
     }
     printf("e.g. \"test alarm 1\", \"test thread 100\" \n");
     return 0;
+}
+
+int test_sleep(int argc, char** argv){
+    int i;
+    
 }
 
 void usr_handler(int signum){

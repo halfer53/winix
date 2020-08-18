@@ -22,4 +22,7 @@
 #define KIOCSLEDS       16
 #define KIOCSMAP	17
 
+#define TIOCSCTTY   18
+#define TIOCNOTTY   19
+
 #endif
