@@ -34,6 +34,7 @@ int do_sigprocmask(struct proc* who, struct message* m){
     switch(how){
         case SIG_SETMASK:
             who->sig_mask = set;
+            KDEBUG(("set sigmask %x for %d\n", set, who->pid));
             break;
 
         case SIG_BLOCK:
