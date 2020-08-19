@@ -17,6 +17,7 @@
 #include <sys/debug.h>
 #include <ucontext.h>
 #include <sys/times.h>
+#include <sys/fcntl.h>
 
 #define CMD_PROTOTYPE(name)    int name(int argc, char**argv)
 
@@ -83,13 +84,19 @@ int test_nohandler(int argc, char** argv){
 }
 
 int test_while(int argc, char** argv){
+    char buf[2];
+    int ret;
+    int fd = open("/dev/tty1", O_NONBLOCK | O_RDWR);
     while(1){
-        int x = 1000;
-        
-        printf("!");
-        
-        while(x--);
+        int tmp = 50000;
+        ret = read(fd, buf, 1);
+        if(ret == 1){
+            buf[1] = '\0';
+            printf("%s", buf);
+        }
+        while(tmp--);
     }
+    
     return 0;
 }
 

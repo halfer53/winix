@@ -120,9 +120,10 @@ void tty_exception_handler(RexSp_t* rex, struct tty_state* state){
         if((val == '\n' || state->bptr >= state->buffer_end ) && state->reader){
             *state->bptr = '\0';
             msg = get_exception_m();
-            strncpy(state->read_data, state->buffer, state->read_count);
+            strncpy(state->read_data, state->read_ptr, state->read_count);
             syscall_reply2(READ, state->bptr - state->buffer, state->reader->proc_nr, msg);
             state->bptr = state->buffer;
+            state->read_ptr = state->buffer;
             state->reader = NULL;
         }
     }
