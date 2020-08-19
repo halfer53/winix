@@ -91,14 +91,18 @@ void debug_board(struct board_struct* board){
     fprintf(stderr, "\n");
 }
 
+#define INPUT_SIZ   (12)
+
 enum direction get_direction(struct board_struct* board, enum direction dir){
-    char input;
+    char input[INPUT_SIZ];
     enum direction newdir;
+    int i;
     //non blocking
-    int ret = read(board->ofd, &input, 1);
-    if(ret == 1){
-        fprintf(stderr, "ret %d ", input);
-        switch (input)
+    int ret = read(board->ofd, input, INPUT_SIZ);
+    if(ret > 0){
+        char c = input[ret - 1];
+        fprintf(stderr, "read %d ret %d ",ret, c);
+        switch (c)
         {
         case 'w':
             // if(dir == down)
@@ -201,8 +205,6 @@ void draw_point(int fd, struct point* pos, char character){
     char *draw_format = draw_pos;
     int2str(pos->y, 100, draw_format + 2);
     int2str(pos->x, 100, draw_format + 6);
-    // draw_pos[2] = '0' + pos->y;
-    // draw_pos[4] = '0' + pos->x;
     format[2] = character;
     printf(format, draw_pos);
     fprintf(stderr, "x %d y %d; \n", pos->x, pos->y);

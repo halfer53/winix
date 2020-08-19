@@ -87,10 +87,10 @@ void tty_exception_handler(RexSp_t* rex, struct tty_state* state){
 
         if (val == 8) { // backspace
             if(state->bptr > state->buffer){
-                state->bptr--;
-                if(state->bptr <= state->read_ptr){
+                if(state->bptr == state->read_ptr){
                     state->read_ptr--;
                 }
+                state->bptr--;
                 __kputc(rex, val);
             }
             goto end;
@@ -101,6 +101,11 @@ void tty_exception_handler(RexSp_t* rex, struct tty_state* state){
                 int ret = sys_kill(get_proc(SYSTEM), -(state->foreground_group), SIGINT);
             }
             goto end;
+        }
+
+        // reset ring buffer if buffer end is reached
+        if(state->bptr >= state->buffer_end && state->read_ptr == state->bptr){
+            state->read_ptr = state->bptr = state->buffer;
         }
 
         if(state->bptr < state->buffer_end){
@@ -155,7 +160,7 @@ int __tty_init(RexSp_t* rex, struct device* dev, struct tty_state* state){
 
 int __tty_read(struct tty_state* state, char* data, size_t len){
     size_t buffer_count, count;
-    buffer_count = state->bptr - state->buffer;
+    buffer_count = state->bptr - state->read_ptr;
     count = buffer_count < len ? buffer_count : len;
     
     if(count > 0 && state->bptr > state->read_ptr){
