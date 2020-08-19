@@ -184,16 +184,27 @@ int refresh(struct board_struct* board, enum direction dir){
     // }
     return SUCCESS;
 }
+
+void int2str(int value, int i, char* output){
+    int j;
+    while(i){
+        j = (value / i) % 10;
+        *output++ = '0' + j;
+        i /= 10;
+    }
+}
 // \e[1;1H
 
 void draw_point(int fd, struct point* pos, char character){
-    static char draw_pos[] = {0x1b, 0x5b, 0x31, 0x3b, 0x31, 0x48, 0};
+    static char draw_pos[] = {0x1b, 0x5b, 0x30, 0x30, 0x30, 0x3b, 0x30, 0x30, 0x30, 0x48, 0};
     static char format[] = "%s";
-    draw_pos[2] = '0' + pos->y;
-    draw_pos[4] = '0' + pos->x;
+    char *draw_format = draw_pos;
+    int2str(pos->y, 100, draw_format + 2);
+    int2str(pos->x, 100, draw_format + 6);
+    // draw_pos[2] = '0' + pos->y;
+    // draw_pos[4] = '0' + pos->x;
     format[2] = character;
     printf(format, draw_pos);
-    printf("x");
     fprintf(stderr, "x %d y %d; \n", pos->x, pos->y);
 }
 
@@ -214,7 +225,7 @@ int main(int argc, char** argv){
     enum direction dir = right;
     board_init(bp);
     while(1){
-        int tmp = 50000;
+        int tmp = 20000;
         clear_screen();
         dir = get_direction(bp, dir);
         ret = refresh(bp, dir);
