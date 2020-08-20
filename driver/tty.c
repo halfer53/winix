@@ -116,6 +116,7 @@ void tty_exception_handler(RexSp_t* rex, struct tty_state* state){
                 *state->bptr++ = val;
                 if(state->is_echoing){
                     __kputc(rex, val);
+                    // KDEBUG(("received %d\n", val));
                 }
             }else{
                 __kputc(rex, 7);            // beep
