@@ -49,7 +49,7 @@ struct point* new_point(int x, int y){
 
 struct point* new_food(){
     struct point* p;
-    int x = (rand() % (NUM_COLS -1 )) + 1;
+    int x = (rand() % (NUM_COLS -2 )) + 1;
     int y = (rand() % (NUM_ROWS -1 )) + 1;
     return new_point(x, y);
 }
@@ -234,7 +234,7 @@ int refresh(struct board_struct* board){
         y--;
         break;
     case right:
-        if(x >= NUM_COLS - 1)
+        if(x >= NUM_COLS - 2)
             return FAIL_RIGHT;
         x++;
         break;
@@ -252,7 +252,7 @@ int refresh(struct board_struct* board){
     if(!pos){
         pos = get_point_at_coordinate(&board->snake, x, y);
         if(pos){
-            fprintf(stderr, "eat self x %d y %d\n");
+            // fprintf(stderr, "eat self x %d y %d\n");
             return FAIL_EAT_SELF;
         }
         pos = list_last_entry(&board->snake, struct point, list);
