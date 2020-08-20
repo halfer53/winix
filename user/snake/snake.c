@@ -8,7 +8,7 @@
 
 #define NUM_COLS  (100)
 #define NUM_ROWS  (32)
-#define INITIAL_SNAKE_LEN   (1)
+#define INITIAL_SNAKE_LEN   (3)
 #define INITAL_FOOD_NUM (5)
 #define SNAKE_HEAD(board)   (list_first_entry(&board->snake, struct point, list))
 
@@ -46,6 +46,11 @@ void delete_point(struct point* p){
     free(p);
 }
 
+void disable_cursor(){
+    static char str[] = {0x1b, 0x5b ,0x3f ,0x32 ,0x35 ,0x6c, 0};
+    printf("%s", str);
+}
+
 void board_init(struct board_struct *board){
     int i, x, y, fd, fd2;
     struct point* food_pos, *snake_pos;
@@ -55,8 +60,9 @@ void board_init(struct board_struct *board){
     dup2(fd, STDERR_FILENO);
     fd2 = open("/dev/tty1", O_RDWR | O_NONBLOCK);
     board->ofd = fd2;
-    // ioctl(fd2, TIOCDISABLEECHO);
+    ioctl(fd2, TIOCDISABLEECHO);
     dup2(fd2, STDIN_FILENO);
+    disable_cursor();
 
     for(i = 0; i < INITAL_FOOD_NUM; i++){
         x = rand() % NUM_COLS;
@@ -67,7 +73,7 @@ void board_init(struct board_struct *board){
     for(i = 1; i <= INITIAL_SNAKE_LEN; i++){
         snake_pos = new_point(i, 1);
         list_add(&snake_pos->list, &board->snake);
-        fprintf(stderr, "add x %d y %d\n", i, 1);
+        // fprintf(stderr, "add x %d y %d\n", i, 1);
     }
     
     // printf("fd %d\n", fd);
@@ -91,6 +97,26 @@ void debug_board(struct board_struct* board){
     fprintf(stderr, "\n");
 }
 
+void int2str(int value, int i, char* output){
+    int j;
+    while(i){
+        j = (value / i) % 10;
+        *output++ = '0' + j;
+        i /= 10;
+    }
+}
+
+void draw_point(struct point* pos, char character){
+    static char draw_pos[] = {0x1b, 0x5b, 0x30, 0x30, 0x30, 0x3b, 0x30, 0x30, 0x30, 0x48, 0};
+    static char format[] = "%s";
+    char *draw_format = draw_pos;
+    int2str(pos->y, 100, draw_format + 2);
+    int2str(pos->x, 100, draw_format + 6);
+    format[2] = character;
+    printf(format, draw_pos);
+    // fprintf(stderr, "x %d y %d; \n", pos->x, pos->y);
+}
+
 #define INPUT_SIZ   (12)
 
 enum direction get_direction(struct board_struct* board, enum direction dir){
@@ -101,28 +127,28 @@ enum direction get_direction(struct board_struct* board, enum direction dir){
     int ret = read(board->ofd, input, INPUT_SIZ);
     if(ret > 0){
         char c = input[ret - 1];
-        fprintf(stderr, "read %d ret %d ",ret, c);
+        // fprintf(stderr, "read %d ret %d ",ret, c);
         switch (c)
         {
         case 'w':
-            // if(dir == down)
-            //     return down;
+            if(dir == down)
+                return down;
             return up;
         case 'a':
-            // if(dir == right)
-            //     return right;
+            if(dir == right)
+                return right;
             return left;
         case 's':
-            // if(dir == up)
-            //     return up;
+            if(dir == up)
+                return up;
             return down;
         case 'd':
-            // if(dir == left)
-            //     return left;
+            if(dir == left)
+                return left;
             return right;
 
         default:
-            return down;
+            break;
         }
     }
     return dir;
@@ -166,16 +192,16 @@ int refresh(struct board_struct* board, enum direction dir){
     // newpos = new_point(x, y);
     // list_add(&newpos->list, &board->snake);
 
-    // pos = list_last_entry(&board->snake, struct point, list);
-    // list_del(&pos->list);
-    // pos->x = x;
-    // pos->y = y;
-    // list_add(&pos->list, &board->snake);
-    // debug_board(board);
-
     pos = list_last_entry(&board->snake, struct point, list);
+    list_del(&pos->list);
     pos->x = x;
     pos->y = y;
+    list_add(&pos->list, &board->snake);
+    // debug_board(board);
+
+    // pos = list_last_entry(&board->snake, struct point, list);
+    // pos->x = x;
+    // pos->y = y;
 
     // x++;
     // if(x > NUM_COLS){
@@ -189,35 +215,18 @@ int refresh(struct board_struct* board, enum direction dir){
     return SUCCESS;
 }
 
-void int2str(int value, int i, char* output){
-    int j;
-    while(i){
-        j = (value / i) % 10;
-        *output++ = '0' + j;
-        i /= 10;
-    }
-}
+
 // \e[1;1H
 
-void draw_point(int fd, struct point* pos, char character){
-    static char draw_pos[] = {0x1b, 0x5b, 0x30, 0x30, 0x30, 0x3b, 0x30, 0x30, 0x30, 0x48, 0};
-    static char format[] = "%s";
-    char *draw_format = draw_pos;
-    int2str(pos->y, 100, draw_format + 2);
-    int2str(pos->x, 100, draw_format + 6);
-    format[2] = character;
-    printf(format, draw_pos);
-    fprintf(stderr, "x %d y %d; \n", pos->x, pos->y);
-}
 
 void draw(struct board_struct *board){
     struct point* p;
     list_for_each_entry(struct point, p, &board->snake, list){
-        draw_point(board->ofd, p, 'x');
+        draw_point(p, 'x');
     }
-    // list_for_each_entry(struct point, p, &board->foods, list){
-    //     draw_point(p, 'o');
-    // }
+    list_for_each_entry(struct point, p, &board->foods, list){
+        draw_point(p, 'o');
+    }
 }
 
 int main(int argc, char** argv){
@@ -227,7 +236,7 @@ int main(int argc, char** argv){
     enum direction dir = right;
     board_init(bp);
     while(1){
-        int tmp = 20000;
+        int tmp = 10000;
         clear_screen();
         dir = get_direction(bp, dir);
         ret = refresh(bp, dir);

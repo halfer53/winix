@@ -132,7 +132,7 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
             return -1;
         }else{
             ret = wait(&status);
-            ioctl(STDIN_FILENO, TIOCSPGRP, pgid);
+            
             // printf("parent awaken\n");
         }
     }else{
@@ -144,6 +144,8 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
         dup2(saved_stdout,STDOUT_FILENO);
         close(saved_stdout);
     }
+    ioctl(STDOUT_FILENO, TIOCENABLEECHO);
+    ioctl(STDOUT_FILENO, TIOCSPGRP, pgid);
     printf("\n");
     return 0;
 }
