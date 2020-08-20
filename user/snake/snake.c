@@ -198,6 +198,9 @@ enum direction get_direction(struct board_struct* board){
             if(dir == left)
                 return left;
             return right;
+        case 'q':
+            clear_screen();
+            exit(0);
 
         default:
             break;
