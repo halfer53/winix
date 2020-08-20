@@ -269,7 +269,8 @@ int main(int argc, char** argv){
         dir = get_direction(bp, dir);
         ret = refresh(bp, dir);
         if(ret){
-            printf("failed %d\n", ret);
+            clear_screen();
+            printf("\n You lost :( \n");
             break;
         }
         while(tmp--);
