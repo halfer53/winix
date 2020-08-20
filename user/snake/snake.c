@@ -302,7 +302,7 @@ void reset_board(struct board_struct* board){
 }
 
 int main(int argc, char** argv){
-    int ret;
+    int ret, tick_rate;
     struct board_struct board;
     struct board_struct* bp = &board;
     bool is_snake_alive = true, is_game_running = true, waiting_for_command = true;
@@ -310,6 +310,7 @@ int main(int argc, char** argv){
     clear_screen();
     print_border(bp);
     print_instruction();
+    tick_rate = sysconf(_SC_CLK_TCK);
 
     while(is_game_running){
 
@@ -330,8 +331,7 @@ int main(int argc, char** argv){
         is_snake_alive = true;
 
         while(is_snake_alive){
-            int tmp = 20000;
-            while(tmp--);
+            csleep(tick_rate / 8); // sleep 
             bp->dir = get_direction(bp);
             ret = refresh(bp);
             if(ret){

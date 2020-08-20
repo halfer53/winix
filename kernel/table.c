@@ -13,7 +13,6 @@
 
 struct boot_image boot_table[NUM_TASKS] = {
     {"IDLE",   idle_main,           IDLE,   1,  MIN_PRIORITY,},
-    {"CLOCK",  clock_main,          CLOCK,  32, MAX_PRIORITY,},
     {"SYSTEM", system_main,         SYSTEM, 64, MAX_PRIORITY,},
 };
 

@@ -112,6 +112,7 @@ PRIVATE int sys_sig_handler(struct proc *who, int signum){
             default:
                 KDEBUG(("Signal %d: terminate process \"%s [%d]\"\n"
                                         ,signum,who->name,who->pid));
+                // KDEBUG(("Signal curr %x\n", current_proc));
                 exit_proc(who, 0, signum);
         }
         return OK;
@@ -233,6 +234,7 @@ int is_sigpending(struct proc* who){
 
 int handle_pendingsig(struct proc* who){
     int signum = is_sigpending(who);
+    // KDEBUG(("handle pending %x\n", current_proc));
     if(signum){
         handle_sig(who, signum);
         if(who->state == STATE_RUNNABLE)

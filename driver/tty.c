@@ -98,7 +98,9 @@ void tty_exception_handler(RexSp_t* rex, struct tty_state* state){
 
         if(val == 3){ // Control C
             if(state->controlling_session > 0 && state->foreground_group > 0){
-                int ret = sys_kill(get_proc(SYSTEM), -(state->foreground_group), SIGINT);
+                int ret;
+                ret = sys_kill(get_proc(SYSTEM), -(state->foreground_group), SIGINT);
+                // KDEBUG(("C ret %d curr %p %d state %x\n", ret,current_proc,  current_proc->proc_nr, current_proc->state));
             }
             goto end;
         }

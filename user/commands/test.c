@@ -91,15 +91,10 @@ int test_while(int argc, char** argv){
     csleep(30);
     printf("awaken\n");
 
-    while(1){
-        int tmp = 50000;
-        ret = read(fd, buf, 1);
-        if(ret == 1){
-            buf[1] = '\0';
-            printf("%s", buf);
-        }
-        while(tmp--);
-    }
+    csleep(30);
+    printf("awaken\n");
+
+    while(1);
     
     return 0;
 }

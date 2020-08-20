@@ -124,6 +124,7 @@ int check_waiting(struct proc* who){
     // if this process if waiting for the current to be exited process
     // kreport_proc(parent);
     // kreport_proc(who);
+    // KDEBUG((" curr %d check waiting %d state %x parent %d wpid %d\n",current_proc->proc_nr,  who->proc_nr, who->state, parent->proc_nr, parent->wpid));
     if(parent && parent->state & STATE_WAITING){
         pid_t pid = parent->wpid;
         if( (pid > 0 && pid == who->pid) ||
@@ -163,9 +164,12 @@ void exit_proc_in_interrupt(struct proc* who, int exit_val,int signum){
     em->m1_i1 = 0;
     em->m1_i2 = signum;
     em->src = who->proc_nr;
-    current_proc->state |= STATE_RECEIVING;
-    do_send(SYSTEM, em);
-    current_proc = NULL;
+    who->state |= STATE_RECEIVING;
+    do_notify(who->proc_nr, SYSTEM, em);
+    // KDEBUG(("exit interrupt who %d, curr %d\n", who->proc_nr, current_proc->proc_nr));
+    if(who == current_proc){
+        current_proc = NULL;
+    }
 }
 
 void exit_proc(struct proc *who, int status, int signum){

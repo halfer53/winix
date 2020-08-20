@@ -2,13 +2,15 @@
 #include <winix/list.h>
 #include <kernel/clock.h>
 
-LIST_HEAD(timers);
+struct message m;
 
 void wakeup_process(int proc_nr, clock_t time){
     struct proc* p;
     p = get_proc(proc_nr);
     if(p){
-        enqueue_schedule(p);
+        if(p->state & STATE_ZOMBIE)
+            return;
+        syscall_reply2(CSLEEP, 0, proc_nr, &m);
     }
 }
 
@@ -24,7 +26,7 @@ int do_csleep(struct proc* who, struct message* m){
     }
     
     new_timer(who->proc_nr, alarm, ticks, wakeup_process);
-    return OK;
+    return SUSPEND;
 }
 
 
