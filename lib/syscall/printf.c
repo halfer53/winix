@@ -12,7 +12,7 @@ int __dprintf(int fd, const char *format, void* args){
     m.m1_i1 = fd;
     m.m1_p1 = (void *)format;
     m.m1_p2 = args;
-    return _syscall(WINIX_DPRINTF, &m);
+    return _syscall(DPRINTF, &m);
 }
 
 int dprintf(int fd, const char *format, ...){
@@ -33,7 +33,7 @@ int __strerror(char *buffer, int len){
     m.m1_p1 = buffer;
     m.m1_i1 = len;
     m.m1_i2 = errno;
-    return _syscall(WINIX_STRERROR, &m);
+    return _syscall(STRERROR, &m);
 }
 
 char* strerror(int usrerrno){

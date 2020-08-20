@@ -7,3 +7,5 @@ int fcntl(int fd, int cmd, ... /* arg */ ){
     m.m1_p1 = (int*)&cmd + 1;
     return _syscall(FCNTL, &m);
 }
+
+

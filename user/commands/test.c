@@ -87,6 +87,10 @@ int test_while(int argc, char** argv){
     char buf[2];
     int ret;
     int fd = open("/dev/tty1", O_NONBLOCK | O_RDWR);
+
+    csleep(30);
+    printf("awaken\n");
+
     while(1){
         int tmp = 50000;
         ret = read(fd, buf, 1);

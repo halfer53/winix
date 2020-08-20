@@ -53,12 +53,6 @@ void set_bill_ptr(struct proc* who){
     bill_ptr = who;
 }
 
-void deliver_alarm(int proc_nr, clock_t time){
-    struct proc* who = get_proc(proc_nr);
-
-    send_sig(who,SIGALRM);
-}
-
 clock_t get_uptime(){
     return system_uptime;
 }

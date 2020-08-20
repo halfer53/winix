@@ -23,7 +23,7 @@
 #include <signal.h>
 
 
-#define _NSYSCALL               47
+#define _NSYSCALL               48
 /**
  * System Call Numbers
  **/
@@ -41,8 +41,8 @@
 #define KILL            11
 #define GETPID          12
 #define WINFO           13
-#define WINIX_STRERROR          14
-#define WINIX_DPRINTF          15
+#define STRERROR        14
+#define DPRINTF         15
 #define SYSCONF         16
 #define SIGSUSPEND      17
 #define SIGPENDING      18
@@ -74,6 +74,7 @@
 #define FCNTL           44
 #define IOCTL           45
 #define SETSID          46
+#define CSLEEP          47
 
 #define DECLARE_SYSCALL(function, params, syscall_num, passing_codes)\
 function params{\
@@ -140,6 +141,7 @@ int mknod(const char *pathname, mode_t mode, dev_t dev);
 int fcntl(int fd, int cmd, ... /* arg */ );
 pid_t setsid(void);
 int ioctl(int fd, unsigned long request, ...);
+int csleep(int ticks);
 
 #endif
 

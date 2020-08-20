@@ -16,6 +16,12 @@
 #include <kernel/kernel.h>
 #include <kernel/clock.h>
 
+void deliver_alarm(int proc_nr, clock_t time){
+    struct proc* who = get_proc(proc_nr);
+
+    send_sig(who,SIGALRM);
+}
+
 // alarm syscall
 // input     m.m1_i1    seconds
 // output    m.reply_res    previous timeout

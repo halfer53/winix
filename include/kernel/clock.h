@@ -21,7 +21,8 @@ extern clock_t next_timeout;
 
 void clock_handler();
 void sys_alarm(struct proc *who, struct message *m);
-extern void deliver_alarm(pid_t pid, clock_t time);
+extern void deliver_alarm(int procnr, clock_t time);
+void wakeup_process(int procnr, clock_t time);
 void clock_main();
 
 #endif

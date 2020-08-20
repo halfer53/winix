@@ -182,8 +182,8 @@ void init_syscall_table(){
     SYSCALL_MAP(KILL, do_kill);        //11
     SYSCALL_MAP(GETPID, do_getpid);    //12
     SYSCALL_MAP(WINFO, do_winfo);      //13
-    SYSCALL_MAP(WINIX_STRERROR, do_winix_strerror);        //14
-    SYSCALL_MAP(WINIX_DPRINTF, do_winix_dprintf);    //15
+    SYSCALL_MAP(STRERROR, do_winix_strerror);        //14
+    SYSCALL_MAP(DPRINTF, do_winix_dprintf);    //15
     SYSCALL_MAP(SYSCONF, do_sysconf);  //16
     SYSCALL_MAP(SIGSUSPEND, do_sigsuspend);
     SYSCALL_MAP(SIGPENDING, do_sigpending);
@@ -215,6 +215,7 @@ void init_syscall_table(){
     SYSCALL_MAP(FCNTL, do_fcntl);
     SYSCALL_MAP(IOCTL, do_ioctl);
     SYSCALL_MAP(SETSID, do_setsid);
+    SYSCALL_MAP(CSLEEP, do_csleep);
 }
 
 
