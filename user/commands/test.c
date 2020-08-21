@@ -86,15 +86,14 @@ int test_nohandler(int argc, char** argv){
 int test_while(int argc, char** argv){
     char buf[2];
     int ret;
-    int fd = open("/dev/tty1", O_NONBLOCK | O_RDWR);
-
-    csleep(30);
-    printf("awaken\n");
-
-    csleep(30);
-    printf("awaken\n");
-
-    while(1);
+    
+    enable_syscall_tracing();
+    buf[1] = '\0';
+    while(1){
+        ret = getchar();
+        buf[0] = ret;
+        printf("got %d %s\n", ret, buf);
+    }
     
     return 0;
 }

@@ -1,4 +1,5 @@
 #include "fs.h"
+#include <winix/list.h>
 
 static filp_t fd_table[NR_FILPS];
 
@@ -23,6 +24,7 @@ int get_fd(struct proc *curr, int start, int *open_slot, filp_t **fpt){
         if (f->filp_count == 0) {
             memset(f,0, sizeof(struct filp));
             f->filp_table_index = i;
+            INIT_LIST_HEAD(&f->reader_queue);
             *fpt = f;
             return(OK);
         }

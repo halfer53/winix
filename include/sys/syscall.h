@@ -142,6 +142,7 @@ int fcntl(int fd, int cmd, ... /* arg */ );
 pid_t setsid(void);
 int ioctl(int fd, unsigned long request, ...);
 int csleep(int ticks);
+int enable_syscall_tracing();
 
 #endif
 

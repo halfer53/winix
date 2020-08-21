@@ -192,7 +192,10 @@ int tty_write_rex(RexSp_t* rex, char* data, size_t len){
 int tty_read ( struct filp *filp, char *data, size_t count, off_t offset){
     struct tty_state* state = (struct tty_state*)filp->private;
     if(state->reader){
-        return EBUSY;
+        if(IS_INUSE(state->reader)){
+            return EBUSY;
+        }
+        state->reader = NULL;
     }
     if(filp->filp_flags & O_NONBLOCK){
         return __tty_read(state, data, count);

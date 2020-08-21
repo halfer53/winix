@@ -3,6 +3,7 @@
 
 #include <fs/inode.h>
 #include <winix/comm.h>
+#include <winix/type.h>
 
 #define OPEN_MAX  8
 
@@ -28,6 +29,7 @@ typedef struct filp {
     int filp_table_index;
     zone_t getdents_zone_nr;
     int getdents_dirstream_nr;
+    struct list_head reader_queue;
 
     void* private;
     

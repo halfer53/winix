@@ -23,7 +23,7 @@ CMD_PROTOTYPE(ps);
 CMD_PROTOTYPE(cmd_kill);
 CMD_PROTOTYPE(print_pid);
 CMD_PROTOTYPE(mem_info);
-CMD_PROTOTYPE(trace_syscall);
+CMD_PROTOTYPE(do_trace_syscall);
 CMD_PROTOTYPE(help);
 CMD_PROTOTYPE(cmd_exit);
 CMD_PROTOTYPE(printenv);
@@ -35,7 +35,7 @@ CMD_PROTOTYPE(do_cls);
 // Command handling
 struct cmd_internal builtin_commands[] = {
     { printenv, "printenv" },
-    { trace_syscall, "trace"},
+    { do_trace_syscall, "trace"},
     { cmd_bash, "bash"},
     { ps, "ps"},
     { cmd_kill, "kill"},
@@ -110,7 +110,7 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
         saved_stdout = dup(STDOUT_FILENO); //backup stdout
         if(cmd->append) //if append
             mode |= O_APPEND;
-        else //else replace theoriginal document
+        else //else replace the original document
             mode |= O_TRUNC;
         sout = open(cmd->outfile, mode, 0644);
         dup2(sout,STDOUT_FILENO);
@@ -241,11 +241,8 @@ int do_cls(int argc, char** argv){
     return 0;
 }
 
-// Print the user space heap
-int trace_syscall(int argc, char** argv){
-    struct message m;
-    m.m1_i1 = WINFO_TRACE_SYSCALL;
-    return _syscall(WINFO, &m);
+int do_trace_syscall(int argc, char** argv){
+    return enable_syscall_tracing();
 }
 
 // Print the system wise memory info

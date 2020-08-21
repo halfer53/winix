@@ -86,7 +86,9 @@ int printf(const char *format, ...);
 int dprintf(int fd, const char *format, ...);
 int fprintf(FILE *stream, const char *format, ...);
 int putchar(const char c);
-int getchar();
+
+
+#define getchar()	(getc(stdin))
 
 
 extern FILE	*__iotab[FOPEN_MAX];
