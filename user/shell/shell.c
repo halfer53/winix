@@ -116,6 +116,13 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
         dup2(sout,STDOUT_FILENO);
         close(sout);
     }
+
+    if(cmd->infile){ //if redirecting input
+        saved_stdin = dup(STDIN_FILENO); //backup stdin
+        sin = open(cmd->infile, O_RDONLY);
+        dup2(sin,STDIN_FILENO);
+        close(sin);
+    }
     
     if(search_path(buffer, cmd->argv[0]) == 0){
         pid = vfork();

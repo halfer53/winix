@@ -2,8 +2,8 @@
 
 #include <stdio.h>
 #include <sys/fcntl.h>
-#define isdigit(c) (c >= '0' && c <= '9)
-#define isspace(c) (c == ' ' || c == '\t' || c == '\n' || c == '\f' || c == '\r')
+#define isdigit(c) (c >= '0' && c <= '9')
+#define isspace(c) (c == ' ' || c == '\t' || c == '\n')
 /*
  *
  *	Usage:  wc [-lwc] [names]
@@ -39,7 +39,41 @@ long ltotal;			/* Total count of lines */
 long wtotal;			/* Total count of words */
 long ctotal;			/* Total count of characters */
 
-main(argc, argv)
+
+
+void count()
+{
+  register int c;
+  register int word = 0;
+
+	lcount = 0;
+	wcount = 0;
+	ccount = 0L;
+
+  while((c = getc(stdin)) > 0) {
+	ccount++;
+
+	if(isspace(c)) {
+		if(word) wcount++;
+		word = 0;
+	} else {
+		word = 1;
+	}
+
+	if (c == '\n' || c == '\f') lcount++;
+  }
+  ltotal += lcount;
+  wtotal += wcount;
+  ctotal += ccount;
+}
+
+void usage()
+{
+  fprintf(stderr, "Usage: wc [-lwc] [name ...]\n");
+  exit(1);
+}
+
+int main(argc, argv)
 int argc;
 char *argv[];
 {
@@ -113,39 +147,8 @@ char *argv[];
 	printf(" total\n");
   }
 
-  exit(0);
+  return 0;
 }
 
-count()
-{
-  register int c;
-  register int word = 0;
-
-	lcount = 0;
-	wcount = 0;
-	ccount = 0L;
-
-  while((c = getc(stdin)) > 0) {
-	ccount++;
-
-	if(isspace(c)) {
-		if(word) wcount++;
-		word = 0;
-	} else {
-		word = 1;
-	}
-
-	if (c == '\n' || c == '\f') lcount++;
-  }
-  ltotal += lcount;
-  wtotal += wcount;
-  ctotal += ccount;
-}
-
-usage()
-{
-  std_err("Usage: wc [-lwc] [name ...]\n");
-  exit(1);
-}
 
 
