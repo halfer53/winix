@@ -203,7 +203,7 @@ typedef struct proc {
 * Pointer to the current process.
 **/
 extern struct proc *current_proc;
-extern struct proc *curr_user;
+extern struct proc *curr_user_proc;
 
 extern struct proc *proc_table;
 extern struct proc *ready_q[NUM_QUEUES][2];
@@ -225,7 +225,7 @@ extern struct proc *block_q[2];
 
 #define TASK_NR_TO_SID(tnr)             (tnr <= 0 ? -tnr + 1 : tnr)
 #define SID_TO_TASK_NR(sid)             (-sid + 1)
-#define SET_CALLER(pcurr)   (curr_user = pcurr)
+#define SET_CALLER(pcurr)   (curr_user_proc = pcurr)
 
 // proc_table points at index zero of the process table, so proc_table + INIT
 // simply starts at init

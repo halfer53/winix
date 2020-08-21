@@ -40,6 +40,7 @@ struct filp_operations{
     int (*read) (struct filp *, char *, size_t, off_t );
     int (*write) (struct filp *, char *, size_t, off_t );
     int (*close) (struct device *, struct filp *);
+    int (*ioctl) (struct filp *, int, ptr_t*);
     // int (*lseek) ( struct filp *, off_t, int);
     // int (*flush) (struct filp *);
 };

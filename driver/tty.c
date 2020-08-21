@@ -8,7 +8,7 @@
 #include <fs/filp.h>
 #include <winix/dev.h>
 #include <fs/fs_methods.h>
-
+#include <sys/ioctl.h>
 #include <winix/rex.h>
 #include <winix/list.h>
 #include <string.h>
@@ -34,22 +34,11 @@ int __kputc(RexSp_t* rex, const int c) {
     }
     return EOF;
 }
-/**
- * Writes a character to serial port 1.
- **/
-int kputc( const int c) {
-    if(IS_SERIAL_CODE(c)){
-        while(!(RexSp1->Stat & 2));
-        RexSp1->Tx = c;
-        return c;
-    }
-    return EOF;
-}
 
 int kputs(const char *s) {
     int count = 0;
     while(*s){
-        if(kputc(*s++) != EOF)
+        if(__kputc(RexSp1, *s++) != EOF)
             count++;
     }
     return count;    
@@ -202,7 +191,7 @@ int tty_read ( struct filp *filp, char *data, size_t count, off_t offset){
     }
     state->read_data = data;
     state->read_count = count;
-    state->reader = curr_user;
+    state->reader = curr_user_proc;
     return SUSPEND;
 }
 
@@ -218,6 +207,35 @@ int tty_open ( struct device* dev, struct filp *file){
 
 int tty_close ( struct device* dev, struct filp *file){
     return 0;
+}
+
+int tty_ioctl(struct filp* file, int request, ptr_t* ptr){
+    struct proc* who = curr_user_proc;
+    struct tty_state* tty_data;
+    tty_data = (struct tty_state*)file->filp_dev->private;
+    switch (request)
+    {
+    case TIOCGPGRP:
+        *ptr = (pid_t)tty_data->foreground_group;
+        break;
+    case TIOCSPGRP:
+        tty_data->foreground_group = (pid_t)*ptr;
+        // KDEBUG(("foreground to %d for %s, vir %x phy %x\n", (pid_t)*ptr, dev->init_name, arg, ptr));
+        break;
+    case TIOCSCTTY:
+        tty_data->controlling_session = who->session_id;
+        break;
+    case TIOCDISABLEECHO:
+        tty_data->is_echoing = false;
+        break;
+    case TIOCENABLEECHO:
+        tty_data->is_echoing = true;
+        break;
+
+    default:
+        return EINVAL;
+    }
+    return OK;
 }
 
 int tty_dev_init(){
@@ -258,7 +276,7 @@ int tty2_dev_release(){
 
 static struct device_operations dops = {tty_dev_init, tty_dev_io_read, tty_dev_io_write, tty_dev_release};
 static struct device_operations dops2  = {tty2_dev_init, tty2_dev_io_read, tty2_dev_io_write, tty2_dev_release};
-static struct filp_operations fops = {tty_open, tty_read, tty_write, tty_close};
+static struct filp_operations fops = {tty_open, tty_read, tty_write, tty_close, tty_ioctl};
 
 void init_tty_filp(struct filp** _file, struct device* dev, struct tty_state* state){
     struct filp* file;

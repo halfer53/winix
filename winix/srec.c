@@ -72,7 +72,7 @@ if ((wordslength = winix_load_srec_words_length(buf))) {
         return ERR;
     }
     if (wordsLoaded % 100 == 0) {
-        kputc('.');
+        // kputc('.');
     }
 }
     // kprintf("wordsLoaded %d wordslength %d\n",wordsLoaded,wordslength);

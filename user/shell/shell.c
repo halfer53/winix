@@ -151,8 +151,14 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
         dup2(saved_stdout,STDOUT_FILENO);
         close(saved_stdout);
     }
-    ioctl(STDOUT_FILENO, TIOCENABLEECHO);
-    ioctl(STDOUT_FILENO, TIOCSPGRP, pgid);
+
+    if(cmd->infile){
+        dup2(saved_stdin,STDIN_FILENO);
+        close(saved_stdin);
+    }
+
+    ioctl(STDIN_FILENO, TIOCENABLEECHO);
+    ioctl(STDIN_FILENO, TIOCSPGRP, pgid);
     printf("\n");
     return 0;
 }
