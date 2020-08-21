@@ -72,14 +72,13 @@ static char draw_pos[] = {0x1b, 0x5b, 0x30, 0x30, 0x30, 0x3b, 0x30, 0x30, 0x30, 
 static char coordinate_format[] = "%s ";
 
 void draw_coordinate(int x, int y, char character){
-    char buf[2];
     char *draw_format = draw_pos;
     int2str(y, 100, draw_format + 2);
     int2str(x, 100, draw_format + 6);
     coordinate_format[2] = character;
     printf(coordinate_format, draw_pos);
-    buf[0] = character;
-    buf[1] = '\0';
+    // buf[0] = character;
+    // buf[1] = '\0';
     // fprintf(stderr, "Draw %s at x %d y %d | ", buf, pos->x, pos->y);
 }
 
@@ -110,7 +109,7 @@ void print_instruction(){
 }
 
 void print_border(struct board_struct* board){
-    char buffer[NUM_COLS + 1];
+    char *buffer = malloc(NUM_COLS);
     char *buf = buffer;
     int i,j, end = NUM_COLS - 2;
     for(i = 0; i < end; i++){
@@ -121,12 +120,14 @@ void print_border(struct board_struct* board){
     printf("%s", buffer);
     draw_coordinate(0, NUM_ROWS, '-');
     printf("%s", buffer);
+    
     for (i = 1; i < NUM_ROWS; i++){
         draw_coordinate(0, i, '|');
     }
     for (i = 1; i < NUM_ROWS; i++){
         draw_coordinate(NUM_COLS - 1, i, '|');
     }
+    free(buffer);
 }
 
 void board_init(struct board_struct *board){
@@ -189,7 +190,7 @@ enum direction get_direction(struct board_struct* board){
         case 'a':
             if(dir == right)
                 return right;
-            return left;
+            return left; 
         case 's':
             if(dir == up)
                 return up;
