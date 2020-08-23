@@ -240,7 +240,7 @@ int kprintf_vm( struct filp* file, const char *orignal_format, void *arg, ptr_t 
                 format++;
             }
             
-            while(*format >= '0' && *format <= '9' && (buf2_count < (BUF2_SIZ - 1))){
+            while(isdigit(*format) && (buf2_count < (BUF2_SIZ - 1))){
                 buf2[buf2_count++] = *format++;
             }
 
