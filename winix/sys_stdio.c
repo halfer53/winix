@@ -187,6 +187,7 @@ void add_to_buffer(char* buf, int *buf_len, char c){
 }
 
 
+#define BUF2_SIZ    (3)
 /**
  * virtual memory printf, this function is used by both kernel and user process
  * @param  format    
@@ -204,8 +205,10 @@ int kprintf_vm( struct filp* file, const char *orignal_format, void *arg, ptr_t 
     int (*filp_write)(struct filp *, char *, size_t, off_t );
     char* format = (char*)orignal_format;
     char prev;
-    char token = SPACE;
+    char token;
     int format_len;
+    char buf2[BUF2_SIZ];
+    int buf2_count;
     
     filp_write = file ? file->filp_dev->fops->write : tty_non_init_write;
 
@@ -215,8 +218,10 @@ int kprintf_vm( struct filp* file, const char *orignal_format, void *arg, ptr_t 
             format++;
             padding_len = 0;
             format_len = 0;
+            buf2_count = 0;
             padding_direction = LEFT_PADDING;
             buf = buffer;
+            token = SPACE;
 
             // flush the buffer
             if(buf_len > 0){
@@ -229,17 +234,25 @@ int kprintf_vm( struct filp* file, const char *orignal_format, void *arg, ptr_t 
                 format++;
                 padding_direction = RIGHT_PADDING;
             }
+
+            if(*format == '0'){
+                token = ZERO;
+                format++;
+            }
             
-            if(*format >= '0' && *format <= '9'){
-                char buf2[3];
-                // todo limit it to 20
-                strncpy(buf2, format, 2);
+            while(*format >= '0' && *format <= '9' && (buf2_count < (BUF2_SIZ - 1))){
+                buf2[buf2_count++] = *format++;
+            }
+
+            if(buf2_count > 0 ){
+                buf2[buf2_count] = '\0';
                 padding_len = atoi(buf2);
                 if(padding_len > PADDING_BUFFER_SIZ){
                     padding_len = PADDING_BUFFER_SIZ;
                 }
-                format += 2;
+                // kputs(buf2);
             }
+            
 
             if(*format == 'l'){
                 format++;
@@ -289,8 +302,6 @@ int kprintf_vm( struct filp* file, const char *orignal_format, void *arg, ptr_t 
                     char padding_buffer[PADDING_BUFFER_SIZ];
                     char *padding_ptr = padding_buffer;
                     int len = padding_len;
-                    if(prev == 'x' || prev == 'd')
-                        token = ZERO;
                     while(len-- > 0){
                         *padding_ptr++ = token;
                         // count += filp_write(file, &token, 1 , 0);

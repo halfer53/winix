@@ -123,7 +123,7 @@ int main(int argc, char *argv[])
         cflag = 1;
     }
 
-    // printf("argc %d flags %d %d %d\n", argc, lflag, wflag, cflag);
+    // printf("argc %6d flags %6d %6d %6d\n", argc, lflag, wflag, cflag);
 
     /* Process files. */
     tflag = files >= 2; /* set if # files > 1 */
@@ -133,11 +133,11 @@ int main(int argc, char *argv[])
     {
         count();
         if (lflag)
-            printf(" %d", lcount);
+            printf(" %6d", lcount);
         if (wflag)
-            printf(" %d", wcount);
+            printf(" %6d", wcount);
         if (cflag)
-            printf(" %d", ccount);
+            printf(" %6d", ccount);
         printf(" \n");
         exit(0);
     }
@@ -158,11 +158,11 @@ int main(int argc, char *argv[])
             /* Next file has been opened as std input. */
             count();
             if (lflag)
-                printf(" %d", lcount);
+                printf(" %6d", lcount);
             if (wflag)
-                printf(" %d", wcount);
+                printf(" %6d", wcount);
             if (cflag)
-                printf(" %d", ccount);
+                printf(" %6d", ccount);
             printf(" %s\n", argv[k]);
         }
         k++;
@@ -171,11 +171,11 @@ int main(int argc, char *argv[])
     if (tflag)
     {
         if (lflag)
-            printf(" %d", ltotal);
+            printf(" %6d", ltotal);
         if (wflag)
-            printf(" %d", wtotal);
+            printf(" %6d", wtotal);
         if (cflag)
-            printf(" %d", ctotal);
+            printf(" %6d", ctotal);
         printf(" total\n");
     }
 
