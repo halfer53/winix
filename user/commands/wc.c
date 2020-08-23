@@ -26,129 +26,158 @@
  *      Program (heavily) modified by Andy Tanenbaum 
  */
 
+int lflag = 0; /* Count lines */
+int wflag = 0; /* Count words */
+int cflag = 0; /* Count characters */
 
-int lflag;			/* Count lines */
-int wflag;			/* Count words */
-int cflag;			/* Count characters */
+long lcount; /* Count of lines */
+long wcount; /* Count of words */
+long ccount; /* Count of characters */
 
-long lcount;			/* Count of lines */
-long wcount;			/* Count of words */
-long ccount;			/* Count of characters */
-
-long ltotal;			/* Total count of lines */
-long wtotal;			/* Total count of words */
-long ctotal;			/* Total count of characters */
-
-
+long ltotal; /* Total count of lines */
+long wtotal; /* Total count of words */
+long ctotal; /* Total count of characters */
 
 void count()
 {
-  register int c;
-  register int word = 0;
+    register int c;
+    register int word = 0;
 
-	lcount = 0;
-	wcount = 0;
-	ccount = 0L;
+    lcount = 0;
+    wcount = 0;
+    ccount = 0L;
 
-  while((c = getc(stdin)) > 0) {
-	ccount++;
+    while ((c = getc(stdin)) > 0)
+    {
+        ccount++;
 
-	if(isspace(c)) {
-		if(word) wcount++;
-		word = 0;
-	} else {
-		word = 1;
-	}
+        if (isspace(c))
+        {
+            if (word)
+                wcount++;
+            word = 0;
+        }
+        else
+        {
+            word = 1;
+        }
 
-	if (c == '\n' || c == '\f') lcount++;
-  }
-  ltotal += lcount;
-  wtotal += wcount;
-  ctotal += ccount;
+        if (c == '\n' || c == '\f')
+            lcount++;
+    }
+    ltotal += lcount;
+    wtotal += wcount;
+    ctotal += ccount;
 }
 
 void usage()
 {
-  fprintf(stderr, "Usage: wc [-lwc] [name ...]\n");
-  exit(1);
+    fprintf(stderr, "Usage: wc [-lwc] [name ...]\n");
+    exit(1);
 }
 
-int main(argc, argv)
-int argc;
-char *argv[];
+int main(int argc, char *argv[]) 
 {
-  int k;
-  char *cp;
-  int tflag, files;
-  int i;
-  int fd;
+    int k;
+    char *cp;
+    int tflag, files;
+    int i;
+    int fd;
 
-  /* Get flags. */
-  files = argc - 1;
-  k = 1;
-  cp = argv[1];
-  if (*cp++ == '-') {
-	files--;
-	k++;			/* points to first file */
-	while (*cp != 0) {
-		switch (*cp) {
-			case 'l':	lflag++;	break;
-			case 'w':	wflag++;	break;
-			case 'c':	cflag++;	break;
-			default:	usage();
-		}
-		cp++;
-	}
-  }
+    /* Get flags. */
+    files = argc - 1;
+    k = 1;
+    cp = argv[1];
 
-  /* If no flags are set, treat as wc -lwc. */
-  if(!lflag && !wflag && !cflag) {
-	lflag = 1;
-	wflag = 1;
-	cflag = 1;
-  }
+    
 
-  /* Process files. */
-  tflag = files >= 2;		/* set if # files > 1 */
+    if (cp && *cp++ == '-')
+    {
+        files--;
+        k++; /* points to first file */
+        while (*cp != 0)
+        {
+            switch (*cp)
+            {
+            case 'l':
+                lflag++;
+                break;
+            case 'w':
+                wflag++;
+                break;
+            case 'c':
+                cflag++;
+                break;
+            default:
+                usage();
+            }
+            cp++;
+        }
+    }
 
-  /* Check to see if input comes from std input. */
-  if (k >= argc) {
-	count();
-	if(lflag) printf(" %6d", lcount);
-	if(wflag) printf(" %6d", wcount);
-	if(cflag) printf(" %6d", ccount);
-	printf(" \n");
-	exit(0);
-  }
+    /* If no flags are set, treat as wc -lwc. */
+    if (!lflag && !wflag && !cflag)
+    {
+        lflag = 1;
+        wflag = 1;
+        cflag = 1;
+    }
 
-  /* There is an explicit list of files.  Loop on files. */
-  while (k < argc) {
-	// fclose(stdin);
-    close(STDIN_FILENO);
-	if ((fd = open(argv[k], O_RDONLY)) == -1) {
-		fprintf(stderr, "wc: cannot open %s\n", argv[k]);
-		k++;
-		continue;
-	} else {
-		/* Next file has been opened as std input. */
-		count();
-		if(lflag) printf(" %6d", lcount);
-		if(wflag) printf(" %6d", wcount);
-		if(cflag) printf(" %6d", ccount);
-		printf(" %s\n", argv[k]);
-	}
-	k++;
-  }
+    // printf("argc %d flags %d %d %d\n", argc, lflag, wflag, cflag);
 
-  if(tflag) {
-	if(lflag) printf(" %6d", ltotal);
-	if(wflag) printf(" %6d", wtotal);
-	if(cflag) printf(" %6d", ctotal);
-	printf(" total\n");
-  }
+    /* Process files. */
+    tflag = files >= 2; /* set if # files > 1 */
 
-  return 0;
+    /* Check to see if input comes from std input. */
+    if (k >= argc)
+    {
+        count();
+        if (lflag)
+            printf(" %d", lcount);
+        if (wflag)
+            printf(" %d", wcount);
+        if (cflag)
+            printf(" %d", ccount);
+        printf(" \n");
+        exit(0);
+    }
+
+    /* There is an explicit list of files.  Loop on files. */
+    while (k < argc)
+    {
+        // fclose(stdin);
+        close(STDIN_FILENO);
+        if ((fd = open(argv[k], O_RDONLY)) == -1)
+        {
+            fprintf(stderr, "wc: cannot open %s\n", argv[k]);
+            k++;
+            continue;
+        }
+        else
+        {
+            /* Next file has been opened as std input. */
+            count();
+            if (lflag)
+                printf(" %d", lcount);
+            if (wflag)
+                printf(" %d", wcount);
+            if (cflag)
+                printf(" %d", ccount);
+            printf(" %s\n", argv[k]);
+        }
+        k++;
+    }
+
+    if (tflag)
+    {
+        if (lflag)
+            printf(" %d", ltotal);
+        if (wflag)
+            printf(" %d", wtotal);
+        if (cflag)
+            printf(" %d", ctotal);
+        printf(" total\n");
+    }
+
+    return 0;
 }
-
-
-
