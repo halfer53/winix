@@ -173,8 +173,7 @@ int kputs_vm_buf(char *s, void *who_rbase, char *buf) {
 #define LEFT_PADDING    1
 #define RIGHT_PADDING   2
 
-#define BUFFER_SIZ  (64)
-#define PADDING_BUFFER_SIZ  (20)
+
 
 int tty_non_init_write(struct filp *file, char *data, size_t len, off_t offset){
     return tty_write_rex(RexSp2, data, len);
@@ -186,8 +185,9 @@ void add_to_buffer(char* buf, int *buf_len, char c){
     *buf_len = len;
 }
 
-
-#define BUF2_SIZ    (3)
+#define BUFFER_SIZ  (64)
+#define FORMAT_BUF_SIZ  (11)
+#define PADDING_NUM_BUF_SIZ (3)
 /**
  * virtual memory printf, this function is used by both kernel and user process
  * @param  format    
@@ -197,18 +197,19 @@ void add_to_buffer(char* buf, int *buf_len, char c){
  */
 int kprintf_vm( struct filp* file, const char *orignal_format, void *arg, ptr_t *who_rbase){
     static char buffer[BUFFER_SIZ];
-    char *buf = buffer;
+    static char format_buffer[FORMAT_BUF_SIZ];
+    char *ptr, *p, *format_ptr, *second_ptr;
     int padding_len;
     int padding_direction;
-    int buf_len = 0;
+    int buf_len = 0, format_buf_len, second_buf_len;
     int count = 0;
     int (*filp_write)(struct filp *, char *, size_t, off_t );
     char* format = (char*)orignal_format;
     char prev;
     char token;
     int format_len;
-    char buf2[BUF2_SIZ];
-    int buf2_count;
+    char padding_num_buffer[PADDING_NUM_BUF_SIZ];
+    int padding_num_buffer_count;
     
     filp_write = file ? file->filp_dev->fops->write : tty_non_init_write;
 
@@ -218,16 +219,17 @@ int kprintf_vm( struct filp* file, const char *orignal_format, void *arg, ptr_t 
             format++;
             padding_len = 0;
             format_len = 0;
-            buf2_count = 0;
+            padding_num_buffer_count = 0;
             padding_direction = LEFT_PADDING;
-            buf = buffer;
+            format_ptr = format_buffer;
             token = SPACE;
+            format_buf_len = 0;
 
             // flush the buffer
-            if(buf_len > 0){
-                count += filp_write(file, buffer, buf_len, count);
-                buf_len = 0;
-            }
+            // if(buf_len > 0){
+            //     count += filp_write(file, buffer, buf_len, count);
+            //     buf_len = 0;
+            // }
             
             // decode padding options
             if(*format == '-'){
@@ -240,17 +242,14 @@ int kprintf_vm( struct filp* file, const char *orignal_format, void *arg, ptr_t 
                 format++;
             }
             
-            while(isdigit(*format) && (buf2_count < (BUF2_SIZ - 1))){
-                buf2[buf2_count++] = *format++;
+            while(isdigit(*format) && (padding_num_buffer_count < (PADDING_NUM_BUF_SIZ - 1))){
+                padding_num_buffer[padding_num_buffer_count++] = *format++;
             }
 
-            if(buf2_count > 0 ){
-                buf2[buf2_count] = '\0';
-                padding_len = atoi(buf2);
-                if(padding_len > PADDING_BUFFER_SIZ){
-                    padding_len = PADDING_BUFFER_SIZ;
-                }
-                // kputs(buf2);
+            if(padding_num_buffer_count > 0 ){
+                padding_num_buffer[padding_num_buffer_count] = '\0';
+                padding_len = atoi(padding_num_buffer);
+                // kputs(padding_num_buffer);
             }
             
 
@@ -263,131 +262,89 @@ int kprintf_vm( struct filp* file, const char *orignal_format, void *arg, ptr_t 
             switch(*format) {
                 
                 case 'd':
-                    buf_len = kputd_buf(*((int*)arg),buf);
+                    format_buf_len = kputd_buf(*((int*)arg),format_buffer);
                     break;
 
                 case 'x':
                 case 'p':
-                    buf_len = kputx_buf(*((int*)arg),buf);
+                    format_buf_len = kputx_buf(*((int*)arg),format_buffer);
                     break;
 
                 case 's':
-                    buf = *(char **)arg + (int)who_rbase;
-                    if(buf){
-                        buf_len = strlen(buf);
-                    }else{
-                        buf = buffer;
-                        *buf = '\0';
+                    format_ptr = *(char **)arg + (int)who_rbase;
+                    if(format_ptr){
+                        format_buf_len = strlen(format_ptr);
                     }
-                    
                     break;
 
                 case 'c':
                 default:
-                    *buf++ = *(int *)arg;
-                    *buf = '\0';
-                    buf_len = 1;
+                    *format_ptr = *((int *)arg);
+                    format_buf_len = 1;
                     break;
             }
             arg = ((char *)arg) + 1;
             format++;
 
-            padding_len -= buf_len;
+            padding_len -= format_buf_len;
             // count += buf_len;
 
 
             // left padding
             if(padding_len > 0){ 
+                int padding_total;
+                int len = padding_len;
+                second_ptr = format_buffer;
+
                 if(padding_direction == LEFT_PADDING ){
-                    char padding_buffer[PADDING_BUFFER_SIZ];
-                    char *padding_ptr = padding_buffer;
-                    int len = padding_len;
-                    while(len-- > 0){
-                        *padding_ptr++ = token;
-                        // count += filp_write(file, &token, 1 , 0);
+                    second_buf_len = format_buf_len;
+                    padding_total = padding_len + buf_len;
+                    p = &buffer[buf_len];
+                    if(padding_total >= BUFFER_SIZ){
+                        len = BUFFER_SIZ - buf_len;
                     }
-                    count += filp_write(file, padding_buffer, padding_len , count);
+                    buf_len += len;
+
                 }else{
-                    char* p = buf + buf_len;
-                    buf_len += padding_len;
-                    while(padding_len-- > 0){ 
-                        *p++ = token;
+                    goto add_format_to_buffer;
+
+                    continue_right_padding_processing:
+                    if(len >= FORMAT_BUF_SIZ){
+                        len = FORMAT_BUF_SIZ;
                     }
-                    *p = '\0';
+                    p = format_buffer;
+                    second_buf_len = len;
                 }
+                
+                while(len-- > 0){
+                    *p++ = token;
+                }
+                count += filp_write(file, buffer , buf_len, count);
+                count += filp_write(file, second_ptr , second_buf_len, count);
+                buf_len = 0;
+                continue;
             }
-            count += filp_write(file, buf, buf_len, count);
-            buf_len = 0;
 
-        }else if(*format == '\\'){
-            char outchar;
-            format++;
-
-            switch (*format)
-            {
-            case 'a':
-                outchar = 0x7;
-                break;
-            case 'b':
-                outchar = 0x8;
-                break;
-            case 'e':
-                outchar = 0x1b;
-                break;
-            case 'n':
-                outchar = 0xa;
-                break;
-            case 'r':
-                outchar = 0xd;
-                break;
-            case 't':
-                outchar = 0x9;
-                break;
-            
-            default:
-                outchar = *format;
-                break;
+            add_format_to_buffer:
+            ptr = buffer;
+            if(format_buf_len + buf_len >= BUFFER_SIZ){
+                count += filp_write(file, buffer , buf_len, count);
+                buf_len = 0;
+            }else{
+                ptr += buf_len;
             }
-            KDEBUG(("escape char %x\n", outchar));
-            buffer[buf_len++] = outchar;
-            format++;
+
+            buf_len += format_buf_len;
+            while(format_buf_len--){
+                *ptr++ = *format_ptr++;
+            }
+
+            if(padding_len > 0 && padding_direction == RIGHT_PADDING){
+                goto continue_right_padding_processing;
+            }
 
         }else {
-
             char outchar = *format;
-
-            // switch (*format)
-            // {
-            // case '\\':
-            //     outchar = '!';
-            //     break;
-            // case '\a':
-            //     outchar = 0x7;
-            //     break;
-            // case '\b':
-            //     outchar = 0x8;
-            //     break;
-            // case 0x1b:
-            //     outchar = '!';
-            //     break;
-            // case 'e':
-            //     outchar = '!';
-            //     break;
-            // case '\n':
-            //     outchar = 0xa;
-            //     break;
-            // case '\r':
-            //     outchar = 0xd;
-            //     break;
-            // case '\t':
-            //     outchar = 0x9;
-            //     break;
-            
-            // default:
-            //     outchar = *format;
-            //     break;
-            // }
-            
             format++;
             buffer[buf_len++] = outchar;
 
@@ -395,7 +352,7 @@ int kprintf_vm( struct filp* file, const char *orignal_format, void *arg, ptr_t 
             // serial port 1
             // count += filp_write(file, format++, 1, 0);
             // buffer[buf_len++] = *format++;
-            if(buf_len >= BUFFER_SIZ){
+            if(buf_len >= (BUFFER_SIZ)){
                 count += filp_write(file, buffer, buf_len, count);
                 buf_len = 0;
             }
