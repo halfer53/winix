@@ -58,10 +58,10 @@ int do_send(int dest, struct message *m) {
             pDest->ctx.m.regs[0] = m->reply_res;
             enqueue_head(ready_q[pDest->priority], pDest);
         }else {
-            if(is_debugging_ipc()){
-                KDEBUG(("\nIPC: SEND to %d from %d blocked| ",
-                            dest, current_proc->proc_nr,m->type));
-            }
+            // if(is_debugging_ipc()){
+            //     KDEBUG(("\nIPC: SEND to %d from %d blocked| ",
+            //                 dest, current_proc->proc_nr,m->type));
+            // }
             // Otherwise, block current process and add it to
             // head of sending queue of the destination.
             current_proc->state |= STATE_SENDING;
@@ -69,10 +69,10 @@ int do_send(int dest, struct message *m) {
             pDest->sender_q = current_proc;
         }
 
-        if(is_debugging_ipc()){
-            KDEBUG(("\nIPC: SEND to %d from %d type %d| ",
-                        dest, current_proc->proc_nr,m->type));
-        }
+        // if(is_debugging_ipc()){
+        //     KDEBUG(("\nIPC: SEND to %d from %d type %d| ",
+        //                 dest, current_proc->proc_nr,m->type));
+        // }
         return OK;
     }
     return ESRCH;
@@ -115,8 +115,8 @@ int do_receive(struct message *m) {
         if(p->state == STATE_RUNNABLE)
             enqueue_head(ready_q[p->priority], p);
         
-        if(is_debugging_ipc())
-            KDEBUG(("\nIPC: %d REC from %d type %d| ",current_proc->proc_nr, m->src ,m->type));
+        // if(is_debugging_ipc())
+        //     KDEBUG(("\nIPC: %d REC from %d type %d| ",current_proc->proc_nr, m->src ,m->type));
         
         return OK;
     }
@@ -143,8 +143,8 @@ int do_notify(int src, int dest, struct message *m) {
         if(pDest->state & STATE_KILLED)
             return ERR;
 
-        if(is_debugging_ipc())
-            KDEBUG(("\nNOTIFY %d from %d type %d| ",dest, src ,m->type));
+        // if(is_debugging_ipc())
+        //     KDEBUG(("\nNOTIFY %d from %d type %d| ",dest, src ,m->type));
             
         // If destination is waiting, deliver message immediately.
         if (pDest->state == STATE_RECEIVING) {

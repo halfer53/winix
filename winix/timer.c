@@ -101,8 +101,8 @@ void insert_timer(struct timer *timer){
 
     enable_interrupt();
     
-    if(is_debugging_timer())
-        kreport_timers();
+    // if(is_debugging_timer())
+    //     kreport_timers();
 }
 
 /**

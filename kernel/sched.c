@@ -55,9 +55,9 @@ struct proc *pick_proc() {
     // Find the highest-priority non-empty queue
     for (i = 0; i < NUM_QUEUES; i++){
         if(mp = dequeue(ready_q[i])){
-            if(is_debugging_sched()){
-                kprintf("|| %d || ", mp->proc_nr);
-            }
+            // if(is_debugging_sched()){
+            //     kprintf("|| %d || ", mp->proc_nr);
+            // }
             return mp;
         }
     }
