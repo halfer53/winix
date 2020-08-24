@@ -78,7 +78,7 @@ const char* kstr_error(int err){
  */
 int kputx_buf(int n,char *buf) {
     int i;
-    int v = 0, count = 0;
+    int v = 0, offset = 0;
 
     if(n == 0){
         *buf++ = '0';
@@ -92,18 +92,18 @@ int kputx_buf(int n,char *buf) {
         if(d < 10) {
             if(v){
                 *buf++ = d + '0';
-                count++;
+                offset++;
             }    
         }
         else {
             // kputc(d - 10 + 'A');
             *buf++ = d - 10 + 'A';
-            count++;
+            offset++;
         }
         
     }
     *buf = '\0';
-    return count;
+    return offset;
 }
 
 /**
@@ -114,7 +114,7 @@ int kputx_buf(int n,char *buf) {
  */
 int kputd_buf(int n, char *buf) {
     int place = 1000000000;
-    int count = 0;
+    int offset = 0;
     // zero?
     if(n == 0) {
         *buf++ = '0';
@@ -125,7 +125,7 @@ int kputd_buf(int n, char *buf) {
     // negative?
     if(n < 0) {
         *buf++ = '-';
-        count++;
+        offset++;
         n *= -1;
     }
 
@@ -139,32 +139,32 @@ int kputd_buf(int n, char *buf) {
         int d = n / place;
         *buf++ = d % 10 + '0';
         place /= 10;
-        count++;
+        offset++;
     }
     *buf = '\0';
-    return count;
+    return offset;
 }
 
 int kputs_vm_buf(char *s, void *who_rbase, char *buf) {
     char *sp = s;
-    int count = 0;
+    int offset = 0;
     sp += (int)who_rbase;
     while(*sp){
         *buf++ = *sp++;
-        count++;
+        offset++;
     }
         
     *buf = '\0';
-    return count;
+    return offset;
 }
 
 // int kput_token(char token, int len){
-//     int count = 0;
+//     int offset = 0;
 //     while(len--){
 //         if(kputc(token) != EOF)
-//             count++;
+//             offset++;
 //     }
-//     return count;
+//     return offset;
 // }
 
 #define SPACE    ' '
@@ -179,15 +179,76 @@ int tty_non_init_write(struct filp *file, char *data, size_t len, off_t offset){
     return tty_write_rex(RexSp2, data, len);
 }
 
-void add_to_buffer(char* buf, int *buf_len, char c){
-    int len = *buf_len;
-    buf[len++] = c;
-    *buf_len = len;
-}
+
+
 
 #define BUFFER_SIZ  (64)
 #define FORMAT_BUF_SIZ  (11)
+#define PADDING_BUFFER_SIZ (20)
 #define PADDING_NUM_BUF_SIZ (3)
+// static char buffer[BUFFER_SIZ];
+
+
+struct printf_buffer{
+    char buffer[BUFFER_SIZ];
+    int limit;
+    int pos;
+    int (*filp_write)(struct filp *, char *, size_t, off_t );
+    int total_count;
+    struct filp* filp;
+};
+
+static void debug_buffer(struct printf_buffer* tbuf){
+    kputs("|");
+    tbuf->buffer[tbuf->pos] = '\0';
+    kputs("|");
+    kputs(tbuf->buffer);
+    kputs("\n");
+}
+
+static void flush_buffer(struct printf_buffer* tbuf){
+    if(tbuf->pos > 0){
+        tbuf->total_count += tbuf->filp_write(tbuf->filp, tbuf->buffer, tbuf->pos, tbuf->filp->filp_pos);
+        tbuf->pos = 0;
+    }
+}
+
+static void add_char_to_buffer(struct printf_buffer* tbuf, char c){
+    if(tbuf->pos >= tbuf->limit){
+        flush_buffer(tbuf);
+    }
+    tbuf->buffer[tbuf->pos++] = c;
+}
+
+static void append_buffer(struct printf_buffer* tbuf, char* sbuf, int sbuf_len){
+    char *p;
+    if(sbuf_len + tbuf->pos >= tbuf->limit){
+        flush_buffer(tbuf);
+    }
+    p = &tbuf->buffer[tbuf->pos];
+    tbuf->pos += sbuf_len;
+    while(sbuf_len--){
+        *p++ = *sbuf++;
+    }
+}
+
+static void fill_padding(struct printf_buffer* tbuf, char token, int len){
+    static char padding_buffer[PADDING_BUFFER_SIZ];
+    char *p = padding_buffer;
+    int len_back;
+    if(len + tbuf->pos >= tbuf->limit){
+        flush_buffer(tbuf);
+    }
+    if(len >= FORMAT_BUF_SIZ){
+        len = FORMAT_BUF_SIZ;
+    }
+    len_back = len;
+    while(len--){
+        *p++ = token;
+    }
+    append_buffer(tbuf, padding_buffer, len_back);
+}
+
 /**
  * virtual memory printf, this function is used by both kernel and user process
  * @param  format    
@@ -196,41 +257,37 @@ void add_to_buffer(char* buf, int *buf_len, char c){
  * @return           number of bytes being printed
  */
 int kprintf_vm( struct filp* file, const char *orignal_format, void *arg, ptr_t *who_rbase){
-    static char buffer[BUFFER_SIZ];
     static char format_buffer[FORMAT_BUF_SIZ];
-    char *ptr, *p, *format_ptr, *second_ptr;
+    struct printf_buffer _this_buffer;
+    struct printf_buffer* this_buffer = &_this_buffer;
+    char *format_ptr;
     int padding_len;
     int padding_direction;
-    int buf_len = 0, format_buf_len, second_buf_len;
-    int count = 0;
+    int format_buf_len;
     int (*filp_write)(struct filp *, char *, size_t, off_t );
     char* format = (char*)orignal_format;
     char prev;
     char token;
-    int format_len;
     char padding_num_buffer[PADDING_NUM_BUF_SIZ];
     int padding_num_buffer_count;
-    
+
+    memset(this_buffer, 0, sizeof(struct printf_buffer));
+    this_buffer->limit = BUFFER_SIZ;
     filp_write = file ? file->filp_dev->fops->write : tty_non_init_write;
+    this_buffer->filp_write = filp_write;
+    this_buffer->filp = file;
 
     while(*format) {
 
         if(*format == '%') {
             format++;
             padding_len = 0;
-            format_len = 0;
             padding_num_buffer_count = 0;
             padding_direction = LEFT_PADDING;
             format_ptr = format_buffer;
             token = SPACE;
             format_buf_len = 0;
 
-            // flush the buffer
-            // if(buf_len > 0){
-            //     count += filp_write(file, buffer, buf_len, count);
-            //     buf_len = 0;
-            // }
-            
             // decode padding options
             if(*format == '-'){
                 format++;
@@ -262,12 +319,12 @@ int kprintf_vm( struct filp* file, const char *orignal_format, void *arg, ptr_t 
             switch(*format) {
                 
                 case 'd':
-                    format_buf_len = kputd_buf(*((int*)arg),format_buffer);
+                    format_buf_len = kputd_buf(*((int*)arg),format_ptr);
                     break;
 
                 case 'x':
                 case 'p':
-                    format_buf_len = kputx_buf(*((int*)arg),format_buffer);
+                    format_buf_len = kputx_buf(*((int*)arg),format_ptr);
                     break;
 
                 case 's':
@@ -287,81 +344,32 @@ int kprintf_vm( struct filp* file, const char *orignal_format, void *arg, ptr_t 
             format++;
 
             padding_len -= format_buf_len;
-            // count += buf_len;
+            // offset += this_buffer->pos;
 
 
             // left padding
             if(padding_len > 0){ 
-                int padding_total;
-                int len = padding_len;
-                second_ptr = format_buffer;
 
                 if(padding_direction == LEFT_PADDING ){
-                    second_buf_len = format_buf_len;
-                    padding_total = padding_len + buf_len;
-                    p = &buffer[buf_len];
-                    if(padding_total >= BUFFER_SIZ){
-                        len = BUFFER_SIZ - buf_len;
-                    }
-                    buf_len += len;
+                    fill_padding(this_buffer, token, padding_len);
+                    append_buffer(this_buffer, format_ptr, format_buf_len);
 
                 }else{
-                    goto add_format_to_buffer;
-
-                    continue_right_padding_processing:
-                    if(len >= FORMAT_BUF_SIZ){
-                        len = FORMAT_BUF_SIZ;
-                    }
-                    p = format_buffer;
-                    second_buf_len = len;
+                    append_buffer(this_buffer, format_ptr, format_buf_len);
+                    fill_padding(this_buffer, token, padding_len);
                 }
-                
-                while(len-- > 0){
-                    *p++ = token;
-                }
-                count += filp_write(file, buffer , buf_len, count);
-                count += filp_write(file, second_ptr , second_buf_len, count);
-                buf_len = 0;
-                continue;
-            }
-
-            add_format_to_buffer:
-            ptr = buffer;
-            if(format_buf_len + buf_len >= BUFFER_SIZ){
-                count += filp_write(file, buffer , buf_len, count);
-                buf_len = 0;
             }else{
-                ptr += buf_len;
-            }
+                append_buffer(this_buffer, format_ptr, format_buf_len);
 
-            buf_len += format_buf_len;
-            while(format_buf_len--){
-                *ptr++ = *format_ptr++;
-            }
-
-            if(padding_len > 0 && padding_direction == RIGHT_PADDING){
-                goto continue_right_padding_processing;
             }
 
         }else {
-            char outchar = *format;
-            format++;
-            buffer[buf_len++] = outchar;
 
-            // if this is a normal character, simply print it to 
-            // serial port 1
-            // count += filp_write(file, format++, 1, 0);
-            // buffer[buf_len++] = *format++;
-            if(buf_len >= (BUFFER_SIZ)){
-                count += filp_write(file, buffer, buf_len, count);
-                buf_len = 0;
-            }
+            add_char_to_buffer(this_buffer, *format++);
         }
     }
-    if(buf_len > 0){
-        count += filp_write(file, buffer, buf_len, count);
-    }
-    return count;
+    flush_buffer(this_buffer);
+    return this_buffer->total_count;
 }
 
 int filp_kprint(struct filp* file, const char* format, ...){

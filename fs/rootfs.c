@@ -147,6 +147,16 @@ int root_fs_read (struct filp *filp, char *data, size_t count, off_t offset){
     return ret;
 }
 
+// char* get_buffer_data(char* data, size_t count){
+//     static char __buffer[50];
+//     char* p = __buffer;
+//     while(count--){
+//         *p++ = *data++;
+//     }
+//     *p = '\0';
+//     return __buffer;
+// }
+
 int root_fs_write (struct filp *filp, char *data, size_t count, off_t offset){
     int r, j, ret = 0;
     unsigned int len;
@@ -199,6 +209,7 @@ int root_fs_write (struct filp *filp, char *data, size_t count, off_t offset){
         filp->filp_ino->i_size += r;
         off = 0;
     }
+    // KDEBUG(("Rootfs %d write count %d, offset %d ret %d data %s\n",filp->filp_ino->i_num, count, offset, ret, get_buffer_data(data, count)));
     return ret;
 }
 

@@ -166,8 +166,11 @@ int __tty_read(struct tty_state* state, char* data, size_t len){
     return 0;
 }
 
+char* get_buffer_data(char* data, size_t count);
+
 int tty_write_rex(RexSp_t* rex, char* data, size_t len){
     char *p = data;
+    
     while(len-- > 0){
         if(IS_SERIAL_CODE(*p)){
             while(!(rex->Stat & 2));
@@ -197,7 +200,10 @@ int tty_read ( struct filp *filp, char *data, size_t count, off_t offset){
 
 int tty_write ( struct filp *filp, char *data, size_t count, off_t offset){
     struct tty_state* state = (struct tty_state*)filp->private;
-    return tty_write_rex(state->rex, data, count);
+    int ret;
+    ret = tty_write_rex(state->rex, data, count);
+
+    return ret;
 }
 
 int tty_open ( struct device* dev, struct filp *file){
