@@ -46,6 +46,8 @@ void system_main() {
         // get a message
         winix_receive(mesg);
         who_proc_nr = mesg->src;
+        // who = proc_table + who_proc_nr;
+        // KDEBUG(("who pnr %d flag %x\n", who_proc_nr, who->flags));
         who = get_proc(who_proc_nr);
 
         syscall_region_begin();
@@ -90,6 +92,7 @@ void system_main() {
 }
 
 void syscall_region_begin(){
+    ASSERT(who != NULL);
 
     // Bill the user proc's sys_used_time while executing syscall
     // on behalf of the user process
@@ -100,16 +103,14 @@ void syscall_region_begin(){
     // the following two are defensive statements
     // to ensure the caller is suspended while the system
     // is handling the system call
-    who->state |= STATE_RECEIVING;
-    dequeue_schedule(who);
 
-    if(is_debugging_syscall())
-        if(m.type >= 1 && m.type <= _NSYSCALL)
-            kprintf_syscall_request(m.type, m.src);
+    who->state |= STATE_RECEIVING;
+    // dequeue_schedule(who);
     
     SET_CALLER(who);
     // Make sure system doesn't send a message to itself
-    ASSERT(who != NULL && who_proc_nr != SYSTEM); 
+    
+    ASSERT(who_proc_nr != SYSTEM); 
 }
 
 void syscall_region_end(){

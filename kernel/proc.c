@@ -84,7 +84,7 @@ void kreport_all_procs() {
 **/
 void kreport_proc(struct proc* curr) {
     int ptable_idx = PADDR_TO_PAGED(curr->ctx.rbase)/32;
-    kprintf("%-03d %-04d 0x%08x 0x%08x 0x%08x 0x%08x %d 0x%08x %-04d %s\n",
+    kprintf("%-3d %-4d 0x%08x 0x%08x 0x%08x 0x%08x %d 0x%08x %4x %s\n",
             curr->pid,
             get_proc(curr->parent)->pid,
             curr->ctx.rbase,

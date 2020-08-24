@@ -167,9 +167,6 @@ void exit_proc_in_interrupt(struct proc* who, int exit_val,int signum){
     who->state |= STATE_RECEIVING;
     do_notify(who->proc_nr, SYSTEM, em);
     // KDEBUG(("exit interrupt who %d, curr %d\n", who->proc_nr, current_proc->proc_nr));
-    if(who == current_proc){
-        current_proc = NULL;
-    }
 }
 
 void exit_proc(struct proc *who, int status, int signum){

@@ -206,9 +206,14 @@ static void debug_buffer(struct printf_buffer* tbuf){
     kputs("\n");
 }
 
+static void flush_buffer_data(struct printf_buffer* tbuf, char* data, int len){
+    tbuf->total_count += tbuf->filp_write(tbuf->filp, data, len, tbuf->filp->filp_pos);
+}
+
 static void flush_buffer(struct printf_buffer* tbuf){
     if(tbuf->pos > 0){
-        tbuf->total_count += tbuf->filp_write(tbuf->filp, tbuf->buffer, tbuf->pos, tbuf->filp->filp_pos);
+        flush_buffer_data(tbuf, tbuf->buffer, tbuf->pos);
+        // tbuf->total_count += tbuf->filp_write(tbuf->filp, tbuf->buffer, tbuf->pos, tbuf->filp->filp_pos);
         tbuf->pos = 0;
     }
 }
@@ -222,6 +227,12 @@ static void add_char_to_buffer(struct printf_buffer* tbuf, char c){
 
 static void append_buffer(struct printf_buffer* tbuf, char* sbuf, int sbuf_len){
     char *p;
+    if(sbuf_len > tbuf->limit){
+        flush_buffer(tbuf);
+        flush_buffer_data(tbuf, sbuf, sbuf_len);
+        return;
+    }
+
     if(sbuf_len + tbuf->pos >= tbuf->limit){
         flush_buffer(tbuf);
     }
@@ -233,20 +244,12 @@ static void append_buffer(struct printf_buffer* tbuf, char* sbuf, int sbuf_len){
 }
 
 static void fill_padding(struct printf_buffer* tbuf, char token, int len){
-    static char padding_buffer[PADDING_BUFFER_SIZ];
-    char *p = padding_buffer;
-    int len_back;
     if(len + tbuf->pos >= tbuf->limit){
         flush_buffer(tbuf);
     }
-    if(len >= FORMAT_BUF_SIZ){
-        len = FORMAT_BUF_SIZ;
-    }
-    len_back = len;
     while(len--){
-        *p++ = token;
+        add_char_to_buffer(tbuf, token);
     }
-    append_buffer(tbuf, padding_buffer, len_back);
 }
 
 /**
@@ -257,7 +260,7 @@ static void fill_padding(struct printf_buffer* tbuf, char token, int len){
  * @return           number of bytes being printed
  */
 int kprintf_vm( struct filp* file, const char *orignal_format, void *arg, ptr_t *who_rbase){
-    static char format_buffer[FORMAT_BUF_SIZ];
+    char format_buffer[FORMAT_BUF_SIZ];
     struct printf_buffer _this_buffer;
     struct printf_buffer* this_buffer = &_this_buffer;
     char *format_ptr;
