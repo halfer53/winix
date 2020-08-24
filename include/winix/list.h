@@ -23,6 +23,10 @@
 #ifndef WRITE_ONCE
 #define WRITE_ONCE(left, right) (left = right)
 #endif
+
+#ifndef READ_ONCE
+#define READ_ONCE(val) (val)
+#endif
 /*
  * Simple doubly linked list implementation.
  *
@@ -132,22 +136,7 @@ do{\
  * @old : the element to be replaced
  * @new : the new element to insert
  *
- * If @old was empty, it will be overwritten.
- */
-void list_replace(struct list_head *old, struct list_head *new);
-#define   list_replace(old, new)\
-do{\
-	(new)->next = (old)->next;\
-	(new)->(next)->prev = new;\
-	(new)->prev = (old)->prev;\
-	(new)->(prev)->next = new;\
-}while(0)
-
-void list_replace_init(struct list_head *old, struct list_head *new);
-#define   list_replace_init(old, new)\
-do{\
-	list_replace(old, new);\
-	INIT_LIST_HEAD(old);\
+ * If @old was empty, it will be overwrittenREAD_ONCE
 }while(0)
 
 /**
@@ -198,7 +187,7 @@ int list_is_last(const struct list_head *list, const struct list_head *head);
  * @head: the list to test.
  */
 int list_empty(const struct list_head *head);
-#define   list_empty(head)	(READ_ONCE((head)->next) == head)
+#define   list_empty(head)	((head)->next == head)
 
 /**
  * list_empty_careful - tests whether a list is empty and not being modified

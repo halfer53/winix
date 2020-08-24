@@ -16,6 +16,7 @@
 #include <winix/mm.h>
 #include <winix/srec.h>
 #include <winix/welf.h>
+#include <winix/list.h>
 
 // Linked lists are defined by a head and tail pointer.
 
@@ -320,6 +321,8 @@ void proc_set_default(struct proc *p) {
     p->alarm.proc_nr = p->proc_nr;
     p->sig_table[SIGCHLD].sa_handler = SIG_IGN;
     p->umask = 0x22;
+
+    INIT_LIST_HEAD(&p->notify_queue);
 }
 
 /**

@@ -16,6 +16,7 @@
 #include <kernel/table.h>
 #include <kernel/exception.h>
 #include <winix/bitmap.h>
+#include <winix/list.h>
 
 /**
  * sends a message.
@@ -86,18 +87,15 @@ int do_send(int dest, struct message *m) {
  * Returns:            0
  **/
 int do_receive(struct message *m) {
-    struct proc *p;
+    struct proc *p, *bak;
 
-    if(current_proc->notify_pending){
-        int i;
-        unsigned int map = current_proc->notify_pending;
-        for(i = 0; i < 32; i++){
-            if(map & (1 << i)){
-                unset_bit(current_proc->notify_pending, i);
-                i = SID_TO_TASK_NR(i);
-                *m = i == INTERRUPT ? *get_exception_m() : *(get_proc(i)->message);
-                return OK;
-            }
+    if(!list_empty(&current_proc->notify_queue)){
+        // KDEBUG(("not empty"));
+        list_for_each_entry_safe(struct proc, p, bak, &current_proc->notify_queue, notify_queue){
+            list_del(&p->notify_queue);
+            *m = *(p->message);
+            // KDEBUG(("receive not %d call %d\n", p->proc_nr, m->src));
+            return OK;
         }
     }
     
@@ -139,9 +137,11 @@ int do_receive(struct message *m) {
  **/
 int do_notify(int src, int dest, struct message *m) {
     struct proc *pDest, *pSrc;
-
     // Is the destination valid?
     if (pDest = get_proc(dest)) {
+
+        if(pDest->state & STATE_KILLED)
+            return ERR;
 
         if(is_debugging_ipc())
             KDEBUG(("\nNOTIFY %d from %d type %d| ",dest, src ,m->type));
@@ -157,8 +157,10 @@ int do_notify(int src, int dest, struct message *m) {
             pDest->ctx.m.regs[0] = m->reply_res;
             enqueue_head(ready_q[pDest->priority], pDest);
         }else{
-            int sid = TASK_NR_TO_SID(src);
-            set_bit(pDest->notify_pending, sid);
+            pSrc = get_proc(src);
+            pSrc->message = m;
+            list_add(&pSrc->notify_queue, &pDest->notify_queue);
+            // KDEBUG(("notify from %d to %d, %d\n", pSrc->proc_nr, pDest->proc_nr, list_empty(&pDest->notify_queue)));
         }
         // do nothing if it's not waiting
         return OK;

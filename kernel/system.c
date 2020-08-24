@@ -46,9 +46,10 @@ void system_main() {
         // get a message
         winix_receive(mesg);
         who_proc_nr = mesg->src;
-        // who = proc_table + who_proc_nr;
-        // KDEBUG(("who pnr %d flag %x\n", who_proc_nr, who->flags));
         who = get_proc(who_proc_nr);
+        if(!who){
+            KDEBUG(("who pnr %x \n", who_proc_nr));
+        }
 
         syscall_region_begin();
 

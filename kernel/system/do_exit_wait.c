@@ -150,7 +150,9 @@ int check_waiting(struct proc* who){
 }
 
 void exit_proc_in_interrupt(struct proc* who, int exit_val,int signum){
-    struct message* em;
+    struct message em;
+    vptr_t *vptr;
+    ptr_t* ptr;
     if(!in_interrupt())
         return;
 
@@ -159,13 +161,14 @@ void exit_proc_in_interrupt(struct proc* who, int exit_val,int signum){
     // if most cases, this function is triggered when a signal
     // is sent during exception, refer to kernel/exception.c for
     // more detail e.g. send_sig(current_proc, SIGSEGV)
-    em = get_exception_m();
-    em->type = EXIT;
-    em->m1_i1 = 0;
-    em->m1_i2 = signum;
-    em->src = who->proc_nr;
-    who->state |= STATE_RECEIVING;
-    do_notify(who->proc_nr, SYSTEM, em);
+    em.type = EXIT;
+    em.m1_i1 = 0;
+    em.m1_i2 = signum;
+    em.src = who->proc_nr;
+    vptr = copyto_user_heap(who, &em, sizeof(struct message));
+    ptr = get_physical_addr(vptr, who);
+    who->state |= STATE_KILLED;
+    do_notify(who->proc_nr, SYSTEM, (struct message*) ptr);
     // KDEBUG(("exit interrupt who %d, curr %d\n", who->proc_nr, current_proc->proc_nr));
 }
 
