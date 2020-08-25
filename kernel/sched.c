@@ -110,7 +110,7 @@ void sched() {
             handle_sig(current_proc, signum);
         }
             
-    }while(current_proc == NULL && !current_proc->state);
+    }while(current_proc == NULL || current_proc->state);
     
 
     // Reset quantum if needed
