@@ -71,6 +71,7 @@ compile_disk: FORCE
 
 clean:
 	$(Q)rm -f makedisk
+	$(Q)rm -f include/srec/*
 	$(Q)$(MAKE) $(cleanall)='$(alldir)'
 
 d-verbose:

@@ -24,7 +24,7 @@ void init_init(){
   sigprocmask(SIG_SETMASK, &mask, NULL);
 }
 
-char shell_path[] = "/bin/shell";
+char shell_path[] = "/bin/bash";
 char *shell_argv[] = {
   shell_path,
   NULL

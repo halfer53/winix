@@ -87,7 +87,10 @@ int dprintf(int fd, const char *format, ...);
 int fprintf(FILE *stream, const char *format, ...);
 int putchar(const char c);
 
-
+FILE *fopen(const char *pathname, const char *mode);
+int fclose(FILE *stream);
+size_t fread(void *ptr, size_t size, size_t nmemb, FILE *stream);
+size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream);
 #define getchar()	(getc(stdin))
 
 
