@@ -1,1 +1,1 @@
-obj-y += shell/ commands/ snake/
+obj-y += bash/ commands/ snake/

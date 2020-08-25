@@ -12,7 +12,7 @@
  * 
 */
 
-#include "shell.h"
+#include "bash.h"
 
 // Input buffer & tokeniser
 static char buf[MAX_LINE];
