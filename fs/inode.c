@@ -84,7 +84,7 @@ int alloc_block(inode_t *ino, struct device* id){
             sb->s_block_inuse += 1;
             sb->s_free_blocks -= 1;
             ino->i_total_size += BLOCK_SIZE;
-            put_block_buffer_immed(bmap, id);
+            put_block_buffer_dirt(bmap);
             // KDEBUG(("alloc_block %d for inode %d\n", free_bit, ino->i_num));
             return free_bit;
         }
@@ -231,7 +231,7 @@ int put_inode(inode_t *inode, bool is_dirty){
     buffer = get_block_buffer(inode->i_ndblock, inode->i_dev);
     dearch_inode(inode);
     memcpy(buffer->block + inode_block_offset, inode, INODE_DISK_SIZE);
-    put_block_buffer_immed(buffer, inode->i_dev);
+    put_block_buffer_dirt(buffer);
     // KDEBUG(("put inode %d blk %d offset %d\n", inode->i_num, inode->i_ndblock, inode_block_offset));
     return flush_inode_zones(inode);
 }
@@ -263,7 +263,7 @@ inode_t* alloc_inode(struct proc* who, struct device* parentdev, struct device* 
         return NULL;
     }
     bitmap_set_bit((unsigned int*)imap->block, BLOCK_SIZE_WORD, inum);
-    put_block_buffer_immed(imap, parentdev);
+    put_block_buffer_dirt(imap);
 
     inode = get_free_inode_slot();
     init_inode_non_disk(inode, inum, inodev, sb);
@@ -310,11 +310,12 @@ int release_inode(inode_t *inode){
     bitmap_clear_bit((unsigned int*)imap->block, BLOCK_SIZE_WORD, inum);
     sb->s_inode_inuse -= 1;
     sb->s_free_inodes += 1;
-    put_block_buffer_immed(imap, id);
+    put_block_buffer_dirt(imap);
 
     memset(inode, 0, sizeof(struct inode));
     return OK;
 }
+
 
 int fill_dirent(inode_t* ino, struct winix_dirent* curr, char* string){
     mode_t mode = ino->i_mode;
