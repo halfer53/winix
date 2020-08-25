@@ -5,6 +5,7 @@
 #define _POSIX_ 1
 #endif
 
+#include <sys/ioctl.h>
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/unistd.h>
@@ -16,9 +17,7 @@
 #include <errno.h>
 #include <signal.h>
 #include <stddef.h>
-#include <stdlib.h>
 
-
-
+int isatty(int fd);
 
 #endif

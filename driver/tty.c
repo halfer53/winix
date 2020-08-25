@@ -1,7 +1,9 @@
 //
 // Created by bruce on 25/04/20.
 //
+
 #include <kernel/kernel.h>
+#include <sys/tty.h>
 #include <sys/fcntl.h>
 #include <fs/const.h>
 #include <fs/cache.h>
@@ -298,6 +300,6 @@ void init_tty(){
     init_tty_filp(&tty1_filp, &_tty_dev, &tty1_state);
     init_tty_filp(&tty2_filp, &_tty2_dev, &tty2_state);
 
-    register_device(&_tty_dev, name, TTY_DEV_NUM, S_IFCHR, &dops, &fops);
+    register_device(&_tty_dev, name, TTY1_DEV_NUM, S_IFCHR, &dops, &fops);
     register_device(&_tty2_dev, name2, TTY2_DEV_NUM, S_IFCHR, &dops2, &fops);
 }

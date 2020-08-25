@@ -4,6 +4,7 @@
 
 #include "../fs.h"
 
+
 struct device tty_dev_static;
 static struct filp_operations fops;
 static struct device_operations dops;
@@ -54,5 +55,5 @@ void init_tty(){
     fops.read = tty_read;
     fops.write = tty_write;
     fops.close = tty_close;
-    register_device(&tty_dev_static, name, TTY_DEV_NUM, S_IFCHR, &dops, &fops);
+    register_device(&tty_dev_static, name, TTY1_DEV_NUM, S_IFCHR, &dops, &fops);
 }

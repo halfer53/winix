@@ -4,7 +4,7 @@
 #include <sys/debug.h>
 #include <stddef.h>
 #include <errno.h>
-#include <fs/const.h>
+#include <sys/tty.h>
 #include <sys/fcntl.h>
 
 #define CHECK_SYSCALL(cond) \
@@ -41,7 +41,7 @@ int main(int argc, char **argv){
   ret = mkdir("/dev", 0x755);
   CHECK_SYSCALL(ret == 0);
 
-  ret = mknod("/dev/tty1", 0x755, TTY_DEV_NUM);
+  ret = mknod("/dev/tty1", 0x755, TTY1_DEV_NUM);
   CHECK_SYSCALL(ret == 0);
 
   ret = mknod("/dev/tty2", 0x755, TTY2_DEV_NUM);

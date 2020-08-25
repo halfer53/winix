@@ -18,6 +18,7 @@
 #include <ucontext.h>
 #include <sys/times.h>
 #include <sys/fcntl.h>
+#include <stdlib.h>
 
 #define CMD_PROTOTYPE(name)    int name(int argc, char**argv)
 
@@ -86,15 +87,8 @@ int test_nohandler(int argc, char** argv){
 int test_while(int argc, char** argv){
     char buf[2];
     int ret;
-    
-    enable_syscall_tracing();
-    buf[1] = '\0';
-    while(1){
-        ret = getchar();
-        buf[0] = ret;
-        printf("got %d %s\n", ret, buf);
-    }
-    
+    int fd = open("foo", O_RDWR);
+    printf(" stdin: %d, foo %d %d\n", isatty(STDIN_FILENO), fd, isatty(fd) );
     return 0;
 }
 

@@ -3,6 +3,7 @@
 
 #include <sys/types.h>
 #include <fs/type.h>
+#include <sys/macro.h>
 
 #define ROOT_INODE_NUM  1
 
@@ -27,12 +28,6 @@
 #define NR_INODES         48    /* # slots in "in core" inode table */
 #define NR_SUPERS          8    /* # slots in super block table */
 #define NR_LOCKS           8    /* # slots in the file locking table */
-
-#define MAKEDEV(dmajor, dminor) ((((unsigned int)dmajor << 8) & 0xFF00U) | ((unsigned int)dminor & 0xFFFF00FFU))
-#define DEV_MAJOR(devnum)           (((unsigned int)devnum & 0xFF00U) >> 8)
-#define DEV_MINOR(devnum)           ((unsigned int)devnum & 0xFFFF00FFU)
-#define TTY_DEV_NUM     (0x301)
-#define TTY2_DEV_NUM     (0x302)
 
 #define READING 1
 #define WRITING 2

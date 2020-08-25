@@ -5,6 +5,7 @@
 #include <sys/ioctl.h>
 #include <sys/fcntl.h>
 #include <unistd.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/debug.h>

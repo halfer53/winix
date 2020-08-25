@@ -18,7 +18,7 @@ built_in = {
 	"string.h": {STRING},
 	"signal.h": {SIGNAL},
 	"ucontext.h": {GEN},
-	"unistd.h": {POSIX, ANSI, STDLIB},
+	"unistd.h": {POSIX, ANSI},
 	"util.h":	{UTIL},
 	"stdio.h":	{STDIO},
 	"debug.h":	{DEBUG},
