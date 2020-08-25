@@ -172,7 +172,7 @@ void debug_board(struct board_struct* board){
 #define INPUT_SIZ   (12)
 
 enum direction get_direction(struct board_struct* board){
-    char input[INPUT_SIZ];
+    static char input[INPUT_SIZ];
     enum direction newdir;
     enum direction dir = board->dir;
     int i;
@@ -211,8 +211,8 @@ enum direction get_direction(struct board_struct* board){
 }
 
 struct point* get_point_at_coordinate(struct list_head* head, int x, int y){
-    struct point* p1, *p2;
-    list_for_each_entry_safe(struct point, p1, p2, head, list){
+    struct point* p1;
+    list_for_each_entry(struct point, p1, head, list){
         if(p1->x == x && p1->y == y){
             return p1;
         }
@@ -306,8 +306,8 @@ void reset_board(struct board_struct* board){
 }
 
 int main(int argc, char** argv){
+    static struct board_struct board;
     int ret, tick_rate;
-    struct board_struct board;
     struct board_struct* bp = &board;
     bool is_snake_alive = true, is_game_running = true, waiting_for_command = true;
     board_init(bp);

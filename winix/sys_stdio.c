@@ -408,7 +408,16 @@ int kerror(const char *format, ...){
     void *arg = &format;
     arg = ((char*)arg) + 1;
 
-    kprintf("[%d] ERROR: ", get_uptime());
+    kprintf2("[%d] ERROR: ", get_uptime());
+    return kprintf_vm(tty2_filp, format, arg, 0);
+}
+
+
+int kwarn(const char *format, ...){
+    void *arg = &format;
+    arg = ((char*)arg) + 1;
+
+    kprintf2("[%d] WARN: ", get_uptime());
     return kprintf_vm(tty2_filp, format, arg, 0);
 }
 

@@ -28,6 +28,7 @@ int kgetc(struct proc* who);
 int kprintf(const char *format, ...);
 int kerror(const char *format, ...);
 int klog(const char *format, ...);
+int kwarn(const char *format, ...);
 
 int kputs(const char *s);
 

@@ -70,9 +70,8 @@ compile_disk: FORCE
 	$(Q)$(MAKE) $(build)=include
 
 clean:
-	$(Q)$(MAKE) -C tools clean
+	$(Q)rm -f makedisk
 	$(Q)$(MAKE) $(cleanall)='$(alldir)'
-
 
 d-verbose:
 	$(MAKE) all CFLAGS=-D_DEBUG=2

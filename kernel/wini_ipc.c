@@ -158,6 +158,10 @@ int do_notify(int src, int dest, struct message *m) {
             enqueue_head(ready_q[pDest->priority], pDest);
         }else{
             pSrc = get_proc(src);
+            if(IS_KERNEL_PROC(pSrc)){
+                kwarn("Dest %d state %x cannot receive message from kernel\n", pDest->proc_nr, pDest->state);
+                return ERR;
+            }
             pSrc->message = m;
             list_add(&pSrc->notify_queue, &pDest->notify_queue);
             // KDEBUG(("notify from %d to %d, %d\n", pSrc->proc_nr, pDest->proc_nr, list_empty(&pDest->notify_queue)));

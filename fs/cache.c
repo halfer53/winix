@@ -172,9 +172,10 @@ struct block_buffer *get_block_buffer(block_t blocknr, struct device* dev){
         tbuf->b_dirt = false;
         KDEBUG(("Sync block %d count %d before returning %d\n", tbuf->b_blocknr, tbuf->b_count, blocknr));
     }
+
     tbuf->b_blocknr = blocknr;
-    if (block_io(tbuf, dev, READING) == 0) {
-        KDEBUG(("ERR: flush block, dev io return %d\n", ret));
+    if ((ret = block_io(tbuf, dev, READING)) != BLOCK_SIZE) {
+        KDEBUG(("dev io return %d for %d\n", ret, tbuf->b_blocknr));
         enqueue_buf(tbuf);
         return NULL;
     }

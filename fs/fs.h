@@ -48,6 +48,7 @@
     printf("[SYSTEM] "); \
     printf token; \
     }while(0)
+
 #else
     #define KDEBUG(token)
 #endif

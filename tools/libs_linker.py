@@ -18,11 +18,11 @@ built_in = {
 	"string.h": {STRING},
 	"signal.h": {SIGNAL},
 	"ucontext.h": {GEN},
-	"unistd.h": {POSIX, ANSI},
+	"unistd.h": {POSIX, ANSI, STDLIB},
 	"util.h":	{UTIL},
 	"stdio.h":	{STDIO},
 	"debug.h":	{DEBUG},
-	"dirent.h":	{POSIX, STDLIB, ANSI}
+	"dirent.h":	{POSIX, ANSI, STDLIB}
 }
 
 dir_path = ""
