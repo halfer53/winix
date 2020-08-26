@@ -139,6 +139,7 @@ int check_waiting(struct proc* who){
             mesg->type = WAITPID;
             mesg->m1_i2 = get_wstats(who);
             parent->state &= ~STATE_WAITING;
+            parent->wpid = 0;
             syscall_reply2( WAITPID ,who->pid, parent->proc_nr, mesg);
             if(who->state & STATE_ZOMBIE)
                 release_zombie(who);
@@ -240,7 +241,7 @@ int do_exit(struct proc *who, struct message *m){
         status = who->ctx.m.regs[0];
     }
 
-    // KDEBUG(("%s[%d] exit status %d signal %d\n",who->name, who->pid, status, signum));
+    KDEBUG(("%s[%d] exit status %d signal %d\n",who->name, who->pid, status, signum));
     
     exit_proc(who, status, signum);
     

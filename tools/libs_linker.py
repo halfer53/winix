@@ -89,7 +89,7 @@ def do_include_search(filename):
 def main():
 	if(len(sys.argv) < 2):
 		return -1
-	libs = {ENVIRON, SYSCALL, STDLIB}
+	libs = {ENVIRON, SYSCALL}
 	for i in range(1,len(sys.argv)):
 		tlib = do_include_search(sys.argv[i])
 		libs.update(tlib)

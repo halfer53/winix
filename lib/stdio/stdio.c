@@ -14,22 +14,22 @@ int putchar(const char c){
 }
 
 FILE *fopen(const char *pathname, const char *mode){
-    FILE* f = malloc(sizeof(FILE));
+    FILE* f = sbrk(sizeof(FILE));
     if(!f)
         return f;
     f->_fd = open(pathname, O_RDWR | O_CREAT);
     if(f->_fd == -1)
         goto err;
-    f->_buf = malloc(BUFFER_SIZ);
+    f->_buf = sbrk(BUFFER_SIZ);
     if(!f->_buf)
         goto err_buffer;
     f->_bufsiz = BUFFER_SIZ;
     return f;
     
 err_buffer:
-    free(f->_buf);
+    // free(f->_buf);
 err:
-    free(f);
+    // free(f);
     return NULL;
 }
 
@@ -45,8 +45,8 @@ size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream){
 
 int fclose(FILE *stream){
     int ret = close(stream->_fd);
-    free(stream->_buf);
-    free(stream);
+    // free(stream->_buf);
+    // free(stream);
     return ret;
 }
 
@@ -61,7 +61,7 @@ int getc(FILE* stream){
         return EOF;
 
     if(!stream->_buf){
-        stream->_buf = malloc(BUFFER_SIZ);
+        stream->_buf = sbrk(BUFFER_SIZ);
         stream->_bufsiz = BUFFER_SIZ;
     }
 

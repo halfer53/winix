@@ -29,7 +29,7 @@ int copy_pcb(struct proc* parent, struct proc* child){
     pid_t pidbak;
     pbak = child->proc_nr;
     pidbak = child->pid;
-    *child = *parent;
+    memcpy(child, parent, sizeof(struct proc));
     child->proc_nr = pbak;
     child->pid = pidbak;
     // child's pending signals are cleared
