@@ -99,6 +99,7 @@ pid_t vfork();
 int brk(void *addr);
 void *sbrk(int incr);
 void perror(const char *s);
+char* strerror(int usrerrno);
 unsigned int alarm(unsigned int seconds);
 pid_t wait(int *wstatus);
 pid_t waitpid(pid_t pid, int *wstatus, int options);

@@ -3,9 +3,6 @@ extern pid_t _pid;
 
 pid_t getpid(){
     struct message m;
-    if(_pid != 0){
-        return _pid;
-    }
     _pid = _syscall(GETPID, &m);
     return _pid;
 }

@@ -1,4 +1,5 @@
 #include <sys/syscall.h>
+#include <sys/debug.h>
 
 pid_t _pid = 0;// pid cache
 
@@ -10,3 +11,4 @@ pid_t fork(){
         _pid = 0; // reset pid cache if its child
     return result;
 }
+

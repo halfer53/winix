@@ -47,9 +47,6 @@ void system_main() {
         winix_receive(mesg);
         who_proc_nr = mesg->src;
         who = get_proc(who_proc_nr);
-        if(!who){
-            KDEBUG(("who pnr %x \n", who_proc_nr));
-        }
 
         syscall_region_begin();
 
@@ -153,7 +150,7 @@ int syscall_reply2(int syscall_num, int reply, int dest, struct message* m){
     char buf[32];
     char* p = buf;
     struct proc* pDest = get_proc(dest);
-    if(trace_syscall){
+    if(trace_syscall && syscall_num > 0 && syscall_num < _NSYSCALL){
         if(reply < 0){
             p = (char*)kstr_error(reply);
         }else{

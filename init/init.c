@@ -13,7 +13,7 @@ if(!(cond)){ \
 }
 
 void failed_init(int line){
-  printf("init failed at %d, err %d\n", line, errno);
+  printf("init %d failed at %d, err %s\n", getpid(), line, strerror(line));
   exit(1);
 }
 
@@ -22,6 +22,12 @@ void init_init(){
   sigfillset(&mask);
   sigdelset(&mask, SIGSEGV);
   sigprocmask(SIG_SETMASK, &mask, NULL);
+}
+
+void do_ps(){
+  struct message m;
+  m.m1_i1 = WINFO_PS;
+  _syscall(WINFO, &m);
 }
 
 char shell_path[] = "/bin/bash";
@@ -37,6 +43,9 @@ int main(int argc, char **argv){
   int status;
   int i, ret, fd, read_nr;
   char buffer[128];
+
+  enable_syscall_tracing();
+  do_ps();
 
   ret = mkdir("/dev", 0x755);
   CHECK_SYSCALL(ret == 0);
@@ -63,6 +72,7 @@ int main(int argc, char **argv){
   pid = vfork();
   if(pid == 0){
     i = execv(shell_path, shell_argv);
+    return 1;
   }
 
   init_init();
