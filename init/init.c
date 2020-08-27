@@ -59,12 +59,12 @@ int main(int argc, char **argv){
   ret = dup(fd);
   ret = dup(fd);
 
-  // fd = open("/foo", O_CREAT | O_RDWR, 0x755);
-  // CHECK_SYSCALL(fd > 0);
-  // ret = write(fd, "abcd", 5);
-  // CHECK_SYSCALL(ret == 5);
-  // ret = close(fd);
-  // CHECK_SYSCALL(ret == 0);
+  fd = open("/foo", O_CREAT | O_RDWR, 0x755);
+  CHECK_SYSCALL(fd > 0);
+  ret = write(fd, "abcd", 5);
+  CHECK_SYSCALL(ret == 5);
+  ret = close(fd);
+  CHECK_SYSCALL(ret == 0);
 
   pid = vfork();
   if(pid == 0){

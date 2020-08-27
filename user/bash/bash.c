@@ -13,6 +13,7 @@
 */
 
 #include "bash.h"
+#include <stdbool.h>
 
 // Input buffer & tokeniser
 static char buf[MAX_LINE];
@@ -75,6 +76,7 @@ int main() {
             }
             continue;
         }
+
         len = strlen(buf);
         buf[len - 2] = '\0'; // delete end line
         exec_cmd(buf, NULL);     
@@ -92,13 +94,15 @@ int _exec_cmd_pipe(struct cmdLine *cmd, int cmd1_idx, int cmd2_idx, int prev_fd,
     return 0;
 }
 
+#define PIPE_READ   (0)
+#define PIPE_WRITE  (1)
+
 /**
  * Handles any unknown command.
  **/
 int _exec_cmd(char *line, struct cmdLine *cmd) {
     char buffer[128];
     int status;
-    int ret;
     pid_t pid, second_pid;
     sigset_t sigmask = 0;
     int saved_stdin, saved_stdout;
@@ -110,8 +114,14 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
         return 0;
 
     pid = vfork();
+    
     if(!pid){
         pid_t child_pgid;
+        int i, ret, cmd_start;
+        int exit_code = 0;
+        int pipe_fds[10];
+        int *pipe_ptr, *prev_pipe_ptr;
+
         signal(SIGINT, SIG_DFL);
         signal(SIGTERM, SIG_DFL);
         signal(SIGTSTP, SIG_DFL);
@@ -119,39 +129,70 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
         child_pgid = getpgid(0);
         ioctl(STDIN_FILENO, TIOCSPGRP, child_pgid);
 
-        if(cmd->outfile){ //if redirecting output
-            int mode = O_WRONLY | O_CREAT;
-            // saved_stdout = dup(STDOUT_FILENO); //backup stdout
-            if(cmd->append) //if append
-                mode |= O_APPEND;
-            else //else replace the original document
-                mode |= O_TRUNC;
-            sout = open(cmd->outfile, mode, 0644);
-            dup2(sout,STDOUT_FILENO);
-            close(sout);
-        }
-
         if(cmd->infile){ //if redirecting input
             // saved_stdin = dup(STDIN_FILENO); //backup stdin
             sin = open(cmd->infile, O_RDONLY);
             dup2(sin,STDIN_FILENO);
             close(sin);
         }
-        
-        if(search_path(buffer, cmd->argv[0]) == 0){
-            second_pid = vfork();
-            if(second_pid == 0){
+
+        // enable_syscall_tracing();
+
+        for(i = 0; i < cmd->numCommands; i++){
+            cmd_start = cmd->cmdStart[i];
+            if(search_path(buffer, cmd->argv[cmd_start]) == 0){
+                pipe_ptr = &pipe_fds[(i * 2)];
                 
-                execv(buffer, cmd->argv);
-                exit(-1);
+                if((i < cmd->numCommands - 1)){ // not the last command, create new pipe
+                    ret = pipe(pipe_ptr);
+                    if(ret){
+                        perror("pipe");
+                        exit(1);
+                    }
+                    fcntl(pipe_ptr[PIPE_READ], F_SETFL, O_NONBLOCK);
+                    // printf("pipeptr %x ret %d %d\n", pipe_ptr, pipe_ptr[PIPE_READ], pipe_ptr[PIPE_WRITE]);
+
+                }else if(cmd->outfile){ //if redirecting output and last command
+                    int mode = O_WRONLY | O_CREAT;
+                    if(cmd->append) //if append
+                        mode |= O_APPEND;
+                    else //else replace the original document
+                        mode |= O_TRUNC;
+                    sout = open(cmd->outfile, mode, 0744);
+                    dup2(sout,STDOUT_FILENO);
+                    close(sout);
+                }
+
+                second_pid = vfork();
+
+                if(second_pid == 0){ // child, actual command
+                    if(cmd->numCommands > 1){
+                        
+                        // printf("pipeptr %x ret %d %d\n", pipe_ptr, pipe_ptr[PIPE_READ], pipe_ptr[PIPE_WRITE]);
+                        if((i < cmd->numCommands - 1)){ // not the last command
+                            pipe_ptr = &pipe_fds[(i * 2)];
+                            dup2(pipe_ptr[PIPE_WRITE], STDOUT_FILENO);
+                            close(pipe_ptr[PIPE_WRITE]);
+                        }
+
+                        if(i > 0){ // not the first command, read previous pipe
+                            prev_pipe_ptr = &pipe_fds[((i - 1) * 2)];
+                            dup2(prev_pipe_ptr[PIPE_READ], STDIN_FILENO);
+                            close(prev_pipe_ptr[PIPE_READ]);
+                        }
+                    }
+                    cmd_start = cmd->cmdStart[i];
+                    execv(buffer, &cmd->argv[cmd_start]);
+                    exit(-1);
+                }else{
+                    ret = wait(&status);
+                    
+                    // printf("parent awaken\n");
+                }
             }else{
-                ret = wait(&status);
-                
-                // printf("parent awaken\n");
+                fprintf(stderr, "Unknown command '%s'\n", cmd->argv[cmd_start]);
+                exit_code = 1;
             }
-        }else{
-            fprintf(stderr, "Unknown command '%s'\r\n", cmd->argv[0]);
-            return -1;
         }
 
         // if(cmd->outfile){
@@ -163,7 +204,7 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
         //     dup2(saved_stdin,STDIN_FILENO);
         //     close(saved_stdin);
         // }
-        exit(0);
+        exit(exit_code);
     }
 
     ioctl(STDIN_FILENO, TIOCENABLEECHO);

@@ -93,6 +93,7 @@ int sys_pipe(struct proc* who, int fd[2]){
 
     INIT_LIST_HEAD(&inode->pipe_writing_list);
     INIT_LIST_HEAD(&inode->pipe_reading_list);
+    // KDEBUG(("pipe ret %d %d to %p for proc %d\n", ret1, ret2, fd, who->proc_nr));
     return OK;
 
     failed_filp2:
