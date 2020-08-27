@@ -109,15 +109,19 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
     if(*line == '#')
         return 0;
 
-    enable_syscall_tracing();
-
     pid = vfork();
-    printf(" vfork %d\n", pid);
     if(!pid){
-        
+        pid_t child_pgid;
+        signal(SIGINT, SIG_DFL);
+        signal(SIGTERM, SIG_DFL);
+        signal(SIGTSTP, SIG_DFL);
+        setpgid(0, 0);
+        child_pgid = getpgid(0);
+        ioctl(STDIN_FILENO, TIOCSPGRP, child_pgid);
+
         if(cmd->outfile){ //if redirecting output
             int mode = O_WRONLY | O_CREAT;
-            saved_stdout = dup(STDOUT_FILENO); //backup stdout
+            // saved_stdout = dup(STDOUT_FILENO); //backup stdout
             if(cmd->append) //if append
                 mode |= O_APPEND;
             else //else replace the original document
@@ -128,7 +132,7 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
         }
 
         if(cmd->infile){ //if redirecting input
-            saved_stdin = dup(STDIN_FILENO); //backup stdin
+            // saved_stdin = dup(STDIN_FILENO); //backup stdin
             sin = open(cmd->infile, O_RDONLY);
             dup2(sin,STDIN_FILENO);
             close(sin);
@@ -137,13 +141,7 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
         if(search_path(buffer, cmd->argv[0]) == 0){
             second_pid = vfork();
             if(second_pid == 0){
-                pid_t child_pgid;
-                signal(SIGINT, SIG_DFL);
-                signal(SIGTERM, SIG_DFL);
-                signal(SIGTSTP, SIG_DFL);
-                setpgid(0, 0);
-                child_pgid = getpgid(0);
-                ioctl(STDIN_FILENO, TIOCSPGRP, child_pgid);
+                
                 execv(buffer, cmd->argv);
                 exit(-1);
             }else{
@@ -156,19 +154,18 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
             return -1;
         }
 
-        if(cmd->outfile){
-            dup2(saved_stdout,STDOUT_FILENO);
-            close(saved_stdout);
-        }
+        // if(cmd->outfile){
+        //     dup2(saved_stdout,STDOUT_FILENO);
+        //     close(saved_stdout);
+        // }
 
-        if(cmd->infile){
-            dup2(saved_stdin,STDIN_FILENO);
-            close(saved_stdin);
-        }
+        // if(cmd->infile){
+        //     dup2(saved_stdin,STDIN_FILENO);
+        //     close(saved_stdin);
+        // }
         exit(0);
     }
 
-    printf("parent vfork\n");
     ioctl(STDIN_FILENO, TIOCENABLEECHO);
     ioctl(STDIN_FILENO, TIOCSPGRP, pgid);
     printf("\n");
