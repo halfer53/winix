@@ -149,6 +149,7 @@ int enable_syscall_tracing();
 
 #ifndef _SYSTEM
 
+void* get_sigreturn_func_ptr(void);
 #define sync()                      (wramp_syscall(SYNC))
 #define getdents(fd, dirp, count)   (wramp_syscall(GETDENT, fd, dirp, count))
 #define creat(pathname, mode)       (wramp_syscall(CREAT, mode, pathname))
@@ -181,6 +182,7 @@ int enable_syscall_tracing();
 #define __strerror(buffer, len,usrerr)     (wramp_syscall(STRERROR, len, buffer, usrerr))
 #define setpgid(pid, pgid)          (wramp_syscall(SETPGID, pid, pgid))
 #define setsid()                    (wramp_syscall(SETSID))
+#define sigaction(signum, act, oact)(wramp_syscall(SIGACTION, act, oact, get_sigreturn_func_ptr(), signum))
 
 #endif
 

@@ -235,7 +235,9 @@ PRIVATE void syscall_handler() {
             m->m1_p1 = (void*)*sp++;
             m->m1_i2 = *sp;
             break;
-
+            
+        case SIGACTION:
+            m->m1_i1 = *(sp + 3);
         case EXECVE:
             m->m1_p3 = (void*)*(sp + 2);
         case STAT:
