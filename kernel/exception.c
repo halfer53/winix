@@ -214,6 +214,7 @@ PRIVATE void syscall_handler() {
             m->m1_i2 = *sp;
             break;
         case PIPE:
+        case CHDIR:
             m->m1_p1 = (void*)*sp;
             break;
 

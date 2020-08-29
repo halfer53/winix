@@ -51,11 +51,11 @@ int creat(const char *pathname, mode_t mode){
 //     return _syscall(MKNOD, &m);
 // }
 
-int chdir(const char *path){
-    struct message m;
-    m.m1_p1 = (void*)path;
-    return _syscall(CHDIR, &m);
-}
+// int chdir(const char *path){
+//     struct message m;
+//     m.m1_p1 = (void*)path;
+//     return _syscall(CHDIR, &m);
+// }
 
 int chown(const char *pathname, uid_t owner, gid_t group){
     struct message m;
