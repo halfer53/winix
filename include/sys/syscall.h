@@ -173,6 +173,8 @@ int enable_syscall_tracing();
 #define alarm(seconds)              (wramp_syscall(ALARM, seconds))
 #define csleep(ticks)               (wramp_syscall(CSLEEP, ticks))
 #define execve(path, argv, envp)    (wramp_syscall(EXECVE, path, argv, envp))
+#define fork()                      (wramp_syscall(FORK))
+#define getpgid(pid)                (wramp_syscall(GETPGID, pid))
 
 #endif
 

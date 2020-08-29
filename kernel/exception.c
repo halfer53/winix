@@ -214,6 +214,7 @@ PRIVATE void syscall_handler() {
         case DUP:
         case UMASK:
         case CSLEEP:
+        case GETPGID:
             m->m1_i1 = *sp;
             break;
 
@@ -241,7 +242,9 @@ PRIVATE void syscall_handler() {
         case UNLINK:
             m->m1_p1 = (void*)*sp;
             break;
-        
+
+        case FORK:
+        case VFORK:
         default:
             break;
         }
