@@ -137,6 +137,7 @@ int do_receive(struct message *m) {
  **/
 int do_notify(int src, int dest, struct message *m) {
     struct proc *pDest, *pSrc;
+    int reply;
     // Is the destination valid?
     if (pDest = get_proc(dest)) {
 
@@ -150,13 +151,17 @@ int do_notify(int src, int dest, struct message *m) {
         if (pDest->state == STATE_RECEIVING) {
 
             if(pDest->flags & DIRECT_SYSCALL){
+                if(m->reply_res < 0){
+                    reply = -(m->reply_res);
+                    *(pDest->stack_top + 1) = reply;
+                    // KDEBUG(("save %d to %s %x\n", reply, pDest->name,  get_virtual_addr((pDest->stack_top + 1), pDest)));
+                    m->reply_res = -1;
+                }
                 pDest->flags &= ~DIRECT_SYSCALL;
-                // sys_sbrk(pDest, -(sizeof(struct message)));
-                kfree(pDest->message);
-            }else{
-                // Copy message to destination
-                *(pDest->message) = *m;
             }
+            // Copy message to destination
+            *(pDest->message) = *m;
+            
 
             // Unblock receiver
             pDest->state &= ~STATE_RECEIVING;

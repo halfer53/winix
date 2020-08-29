@@ -23,12 +23,18 @@
 /* Now define _SIGN as "" or "-" depending on _SYSTEM. */
 #ifdef _SYSTEM
 #   define _SIGN         -
+#define errno   (__errno)
+#define __set_errno(val)    ((__errno) = (val))
 #else
-#   define _SIGN         
+#   define _SIGN 
+#define ERRNO_PTR           ((int *)1025)
+#define errno   (*ERRNO_PTR)
+#define __set_errno(val)    ((*ERRNO_PTR) = (val))        
 #endif
 
 extern int __errno;          /* place where the error numbers go */
-#define errno   (__errno)
+
+
 
 /* Here are the numerical values of the error numbers. */
 #define _NERROR              40  /* number of errors */  
@@ -73,7 +79,7 @@ extern int __errno;          /* place where the error numbers go */
 #define ENOSYS        (_SIGN 38)  /* function not implemented */
 #define ENOTEMPTY     (_SIGN 39)  /* directory not empty */
 
-#define __set_errno(val)    ((__errno) = (val))
+
 
 #endif /* _ERRNO_H */
 

@@ -28,9 +28,10 @@ int do_winix_strerror(struct proc* who, struct message* msg){
     len = msg->m1_i1;
     usr_errno = msg->m1_i2;
     
-    if(usr_errno < 0 || usr_errno >= _NERROR)
+    if(usr_errno <= 0 || usr_errno >= _NERROR)
         return EINVAL;
     dst = (char*)get_physical_addr(msg->m1_p1, who);
+    // KDEBUG(("errno %d from %s\n", usr_errno, who->name));
     strncpy(dst, kstr_error(usr_errno), len);
     return 0;
 }
