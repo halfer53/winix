@@ -65,12 +65,12 @@ int creat(const char *pathname, mode_t mode){
 //     return _syscall(CHOWN, &m);
 // }
 
-int chmod(const char *pathname, mode_t mode){
-    struct message m;
-    m.m1_p1 = (void*)pathname;
-    m.m1_i1 = mode;
-    return _syscall(CHMOD, &m);
-}
+// int chmod(const char *pathname, mode_t mode){
+//     struct message m;
+//     m.m1_p1 = (void*)pathname;
+//     m.m1_i1 = mode;
+//     return _syscall(CHMOD, &m);
+// }
 
 int stat(const char *pathname, struct stat *statbuf){
     struct message m;

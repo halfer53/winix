@@ -209,6 +209,7 @@ PRIVATE void syscall_handler() {
         case WRITE:
         case MKNOD:
         case CHOWN:
+        case CHMOD:
         case GETDENT:
             m->m1_i1 = *sp++;
             m->m1_p1 = (void*)*sp++;

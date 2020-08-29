@@ -159,7 +159,7 @@ int enable_syscall_tracing();
 #define mknod(pathname, mode, dev)  (wramp_syscall(MKNOD, mode, pathname, dev))
 #define chdir(path)                 (wramp_syscall(CHDIR, path))
 #define chown(pathname, owner, group)(wramp_syscall(CHOWN, owner, pathname, group))
-// #define chmod(pathname, mode)
+#define chmod(pathname, mode)       (wramp_syscall(mode, pathname))
 // #define stat(pathname, statbuf)
 // #define fstat(fd, statbuf)
 // #define dup(oldfd)
