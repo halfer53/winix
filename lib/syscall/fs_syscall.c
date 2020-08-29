@@ -114,12 +114,12 @@ int creat(const char *pathname, mode_t mode){
 
 
 
-int access(const char *pathname, int mode){
-    struct message m;
-    m.m1_p1 = (void*)pathname;
-    m.m1_i1 = mode;
-    return _syscall(ACCESS, &m);
-}
+// int access(const char *pathname, int mode){
+//     struct message m;
+//     m.m1_p1 = (void*)pathname;
+//     m.m1_i1 = mode;
+//     return _syscall(ACCESS, &m);
+// }
 
 int mkdir(const char *pathname, mode_t mode){
     struct message m;

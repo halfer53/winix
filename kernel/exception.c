@@ -217,6 +217,7 @@ PRIVATE void syscall_handler() {
         case CHMOD:
         case FSTAT:
         case GETDENT:
+        case ACCESS:
             m->m1_i1 = *sp++;
             m->m1_p1 = (void*)*sp++;
             m->m1_i2 = *sp;
