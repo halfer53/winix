@@ -176,6 +176,7 @@ int enable_syscall_tracing();
 #define fork()                      (wramp_syscall(FORK))
 #define getpgid(pid)                (wramp_syscall(GETPGID, pid))
 #define getpid()                    (wramp_syscall(GETPID))
+#define kill(pid, sig)              (wramp_syscall(KILL, pid, sig))
 
 #endif
 
