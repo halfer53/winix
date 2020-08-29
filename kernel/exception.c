@@ -209,6 +209,7 @@ PRIVATE void syscall_handler() {
             m->m1_i3 = *(sp + 2);
         case DUP2:
         case KILL:
+        case SETPGID:
             m->m1_i2 = *(sp + 1);
         case ALARM:
         case CLOSE:
@@ -251,9 +252,10 @@ PRIVATE void syscall_handler() {
             m->m1_p1 = (void *)*sp++;
             m->m1_p2 = (void *)*sp;
 
-        case FORK:
-        case GETPID:
-        case VFORK:
+        // case FORK:
+        // case GETPID:
+        // case VFORK:
+        // case SETSID:
         default:
             break;
         }
