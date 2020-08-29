@@ -28,6 +28,17 @@ int strcmp(const char *s1, const char *s2) {
     return *s1 - *s2;
 }
 
+int strncmp(const char *s1, const char *s2, size_t size) {
+    while (*s1 && *s2 && size--) {
+        if (*s1 != *s2) {
+            break;
+        }
+        s1++;
+        s2++;
+    }
+    return *s1 - *s2;
+}
+
 /**
  * Calculates the length of a string.
  **/
@@ -65,12 +76,6 @@ char *strcat(char *dest, const char *src) {
     return saved;
 }
 
-char *strchr(char *s, int c){
-    while(*s && *s != c)
-        s++;
-    return s;
-}
-
 void *memset(void *dst, int c, size_t n)
 {
     if (n) {
@@ -96,5 +101,13 @@ int substring(char* buffer, char* original, int start_index, int length) {
     }
     buffer[count] = '\0';
     return count;
+}
+
+
+char *index(const char *string, int c){
+    char *s = (char *)string;
+    while(*s && *s != c)
+        s++;
+    return s;
 }
 

@@ -1,0 +1,1 @@
+obj-y = regexp.o regsub.o

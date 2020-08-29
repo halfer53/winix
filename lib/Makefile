@@ -1,4 +1,4 @@
-obj-y += ansi/ gen/ posix/ stdio/ stdlib/ syscall/ util/
+obj-y += ansi/ gen/ posix/ stdio/ stdlib/ syscall/ util/ regex/
 
 							
 

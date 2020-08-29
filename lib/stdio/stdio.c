@@ -81,3 +81,21 @@ int getc(FILE* stream){
 }
 
 
+int getline(char *buf, int size)
+{
+	char *initbuf = buf, c;
+
+	while (1)
+	{
+		c = getc(stdin);
+		*buf++ = c;
+		if (c <= 0)
+			return (-1);
+		if ((buf - initbuf) == size - 1)
+			return (buf - initbuf);
+		if (c == '\n')
+			return (buf - initbuf);
+	}
+}
+
+

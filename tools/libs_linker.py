@@ -12,6 +12,7 @@ STDIO ="lib/stdio/"
 SYSCALL = "lib/syscall/"
 STRING = "lib/ansi/string.o"
 DEBUG = "lib/util/debug.o"
+REGEX = "lib/regex/"
 
 built_in = {
 	"stdlib.h": {STDLIB, ANSI},
@@ -22,7 +23,8 @@ built_in = {
 	"util.h":	{UTIL},
 	"stdio.h":	{STDIO},
 	"debug.h":	{DEBUG},
-	"dirent.h":	{POSIX, ANSI, STDLIB}
+	"dirent.h":	{POSIX, ANSI, STDLIB},
+	"regexp.h": {REGEX}
 }
 
 dir_path = ""
