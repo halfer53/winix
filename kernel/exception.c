@@ -202,7 +202,7 @@ PRIVATE void syscall_handler() {
         sp++;
         switch (operation)
         {
-            
+
         case DUP2:
             m->m1_i2 = *(sp + 1);
         case CLOSE:
@@ -223,9 +223,11 @@ PRIVATE void syscall_handler() {
             break;
 
         case STAT:
+        case LINK:
             m->m1_p2 = (void *)*(sp + 1);
         case PIPE:
         case CHDIR:
+        case UNLINK:
             m->m1_p1 = (void*)*sp;
             break;
         

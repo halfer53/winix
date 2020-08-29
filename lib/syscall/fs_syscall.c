@@ -99,18 +99,18 @@ int creat(const char *pathname, mode_t mode){
 //     return _syscall(DUP2, &m);
 // }
 
-int link(const char *oldpath, const char *newpath){
-    struct message m;
-    m.m1_p1 = (void*)oldpath;
-    m.m1_p2 = (void*)newpath;
-    return _syscall(LINK, &m);
-}
+// int link(const char *oldpath, const char *newpath){
+//     struct message m;
+//     m.m1_p1 = (void*)oldpath;
+//     m.m1_p2 = (void*)newpath;
+//     return _syscall(LINK, &m);
+// }
 
-int unlink(const char *pathname){
-    struct message m;
-    m.m1_p1 = (void*)pathname;
-    return _syscall(UNLINK, &m);
-}
+// int unlink(const char *pathname){
+//     struct message m;
+//     m.m1_p1 = (void*)pathname;
+//     return _syscall(UNLINK, &m);
+// }
 
 
 
