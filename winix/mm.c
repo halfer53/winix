@@ -182,7 +182,7 @@ int peek_last_free_page(){
  * @param  len  
  * @return      
  */
-int free_pages(ptr_t* page, int len){
+int release_pages(ptr_t* page, int len){
     int page_index;
     if((int)page % PAGE_LEN != 0)
         return ERR;
@@ -192,7 +192,7 @@ int free_pages(ptr_t* page, int len){
 
 int user_free_pages(struct proc* who, ptr_t* page, int len){
     int index;
-    if(free_pages(page,len) != OK)
+    if(release_pages(page,len) != OK)
         return ERR;
     index = PADDR_TO_PAGED(page);
     return bitmap_clear_nbits(who->ctx.ptable, PTABLE_LEN, index, len);

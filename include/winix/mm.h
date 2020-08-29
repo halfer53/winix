@@ -21,14 +21,14 @@
 void init_mem_table();
 
 ptr_t* get_free_pages(int length, int flags);
-int free_pages(ptr_t* page, int num);
+int release_pages(ptr_t* page, int num);
 int user_free_pages(struct proc* who, ptr_t* page, int len);
 ptr_t* user_get_free_pages(struct proc* who, int length, int flags);
 bool is_vaddr_ok(vptr_t* addr,struct proc* who);
 
 
 #define is_vaddr_accessible(addr, who) is_vaddr_ok((vptr_t*)addr, who)
-#define free_page(page)         (free_pages((page),1))
+#define free_page(page)         (release_pages((page),1))
 #define get_free_page(flags)    (get_free_pages(1,(flags)))
 #define user_get_free_page(who,flags)   (user_get_free_pages((who),1,(flags)))
 #define user_free_page(who,page)        (user_free_pages((who),(page),1))

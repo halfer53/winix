@@ -42,6 +42,8 @@
 #include <stdio.h>
 #include "makefs_only/cmake_util.h"
 #define kprintf(...) printf(__VA_ARGS__)
+#define get_free_pages(num, flag)   kmalloc(num * BLOCK_SIZE)
+#define release_pages(ptr, num)     kfree(ptr)
 #ifdef _DEBUG
     #define KDEBUG(token)   \
     do{\
