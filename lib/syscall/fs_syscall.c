@@ -57,13 +57,13 @@ int creat(const char *pathname, mode_t mode){
 //     return _syscall(CHDIR, &m);
 // }
 
-int chown(const char *pathname, uid_t owner, gid_t group){
-    struct message m;
-    m.m1_p1 = (void*)pathname;
-    m.m1_i1 = owner;
-    m.m1_i2 = group;
-    return _syscall(CHOWN, &m);
-}
+// int chown(const char *pathname, uid_t owner, gid_t group){
+//     struct message m;
+//     m.m1_p1 = (void*)pathname;
+//     m.m1_i1 = owner;
+//     m.m1_i2 = group;
+//     return _syscall(CHOWN, &m);
+// }
 
 int chmod(const char *pathname, mode_t mode){
     struct message m;

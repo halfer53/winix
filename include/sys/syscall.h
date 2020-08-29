@@ -158,7 +158,7 @@ int enable_syscall_tracing();
 #define pipe(pipefd)                (wramp_syscall(PIPE, pipefd))
 #define mknod(pathname, mode, dev)  (wramp_syscall(MKNOD, mode, pathname, dev))
 #define chdir(path)                 (wramp_syscall(CHDIR, path))
-// #define chown(pathname, owner, group)
+#define chown(pathname, owner, group)(wramp_syscall(CHOWN, owner, pathname, group))
 // #define chmod(pathname, mode)
 // #define stat(pathname, statbuf)
 // #define fstat(fd, statbuf)

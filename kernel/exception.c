@@ -208,6 +208,7 @@ PRIVATE void syscall_handler() {
         case READ:
         case WRITE:
         case MKNOD:
+        case CHOWN:
         case GETDENT:
             m->m1_i1 = *sp++;
             m->m1_p1 = (void*)*sp++;
