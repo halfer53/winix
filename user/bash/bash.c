@@ -190,7 +190,8 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
                     // printf("parent awaken\n");
                 }
             }else{
-                fprintf(stderr, "Unknown command '%s' %s\n", cmd->argv[cmd_start], strerror(errno));
+                cmd_start = cmd->cmdStart[i];
+                fprintf(stderr, "Unknown command '%s'\n", cmd->argv[cmd_start]);
                 exit_code = 1;
             }
         }
