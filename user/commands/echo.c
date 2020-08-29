@@ -1,7 +1,7 @@
-#include <stdio.h>
 #include <sys/syscall.h>
 #include <sys/fcntl.h>
-#include <string.h>
+
+static char buffer[128];
 
 int main(int argc, char *argv[]){
     char *p, *dest, *dest_bak;
@@ -10,9 +10,7 @@ int main(int argc, char *argv[]){
     if(argc < 2)
         return -1;
     p = argv[1];
-    len = strlen(p);
-    dest_bak = sbrk(len);
-    dest = dest_bak;
+    dest = buffer;
     while(*p){
         c = *p;
         if(c == '\\'){
@@ -35,7 +33,7 @@ int main(int argc, char *argv[]){
         p++;
     }
     *dest = '\0';
-    printf("%s", dest_bak);
+    printf("%s", buffer);
     return 0;
 }
 
