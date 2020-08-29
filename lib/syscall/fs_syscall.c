@@ -8,12 +8,12 @@ int open(const char *pathname,int flags, ...){
     return _syscall(OPEN, &msg);
 }
 
-int creat(const char *pathname, mode_t mode){
-    struct message m;
-    m.m1_p1 = (void*)pathname;
-    m.m1_i1 = mode;
-    return _syscall(CREAT, &m);
-}
+// int creat(const char *pathname, mode_t mode){
+//     struct message m;
+//     m.m1_p1 = (void*)pathname;
+//     m.m1_i1 = mode;
+//     return _syscall(CREAT, &m);
+// }
 
 // int close(int fd){
 //     struct message m;

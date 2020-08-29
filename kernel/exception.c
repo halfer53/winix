@@ -214,6 +214,7 @@ PRIVATE void syscall_handler() {
 
         case READ:
         case WRITE:
+        case CREAT:
         case MKNOD:
         case CHOWN:
         case CHMOD:

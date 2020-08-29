@@ -151,7 +151,7 @@ int enable_syscall_tracing();
 
 #define sync()                      (wramp_syscall(SYNC))
 #define getdents(fd, dirp, count)   (wramp_syscall(GETDENT, fd, dirp, count))
-// #define creat(pathname, mode)
+#define creat(pathname, mode)       (wramp_syscall(CREAT, mode, pathname))
 #define close(fd)                   (wramp_syscall(CLOSE, fd))
 #define read(fd, buf, count)        (wramp_syscall(READ,fd, buf, count))
 #define write(fd, buf, count)       (wramp_syscall(WRITE,fd, buf, count))
