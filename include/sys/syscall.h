@@ -175,6 +175,7 @@ int enable_syscall_tracing();
 #define execve(path, argv, envp)    (wramp_syscall(EXECVE, path, argv, envp))
 #define fork()                      (wramp_syscall(FORK))
 #define getpgid(pid)                (wramp_syscall(GETPGID, pid))
+#define getpid()                    (wramp_syscall(GETPID))
 
 #endif
 

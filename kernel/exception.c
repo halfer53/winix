@@ -244,6 +244,7 @@ PRIVATE void syscall_handler() {
             break;
 
         case FORK:
+        case GETPID:
         case VFORK:
         default:
             break;
