@@ -22,6 +22,8 @@ void init_init(){
   sigfillset(&mask);
   sigdelset(&mask, SIGSEGV);
   sigprocmask(SIG_SETMASK, &mask, NULL);
+  enable_syscall_tracing();
+  sync();
 }
 
 void do_ps(){
@@ -47,6 +49,8 @@ int main(int argc, char **argv){
   int i, j, ret, fd, read_nr;
   char buffer[128];
   char *p = buffer;
+
+  
 
   ret = mkdir("/dev", 0x755);
   CHECK_SYSCALL(ret == 0);
@@ -83,8 +87,6 @@ int main(int argc, char **argv){
     i = execv(shell_path, shell_argv);
     return 1;
   }
-
-  init_init();
 
   while(1){
     pid = wait(&status);

@@ -98,7 +98,7 @@
 // Process Information flags
 #define IN_USE                    	0x0001      /* process slot is in use */
 #define BILLABLE                	0x0002      /* Set when user is invoking a system call */
-#define DISABLE_FIRST_PAGE          0x0004      /* Set when the first page of the user address space is disabled */
+#define DIRECT_SYSCALL              0x0004      /* Direct Syscall mode */
 
 // proc_memctll flags
 #define PROC_ACCESS                	1

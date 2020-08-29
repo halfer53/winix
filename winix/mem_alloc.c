@@ -229,6 +229,8 @@ void kfree(void *ptr_parameter) {
         hole_delete(used_holes, h);
         // try to merge the newly deleted hole with exiting unused holes
         merge_holes(unused_holes, h);
+    }else{
+        kwarn("invalid ptr %x\n", ptr_parameter);
     }
 }
 

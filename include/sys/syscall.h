@@ -92,7 +92,7 @@ function params{\
 #ifndef MAKEFS_STANDALONE
 
 int _syscall(int syscall_num, struct message *m);
-int direct_wramp_syscall(int num);
+int direct_wramp_syscall(int num, ...);
 
 int ___exit(int status);
 int sys_ps();
@@ -147,7 +147,31 @@ int ioctl(int fd, unsigned long request, ...);
 int csleep(int ticks);
 int enable_syscall_tracing();
 
-#define sync()  (direct_wramp_syscall(SYNC))
+#ifndef _SYSTEM
+
+#define sync()                      (wramp_syscall(SYNC))
+#define getdents(fd, dirp, count)   (wramp_syscall(GETDENT, fd, dirp, count))
+// #define creat(pathname, mode)
+#define close(fd)                   (wramp_syscall(CLOSE, fd))
+#define read(fd, buf, count)        (wramp_syscall(READ,fd, buf, count))
+#define write(fd, buf, count)       (wramp_syscall(WRITE,fd, buf, count))
+#define pipe(pipefd)                (wramp_syscall(PIPE, pipefd))
+#define mknod(pathname, mode, dev)  (wramp_syscall(MKNOD, mode, pathname, dev))
+// #define chdir(path)
+// #define chown(pathname, owner, group)
+// #define chmod(pathname, mode)
+// #define stat(pathname, statbuf)
+// #define fstat(fd, statbuf)
+// #define dup(oldfd)
+// #define dup2(oldfd, newfd)
+// #define link(oldpath, newpath)
+// #define unlink(pathname)
+// #define access(pathname, mode)
+// #define mkdir(pathname, mode)
+// #define lseek(fd, offset, whence)
+// #define umask(mask)
+
+#endif
 
 #endif
 

@@ -195,19 +195,37 @@ PRIVATE void syscall_handler() {
     operation = *(sp);                // Operation is the first parameter on the stack
 
     if(operation > 0 && operation < _NSYSCALL){ // direct syscall mode
-        struct message msg;
-        msg.type = operation;
+        // m = (struct message*)sys_sbrk(current_proc, sizeof(struct message));
+        m = kmalloc(sizeof(struct message));
+        m->type = operation;
+        dest = SYSTEM;
+        sp++;
         switch (operation)
         {
+        case CLOSE:
+            m->m1_i1 = *sp;
+            break;
+        case READ:
+        case WRITE:
+        case MKNOD:
+        case GETDENT:
+            m->m1_i1 = *sp++;
+            m->m1_p1 = (void*)*sp++;
+            m->m1_i2 = *sp;
+            break;
+        case PIPE:
+            m->m1_p1 = (void*)*sp;
+            break;
+
         case SYNC:
-            msg.m1_i1 = SYNC;
+            m->m1_i1 = SYNC;
             break;
         
         default:
             break;
         }
-        dest = SYSTEM;
-        m = (struct message*)sys_sbrk(current_proc, sizeof(struct message));
+        operation = WINIX_SENDREC;
+        current_proc->flags |= DIRECT_SYSCALL;
 
     }else{ // traditional IPC mode
 

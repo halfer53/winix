@@ -149,8 +149,14 @@ int do_notify(int src, int dest, struct message *m) {
         // If destination is waiting, deliver message immediately.
         if (pDest->state == STATE_RECEIVING) {
 
-            // Copy message to destination
-            *(pDest->message) = *m;
+            if(pDest->flags & DIRECT_SYSCALL){
+                pDest->flags &= ~DIRECT_SYSCALL;
+                // sys_sbrk(pDest, -(sizeof(struct message)));
+                kfree(pDest->message);
+            }else{
+                // Copy message to destination
+                *(pDest->message) = *m;
+            }
 
             // Unblock receiver
             pDest->state &= ~STATE_RECEIVING;
