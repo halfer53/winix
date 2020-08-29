@@ -177,6 +177,8 @@ int enable_syscall_tracing();
 #define getpgid(pid)                (wramp_syscall(GETPGID, pid))
 #define getpid()                    (wramp_syscall(GETPID))
 #define kill(pid, sig)              (wramp_syscall(KILL, pid, sig))
+#define __dprintf(fd, format, arg)  (wramp_syscall(DPRINTF, fd, format, arg))
+#define __strerror(buffer, len,usrerr)     (wramp_syscall(STRERROR, len, buffer, usrerr))
 
 #endif
 

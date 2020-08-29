@@ -229,10 +229,12 @@ PRIVATE void syscall_handler() {
         case GETDENT:
         case ACCESS:
         case MKDIR:
+        case STRERROR:
             m->m1_i1 = *sp++;
             m->m1_p1 = (void*)*sp++;
             m->m1_i2 = *sp;
             break;
+
         case EXECVE:
             m->m1_p3 = (void*)*(sp + 2);
         case STAT:
@@ -243,6 +245,11 @@ PRIVATE void syscall_handler() {
         case UNLINK:
             m->m1_p1 = (void*)*sp;
             break;
+        
+        case DPRINTF:
+            m->m1_i1 = *sp++;
+            m->m1_p1 = (void *)*sp++;
+            m->m1_p2 = (void *)*sp;
 
         case FORK:
         case GETPID:

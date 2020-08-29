@@ -23,8 +23,8 @@
 /* Now define _SIGN as "" or "-" depending on _SYSTEM. */
 #ifdef _SYSTEM
 #   define _SIGN         -
-#define errno   (__errno)
-#define __set_errno(val)    ((__errno) = (val))
+#define errno  
+#define __set_errno(val)   
 #else
 #   define _SIGN 
 #define ERRNO_PTR           ((int *)1025)

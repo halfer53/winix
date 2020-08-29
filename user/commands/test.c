@@ -87,8 +87,18 @@ int test_nohandler(int argc, char** argv){
 int test_while(int argc, char** argv){
     char buf[2];
     int ret;
-    int fd = open("foo", O_RDWR);
-    printf(" stdin: %d, foo %d %d\n", isatty(STDIN_FILENO), fd, isatty(fd) );
+    int fd;
+    // __set_errno(EBUSY);
+    // perror("busy");
+    printf(" foo %d %x %s\n", fd, errno, strerror(errno) );
+    fd = open("food", O_RDWR);
+    printf(" foo %d %x %s\n", fd, errno, strerror(errno) );
+    fd = creat("foo",0x755);
+    printf(" foo %d %d %s\n", fd, errno, strerror(errno) );
+    fd = open("food", O_RDWR);
+    printf(" foo %d %d %s\n", fd, errno, strerror(errno) );
+    fd = creat("foo",0x755);
+    printf(" foo %d %d %s\n", fd, errno, strerror(errno) );
     return 0;
 }
 

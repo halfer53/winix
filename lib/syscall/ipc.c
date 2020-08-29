@@ -33,9 +33,9 @@ int wramp_syscall(int operation, ...);
     return wramp_syscall(WINIX_RECEIVE, NULL, m);
 }
 
-
 #define winix_send_comm(type, dest, m, ret)\
 do{\
+    __set_errno(0);\
     ret = wramp_syscall(type, dest, m);\
     if(ret < 0){\
         __set_errno(-ret);\
