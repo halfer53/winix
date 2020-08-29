@@ -1,69 +1,42 @@
 /*
  * regsub
- *
- *	Copyright (c) 1986 by University of Toronto.
- *	Written by Henry Spencer.  Not derived from licensed software.
- *
- *	Permission is granted to anyone to use this software for any
- *	purpose on any computer system, and to redistribute it freely,
- *	subject to the following restrictions:
- *
- *	1. The author is not responsible for the consequences of use of
- *		this software, no matter how awful, even if they arise
- *		from defects in it.
- *
- *	2. The origin of this software must not be misrepresented, either
- *		by explicit claim or by omission.
- *
- *	3. Altered versions must be plainly marked as such, and must not
- *		be misrepresented as being the original software.
  */
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
 #include <regexp.h>
-/*
- * The first byte of the regexp internal "program" is actually this magic
- * number; the start node begins in the second byte.
- */
-#define	MAGIC	0234
-
-
-#define CHARBITS 0377
-#ifndef CHARBITS
-#define	UCHARAT(p)	((int)*(unsigned char *)(p))
-#else
-#define	UCHARAT(p)	((int)*(p)&CHARBITS)
-#endif
+#include "regmagic.h"
 
 /*
  - regsub - perform substitutions after a regexp match
  */
-void regsub(prog, source, dest)
-regexp *prog;
-char *source;
+void
+regsub(rp, source, dest)
+const regexp *rp;
+const char *source;
 char *dest;
 {
-	register char *src;
-	register char *dst;
+	register regexp * const prog = (regexp *)rp;
+	register char *src = (char *)source;
+	register char *dst = dest;
 	register char c;
 	register int no;
-	register int len;
-	extern char *strncpy();
+	register size_t len;
 
 	if (prog == NULL || source == NULL || dest == NULL) {
-		regerror("NULL parm to regsub");
+		regerror("NULL parameter to regsub");
 		return;
 	}
-	if (UCHARAT(prog->program) != MAGIC) {
-		regerror("damaged regexp fed to regsub");
+	if ((unsigned char)*(prog->program) != MAGIC) {
+		regerror("damaged regexp");
 		return;
 	}
 
-	src = source;
-	dst = dest;
 	while ((c = *src++) != '\0') {
 		if (c == '&')
 			no = 0;
-		else if (c == '\\' && '0' <= *src && *src <= '9')
+		else if (c == '\\' && isdigit(*src))
 			no = *src++ - '0';
 		else
 			no = -1;
@@ -72,11 +45,12 @@ char *dest;
 			if (c == '\\' && (*src == '\\' || *src == '&'))
 				c = *src++;
 			*dst++ = c;
-		} else if (prog->startp[no] != NULL && prog->endp[no] != NULL) {
+		} else if (prog->startp[no] != NULL && prog->endp[no] != NULL &&
+					prog->endp[no] > prog->startp[no]) {
 			len = prog->endp[no] - prog->startp[no];
-			strncpy(dst, prog->startp[no], len);
+			(void) strncpy(dst, prog->startp[no], len);
 			dst += len;
-			if (len !=0 && *(dst-1) == '\0') { /* strncpy hit NUL. */
+			if (*(dst-1) == '\0') {	/* strncpy hit NUL. */
 				regerror("damaged match string");
 				return;
 			}

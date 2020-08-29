@@ -333,7 +333,7 @@ int kprintf_vm( struct filp* file, const char *orignal_format, void *arg, ptr_t 
                 case 's':
                     format_ptr = *(char **)arg + (int)who_rbase;
                     if(format_ptr){
-                        format_buf_len = strlen(format_ptr);
+                        format_buf_len = strlen(format_ptr) - 1;
                     }
                     break;
 

@@ -1,1 +1,1 @@
-obj-y = regexp.o regsub.o
+obj-y = regexp.o regsub.o regerror.o

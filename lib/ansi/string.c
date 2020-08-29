@@ -108,6 +108,88 @@ char *index(const char *string, int c){
     char *s = (char *)string;
     while(*s && *s != c)
         s++;
-    return s;
+    return *s ? s : NULL;
+}
+
+#include <stdio.h>
+
+// returns true if X and Y are same
+int compare(const char *X, const char *Y)
+{
+	while (*X && *Y)
+	{
+		if (*X != *Y)
+			return 0;
+
+		X++;
+		Y++;
+	}
+
+	return (*Y == '\0');
+}
+
+// Function to implement strstr() function
+char* strstr(const char* haystack, const char* needle)
+{
+    char *X = (char *)haystack;
+    char *Y = (char *)needle;
+	while (*X != '\0')
+	{
+		if ((*X == *Y) && compare(X, Y))
+			return X;
+		X++;
+	}
+
+	return NULL;
+}
+
+size_t strcspn(const char *s1, const char *s2)
+{
+    size_t ret=0;
+    while(*s1)
+        if(strchr(s2,*s1))
+            return ret;
+        else
+            s1++,ret++;
+    return ret;
+}
+
+size_t strspn(const char *s1, const char *s2)
+{
+    size_t ret=0;
+    while(*s1 && strchr(s2,*s1++))
+        ret++;
+    return ret;    
+}
+
+void *memmove(void *dest, const void *src, size_t n)
+{
+	char* from = (char*) src;
+	char* to = (char*) dest;
+
+	if (from == to || n == 0)
+		return dest;
+	if (to > from && to-from < (int)n) {
+		/* to overlaps with from */
+		/*  <from......>         */
+		/*         <to........>  */
+		/* copy in reverse, to avoid overwriting from */
+		int i;
+		for(i=n-1; i>=0; i--)
+			to[i] = from[i];
+		return dest;
+	}
+	if (from > to && from-to < (int)n) {
+		/* to overlaps with from */
+		/*        <from......>   */
+		/*  <to........>         */
+		/* copy forwards, to avoid overwriting from */
+		size_t i;
+		for(i=0; i<n; i++)
+			to[i] = from[i];
+		return dest;
+	}
+	memcpy(dest, src, n);
+	return dest;
 }
 

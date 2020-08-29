@@ -30,6 +30,8 @@ void pline(char *name, int lineno, char buf[]);
 int getline(char *buf, int size);
 void usage();
 
+void regdump(regexp *s);
+
 #define MAXLINE (100)
 int status = 1;
 char *progname;
@@ -43,6 +45,7 @@ char *argv[];
 {
 	regexp *exp;
 	char **argp = &argv[1];
+	int fd;
 
 	args = argc;
 	progname = argv[0];
@@ -73,14 +76,17 @@ out:
 	if (*argp == 0)
 		usage();
 
+	// printf("flags pm %d pnm %d n %d \n", pmflag, pnmflag, nflag);
+
 	if ((exp = regcomp(*argp++)) == NULL)
 	{
 		fprintf(stderr, "grep: regcomp failed\n");
 		exit(2);
 	}
-	if (*argp == 0)
+
+	if (*argp == 0){
 		match((char *)0, exp);
-	else
+	}else{
 		while (*argp)
 		{
 			int infd;
@@ -90,19 +96,21 @@ out:
 			else
 			{
 				close(STDIN_FILENO);
-				if (open(*argp, O_RDONLY) == -1)
+				if ((fd = open(*argp, O_RDONLY)) == -1)
 				{
 					fprintf(stderr, "Can't open %s\n", *argp);
 					status = 2;
 				}
 				else
 				{
+					// printf("opened %s in %d\n", *argp, fd);
 					match(*argp, exp);
 					close(infd);
 				}
 			}
 			argp++;
 		}
+	}
 	return status;
 }
 
@@ -112,9 +120,11 @@ out:
 void match(char *name, regexp *exp) 
 {
 	char buf[MAXLINE];
-	int lineno = 0;
+	int lineno = 0, ret, lineret;
 
-	while (getline(buf, MAXLINE) != -1)
+	// printf("match %s\n", name);
+	// enable_syscall_tracing();
+	while ((lineret = getline(buf, MAXLINE)) != -1)
 	{
 		char *cr = index(buf, '\n');
 		lineno++;
@@ -123,25 +133,24 @@ void match(char *name, regexp *exp)
 			fprintf(stderr, "Line too long in ");
 			fprintf(stderr, name == 0 ? "stdin" : name);
 		}
-		else
+		else{
 			*cr = '\0';
-		if (regexec(exp, buf))
+		}
+			
+		ret = regexec(exp, buf);
+		if (ret)
 		{
 			if (pmflag)
 				pline(name, lineno, buf);
 			if (status != 2)
 				status = 0;
 		}
-		else if (pnmflag)
+		else if (pnmflag){
 			pline(name, lineno, buf);
+		}
+		// printf("regexec %s ret %d\n", buf, ret);
 	}
-}
-void regerror(s) char *s;
-{
-	fprintf(stderr, "grep: ");
-	fprintf(stderr, s);
-	fprintf(stderr, "\n");
-	exit(2);
+	// printf("line ret %d\n", lineret);
 }
 
 void pline(char *name, int lineno, char buf[])
@@ -159,4 +168,22 @@ void usage()
 	exit(2);
 }
 
+int getline(char *buf, int size)
+{
+	char *initbuf = buf, c;
+
+	while (1)
+	{
+		c = getc(stdin);
+		// printf("read %d %c\n", c, c);
+		*buf++ = c;
+		if (c < 0)
+			return (-1);
+		if (((buf - initbuf) == size - 1) || c == '\n'){
+			*buf = '\0';
+			return buf - initbuf;
+		}
+	}
+	return -1;
+}
 

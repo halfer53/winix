@@ -41,8 +41,10 @@ int main(int argc, char **argv){
   struct stat statbuf;
   pid_t pid;
   int status;
-  int i, ret, fd, read_nr;
+  char c = 'a';
+  int i, j, ret, fd, read_nr;
   char buffer[128];
+  char *p = buffer;
 
   ret = mkdir("/dev", 0x755);
   CHECK_SYSCALL(ret == 0);
@@ -61,8 +63,14 @@ int main(int argc, char **argv){
 
   fd = open("/foo", O_CREAT | O_RDWR, 0x755);
   CHECK_SYSCALL(fd > 0);
-  ret = write(fd, "abcd", 5);
-  CHECK_SYSCALL(ret == 5);
+  for(i = 0; i < 6; i++){
+    for(j = 0; j < 4; j++){
+      *p++ = c++;
+    }
+    *p = '\0';
+    dprintf(fd, "%s\n", buffer);
+    p = buffer;
+  }
   ret = close(fd);
   CHECK_SYSCALL(ret == 0);
 
