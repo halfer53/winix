@@ -141,13 +141,13 @@ int creat(const char *pathname, mode_t mode){
 //     return _syscall(SYNC, &m);
 // }
 
-off_t lseek(int fd, off_t offset, int whence){
-    struct message m;
-    m.m1_i1 = fd;
-    m.m1_i2 = offset;
-    m.m1_i3 = whence;
-    return (off_t)_syscall(LSEEK, &m);
-}
+// off_t lseek(int fd, off_t offset, int whence){
+//     struct message m;
+//     m.m1_i1 = fd;
+//     m.m1_i2 = offset;
+//     m.m1_i3 = whence;
+//     return (off_t)_syscall(LSEEK, &m);
+// }
 
 mode_t umask(mode_t mask){
     struct message m;

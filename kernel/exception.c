@@ -202,7 +202,8 @@ PRIVATE void syscall_handler() {
         sp++;
         switch (operation)
         {
-
+        case LSEEK:
+            m->m1_i3 = *(sp + 2);
         case DUP2:
             m->m1_i2 = *(sp + 1);
         case CLOSE:
