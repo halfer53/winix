@@ -170,6 +170,7 @@ int enable_syscall_tracing();
 #define mkdir(pathname, mode)       (wramp_syscall(MKDIR, mode, pathname))
 #define lseek(fd, offset, whence)   (wramp_syscall(LSEEK, fd, offset, whence))
 #define umask(mask)                 (wramp_syscall(UMASK, mask))
+#define alarm(seconds)              (wramp_syscall(ALARM, seconds))
 
 #endif
 

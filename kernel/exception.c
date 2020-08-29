@@ -209,6 +209,7 @@ PRIVATE void syscall_handler() {
             m->m1_i3 = *(sp + 2);
         case DUP2:
             m->m1_i2 = *(sp + 1);
+        case ALARM:
         case CLOSE:
         case DUP:
         case UMASK:
