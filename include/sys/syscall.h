@@ -171,6 +171,7 @@ int enable_syscall_tracing();
 #define lseek(fd, offset, whence)   (wramp_syscall(LSEEK, fd, offset, whence))
 #define umask(mask)                 (wramp_syscall(UMASK, mask))
 #define alarm(seconds)              (wramp_syscall(ALARM, seconds))
+#define csleep(ticks)               (wramp_syscall(CSLEEP, ticks))
 
 #endif
 

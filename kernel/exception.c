@@ -213,6 +213,7 @@ PRIVATE void syscall_handler() {
         case CLOSE:
         case DUP:
         case UMASK:
+        case CSLEEP:
             m->m1_i1 = *sp;
             break;
 
