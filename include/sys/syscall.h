@@ -92,6 +92,8 @@ function params{\
 #ifndef MAKEFS_STANDALONE
 
 int _syscall(int syscall_num, struct message *m);
+int direct_wramp_syscall(int num);
+
 int ___exit(int status);
 int sys_ps();
 pid_t fork();
@@ -144,6 +146,8 @@ pid_t setsid(void);
 int ioctl(int fd, unsigned long request, ...);
 int csleep(int ticks);
 int enable_syscall_tracing();
+
+#define sync()  (direct_wramp_syscall(SYNC))
 
 #endif
 

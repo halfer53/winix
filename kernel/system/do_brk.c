@@ -38,20 +38,28 @@
 // sbrk function
 // NB sbrk() is implemented as a user wrapper function, that internally uses brk() syscall
 // This function is just an internal kernel function for extending heaps
-void* sys_sbrk(struct proc *who, int size){
+ptr_t* sys_sbrk(struct proc *who, int size){
     ptr_t* next_page;
     int err;
     void* oheap;
     int residual, request_size;
 
     if(size == 0)
-        return get_virtual_addr(who->heap_break, who);
+        goto ret_result;
+
+    if(size < 0){
+        if(who->heap_break + size >= who->heap_top){
+            who->heap_break += size;
+            goto ret_result;
+        }
+        return NULL;
+    }
     
     // residual is the remaining unused heap by the user
     residual = who->heap_bottom - who->heap_break;
     if(residual >= size){
         who->heap_break += size;
-        return get_virtual_addr(who->heap_break, who);
+        goto ret_result;
     }
 
     // extend the heap bottom if needed
@@ -65,7 +73,9 @@ void* sys_sbrk(struct proc *who, int size){
     //                                                         (who->heap_break + size), who->heap_bottom);                                  
     who->heap_break += size;
     who->heap_bottom += align_page(request_size);
-    return get_virtual_addr(who->heap_break,who);
+
+ret_result:
+    return who->heap_break;
 }
 
 // syscall for brk()
@@ -96,7 +106,7 @@ int do_brk(struct proc *who, struct message *m){
     new_brk = sys_sbrk(who, size);
     if(new_brk == NULL)
         return ENOMEM;
-    
+    new_brk = get_virtual_addr(new_brk, who);
     m->m1_p1 = new_brk;
     return OK;
 }

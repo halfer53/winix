@@ -173,6 +173,13 @@ PRIVATE void gpf_handler() {
     sched();
 }
 
+
+void do_direct_syscall(int num){
+    struct message msg;
+    
+
+}
+
 /**
  * System Call.
  *
@@ -186,10 +193,29 @@ PRIVATE void syscall_handler() {
     sp = get_physical_addr(current_proc->ctx.m.sp, current_proc);
 
     operation = *(sp);                // Operation is the first parameter on the stack
-    dest = *(sp+1);                // Destination is second parameter on the stack
-    m = (struct message *)get_physical_addr(*(sp+ 2), current_proc);  // Message is the third parameter
-    m->src = current_proc->proc_nr;            // Don't trust the who to specify their own source process number
 
+    if(operation > 0 && operation < _NSYSCALL){ // direct syscall mode
+        struct message msg;
+        msg.type = operation;
+        switch (operation)
+        {
+        case SYNC:
+            msg.m1_i1 = SYNC;
+            break;
+        
+        default:
+            break;
+        }
+        dest = SYSTEM;
+        m = (struct message*)sys_sbrk(current_proc, sizeof(struct message));
+
+    }else{ // traditional IPC mode
+
+        dest = *(sp+1);                // Destination is second parameter on the stack
+        m = (struct message *)get_physical_addr(*(sp+ 2), current_proc);  // Message is the third parameter
+    }
+
+    m->src = current_proc->proc_nr;            // Don't trust the who to specify their own source process number
     retval = (int*)&current_proc->ctx.m.regs[0];        // Result is returned in $1
 
     // Decode operation

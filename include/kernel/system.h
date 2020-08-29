@@ -34,6 +34,7 @@ struct syscall_ctx *interrupted_syscall_ctx();
 void kreport_sysinfo();
 void init_syscall_table();
 bool is_in_syscall(struct proc* who);
+ptr_t* sys_sbrk(struct proc *who, int size);
 
 int sys_kill(struct proc* who, pid_t pid, int signum);
 

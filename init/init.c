@@ -30,6 +30,8 @@ void do_ps(){
   _syscall(WINFO, &m);
 }
 
+
+
 char shell_path[] = "/bin/bash";
 char *shell_argv[] = {
   shell_path,
@@ -73,6 +75,8 @@ int main(int argc, char **argv){
   }
   ret = close(fd);
   CHECK_SYSCALL(ret == 0);
+
+  sync();
 
   pid = vfork();
   if(pid == 0){

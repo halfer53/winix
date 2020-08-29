@@ -15,3 +15,8 @@
 wramp_syscall:
 	syscall
 	jr $ra
+
+.global direct_wramp_syscall
+direct_wramp_syscall:
+	syscall
+	jr $ra

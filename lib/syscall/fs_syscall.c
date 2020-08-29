@@ -137,10 +137,10 @@ int getdents( int fd, struct dirent *dirp, unsigned int count){
     return _syscall(GETDENT, &m);
 }
 
-int sync(){
-    struct message m;
-    return _syscall(SYNC, &m);
-}
+// int sync(){
+//     struct message m;
+//     return _syscall(SYNC, &m);
+// }
 
 off_t lseek(int fd, off_t offset, int whence){
     struct message m;
