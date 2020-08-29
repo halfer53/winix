@@ -202,9 +202,14 @@ PRIVATE void syscall_handler() {
         sp++;
         switch (operation)
         {
+            
+        case DUP2:
+            m->m1_i2 = *(sp + 1);
         case CLOSE:
+        case DUP:
             m->m1_i1 = *sp;
             break;
+
         case READ:
         case WRITE:
         case MKNOD:
@@ -216,16 +221,12 @@ PRIVATE void syscall_handler() {
             m->m1_p1 = (void*)*sp++;
             m->m1_i2 = *sp;
             break;
+
+        case STAT:
+            m->m1_p2 = (void *)*(sp + 1);
         case PIPE:
         case CHDIR:
             m->m1_p1 = (void*)*sp;
-            break;
-        case STAT:
-            m->m1_p1 = (void *)*sp++;
-            m->m1_p2 = (void *)*sp;
-            break;
-        case SYNC:
-            m->m1_i1 = SYNC;
             break;
         
         default:

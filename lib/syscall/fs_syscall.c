@@ -86,18 +86,18 @@ int creat(const char *pathname, mode_t mode){
 //     return _syscall(FSTAT, &m);
 // }
 
-int dup(int oldfd){
-    struct message m;
-    m.m1_i1 = oldfd;
-    return _syscall(DUP, &m);
-}
+// int dup(int oldfd){
+//     struct message m;
+//     m.m1_i1 = oldfd;
+//     return _syscall(DUP, &m);
+// }
 
-int dup2(int oldfd, int newfd){
-    struct message m;
-    m.m1_i1 = oldfd;
-    m.m1_i2 = newfd;
-    return _syscall(DUP2, &m);
-}
+// int dup2(int oldfd, int newfd){
+//     struct message m;
+//     m.m1_i1 = oldfd;
+//     m.m1_i2 = newfd;
+//     return _syscall(DUP2, &m);
+// }
 
 int link(const char *oldpath, const char *newpath){
     struct message m;
