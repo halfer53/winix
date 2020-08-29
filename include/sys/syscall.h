@@ -183,6 +183,7 @@ void* get_sigreturn_func_ptr(void);
 #define setpgid(pid, pgid)          (wramp_syscall(SETPGID, pid, pgid))
 #define setsid()                    (wramp_syscall(SETSID))
 #define sigaction(signum, act, oact)(wramp_syscall(SIGACTION, act, oact, get_sigreturn_func_ptr(), signum))
+#define sigsuspend(mask)            (wramp_syscall(SIGSUSPEND, *mask))
 
 #endif
 

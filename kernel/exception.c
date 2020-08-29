@@ -217,6 +217,7 @@ PRIVATE void syscall_handler() {
         case UMASK:
         case CSLEEP:
         case GETPGID:
+        case SIGSUSPEND:
             m->m1_i1 = *sp;
             break;
 
