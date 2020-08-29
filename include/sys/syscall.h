@@ -167,7 +167,7 @@ int enable_syscall_tracing();
 #define link(oldpath, newpath)      (wramp_syscall(LINK, oldpath, newpath))
 #define unlink(pathname)            (wramp_syscall(UNLINK, pathname))
 #define access(pathname, mode)      (wramp_syscall(ACCESS, mode, pathname))
-// #define mkdir(pathname, mode)
+#define mkdir(pathname, mode)       (wramp_syscall(MKDIR, mode, pathname))
 // #define lseek(fd, offset, whence)
 // #define umask(mask)
 

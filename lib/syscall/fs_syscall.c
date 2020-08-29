@@ -121,12 +121,12 @@ int creat(const char *pathname, mode_t mode){
 //     return _syscall(ACCESS, &m);
 // }
 
-int mkdir(const char *pathname, mode_t mode){
-    struct message m;
-    m.m1_p1 = (void*)pathname;
-    m.m1_i1 = mode;
-    return _syscall(MKDIR, &m);
-}
+// int mkdir(const char *pathname, mode_t mode){
+//     struct message m;
+//     m.m1_p1 = (void*)pathname;
+//     m.m1_i1 = mode;
+//     return _syscall(MKDIR, &m);
+// }
 
 // int getdents( int fd, struct dirent *dirp, unsigned int count){
 //     struct message m;

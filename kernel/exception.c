@@ -218,6 +218,7 @@ PRIVATE void syscall_handler() {
         case FSTAT:
         case GETDENT:
         case ACCESS:
+        case MKDIR:
             m->m1_i1 = *sp++;
             m->m1_p1 = (void*)*sp++;
             m->m1_i2 = *sp;
