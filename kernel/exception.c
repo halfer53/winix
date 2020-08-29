@@ -208,6 +208,7 @@ PRIVATE void syscall_handler() {
             m->m1_i2 = *(sp + 1);
         case CLOSE:
         case DUP:
+        case UMASK:
             m->m1_i1 = *sp;
             break;
 

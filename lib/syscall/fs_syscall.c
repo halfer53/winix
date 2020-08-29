@@ -149,11 +149,11 @@ int creat(const char *pathname, mode_t mode){
 //     return (off_t)_syscall(LSEEK, &m);
 // }
 
-mode_t umask(mode_t mask){
-    struct message m;
-    m.m1_i1 = mask;
-    return (mode_t)_syscall(UMASK, &m);
-}
+// mode_t umask(mode_t mask){
+//     struct message m;
+//     m.m1_i1 = mask;
+//     return (mode_t)_syscall(UMASK, &m);
+// }
 
 int ioctl(int fd, unsigned long request, ...){
     struct message m;
