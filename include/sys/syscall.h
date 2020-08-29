@@ -172,6 +172,7 @@ int enable_syscall_tracing();
 #define umask(mask)                 (wramp_syscall(UMASK, mask))
 #define alarm(seconds)              (wramp_syscall(ALARM, seconds))
 #define csleep(ticks)               (wramp_syscall(CSLEEP, ticks))
+#define execve(path, argv, envp)    (wramp_syscall(EXECVE, path, argv, envp))
 
 #endif
 
