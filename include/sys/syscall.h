@@ -184,6 +184,7 @@ void* get_sigreturn_func_ptr(void);
 #define setsid()                    (wramp_syscall(SETSID))
 #define sigaction(signum, act, oact)(wramp_syscall(SIGACTION, act, oact, get_sigreturn_func_ptr(), signum))
 #define sigsuspend(mask)            (wramp_syscall(SIGSUSPEND, *mask))
+#define sysconf(name)               (wramp_syscall(SYSCONF, name))
 
 #endif
 
