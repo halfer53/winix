@@ -210,6 +210,7 @@ PRIVATE void syscall_handler() {
         case MKNOD:
         case CHOWN:
         case CHMOD:
+        case FSTAT:
         case GETDENT:
             m->m1_i1 = *sp++;
             m->m1_p1 = (void*)*sp++;
@@ -219,7 +220,10 @@ PRIVATE void syscall_handler() {
         case CHDIR:
             m->m1_p1 = (void*)*sp;
             break;
-
+        case STAT:
+            m->m1_p1 = (void *)*sp++;
+            m->m1_p2 = (void *)*sp;
+            break;
         case SYNC:
             m->m1_i1 = SYNC;
             break;

@@ -72,19 +72,19 @@ int creat(const char *pathname, mode_t mode){
 //     return _syscall(CHMOD, &m);
 // }
 
-int stat(const char *pathname, struct stat *statbuf){
-    struct message m;
-    m.m1_p1 = (void*)pathname;
-    m.m1_p2 = (void*)statbuf;
-    return _syscall(STAT, &m);
-}
+// int stat(const char *pathname, struct stat *statbuf){
+//     struct message m;
+//     m.m1_p1 = (void*)pathname;
+//     m.m1_p2 = (void*)statbuf;
+//     return _syscall(STAT, &m);
+// }
 
-int fstat(int fd, struct stat *statbuf){
-    struct message m;
-    m.m1_i1 = fd;
-    m.m1_p1 = (void*)statbuf;
-    return _syscall(FSTAT, &m);
-}
+// int fstat(int fd, struct stat *statbuf){
+//     struct message m;
+//     m.m1_i1 = fd;
+//     m.m1_p1 = (void*)statbuf;
+//     return _syscall(FSTAT, &m);
+// }
 
 int dup(int oldfd){
     struct message m;
