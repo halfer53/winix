@@ -220,6 +220,7 @@ PRIVATE void syscall_handler() {
         case SIGSUSPEND:
         case SYSCONF:
         case WINFO:
+        case SBRK:
             m->m1_i1 = *sp;
             break;
 

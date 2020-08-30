@@ -12,11 +12,12 @@
 #       Parameters are passed on the stack, return value in $1
 ##
 .global wramp_syscall
+.global ptr_wramp_syscall
+
+ptr_wramp_syscall:
 wramp_syscall:
 	syscall
 	jr $ra
 
-.global direct_wramp_syscall
-direct_wramp_syscall:
-	syscall
-	jr $ra
+
+

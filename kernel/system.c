@@ -217,6 +217,7 @@ void init_syscall_table(){
     SYSCALL_MAP(CSLEEP, do_csleep);
     SYSCALL_MAP(GETPPID, do_getppid);
     SYSCALL_MAP(SIGNAL, do_signal);
+    SYSCALL_MAP(SBRK, do_sbrk);  
 }
 
 

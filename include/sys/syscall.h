@@ -24,7 +24,7 @@
 #include <stdio.h>
 
 
-#define _NSYSCALL               50
+#define _NSYSCALL               51
 /**
  * System Call Numbers
  **/
@@ -78,6 +78,7 @@
 #define CSLEEP          47
 #define GETPPID         48
 #define SIGNAL          49
+#define SBRK            50
 
 #define DECLARE_SYSCALL(function, params, syscall_num, passing_codes)\
 function params{\
@@ -96,7 +97,7 @@ function params{\
 #ifndef MAKEFS_STANDALONE
 
 int _syscall(int syscall_num, struct message *m);
-int direct_wramp_syscall(int num, ...);
+void *ptr_wramp_syscall(int num, ...);
 
 void exit(int status);
 pid_t getppid();
@@ -196,6 +197,7 @@ char *strerror(int err);
 #define exit(status)                (wramp_syscall(EXIT, status))
 #define getppid()                   (wramp_syscall(GETPPID))
 #define signal(signum, handler)     (wramp_syscall(SIGNAL, signum, get_sigreturn_func_ptr(), handler))
+#define sbrk(increment)             (ptr_wramp_syscall(SBRK, increment))
 
 #endif //_SYSTEM
 #endif //__wramp__

@@ -78,6 +78,11 @@ ret_result:
     return who->heap_break;
 }
 
+int do_sbrk(struct proc* who, struct message *m){
+    ptr_t* ret = sys_sbrk(who, m->m1_i1);
+    return (int)get_virtual_addr(ret, who);
+}
+
 // syscall for brk()
 // in contrast to the user space sbrk(), system call brk() returns the new heap break 
 // to the user space, and then user space sbrk() will return the saved previous break. 
