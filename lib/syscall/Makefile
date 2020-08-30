@@ -1,7 +1,4 @@
 
-obj-y += alarm.o     execve.o  perror.o  ipc.o     setpgid.o     sigprocmask.o  sysconf.o    wait.o\
-			brk_sbrk.o  _exit.o   getpgid.o  kill.o    sigaction.o   sigsuspend.o   sys_winfo.o\
-			errno.o     fork.o    getpid.o   printf.o  sigpending.o  _syscall.o     times.o \
-			fs_syscall.o fcntl.o csleep.o
+obj-y += _exit.o _syscall.o brk_sbrk.o errno.o execve.o fcntl.o fs_syscall.o getpid.o ipc.o printf.o sigaction.o
 
 asm-y += wramp_syscall.o vfork.o __sigreturn.o debug.o
