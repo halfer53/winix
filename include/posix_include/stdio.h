@@ -98,4 +98,6 @@ int getline(char *buf, int size);
 extern FILE	*__iotab[FOPEN_MAX];
 extern FILE	*stdin, *stdout, *stderr;
 
+#include <sys/syscall.h>
+
 #endif

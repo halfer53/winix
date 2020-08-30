@@ -56,9 +56,9 @@
 #define	NOTHING	9	/* no	Match empty string. */
 #define	STAR	10	/* node	Match this 0 or more times. */
 #define	PLUS	11	/* node	Match this 1 or more times. */
-#define	OPEN	20	/* no	Sub-RE starts here. */
-			/*	OPEN+1 is number 1, etc. */
-#define	CLOSE	30	/* no	Analogous to OPEN. */
+#define	SUB_OPEN	20	/* no	Sub-RE starts here. */
+			/*	SUB_OPEN+1 is number 1, etc. */
+#define	SUB_CLOSE	30	/* no	Analogous to SUB_OPEN. */
 
 /*
  * Opcode notes:
@@ -79,7 +79,7 @@
  *		per match) are implemented with STAR and PLUS for speed
  *		and to minimize recursive plunges.
  *
- * OPEN,CLOSE	...are numbered at compile time.
+ * SUB_OPEN,SUB_CLOSE	...are numbered at compile time.
  */
 
 /*
@@ -261,12 +261,12 @@ int *flagp;
 	*flagp = HASWIDTH;	/* Tentatively. */
 
 	if (paren) {
-		/* Make an OPEN node. */
+		/* Make an SUB_OPEN node. */
 		if (cp->regnpar >= NSUBEXP)
 			FAIL("too many ()");
 		parno = cp->regnpar;
 		cp->regnpar++;
-		ret = regnode(cp, OPEN+parno);
+		ret = regnode(cp, SUB_OPEN+parno);
 	}
 
 	/* Pick up the branches, linking them together. */
@@ -274,7 +274,7 @@ int *flagp;
 	if (br == NULL)
 		return(NULL);
 	if (paren)
-		regtail(cp, ret, br);	/* OPEN -> first. */
+		regtail(cp, ret, br);	/* SUB_OPEN -> first. */
 	else
 		ret = br;
 	*flagp &= ~(~flags&HASWIDTH);	/* Clear bit if bit 0. */
@@ -290,7 +290,7 @@ int *flagp;
 	}
 
 	/* Make a closing node, and hook it on the end. */
-	ender = regnode(cp, (paren) ? CLOSE+parno : END);
+	ender = regnode(cp, (paren) ? SUB_CLOSE+parno : END);
 	regtail(cp, ret, ender);
 
 	/* Hook the tails of the branches to the closing node. */
@@ -818,10 +818,10 @@ char *prog;
 			break;
 		case BACK:
 			break;
-		case OPEN+1: case OPEN+2: case OPEN+3:
-		case OPEN+4: case OPEN+5: case OPEN+6:
-		case OPEN+7: case OPEN+8: case OPEN+9: {
-			const int no = OP(scan) - OPEN;
+		case SUB_OPEN+1: case SUB_OPEN+2: case SUB_OPEN+3:
+		case SUB_OPEN+4: case SUB_OPEN+5: case SUB_OPEN+6:
+		case SUB_OPEN+7: case SUB_OPEN+8: case SUB_OPEN+9: {
+			const int no = OP(scan) - SUB_OPEN;
 			char *const input = ep->reginput;
 
 			if (regmatch(ep, next)) {
@@ -837,10 +837,10 @@ char *prog;
 				return(0);
 			break;
 			}
-		case CLOSE+1: case CLOSE+2: case CLOSE+3:
-		case CLOSE+4: case CLOSE+5: case CLOSE+6:
-		case CLOSE+7: case CLOSE+8: case CLOSE+9: {
-			const int no = OP(scan) - CLOSE;
+		case SUB_CLOSE+1: case SUB_CLOSE+2: case SUB_CLOSE+3:
+		case SUB_CLOSE+4: case SUB_CLOSE+5: case SUB_CLOSE+6:
+		case SUB_CLOSE+7: case SUB_CLOSE+8: case SUB_CLOSE+9: {
+			const int no = OP(scan) - SUB_CLOSE;
 			char *const input = ep->reginput;
 
 			if (regmatch(ep, next)) {
@@ -1050,28 +1050,28 @@ char *op;
 	case END:
 		p = "END";
 		break;
-	case OPEN+1:
-	case OPEN+2:
-	case OPEN+3:
-	case OPEN+4:
-	case OPEN+5:
-	case OPEN+6:
-	case OPEN+7:
-	case OPEN+8:
-	case OPEN+9:
-		sprintf(buf+strlen(buf), "OPEN%d", OP(op)-OPEN);
+	case SUB_OPEN+1:
+	case SUB_OPEN+2:
+	case SUB_OPEN+3:
+	case SUB_OPEN+4:
+	case SUB_OPEN+5:
+	case SUB_OPEN+6:
+	case SUB_OPEN+7:
+	case SUB_OPEN+8:
+	case SUB_OPEN+9:
+		sprintf(buf+strlen(buf), "SUB_OPEN%d", OP(op)-SUB_OPEN);
 		p = NULL;
 		break;
-	case CLOSE+1:
-	case CLOSE+2:
-	case CLOSE+3:
-	case CLOSE+4:
-	case CLOSE+5:
-	case CLOSE+6:
-	case CLOSE+7:
-	case CLOSE+8:
-	case CLOSE+9:
-		sprintf(buf+strlen(buf), "CLOSE%d", OP(op)-CLOSE);
+	case SUB_CLOSE+1:
+	case SUB_CLOSE+2:
+	case SUB_CLOSE+3:
+	case SUB_CLOSE+4:
+	case SUB_CLOSE+5:
+	case SUB_CLOSE+6:
+	case SUB_CLOSE+7:
+	case SUB_CLOSE+8:
+	case SUB_CLOSE+9:
+		sprintf(buf+strlen(buf), "SUB_CLOSE%d", OP(op)-SUB_CLOSE);
 		p = NULL;
 		break;
 	case STAR:
