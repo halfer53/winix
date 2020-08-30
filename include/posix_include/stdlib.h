@@ -15,7 +15,6 @@ void* malloc (long size);
 void free(void *ptr);
 void* realloc(void *p,long size);
 void *calloc(long number , long size);
-int exit(int status);
 char *getenv(const char *name);
 int putenv(char *name);
 int setenv(const char *name, const char *value, int overwrite);

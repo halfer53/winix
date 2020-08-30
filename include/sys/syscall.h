@@ -23,7 +23,7 @@
 #include <signal.h>
 
 
-#define _NSYSCALL               48
+#define _NSYSCALL               49
 /**
  * System Call Numbers
  **/
@@ -75,6 +75,7 @@
 #define IOCTL           45
 #define SETSID          46
 #define CSLEEP          47
+#define GETPPID         48
 
 #define DECLARE_SYSCALL(function, params, syscall_num, passing_codes)\
 function params{\
@@ -94,7 +95,7 @@ function params{\
 int _syscall(int syscall_num, struct message *m);
 int direct_wramp_syscall(int num, ...);
 
-int ___exit(int status);
+void exit(int status);
 int sys_ps();
 pid_t fork();
 pid_t vfork();
@@ -193,6 +194,8 @@ void* get_sigreturn_func_ptr(void);
 #define wait(wstatus)               (waitpid(-1, wstatus, 0))
 #define enable_syscall_tracing()    (wramp_syscall(WINFO, WINFO_TRACE_SYSCALL))
 #define vfork()                     (wramp_syscall(VFORK))
+#define __exit(status)              (wramp_syscall(EXIT, status))
+#define getppid()                   (wramp_syscall(GETPPID))
 
 #endif
 

@@ -74,6 +74,8 @@ int do_fcntl(struct proc* who, struct message* msg);
 int do_setsid(struct proc* who, struct message* m);
 int do_ioctl(struct proc* who, struct message* m);
 int do_csleep(struct proc* who, struct message* m);
+int do_getppid(struct proc* who, struct message *m);
+int do_signal(struct proc* who, struct message *m);
 
 #endif
 

@@ -352,7 +352,8 @@ int cmd_exit(int argc, char **argv){
         status = atoi(argv[1]);
     printf("Bye!\n");
     // printf("Child %d [parent %d] exits\n",getpid(),getppid());
-    return exit(status);
+    exit(status);
+    return -1;
 }
 
 

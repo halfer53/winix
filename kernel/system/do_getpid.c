@@ -21,3 +21,7 @@ int do_getpid(struct proc *who, struct message *m){
     m->m1_i2 = who->parent;
     return who->pid;
 }
+
+int do_getppid(struct proc* who, struct message *m){
+    return who->parent;
+}

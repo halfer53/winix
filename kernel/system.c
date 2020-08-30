@@ -215,6 +215,7 @@ void init_syscall_table(){
     SYSCALL_MAP(IOCTL, do_ioctl);
     SYSCALL_MAP(SETSID, do_setsid);
     SYSCALL_MAP(CSLEEP, do_csleep);
+    SYSCALL_MAP(GETPPID, do_getppid);
 }
 
 

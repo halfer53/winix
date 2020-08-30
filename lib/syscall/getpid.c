@@ -9,8 +9,8 @@ extern pid_t _pid;
 
 // ppid may change through init adoption, so it's not a
 // good idea to cache it
-pid_t getppid(){
-    struct message m;
-    _syscall(GETPID, &m);
-    return m.m1_i2;
-}
+// pid_t getppid(){
+//     struct message m;
+//     _syscall(GETPID, &m);
+//     return m.m1_i2;
+// }
