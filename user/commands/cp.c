@@ -43,10 +43,14 @@ int main(int argc, char *argv[]){
 
     while((ret = read(src_fd, buffer, BUFFER_SIZ)) > 0){
         ret = write(dest_fd, buffer, ret);
+        if(ret <= 0){
+            perror("write");
+            break;
+        }
     }
     close(src_fd);
     close(dest_fd);
-    
+
     return 0;
 }
 
