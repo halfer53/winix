@@ -1,8 +1,9 @@
 obj-y += ls.o test.o stat.o cat.o echo.o uptime.o wc.o \
-	grep.o cp.o rm.o mv.o
+	grep.o cp.o rm.o mv.o touch.o
 
 srec-y += ls.srec test.srec stat.srec cat.srec echo.srec \
-	uptime.srec wc.srec grep.srec cp.srec rm.srec mv.srec
+	uptime.srec wc.srec grep.srec cp.srec rm.srec mv.srec \
+	touch.srec
 
 
 ls.srec = ls.o
@@ -16,3 +17,4 @@ grep.srec = grep.o
 cp.srec = cp.o
 rm.srec = rm.o
 mv.srec = mv.o
+touch.srec = touch.o
