@@ -28,9 +28,10 @@ __sigreturn:
 	addui $sp, $sp, 1
 	syscall
 	# Hopefull never get here
-	addui $1, $0, 1
-	sw $1, 0($1)
-	j exit
+	# addui $1, $0, 2
+	# sw $1, 0($1)
+	# sw $1, 1($1)
+	# j wramp_syscall
 
 .extern	_pid 1
 .extern	stderr 1

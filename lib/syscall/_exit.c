@@ -15,8 +15,8 @@
 //     return _syscall(EXIT, &m);
 // }
 
-void exit(int status){
-    __exit(status);
-}
+// void exit(int status){
+//     __exit(status);
+// }
 
 

@@ -193,7 +193,7 @@ char *strerror(int err);
 #define enable_syscall_tracing()    (wramp_syscall(WINFO, WINFO_TRACE_SYSCALL))
 #define disable_syscall_tracing()    (wramp_syscall(WINFO, WINFO_DISABLE_TRACE))
 #define vfork()                     (wramp_syscall(VFORK))
-#define __exit(status)              (wramp_syscall(EXIT, status))
+#define exit(status)                (wramp_syscall(EXIT, status))
 #define getppid()                   (wramp_syscall(GETPPID))
 #define signal(signum, handler)     (wramp_syscall(SIGNAL, signum, get_sigreturn_func_ptr(), handler))
 
