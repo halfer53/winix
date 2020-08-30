@@ -22,33 +22,33 @@ struct stat {
 
 
 
-#define	S_ISUID	0004000			/* set user id on execution */
-#define	S_ISGID	0002000			/* set group id on execution */
+#define	S_ISUID	0x0004000			/* set user id on execution */
+#define	S_ISGID	0x0002000			/* set group id on execution */
 
-#define	S_IRWXU	0000700			/* RWX mask for owner */
-#define	S_IRUSR	0000400			/* R for owner */
-#define	S_IWUSR	0000200			/* W for owner */
-#define	S_IXUSR	0000100			/* X for owner */
+#define	S_IRWXU	0x0000700			/* RWX mask for owner */
+#define	S_IRUSR	0x0000400			/* R for owner */
+#define	S_IWUSR	0x0000200			/* W for owner */
+#define	S_IXUSR	0x0000100			/* X for owner */
 
-#define	S_IRWXG	0000070			/* RWX mask for group */
-#define	S_IRGRP	0000040			/* R for group */
-#define	S_IWGRP	0000020			/* W for group */
-#define	S_IXGRP	0000010			/* X for group */
+#define	S_IRWXG	0x0000070			/* RWX mask for group */
+#define	S_IRGRP	0x0000040			/* R for group */
+#define	S_IWGRP	0x0000020			/* W for group */
+#define	S_IXGRP	0x0000010			/* X for group */
 
-#define	S_IRWXO	0000007			/* RWX mask for other */
-#define	S_IROTH	0000004			/* R for other */
-#define	S_IWOTH	0000002			/* W for other */
-#define	S_IXOTH	0000001			/* X for other */
+#define	S_IRWXO	0x0000007			/* RWX mask for other */
+#define	S_IROTH	0x0000004			/* R for other */
+#define	S_IWOTH	0x0000002			/* W for other */
+#define	S_IXOTH	0x0000001			/* X for other */
 
-#define	S_IFMT	  0170000		/* type of file mask */
-#define	S_IFIFO  0010000		/* named pipe (fifo) */
-#define	S_IFCHR  0020000		/* character special */
-#define	S_IFDIR  0040000		/* directory */
-#define	S_IFBLK  0060000		/* block special */
-#define	S_IFREG  0100000		/* regular */
-#define	S_IFLNK  0120000		/* symbolic link */
-#define	S_IFSOCK 0140000		/* socket */
-#define	S_ISVTX  0001000		/* save swapped text even after use */
+#define	S_IFMT	 0x0170000		/* type of file mask */
+#define	S_IFIFO  0x0010000		/* named pipe (fifo) */
+#define	S_IFCHR  0x0020000		/* character special */
+#define	S_IFDIR  0x0040000		/* directory */
+#define	S_IFBLK  0x0060000		/* block special */
+#define	S_IFREG  0x0100000		/* regular */
+#define	S_IFLNK  0x0120000		/* symbolic link */
+#define	S_IFSOCK 0x0140000		/* socket */
+#define	S_ISVTX  0x0001000		/* save swapped text even after use */
 
 
 #define	S_ISDIR(m)	(((m) & S_IFMT) == S_IFDIR)	/* directory */
