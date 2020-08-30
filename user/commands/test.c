@@ -11,6 +11,7 @@
  * @create date 2017-08-23 06:13:47
  * 
 */
+#include <sys/ipc.h>
 #include <unistd.h>
 #include <stdio.h>
 #include <string.h>

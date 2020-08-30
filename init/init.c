@@ -6,41 +6,36 @@
 #include <errno.h>
 #include <sys/tty.h>
 #include <sys/fcntl.h>
+#include <sys/ipc.h>
 
 #define CHECK_SYSCALL(cond) \
-if(!(cond)){ \
-  failed_init(__LINE__); \
-}
+  if (!(cond))              \
+  {                         \
+    failed_init(__LINE__);  \
+  }
 
-void failed_init(int line){
+void failed_init(int line)
+{
   printf("init %d failed at %d, err %s\n", getpid(), line, strerror(line));
   exit(1);
 }
 
-void init_init(){
+void init_init()
+{
   sigset_t mask;
   sigfillset(&mask);
   sigdelset(&mask, SIGSEGV);
   sigprocmask(SIG_SETMASK, &mask, NULL);
-  enable_syscall_tracing();
-  sync();
 }
-
-void do_ps(){
-  struct message m;
-  m.m1_i1 = WINFO_PS;
-  _syscall(WINFO, &m);
-}
-
-
 
 char shell_path[] = "/bin/bash";
 char *shell_argv[] = {
-  shell_path,
-  NULL
+    shell_path,
+    NULL
 };
 
-int main(int argc, char **argv){
+int main(int argc, char **argv)
+{
   struct message m;
   struct stat statbuf;
   pid_t pid;
@@ -51,7 +46,7 @@ int main(int argc, char **argv){
   char *p = buffer;
 
   unlink("/bin/init");
-  
+
   ret = mkdir("/dev", 0x755);
   CHECK_SYSCALL(ret == 0);
 
@@ -69,8 +64,10 @@ int main(int argc, char **argv){
 
   fd = open("/foo", O_CREAT | O_RDWR, 0x755);
   CHECK_SYSCALL(fd > 0);
-  for(i = 0; i < 6; i++){
-    for(j = 0; j < 4; j++){
+  for (i = 0; i < 6; i++)
+  {
+    for (j = 0; j < 4; j++)
+    {
       *p++ = c++;
     }
     *p = '\0';
@@ -81,19 +78,25 @@ int main(int argc, char **argv){
   CHECK_SYSCALL(ret == 0);
 
   pid = vfork();
-  if(pid == 0){
+  if (pid == 0)
+  {
     i = execv(shell_path, shell_argv);
     return 1;
   }
 
-  while(1){
+  // delete bash after execving it
+  unlink(shell_path);
+  init_init();
+  while (1)
+  {
     pid = wait(&status);
-    if(pid == -1){
+    if (pid == -1)
+    {
       break;
     }
     // printf("INIT: child %d exit status %d\n", pid, WEXITSTATUS(status));
   }
-  
+
   printf("Shutting down...\n");
   // winix_receive(&m);
   return 0;

@@ -13,6 +13,7 @@ SYSCALL = "lib/syscall/"
 STRING = "lib/ansi/string.o"
 DEBUG = "lib/util/debug.o"
 REGEX = "lib/regex/"
+IPC = "lib/ipc/"
 
 built_in = {
 	"stdlib.h": {STDLIB, ANSI},
@@ -24,7 +25,8 @@ built_in = {
 	"stdio.h":	{STDIO},
 	"debug.h":	{DEBUG},
 	"dirent.h":	{POSIX, ANSI, STDLIB},
-	"regexp.h": {REGEX}
+	"regexp.h": {REGEX},
+	"sys/ipc.h": {IPC}
 }
 
 dir_path = ""

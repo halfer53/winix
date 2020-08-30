@@ -16,7 +16,6 @@
 #ifndef _SYSCALL_H_
 #define _SYSCALL_H_ 1
 
-#include <sys/ipc.h>
 #include <sys/types.h>
 #include <sys/dirent.h>
 #include <sys/stat.h>
@@ -97,6 +96,7 @@ function params{\
 #ifndef MAKEFS_STANDALONE
 
 int _syscall(int syscall_num, struct message *m);
+int wramp_syscall(int num, ...);
 void *ptr_wramp_syscall(int num, ...);
 
 void exit(int status);

@@ -13,7 +13,6 @@
 */
 
 #include "bash.h"
-#include <stdbool.h>
 
 // Input buffer & tokeniser
 static char buf[MAX_LINE];
@@ -311,9 +310,7 @@ int do_trace_syscall(int argc, char** argv){
 
 // Print the system wise memory info
 int mem_info(int argc, char** argv){
-    struct message m;
-    m.m1_i1 = WINFO_MEM;
-    return _syscall(WINFO, &m);
+    return wramp_syscall(WINFO, WINFO_MEM);
 }
 
 // current pid
@@ -324,9 +321,7 @@ int print_pid(int argc, char **argv){
 
 // list all the processes in the system
 int ps(int argc, char **argv){
-    struct message m;
-    m.m1_i1 = WINFO_PS;
-    return _syscall(WINFO, &m);
+    return wramp_syscall(WINFO, WINFO_PS);
 }
 
 // start a new bash shell, parent shell is blocked until child shell exits

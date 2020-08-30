@@ -4,7 +4,7 @@ srctree := $(shell pwd)
 include tools/Kbuild.include
 
 # List of user libraries used by the kernel
-KLIB_O = lib/syscall/wramp_syscall.o lib/syscall/ipc.o \
+KLIB_O = lib/syscall/wramp_syscall.o lib/ipc/ipc.o \
 		lib/ansi/string.o lib/util/util.o lib/gen/ucontext.o lib/stdlib/atoi.o\
 		lib/syscall/debug.o lib/posix/_sigset.o lib/ansi/rand.o
 
