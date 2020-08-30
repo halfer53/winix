@@ -58,8 +58,6 @@ int sys_unlink(struct proc* who, char *path){
     
     if(ino->i_nlinks == 0 && ino->i_count == 0){
         ret = release_inode(ino);
-    }else{
-        ret = EBUSY;
     }
     goto final;
 
