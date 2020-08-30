@@ -198,7 +198,7 @@ PRIVATE void syscall_handler() {
 
     if(operation > 0 && operation < _NSYSCALL){ // direct syscall mode
         // m = (struct message*)sys_sbrk(current_proc, sizeof(struct message));
-        m = (struct message *)(current_proc->stack_top + 2);
+        m = USER_TMP_MESSAGE(current_proc);
         current_proc->flags |= DIRECT_SYSCALL;
         m->type = operation;
         dest = SYSTEM;

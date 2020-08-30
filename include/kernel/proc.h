@@ -225,9 +225,13 @@ extern struct proc *block_q[2];
 #define IS_ZOMBIE(p)                    (IS_INUSE(p) && (p)->state & STATE_ZOMBIE)
 #define IS_BLOCKED(p)                   (IS_INUSE(p) && (p)->state > 0)
 
+#define USER_ERRNO(p)                   (p->stack_top + 1)
+#define USER_TMP_MESSAGE(p)             ((struct message*)p->stack_top + 2)
+
 #define TASK_NR_TO_SID(tnr)             (tnr <= 0 ? -tnr + 1 : tnr)
 #define SID_TO_TASK_NR(sid)             (-sid + 1)
 #define SET_CALLER(pcurr)   (curr_user_proc = pcurr)
+
 
 // proc_table points at index zero of the process table, so proc_table + INIT
 // simply starts at init
