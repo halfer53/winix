@@ -111,6 +111,91 @@ void syscall_region_begin(){
     ASSERT(who_proc_nr != SYSTEM); 
 }
 
+void set_message_for_syscall(int operation, ptr_t* sp, struct message *m, struct proc* who){
+    switch (operation)
+    {
+    case LSEEK:
+        m->m1_i3 = *(sp + 2);
+    case DUP2:
+    case KILL:
+    case SETPGID:
+        m->m1_i2 = *(sp + 1);
+    case ALARM:
+    case CLOSE:
+    case DUP:
+    case UMASK:
+    case CSLEEP:
+    case GETPGID:
+    case SIGSUSPEND:
+    case SYSCONF:
+    case WINFO:
+    case SBRK:
+        m->m1_i1 = *sp;
+        break;
+
+    case READ:
+    case WRITE:
+    case CREAT:
+    case MKNOD:
+    case CHOWN:
+    case CHMOD:
+    case FSTAT:
+    case GETDENT:
+    case ACCESS:
+    case MKDIR:
+    case STRERROR:
+    case SIGPROCMASK:
+    case WAITPID:
+    case SIGNAL:
+        m->m1_i1 = *sp++;
+        m->m1_p1 = (void*)*sp++;
+        m->m1_i2 = *sp;
+        break;
+        
+    case SIGACTION:
+        m->m1_i1 = *(sp + 3);
+    case EXECVE:
+        m->m1_p3 = (void*)*(sp + 2);
+    case STAT:
+    case LINK:
+        m->m1_p2 = (void *)*(sp + 1);
+    case PIPE:
+    case CHDIR:
+    case UNLINK:
+    case SIGPENDING:
+    case TIMES:
+        m->m1_p1 = (void*)*sp;
+        break;
+    
+    case DPRINTF:
+        m->m1_i1 = *sp++;
+        m->m1_p1 = (void *)*sp++;
+        m->m1_p2 = (void *)*sp;
+        break;
+
+    case OPEN:
+        who->ctx.m.sp++;
+        m->m1_p1 = (void *)*sp++;
+        m->m1_i1 = *sp++;
+        m->m1_i2 = *sp++;
+        break;
+    
+    case FCNTL:
+    case IOCTL:
+        who->ctx.m.sp++;
+        m->m1_i1 = *sp++;
+        m->m1_i2 = *sp++;
+        m->m1_p1 = (void *)get_virtual_addr(sp, who);
+        break;
+
+    // case GETPID:
+    // case VFORK:
+    // case SETSID:
+    default:
+        break;
+    }
+}
+
 void syscall_region_end(){
     get_proc(SYSTEM)->flags &= ~BILLABLE;
     // reset messages

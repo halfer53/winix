@@ -170,7 +170,7 @@ struct block_buffer *get_block_buffer(block_t blocknr, struct device* dev){
     if(tbuf->b_dirt){
         ret = block_io(tbuf, dev, WRITING);
         tbuf->b_dirt = false;
-        KDEBUG(("Sync block %d count %d before returning %d\n", tbuf->b_blocknr, tbuf->b_count, blocknr));
+        // KDEBUG(("Sync block %d count %d before returning %d\n", tbuf->b_blocknr, tbuf->b_count, blocknr));
     }
 
     tbuf->b_blocknr = blocknr;
