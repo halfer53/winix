@@ -44,6 +44,7 @@
 #include <winix/kdebug.h>
 #include <winix/sys_stdio.h>
 #include <winix/wini_ipc.h>
+#include <winix/mm.h>
 #include <kernel/system.h>
 #include <winix/slab.h>
 

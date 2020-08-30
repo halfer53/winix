@@ -18,12 +18,19 @@
 */
 
 int do_sigprocmask(struct proc* who, struct message* m){
-    sigset_t set;
+    sigset_t set, set_bak;
     sigset_t *pset, *pblocked;
     int i;
     int how = m->m1_i1;
+    vptr_t *vir_oldact;
+    ptr_t *oldact;
 
-    m->m1_i1 = who->sig_mask;
+    vir_oldact = m->m1_p1;
+
+    if(!is_vaddr_accessible(vir_oldact, who))
+        return EACCES;
+    oldact = get_physical_addr(vir_oldact, who);
+    *oldact = who->sig_mask;
     
     set = m->m1_i2;
     pset = &set;
