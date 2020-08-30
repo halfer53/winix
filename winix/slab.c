@@ -20,6 +20,7 @@ struct mem_block {
     size_t size;
     struct mem_block *next;
     struct mem_block *prev;
+    void *ra;
     int free;
     void *ptr; // a pointer to the allocated block
     char data[1]; // the pointer where the real data is pointed at. b->data is what kmalloc returns
@@ -35,11 +36,12 @@ static int count = 0;
 #define align4(x) 	(((((x)-1)>>2)<<2)+4)
 
 void printblock(struct mem_block *b) {
-    kprintf("0x%04x size %04d prev 0x%04x next 0x%04x %s\n",
+    kprintf("0x%08x size %4d prev 0x%08x next 0x%08x ra %08x %s\n",
         b, 
         b->size, 
         b->prev, 
         b->next, 
+        b->ra,
         b->free ? "is free" : "in use");
 }
 
@@ -133,7 +135,7 @@ struct mem_block *extend_heap(struct mem_block *first , size_t s)
     return b;
 }
 
-void *kmalloc(size_t size) {
+void *_kmalloc(size_t size, void* ra) {
 
     struct mem_block *b, *first, *b2;
     size_t s;
@@ -164,6 +166,7 @@ void *kmalloc(size_t size) {
             return (NULL);
         base = b;        
     }
+    b->ra = ra;
     b->free = false;
     // printblock(b);
     return (b->data);
@@ -203,7 +206,7 @@ struct mem_block *fusion(struct mem_block *b) {
 
 /* The free */
 /* See free(3) */
-void kfree(void *p)
+void _kfree(void *p, void *ra)
 {
     struct mem_block *b;
     if (valid_addr(p))

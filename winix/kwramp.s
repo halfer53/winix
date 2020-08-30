@@ -7,6 +7,28 @@
 
 .text
 
+.global kmalloc
+kmalloc:
+	subui $sp, $sp, 2
+	lw $1, 2($sp)
+	sw $1, 0($sp)
+	sw $ra, 1($sp)
+	jal _kmalloc
+	lw $ra, 1($sp)
+	addui $sp, $sp, 2
+	jr $ra
+
+.global kfree
+kfree:
+	subui $sp, $sp, 2
+	lw $1, 2($sp)
+	sw $1, 0($sp)
+	sw $ra, 1($sp)
+	jal _kfree
+	lw $ra, 1($sp)
+	addui $sp, $sp, 2
+	jr $ra
+
 ##
 #	void* get_pc(struct proc* who)
 ##
