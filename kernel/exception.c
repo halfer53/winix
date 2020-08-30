@@ -219,6 +219,7 @@ PRIVATE void syscall_handler() {
         case GETPGID:
         case SIGSUSPEND:
         case SYSCONF:
+        case WINFO:
             m->m1_i1 = *sp;
             break;
 
