@@ -270,6 +270,7 @@ PRIVATE void syscall_handler() {
             m->m1_i2 = *sp++;
             break;
         
+        case FCNTL:
         case IOCTL:
             current_proc->ctx.m.sp++;
             m->m1_i1 = *sp++;

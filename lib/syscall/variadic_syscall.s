@@ -13,4 +13,11 @@ ioctl:
     sw $1, 0($sp)
     j wramp_syscall
 
+.global fcntl
+fcntl:
+    subui $sp, $sp, 1
+    addui $1, $0, 44
+    sw $1, 0($sp)
+    j wramp_syscall
+
 
