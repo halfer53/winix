@@ -34,10 +34,7 @@ int main(int argc, char *argv[]){
     }
     
     ret = stat(dest, &dest_buf);
-    if(ret)
-        return ret;
-
-    if(S_ISDIR(dest_buf.st_mode)){
+    if(ret == 0 && S_ISDIR(dest_buf.st_mode)){
         p = dest;
         buf = buffer;
         while(*p){
@@ -73,7 +70,6 @@ int main(int argc, char *argv[]){
     }
     close(src_fd);
     close(dest_fd);
-
     return 0;
 }
 
