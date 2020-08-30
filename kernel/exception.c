@@ -269,6 +269,13 @@ PRIVATE void syscall_handler() {
             m->m1_i1 = *sp++;
             m->m1_i2 = *sp++;
             break;
+        
+        case IOCTL:
+            current_proc->ctx.m.sp++;
+            m->m1_i1 = *sp++;
+            m->m1_i2 = *sp++;
+            m->m1_p1 = (void *)get_virtual_addr(sp, current_proc);
+            break;
 
         // case GETPID:
         // case VFORK:

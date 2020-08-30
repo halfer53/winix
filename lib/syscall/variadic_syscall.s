@@ -6,4 +6,11 @@ open:
     sw $1, 0($sp)
     j wramp_syscall
 
+.global ioctl
+ioctl:
+    subui $sp, $sp, 1
+    addui $1, $0, 45
+    sw $1, 0($sp)
+    j wramp_syscall
+
 
