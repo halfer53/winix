@@ -14,6 +14,8 @@
 
 #include "bash.h"
 
+static char history_file[] = ".bash_history";
+
 // Input buffer & tokeniser
 static char buf[MAX_LINE];
 static pid_t pgid;
@@ -61,8 +63,14 @@ void init_shell(){
 int main() {
     int ret, len;
     char *c;
+    int history_fd;
 
     init_shell();
+    history_fd = open(history_file, O_CREAT | O_RDWR, 0x755);
+    if(history_fd < 0){
+        perror(history_file);
+        return 1;
+    }
 
     while(1) {
         printf("WINIX> ");
@@ -77,6 +85,7 @@ int main() {
         }
 
         len = strlen(buf);
+        write(history_fd, buf, len - 1);
         buf[len - 2] = '\0'; // delete end line
         exec_cmd(buf, NULL);     
     }
