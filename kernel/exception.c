@@ -261,8 +261,15 @@ PRIVATE void syscall_handler() {
             m->m1_i1 = *sp++;
             m->m1_p1 = (void *)*sp++;
             m->m1_p2 = (void *)*sp;
+            break;
 
-        // case FORK:
+        case OPEN:
+            current_proc->ctx.m.sp++;
+            m->m1_p1 = (void *)*sp++;
+            m->m1_i1 = *sp++;
+            m->m1_i2 = *sp++;
+            break;
+
         // case GETPID:
         // case VFORK:
         // case SETSID:

@@ -31,6 +31,7 @@ RexSimulatorGui.exe
 !lib/syscall/wramp_syscall.s
 !lib/syscall/debug.s
 !lib/syscall/vfork.s
+!lib/syscall/variadic_syscall.s
 !lib/syscall/__sigreturn.s
 !winix/kwramp.s
 !winix/limits/limits_head.s
