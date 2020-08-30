@@ -192,6 +192,7 @@ void* get_sigreturn_func_ptr(void);
 #define waitpid(pid, wstatus, option)   (wramp_syscall(WAITPID, pid, wstatus, option))
 #define wait(wstatus)               (waitpid(-1, wstatus, 0))
 #define enable_syscall_tracing()    (wramp_syscall(WINFO, WINFO_TRACE_SYSCALL))
+#define vfork()                     (wramp_syscall(VFORK))
 
 #endif
 

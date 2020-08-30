@@ -1,6 +1,6 @@
 
-.global vfork
-vfork:
+.global __vfork
+__vfork:
 	subui $sp, $sp, 4	# 3 is the function scope stack
 	sw $ra, 3($sp)
 
