@@ -145,7 +145,7 @@ int fcntl(int fd, int cmd, ... /* arg */ );
 pid_t setsid(void);
 int ioctl(int fd, unsigned long request, ...);
 int csleep(int ticks);
-clock_t times(struct tms *_buffer);
+// clock_t times(struct tms *_buffer);
 int enable_syscall_tracing();
 
 #ifndef _SYSTEM
@@ -189,6 +189,8 @@ void* get_sigreturn_func_ptr(void);
 #define sigprocmask(how, set, oldset)   (wramp_syscall(SIGPROCMASK,how, oldset, *set))
 #define sigpending(set)             (wramp_syscall(SIGPENDING, set))
 #define times(buf)                  (wramp_syscall(TIMES, buf))
+#define waitpid(pid, wstatus, option)   (wramp_syscall(WAITPID, pid, wstatus, option))
+#define wait(wstatus)               (waitpid(-1, wstatus, 0))
 
 #endif
 

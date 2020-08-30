@@ -234,6 +234,7 @@ PRIVATE void syscall_handler() {
         case MKDIR:
         case STRERROR:
         case SIGPROCMASK:
+        case WAITPID:
             m->m1_i1 = *sp++;
             m->m1_p1 = (void*)*sp++;
             m->m1_i2 = *sp;

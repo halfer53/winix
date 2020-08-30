@@ -35,7 +35,7 @@
 #define WIFSTOPPED(s)       (_LOW(s) == 0177)            /* stopped */
 #define WSTOPSIG(s)         (_HIGH(s))                    /* stop signal */
 
-pid_t wait(int *wstatus);
+// pid_t wait(int *wstatus);
 // pid_t waitpid(pid_t pid, int *wstatus, int options);
 
 #endif /* _WAIT_H */
