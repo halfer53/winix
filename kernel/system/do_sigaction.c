@@ -22,7 +22,6 @@ int sys_sigaction(struct proc* who, int signum, struct sigaction* act, struct si
     if(signum == SIGKILL || signum == SIGSTOP)
         return EINVAL;
 
-    
     if(act->sa_handler == SIG_IGN){
         if(signum == SIGSEGV)
             return EINVAL;
@@ -71,9 +70,9 @@ int do_sigaction(struct proc *who, struct message *m){
 int do_signal(struct proc* who, struct message *m){
     struct sigaction sa, oldsa;
     int signum = m->m1_i1;
-    void *restorer = m->m1_p2;
+    void *restorer = m->m1_p1;
     
-    sa.sa_handler = (sighandler_t)m->m1_p1;
+    sa.sa_handler = (sighandler_t)m->m1_i2;
     sa.sa_flags = SA_RESETHAND;
     sa.sa_mask = 0xffff;
     if(sys_sigaction(who, signum, &sa, &oldsa, restorer))

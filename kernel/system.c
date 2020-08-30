@@ -55,7 +55,7 @@ void system_main() {
         else
             handler = no_syscall;
         
-        reply = handler(who,mesg);
+        reply = handler(who, mesg);
         
 
         switch(reply){
@@ -216,6 +216,7 @@ void init_syscall_table(){
     SYSCALL_MAP(SETSID, do_setsid);
     SYSCALL_MAP(CSLEEP, do_csleep);
     SYSCALL_MAP(GETPPID, do_getppid);
+    SYSCALL_MAP(SIGNAL, do_signal);
 }
 
 

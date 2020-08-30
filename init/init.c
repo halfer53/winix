@@ -50,6 +50,7 @@ int main(int argc, char **argv){
   char buffer[128];
   char *p = buffer;
 
+  enable_syscall_tracing();
   
 
   ret = mkdir("/dev", 0x755);

@@ -236,6 +236,7 @@ PRIVATE void syscall_handler() {
         case STRERROR:
         case SIGPROCMASK:
         case WAITPID:
+        case SIGNAL:
             m->m1_i1 = *sp++;
             m->m1_p1 = (void*)*sp++;
             m->m1_i2 = *sp;
@@ -257,7 +258,6 @@ PRIVATE void syscall_handler() {
             break;
         
         case DPRINTF:
-        case SIGNAL:
             m->m1_i1 = *sp++;
             m->m1_p1 = (void *)*sp++;
             m->m1_p2 = (void *)*sp;

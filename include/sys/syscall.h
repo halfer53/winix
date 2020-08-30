@@ -197,7 +197,7 @@ void* get_sigreturn_func_ptr(void);
 #define vfork()                     (wramp_syscall(VFORK))
 #define __exit(status)              (wramp_syscall(EXIT, status))
 #define getppid()                   (wramp_syscall(GETPPID))
-// #define signal(signum, handler)     (wramp_syscall(SIGNAL, signum, handler, get_sigreturn_func_ptr()))
+#define signal(signum, handler)     (wramp_syscall(SIGNAL, signum, get_sigreturn_func_ptr(), handler))
 
 #endif
 
