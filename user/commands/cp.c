@@ -22,14 +22,17 @@ int main(int argc, char *argv[]){
         perror(src);
         return 1;
     }
-    dest_fd = open(dest, O_WRONLY | O_CREAT);
+
+    ret = fstat(src_fd, &src_buf);
+    if(ret)
+        return ret;
+
+    dest_fd = open(dest, O_WRONLY | O_CREAT, src_buf.st_mode);
     if(dest_fd < 0){
         perror(dest);
         return 1;
     }
-    ret = fstat(src_fd, &src_buf);
-    if(ret)
-        return ret;
+    
     ret = fstat(dest_fd, &dest_buf);
     if(ret)
         return ret;
@@ -41,6 +44,9 @@ int main(int argc, char *argv[]){
     while((ret = read(src_fd, buffer, BUFFER_SIZ)) > 0){
         ret = write(dest_fd, buffer, ret);
     }
+    close(src_fd);
+    close(dest_fd);
+    
     return 0;
 }
 
