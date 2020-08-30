@@ -233,6 +233,7 @@ PRIVATE void syscall_handler() {
         case ACCESS:
         case MKDIR:
         case STRERROR:
+        case SIGPROCMASK:
             m->m1_i1 = *sp++;
             m->m1_p1 = (void*)*sp++;
             m->m1_i2 = *sp;
@@ -248,6 +249,7 @@ PRIVATE void syscall_handler() {
         case PIPE:
         case CHDIR:
         case UNLINK:
+        case SIGPENDING:
             m->m1_p1 = (void*)*sp;
             break;
         

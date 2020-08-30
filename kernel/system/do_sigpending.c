@@ -15,7 +15,13 @@
  * 
 */
 int do_sigpending(struct proc* who, struct message* m){
-    m->m1_i1 = who->sig_pending;
+    vptr_t *vp = m->m1_p1;
+    ptr_t *p;
+    if(!is_vaddr_accessible(vp, who))
+        return EACCES;
+    p = get_physical_addr(vp, who);
+    *p = who->sig_pending;
+    // m->m1_i1 = who->sig_pending;
     return OK;
 }
 

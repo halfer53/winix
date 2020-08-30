@@ -186,6 +186,7 @@ void* get_sigreturn_func_ptr(void);
 #define sigsuspend(mask)            (wramp_syscall(SIGSUSPEND, *mask))
 #define sysconf(name)               (wramp_syscall(SYSCONF, name))
 #define sigprocmask(how, set, oldset)   (wramp_syscall(SIGPROCMASK,how, oldset, *set))
+#define sigpending(set)             (wramp_syscall(SIGPENDING, set))
 
 #endif
 
