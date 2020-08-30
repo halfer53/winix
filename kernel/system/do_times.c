@@ -21,8 +21,18 @@
 #include <sys/times.h>
 
 int do_times(struct proc *who, struct message *m){
-    m->m2_l1 = get_uptime(); 
-    m->m2_l2 = who->time_used;
-    m->m2_l3 = who->sys_time_used;
-    return OK;
+    vptr_t *vp = m->m1_p1;
+    ptr_t *p;
+    struct tms* buf;
+    if(!is_vaddr_accessible(vp, who))
+        return EACCES;
+    buf = (struct tms*)get_physical_addr(vp, who);
+    buf->tms_utime = who->time_used;
+    buf->tms_stime = who->sys_time_used;
+    buf->tms_cstime = 0;
+    buf->tms_cutime = 0;
+    // m->m2_l1 = get_uptime(); 
+    // m->m2_l2 = who->time_used;
+    // m->m2_l3 = who->sys_time_used;
+    return get_uptime();
 }

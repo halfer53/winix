@@ -250,6 +250,7 @@ PRIVATE void syscall_handler() {
         case CHDIR:
         case UNLINK:
         case SIGPENDING:
+        case TIMES:
             m->m1_p1 = (void*)*sp;
             break;
         
