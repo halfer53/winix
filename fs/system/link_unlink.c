@@ -49,16 +49,12 @@ int sys_unlink(struct proc* who, char *path){
     }
 
     ret = remove_inode_from_dir(who, lastdir, ino, string);
-    if(ret)
-        goto remove_failed;
-
+    put_inode(ino, false);
+    
     if(ino->i_nlinks == 0 && ino->i_count == 0){
         ret = release_inode(ino);
     }
-
-    remove_failed:
-    put_inode(ino, false);
-
+    
     final:
     put_inode(lastdir, false);
     return ret;

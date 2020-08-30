@@ -296,7 +296,7 @@ int release_inode(inode_t *inode){
     if(inode->i_count != 0){
         kprintf("[ERROR]: %d is in use before releasing\n", inum);
     }
-
+    KDEBUG(("releasing inode %d\n", inode->i_num));
 
     for(i = 0; i < NR_TZONES; i++){
         zone_id = inode->i_zone[i];

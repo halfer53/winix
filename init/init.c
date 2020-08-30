@@ -50,9 +50,8 @@ int main(int argc, char **argv){
   char buffer[128];
   char *p = buffer;
 
-  enable_syscall_tracing();
+  unlink("/bin/init");
   
-
   ret = mkdir("/dev", 0x755);
   CHECK_SYSCALL(ret == 0);
 
@@ -80,8 +79,6 @@ int main(int argc, char **argv){
   }
   ret = close(fd);
   CHECK_SYSCALL(ret == 0);
-
-  sync();
 
   pid = vfork();
   if(pid == 0){

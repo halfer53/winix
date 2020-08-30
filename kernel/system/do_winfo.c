@@ -27,7 +27,11 @@ int do_winfo(struct proc *who, struct message *m){
             break;
 
         case WINFO_TRACE_SYSCALL:
-            trace_syscall = ~trace_syscall;
+            trace_syscall = true;
+            break;
+
+        case WINFO_DISABLE_TRACE:
+            trace_syscall = false;
             break;
 
         default:

@@ -168,22 +168,22 @@ int syscall_reply2(int syscall_num, int reply, int dest, struct message* m){
 
 void init_syscall_table(){
 
-    SYSCALL_MAP(TIMES, do_times);      //1
-    SYSCALL_MAP(EXIT, do_exit);        //2
-    SYSCALL_MAP(FORK, do_fork);        //3
-    SYSCALL_MAP(VFORK, do_vfork);      //4
-    SYSCALL_MAP(EXECVE, do_execve);      //5
-    SYSCALL_MAP(BRK, do_brk);          //6
-    SYSCALL_MAP(ALARM, do_alarm);      //7
-    SYSCALL_MAP(SIGACTION, do_sigaction); //8
-    SYSCALL_MAP(SIGRET, do_sigreturn); //9
-    SYSCALL_MAP(WAITPID, do_waitpid);        //10
-    SYSCALL_MAP(KILL, do_kill);        //11
-    SYSCALL_MAP(GETPID, do_getpid);    //12
-    SYSCALL_MAP(WINFO, do_winfo);      //13
-    SYSCALL_MAP(STRERROR, do_winix_strerror);        //14
-    SYSCALL_MAP(DPRINTF, do_winix_dprintf);    //15
-    SYSCALL_MAP(SYSCONF, do_sysconf);  //16
+    SYSCALL_MAP(TIMES, do_times);     
+    SYSCALL_MAP(EXIT, do_exit);    
+    SYSCALL_MAP(FORK, do_fork);    
+    SYSCALL_MAP(VFORK, do_vfork);     
+    SYSCALL_MAP(EXECVE, do_execve);  
+    SYSCALL_MAP(BRK, do_brk);         
+    SYSCALL_MAP(ALARM, do_alarm);   
+    SYSCALL_MAP(SIGACTION, do_sigaction); 
+    SYSCALL_MAP(SIGRET, do_sigreturn); 
+    SYSCALL_MAP(WAITPID, do_waitpid);      
+    SYSCALL_MAP(KILL, do_kill);       
+    SYSCALL_MAP(GETPID, do_getpid);   
+    SYSCALL_MAP(WINFO, do_winfo);     
+    SYSCALL_MAP(STRERROR, do_winix_strerror);      
+    SYSCALL_MAP(DPRINTF, do_winix_dprintf);   
+    SYSCALL_MAP(SYSCONF, do_sysconf);  
     SYSCALL_MAP(SIGSUSPEND, do_sigsuspend);
     SYSCALL_MAP(SIGPENDING, do_sigpending);
     SYSCALL_MAP(SIGPROCMASK, do_sigprocmask);

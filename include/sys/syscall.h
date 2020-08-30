@@ -21,6 +21,7 @@
 #include <sys/dirent.h>
 #include <sys/stat.h>
 #include <signal.h>
+#include <stdio.h>
 
 
 #define _NSYSCALL               50
@@ -86,10 +87,11 @@ function params{\
 }\
 
 
-#define WINFO_PS    1
-#define WINFO_MEM   2
-#define WINFO_SLAB  4
-#define WINFO_TRACE_SYSCALL (8)
+#define WINFO_PS            1
+#define WINFO_MEM           2
+#define WINFO_SLAB          3
+#define WINFO_TRACE_SYSCALL (4)
+#define WINFO_DISABLE_TRACE (5)
 
 #ifndef MAKEFS_STANDALONE
 
@@ -97,17 +99,6 @@ int _syscall(int syscall_num, struct message *m);
 int direct_wramp_syscall(int num, ...);
 
 void exit(int status);
-int sys_ps();
-pid_t fork();
-pid_t vfork();
-int brk(void *addr);
-void *sbrk(int incr);
-void perror(const char *s);
-char* strerror(int usrerrno);
-unsigned int alarm(unsigned int seconds);
-pid_t wait(int *wstatus);
-pid_t waitpid(pid_t pid, int *wstatus, int options);
-pid_t getpid();
 pid_t getppid();
 int kill (pid_t pid, int sig);
 long sysconf(int name);
@@ -147,12 +138,17 @@ int fcntl(int fd, int cmd, ... /* arg */ );
 pid_t setsid(void);
 int ioctl(int fd, unsigned long request, ...);
 int csleep(int ticks);
-// clock_t times(struct tms *_buffer);
+int dprintf(int fd, const char *format, ...);
+int fprintf(FILE *stream, const char *format, ...);
+int printf(const char *format, ...);
 int enable_syscall_tracing();
+int disable_syscall_tracing();
+void* get_sigreturn_func_ptr(void);
+void *sbrk(int increment);
 
+#ifdef __wramp__
 #ifndef _SYSTEM
 
-void* get_sigreturn_func_ptr(void);
 #define sync()                      (wramp_syscall(SYNC))
 #define getdents(fd, dirp, count)   (wramp_syscall(GETDENT, fd, dirp, count))
 #define creat(pathname, mode)       (wramp_syscall(CREAT, mode, pathname))
@@ -194,13 +190,15 @@ void* get_sigreturn_func_ptr(void);
 #define waitpid(pid, wstatus, option)   (wramp_syscall(WAITPID, pid, wstatus, option))
 #define wait(wstatus)               (waitpid(-1, wstatus, 0))
 #define enable_syscall_tracing()    (wramp_syscall(WINFO, WINFO_TRACE_SYSCALL))
+#define disable_syscall_tracing()    (wramp_syscall(WINFO, WINFO_DISABLE_TRACE))
 #define vfork()                     (wramp_syscall(VFORK))
 #define __exit(status)              (wramp_syscall(EXIT, status))
 #define getppid()                   (wramp_syscall(GETPPID))
 #define signal(signum, handler)     (wramp_syscall(SIGNAL, signum, get_sigreturn_func_ptr(), handler))
 
-#endif
+#endif //_SYSTEM
+#endif //__wramp__
 
-#endif
+#endif //MAKEFS_STANDALONE
 
 #endif

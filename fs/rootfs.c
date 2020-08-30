@@ -221,6 +221,7 @@ int root_fs_close (struct device* dev, struct filp *filp){
     filp->filp_count -= 1;
     if(filp->filp_count == 0){
         put_inode(filp->filp_ino, true);
+        // KDEBUG(("closing count %d link %d\n", filp->filp_ino->i_count, filp->filp_ino->i_nlinks));
         if(filp->filp_ino->i_count == 0 && filp->filp_ino->i_nlinks == 0){
             release_inode(filp->filp_ino);
         }
