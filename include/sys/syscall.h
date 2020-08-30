@@ -23,7 +23,7 @@
 #include <signal.h>
 
 
-#define _NSYSCALL               49
+#define _NSYSCALL               50
 /**
  * System Call Numbers
  **/
@@ -76,6 +76,7 @@
 #define SETSID          46
 #define CSLEEP          47
 #define GETPPID         48
+#define SIGNAL          49
 
 #define DECLARE_SYSCALL(function, params, syscall_num, passing_codes)\
 function params{\
@@ -196,6 +197,7 @@ void* get_sigreturn_func_ptr(void);
 #define vfork()                     (wramp_syscall(VFORK))
 #define __exit(status)              (wramp_syscall(EXIT, status))
 #define getppid()                   (wramp_syscall(GETPPID))
+// #define signal(signum, handler)     (wramp_syscall(SIGNAL, signum, handler, get_sigreturn_func_ptr()))
 
 #endif
 

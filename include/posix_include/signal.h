@@ -46,7 +46,7 @@ typedef unsigned int sigset_t;
 typedef void (*sighandler_t)(int);
 
 /* Macros used as function pointers. */
-#define SIG_ERR    ((sighandler_t) 0xffffffff)    /* error return */
+#define SIG_ERR     ((sighandler_t) 0xffff)    /* error return */
 #define SIG_DFL       ((sighandler_t)  0)    /* default signal handling */
 #define SIG_IGN       ((sighandler_t)  1)    /* ignore signal */
 
