@@ -145,6 +145,7 @@ int enable_syscall_tracing();
 int disable_syscall_tracing();
 void* get_sigreturn_func_ptr(void);
 void *sbrk(int increment);
+char *strerror(int err);
 
 #ifdef __wramp__
 #ifndef _SYSTEM
