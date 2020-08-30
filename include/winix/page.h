@@ -19,6 +19,7 @@ int align_page(int len);
 #define align4(x)                       (((((x)-1)>>2)<<2)+4)
 #define ALIGN1K_LB(x)                   ((((((int)x)-1)>>10)<<10))
 #define ALIGN1K(x) 	                    (((((x)-1)>>10)<<10)+1023)
+#define ALIGN1K_HB(x) 	                (((((x)-1)>>10)<<10)+PAGE_LEN)
 
 #define get_physical_addr(va,proc)      (((ptr_t*)(va))+(unsigned int)(proc)->ctx.rbase)
 #define get_virtual_addr(pa,proc)       (((ptr_t*)(pa))-(unsigned int)(proc)->ctx.rbase)
