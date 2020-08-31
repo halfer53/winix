@@ -319,7 +319,14 @@ int do_trace_syscall(int argc, char** argv){
 
 // Print the system wise memory info
 int mem_info(int argc, char** argv){
-    return wramp_syscall(WINFO, WINFO_MEM);
+    struct statfs buf;
+    int ret = wramp_syscall(WINFO, WINFO_MEM);
+    ret = statfs("/", &buf);
+    if(ret)
+        return ret;
+    printf("\nFileSystem status:\n%d blocks in total, %d blocks free\n%d inodes in total, %d inodes free. \n",
+             buf.f_blocks, buf.f_bfree, buf.f_files, buf.f_ffree);
+    return 0;
 }
 
 // current pid

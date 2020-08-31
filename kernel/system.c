@@ -53,6 +53,9 @@ void system_main() {
             handler = syscall_table[mesg->type];
         else
             handler = no_syscall;
+
+        if(!handler)
+            handler = syscall_not_implemented;
         
         reply = handler(who, mesg);
         
@@ -157,6 +160,7 @@ void set_message_for_syscall(int operation, ptr_t* sp, struct message *m, struct
         m->m1_p3 = (void*)*(sp + 2);
     case STAT:
     case LINK:
+    case STATFS:
         m->m1_p2 = (void *)*(sp + 1);
     case PIPE:
     case CHDIR:
@@ -206,6 +210,12 @@ void syscall_region_end(){
 int no_syscall(struct proc* who, struct message* m){
     KDEBUG(("Process \"%s (%d)\" performed unknown system call %d\r\n", 
         who->name, who->pid, m->type));
+    return ENOSYS;
+}
+
+int syscall_not_implemented(struct proc* who, struct message *m){
+    kprintf("ERR: %s[%d] performed syscall %d that is not linked\n", 
+            who->name, who->proc_nr, m->type);
     return ENOSYS;
 }
 
@@ -302,6 +312,7 @@ void init_syscall_table(){
     SYSCALL_MAP(GETPPID, do_getppid);
     SYSCALL_MAP(SIGNAL, do_signal);
     SYSCALL_MAP(SBRK, do_sbrk);  
+    SYSCALL_MAP(STATFS, do_statfs);
 }
 
 

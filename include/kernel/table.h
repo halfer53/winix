@@ -27,6 +27,7 @@ extern syscall_handler_t syscall_table[_NSYSCALL];
 extern char *syscall_str[_NSYSCALL];
 
 int no_syscall(struct proc* who, struct message* m);
+int syscall_not_implemented(struct proc* who, struct message *m);
 int do_times(struct proc* who, struct message* m);
 int do_exit(struct proc* who, struct message* m);
 int do_fork(struct proc* who, struct message* m);
@@ -77,6 +78,7 @@ int do_ioctl(struct proc* who, struct message* m);
 int do_csleep(struct proc* who, struct message* m);
 int do_getppid(struct proc* who, struct message *m);
 int do_signal(struct proc* who, struct message *m);
+int do_statfs(struct proc* who, struct message *msg);
 
 #endif
 

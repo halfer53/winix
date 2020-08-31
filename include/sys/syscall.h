@@ -18,12 +18,13 @@
 
 #include <sys/types.h>
 #include <sys/dirent.h>
+#include <sys/statfs.h>
 #include <sys/stat.h>
 #include <signal.h>
 #include <stdio.h>
 
 
-#define _NSYSCALL               51
+#define _NSYSCALL               52
 /**
  * System Call Numbers
  **/
@@ -78,6 +79,7 @@
 #define GETPPID         48
 #define SIGNAL          49
 #define SBRK            50
+#define STATFS          51
 
 #define DECLARE_SYSCALL(function, params, syscall_num, passing_codes)\
 function params{\
@@ -147,6 +149,7 @@ int disable_syscall_tracing();
 void* get_sigreturn_func_ptr(void);
 void *sbrk(int increment);
 char *strerror(int err);
+int statfs(const char *path, struct statfs *buf);
 
 #ifdef __wramp__
 #ifndef _SYSTEM
@@ -198,6 +201,7 @@ char *strerror(int err);
 #define getppid()                   (wramp_syscall(GETPPID))
 #define signal(signum, handler)     (wramp_syscall(SIGNAL, signum, get_sigreturn_func_ptr(), handler))
 #define sbrk(increment)             (ptr_wramp_syscall(SBRK, increment))
+#define statfs(path, buf)           (wramp_syscall(STATFS, path, buf))
 
 #endif //_SYSTEM
 #endif //__wramp__
