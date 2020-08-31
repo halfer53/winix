@@ -100,12 +100,15 @@ int alloc_block(inode_t *ino, struct device* id){
 int release_block(block_t bnr, struct device* id){
     struct superblock* sb = get_sb(id);
     block_t bmap_nr = sb->s_blockmapnr + (bnr / BLOCK_SIZE);
-    struct block_buffer *bmap;
+    struct block_buffer *bmap, *block;
     int ret;
     if(bnr > sb->s_blockmap_size){
         KDEBUG(("Invalid block id %d", bnr));
         return -1;
     }
+    block = get_block_buffer(bnr, id);
+    memset(block->block, 0, BLOCK_SIZE);
+    put_block_buffer_dirt(block);
 
     bmap = get_block_buffer(bmap_nr, id);
 
@@ -237,7 +240,7 @@ int put_inode(inode_t *inode, bool is_dirty){
     memcpy(buffer->block + inode_block_offset, inode, INODE_DISK_SIZE);
     put_block_buffer_dirt(buffer);
     // KDEBUG(("put inode %d blk %d offset %d\n", inode->i_num, inode->i_ndblock, inode_block_offset));
-    return flush_inode_zones(inode);
+    return OK;
 }
 
 
@@ -288,7 +291,6 @@ int release_inode(inode_t *inode){
     struct device* id = inode->i_dev;
     int inum = inode->i_num;
     struct superblock* sb = get_sb(id);
-    block_t imap_nr = sb->s_inodemapnr + (inum * sb->s_inode_size / BLOCK_SIZE);
     struct block_buffer *imap;
     block_t zone_id;
     int i = 0;
@@ -305,12 +307,14 @@ int release_inode(inode_t *inode){
     for(i = 0; i < NR_TZONES; i++){
         zone_id = inode->i_zone[i];
         if(zone_id > 0){
+            // KDEBUG(("releasing block %d for %d\n", zone_id, inode->i_num));
             release_block(zone_id, id);
             inode->i_zone[i] = 0;
         }
     }
 
-    imap = get_block_buffer(imap_nr, id);
+    // assumping inum is smaller than 1024 for simplicity
+    imap = get_block_buffer(sb->s_inode_tablenr, id);
     bitmap_clear_bit((unsigned int*)imap->block, BLOCK_SIZE_WORD, inum);
     sb->s_inode_inuse -= 1;
     sb->s_free_inodes += 1;

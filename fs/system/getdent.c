@@ -26,6 +26,7 @@ int sys_getdents(struct proc* who, int fd, struct dirent* dirp_dst, unsigned int
     for(; i < NR_TZONES; i++){
         bnr = dirp->i_zone[i];
         if(bnr > 0){
+            // KDEBUG(("getting block %d for inode %d\n", bnr, dirp->i_num));
             buffer = get_block_buffer(bnr, dirp->i_dev);
             endstream = (struct winix_dirent*)&buffer->block[BLOCK_SIZE];
             dirstream = (struct winix_dirent*)buffer->block;

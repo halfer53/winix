@@ -26,6 +26,10 @@ void init_init()
   sigfillset(&mask);
   sigdelset(&mask, SIGSEGV);
   sigprocmask(SIG_SETMASK, &mask, NULL);
+  signal(SIGINT, SIG_IGN);
+  signal(SIGABRT, SIG_IGN);
+  signal(SIGTSTP, SIG_IGN);
+  signal(SIGTERM, SIG_IGN);
 }
 
 char shell_path[] = "/bin/bash";
@@ -44,7 +48,6 @@ int main(int argc, char **argv)
   int i, j, ret, fd, read_nr;
   char buffer[128];
   char *p = buffer;
-
   unlink("/bin/init");
 
   ret = mkdir("/dev", 0x755);
@@ -62,6 +65,16 @@ int main(int argc, char **argv)
   ret = dup(fd);
   ret = dup(fd);
 
+  pid = vfork();
+  if (pid == 0)
+  {
+    i = execv(shell_path, shell_argv);
+    return 1;
+  }
+
+  // delete bash after execving it
+  unlink(shell_path);
+
   fd = open("/foo", O_CREAT | O_RDWR, 0x755);
   CHECK_SYSCALL(fd > 0);
   for (i = 0; i < 6; i++)
@@ -77,15 +90,6 @@ int main(int argc, char **argv)
   ret = close(fd);
   CHECK_SYSCALL(ret == 0);
 
-  pid = vfork();
-  if (pid == 0)
-  {
-    i = execv(shell_path, shell_argv);
-    return 1;
-  }
-
-  // delete bash after execving it
-  unlink(shell_path);
   init_init();
   while (1)
   {
