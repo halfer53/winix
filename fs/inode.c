@@ -151,12 +151,16 @@ int init_inode_non_disk(struct inode* ino, ino_t num, struct device* dev, struct
 void arch_inode(struct inode* ino){
     
 #ifdef __wramp__
-    if(!is_bit_on(inode_arch_map, INODE_ARC_MAP_LEN, ino->i_num)){
+    int result = is_bit_on(inode_arch_map, INODE_ARC_MAP_LEN, ino->i_num);
+    if(!result){
         ino->i_size /= 4;
         bitmap_set_bit(inode_arch_map, INODE_ARC_MAP_LEN, ino->i_num);
     }
-    
+    // if(ino->i_num > 1){
+    //     KDEBUG(("arch %d ret %d %x\n", ino->i_num, result, inode_arch_map[0]));
+    // }
 #endif
+    
 }
 
 void dearch_inode(struct inode* ino){
@@ -183,13 +187,13 @@ int read_inode(int num, struct inode** ret_ino, struct device* id){
 
     buffer = get_block_buffer(blocknr, id);
     memcpy(inode, &buffer->block[offset], INODE_DISK_SIZE);
-    arch_inode(inode);
-
     inode->i_count += 1;
     init_inode_non_disk(inode, num, id, sb);
+    arch_inode(inode);
+
     put_block_buffer(buffer);
     *ret_ino = inode;
-//    KDEBUG(("read inode %d blk %d off %d zone %d\n", num, blocknr, offset, inode->i_zone[0]));
+    // KDEBUG(("read inode %d blk %d off %d zone %d\n", num, blocknr, offset, inode->i_zone[0]));
     return OK;
 }
 
@@ -272,6 +276,7 @@ inode_t* alloc_inode(struct proc* who, struct device* parentdev, struct device* 
     inode->i_count += 1;
     inode->i_ctime = INODE_MOCK_UTC_TIME;
     bitmap_set_bit(inode_arch_map, INODE_ARC_MAP_LEN, inum);
+    // KDEBUG(("alloc ino set bit %d\n", inum));
 
     sb->s_free_inodes -= 1;
     sb->s_inode_inuse += 1;

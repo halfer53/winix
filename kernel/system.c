@@ -30,25 +30,6 @@ bool trace_syscall = false;
 
 PRIVATE ucontext_t recv_ctx;
 
-// void test_slab(){
-//     void *p0 = kmalloc(1);
-//     void *p1 = kmalloc(5);
-//     void *p2 = kmalloc(6);
-//     void *p3 = kmalloc(9);
-//     // void *p4 = kmalloc(1024);
-//     // void *p5 = kmalloc(2048);
-//     // void *p6 = kmalloc(512);
-//     // void *p7 = kmalloc(1024);
-//     void *p8 = kmalloc(512);
-//     // void *p9 = kmalloc(1024);
-//     kfree(p2);
-//     kfree(p3);
-//     kfree(p1);
-//     kfree(p0);
-//     kfree(p8);
-//     kprint_slab();
-// }
-
 /**
  * Entry point for system task.
  **/

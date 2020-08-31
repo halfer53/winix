@@ -30,17 +30,15 @@ void main() {
     *((unsigned int*)1) = 0;
     memset(&BSS_BEGIN, 0, bss_len);
     
-
+    init_bitmap();
     init_dev();
     init_fs();
     init_tty();
     init_all_dev();
     kprintf2("\nWINIX v%d.%d\n", MAJOR_VERSION, MINOR_VERSION);
-
-    init_bitmap();
+    
     init_mem_table();
     init_proc();
-    init_holes();
     init_sched();
     init_syscall_table();
     
