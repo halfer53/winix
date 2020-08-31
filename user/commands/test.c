@@ -45,13 +45,10 @@ CMD_PROTOTYPE(test_signal);
 CMD_PROTOTYPE(test_while);
 
 struct cmd_internal test_commands[] = {
-    { test_malloc, "malloc"}, 
     { test_so, "stack"},
     { test_float, "float"},
     { test_thread, "thread"},
     { test_alarm, "alarm"},
-    { test_eintr, "eintr"},
-    { test_vfork, "vfork"},
     { test_deadlock, "deadlock"},
     { test_ipc, "ipc"},
     { test_signal, "signal"},
@@ -78,7 +75,7 @@ int test_nohandler(int argc, char** argv){
     struct cmd_internal* handler;
     handler = test_commands;
     printf("Available Test Options\n");
-    for( i = 0; i < sizeof(test_commands) / sizeof(struct cmd_internal) - 1; i++){
+    while(handler->name){
         printf(" * %s\n",handler->name);
         handler++;
     }
@@ -91,15 +88,7 @@ int test_while(int argc, char** argv){
     int fd;
     // __set_errno(EBUSY);
     // perror("busy");
-    printf(" foo %d %x %s\n", fd, errno, strerror(errno) );
-    fd = open("food", O_RDWR);
-    printf(" foo %d %x %s\n", fd, errno, strerror(errno) );
-    fd = creat("foo",0x755);
-    printf(" foo %d %d %s\n", fd, errno, strerror(errno) );
-    fd = open("food", O_RDWR);
-    printf(" foo %d %d %s\n", fd, errno, strerror(errno) );
-    fd = creat("foo",0x755);
-    printf(" foo %d %d %s\n", fd, errno, strerror(errno) );
+    while(1);
     return 0;
 }
 
@@ -166,19 +155,6 @@ int test_signal(int argc, char **argv){
     // unblock all pending signals
     printf("signal handler usr1 should be called after this\n");
     sigsuspend(&prevset);
-    return 0;
-}
-
-int test_vfork(int argc, char **argv){
-
-    pid_t pid = vfork();
-    if(pid == 0){
-        signal(SIGINT, SIG_DFL);
-        signal(SIGTERM, SIG_DFL);
-        signal(SIGTSTP, SIG_DFL);
-        exit(0);
-    }
-    printf("parent awaken\n");
     return 0;
 }
 
@@ -264,22 +240,6 @@ void alarm_handler(int signum){
     cont = 0;
 }
 
-/**
-
-    The difference between test_alarm and test_eintr is that
-    test_signal will return to the main shell loop after issuing the
-    alarm syscall, thus it will be blocked until a new character arrives.
-    After one second, when SIGALRM is scheduled to be delivered, and when
-    shell process is still blocked, the kernel will temporarily schedule 
-    the process, and call the signal handler. Upon exiting signal handler,
-    the shell process will be blocked again.
-
-    On the other side, test_alarm() simply calls a while loop to wait for
-    the signal to be delivered, this serves as a simple test case for signal
-    but avoids to test on the edge cases where signal is delivered while 
-    a process is blocked by a system call.
-
-**/
 int test_alarm(int argc, char **argv){
     int i;
     seconds = (argc > 1) ? atoi(argv[1]) : 1;
@@ -295,17 +255,6 @@ int test_alarm(int argc, char **argv){
         i = 10000;
     }
         
-    return 0;
-}
-
-int test_eintr(int argc, char **argv){
-    int i;
-    pid_t pid;
-    pid_t fr;
-    
-    seconds = (argc > 1) ? atoi(argv[1]) : 1;
-    signal(SIGALRM,signal_handler);
-    alarm(seconds);
     return 0;
 }
 
@@ -372,28 +321,9 @@ int test_thread(int argc, char **argv){
         free(threads);
     err:
         if(errno == ENOMEM)
-            perror("malloc failed");
+            perror("malloc");
     return 0;
 }
 
 
-int test_malloc(int argc, char **argv){
-    
-    void *p0 = malloc(512);
-    void *p1 = malloc(512);
-    void *p2 = malloc(1024);
-    void *p3 = malloc(512);
-    void *p4 = malloc(1024);
-    void *p5 = malloc(2048);
-    void *p6 = malloc(512);
-    void *p7 = malloc(1024);
-    void *p8 = malloc(512);
-    void *p9 = malloc(1024);
-    free(p5);
-    free(p6);
-    free(p2);
-    free(p8);
-    print_heap();
-  
-    return 0;
-}
+
