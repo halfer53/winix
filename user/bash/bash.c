@@ -21,7 +21,7 @@ static char buf[MAX_LINE];
 static pid_t pgid;
 
 // Prototypes
-CMD_PROTOTYPE(ps);
+CMD_PROTOTYPE(slab);
 CMD_PROTOTYPE(cmd_kill);
 CMD_PROTOTYPE(print_pid);
 CMD_PROTOTYPE(mem_info);
@@ -39,7 +39,7 @@ struct cmd_internal builtin_commands[] = {
     { printenv, "printenv" },
     { do_trace_syscall, "trace"},
     { cmd_bash, "bash"},
-    { ps, "ps"},
+    { slab, "slab"},
     { cmd_kill, "kill"},
     { print_pid, "pid"},
     { mem_info, "free"},
@@ -336,7 +336,7 @@ int print_pid(int argc, char **argv){
 }
 
 // list all the processes in the system
-int ps(int argc, char **argv){
+int slab(int argc, char **argv){
     return wramp_syscall(WINFO, WINFO_PS);
 }
 

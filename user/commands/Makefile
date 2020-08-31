@@ -1,9 +1,10 @@
 obj-y += ls.o test.o stat.o cat.o echo.o uptime.o wc.o \
-	grep.o cp.o rm.o mv.o touch.o mkdir.o history.o
+	grep.o cp.o rm.o mv.o touch.o mkdir.o history.o \
+	ps.o
 
 srec-y += ls.srec test.srec stat.srec cat.srec echo.srec \
 	uptime.srec wc.srec grep.srec cp.srec rm.srec mv.srec \
-	touch.srec mkdir.srec history.srec
+	touch.srec mkdir.srec history.srec ps.srec
 
 
 ls.srec = ls.o
@@ -20,4 +21,5 @@ mv.srec = mv.o
 touch.srec = touch.o
 mkdir.srec = mkdir.o
 history.srec = history.o
+ps.srec = ps.o
 

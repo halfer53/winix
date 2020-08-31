@@ -13,8 +13,5 @@ int main(int argc, char *argv[]){
 }
 
 
-int foo(){
-    return wramp_syscall(OPEN);
-}
 
 
