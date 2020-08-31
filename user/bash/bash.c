@@ -337,7 +337,7 @@ int print_pid(int argc, char **argv){
 
 // list all the processes in the system
 int slab(int argc, char **argv){
-    return wramp_syscall(WINFO, WINFO_PS);
+    return wramp_syscall(WINFO, WINFO_SLAB);
 }
 
 // start a new bash shell, parent shell is blocked until child shell exits
