@@ -35,12 +35,15 @@ static int count = 0;
 #define SLAB_BLOCK_SIZE 	(sizeof(struct mem_block) - 1)
 #define align4(x) 	(((((x)-1)>>2)<<2)+4)
 
-void printblock(struct mem_block *b) {
-    kprintf("0x%08x size %4d prev 0x%08x next 0x%08x ra %08x %s\n",
-        b, 
+void kprintblock(struct mem_block *b) {
+    char *prev, *next;
+    prev = (char *)(b->prev != NULL ? (char *)b->prev->data : (char *)b->prev);
+    next = (char *)(b->next != NULL ? (char *)b->next->data : (char *)b->next);
+    kprintf2("0x%08x size %4d prev 0x%08x next 0x%08x ra %08x %s\n",
+        b->data,
         b->size, 
-        b->prev, 
-        b->next, 
+        prev, 
+        next, 
         b->ra,
         b->free ? "is free" : "in use");
 }
@@ -51,7 +54,7 @@ void kprint_slab() {
     struct mem_block *b = base;
     
     if(!b){
-        kprintf("slab is empty\n");
+        kprintf2("slab is empty\n");
         return;
     }
     while (b) {
@@ -59,10 +62,10 @@ void kprint_slab() {
             frees += b->size;
         else
             used += b->size;
-        printblock(b);
+        kprintblock(b);
         b = b->prev;
     }
-    kprintf("Total free words: %d\nTotal words in use: %d\n", frees, used);
+    kprintf2("Total free words: %d\nTotal words in use: %d\n", frees, used);
 }
 
 
@@ -88,9 +91,12 @@ struct mem_block* split_block(struct mem_block *b, size_t s)
     new->free = true;
     new->ptr = new->data;
 
+    // KDEBUG(("input %d new 0x%08x size %d orisize %d\n", s, new, new->size, b->size));
     b->size = b->size - s - SLAB_BLOCK_SIZE;
-    // kprintf("new 0x%08x size %d orisize %d\n", new, new->size, b->size);
     b->next = new;
+    if(b == base){
+        base = new;
+    }
     if (new->next)
         new->next->prev = new;
     return new;
@@ -142,6 +148,7 @@ void *_kmalloc(size_t size, void* ra) {
 
     count++;
     s = align4(size);
+    // KDEBUG(("kmalloc begin size %d by %x\n", size, ra));
 
     if (base) {
         // kprintf("finding heap\n");
@@ -168,6 +175,7 @@ void *_kmalloc(size_t size, void* ra) {
     }
     b->ra = ra;
     b->free = false;
+    // KDEBUG(("kmalloc %x size %d to %x\n", b->data, size, ra));
     // printblock(b);
     return (b->data);
 }
@@ -181,26 +189,25 @@ struct mem_block *get_block(void *p){
 bool valid_addr(void *p)
 {
     struct mem_block *b;
-    if (base)
-    {
-        if ( p < base)
-        {
-            return (p == (get_block(p))->ptr);
-        }
-    }
-    // kprintf("invalid addr %x base %x \n",p, base, );
-    // printblock(p);
-    return false;
+    bool result = p && (get_block(p))->ptr == p;
+    return result;
 }
 
 struct mem_block *fusion(struct mem_block *b) {
     struct mem_block* next = b->next;
+    // KDEBUG(("before fusing %x ", b->data));
+    // kprint_slab();
     if (next && next->free && ((int)(b->ptr) + b->size == (int)next)) {
         b->size += SLAB_BLOCK_SIZE + next->size;
         b->next = next->next;
+        if(next == base){
+            base = b;
+        }
         if (b->next)
             b->next->prev = b;
     }
+    // KDEBUG(("after fusing %x ", b->data));
+    // kprint_slab();
     return (b);
 }
 
@@ -223,8 +230,10 @@ void _kfree(void *p, void *ra)
             // kprintf("fuse next %x %x\n", b->next, b);
             fusion(b);
         }
+        // KDEBUG(("kfree %x by %x\n", p, ra));
+        // kprint_slab();
     }else{
-        kwarn("invalid addr %x\n", p);
+        kwarn("invalid addr %x by %x\n", p, ra);
     }
     
     // putchar('\n');

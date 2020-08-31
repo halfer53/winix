@@ -111,10 +111,13 @@ int copy_stirng_array(struct string_array *arr, char* from[], struct proc* who, 
 
 void kfree_string_array(struct string_array* arr){
     int j;
+    char *p;
     for( j = 0; j < arr->size; j++){
-        kfree(arr->array[j]);
+        p = arr->array[j];
+        if(p){
+            kfree(p);
+        }
     }
-
     kfree(arr->array);
 }
 
@@ -231,6 +234,10 @@ int exec_welf(struct proc* who, char* path, char *argv[], char *envp[], bool is_
     sys_close(who, fd);
     who->state = STATE_RUNNABLE;
     enqueue_schedule(who);
+    // KDEBUG(("freeing argv\n"));
+    kfree_string_array(&argv_copy);
+    // KDEBUG(("freeing envp\n"));
+    kfree_string_array(&envp_copy);
     if(!is_new){
         if(parent->state | STATE_VFORKING){
             parent->state &= ~STATE_VFORKING;
