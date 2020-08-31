@@ -119,7 +119,7 @@ pid_t get_next_pid(){
 struct proc* get_proc_by_pid(pid_t pid){
     struct proc* curr;
     if(pid == 0)
-        return get_proc(SYSTEM);
+        return SYSTEM_TASK;
     foreach_proc(curr){
         if(curr->pid == pid){
             return curr;

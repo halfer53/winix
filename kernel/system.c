@@ -97,7 +97,7 @@ void syscall_region_begin(){
     // Bill the user proc's sys_used_time while executing syscall
     // on behalf of the user process
     set_bill_ptr(who);
-    get_proc(SYSTEM)->flags |= BILLABLE;
+    SYSTEM_TASK->flags |= BILLABLE;
     curr_syscall = m.type;
 
     // the following two are defensive statements
@@ -200,7 +200,7 @@ void set_message_for_syscall(int operation, ptr_t* sp, struct message *m, struct
 }
 
 void syscall_region_end(){
-    get_proc(SYSTEM)->flags &= ~BILLABLE;
+    SYSTEM_TASK->flags &= ~BILLABLE;
     // reset messages
     memset(&m, 0, sizeof(struct message));
     who_proc_nr = 0;

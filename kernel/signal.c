@@ -14,6 +14,7 @@
 #include <kernel/kernel.h>
 #include <kernel/exception.h>
 #include <winix/sigsend.h>
+
 /**
     addui $sp, $sp, 1
     syscall
@@ -64,7 +65,7 @@ PRIVATE int build_signal_ctx(struct proc *who, int signum){
 
     frame->signum = signum;
     frame->s_base.operation = WINIX_SENDREC;
-    frame->s_base.dest = SYSTEM_TASK;
+    frame->s_base.dest = SYSTEM;
     frame->s_base.pm = (struct message*)(who->ctx.m.sp - sizeof(struct message));
     frame->s_base.m.m1_i1 = signum;
     frame->s_base.m.type = SIGRET;

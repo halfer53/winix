@@ -270,7 +270,7 @@ int exec_welf(struct proc* who, char* path, char *argv[], char *envp[], bool is_
 //         who->flags |= DISABLE_FIRST_PAGE;
 //     }
 
-//     build_initial_stack(who, NULL, initial_env, get_proc(SYSTEM));
+//     build_initial_stack(who, NULL, initial_env, SYSTEM_TASK);
 
 //     memcpy(who->ctx.rbase + offset, lines , length);
 //     first_word = who->ctx.rbase + offset;

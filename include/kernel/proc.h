@@ -211,6 +211,8 @@ extern struct proc *proc_table;
 extern struct proc *ready_q[NUM_QUEUES][2];
 extern struct proc *block_q[2];
 
+#define SYSTEM_TASK                     (proc_table)
+
 #define IS_PROCN_OK(i)                  ((i)> -NUM_TASKS && (i) <= NUM_PROCS)
 #define IS_PRIORITY_OK(priority)        (0 <= (priority) && (priority) < NUM_QUEUES)
 #define IS_KERNEL_PROC(p)               ((p)->ctx.rbase == NULL)
