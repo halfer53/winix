@@ -39,7 +39,7 @@ void kprintblock(struct mem_block *b) {
     char *prev, *next;
     prev = (char *)(b->prev != NULL ? (char *)b->prev->data : (char *)b->prev);
     next = (char *)(b->next != NULL ? (char *)b->next->data : (char *)b->next);
-    kprintf2("0x%08x size %4d prev 0x%08x next 0x%08x ra %08x %s\n",
+    kprintf("0x%08x size %4d prev 0x%08x next 0x%08x ra %08x %s\n",
         b->data,
         b->size, 
         prev, 
@@ -54,7 +54,7 @@ void kprint_slab() {
     struct mem_block *b = base;
     
     if(!b){
-        kprintf2("slab is empty\n");
+        kprintf("slab is empty\n");
         return;
     }
     while (b) {
@@ -65,7 +65,7 @@ void kprint_slab() {
         kprintblock(b);
         b = b->prev;
     }
-    kprintf2("Total free words: %d\nTotal words in use: %d\n", frees, used);
+    kprintf("Total free words: %d\nTotal words in use: %d\n", frees, used);
 }
 
 

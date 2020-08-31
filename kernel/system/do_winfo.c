@@ -17,9 +17,18 @@
 #include <kernel/kernel.h>
 
 int do_winfo(struct proc *who, struct message *m){
+    struct filp* file = who->fp_filp[STDOUT_FILENO];
+
+    if(!file)
+        return EINVAL;
+
     switch(m->m1_i1){
         case WINFO_PS:
-            kreport_all_procs();
+            kreport_all_procs(file);
+            break;
+
+        case WINFO_SLAB:
+            kprint_slab();
             break;
 
         case WINFO_MEM:

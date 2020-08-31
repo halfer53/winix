@@ -71,21 +71,21 @@ PUBLIC struct proc *curr_user_proc;
  * 
  *
 **/
-void kreport_all_procs() {
+void kreport_all_procs(struct filp* file) {
     struct proc *curr;
-    kprintf("PID PPID RBASE      PC         STACK      HEAP       PROTECTION   FLAG NAME    \n");
+    filp_kprint(file, "PID PPID RBASE      PC         STACK      HEAP       PROTECTION   FLAG NAME    \n");
 
     foreach_proc(curr){
-        kreport_proc(curr);
+        kreport_proc(curr, file);
     }
 }
 
 /**
  * Report the proc's info
 **/
-void kreport_proc(struct proc* curr) {
+void kreport_proc(struct proc* curr, struct filp* file) {
     int ptable_idx = PADDR_TO_PAGED(curr->ctx.rbase)/32;
-    kprintf("%-3d %-4d 0x%08x 0x%08x 0x%08x 0x%08x %d 0x%08x %4x %s\n",
+    filp_kprint(file, "%-3d %-4d 0x%08x 0x%08x 0x%08x 0x%08x %d 0x%08x %4x %s\n",
             curr->pid,
             get_proc(curr->parent)->pid,
             curr->ctx.rbase,
