@@ -94,10 +94,11 @@ function params{\
 #define WINFO_SLAB          3
 #define WINFO_TRACE_SYSCALL (4)
 #define WINFO_DISABLE_TRACE (5)
+#define WINFO_DEBUG_IPC     6
 
 #ifndef MAKEFS_STANDALONE
 
-int _syscall(int syscall_num, struct message *m);
+// int _syscall(int syscall_num, struct message *m);
 int wramp_syscall(int num, ...);
 void *ptr_wramp_syscall(int num, ...);
 

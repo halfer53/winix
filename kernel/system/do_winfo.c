@@ -43,6 +43,10 @@ int do_winfo(struct proc *who, struct message *m){
             trace_syscall = false;
             break;
 
+        case WINFO_DEBUG_IPC:
+            debug_ipc(30);
+            break;
+
         default:
             return EINVAL;
     }

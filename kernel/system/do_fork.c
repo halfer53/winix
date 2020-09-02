@@ -17,6 +17,7 @@
 #include <kernel/kernel.h>
 #include <winix/bitmap.h>
 #include <winix/mm.h>
+#include <winix/list.h>
 /**
  * copy the pcb struct from parent to child
  * @param  parent 
@@ -36,6 +37,7 @@ int copy_pcb(struct proc* parent, struct proc* child){
     child->sig_pending = 0;
     // ptable points to its own protection table
     child->ctx.ptable = child->protection_table;
+    INIT_LIST_HEAD(&child->notify_queue);
 
     for (i = 0; i < OPEN_MAX; ++i) {
         file = child->fp_filp[i];

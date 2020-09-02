@@ -160,7 +160,9 @@ int test_signal(int argc, char **argv){
 
 int test_ipc(int argc, char **argv){
     pid_t pid;
+    int ret;
     struct message m;
+    wramp_syscall(WINFO, WINFO_DEBUG_IPC);
     if(pid = fork()){
         m.type = 100;
         winix_sendrec(pid,&m);
@@ -170,7 +172,10 @@ int test_ipc(int argc, char **argv){
         winix_receive(&m);
         printf("received %d from parent\n",m.type);
         m.reply_res = 200;
-        winix_send(getppid(), &m);
+        ret = winix_send(getppid(), &m);
+        if(ret){
+            perror("send");
+        }
         exit(0);
     }
     return 0;

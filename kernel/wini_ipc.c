@@ -57,11 +57,14 @@ int do_send(int dest, struct message *m) {
             pDest->state &= ~STATE_RECEIVING;
             pDest->ctx.m.regs[0] = m->reply_res;
             enqueue_head(ready_q[pDest->priority], pDest);
+            if(is_debugging_ipc()){
+                KDEBUG(("IPC: msg delivered to %d from %d\n", dest, current_proc->proc_nr));
+            }
         }else {
-            // if(is_debugging_ipc()){
-            //     KDEBUG(("\nIPC: SEND to %d from %d blocked| ",
-            //                 dest, current_proc->proc_nr,m->type));
-            // }
+            if(is_debugging_ipc()){
+                KDEBUG(("IPC: SEND to %d from %d blocked\n",
+                            dest, current_proc->proc_nr,m->type));
+            }
             // Otherwise, block current process and add it to
             // head of sending queue of the destination.
             current_proc->state |= STATE_SENDING;
@@ -69,10 +72,6 @@ int do_send(int dest, struct message *m) {
             pDest->sender_q = current_proc;
         }
 
-        // if(is_debugging_ipc()){
-        //     KDEBUG(("\nIPC: SEND to %d from %d type %d| ",
-        //                 dest, current_proc->proc_nr,m->type));
-        // }
         return OK;
     }
     return ESRCH;
@@ -94,7 +93,9 @@ int do_receive(struct message *m) {
         list_for_each_entry_safe(struct proc, p, bak, &current_proc->notify_queue, notify_queue){
             list_del(&p->notify_queue);
             *m = *(p->message);
-            // KDEBUG(("receive not %d call %d\n", p->proc_nr, m->src));
+            if(is_debugging_ipc()){
+                KDEBUG(("%d notify queue %d type %d\n", current_proc->proc_nr, p->proc_nr, m->type));
+            }
             return OK;
         }
     }
@@ -115,8 +116,8 @@ int do_receive(struct message *m) {
         if(p->state == STATE_RUNNABLE)
             enqueue_head(ready_q[p->priority], p);
         
-        // if(is_debugging_ipc())
-        //     KDEBUG(("\nIPC: %d REC from %d type %d| ",current_proc->proc_nr, m->src ,m->type));
+        if(is_debugging_ipc())
+            KDEBUG(("IPC: %d REC from %d type %d\n",current_proc->proc_nr, m->src ,m->type));
         
         return OK;
     }
@@ -144,8 +145,8 @@ int do_notify(int src, int dest, struct message *m) {
         if(pDest->state & STATE_KILLED)
             return ERR;
 
-        // if(is_debugging_ipc())
-        //     KDEBUG(("\nNOTIFY %d from %d type %d| ",dest, src ,m->type));
+
+        // KDEBUG(("\nNOTIFY %d from %d type %d| ",dest, src ,m->type));
             
         // If destination is waiting, deliver message immediately.
         if (pDest->state == STATE_RECEIVING) {
@@ -169,10 +170,9 @@ int do_notify(int src, int dest, struct message *m) {
             enqueue_head(ready_q[pDest->priority], pDest);
         }else{
             pSrc = get_proc(src);
-            if(IS_KERNEL_PROC(pSrc)){
-                kwarn("Dest %d state %x cannot receive message from kernel\n", pDest->proc_nr, pDest->state);
-                return ERR;
-            }
+
+            kwarn("notify: dest %d state %x cant receive from %d\n", pDest->proc_nr, pDest->state, src);
+            
             pSrc->message = m;
             list_add(&pSrc->notify_queue, &pDest->notify_queue);
             // KDEBUG(("notify from %d to %d, %d\n", pSrc->proc_nr, pDest->proc_nr, list_empty(&pDest->notify_queue)));
