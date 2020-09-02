@@ -57,14 +57,14 @@ int do_send(int dest, struct message *m) {
             pDest->state &= ~STATE_RECEIVING;
             pDest->ctx.m.regs[0] = m->reply_res;
             enqueue_head(ready_q[pDest->priority], pDest);
-            if(is_debugging_ipc()){
-                KDEBUG(("IPC: msg delivered to %d from %d\n", dest, current_proc->proc_nr));
-            }
+            // if(is_debugging_ipc()){
+            //     KDEBUG(("IPC: msg delivered to %d from %d\n", dest, current_proc->proc_nr));
+            // }
         }else {
-            if(is_debugging_ipc()){
-                KDEBUG(("IPC: SEND to %d from %d blocked\n",
-                            dest, current_proc->proc_nr,m->type));
-            }
+            // if(is_debugging_ipc()){
+            //     KDEBUG(("IPC: SEND to %d from %d blocked\n",
+            //                 dest, current_proc->proc_nr,m->type));
+            // }
             // Otherwise, block current process and add it to
             // head of sending queue of the destination.
             current_proc->state |= STATE_SENDING;
@@ -93,9 +93,9 @@ int do_receive(struct message *m) {
         list_for_each_entry_safe(struct proc, p, bak, &current_proc->notify_queue, notify_queue){
             list_del(&p->notify_queue);
             *m = *(p->message);
-            if(is_debugging_ipc()){
-                KDEBUG(("%d notify queue %d type %d\n", current_proc->proc_nr, p->proc_nr, m->type));
-            }
+            // if(is_debugging_ipc()){
+            //     KDEBUG(("%d notify queue %d type %d\n", current_proc->proc_nr, p->proc_nr, m->type));
+            // }
             return OK;
         }
     }
@@ -116,8 +116,8 @@ int do_receive(struct message *m) {
         if(p->state == STATE_RUNNABLE)
             enqueue_head(ready_q[p->priority], p);
         
-        if(is_debugging_ipc())
-            KDEBUG(("IPC: %d REC from %d type %d\n",current_proc->proc_nr, m->src ,m->type));
+        // if(is_debugging_ipc())
+        //     KDEBUG(("IPC: %d REC from %d type %d\n",current_proc->proc_nr, m->src ,m->type));
         
         return OK;
     }
