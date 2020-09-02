@@ -82,6 +82,7 @@ void system_main() {
     free_mem_begin = peek_next_free_page() * PAGE_LEN;
     mem_end = peek_last_free_page() * PAGE_LEN;
     kprintf("\nWINIX v%d.%d\n", MAJOR_VERSION, MINOR_VERSION);
+    kprintf2("\nWINIX v%d.%d\n", MAJOR_VERSION, MINOR_VERSION);
     kprintf("Text Segment: 0x%08x - 0x%08x\n", &TEXT_BEGIN, &TEXT_END);
     kprintf("Data Segment: 0x%08x - 0x%08x\n", &DATA_BEGIN, &DATA_END);
     kprintf("BSS Segment:  0x%08x - 0x%08x\n", &BSS_BEGIN, &BSS_END);
