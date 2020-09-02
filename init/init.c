@@ -48,7 +48,6 @@ int main(int argc, char **argv)
   int i, j, ret, fd, read_nr;
   char buffer[128];
   char *p = buffer;
-  unlink("/bin/init");
 
   ret = mkdir("/dev", 0x755);
   CHECK_SYSCALL(ret == 0);
@@ -73,6 +72,7 @@ int main(int argc, char **argv)
   }
 
   // delete bash after execving it
+  unlink("/bin/init");
   unlink(shell_path);
 
   fd = open("/foo", O_CREAT | O_RDWR, 0x755);

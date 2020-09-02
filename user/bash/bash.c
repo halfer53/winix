@@ -144,8 +144,6 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
             close(sin);
         }
 
-        // enable_syscall_tracing();
-
         for(i = 0; i < cmd->numCommands; i++){
             cmd_start = cmd->cmdStart[i];
             if(search_path(buffer, cmd->argv[cmd_start]) == 0){
@@ -176,22 +174,25 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
                 if(second_pid == 0){ // child, actual command
                     if(cmd->numCommands > 1){
                         
-                        // printf("pipeptr %x ret %d %d\n", pipe_ptr, pipe_ptr[PIPE_READ], pipe_ptr[PIPE_WRITE]);
-                        if((i < cmd->numCommands - 1)){ // not the last command
+                        if((i+1) < cmd->numCommands ){ // not the last command
                             pipe_ptr = &pipe_fds[(i * 2)];
                             dup2(pipe_ptr[PIPE_WRITE], STDOUT_FILENO);
                             close(pipe_ptr[PIPE_WRITE]);
+                            // printf("cmd %d %s pipe  %d %d\n", i, buffer, pipe_ptr[PIPE_READ], pipe_ptr[PIPE_WRITE]);
+
                         }
+                        // printf("cmd %d %s com %d, res %d\n", i, buffer,  cmd->numCommands, (i+1) < cmd->numCommands);
 
                         if(i > 0){ // not the first command, read previous pipe
                             prev_pipe_ptr = &pipe_fds[((i - 1) * 2)];
                             dup2(prev_pipe_ptr[PIPE_READ], STDIN_FILENO);
                             close(prev_pipe_ptr[PIPE_READ]);
+                            // printf("cmd %d %s dup read %d\n", i, buffer, prev_pipe_ptr[PIPE_READ]);
                         }
                     }
                     cmd_start = cmd->cmdStart[i];
                     execv(buffer, &cmd->argv[cmd_start]);
-                    exit(-1);
+                    exit(1);
                 }else{
                     ret = wait(&status);
                     

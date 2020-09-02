@@ -38,6 +38,8 @@ int copy_pcb(struct proc* parent, struct proc* child){
     // ptable points to its own protection table
     child->ctx.ptable = child->protection_table;
     INIT_LIST_HEAD(&child->notify_queue);
+    INIT_LIST_HEAD(&child->pipe_reading_list);
+    INIT_LIST_HEAD(&child->pipe_writing_list);
 
     for (i = 0; i < OPEN_MAX; ++i) {
         file = child->fp_filp[i];

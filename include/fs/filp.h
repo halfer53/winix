@@ -5,7 +5,7 @@
 #include <winix/comm.h>
 #include <winix/type.h>
 
-#define OPEN_MAX  8
+#define OPEN_MAX  16
 
 struct filp_pipe{
     char* data;

@@ -170,8 +170,9 @@ int do_notify(int src, int dest, struct message *m) {
             enqueue_head(ready_q[pDest->priority], pDest);
         }else{
             pSrc = get_proc(src);
-
-            kwarn("notify: dest %d state %x cant receive from %d\n", pDest->proc_nr, pDest->state, src);
+            if(IS_KERNEL_PROC(pSrc)){
+                kwarn("notify: dest %d state %x cant receive from %d\n", pDest->proc_nr, pDest->state, src);
+            }
             
             pSrc->message = m;
             list_add(&pSrc->notify_queue, &pDest->notify_queue);

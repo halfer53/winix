@@ -147,7 +147,6 @@ typedef struct proc {
     /* IPC queue */
     struct proc *sender_q;        	// Head of process queue waiting to send to this process
     struct proc *next_sender;     	// Link to next sender in the queue
-    struct list_head read_queue;
 
     /* Pending messages, used by winix_notify */
     // unsigned int notify_pending;	// bitmap for masking list of pending messages by system proc
@@ -193,7 +192,7 @@ typedef struct proc {
 
     /* File System */
     mode_t umask;
-    filp_t* fp_filp[PROC_FILEP_NR];
+    filp_t* fp_filp[OPEN_MAX];
     inode_t *fp_rootdir;
     inode_t *fp_workdir;
     struct list_head pipe_reading_list;

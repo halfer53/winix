@@ -9,15 +9,7 @@ struct inode* get_free_inode_slot(){
     int i;
     for(i = 0; i < NR_INODES; i++ ){
         rep = &inode_table[i];
-        if(rep->i_num == 0){
-            memset(rep, 0, sizeof(struct inode));
-            return rep;
-        }
-    }
-
-    for(i = 0; i < NR_INODES; i++ ){
-        rep = &inode_table[i];
-        if(rep->i_count <= 0){
+        if(rep->i_num <= 0){
             memset(rep, 0, sizeof(struct inode));
             return rep;
         }
