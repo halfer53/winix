@@ -79,7 +79,12 @@ int _sys_open(struct proc *who, char *path, int flags, mode_t mode, dev_t devid)
         inode = lastdir;
     }
 
+    if(flags & O_TRUNC){
+        truncate_inode(inode);
+    }
+
     init_filp_by_inode(filp, inode);
+    
     if(flags & O_APPEND){
         filp->filp_pos = inode->i_size;
     }

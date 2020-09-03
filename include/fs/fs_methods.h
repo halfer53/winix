@@ -62,6 +62,7 @@ int read_inode(int num, inode_t **inode, struct device*);
 inode_t* get_inode(int num, struct device*);
 int put_inode(inode_t *inode, bool is_dirty);
 inode_t* alloc_inode(struct proc* who, struct device*, struct device*);
+int truncate_inode(inode_t *inode);
 void init_inode();
 int unit_test1();
 

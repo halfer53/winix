@@ -278,6 +278,23 @@ inode_t* alloc_inode(struct proc* who, struct device* parentdev, struct device* 
     return inode;
 }
 
+int truncate_inode(inode_t *inode){
+    struct block_buffer *imap;
+    block_t zone_id;
+    int i = 0;
+    int ret;
+
+    for(i = 0; i < NR_TZONES; i++){
+        zone_id = inode->i_zone[i];
+        if(zone_id > 0){
+            // KDEBUG(("releasing block %d for %d\n", zone_id, inode->i_num));
+            release_block(zone_id, inode->i_dev);
+            inode->i_zone[i] = 0;
+        }
+    }
+    return OK;
+}
+
 
 int release_inode(inode_t *inode){
     struct device* id = inode->i_dev;
