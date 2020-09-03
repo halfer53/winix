@@ -10,7 +10,7 @@
 #define NUM_COLS  (100)
 #define NUM_ROWS  (31)
 #define INITIAL_SNAKE_LEN   (3)
-#define INITAL_FOOD_NUM (5)
+#define INITAL_FOOD_NUM (10)
 #define SNAKE_CHAR  ('x')
 #define FOOD_CHAR   ('o')
 #define GET_SNAKE_HEAD(board)   (list_first_entry(&board->snake, struct point, list))

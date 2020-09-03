@@ -141,8 +141,8 @@ PRIVATE void gpf_handler() {
     // is the current process a valid one?
     ASSERT(IS_PROCN_OK(current_proc->proc_nr));
     
-    if(*current_proc->stack_top != STACK_MAGIC)
-        kprintf("Stack Overflow\n");
+    // if(*current_proc->stack_top != STACK_MAGIC)
+    //     kprintf("Stack Overflow\n");
     
 #ifdef _DEBUG
     kprintf("\nGeneral Protection Fault: \"%s (%d)\" Rbase=0x%x \n",
