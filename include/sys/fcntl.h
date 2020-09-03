@@ -24,17 +24,17 @@
 #define	O_ACCMODE	0x00000003	/* mask for above modes */
 
 /* File status flags for open() and fcntl().  POSIX Table 6-5. */
-#define O_APPEND       02000	/* set append mode */
-#define O_NONBLOCK     04000	/* no delay */
-#define O_REOPEN      010000	
+#define O_APPEND       0x02000	/* set append mode */
+#define O_NONBLOCK     0x04000	/* no delay */
+#define O_REOPEN      0x010000	
 
 
 
 /* Oflag values for open().  POSIX Table 6-4. */
-#define O_CREAT        00100	/* creat file if it doesn't exist */
-#define O_EXCL         00200	/* exclusive use flag */
-#define O_NOCTTY       00400	/* do not assign a controlling terminal */
-#define O_TRUNC        01000	/* truncate flag */
+#define O_CREAT        0x00100	/* creat file if it doesn't exist */
+#define O_EXCL         0x00200	/* exclusive use flag */
+#define O_NOCTTY       0x00400	/* do not assign a controlling terminal */
+#define O_TRUNC        0x01000	/* truncate flag */
 
 #define	O_DSYNC		0x00010000	/* write: I/O data completion */
 #define	O_RSYNC		0x00020000	/* read: I/O completion as for write */
