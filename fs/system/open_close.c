@@ -115,13 +115,19 @@ int sys_open(struct proc *who, char *path, int flags, mode_t mode)
 
 int do_open(struct proc *who, struct message *msg)
 {
-    char *path = (char *)get_physical_addr(msg->m1_p1, who);
+    char *path;
+    if(!is_vaddr_accessible(msg->m1_p1, who))
+        return EFAULT;
+    path = (char *)get_physical_addr(msg->m1_p1, who);
     return sys_open(who, path, msg->m1_i1, msg->m1_i2);
 }
 
 int do_creat(struct proc *who, struct message *msg)
 {
-    char *path = (char *)get_physical_addr(msg->m1_p1, who);
+    char *path;
+    if(!is_vaddr_accessible(msg->m1_p1, who))
+        return EFAULT;
+    path = (char *)get_physical_addr(msg->m1_p1, who);
     return sys_creat(who, path, msg->m1_i1);
 }
 
