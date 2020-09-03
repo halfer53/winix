@@ -80,6 +80,10 @@ int _sys_open(struct proc *who, char *path, int flags, mode_t mode, dev_t devid)
     }
 
     init_filp_by_inode(filp, inode);
+    if(flags & O_APPEND){
+        filp->filp_pos = inode->i_size;
+    }
+    
     filp->filp_mode = inode->i_mode;
     filp->filp_flags = flags;
     who->fp_filp[open_slot] = filp;

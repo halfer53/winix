@@ -35,7 +35,6 @@ int init_filp_by_inode(struct filp* filp, struct inode* inode){
     filp->filp_ino = inode;
     filp->filp_count += 1;
     filp->filp_dev = inode->i_dev;
-    filp->filp_pos = 0;
     return OK;
 }
 
