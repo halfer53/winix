@@ -8,9 +8,6 @@ Winix includes full-featured kernel with process and memory management, in-memor
 
 ## Demo
 
-### Loading Winix
-![load winix](demo/load_winix.gif)
-
 ### Playing Sake
 ![play snake](demo/snake.gif)
 
@@ -37,6 +34,9 @@ Download the latest WINIX binary ```winix.srec``` from [Here](https://github.com
 Run ```Rexsimulator.exe```
 
 Click ```Quick Load```, select ```winix.srec```
+
+### Loading Winix
+![load winix](demo/load_winix.gif)
 
 ## How to Compile
 

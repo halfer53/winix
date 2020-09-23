@@ -18,8 +18,9 @@
 
 void deliver_alarm(int proc_nr, clock_t time){
     struct proc* who = get_proc(proc_nr);
-
-    send_sig(who,SIGALRM);
+    if(who){
+        send_sig(who,SIGALRM);
+    }
 }
 
 // alarm syscall

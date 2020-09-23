@@ -22,6 +22,10 @@
  * 
  * stack_top
  * stack bottom
+ * text
+ * bss
+ * data
+ * heap_top
  * heap_break
  * heap_bottom 
  * 
