@@ -177,6 +177,10 @@ void set_message_for_syscall(int operation, ptr_t* sp, struct message *m, struct
         m->m1_p2 = (void *)*sp;
         break;
 
+    // This is bit hacky, since C89 does not support variadic macro, so we have to 
+    // implement open(2) ioctl(2) and fcntl(2) in assembly to support direct syscall mode
+    // who->ctx.m.sp++ basically clears the first parameter which is the system call number
+    // set by the assembly function in lib/syscall/variadic_syscall.s
     case OPEN:
         who->ctx.m.sp++;
         m->m1_p1 = (void *)*sp++;
