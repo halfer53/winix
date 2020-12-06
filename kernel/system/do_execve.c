@@ -86,7 +86,7 @@ int copy_stirng_array(struct string_array *arr, char* from[], struct proc* who, 
         }
         strsize = strlen(physical);
         strsize = strsize < limit ? strsize : limit;
-        arr->array[i] = (char*)kmalloc(strsize);
+        arr->array[i] = (char*)kmalloc(strsize + 1);
         if(!arr->array[i]){
             ret = ENOMEM;
             goto err_free_all;

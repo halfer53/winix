@@ -210,7 +210,7 @@ int parse_quotes(char *input, char* buffer){
             // buffer
             *out = '\0';
             strcat(out,envval);
-            out += strlen(envval) - 1;
+            out += strlen(envval);
             *in = bak_char;
         }else{
             *out++ = *in++;

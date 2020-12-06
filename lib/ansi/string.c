@@ -44,7 +44,8 @@ int strncmp(const char *s1, const char *s2, size_t size) {
  **/
 int strlen(const char *s) {
     const char* bak = s;
-    while (*s++);
+    for (; *s; ++s)
+                ;
     return s - bak;
 }
 

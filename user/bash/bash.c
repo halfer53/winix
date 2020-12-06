@@ -61,7 +61,7 @@ void init_shell(){
 
 
 int main() {
-    int ret, len;
+    int ret, len, newline_pos;
     char *c;
     int history_fd;
 
@@ -85,8 +85,12 @@ int main() {
         }
 
         len = strlen(buf);
-        write(history_fd, buf, len - 1);
-        buf[len - 2] = '\0'; // delete end line
+        newline_pos = len - 1;
+        
+        write(history_fd, buf, len);
+        if(buf[newline_pos] == '\n'){
+            buf[newline_pos] = '\0';
+        }
         exec_cmd(buf, NULL);     
     }
     return 0;
