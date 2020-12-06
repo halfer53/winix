@@ -28,6 +28,21 @@ Winix includes full-featured kernel with process and memory management, in-memor
 ## Supported Commands
 
  - [cat](user/commands/cat.c)
+ - [cp](user/commands/cp.c)
+ - [echo](user/commands/echo.c)
+ - [grep](user/commands/grep.c)
+ - [history](user/commands/history.c)
+ - [ls](user/commands/ls.c)
+ - [mkdir](user/commands/mkdir.c)
+ - [mv](user/commands/mv.c)
+ - [ps](user/commands/ps.c)
+ - [pwd](user/commands/pwd.c)
+ - [rm](user/commands/rm.c)
+ - [stat](user/commands/stat.c)
+ - [test](user/commands/test.c)
+ - [touch](user/commands/touch.c)
+ - [uptime](user/commands/uptime.c)
+ - [wc](user/commands/wc.c)
 
 ## How to Run
 
