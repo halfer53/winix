@@ -24,7 +24,7 @@
 #include <stdio.h>
 
 
-#define _NSYSCALL               52
+#define _NSYSCALL               53
 /**
  * System Call Numbers
  **/
@@ -80,6 +80,7 @@
 #define SIGNAL          49
 #define SBRK            50
 #define STATFS          51
+#define GETCWD          52
 
 #define DECLARE_SYSCALL(function, params, syscall_num, passing_codes)\
 function params{\
@@ -151,6 +152,7 @@ void* get_sigreturn_func_ptr(void);
 void *sbrk(int increment);
 char *strerror(int err);
 int statfs(const char *path, struct statfs *buf);
+char *getcwd(char *buf, size_t size);
 
 #ifdef __wramp__
 #ifndef _SYSTEM
@@ -203,6 +205,7 @@ int statfs(const char *path, struct statfs *buf);
 #define signal(signum, handler)     (wramp_syscall(SIGNAL, signum, get_sigreturn_func_ptr(), handler))
 #define sbrk(increment)             (ptr_wramp_syscall(SBRK, increment))
 #define statfs(path, buf)           (wramp_syscall(STATFS, path, buf))
+#define getcwd(buf, size)           (ptr_wramp_syscall(GETCWD, size, buf))
 
 #endif //_SYSTEM
 #endif //__wramp__

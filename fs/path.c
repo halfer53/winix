@@ -51,7 +51,7 @@ char *get_name(char *old_name, char string[NAME_MAX]){
 int advance(inode_t *dirp, char string[NAME_MAX]){
     int i,inum  = 0;
     struct block_buffer *buffer;
-    struct winix_dirent* dirstream;
+    struct winix_dirent* dirstream, *dirend;
 
     if(*string == '\0')
         return ERR;
@@ -61,11 +61,67 @@ int advance(inode_t *dirp, char string[NAME_MAX]){
         if(dirp->i_zone[i] > 0 ){
             if((buffer = get_block_buffer(dirp->i_zone[i], dirp->i_dev)) != NULL){
                 dirstream = (struct winix_dirent*)buffer->block;
-                for(; dirstream < (struct winix_dirent* )&buffer->block[BLOCK_SIZE]; dirstream++ ){
+                dirend = (struct winix_dirent* )&buffer->block[BLOCK_SIZE];
+                for(; dirstream < dirend; dirstream++ ){
                     if(char32_strcmp(dirstream->dirent.d_name, string) == 0){
                         inum = dirstream->dirent.d_ino;
                         put_block_buffer(buffer);
                         return inum;
+                    }
+                }
+                put_block_buffer(buffer);
+            }
+        }
+
+    }
+    return ERR;
+}
+
+int get_parent_inode_num(inode_t *dirp){
+    int i,inum  = 0;
+    struct block_buffer *buffer;
+    struct winix_dirent* dirstream, *dirend;
+
+//    KDEBUG(("get_parent_inode %s in inode %d\n", string, dirp->i_num));
+    for(i = 0; i < NR_TZONES; i++){
+        if(dirp->i_zone[i] > 0 ){
+            if((buffer = get_block_buffer(dirp->i_zone[i], dirp->i_dev)) != NULL){
+                dirstream = (struct winix_dirent*)buffer->block;
+                dirend = (struct winix_dirent* )&buffer->block[BLOCK_SIZE];
+                for(; dirstream < dirend; dirstream++ ){
+                    if(char32_strcmp(dirstream->dirent.d_name, dot2) == 0){
+                        inum = dirstream->dirent.d_ino;
+                        put_block_buffer(buffer);
+                        return inum;
+                    }
+                }
+                put_block_buffer(buffer);
+            }
+        }
+
+    }
+    return ERR;
+}
+
+int get_child_inode_name(inode_t* parent, inode_t* child, char string[NAME_MAX]){
+    int len, i;
+    char32_t *p;
+    struct block_buffer *buffer;
+    struct winix_dirent* dirstream, *dirend;
+
+//    KDEBUG(("get_parent_inode %s in inode %d\n", string, dirp->i_num));
+    for(i = 0; i < NR_TZONES; i++){
+        if(parent->i_zone[i] > 0 ){
+            if((buffer = get_block_buffer(parent->i_zone[i], parent->i_dev)) != NULL){
+                dirstream = (struct winix_dirent*)buffer->block;
+                dirend = (struct winix_dirent* )&buffer->block[BLOCK_SIZE];
+                for(; dirstream < dirend; dirstream++ ){
+                    if(dirstream->dirent.d_ino == child->i_num){
+                        p = dirstream->dirent.d_name;
+                        len = char32_strlen(p);
+                        memcpy(string, p, len + 1);
+                        put_block_buffer(buffer);
+                        return len;
                     }
                 }
                 put_block_buffer(buffer);

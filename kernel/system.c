@@ -150,6 +150,7 @@ void set_message_for_syscall(int operation, ptr_t* sp, struct message *m, struct
     case SIGPROCMASK:
     case WAITPID:
     case SIGNAL:
+    case GETCWD:
         m->m1_i1 = *sp++;
         m->m1_p1 = (void*)*sp++;
         m->m1_i2 = *sp;
@@ -318,6 +319,7 @@ void init_syscall_table(){
     SYSCALL_MAP(SIGNAL, do_signal);
     SYSCALL_MAP(SBRK, do_sbrk);  
     SYSCALL_MAP(STATFS, do_statfs);
+    SYSCALL_MAP(GETCWD, do_getcwd);
 }
 
 
