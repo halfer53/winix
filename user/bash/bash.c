@@ -36,7 +36,7 @@ CMD_PROTOTYPE(do_cls);
 
 // Command handling
 struct cmd_internal builtin_commands[] = {
-    { printenv, "printenv" },
+    { printenv, "env" },
     { do_trace_syscall, "trace"},
     { cmd_bash, "bash"},
     { slab, "slab"},
@@ -275,13 +275,13 @@ int cmd_kill(int argc, char **argv){
     pid_t pid;
     int signum = SIGTERM;
     if(argc < 2){
-        printf("kill [-s signum] pid\n");
+        printf("kill <-signal> [pid]\n");
         return -1;
     }
         
-    if(strcmp("-s",argv[1]) == 0){
-        signum = atoi(argv[2]);
-        pid = atoi(argv[3]);
+    if(*argv[1] == '-'){
+        signum = atoi(argv[1] + 1);
+        pid = atoi(argv[2]);
     }else{
         pid = atoi(argv[1]);
     }
