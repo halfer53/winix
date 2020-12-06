@@ -21,7 +21,8 @@ char32_t *char32_strncpy(char32_t *dest, const char *src, size_t n){
 
 int char32_strlen(const char32_t *s) {
     const char32_t* bak = s;
-    while (*s++);
+    for (; *s; ++s)
+            ;
     return (int)(s - bak);
 }
 

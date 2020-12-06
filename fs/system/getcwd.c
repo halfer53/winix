@@ -23,8 +23,9 @@ int sys_getcwd(struct proc* who, char* pathname, int size){
         inum = get_parent_inode_num(inode);
         parent_inode = get_inode(inum, inode->i_dev);
         ret = get_child_inode_name(parent_inode, inode, string);
+        // KDEBUG(("cwd: ret %d curr %d (%s), parent %d\n", ret, inode->i_num, string, inum));
         if(ret == ERR){
-            KDEBUG(("corruptted fs of %d inode\n", inum));
+            // KDEBUG(("corruptted fs of %d inode\n", inum));
             ret = EFAULT;
             goto end;
         }
