@@ -17,6 +17,7 @@ struct boot_image{
     int proc_nr;
     int quantum;
     int priority;
+    int stack_size;
 };
 
 extern struct boot_image boot_table[NUM_TASKS];
@@ -25,6 +26,8 @@ extern char *init_argv[];
 extern char INIT_PATH[];
 extern syscall_handler_t syscall_table[_NSYSCALL];
 extern char *syscall_str[_NSYSCALL];
+
+struct proc *start_kernel_proc(struct boot_image* task);
 
 int no_syscall(struct proc* who, struct message* m);
 int syscall_not_implemented(struct proc* who, struct message *m);

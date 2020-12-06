@@ -13,6 +13,7 @@
 */
 
 #include <kernel/kernel.h>
+#include <kernel/table.h>
 #include <winix/mm.h>
 #include <winix/srec.h>
 #include <winix/welf.h>
@@ -333,17 +334,21 @@ void proc_set_default(struct proc *p) {
  * @param       who 
  * @return      virtual address of the stack
  */
-reg_t* alloc_kstack(struct proc *who){
+reg_t* alloc_kstack(struct proc *who, int size){
     int page_size;
     int index;
     ptr_t *addr, *stack_top;
 
-    stack_top = user_get_free_pages(who, KERNEL_STACK_SIZE, GFP_HIGH);
-    
-    addr = stack_top + KERNEL_STACK_SIZE - 1;
+    if(size % PAGE_LEN == 0){
+        stack_top = get_free_pages(size, GFP_HIGH);
+    }else{
+        stack_top = kmalloc(size);
+    }
+
+    addr = stack_top + size - 1;
     *stack_top = STACK_MAGIC;
     who->stack_top = stack_top;
-    return get_virtual_addr(addr, who);
+    return addr;
 }
 
 /**
@@ -387,22 +392,26 @@ void set_proc(struct proc *p, void (*entry)(), const char *name) {
  * Side Effects:
  *   A proc is removed from the free_proc list, reinitialised, and added to ready_q.
  */
-struct proc *start_kernel_proc(void (*entry)(), int proc_nr, const char *name, int quantum, int priority) {
-    struct proc *who = NULL;
-    
-    if(who = proc_table + proc_nr){
-        proc_set_default(who);
-        who->flags |= IN_USE;
+struct proc *start_kernel_proc(struct boot_image* task) {
+    struct proc *who = proc_table + task->proc_nr;
+    // void (*entry)();
+    // int proc_nr;
+    // const char *name; 
+    // int quantum;
+    // int priority;
 
-        set_proc(who, entry, name);
-        kset_ptable(who);
-        who->quantum = quantum;
-        who->ctx.m.sp = alloc_kstack(who);
-        who->priority = priority;
-        who->pid = 0;
-        who->state = STATE_RUNNABLE;
-        enqueue_schedule(who);
-    }
+    proc_set_default(who);
+    who->flags |= IN_USE;
+
+    set_proc(who, task->entry, task->name);
+    kset_ptable(who);
+    who->quantum = task->quantum;
+    who->ctx.m.sp = alloc_kstack(who, task->stack_size);
+    who->priority = task->priority;
+    who->pid = 0;
+    who->state = STATE_RUNNABLE;
+    enqueue_schedule(who);
+    
     return who;
 }
 
