@@ -65,9 +65,6 @@ void start_init(){
     init->state = STATE_RUNNABLE;
     init->flags = IN_USE;
     init->pid = 1;
-    // if(exec_proc(init,init_code,init_code_length,init_pc,init_offset,"init"))
-    //     PANIC("init");
-    // add_free_mem(init_code, init_code_length);
     ret = exec_welf(init, INIT_PATH, init_argv, initial_env, true);
     if(ret != OK && ret != DONTREPLY){
         kerror("%d\n", ret);
@@ -75,9 +72,3 @@ void start_init(){
     }
 }
 
-// void start_bins(){
-//     struct proc* p;
-//     p = start_user_proc(shell_code,shell_code_length, shell_pc, shell_offset,"shell");
-//     p->parent = INIT;// hack 
-//     add_free_mem(shell_code,shell_code_length);
-// }
