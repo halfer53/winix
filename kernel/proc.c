@@ -40,30 +40,30 @@ PUBLIC struct proc *curr_user_proc;
  * How is the process image aligned?
  *
  * Each process image is aligned as shown below
- *
+ * 
+ *              <- rbase
+ * Inaccessible Page (1024 words) 
+ *              <- stack_top
+ * Stack       (1024 words)
  * Text segment
  * Data segment
  * Bss segment
- * Stack
  * Heap
+ *              <- heap_bottom
  *
- * In the struct proc, rbase points to the beggining of 
- * the process image.
+ * In the struct proc, rbase points to the first page for which 
+ * the process does not have access. This is because NULL points to 0, which is 
+ * effectively the first page of the process image. By setting the first page
+ * as inaccessible, derefercing NULL will triger page fault.
+ * 
+ * Stack_top points to the start of the memory where memory can be accessed
  *
- * stack_top is the physical pointer that points to the 
- * physical address of the beginning of the stack. Stack
- * cannot be extended
- *
- * heap_break points to the physical address of the current
- * user heap break
- *
- * heap_bottom, points to the end of the
- * process image. Heap can be extended by extending heap_bottom.
+ * Heap_bottom points to the end of the process image where memory can be accessed.
+ * Heap can be extended by extending heap_bottom.
  *
  * Note that all those segments are continous, so whenever a fork
  * is called, we can simply compute the number of pages this process
- * is occuping by doing heap_bottom + 1 - rbase. NB heap_bottom points
- * to the end of the page.
+ * is occuping by doing heap_bottom + 1 - stack_top. 
  * 
  */
 
