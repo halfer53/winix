@@ -25,6 +25,10 @@ Winix includes full-featured kernel with process and memory management, in-memor
  - User coroutine with ```ucontext.h``` support
  - Stacktrace dump, segfault analysis
 
+## Supported Commands
+
+ - [cat](user/commands/cat.c)
+
 ## How to Run
 
 Download the latest Rexsimulator from [Here](https://github.com/halfer53/rexsimulator/releases)
