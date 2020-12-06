@@ -140,6 +140,7 @@ void board_init(struct board_struct *board){
     board->ofd = fd2;
     ioctl(fd2, TIOCDISABLEECHO);
     dup2(fd2, STDIN_FILENO);
+    srand(times(NULL));
     disable_cursor();
 }
 

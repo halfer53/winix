@@ -153,6 +153,7 @@ void *sbrk(int increment);
 char *strerror(int err);
 int statfs(const char *path, struct statfs *buf);
 char *getcwd(char *buf, size_t size);
+clock_t times(struct tms *buf);
 
 #ifdef __wramp__
 #ifndef _SYSTEM
