@@ -152,12 +152,7 @@ int do_notify(int src, int dest, struct message *m) {
         if (pDest->state == STATE_RECEIVING) {
 
             if(pDest->flags & DIRECT_SYSCALL){
-                if(m->reply_res < 0){
-                    reply = -(m->reply_res);
-                    *(USER_ERRNO(pDest)) = reply;
-                    // KDEBUG(("save %d to %s %x\n", reply, pDest->name,  get_virtual_addr((pDest->stack_top + 1), pDest)));
-                    m->reply_res = -1;
-                }
+                set_reply_res_errno(pDest, m);
                 pDest->flags &= ~DIRECT_SYSCALL;
             }
             // Copy message to destination

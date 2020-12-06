@@ -36,6 +36,7 @@ void init_syscall_table();
 bool is_in_syscall(struct proc* who);
 ptr_t* sys_sbrk(struct proc *who, int size);
 void set_message_for_syscall(int operation, ptr_t* sp, struct message *m, struct proc* who);
+void set_reply_res_errno(struct proc* who, struct message *m);
 
 int sys_kill(struct proc* who, pid_t pid, int signum);
 

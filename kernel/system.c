@@ -205,6 +205,24 @@ void set_message_for_syscall(int operation, ptr_t* sp, struct message *m, struct
     }
 }
 
+void set_reply_res_errno(struct proc* who, struct message *m){
+    int reply;
+    if(m->reply_res < 0){
+        reply = -(m->reply_res);
+        *(USER_ERRNO(who)) = reply;
+        switch (m->type)
+        {
+        case GETCWD:
+            m->reply_res = 0;
+            break;
+        
+        default:
+            m->reply_res = -1;
+            break;
+        }        
+    }
+}
+
 void syscall_region_end(){
     SYSTEM_TASK->flags &= ~BILLABLE;
     // reset messages
