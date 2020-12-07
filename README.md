@@ -43,6 +43,8 @@ Winix includes full-featured kernel with process and memory management, in-memor
  - [touch](user/commands/touch.c)
  - [uptime](user/commands/uptime.c)
  - [wc](user/commands/wc.c)
+ - [df](user/commands/df.c)
+ - [du](user/commands/du.c)
 
 ## How to Run
 
