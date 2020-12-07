@@ -6,31 +6,50 @@
 #define PATH_LEN    (64)
 char slash[] = "/";
 
-int count_dir_size(DIR* directory, char *parent_name){
+void reset_path(char *dir_path, char *path){
+    strncpy(path, dir_path, PATH_LEN);
+    strncat(path, slash, PATH_LEN);
+}
+
+size_t count_dir_size(char *dir_path){
     struct dirent* dir;
-    int count = 0;
-    char *path = malloc(PATH_LEN);
-    strncpy(path, parent_name, PATH_LEN);
-    while((dir = readdir(directory))){
+    struct stat statbuf;
+    size_t count = 0, ret;
+    char *path;
+    DIR* directory = opendir(dir_path);
+    if(!directory){
+        fprintf(stderr, "err:%s\n", dir_path);
+        return 0;
+    }
+    path = malloc(PATH_LEN);
+    reset_path(dir_path, path);
+    // printf("opening %s fd %d\n", dir_path, directory->fd);
+    while((dir = readdir(directory)) != NULL){
         if(*dir->d_name == '.')
             continue;
+        strncat(path, (const char*)dir->d_name, PATH_LEN);
         if(dir->d_type == DT_DIR){
-            
-            DIR* subdir = opendir(dir->d_name);
-            count += count_dir_size(subdir, parent_name);
+            count += count_dir_size(path);
+        }else{
+            ret = stat(path, &statbuf);
+            // printf("stat %s %d size %d\n", dir->d_name, ret, statbuf.st_size);
+            count += (size_t)statbuf.st_size;
         }
+        reset_path(dir_path, path);
     }
+    
+    printf("%-8d %s\n", count, dir_path);
+    closedir(directory);
+    free(path);
+    return count;
 }
 
 int main(int argc, char **argv){
-    DIR* directory;
-    struct dirent* dir;
     char *curr_dir = ".";
     if(argc > 1)
         curr_dir = argv[1];
 
-    directory = opendir(curr_dir);
-    if(!directory)
-        return -1;
+    count_dir_size(curr_dir);
+    return 0;
 }
 
