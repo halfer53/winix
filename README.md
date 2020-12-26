@@ -27,6 +27,7 @@ Winix includes full-featured kernel with process and memory management, in-memor
 
 ## Supported Commands
 
+ - [snake](user/commands/snake.c)
  - [cat](user/commands/cat.c)
  - [cp](user/commands/cp.c)
  - [echo](user/commands/echo.c)
