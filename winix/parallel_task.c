@@ -11,8 +11,9 @@
  * @create date 2016-09-19
  * 
 */
-
+#include <kernel/kernel.h>
 #include <winix/rex.h>
+
 // TODO: remove rex.h include
 
 /**
@@ -47,12 +48,16 @@ void printDec(int n) {
  * Main entry point.
  **/
 void parallel_main() {
+    int switch_val, n;
     RexParallel->Ctrl = 1; // HEX-SSD decoding on
-    
+
     while(1) {
-        
         // Load switch value
-        int n = 100 / RexParallel->Switches;
+        switch_val = RexParallel->Switches;
+        if(!switch_val)
+            n = 0;
+        else
+            n = 100 / switch_val;
         
         // Change display mode?
         switch(RexParallel->Buttons) {
@@ -65,7 +70,8 @@ void parallel_main() {
                 break;
             
             case 3:
-                exit(0);
+                // kprintf("exit\n");
+                current_proc = NULL;
                 return; // exit
         }
         

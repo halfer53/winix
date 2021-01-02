@@ -34,9 +34,9 @@
 
 // Kernel Process
 // Plz do make sure IDLE has the lowest process number
-#define NUM_TASKS                   2
-#define IDLE                    	-1
-#define CLOCK                    	-2
+#define NUM_TASKS                   3
+#define IDLE                    	-2
+#define PARALLEL                    -1
 #define SYSTEM                      0
 
 // Number of User procs

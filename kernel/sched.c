@@ -19,7 +19,7 @@ PRIVATE struct timer sched_timer;
 
 void init_sched(){
     memset(&sched_timer, 0, sizeof(struct timer));
-    new_timer(CLOCK, &sched_timer, REBALANCE_TIMEOUT, rebalance_queues);
+    new_timer(SYSTEM_TASK, &sched_timer, REBALANCE_TIMEOUT, rebalance_queues);
 }
 
 /**
@@ -35,7 +35,7 @@ void rebalance_queues(int proc_nr, clock_t time){
         curr->priority = MAX_PRIORITY;
     }
 
-    new_timer(CLOCK, &sched_timer, REBALANCE_TIMEOUT, rebalance_queues);
+    new_timer(SYSTEM_TASK, &sched_timer, REBALANCE_TIMEOUT, rebalance_queues);
 }
 
 /**

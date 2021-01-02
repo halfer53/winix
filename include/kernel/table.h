@@ -9,6 +9,8 @@
 #include <kernel/system.h>
 #include <kernel/idle.h>
 
+void parallel_main();
+
 #define INITILISE_ARRAY(n,val)  
 
 struct boot_image{
