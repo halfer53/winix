@@ -103,7 +103,7 @@ int flush_inode_zones(struct inode *ino){
             for(j = 0; j < LRU_LEN; j++){
                 tbuf = &buf_table[j];
                 if(tbuf->b_blocknr == zid && tbuf->b_dirt){
-                    block_io(tbuf, ino->i_dev, WRITING);
+                    block_io(tbuf, tbuf->b_dev, WRITING);
                     tbuf->b_dirt = false;
                 }
             }
@@ -168,13 +168,13 @@ struct block_buffer *get_block_buffer(block_t blocknr, struct device* dev){
     }
 
     if(tbuf->b_dirt){
-        ret = block_io(tbuf, dev, WRITING);
+        ret = block_io(tbuf, tbuf->b_dev, WRITING);
         tbuf->b_dirt = false;
         // KDEBUG(("Sync block %d count %d before returning %d\n", tbuf->b_blocknr, tbuf->b_count, blocknr));
     }
 
     tbuf->b_blocknr = blocknr;
-    if ((ret = block_io(tbuf, dev, READING)) != BLOCK_SIZE) {
+    if ((ret = block_io(tbuf, tbuf->b_dev, READING)) != BLOCK_SIZE) {
         KDEBUG(("dev io return %d for %d\n", ret, tbuf->b_blocknr));
         enqueue_buf(tbuf);
         return NULL;
