@@ -18,6 +18,7 @@ static char history_file[] = ".bash_history";
 
 // Input buffer & tokeniser
 static char buf[MAX_LINE];
+static char prev_cmd[MAX_LINE];
 static pid_t pgid;
 
 // Prototypes
@@ -86,12 +87,14 @@ int main() {
 
         len = strlen(buf);
         newline_pos = len - 1;
-        
-        write(history_fd, buf, len);
+        strncpy(prev_cmd, buf, MAX_LINE);
         if(buf[newline_pos] == '\n'){
             buf[newline_pos] = '\0';
         }
-        exec_cmd(buf, NULL);     
+
+        exec_cmd(buf, NULL);
+
+        write(history_fd, prev_cmd, len);
     }
     return 0;
 }

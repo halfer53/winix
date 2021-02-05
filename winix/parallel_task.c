@@ -50,7 +50,7 @@ void printDec(int n) {
 void parallel_main() {
     int switch_val, n;
     RexParallel->Ctrl = 1; // HEX-SSD decoding on
-
+ 
     while(1) {
         // Load switch value
         switch_val = RexParallel->Switches;
