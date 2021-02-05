@@ -174,18 +174,17 @@ struct block_buffer *get_block_buffer(block_t blocknr, struct device* dev){
     }
 
     tbuf->b_blocknr = blocknr;
+    tbuf->b_dev = dev;
+
     if ((ret = block_io(tbuf, tbuf->b_dev, READING)) != BLOCK_SIZE) {
         KDEBUG(("dev io return %d for %d\n", ret, tbuf->b_blocknr));
         enqueue_buf(tbuf);
         return NULL;
     }
 
-    tbuf->b_blocknr = blocknr;
     tbuf->next = tbuf->prev = NULL;
     tbuf->b_dirt = 0;
-    tbuf->b_dev = dev;
     tbuf->b_count = 1;
-//    KDEBUG(("Buffer %d get\n", blocknr));
     return tbuf;
 }
 
