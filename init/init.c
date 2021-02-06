@@ -30,7 +30,7 @@ void failed_init(int line)
   exit(1);
 }
 
-void init_init()
+void block_signals()
 {
   sigset_t mask;
   sigfillset(&mask);
@@ -92,15 +92,30 @@ void write_dummy_file(){
   CHECK_SYSCALL(ret == 0);
 }
 
+void start_init_routine(){
+  pid_t pid;
+  int status;
+  block_signals();
+  while (1)
+  {
+    pid = wait(&status);
+    if (pid == -1)
+    {
+      break;
+    }
+    // printf("INIT: child %d exit status %d\n", pid, WEXITSTATUS(status));
+  }
+
+  printf("Shutting down...\n");
+}
+
 int main(int argc, char **argv)
 {
   struct message m;
   struct stat statbuf;
   pid_t pid;
-  int status;
   int i, ret, fd, read_nr;
 
-  init_init();
   init_dev();
   init_tty();
   
@@ -116,17 +131,6 @@ int main(int argc, char **argv)
   unlink(shell_path);
   write_dummy_file();
   
-  while (1)
-  {
-    pid = wait(&status);
-    if (pid == -1)
-    {
-      break;
-    }
-    // printf("INIT: child %d exit status %d\n", pid, WEXITSTATUS(status));
-  }
-
-  printf("Shutting down...\n");
-  // winix_receive(&m);
+  start_init_routine();
   return 0;
 }
