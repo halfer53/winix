@@ -20,6 +20,8 @@ static char history_file[] = ".bash_history";
 static char buf[MAX_LINE];
 static char prev_cmd[MAX_LINE];
 static pid_t pgid;
+static pid_t last_pgid;
+static pid_t last_stopped_pgid;
 
 // Prototypes
 CMD_PROTOTYPE(slab);
@@ -33,6 +35,7 @@ CMD_PROTOTYPE(printenv);
 CMD_PROTOTYPE(cmd_bash);
 CMD_PROTOTYPE(do_cd);
 CMD_PROTOTYPE(do_cls);
+CMD_PROTOTYPE(do_fg);
 
 
 // Command handling
@@ -48,6 +51,7 @@ struct cmd_internal builtin_commands[] = {
     { help, "help"},
     { do_cd, "cd"},
     { do_cls, "clear"},
+    { do_fg, "fg"},
     { 0, NULL}
 };
 
@@ -117,7 +121,7 @@ int _exec_cmd_pipe(struct cmdLine *cmd, int cmd1_idx, int cmd2_idx, int prev_fd,
  **/
 int _exec_cmd(char *line, struct cmdLine *cmd) {
     char buffer[128];
-    int status;
+    int status, options;
     pid_t pid, second_pid;
     sigset_t sigmask = 0;
     int saved_stdin, saved_stdout;
@@ -131,7 +135,7 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
     pid = vfork();
     
     if(!pid){
-        pid_t child_pgid;
+        
         int i, ret, cmd_start;
         int exit_code = 0;
         int pipe_fds[10];
@@ -141,8 +145,8 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
         signal(SIGTERM, SIG_DFL);
         signal(SIGTSTP, SIG_DFL);
         setpgid(0, 0);
-        child_pgid = getpgid(0);
-        ioctl(STDIN_FILENO, TIOCSPGRP, child_pgid);
+        last_pgid = getpgid(0);
+        ioctl(STDIN_FILENO, TIOCSPGRP, last_pgid);
 
         if(cmd->infile){ //if redirecting input
             // saved_stdin = dup(STDIN_FILENO); //backup stdin
@@ -222,6 +226,12 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
         //     close(saved_stdin);
         // }
         exit(exit_code);
+    }else{
+        options = WNOHANG | WUNTRACED;
+        pid = waitpid(-1, &status, options);
+        if(WIFSTOPPED(status)){
+            last_stopped_pgid = last_pgid;
+        }
     }
 
     ioctl(STDIN_FILENO, TIOCENABLEECHO);
@@ -368,6 +378,19 @@ int cmd_exit(int argc, char **argv){
     // printf("Child %d [parent %d] exits\n",getpid(),getppid());
     exit(status);
     return 1;
+}
+
+int do_fg(int argc, char **argv){
+    int status;
+    int ret;
+
+    ioctl(0, TIOCSPGRP, &last_stopped_pgid);
+    ret =  kill(-last_stopped_pgid, SIGCONT);
+    if(ret == 0){
+        ret = waitpid(-last_stopped_pgid, &status, WUNTRACED);
+    }
+    ioctl(STDIN_FILENO, TIOCSPGRP, pgid);
+    return ret;
 }
 
 

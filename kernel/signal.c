@@ -98,7 +98,9 @@ PRIVATE int sys_sig_handler(struct proc *who, int signum){
             case SIGCONT:
                 if(who->state & STATE_STOPPED){
                     who->state &= ~STATE_STOPPED;
-                    enqueue_schedule(who);
+                    if(!who->state){
+                        enqueue_schedule(who);
+                    }
                 }
                 break;
 

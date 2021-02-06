@@ -154,6 +154,7 @@ char *strerror(int err);
 int statfs(const char *path, struct statfs *buf);
 char *getcwd(char *buf, size_t size);
 clock_t times(struct tms *buf);
+pid_t waitpid(pid_t pid, int *status, int options);
 
 #ifdef __wramp__
 #ifndef _SYSTEM
