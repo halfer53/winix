@@ -113,7 +113,7 @@ static int retrieve_block(struct block_buffer *buf, struct device *dev, block_t 
 }
 
 static int flush_block(struct block_buffer *buf){
-    return 0;
+    return BLOCK_SIZE;
 }
 
 static int release_block(struct block_buffer *buf){

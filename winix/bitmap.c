@@ -18,9 +18,9 @@ PRIVATE unsigned int mask[BITMASK_NR];
 
 void init_bitmap(){
     int i;
-    mask[BITMASK_NR-1] = 1;
-    for(i=BITMASK_NR-2;i>=0;i--){
-        mask[i] = mask[i+1] << 1;
+    mask[0] = 0x80000000;
+    for(i=1; i < BITMASK_NR; i++){
+        mask[i] = mask[i-1] >> 1;
     }
 }
 
