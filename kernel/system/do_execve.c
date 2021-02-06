@@ -192,6 +192,7 @@ int exec_welf(struct proc* who, char* path, char *argv[], char *envp[], bool is_
     // KDEBUG(("copy argv string %d\n", argv_copy.size));
     copy_stirng_array(&envp_copy, envp, who, is_new);
     // KDEBUG(("copy env string %d\n", envp_copy.size));
+    
 
     if(!is_new){
         who->sig_pending = 0;
@@ -204,6 +205,7 @@ int exec_welf(struct proc* who, char* path, char *argv[], char *envp[], bool is_
             release_proc_mem(who);
         }
     }
+    who->thread_parent = 0;
 
     fd = sys_open(who, path, O_RDONLY | O_DIRECT, 0);
     if(fd < 0)

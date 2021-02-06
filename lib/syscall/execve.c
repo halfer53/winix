@@ -15,6 +15,8 @@ extern char **_environ;
 
 int execv(const char *path, char *const argv[]){
     init_environ();
-    return execve(path, argv, _environ);
+    execve(path, argv, _environ);
+    exit(1);
+    return 1;
 }
 
