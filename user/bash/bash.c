@@ -180,7 +180,7 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
                     close(sout);
                 }
 
-                second_pid = tfork();
+                second_pid = vfork();
 
                 if(second_pid == 0){ // child, actual command
                     if(cmd->numCommands > 1){
