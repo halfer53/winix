@@ -19,6 +19,17 @@
 #include <winix/sigsend.h>
 
 
+#define CTRL_A  (1)
+#define CTRL_E  (5)
+#define CTRL_B  (2)
+#define CTRL_F  (6)
+#define CTRL_P  (16)
+#define CTRL_N  (14)
+#define CTRL_C  (3)
+#define CTRL_Z  (26)
+#define BEEP    (7)
+#define BACKSPACE   (8)
+
 struct tty_state tty1_state, tty2_state;
 struct device _tty_dev, _tty2_dev;
 struct filp *tty1_filp = NULL, *tty2_filp = NULL;
@@ -70,14 +81,14 @@ int kgetc(struct proc* who) {
 }
 
 void tty_exception_handler(RexSp_t* rex, struct tty_state* state){
-    int val, stat;
+    int val, stat, ret;
     struct message* msg;
     stat = rex->Stat;
     
     if(stat & 1){
         val = rex->Rx;
 
-        if (val == 8) { // backspace
+        if (val == BACKSPACE) { // backspace
             if(state->bptr > state->buffer){
                 if(state->bptr == state->read_ptr){
                     state->read_ptr--;
@@ -88,15 +99,15 @@ void tty_exception_handler(RexSp_t* rex, struct tty_state* state){
             goto end;
         }
 
-        if(val == 3 || val == 26){ // Control C or Z
+        if(val == CTRL_C || val == CTRL_Z){ // Control C or Z
             int signal;
             switch (val)
             {
-            case 3:
+            case CTRL_C:
                 signal = SIGINT;
                 break;
 
-            case 26:
+            case CTRL_Z:
                 signal = SIGSTOP;
                 break;
             
@@ -104,11 +115,14 @@ void tty_exception_handler(RexSp_t* rex, struct tty_state* state){
                 break;
             }
             if(state->controlling_session > 0 && state->foreground_group > 0){
-                int ret;
                 ret = sys_kill(SYSTEM_TASK, -(state->foreground_group), signal);
                 // KDEBUG(("C ret %d curr %p %d state %x\n", ret,current_proc,  current_proc->proc_nr, current_proc->state));
             }
             goto end;
+        }
+
+        if(val == CTRL_P || val == CTRL_N){ // control p or n, to navigate through history
+
         }
 
         // reset ring buffer if buffer end is reached
@@ -127,7 +141,7 @@ void tty_exception_handler(RexSp_t* rex, struct tty_state* state){
                     // KDEBUG(("received %d\n", val));
                 }
             }else{
-                __kputc(rex, 7);            // beep
+                __kputc(rex, BEEP);            // beep
             }
         }
 
