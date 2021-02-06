@@ -132,7 +132,7 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
     if(*line == '#')
         return 0;
 
-    pid = vfork();
+    pid = tfork();
     
     if(!pid){
         
@@ -180,7 +180,7 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
                     close(sout);
                 }
 
-                second_pid = vfork();
+                second_pid = tfork();
 
                 if(second_pid == 0){ // child, actual command
                     if(cmd->numCommands > 1){

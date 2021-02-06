@@ -231,11 +231,17 @@ void* dup_vm(struct proc* parent, struct proc* child){
  * @param who 
  */
 void release_proc_mem(struct proc *who){
-    int page_len = (int)(who->heap_bottom + 1 - who->mem_start) / PAGE_LEN;
-    int start_page = (int)who->mem_start / PAGE_LEN;
-    bitmap_clear_nbits(mem_map, MEM_MAP_LEN, start_page, page_len );
-    // bitmap_xor(mem_map, who->ctx.ptable, MEM_MAP_LEN);
-    bitmap_clear(who->ctx.ptable, PTABLE_LEN);
+
+    if(who->thread_parent > 0){ // thread, in this case, we only release the stack
+        user_release_pages(who, who->stack_top, 1);
+    }else{
+        int page_len = (int)(who->heap_bottom + 1 - who->mem_start) / PAGE_LEN;
+        int start_page = (int)who->mem_start / PAGE_LEN;
+        bitmap_clear_nbits(mem_map, MEM_MAP_LEN, start_page, page_len );
+        // bitmap_xor(mem_map, who->ctx.ptable, MEM_MAP_LEN);
+        bitmap_clear(who->ctx.ptable, PTABLE_LEN);
+    }
+    
 }
 
 void kreport_ptable(struct proc* who){

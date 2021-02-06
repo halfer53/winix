@@ -222,8 +222,6 @@ void exit_proc(struct proc *who, int status, int signum){
         parent->state &= ~STATE_VFORKING;
         mesg->type = VFORK;
         syscall_reply2(VFORK, who->pid, parent->proc_nr, mesg);
-    }else if(who->thread_parent > 0){ // thread, in this case, we only release the stack
-        user_release_pages(who, who->stack_top, 1);
     }else{
         release_proc_mem(who);
     }
