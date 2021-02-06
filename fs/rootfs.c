@@ -4,6 +4,8 @@
 
 #include "fs.h"
 
+#define DIRECT_BLOCK_IO 
+
 const char* DEVICE_NAME = "sda";
 const char* FS_TYPE = "wfs";
 
@@ -98,24 +100,53 @@ int blk_dev_release(){
     return 0;
 }
 
+#ifdef DIRECT_BLOCK_IO
+
 static int init_block(struct block_buffer *buf){
     return 0;
 }
 
 static int retrieve_block(struct block_buffer *buf, struct device *dev, block_t bnr){
     off_t off = bnr * BLOCK_SIZE;
-    return blk_dev_io_read(buf->block, off, BLOCK_SIZE);
+    buf->block = rootfs_disk + off;
+    return BLOCK_SIZE;
 }
 
 static int flush_block(struct block_buffer *buf){
-    off_t off = buf->b_blocknr * BLOCK_SIZE;
-    return blk_dev_io_write(buf->block, off, BLOCK_SIZE);
+    return 0;
 }
 
 static int release_block(struct block_buffer *buf){
     return 0;
 }
 
+static struct block_operations bops = {init_block, retrieve_block, flush_block, release_block};
+
+#elif
+
+static int buffered_init_block(struct block_buffer *buf){
+    buf->block = (char*)get_free_page(GFP_HIGH);
+    return 0;
+}
+
+static int buffered_retrieve_block(struct block_buffer *buf, struct device *dev, block_t bnr){
+    off_t off = bnr * BLOCK_SIZE;
+    return blk_dev_io_read(buf->block, off, BLOCK_SIZE);
+}
+
+static int buffered_flush_block(struct block_buffer *buf){
+    off_t off = buf->b_blocknr * BLOCK_SIZE;
+    return blk_dev_io_write(buf->block, off, BLOCK_SIZE);
+}
+
+static int buffered_release_block(struct block_buffer *buf){
+    release_pages((ptr_t *)buf->block, 1);
+    return 0;
+}
+static struct block_operations bops = {buffered_init_block, buffered_retrieve_block, buffered_flush_block, buffered_release_block};
+
+
+#endif
 
 int root_fs_read (struct filp *filp, char *data, size_t count, off_t offset){
     int ret = 0, r, j;
@@ -254,7 +285,6 @@ int root_fs_ioctl(struct filp* file, int request_type, ptr_t* arg){
 
 static struct device_operations dops = {blk_dev_init, blk_dev_io_read, blk_dev_io_write, blk_dev_release};
 static struct filp_operations ops = {root_fs_open, root_fs_read, root_fs_write, root_fs_close, root_fs_ioctl};
-static struct block_operations bops = {init_block, retrieve_block, flush_block, release_block};
 
 void init_root_fs(){
     rootfs_dev.bops = &bops;
