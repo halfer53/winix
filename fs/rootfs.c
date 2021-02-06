@@ -4,8 +4,8 @@
 
 #include "fs.h"
 
-char* DEVICE_NAME = "sda";
-char* FS_TYPE = "wfs";
+const char* DEVICE_NAME = "sda";
+const char* FS_TYPE = "wfs";
 
 static char* rootfs_disk;
 static size_t rootfs_disk_size;
@@ -97,6 +97,25 @@ void dearch_superblock(struct superblock* sb){
 int blk_dev_release(){
     return 0;
 }
+
+static int init_block(struct block_buffer *buf){
+    return 0;
+}
+
+static int retrieve_block(struct block_buffer *buf, struct device *dev, block_t bnr){
+    off_t off = bnr * BLOCK_SIZE;
+    return blk_dev_io_read(buf->block, off, BLOCK_SIZE);
+}
+
+static int flush_block(struct block_buffer *buf){
+    off_t off = buf->b_blocknr * BLOCK_SIZE;
+    return blk_dev_io_write(buf->block, off, BLOCK_SIZE);
+}
+
+static int release_block(struct block_buffer *buf){
+    return 0;
+}
+
 
 int root_fs_read (struct filp *filp, char *data, size_t count, off_t offset){
     int ret = 0, r, j;
@@ -235,8 +254,10 @@ int root_fs_ioctl(struct filp* file, int request_type, ptr_t* arg){
 
 static struct device_operations dops = {blk_dev_init, blk_dev_io_read, blk_dev_io_write, blk_dev_release};
 static struct filp_operations ops = {root_fs_open, root_fs_read, root_fs_write, root_fs_close, root_fs_ioctl};
+static struct block_operations bops = {init_block, retrieve_block, flush_block, release_block};
 
 void init_root_fs(){
+    rootfs_dev.bops = &bops;
     register_device(&rootfs_dev, DEVICE_NAME, devid, S_IFREG, &dops, &ops);
 }
 

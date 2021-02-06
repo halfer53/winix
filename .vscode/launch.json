@@ -8,8 +8,8 @@
             "name": "gcc-7 - Build and debug active file",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${fileDirname}/${fileBasenameNoExtension}",
-            "args": [],
+            "program": "${workspaceFolder}/makedisk",
+            "args": ["-t", "2048", "-o", "include/disk.c", "-s", "include/srec"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
@@ -22,7 +22,7 @@
                     "ignoreFailures": true
                 }
             ],
-            "preLaunchTask": "gcc-7 build active file",
+            "preLaunchTask": "gcc-7 build makedisk",
             "miDebuggerPath": "/usr/bin/gdb"
         }
     ]

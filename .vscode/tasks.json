@@ -13,6 +13,27 @@
             "options": {
                 "cwd": "/usr/bin"
             }
+        },
+        {
+            "type": "shell",
+            "label": "gcc-7 build makedisk",
+            "command": "/usr/bin/gcc-7",
+            "args": [
+                "-g",
+                "-D",
+                "MAKEFS_STANDALONE",
+                "-w",
+                "-I${workspaceFolder}/include/fs_include",
+                "-I${workspaceFolder}/include",
+                "${workspaceFolder}/fs/*.c",
+                "${workspaceFolder}/fs/system/*.c",
+                "${workspaceFolder}/fs/makefs_only/*.c",
+                "-o",
+                "${workspaceFolder}/makedisk"
+            ],
+            "options": {
+                "cwd": "/usr/bin"
+            },
         }
     ],
     "version": "2.0.0"

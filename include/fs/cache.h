@@ -13,6 +13,14 @@ struct block_buffer
     struct device* b_dev;            /* major | minor device where block resides */
     int b_dirt; // clean or dirty
     int b_count; // number of users on this buffer
+    bool initialised;
+};
+
+struct block_operations{
+    int (*init_block) (struct block_buffer*);
+    int (*retrieve_block) (struct block_buffer*, struct device *, block_t );
+    int (*flush_block) (struct block_buffer*);
+    int (*release_block) (struct block_buffer*);
 };
 
 
@@ -38,7 +46,7 @@ struct block_buffer* dequeue_buf();
 void enqueue_buf(struct block_buffer *tbuf);
 void init_buf();
 int flush_inode_zones(struct inode *ino);
-int block_io(struct block_buffer* tbuf, struct device* dev, int flag);
+int block_io(struct block_buffer* tbuf, int flag);
 int flush_all_buffer();
 void flush_super_block(struct device* dev);
 

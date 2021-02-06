@@ -191,7 +191,8 @@ int eat_path(struct proc* who, char *path, struct inode** last_dir, struct inode
     int ret;
     inode_t *curr_dir;
     if(who->fp_workdir == NULL || who->fp_rootdir == NULL){
-        curr_dir = get_inode(ROOT_INODE_NUM, get_dev(ROOT_DEV));
+        struct device* dev = get_dev(ROOT_DEV);
+        curr_dir = get_inode(ROOT_INODE_NUM, dev);
         who->fp_workdir = who->fp_rootdir = curr_dir;
     }
     curr_dir = (*path == '/') ? who->fp_rootdir : who->fp_workdir;
@@ -200,7 +201,7 @@ int eat_path(struct proc* who, char *path, struct inode** last_dir, struct inode
     *last_dir = NULL;
 
     ret = __eath_path(curr_dir, last_dir, ret_ino, path, string);
-
+    
     return ret;
 }
 

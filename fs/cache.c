@@ -77,7 +77,6 @@ void enqueue_buf(struct block_buffer *tbuf) {
     tbuf->prev = front;
     front->next = tbuf;
     lru_cache[FRONT] = tbuf;
-
 }
 
 int flush_all_buffer(){
@@ -86,7 +85,8 @@ int flush_all_buffer(){
     for(j = 0; j < LRU_LEN; j++){
         tbuf = &buf_table[j];
         if(tbuf->b_dirt){
-            block_io(tbuf, tbuf->b_dev, WRITING);
+            // block_io(tbuf, WRITING);
+            tbuf->b_dev->bops->flush_block(tbuf);
             tbuf->b_dirt = false;
         }
     }
@@ -103,7 +103,8 @@ int flush_inode_zones(struct inode *ino){
             for(j = 0; j < LRU_LEN; j++){
                 tbuf = &buf_table[j];
                 if(tbuf->b_blocknr == zid && tbuf->b_dirt){
-                    block_io(tbuf, tbuf->b_dev, WRITING);
+                    // block_io(tbuf, WRITING);
+                    tbuf->b_dev->bops->flush_block(tbuf);
                     tbuf->b_dirt = false;
                 }
             }
@@ -112,19 +113,19 @@ int flush_inode_zones(struct inode *ino){
     return OK;
 }
 
-int block_io(struct block_buffer* tbuf, struct device* dev, int flag){
+int block_io(struct block_buffer* tbuf, int flag){
     off_t off = tbuf->b_blocknr * BLOCK_SIZE;
 //    KDEBUG(("block io blk %d off %d mode %s\n", tbuf->b_blocknr, off, flag == READING ? "read" : "write"));
     if(flag == READING){
-        return dev->dops->dev_read(tbuf->block, off, BLOCK_SIZE);
+        return tbuf->b_dev->dops->dev_read(tbuf->block, off, BLOCK_SIZE);
     }else if(flag == WRITING){
-        return dev->dops->dev_write(tbuf->block, off, BLOCK_SIZE);
+        return tbuf->b_dev->dops->dev_write(tbuf->block, off, BLOCK_SIZE);
     }
     return 0;
 }
 
 int put_block_buffer_immed(struct block_buffer* tbuf, struct device* dev){
-    if(block_io(tbuf, dev, WRITING) == 0)
+    if(tbuf->b_dev->bops->flush_block(tbuf) == 0)
         return EIO;
     tbuf->b_dirt = false;
     return put_block_buffer(tbuf);
@@ -168,22 +169,37 @@ struct block_buffer *get_block_buffer(block_t blocknr, struct device* dev){
     }
 
     if(tbuf->b_dirt){
-        ret = block_io(tbuf, tbuf->b_dev, WRITING);
+        ret = tbuf->b_dev->bops->flush_block(tbuf);
         tbuf->b_dirt = false;
         // KDEBUG(("Sync block %d count %d before returning %d\n", tbuf->b_blocknr, tbuf->b_count, blocknr));
     }
 
-    tbuf->b_blocknr = blocknr;
-    tbuf->b_dev = dev;
+    
+    if(tbuf->b_dev && tbuf->b_dev != dev){
+        tbuf->b_dev->bops->release_block(tbuf);
+        tbuf->initialised = false;
+    }
 
-    if ((ret = block_io(tbuf, tbuf->b_dev, READING)) != BLOCK_SIZE) {
+    if(!tbuf->initialised){
+        dev->bops->init_block(tbuf);
+        tbuf->initialised = true;
+    }
+
+    ret = dev->bops->retrieve_block(tbuf, dev, blocknr);
+    // printf("ret blk %d %d\n", blocknr, ret);
+
+    if (ret != BLOCK_SIZE) {
         KDEBUG(("dev io return %d for %d\n", ret, tbuf->b_blocknr));
+        dev->bops->release_block(tbuf);
+        tbuf->initialised = false;
         enqueue_buf(tbuf);
         return NULL;
     }
 
+    tbuf->b_blocknr = blocknr;
+    tbuf->b_dev = dev;
     tbuf->next = tbuf->prev = NULL;
-    tbuf->b_dirt = 0;
+    tbuf->b_dirt = false;
     tbuf->b_count = 1;
     return tbuf;
 }

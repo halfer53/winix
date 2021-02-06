@@ -158,6 +158,7 @@ void write_srec_list(struct list_head* lists){
     int elf_size = sizeof(struct winix_elf);
     int binary_size;
     ret = sys_mkdir(current_proc, bin_path, 0x755);
+    // printf("ret %d\n", ret);
     assert(ret == 0);
     list_for_each_entry_safe(struct winix_elf_list, pos, tmp, lists, list){
         strcpy(path, bin_path);

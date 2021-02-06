@@ -10,6 +10,7 @@
 #include <winix/type.h>
 #include <fs/type.h>
 #include <fs/filp.h>
+#include <fs/cache.h>
 #include <winix/rex.h>
 
 struct device_operations{
@@ -26,6 +27,7 @@ struct device{
     struct list_head list;
     struct device_operations *dops;
     struct filp_operations *fops;
+    struct block_operations *bops;
     void* private;
 };
 
