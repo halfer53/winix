@@ -8,6 +8,15 @@
 #include <sys/fcntl.h>
 #include <sys/ipc.h>
 #include <fs/const.h>
+#include <sys/ioctl.h>
+
+char shell_path[] = "/bin/bash";
+char *shell_argv[] = {
+    shell_path,
+    NULL
+};
+
+int pgid;
 
 #define CHECK_SYSCALL(cond) \
   if (!(cond))              \
@@ -33,11 +42,33 @@ void init_init()
   signal(SIGTERM, SIG_IGN);
 }
 
-char shell_path[] = "/bin/bash";
-char *shell_argv[] = {
-    shell_path,
-    NULL
-};
+void init_dev(){
+  int fd, ret;
+
+  ret = mkdir("/dev", 0x755);
+  CHECK_SYSCALL(ret == 0);
+
+  ret = mknod("/dev/tty1", 0x755, TTY1_DEV_NUM);
+  CHECK_SYSCALL(ret == 0);
+
+  ret = mknod("/dev/tty2", 0x755, TTY2_DEV_NUM);
+  CHECK_SYSCALL(ret == 0);
+
+  ret = mknod("/dev/sda", 0x755, ROOT_DEV);
+  CHECK_SYSCALL(ret == 0);
+
+}
+
+void init_tty(){
+  int fd, ret;
+  fd = open("/dev/tty1", O_RDONLY);
+  CHECK_SYSCALL(fd == 0);
+  ret = dup(fd);
+  ret = dup(fd);
+  setpgid(0, 0);
+  pgid = getpgid(0);
+  ioctl(STDIN_FILENO, TIOCSPGRP, pgid);
+}
 
 void write_dummy_file(){
   int fd, ret, i, j;
@@ -69,24 +100,10 @@ int main(int argc, char **argv)
   int status;
   int i, ret, fd, read_nr;
 
-  ret = mkdir("/dev", 0x755);
-  CHECK_SYSCALL(ret == 0);
-
-  ret = mknod("/dev/tty1", 0x755, TTY1_DEV_NUM);
-  CHECK_SYSCALL(ret == 0);
-
-  ret = mknod("/dev/tty2", 0x755, TTY2_DEV_NUM);
-  CHECK_SYSCALL(ret == 0);
-
-  ret = mknod("/dev/sda", 0x755, ROOT_DEV);
-  CHECK_SYSCALL(ret == 0);
-
-  fd = open("/dev/tty1", O_RDONLY);
-  CHECK_SYSCALL(fd == 0);
-
-  ret = dup(fd);
-  ret = dup(fd);
-
+  init_init();
+  init_dev();
+  init_tty();
+  
   pid = vfork();
   if (pid == 0)
   {
@@ -97,9 +114,8 @@ int main(int argc, char **argv)
   // delete bash after execving it
   unlink("/bin/init");
   unlink(shell_path);
-
-  init_init();
   write_dummy_file();
+  
   while (1)
   {
     pid = wait(&status);

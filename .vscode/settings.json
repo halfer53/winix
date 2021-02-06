@@ -15,6 +15,7 @@
         "kstring.h": "c",
         "kdebug.h": "c",
         "sys_stdio.h": "c",
-        "mm.h": "c"
+        "mm.h": "c",
+        "ioctl.h": "c"
     }
 }

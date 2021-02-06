@@ -16,6 +16,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <winix/tty.h>
+#include <winix/sigsend.h>
 
 
 struct tty_state tty1_state, tty2_state;
@@ -199,6 +200,11 @@ int tty_write_rex(RexSp_t* rex, char* data, size_t len){
 
 int tty_read ( struct filp *filp, char *data, size_t count, off_t offset){
     struct tty_state* state = (struct tty_state*)filp->private;
+    if(curr_user_proc->procgrp != state->foreground_group){
+        send_sig(curr_user_proc, SIGINT);
+        return DONTREPLY;
+    }
+
     if(state->reader){
         if(IS_INUSE(state->reader)){
             return EBUSY;
