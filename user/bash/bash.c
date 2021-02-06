@@ -227,7 +227,7 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
         // }
         exit(exit_code);
     }else{
-        options = WNOHANG | WUNTRACED;
+        options =  WUNTRACED;
         pid = waitpid(-1, &status, options);
         if(WIFSTOPPED(status)){
             last_stopped_pgid = last_pgid;
