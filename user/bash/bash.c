@@ -357,7 +357,7 @@ int slab(int argc, char **argv){
 int cmd_bash(int argc, char **argv){
     pid_t child_pid;
     if(child_pid = fork()){
-        if(child_pid == 1){
+        if(child_pid == -1){
             perror("fork failed");
             return 1;
         }

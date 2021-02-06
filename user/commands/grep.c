@@ -178,12 +178,12 @@ int getline(char *buf, int size)
 		// printf("read %d %c\n", c, c);
 		*buf++ = c;
 		if (c < 0)
-			return (1);
+			return (-1);
 		if (((buf - initbuf) == size - 1) || c == '\n'){
 			*buf = '\0';
 			return buf - initbuf;
 		}
 	}
-	return 1;
+	return -1;
 }
 
