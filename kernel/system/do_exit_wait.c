@@ -37,11 +37,17 @@ int do_waitpid(struct proc *parent, struct message *mesg){
     struct proc *child;
     struct wait_info* wi;
     pid_t pid;
+    vptr_t* vptr;
+    ptr_t *ptr;
     int options;
     int children = 0;
 
     pid = mesg->m1_i1;
     options = mesg->m1_i2;
+
+    vptr = mesg->m1_p1;
+    if(vptr && !is_vaddr_accessible(vptr, parent))
+        return EFAULT;
     
     foreach_child(child, parent){
         /**
@@ -66,8 +72,11 @@ int do_waitpid(struct proc *parent, struct message *mesg){
         // if it's a zombie, or a stopped process while WUNTRACED is set
         if( (child->state & STATE_ZOMBIE) ||
             (options & WUNTRACED && child->state & STATE_STOPPED) ){
-
-            mesg->m1_i2 = get_wstats(child);
+            
+            if(vptr){
+                ptr = get_physical_addr(vptr, parent);
+                *ptr = get_wstats(child);
+            }
             release_zombie(child);
             return child->pid;
         }
@@ -84,6 +93,7 @@ int do_waitpid(struct proc *parent, struct message *mesg){
 
     parent->wpid = pid;
     parent->woptions = options;
+    parent->varg = vptr;
     parent->state |= STATE_WAITING;
     return SUSPEND;
 }
@@ -119,6 +129,7 @@ void clear_proc_mesg(struct proc *who){
 int check_waiting(struct proc* who){
     struct proc* parent = get_proc(who->parent);
     int children = 0;
+    ptr_t *ptr;
     struct message* mesg = curr_mesg();
 
     // if this process if waiting for the current to be exited process
@@ -136,11 +147,14 @@ int check_waiting(struct proc* who){
             if(who->state & STATE_STOPPED && !(parent->woptions & WUNTRACED))
                 return ERR;
             
-            mesg->type = WAITPID;
-            mesg->m1_i2 = get_wstats(who);
+            if(parent->varg){
+                ptr = get_physical_addr(parent->varg, parent);
+                *ptr = get_wstats(who);
+            }
             parent->state &= ~STATE_WAITING;
             parent->wpid = 0;
             syscall_reply2( WAITPID ,who->pid, parent->proc_nr, mesg);
+
             if(who->state & STATE_ZOMBIE)
                 release_zombie(who);
             return OK;

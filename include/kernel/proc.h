@@ -173,6 +173,8 @@ typedef struct proc {
     pid_t procgrp;                	// Pid of the process group (used for signals)
     pid_t session_id;               // Session id
     pid_t wpid;                    	// pid this process is waiting for
+    vptr_t* varg;                   // virtual arg of system call, usually saved from int* status in waitpid(2), 
+                                    // so that kernel can later return the proper value
     int woptions;                   // waiting options
     int parent;                    	// proc_index of parent
     int flags;                	// information flags
