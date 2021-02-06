@@ -149,8 +149,8 @@ typedef struct proc {
     struct proc *next_sender;     	// Link to next sender in the queue
 
     /* Pending messages, used by winix_notify */
-    // unsigned int notify_pending;	// bitmap for masking list of pending messages by system proc
-    struct list_head notify_queue;
+    unsigned int notify_pending;	// bitmap for masking list of pending messages by system proc
+    // struct list_head notify_queue;
 
     /* Scheduling */
     struct proc *next;            	// Next pointer

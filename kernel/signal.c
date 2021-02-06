@@ -156,6 +156,7 @@ PRIVATE int sys_sig_handler(struct proc *who, int signum){
 int handle_sig(struct proc* who, int signum){
     struct sigaction* act;
     
+    KDEBUG(("handle %d for %d\n", signum, who->proc_nr));
     sigdelset(&who->sig_pending, signum);
     // if the system can handle the signal
     if(sys_sig_handler(who,signum) == OK)

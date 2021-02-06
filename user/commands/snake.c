@@ -319,7 +319,7 @@ int main(int argc, char** argv){
     tick_rate = sysconf(_SC_CLK_TCK);
 
     while(is_game_running){
-
+        
         while(waiting_for_command){
             char c = get_chr();
             if(c == 32){

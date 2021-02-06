@@ -87,16 +87,30 @@ int do_send(int dest, struct message *m) {
  **/
 int do_receive(struct message *m) {
     struct proc *p, *bak;
+    int i, pending;
 
-    if(!list_empty(&current_proc->notify_queue)){
-        // KDEBUG(("not empty"));
-        list_for_each_entry_safe(struct proc, p, bak, &current_proc->notify_queue, notify_queue){
-            list_del(&p->notify_queue);
-            *m = *(p->message);
-            // if(is_debugging_ipc()){
-            //     KDEBUG(("%d notify queue %d type %d\n", current_proc->proc_nr, p->proc_nr, m->type));
-            // }
-            return OK;
+    // if(!list_empty(&current_proc->notify_queue)){
+    //     // KDEBUG(("not empty"));
+    //     list_for_each_entry_safe(struct proc, p, bak, &current_proc->notify_queue, notify_queue){
+    //         list_del(&p->notify_queue);
+    //         *m = *(p->message);
+    //         // if(is_debugging_ipc()){
+    //         //     KDEBUG(("%d notify queue %d type %d\n", current_proc->proc_nr, p->proc_nr, m->type));
+    //         // }
+    //         return OK;
+    //     }
+    // }
+    if(current_proc->notify_pending){
+        for(i = 0; i < 32; i++){
+            if(is_bit_on(&current_proc->notify_pending, 1, i)){
+                bitmap_clear_bit(&current_proc->notify_pending, 1, i);
+                p = get_proc(i);
+                *m = *(p->message);
+                if(is_debugging_ipc()){
+                    KDEBUG(("%d notify queue %d type %d\n", current_proc->proc_nr, p->proc_nr, m->type));
+                }
+                return OK;
+            }
         }
     }
     
@@ -170,8 +184,9 @@ int do_notify(int src, int dest, struct message *m) {
             }
             
             pSrc->message = m;
-            list_add(&pSrc->notify_queue, &pDest->notify_queue);
-            // KDEBUG(("notify from %d to %d, %d\n", pSrc->proc_nr, pDest->proc_nr, list_empty(&pDest->notify_queue)));
+            bitmap_set_bit(&pDest->notify_pending, 1, pSrc->proc_nr);
+            // list_add(&pSrc->notify_queue, &pDest->notify_queue);
+            KDEBUG(("notify from %d to %d \n", pSrc->proc_nr, pDest->proc_nr ));
         }
         // do nothing if it's not waiting
         return OK;

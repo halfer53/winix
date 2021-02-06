@@ -322,8 +322,6 @@ void proc_set_default(struct proc *p) {
     p->alarm.proc_nr = p->proc_nr;
     p->sig_table[SIGCHLD].sa_handler = SIG_IGN;
     p->umask = 0x22;
-
-    INIT_LIST_HEAD(&p->notify_queue);
 }
 
 /**

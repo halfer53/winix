@@ -88,6 +88,7 @@ int test_while(int argc, char** argv){
     int fd;
     // __set_errno(EBUSY);
     // perror("busy");
+    enable_syscall_tracing();
     while(1);
     return 0;
 }
