@@ -64,13 +64,9 @@ Click ```Quick Load```, select ```winix.srec```
 
 ### Prerequisite
 
-#### Linux / WSL
+#### Linux / WSL 
 
 ```sudo apt-get install xutils-dev gcc```
-
-#### MacOS
-
-``` brew install makedepend gcc```
 
 ### Clone and   Compile
 

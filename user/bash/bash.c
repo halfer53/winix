@@ -8,7 +8,7 @@
  * @author Paul Monigatti
  * @email paulmoni@waikato.ac.nz
  * 
- * @create date 2016-09-19
+ * @create date 2016-0919
  * 
 */
 
@@ -124,7 +124,7 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
     int sin = STDIN_FILENO, sout = STDOUT_FILENO;
 
     if(cmd->argc == 0)
-        return -1;
+        return 1;
     if(*line == '#')
         return 0;
 
@@ -279,7 +279,7 @@ int cmd_kill(int argc, char **argv){
     int signum = SIGTERM;
     if(argc < 2){
         printf("kill <-signal> [pid]\n");
-        return -1;
+        return 1;
     }
         
     if(*argv[1] == '-'){
@@ -297,7 +297,7 @@ int cmd_kill(int argc, char **argv){
 int do_cd(int argc, char** argv){
     int ret;
     if(argc < 2)
-        return -1;
+        return 1;
     ret = chdir(argv[1]);
     return ret;
 }
@@ -347,9 +347,9 @@ int slab(int argc, char **argv){
 int cmd_bash(int argc, char **argv){
     pid_t child_pid;
     if(child_pid = fork()){
-        if(child_pid == -1){
+        if(child_pid == 1){
             perror("fork failed");
-            return -1;
+            return 1;
         }
         // printf("parent shell %d waiting for child shell %d\n",getpid(),child_pid);
         child_pid = wait(NULL);
@@ -367,7 +367,7 @@ int cmd_exit(int argc, char **argv){
     printf("Bye!\n");
     // printf("Child %d [parent %d] exits\n",getpid(),getppid());
     exit(status);
-    return -1;
+    return 1;
 }
 
 

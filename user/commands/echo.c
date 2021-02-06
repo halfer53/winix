@@ -8,7 +8,7 @@ int main(int argc, char *argv[]){
     int len;
     char c;
     if(argc < 2)
-        return -1;
+        return 1;
     p = argv[1];
     dest = buffer;
     while(*p){

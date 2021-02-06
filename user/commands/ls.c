@@ -42,7 +42,7 @@ int do_ls(char* pathname, int flag){
        pathname = ".";
    directory = opendir(pathname);
    if(!directory)
-       return -1;
+       return 1;
    while((dir = readdir(directory)) != NULL){
        if(*dir->d_name == '.' && !(flag & SHOW_HIDDEN)){
            continue;
