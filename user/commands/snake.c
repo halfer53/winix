@@ -132,6 +132,7 @@ void print_border(struct board_struct* board){
 
 void board_init(struct board_struct *board){
     int fd, fd2;
+    clock_t clo = times(NULL);
     INIT_LIST_HEAD(&board->foods);
     INIT_LIST_HEAD(&board->snake);
     fd = open("/dev/tty2", O_RDWR);
@@ -140,7 +141,7 @@ void board_init(struct board_struct *board){
     board->ofd = fd2;
     ioctl(fd2, TIOCDISABLEECHO);
     dup2(fd2, STDIN_FILENO);
-    srand(times(NULL));
+    srand(clo);
     disable_cursor();
 }
 
