@@ -152,7 +152,8 @@ int do_receive(struct message *m) {
  **/
 int do_notify(int src, int dest, struct message *m) {
     struct proc *pDest, *pSrc;
-    int reply;
+    int reply, syscall_num;
+    char *msg_type = "";
     // Is the destination valid?
     if (pDest = get_proc(dest)) {
 
@@ -179,14 +180,16 @@ int do_notify(int src, int dest, struct message *m) {
             enqueue_head(ready_q[pDest->priority], pDest);
         }else{
             pSrc = get_proc(src);
-            if(IS_KERNEL_PROC(pSrc)){
-                kwarn("notify: dest %d state %x cant receive from %d\n", pDest->proc_nr, pDest->state, src);
+            syscall_num = m->type;
+            if(syscall_num > 0 && syscall_num < _NSYSCALL){
+                msg_type = syscall_str[syscall_num];
             }
-            
+            if(IS_KERNEL_PROC(pSrc)){
+                kwarn("notify: dest %s[%d] state %x cant receive %s from %d\n", pDest->name, pDest->proc_nr, pDest->state, msg_type, src);
+            }
             pSrc->message = m;
             bitmap_set_bit(&pDest->notify_pending, 1, pSrc->proc_nr);
             // list_add(&pSrc->notify_queue, &pDest->notify_queue);
-            KDEBUG(("notify from %d to %d \n", pSrc->proc_nr, pDest->proc_nr ));
         }
         // do nothing if it's not waiting
         return OK;

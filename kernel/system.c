@@ -277,6 +277,7 @@ int syscall_reply2(int syscall_num, int reply, int dest, struct message* m){
         KDEBUG(("Syscall %s return %s to Proc %s[%d]\n",syscall_str[syscall_num] , p, pDest->name, dest));
     }
     if(pDest){
+        m->type = syscall_num;
         m->reply_res = reply;
         return do_notify(SYSTEM, dest,m);
     }
