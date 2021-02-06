@@ -231,10 +231,13 @@ void* dup_vm(struct proc* parent, struct proc* child){
  * @param who 
  */
 void release_proc_mem(struct proc *who){
+    // struct proc* parent = get_proc(who->parent);
+    // if(parent->state & STATE_VFORKING){
+    //     return;
+    // }
     // KDEBUG(("release proc mem %d %d\n", who->proc_nr, who->thread_parent));
     if(who->thread_parent > 0){ // thread, in this case, we only release the stack
         user_release_pages(who, who->stack_top, 1);
-        // KDEBUG(("release thread stack %x\n", who->stack_top));
     }else{
         int page_len = (int)(who->heap_bottom + 1 - who->mem_start) / PAGE_LEN;
         int start_page = (int)who->mem_start / PAGE_LEN;

@@ -56,7 +56,7 @@ int do_execve(struct proc *who, struct message *m){
         envp = (char**)get_physical_addr(envp, who);
         return exec_welf(who, path, argv, envp, false);
     }
-    return EACCES;
+    return EFAULT;
 }
 
 int copy_stirng_array(struct string_array *arr, char* from[], struct proc* who, bool is_physical_addr){
@@ -196,24 +196,26 @@ int exec_welf(struct proc* who, char* path, char *argv[], char *envp[], bool is_
 
     if(!is_new){
         who->sig_pending = 0;
-        strncpy(who->name, path, PROC_NAME_LEN);
-
-        if(parent->state & STATE_VFORKING){
-            bitmap_clear(who->ctx.ptable, PTABLE_LEN);
-        }else{
+        // if(parent->state & STATE_VFORKING){
+        //     bitmap_clear(who->ctx.ptable, PTABLE_LEN);
+        // }else{
+        //     release_proc_mem(who);
+        // }
+        if(who->parent > 0 && !(parent->state & STATE_VFORKING)){
             release_proc_mem(who);
         }
-        
+        bitmap_clear(who->ctx.ptable, PTABLE_LEN);
     }
-    // KDEBUG(("execve %d tp %d\n", who->proc_nr, who->thread_parent));
+
     who->thread_parent = 0;
 
     fd = sys_open(who, path, O_RDONLY | O_DIRECT, 0);
     if(fd < 0)
         return fd;
-
     ret = sys_read(who, fd, &elf, sizeof(elf));
+
     ret = alloc_mem_welf(who, &elf, USER_STACK_SIZE, USER_HEAP_SIZE);
+
     if(ret)
         goto final;
 
@@ -242,7 +244,7 @@ int exec_welf(struct proc* who, char* path, char *argv[], char *envp[], bool is_
     // KDEBUG(("freeing envp\n"));
     kfree_string_array(&envp_copy);
     if(!is_new){
-        if(parent->state | STATE_VFORKING){
+        if(parent->state & STATE_VFORKING){
             parent->state &= ~STATE_VFORKING;
             m.type = VFORK;
             syscall_reply2(VFORK, who->pid, parent->proc_nr, &m);
