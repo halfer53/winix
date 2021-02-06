@@ -27,10 +27,12 @@ int do_sigprocmask(struct proc* who, struct message* m){
 
     vir_oldact = m->m1_p1;
 
-    if(!is_vaddr_accessible(vir_oldact, who))
+    if(vir_oldact && !is_vaddr_accessible(vir_oldact, who))
         return EACCES;
-    oldact = get_physical_addr(vir_oldact, who);
-    *oldact = who->sig_mask;
+    if(vir_oldact){
+        oldact = get_physical_addr(vir_oldact, who);
+        *oldact = who->sig_mask;
+    }
     
     set = m->m1_i2;
     pset = &set;
