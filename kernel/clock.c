@@ -45,7 +45,9 @@ void clock_main(){
 void do_ticks(){
     while(next_timeout <= system_uptime){
         struct timer* next_timer = dequeue_alarm();
-        next_timer->handler(next_timer->proc_nr,next_timer->time_out);
+        if(next_timer){
+            next_timer->handler(next_timer->proc_nr,next_timer->time_out);
+        }
     }
 }
 
