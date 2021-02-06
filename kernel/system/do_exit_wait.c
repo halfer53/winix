@@ -124,7 +124,7 @@ int check_waiting(struct proc* who){
     // if this process if waiting for the current to be exited process
     // kreport_proc(parent);
     // kreport_proc(who);
-    // KDEBUG((" curr %d check waiting %d state %x parent %d wpid %d\n",current_proc->proc_nr,  who->proc_nr, who->state, parent->proc_nr, parent->wpid));
+    KDEBUG((" curr %d check waiting %d state %x parent %d wpid %d\n",current_proc->proc_nr,  who->proc_nr, who->state, parent->proc_nr, parent->wpid));
     if(parent && parent->state & STATE_WAITING){
         pid_t pid = parent->wpid;
         if( (pid > 0 && pid == who->pid) ||
@@ -145,6 +145,9 @@ int check_waiting(struct proc* who){
                 release_zombie(who);
             return OK;
         }
+    }else if(parent->state & STATE_VFORKING){
+        parent->state &= ~STATE_VFORKING;
+        syscall_reply2(VFORK, who->pid, parent->proc_nr, mesg);
     }
     
     return ERR;
