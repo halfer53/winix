@@ -122,7 +122,7 @@ static int release_block(struct block_buffer *buf){
 
 static struct block_operations bops = {init_block, retrieve_block, flush_block, release_block};
 
-#elif
+#else
 
 static int buffered_init_block(struct block_buffer *buf){
     buf->block = (char*)get_free_page(GFP_HIGH);
