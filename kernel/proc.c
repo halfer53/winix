@@ -18,6 +18,7 @@
 #include <winix/srec.h>
 #include <winix/welf.h>
 #include <winix/list.h>
+#include <winix/tty.h>
 
 // Linked lists are defined by a head and tail pointer.
 

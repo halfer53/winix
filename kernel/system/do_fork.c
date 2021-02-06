@@ -178,6 +178,7 @@ int do_tfork(struct proc* parent, struct message* m){
         copy_pcb(parent,child);
         child->time_used = child->sys_time_used = 0;
         child->parent = parent->proc_nr;
+        child->pid = parent->pid;
         if(parent->thread_parent > 0){
             child->thread_parent = parent->thread_parent;
         }else{
@@ -190,7 +191,7 @@ int do_tfork(struct proc* parent, struct message* m){
         vsp_relative_to_stack_top = (vptr_t*)(get_physical_addr(*sp, child) - child->stack_top);
         sp_physical = (ptr_t *)(new_stack + (ptr_t)vsp_relative_to_stack_top) ;
         *sp = (reg_t *)get_virtual_addr(sp_physical, child);
-        // KDEBUG(("tfork %x %x\n", sp_physical, sp));
+        // KDEBUG(("tfork %x %x for %d tp %d\n", new_stack, *sp, child->proc_nr, child->thread_parent));
         child->stack_top = new_stack;
 
         syscall_reply2(TFORK, 0, child->proc_nr, m);

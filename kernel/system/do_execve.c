@@ -23,6 +23,7 @@
 #include <winix/mm.h>
 #include <winix/bitmap.h>
 #include <winix/page.h>
+#include <winix/dev.h>
 
 #define ASM_ADDUI_SP   (0x1ee10000)
 #define ASM_ADDUI_SP_SP_2   (0x1ee10002)
@@ -192,19 +193,19 @@ int exec_welf(struct proc* who, char* path, char *argv[], char *envp[], bool is_
     // KDEBUG(("copy argv string %d\n", argv_copy.size));
     copy_stirng_array(&envp_copy, envp, who, is_new);
     // KDEBUG(("copy env string %d\n", envp_copy.size));
-    
 
     if(!is_new){
         who->sig_pending = 0;
         strncpy(who->name, path, PROC_NAME_LEN);
-        
-        if(parent->flags | STATE_VFORKING){
+
+        if(parent->state & STATE_VFORKING){
             bitmap_clear(who->ctx.ptable, PTABLE_LEN);
         }else{
-            // KDEBUG(("releasing memory %d\n", who->pid));
             release_proc_mem(who);
         }
+        
     }
+    // KDEBUG(("execve %d tp %d\n", who->proc_nr, who->thread_parent));
     who->thread_parent = 0;
 
     fd = sys_open(who, path, O_RDONLY | O_DIRECT, 0);
