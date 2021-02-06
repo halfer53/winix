@@ -147,4 +147,45 @@ int do_fork(struct proc *who, struct message *m){
     return get_proc(child_pr)->pid;
 }
 
+int do_vfork(struct proc* parent, struct message* m){
+    struct proc* child;
+    if(child = get_free_proc_slot()){
+        copy_pcb(parent,child);
+        child->time_used = child->sys_time_used = 0;
+        child->parent = parent->proc_nr;
+        
+        syscall_reply2(VFORK, 0, child->proc_nr, m);
+        
+        
+        parent->state |= STATE_VFORKING;
+        return SUSPEND;
+    }
+    return EAGAIN;
+}
+
+int do_tfork(struct proc* parent, struct message* m){
+    struct proc* child;
+    ptr_t* new_stack, *sp_physical;
+    reg_t** sp;
+    if(child = get_free_proc_slot()){
+        copy_pcb(parent,child);
+        child->time_used = child->sys_time_used = 0;
+        child->parent = parent->proc_nr;
+        child->thread_parent = parent->proc_nr;
+
+        new_stack = user_get_free_page(child, GFP_NORM);
+        copy_page(new_stack, child->stack_top);
+        sp = &child->ctx.m.sp;
+        sp_physical = (ptr_t *)(new_stack + (unsigned int)*sp - child->rbase_offset) ;
+        *sp = (reg_t *)get_virtual_addr(sp_physical, child);
+        // KDEBUG(("tfork %x %x\n", sp_physical, sp));
+        child->stack_top = new_stack;
+
+        syscall_reply2(TFORK, 0, child->proc_nr, m);
+        
+        return child->proc_nr;
+    }
+    return EAGAIN;
+}
+
 

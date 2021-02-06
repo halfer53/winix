@@ -338,6 +338,7 @@ void init_syscall_table(){
     SYSCALL_MAP(SBRK, do_sbrk);  
     SYSCALL_MAP(STATFS, do_statfs);
     SYSCALL_MAP(GETCWD, do_getcwd);
+    SYSCALL_MAP(TFORK, do_tfork);
 }
 
 

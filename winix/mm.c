@@ -190,7 +190,7 @@ int release_pages(ptr_t* page, int len){
     return bitmap_clear_nbits(mem_map, MEM_MAP_LEN, page_index, len);
 }
 
-int user_free_pages(struct proc* who, ptr_t* page, int len){
+int user_release_pages(struct proc* who, ptr_t* page, int len){
     int index;
     if(release_pages(page,len) != OK)
         return ERR;

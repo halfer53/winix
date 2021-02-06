@@ -24,7 +24,7 @@
 #include <stdio.h>
 
 
-#define _NSYSCALL               53
+#define _NSYSCALL               54
 /**
  * System Call Numbers
  **/
@@ -81,6 +81,7 @@
 #define SBRK            50
 #define STATFS          51
 #define GETCWD          52
+#define TFORK           53
 
 #define DECLARE_SYSCALL(function, params, syscall_num, passing_codes)\
 function params{\
@@ -155,6 +156,7 @@ int statfs(const char *path, struct statfs *buf);
 char *getcwd(char *buf, size_t size);
 clock_t times(struct tms *buf);
 pid_t waitpid(pid_t pid, int *status, int options);
+pid_t tfork();
 
 #ifdef __wramp__
 #ifndef _SYSTEM
@@ -208,6 +210,7 @@ pid_t waitpid(pid_t pid, int *status, int options);
 #define sbrk(increment)             (ptr_wramp_syscall(SBRK, increment))
 #define statfs(path, buf)           (wramp_syscall(STATFS, path, buf))
 #define getcwd(buf, size)           (ptr_wramp_syscall(GETCWD, size, buf))
+#define tfork()                     (wramp_syscall(TFORK))
 
 #endif //_SYSTEM
 #endif //__wramp__

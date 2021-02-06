@@ -85,6 +85,7 @@ int do_getppid(struct proc* who, struct message *m);
 int do_signal(struct proc* who, struct message *m);
 int do_statfs(struct proc* who, struct message *msg);
 int do_getcwd(struct proc* who, struct message *m);
+int do_tfork(struct proc* who, struct message* m);
 
 #endif
 

@@ -177,7 +177,8 @@ typedef struct proc {
                                     // so that kernel can later return the proper value
     int woptions;                   // waiting options
     int parent;                    	// proc_index of parent
-    int flags;                	// information flags
+    int thread_parent;              // proc_index of parent whom share the memory except stack
+    int flags;                	    // information flags
 
     /* Process Table Index */
     int proc_nr;                	// Index in the process table
