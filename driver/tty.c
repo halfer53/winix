@@ -87,10 +87,24 @@ void tty_exception_handler(RexSp_t* rex, struct tty_state* state){
             goto end;
         }
 
-        if(val == 3){ // Control C
+        if(val == 3 || val == 26){ // Control C or Z
+            int signal;
+            switch (val)
+            {
+            case 3:
+                signal = SIGINT;
+                break;
+
+            case 26:
+                signal = SIGSTOP;
+                break;
+            
+            default:
+                break;
+            }
             if(state->controlling_session > 0 && state->foreground_group > 0){
                 int ret;
-                ret = sys_kill(SYSTEM_TASK, -(state->foreground_group), SIGINT);
+                ret = sys_kill(SYSTEM_TASK, -(state->foreground_group), signal);
                 // KDEBUG(("C ret %d curr %p %d state %x\n", ret,current_proc,  current_proc->proc_nr, current_proc->state));
             }
             goto end;
