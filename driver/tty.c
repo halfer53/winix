@@ -31,6 +31,10 @@
 #define BACKSPACE   (8)
 #define CTRL_U  (21)
 #define CTRL_L  (12)
+#define CTRL_D  (4)
+
+#define CURSOR_LEFT     ('D')
+#define CURSOR_RIGHT    ('C')
 
 struct tty_command{
     char *command;
@@ -126,6 +130,14 @@ void clear_screen(RexSp_t* rex){
     __kputs(rex, cls);
 }
 
+void move_cursor(RexSp_t* rex, int num, int direction){
+    //\033[XD
+    static char cmd_cursor[] = {0x5c, 0x30, 0x33, 0x33, 0x5b, 0x31, 0x44, 0};
+    cmd_cursor[5] = '0' + num;
+    cmd_cursor[6] = direction;
+    __kputs(rex, cmd_cursor);
+}   
+
 void tty_exception_handler(RexSp_t* rex, struct tty_state* state){
     int val, stat, ret;
     struct message* msg;
@@ -196,6 +208,9 @@ void tty_exception_handler(RexSp_t* rex, struct tty_state* state){
             clear_screen(rex);
             state->read_ptr = state->bptr = state->buffer;
             val = '\n';
+        }
+        else if(val == CTRL_D){
+            ret = sys_kill(SYSTEM_TASK, -(state->foreground_group), SIGKILL);
         }
 
         // reset ring buffer if buffer end is reached
