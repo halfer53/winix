@@ -198,14 +198,6 @@ struct printf_buffer{
     struct filp* filp;
 };
 
-static void debug_buffer(struct printf_buffer* tbuf){
-    kputs("|");
-    tbuf->buffer[tbuf->pos] = '\0';
-    kputs("|");
-    kputs(tbuf->buffer);
-    kputs("\n");
-}
-
 static void flush_buffer_data(struct printf_buffer* tbuf, char* data, int len){
     tbuf->total_count += tbuf->filp_write(tbuf->filp, data, len, tbuf->filp->filp_pos);
 }

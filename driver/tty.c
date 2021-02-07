@@ -29,10 +29,19 @@
 #define CTRL_Z  (26)
 #define BEEP    (7)
 #define BACKSPACE   (8)
+#define CTRL_U  (21)
+
+struct tty_command{
+    char *command;
+    int len;
+    struct list_head list;
+};
 
 struct tty_state tty1_state, tty2_state;
 struct device _tty_dev, _tty2_dev;
 struct filp *tty1_filp = NULL, *tty2_filp = NULL;
+struct list_head commands;
+struct tty_command* curr_cmd = NULL;
 
 static const char* name = "tty";
 static const char* name2 = "tty2";
@@ -49,13 +58,13 @@ int __kputc(RexSp_t* rex, const int c) {
     return EOF;
 }
 
-int kputs(const char *s) {
-    int count = 0;
+int __kputs(RexSp_t* rex, const char *s){
+    int count;
     while(*s){
-        if(__kputc(RexSp1, *s++) != EOF)
+        if(__kputc(rex, *s++) != EOF)
             count++;
     }
-    return count;    
+    return count;
 }
 
 /**
@@ -80,22 +89,46 @@ int kgetc(struct proc* who) {
     return RexSp1->Rx;
 }
 
+void save_command_history(struct tty_state* state){
+    struct tty_command* cmd;
+    int len;
+    cmd = kmalloc(sizeof(struct tty_command));
+    if(!cmd)
+        return;
+    len = strlen(state->read_ptr);
+    cmd->command = kmalloc(len + 1);
+    if(!cmd->command)
+        goto err_str;
+    strcpy(cmd->command, state->read_ptr);
+    cmd->len = len;
+    list_add(&cmd->list, &commands);
+    return;
+
+    err_str:
+    kfree(cmd);
+}
+
+void terminal_backspace(RexSp_t* rex, struct tty_state* state){
+    if(state->bptr > state->buffer){
+        if(state->bptr == state->read_ptr){
+            state->read_ptr--;
+        }
+        state->bptr--;
+        __kputc(rex, BACKSPACE);
+    }
+}
+
 void tty_exception_handler(RexSp_t* rex, struct tty_state* state){
     int val, stat, ret;
     struct message* msg;
+    
     stat = rex->Stat;
     
     if(stat & 1){
         val = rex->Rx;
 
         if (val == BACKSPACE) { // backspace
-            if(state->bptr > state->buffer){
-                if(state->bptr == state->read_ptr){
-                    state->read_ptr--;
-                }
-                state->bptr--;
-                __kputc(rex, val);
-            }
+            terminal_backspace(rex, state);
             goto end;
         }
 
@@ -121,8 +154,20 @@ void tty_exception_handler(RexSp_t* rex, struct tty_state* state){
             goto end;
         }
 
-        if(val == CTRL_P || val == CTRL_N){ // control p or n, to navigate through history
+        // if(val == CTRL_P || val == CTRL_N){ // control p or n, to navigate through history
+        //     struct tty_command* t1;
+        //     list_for_each_entry_reverse(struct tty_command, t1, &commands, list){
+        //         if(curr_cmd == NULL){
+        //             curr_cmd = t1;
 
+        //         }
+        //     }
+        // }
+
+        if(val == CTRL_U){
+            while(state->bptr > state->buffer){
+                terminal_backspace(rex, state);
+            }
         }
 
         // reset ring buffer if buffer end is reached
@@ -147,6 +192,8 @@ void tty_exception_handler(RexSp_t* rex, struct tty_state* state){
 
         if((val == '\n' || state->bptr >= state->buffer_end ) && state->reader){
             *state->bptr = '\0';
+            save_command_history(state);
+            curr_cmd = NULL;
             msg = get_exception_m();
             strncpy(state->read_data, state->read_ptr, state->read_count);
             syscall_reply2(READ, state->bptr - state->buffer, state->reader->proc_nr, msg);
@@ -330,7 +377,7 @@ void init_tty_filp(struct filp** _file, struct device* dev, struct tty_state* st
 }
 
 void init_tty(){
-
+    INIT_LIST_HEAD(&commands);
     init_tty_filp(&tty1_filp, &_tty_dev, &tty1_state);
     init_tty_filp(&tty2_filp, &_tty2_dev, &tty2_state);
 
