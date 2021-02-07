@@ -30,6 +30,7 @@
 #define BEEP    (7)
 #define BACKSPACE   (8)
 #define CTRL_U  (21)
+#define CTRL_L  (12)
 
 struct tty_command{
     char *command;
@@ -119,6 +120,12 @@ void terminal_backspace(RexSp_t* rex, struct tty_state* state){
     }
 }
 
+void clear_screen(RexSp_t* rex){
+    static char cls[] = {0x1b, 0x5b, 0x31, 0x3b, 0x31, 0x48, 0x1b, 0x5b, 0x32, 0x4a, 0};
+    // static char cls[] = {0x1b, 0x5b, 0x32, 0x4a, 0};
+    __kputs(rex, cls);
+}
+
 void tty_exception_handler(RexSp_t* rex, struct tty_state* state){
     int val, stat, ret;
     struct message* msg;
@@ -132,8 +139,7 @@ void tty_exception_handler(RexSp_t* rex, struct tty_state* state){
             terminal_backspace(rex, state);
             goto end;
         }
-
-        if(val == CTRL_C || val == CTRL_Z){ // Control C or Z
+        else if(val == CTRL_C || val == CTRL_Z){ // Control C or Z
             int signal;
             switch (val)
             {
@@ -154,8 +160,7 @@ void tty_exception_handler(RexSp_t* rex, struct tty_state* state){
             }
             goto end;
         }
-
-        if(val == CTRL_P || val == CTRL_N){ // control p or n, to navigate through history
+        else if(val == CTRL_P || val == CTRL_N){ // control p or n, to navigate through history
             struct tty_command* t1;
             bool found = false;
             int len;
@@ -182,17 +187,21 @@ void tty_exception_handler(RexSp_t* rex, struct tty_state* state){
                 __kputs(rex, t1->command);
             }
         }
-
-        if(val == CTRL_U){
+        else if(val == CTRL_U){
             while(state->bptr > state->buffer){
                 terminal_backspace(rex, state);
             }
         }
+        else if(val == CTRL_L){
+            clear_screen(rex);
+            state->read_ptr = state->bptr = state->buffer;
+            val = '\n';
+        }
 
         // reset ring buffer if buffer end is reached
-        if(state->bptr >= state->buffer_end && state->read_ptr == state->bptr){
-            state->read_ptr = state->bptr = state->buffer;
-        }
+        // if(state->bptr >= state->buffer_end && state->read_ptr == state->bptr){
+        //     state->read_ptr = state->bptr = state->buffer;
+        // }
 
         if(state->bptr < state->buffer_end){
             if(val == '\r')
