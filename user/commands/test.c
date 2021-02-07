@@ -84,11 +84,8 @@ int test_nohandler(int argc, char** argv){
 
 int test_while(int argc, char** argv){
     char buf[2];
-    int ret;
+    int ret, foo;
     int fd;
-    // __set_errno(EBUSY);
-    // perror("busy");
-    enable_syscall_tracing();
     while(1);
     return 0;
 }
@@ -215,6 +212,8 @@ int test_float(int argc, char **argv){
 
     signal(SIGFPE, SIG_IGN);
     foo = 1 / 0;
+    signal(SIGFPE, SIG_DFL);
+    
     return 0;
 }
 

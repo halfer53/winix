@@ -20,6 +20,8 @@
 #ifndef _ERRNO_H_        /* check if <errno.h> is already included */
 #define _ERRNO_H_ 1        /* it is not included; note that fact */
 
+#include <sys/debug.h>
+
 /* Now define _SIGN as "" or "-" depending on _SYSTEM. */
 #ifdef _SYSTEM
 #   define _SIGN         -
@@ -27,7 +29,7 @@
 #define __set_errno(val)   
 #else
 #   define _SIGN 
-#define ERRNO_PTR           ((int *)1025)
+#define ERRNO_PTR           ((int *)( (((unsigned int)get_sp()) >> 10 << 10) + 1))
 #define errno   (*ERRNO_PTR)
 #define __set_errno(val)    ((*ERRNO_PTR) = (val))        
 #endif
