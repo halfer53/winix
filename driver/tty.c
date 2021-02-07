@@ -41,7 +41,7 @@ struct tty_state tty1_state, tty2_state;
 struct device _tty_dev, _tty2_dev;
 struct filp *tty1_filp = NULL, *tty2_filp = NULL;
 struct list_head commands;
-struct tty_command* curr_cmd = NULL;
+struct tty_command* prev_history_cmd = NULL;
 
 static const char* name = "tty";
 static const char* name2 = "tty2";
@@ -102,6 +102,7 @@ void save_command_history(struct tty_state* state){
     strcpy(cmd->command, state->read_ptr);
     cmd->len = len;
     list_add(&cmd->list, &commands);
+    // KDEBUG(("saving %s\n", state->read_ptr));
     return;
 
     err_str:
@@ -154,15 +155,33 @@ void tty_exception_handler(RexSp_t* rex, struct tty_state* state){
             goto end;
         }
 
-        // if(val == CTRL_P || val == CTRL_N){ // control p or n, to navigate through history
-        //     struct tty_command* t1;
-        //     list_for_each_entry_reverse(struct tty_command, t1, &commands, list){
-        //         if(curr_cmd == NULL){
-        //             curr_cmd = t1;
+        if(val == CTRL_P || val == CTRL_N){ // control p or n, to navigate through history
+            struct tty_command* t1;
+            bool found = false;
+            int len;
 
-        //         }
-        //     }
-        // }
+            
+            if(prev_history_cmd){
+                t1 = (val == CTRL_P) ? list_next_entry(struct tty_command, prev_history_cmd, list) : 
+                                    list_prev_entry(struct tty_command, prev_history_cmd, list);
+                if(&t1->list != (&commands)){
+                    found = true;
+                }
+            }else{
+                t1 = list_first_entry(&commands, struct tty_command, list);
+                found = true;
+            }
+            
+            if(found){
+                prev_history_cmd = t1;
+                while(state->bptr > state->buffer){
+                    terminal_backspace(rex, state);
+                }
+                strncpy(state->bptr, t1->command, state->buffer_end - state->bptr);
+                state->bptr += t1->len;
+                __kputs(rex, t1->command);
+            }
+        }
 
         if(val == CTRL_U){
             while(state->bptr > state->buffer){
@@ -179,6 +198,16 @@ void tty_exception_handler(RexSp_t* rex, struct tty_state* state){
             if(val == '\r')
                 val = '\n';
 
+            // only save command history if it's a regular command typed by the user
+            if(val == '\n'){
+                // KDEBUG(("prev cmd %x\n", prev_history_cmd));
+                if(prev_history_cmd == NULL){
+                    *state->bptr = '\0';
+                    save_command_history(state);
+                }
+                prev_history_cmd = NULL;
+            }
+
             if(isprint(val) || val == '\n'){
                 *state->bptr++ = val;
                 if(state->is_echoing){
@@ -192,8 +221,6 @@ void tty_exception_handler(RexSp_t* rex, struct tty_state* state){
 
         if((val == '\n' || state->bptr >= state->buffer_end ) && state->reader){
             *state->bptr = '\0';
-            save_command_history(state);
-            curr_cmd = NULL;
             msg = get_exception_m();
             strncpy(state->read_data, state->read_ptr, state->read_count);
             syscall_reply2(READ, state->bptr - state->buffer, state->reader->proc_nr, msg);
