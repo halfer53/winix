@@ -47,7 +47,7 @@ int sys_stat(struct proc* who, char *pathname, struct stat *statbuf){
 int do_stat(struct proc* who, struct message* msg){
     if(!is_vaddr_accessible(msg->m1_p1, who) 
         || !is_vaddr_accessible(msg->m1_p2, who)){
-            return EACCES;
+            return EFAULT;
         }
     return sys_stat(who, (char*)get_physical_addr(msg->m1_p1, who),
         (struct stat*)get_physical_addr(msg->m1_p2, who));
@@ -55,7 +55,7 @@ int do_stat(struct proc* who, struct message* msg){
 
 int do_fstat(struct proc* who, struct message* msg){
     if(!is_vaddr_accessible(msg->m1_p1, who) ){
-            return EACCES;
+            return EFAULT;
         }
     return sys_fstat(who, msg->m1_i1,
         (struct stat*)get_physical_addr(msg->m1_p1, who));
