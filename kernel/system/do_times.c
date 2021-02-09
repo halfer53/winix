@@ -25,7 +25,7 @@ int do_times(struct proc *who, struct message *m){
     ptr_t *p;
     struct tms* buf;
     if(vp && !is_vaddr_accessible(vp, who))
-        return EACCES;
+        return EFAULT;
     if(vp){
         buf = (struct tms*)get_physical_addr(vp, who);
         buf->tms_utime = who->time_used;
