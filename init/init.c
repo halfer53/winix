@@ -32,14 +32,14 @@ void failed_init(int line)
 
 void block_signals()
 {
+  int i;
   sigset_t mask;
   sigfillset(&mask);
   sigdelset(&mask, SIGSEGV);
   sigprocmask(SIG_SETMASK, &mask, NULL);
-  signal(SIGINT, SIG_IGN);
-  signal(SIGABRT, SIG_IGN);
-  signal(SIGTSTP, SIG_IGN);
-  signal(SIGTERM, SIG_IGN);
+  for(i = 1; i < _NSIG; i++){
+    signal(i, SIG_IGN);
+  }
 }
 
 void init_dev(){
