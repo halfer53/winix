@@ -43,7 +43,7 @@ int sys_mknod(struct proc* who, char *path, mode_t mode, dev_t devid){
 
 int do_mknod(struct proc* who, struct message* msg){
     if(!is_vaddr_accessible(msg->m1_p1, who))
-        return EACCES;
+        return EFAULT;
     return sys_mknod(who, (char*)get_physical_addr(msg->m1_p1, who),
         msg->m1_i1, msg->m1_i2);
 }
