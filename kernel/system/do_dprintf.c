@@ -24,7 +24,7 @@ int do_winix_strerror(struct proc* who, struct message* msg){
     struct filp *stderr_file;
 
     if(!is_vaddr_ok(msg->m1_p1, who))
-        return EACCES;
+        return EFAULT;
     len = msg->m1_i1;
     usr_errno = msg->m1_i2;
     
