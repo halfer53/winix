@@ -136,7 +136,7 @@ int check_waiting(struct proc* who){
     // if this process if waiting for the current to be exited process
     // kreport_proc(parent);
     // kreport_proc(who);
-    // KDEBUG((" curr %d check waiting %d state %x parent %d wpid %d\n",current_proc->proc_nr,  who->proc_nr, who->state, parent->proc_nr, parent->wpid));
+    // KDEBUG((" curr %d check waiting %d state %x parent %d wpid %d\n",curr_scheduling_proc->proc_nr,  who->proc_nr, who->state, parent->proc_nr, parent->wpid));
     if(parent && parent->state & STATE_WAITING){
         pid_t pid = parent->wpid;
         if( (pid > 0 && pid == who->pid) ||
@@ -179,7 +179,7 @@ void exit_proc_in_interrupt(struct proc* who, int exit_val,int signum){
     // to the system on behalf of this process 
     // if most cases, this function is triggered when a signal
     // is sent during exception, refer to kernel/exception.c for
-    // more detail e.g. send_sig(current_proc, SIGSEGV)
+    // more detail e.g. send_sig(curr_scheduling_proc, SIGSEGV)
     em.type = EXIT;
     em.m1_i1 = 0;
     em.m1_i2 = signum;
@@ -188,7 +188,7 @@ void exit_proc_in_interrupt(struct proc* who, int exit_val,int signum){
     ptr = get_physical_addr(vptr, who);
     who->state |= STATE_KILLED;
     do_notify(who->proc_nr, SYSTEM, (struct message*) ptr);
-    // KDEBUG(("exit interrupt who %d, curr %d\n", who->proc_nr, current_proc->proc_nr));
+    // KDEBUG(("exit interrupt who %d, curr %d\n", who->proc_nr, curr_scheduling_proc->proc_nr));
 }
 
 void exit_proc(struct proc *who, int status, int signum){

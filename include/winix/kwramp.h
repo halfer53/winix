@@ -27,7 +27,7 @@
 void wramp_set_handler(void (*handler)(int estat));
 
 /**
- * Loads the context of current_proc.
+ * Loads the context of curr_scheduling_proc.
  *
  * Side Effects:
  *   This function does not return.

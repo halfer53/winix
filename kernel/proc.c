@@ -32,7 +32,7 @@ PUBLIC struct proc *proc_table;
 PUBLIC struct proc *ready_q[NUM_QUEUES][2];
 
 // The currently-running process
-PUBLIC struct proc *current_proc;
+PUBLIC struct proc *curr_scheduling_proc;
 
 PUBLIC struct proc *curr_syscall_caller;
 
@@ -584,7 +584,7 @@ vptr_t* copyto_user_heap(struct proc* who, void *src, size_t len){
 }
 
 void task_exit(){
-    zombify(current_proc);
+    zombify(curr_scheduling_proc);
     wramp_syscall(WINIX_RESCHEDULE); // random number, just to trigger rescheduling
 }
 
@@ -596,7 +596,7 @@ void task_exit(){
  *   ready_q is initialised to all empty queues.
  *   free_proc queue is initialised and filled with processes.
  *   proc_table is initialised to all DEAD processes.
- *   current_proc is set to NULL.
+ *   curr_scheduling_proc is set to NULL.
  **/
 void init_proc() {
     int i, procnr_offset;
@@ -618,7 +618,7 @@ void init_proc() {
     }
 
     proc_table = _proc_table + procnr_offset;
-    current_proc = NULL;
+    curr_scheduling_proc = NULL;
 }
 
 

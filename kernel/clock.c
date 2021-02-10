@@ -78,10 +78,10 @@ void clock_handler(){
     system_uptime++;
 
     // Accounting
-    current_proc->time_used++;
-    current_proc->ticks_left--;
+    curr_scheduling_proc->time_used++;
+    curr_scheduling_proc->ticks_left--;
 
-    if(current_proc->flags & BILLABLE){
+    if(curr_scheduling_proc->flags & BILLABLE){
         bill_ptr->sys_time_used++;
     }
     do_ticks();

@@ -32,7 +32,7 @@
 int do_send(int dest, struct message *m) {
     struct proc *pDest;
 
-    current_proc->message = m; // save for later
+    curr_scheduling_proc->message = m; // save for later
     pDest = get_proc(dest);
     
     // Is the destination valid?
@@ -41,7 +41,7 @@ int do_send(int dest, struct message *m) {
         // if the destination is waiting for the curr proc
         // avoid deadlock
         if(pDest->state & STATE_SENDING){
-            struct proc* xp = current_proc->sender_q;
+            struct proc* xp = curr_scheduling_proc->sender_q;
             while(xp){
                 if(xp == pDest){
                     return EDEADLK;
@@ -58,18 +58,18 @@ int do_send(int dest, struct message *m) {
             pDest->ctx.m.regs[0] = m->reply_res;
             enqueue_head(ready_q[pDest->priority], pDest);
             // if(is_debugging_ipc()){
-            //     KDEBUG(("IPC: msg delivered to %d from %d\n", dest, current_proc->proc_nr));
+            //     KDEBUG(("IPC: msg delivered to %d from %d\n", dest, curr_scheduling_proc->proc_nr));
             // }
         }else {
             // if(is_debugging_ipc()){
             //     KDEBUG(("IPC: SEND to %d from %d blocked\n",
-            //                 dest, current_proc->proc_nr,m->type));
+            //                 dest, curr_scheduling_proc->proc_nr,m->type));
             // }
             // Otherwise, block current process and add it to
             // head of sending queue of the destination.
-            current_proc->state |= STATE_SENDING;
-            current_proc->next_sender = pDest->sender_q;
-            pDest->sender_q = current_proc;
+            curr_scheduling_proc->state |= STATE_SENDING;
+            curr_scheduling_proc->next_sender = pDest->sender_q;
+            pDest->sender_q = curr_scheduling_proc;
         }
 
         return OK;
@@ -89,37 +89,37 @@ int do_receive(struct message *m) {
     struct proc *p, *bak;
     int i, pending;
 
-    // if(!list_empty(&current_proc->notify_queue)){
+    // if(!list_empty(&curr_scheduling_proc->notify_queue)){
     //     // KDEBUG(("not empty"));
-    //     list_for_each_entry_safe(struct proc, p, bak, &current_proc->notify_queue, notify_queue){
+    //     list_for_each_entry_safe(struct proc, p, bak, &curr_scheduling_proc->notify_queue, notify_queue){
     //         list_del(&p->notify_queue);
     //         *m = *(p->message);
     //         // if(is_debugging_ipc()){
-    //         //     KDEBUG(("%d notify queue %d type %d\n", current_proc->proc_nr, p->proc_nr, m->type));
+    //         //     KDEBUG(("%d notify queue %d type %d\n", curr_scheduling_proc->proc_nr, p->proc_nr, m->type));
     //         // }
     //         return OK;
     //     }
     // }
-    if(current_proc->notify_pending){
+    if(curr_scheduling_proc->notify_pending){
         for(i = 0; i < 32; i++){
-            if(is_bit_on(&current_proc->notify_pending, 1, i)){
-                bitmap_clear_bit(&current_proc->notify_pending, 1, i);
+            if(is_bit_on(&curr_scheduling_proc->notify_pending, 1, i)){
+                bitmap_clear_bit(&curr_scheduling_proc->notify_pending, 1, i);
                 p = get_proc(i);
                 *m = *(p->message);
                 if(is_debugging_ipc()){
-                    KDEBUG(("%d notify queue %d type %d\n", current_proc->proc_nr, p->proc_nr, m->type));
+                    KDEBUG(("%d notify queue %d type %d\n", curr_scheduling_proc->proc_nr, p->proc_nr, m->type));
                 }
                 return OK;
             }
         }
     }
     
-    p = current_proc->sender_q;
+    p = curr_scheduling_proc->sender_q;
     // If a process is waiting to send to this process, deliver it immediately.
     if (p != NULL) {
         
         // Dequeue head node
-        current_proc->sender_q = p->next_sender;
+        curr_scheduling_proc->sender_q = p->next_sender;
         
 
         // Copy message to this process
@@ -131,13 +131,13 @@ int do_receive(struct message *m) {
             enqueue_head(ready_q[p->priority], p);
         
         // if(is_debugging_ipc())
-        //     KDEBUG(("IPC: %d REC from %d type %d\n",current_proc->proc_nr, m->src ,m->type));
+        //     KDEBUG(("IPC: %d REC from %d type %d\n",curr_scheduling_proc->proc_nr, m->src ,m->type));
         
         return OK;
     }
 
-    current_proc->message = m;
-    current_proc->state |= STATE_RECEIVING;
+    curr_scheduling_proc->message = m;
+    curr_scheduling_proc->state |= STATE_RECEIVING;
     return OK;
 }
 /**

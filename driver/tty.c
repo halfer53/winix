@@ -168,7 +168,7 @@ void tty_exception_handler(RexSp_t* rex, struct tty_state* state){
             }
             if(state->controlling_session > 0 && state->foreground_group > 0){
                 ret = sys_kill(SYSTEM_TASK, -(state->foreground_group), signal);
-                // KDEBUG(("C ret %d curr %p %d state %x\n", ret,current_proc,  current_proc->proc_nr, current_proc->state));
+                // KDEBUG(("C ret %d curr %p %d state %x\n", ret,curr_scheduling_proc,  curr_scheduling_proc->proc_nr, curr_scheduling_proc->state));
             }
             goto end;
         }

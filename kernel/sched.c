@@ -71,12 +71,12 @@ struct proc *pick_proc() {
  * The Scheduler.
  *
  * Notes:
- *   Context of current_proc must already be saved.
+ *   Context of curr_scheduling_proc must already be saved.
  *   If successful, this function does not return.
  *
  * Side Effects:
- *   current_proc has its accounting fields updated, and is reinserted to ready_q.
- *   current_proc is updated to point to the next runnable process.
+ *   curr_scheduling_proc has its accounting fields updated, and is reinserted to ready_q.
+ *   curr_scheduling_proc is updated to point to the next runnable process.
  *   Context of the new proc is loaded.
  **/
 void sched() {
@@ -85,37 +85,37 @@ void sched() {
     // exception
     reset_irq_count();
 
-    if (current_proc && !current_proc->state) {
+    if (curr_scheduling_proc && !curr_scheduling_proc->state) {
 
-        if (current_proc->ticks_left > 0) {
-            enqueue_head(ready_q[current_proc->priority], current_proc);
+        if (curr_scheduling_proc->ticks_left > 0) {
+            enqueue_head(ready_q[curr_scheduling_proc->priority], curr_scheduling_proc);
         }
         else {
             // move the proc down to the lower ready queue, unless this proc
             // if already at the lowest ready queue, for every REBALANCE_TIMEOUT timer interrupts
             // rebalance_queue is called which bumps every processes in the top
             // ready queue
-            if(IS_USER_PROC(current_proc) && current_proc->priority < MIN_PRIORITY ){
-                current_proc->priority++;
+            if(IS_USER_PROC(curr_scheduling_proc) && curr_scheduling_proc->priority < MIN_PRIORITY ){
+                curr_scheduling_proc->priority++;
             }
-            enqueue_tail(ready_q[current_proc->priority], current_proc);
+            enqueue_tail(ready_q[curr_scheduling_proc->priority], curr_scheduling_proc);
             
         }
     }
 
     do{
-        current_proc = pick_proc();    
-        signum = is_sigpending(current_proc);
+        curr_scheduling_proc = pick_proc();    
+        signum = is_sigpending(curr_scheduling_proc);
         if(signum){
-            handle_sig(current_proc, signum);
+            handle_sig(curr_scheduling_proc, signum);
         }
             
-    }while(current_proc == NULL || current_proc->state);
+    }while(curr_scheduling_proc == NULL || curr_scheduling_proc->state);
     
 
     // Reset quantum if needed
-    if (current_proc->ticks_left <= 0) {
-        current_proc->ticks_left = current_proc->quantum;
+    if (curr_scheduling_proc->ticks_left <= 0) {
+        curr_scheduling_proc->ticks_left = curr_scheduling_proc->quantum;
     }
 
     // Load context and run

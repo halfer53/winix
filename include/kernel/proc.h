@@ -206,7 +206,7 @@ typedef struct proc {
 /**
 * Pointer to the current process.
 **/
-extern struct proc *current_proc;
+extern struct proc *curr_scheduling_proc;
 extern struct proc *curr_syscall_caller;
 
 extern struct proc *proc_table;
