@@ -312,8 +312,8 @@ int tty_write_rex(RexSp_t* rex, char* data, size_t len){
 
 int tty_read ( struct filp *filp, char *data, size_t count, off_t offset){
     struct tty_state* state = (struct tty_state*)filp->private;
-    if(curr_user_proc->procgrp != state->foreground_group){
-        send_sig(curr_user_proc, SIGINT);
+    if(curr_syscall_caller->procgrp != state->foreground_group){
+        send_sig(curr_syscall_caller, SIGINT);
         return DONTREPLY;
     }
 
@@ -328,7 +328,7 @@ int tty_read ( struct filp *filp, char *data, size_t count, off_t offset){
     }
     state->read_data = data;
     state->read_count = count;
-    state->reader = curr_user_proc;
+    state->reader = curr_syscall_caller;
     return SUSPEND;
 }
 
@@ -350,7 +350,7 @@ int tty_close ( struct device* dev, struct filp *file){
 }
 
 int tty_ioctl(struct filp* file, int request, ptr_t* ptr){
-    struct proc* who = curr_user_proc;
+    struct proc* who = curr_syscall_caller;
     struct tty_state* tty_data;
     tty_data = (struct tty_state*)file->filp_dev->private;
     switch (request)
