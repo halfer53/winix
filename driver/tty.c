@@ -160,7 +160,7 @@ void tty_exception_handler(RexSp_t* rex, struct tty_state* state){
                 break;
 
             case CTRL_Z:
-                signal = SIGSTOP;
+                signal = SIGTSTP;
                 break;
             
             default:

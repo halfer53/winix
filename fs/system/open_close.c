@@ -105,7 +105,7 @@ final:
 
 int sys_creat(struct proc *who, char *path, mode_t mode)
 {
-    return sys_open(who, path, O_CREAT | O_EXCL, mode);
+    return _sys_open(who, path, O_CREAT | O_EXCL, mode, ROOT_DEV);
 }
 
 int sys_open(struct proc *who, char *path, int flags, mode_t mode)
