@@ -288,6 +288,8 @@ int build_initial_stack(struct proc* who, char** argv, char** env, struct proc* 
 int exec_welf(struct proc* who, char* path, char *argv[], char *envp[], bool is_new);
 void release_proc_mem(struct proc *who);
 int alloc_mem_welf(struct proc* who, struct winix_elf* elf, int stack_size, int heap_size);
+void task_exit();
+void wramp_break();
 
 #define release_proc_slot(p)    release_zombie(p)
 

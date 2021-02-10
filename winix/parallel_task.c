@@ -70,8 +70,7 @@ void parallel_main() {
                 break;
             
             case 3:
-                // kprintf("exit\n");
-                current_proc = NULL;
+                task_exit();
                 return; // exit
         }
         

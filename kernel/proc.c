@@ -583,6 +583,11 @@ vptr_t* copyto_user_heap(struct proc* who, void *src, size_t len){
     return addr;
 }
 
+void task_exit(){
+    zombify(current_proc);
+    wramp_syscall(WINIX_RESCHEDULE); // random number, just to trigger rescheduling
+}
+
 
 /**
  * Initialises the process table

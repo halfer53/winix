@@ -19,5 +19,10 @@ wramp_syscall:
 	syscall
 	jr $ra
 
+.global wramp_break
+wramp_break:
+	break
+	jr $ra
+
 
 

@@ -174,12 +174,6 @@ PRIVATE void gpf_handler() {
 }
 
 
-void do_direct_syscall(int num){
-    struct message msg;
-    
-
-}
-
 /**
  * System Call.
  *
@@ -191,6 +185,9 @@ PRIVATE void syscall_handler() {
     int *retval;
     int reply;
     ptr_t *sp;
+
+    if(!current_proc )
+        goto end;
 
     sp = get_physical_addr(current_proc->ctx.m.sp, current_proc);
 
@@ -240,6 +237,7 @@ PRIVATE void syscall_handler() {
             break;
     }
 
+end:
     // A system call could potentially make a high-priority process runnable.
     // Run scheduler.
     sched();
@@ -249,6 +247,7 @@ PRIVATE void syscall_handler() {
  * Breakpoint.
  **/
 PRIVATE void break_handler() {
+    KDEBUG(("break"));
 }
 
 /**
