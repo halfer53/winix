@@ -56,7 +56,7 @@ wramp_set_handler:
 .global wramp_load_context
 wramp_load_context:
 	
-	lw $13, current_proc($0)
+	lw $13, curr_scheduling_proc($0)
 
 	lw $1, pcb_reg13($13)
 	movgs $ers, $1
@@ -92,7 +92,7 @@ wramp_load_context:
 ################### PRIVATE ###################
 handler:	
 	#Save Context
-	lw $13, current_proc($0)
+	lw $13, curr_scheduling_proc($0)
 	beqz $13, handler #lock up - current_task should never be null!
 
 	sw $1, pcb_reg1($13)
