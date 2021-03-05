@@ -94,10 +94,14 @@ int kgetc(struct proc* who) {
     return RexSp1->Rx;
 }
 
-void save_command_history(struct tty_state* state, struct tty_command *prev_state){
+void save_command_history(struct tty_state* state){
     struct tty_command* cmd;
     int len;
-    if(prev_state && strcmp(prev_state->command, state->read_ptr)  == 0)
+    struct tty_command *prev_state;
+    if(*state->read_ptr == '\n')
+        return;
+    prev_state = list_first_entry(&commands, struct tty_command, list);
+    if(!list_empty(&commands) && strcmp(prev_state->command, state->read_ptr)  == 0)
         return;
     cmd = kmalloc(sizeof(struct tty_command));
     if(!cmd)
@@ -185,22 +189,25 @@ void tty_exception_handler(RexSp_t* rex, struct tty_state* state){
             if(prev_history_cmd){
                 t1 = (val == CTRL_P) ? list_next_entry(struct tty_command, prev_history_cmd, list) : 
                                     list_prev_entry(struct tty_command, prev_history_cmd, list);
-                if(&t1->list != (&commands)){
-                    found = true;
-                }
-            }else{
+                found = true;
+            }else if(val == CTRL_P){
                 t1 = list_first_entry(&commands, struct tty_command, list);
                 found = true;
             }
             
             if(found){
-                prev_history_cmd = t1;
                 while(state->bptr > state->buffer){
                     terminal_backspace(rex, state);
                 }
-                strncpy(state->bptr, t1->command, state->buffer_end - state->bptr);
-                state->bptr += t1->len;
-                __kputs(rex, t1->command);
+                if(&t1->list == (&commands)){
+                    prev_history_cmd = NULL;
+                }else{
+                    prev_history_cmd = t1;
+                    strncpy(state->bptr, t1->command, TTY_BUFFER_SIZ);
+                    state->bptr += t1->len;
+                    __kputs(rex, t1->command);
+                }
+                
             }
         }
         else if(val == CTRL_U){
@@ -225,7 +232,7 @@ void tty_exception_handler(RexSp_t* rex, struct tty_state* state){
         if(state->bptr < state->buffer_end){
             if(is_new_line){
                 *state->bptr = '\0';
-                save_command_history(state, prev_history_cmd);
+                save_command_history(state);
                 prev_history_cmd = NULL;
             }
 
