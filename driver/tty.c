@@ -161,19 +161,11 @@ void tty_exception_handler(RexSp_t* rex, struct tty_state* state){
         }
         else if(val == CTRL_C || val == CTRL_Z){ // Control C or Z
             int signal;
-            switch (val)
-            {
-            case CTRL_C:
+            if(val == CTRL_C)
                 signal = SIGINT;
-                break;
-
-            case CTRL_Z:
-                signal = SIGTSTP;
-                break;
+            else if(val == CTRL_Z)
+                signal =SIGTSTP;
             
-            default:
-                break;
-            }
             if(state->controlling_session > 0 && state->foreground_group > 0){
                 ret = sys_kill(SYSTEM_TASK, -(state->foreground_group), signal);
                 // KDEBUG(("C ret %d curr %p %d state %x\n", ret,curr_scheduling_proc,  curr_scheduling_proc->proc_nr, curr_scheduling_proc->state));
