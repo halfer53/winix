@@ -17,6 +17,7 @@
         "sys_stdio.h": "c",
         "mm.h": "c",
         "ioctl.h": "c",
-        "bitmap.h": "c"
+        "bitmap.h": "c",
+        "tty.h": "c"
     }
 }

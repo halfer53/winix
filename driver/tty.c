@@ -94,9 +94,11 @@ int kgetc(struct proc* who) {
     return RexSp1->Rx;
 }
 
-void save_command_history(struct tty_state* state){
+void save_command_history(struct tty_state* state, struct tty_command *prev_state){
     struct tty_command* cmd;
     int len;
+    if(prev_state && strcmp(prev_state->command, state->read_ptr)  == 0)
+        return;
     cmd = kmalloc(sizeof(struct tty_command));
     if(!cmd)
         return;
@@ -139,14 +141,16 @@ void move_cursor(RexSp_t* rex, int num, int direction){
 }   
 
 void tty_exception_handler(RexSp_t* rex, struct tty_state* state){
-    int val, stat, ret;
+    int val, stat, ret, is_new_line;
     struct message* msg;
     
     stat = rex->Stat;
     
     if(stat & 1){
         val = rex->Rx;
-
+        if (val == '\r')
+            val = '\n';
+        is_new_line = val == '\n';
         if (val == BACKSPACE) { // backspace
             terminal_backspace(rex, state);
             goto end;
@@ -219,20 +223,13 @@ void tty_exception_handler(RexSp_t* rex, struct tty_state* state){
         // }
 
         if(state->bptr < state->buffer_end){
-            if(val == '\r')
-                val = '\n';
-
-            // only save command history if it's a regular command typed by the user
-            if(val == '\n'){
-                // KDEBUG(("prev cmd %x\n", prev_history_cmd));
-                if(prev_history_cmd == NULL){
-                    *state->bptr = '\0';
-                    save_command_history(state);
-                }
+            if(is_new_line){
+                *state->bptr = '\0';
+                save_command_history(state, prev_history_cmd);
                 prev_history_cmd = NULL;
             }
 
-            if(isprint(val) || val == '\n'){
+            if(isprint(val) || is_new_line){
                 *state->bptr++ = val;
                 if(state->is_echoing){
                     __kputc(rex, val);
@@ -243,7 +240,7 @@ void tty_exception_handler(RexSp_t* rex, struct tty_state* state){
             }
         }
 
-        if((val == '\n' || state->bptr >= state->buffer_end ) && state->reader){
+        if((is_new_line || state->bptr >= state->buffer_end ) && state->reader){
             *state->bptr = '\0';
             msg = get_exception_m();
             strncpy(state->read_data, state->read_ptr, state->read_count);
@@ -254,6 +251,7 @@ void tty_exception_handler(RexSp_t* rex, struct tty_state* state){
         }
     }
     end:
+    state->prev_char = val;
     rex->Iack = 0;
 }
 

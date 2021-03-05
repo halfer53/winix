@@ -17,6 +17,7 @@ struct tty_state{
     pid_t foreground_group;
     pid_t controlling_session;
     bool is_echoing;
+    char prev_char;
 };
 
 #endif
