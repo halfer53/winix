@@ -33,7 +33,6 @@
 #include <winix/mm.h>
 #include <stdbool.h>
 #include <winix/kstring.h>
-#include <winix/tty.h>
 #include <fs/fs_methods.h>
 
 #ifdef MAKEFS_STANDALONE

@@ -18,5 +18,5 @@
 #include <kernel/kernel.h>
 
 int do_getc(struct proc *who, struct message *m){
-    return kgetc(who);
+    return kgetc_blocking(who);
 }

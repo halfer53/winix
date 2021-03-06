@@ -24,7 +24,7 @@ int kputx_buf(int n,char *buf);
 int filp_kprint(struct filp* dev, const char* format, ...);
 int kprintf_vm( struct filp* dev, const char *orignal_format, void *arg, ptr_t *who_rbase);
 int kputc(const int c);
-int kgetc(struct proc* who);
+int kgetc_blocking(struct proc* who);
 int kprintf(const char *format, ...);
 int kerror(const char *format, ...);
 int klog(const char *format, ...);

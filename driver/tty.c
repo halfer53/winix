@@ -15,7 +15,6 @@
 #include <winix/list.h>
 #include <string.h>
 #include <ctype.h>
-#include <winix/tty.h>
 #include <winix/sigsend.h>
 
 
@@ -36,17 +35,33 @@
 #define CURSOR_LEFT     ('D')
 #define CURSOR_RIGHT    ('C')
 
+#define TTY_BUFFER_SIZ  (64)
+
 struct tty_command{
     char *command;
     int len;
     struct list_head list;
 };
 
+struct tty_state{
+    struct device* dev;
+    RexSp_t* rex;
+    char *bptr, *buffer_end, *read_ptr;
+    struct proc* reader;
+    char *read_data;
+    size_t read_count;
+    char buffer[TTY_BUFFER_SIZ];
+    pid_t foreground_group;
+    pid_t controlling_session;
+    bool is_echoing;
+    struct list_head commands;
+    struct tty_command* prev_history_cmd;
+};
+
+
 struct tty_state tty1_state, tty2_state;
 struct device _tty_dev, _tty2_dev;
 struct filp *tty1_filp = NULL, *tty2_filp = NULL;
-struct list_head commands;
-struct tty_command* prev_history_cmd = NULL;
 
 static const char* name = "tty";
 static const char* name2 = "tty2";
@@ -64,7 +79,7 @@ int __kputc(RexSp_t* rex, const int c) {
 }
 
 int __kputs(RexSp_t* rex, const char *s){
-    int count;
+    int count = 0;
     while(*s){
         if(__kputc(rex, *s++) != EOF)
             count++;
@@ -78,7 +93,7 @@ int __kputs(RexSp_t* rex, const char *s){
 
 #define TRIES   (32)
 
-int kgetc(struct proc* who) {
+int kgetc_blocking(struct proc* who) {
     int try;
     if(RexSp1->Ctrl & (1 << 8)){
         return EOF;
@@ -100,9 +115,12 @@ void save_command_history(struct tty_state* state){
     struct tty_command *prev_state;
     if(*state->read_ptr == '\n')
         return;
-    prev_state = list_first_entry(&commands, struct tty_command, list);
-    if(!list_empty(&commands) && strcmp(prev_state->command, state->read_ptr)  == 0)
-        return;
+    if(!list_empty(&state->commands)){
+        prev_state = list_first_entry(&state->commands, struct tty_command, list);
+        if(strcmp(prev_state->command, state->read_ptr)  == 0)
+            return;
+    }
+    
     cmd = kmalloc(sizeof(struct tty_command));
     if(!cmd)
         return;
@@ -112,7 +130,7 @@ void save_command_history(struct tty_state* state){
         goto err_str;
     strcpy(cmd->command, state->read_ptr);
     cmd->len = len;
-    list_add(&cmd->list, &commands);
+    list_add(&cmd->list, &state->commands);
     // KDEBUG(("saving %s\n", state->read_ptr));
     return;
 
@@ -178,12 +196,12 @@ void tty_exception_handler(RexSp_t* rex, struct tty_state* state){
             int len;
 
             
-            if(prev_history_cmd){
-                t1 = (val == CTRL_P) ? list_next_entry(struct tty_command, prev_history_cmd, list) : 
-                                    list_prev_entry(struct tty_command, prev_history_cmd, list);
+            if(state->prev_history_cmd){
+                t1 = (val == CTRL_P) ? list_next_entry(struct tty_command, state->prev_history_cmd, list) : 
+                                    list_prev_entry(struct tty_command, state->prev_history_cmd, list);
                 found = true;
             }else if(val == CTRL_P){
-                t1 = list_first_entry(&commands, struct tty_command, list);
+                t1 = list_first_entry(&state->commands, struct tty_command, list);
                 found = true;
             }
             
@@ -191,10 +209,10 @@ void tty_exception_handler(RexSp_t* rex, struct tty_state* state){
                 while(state->bptr > state->buffer){
                     terminal_backspace(rex, state);
                 }
-                if(&t1->list == (&commands)){
-                    prev_history_cmd = NULL;
+                if(&t1->list == (&state->commands)){
+                    state->prev_history_cmd = NULL;
                 }else{
-                    prev_history_cmd = t1;
+                    state->prev_history_cmd = t1;
                     strncpy(state->bptr, t1->command, TTY_BUFFER_SIZ);
                     state->bptr += t1->len;
                     __kputs(rex, t1->command);
@@ -225,7 +243,7 @@ void tty_exception_handler(RexSp_t* rex, struct tty_state* state){
             if(is_new_line){
                 *state->bptr = '\0';
                 save_command_history(state);
-                prev_history_cmd = NULL;
+                state->prev_history_cmd = NULL;
             }
 
             if(isprint(val) || is_new_line){
@@ -250,7 +268,6 @@ void tty_exception_handler(RexSp_t* rex, struct tty_state* state){
         }
     }
     end:
-    state->prev_char = val;
     rex->Iack = 0;
 }
 
@@ -273,6 +290,8 @@ int __tty_init(RexSp_t* rex, struct device* dev, struct tty_state* state){
     state->rex = rex;
     state->is_echoing = true;
     state->read_ptr = buf;
+    INIT_LIST_HEAD(&state->commands);
+    state->prev_history_cmd = NULL;
     return 0;
 }
 
@@ -425,7 +444,6 @@ void init_tty_filp(struct filp** _file, struct device* dev, struct tty_state* st
 }
 
 void init_tty(){
-    INIT_LIST_HEAD(&commands);
     init_tty_filp(&tty1_filp, &_tty_dev, &tty1_state);
     init_tty_filp(&tty2_filp, &_tty2_dev, &tty2_state);
 
