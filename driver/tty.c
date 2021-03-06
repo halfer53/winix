@@ -138,13 +138,19 @@ void save_command_history(struct tty_state* state){
     kfree(cmd);
 }
 
-void terminal_backspace(RexSp_t* rex, struct tty_state* state){
+void terminal_backspace(struct tty_state* state){
     if(state->bptr > state->buffer){
         if(state->bptr == state->read_ptr){
             state->read_ptr--;
         }
         state->bptr--;
-        __kputc(rex, BACKSPACE);
+        __kputc(state->rex, BACKSPACE);
+    }
+}
+
+void clear_terminal_buffer(struct tty_state *state){
+    while(state->bptr > state->buffer){
+        terminal_backspace(state);
     }
 }
 
@@ -162,9 +168,10 @@ void move_cursor(RexSp_t* rex, int num, int direction){
     __kputs(rex, cmd_cursor);
 }   
 
-void tty_exception_handler(RexSp_t* rex, struct tty_state* state){
+void tty_exception_handler( struct tty_state* state){
     int val, stat, ret, is_new_line;
     struct message* msg;
+    RexSp_t *rex = state->rex;
     
     stat = rex->Stat;
     
@@ -174,7 +181,7 @@ void tty_exception_handler(RexSp_t* rex, struct tty_state* state){
             val = '\n';
         is_new_line = val == '\n';
         if (val == BACKSPACE) { // backspace
-            terminal_backspace(rex, state);
+            terminal_backspace(state);
             goto end;
         }
         else if(val == CTRL_C || val == CTRL_Z){ // Control C or Z
@@ -189,6 +196,19 @@ void tty_exception_handler(RexSp_t* rex, struct tty_state* state){
                 // KDEBUG(("C ret %d curr %p %d state %x\n", ret,curr_scheduling_proc,  curr_scheduling_proc->proc_nr, curr_scheduling_proc->state));
             }
             goto end;
+        }
+        else if(val == CTRL_U){
+            clear_terminal_buffer(state);
+            goto end;
+        }
+        else if(val == CTRL_D){
+            ret = sys_kill(SYSTEM_TASK, -(state->foreground_group), SIGKILL);
+            goto end;
+        }
+        else if(val == CTRL_L){
+            clear_screen(rex);
+            state->read_ptr = state->bptr = state->buffer;
+            val = '\n';
         }
         else if(val == CTRL_P || val == CTRL_N){ // control p or n, to navigate through history
             struct tty_command* t1;
@@ -206,9 +226,7 @@ void tty_exception_handler(RexSp_t* rex, struct tty_state* state){
             }
             
             if(found){
-                while(state->bptr > state->buffer){
-                    terminal_backspace(rex, state);
-                }
+                clear_terminal_buffer(state);
                 if(&t1->list == (&state->commands)){
                     state->prev_history_cmd = NULL;
                 }else{
@@ -219,19 +237,6 @@ void tty_exception_handler(RexSp_t* rex, struct tty_state* state){
                 }
                 
             }
-        }
-        else if(val == CTRL_U){
-            while(state->bptr > state->buffer){
-                terminal_backspace(rex, state);
-            }
-        }
-        else if(val == CTRL_L){
-            clear_screen(rex);
-            state->read_ptr = state->bptr = state->buffer;
-            val = '\n';
-        }
-        else if(val == CTRL_D){
-            ret = sys_kill(SYSTEM_TASK, -(state->foreground_group), SIGKILL);
         }
 
         // reset ring buffer if buffer end is reached
@@ -273,11 +278,11 @@ void tty_exception_handler(RexSp_t* rex, struct tty_state* state){
 
 
 void tty1_handler(){
-    tty_exception_handler(RexSp1, &tty1_state);
+    tty_exception_handler(&tty1_state);
 }
 
 void tty2_handler(){
-    tty_exception_handler(RexSp2, &tty2_state);
+    tty_exception_handler(&tty2_state);
 }
 
 int __tty_init(RexSp_t* rex, struct device* dev, struct tty_state* state){
