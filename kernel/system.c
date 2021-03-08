@@ -119,23 +119,25 @@ void set_message_for_syscall(int operation, ptr_t* sp, struct message *m, struct
     {
     case LSEEK:
         m->m1_i3 = *(sp + 2);
-    case DUP2:
     case KILL:
     case SETPGID:
+    case DUP2:
         m->m1_i2 = *(sp + 1);
     case ALARM:
+    case WINFO:
+    case SYSCONF:
+    case SIGSUSPEND:
+    case GETPGID:
     case CLOSE:
     case DUP:
     case UMASK:
     case CSLEEP:
-    case GETPGID:
-    case SIGSUSPEND:
-    case SYSCONF:
-    case WINFO:
     case SBRK:
         m->m1_i1 = *sp;
         break;
-
+    case WAITPID:
+    case STRERROR:
+    case SIGPROCMASK:
     case READ:
     case WRITE:
     case CREAT:
@@ -146,9 +148,6 @@ void set_message_for_syscall(int operation, ptr_t* sp, struct message *m, struct
     case GETDENT:
     case ACCESS:
     case MKDIR:
-    case STRERROR:
-    case SIGPROCMASK:
-    case WAITPID:
     case SIGNAL:
     case GETCWD:
         m->m1_i1 = *sp++;
@@ -164,11 +163,12 @@ void set_message_for_syscall(int operation, ptr_t* sp, struct message *m, struct
     case LINK:
     case STATFS:
         m->m1_p2 = (void *)*(sp + 1);
+    case TIMES:
+    case BRK:
+    case SIGPENDING:
     case PIPE:
     case CHDIR:
     case UNLINK:
-    case SIGPENDING:
-    case TIMES:
         m->m1_p1 = (void*)*sp;
         break;
     
