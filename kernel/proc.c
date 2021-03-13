@@ -333,14 +333,13 @@ void proc_set_default(struct proc *p) {
  * @return      virtual address of the stack
  */
 reg_t* alloc_kstack(struct proc *who, int size){
-    int page_size;
     int index;
     ptr_t *addr, *stack_top;
 
     if(size % PAGE_LEN == 0){
         stack_top = get_free_pages(size, GFP_HIGH);
     }else{
-        stack_top = kmalloc(size);
+        stack_top = kmalloc;
     }
 
     addr = stack_top + size - 1;
