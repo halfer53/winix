@@ -38,9 +38,9 @@
 #define TTY_BUFFER_SIZ  (64)
 
 struct tty_command{
-    char *command;
     int len;
     struct list_head list;
+    char command[1];
 };
 
 struct tty_state{
@@ -113,29 +113,23 @@ void save_command_history(struct tty_state* state){
     struct tty_command* cmd;
     int len;
     struct tty_command *prev_state;
-    if(*state->read_ptr == '\n')
+    char c = *state->read_ptr;
+    if(c == '\n' || c == '\0')
         return;
     if(!list_empty(&state->commands)){
         prev_state = list_first_entry(&state->commands, struct tty_command, list);
         if(strcmp(prev_state->command, state->read_ptr)  == 0)
             return;
     }
-    
-    cmd = kmalloc(sizeof(struct tty_command));
+    len = strlen(state->read_ptr);
+    cmd = kmalloc(sizeof(struct tty_command) + len);
     if(!cmd)
         return;
-    len = strlen(state->read_ptr);
-    cmd->command = kmalloc(len + 1);
-    if(!cmd->command)
-        goto err_str;
     strcpy(cmd->command, state->read_ptr);
     cmd->len = len;
     list_add(&cmd->list, &state->commands);
     // KDEBUG(("saving %s\n", state->read_ptr));
     return;
-
-    err_str:
-    kfree(cmd);
 }
 
 void terminal_backspace(struct tty_state* state){
