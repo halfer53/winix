@@ -30,7 +30,6 @@ struct mem_block {
 };
 
 static void *base = NULL;
-static int count = 0;
 
 #define SLAB_HEADER_SIZE 	(sizeof(struct mem_block) - 1)
 #define align4(x) 	(((((x)-1)>>2)<<2)+4)
@@ -148,10 +147,9 @@ struct mem_block *extend_heap(struct mem_block *first , size_t s)
 void *_kmalloc(size_t size, void* ra) {
 
     struct mem_block *b, *first, *b2;
-    size_t s;
+    size_t s = size;
 
-    count++;
-    s = align4(size);
+    // s = align4(size);
     // KDEBUG(("kmalloc begin size %d by %x\n", size, ra));
 
     if (base) {
