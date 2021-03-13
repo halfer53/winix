@@ -22,7 +22,7 @@ struct mem_block {
     struct mem_block *prev;
     void *ra;
     int free;
-    void *ptr; // a pointer to the allocated block
+    void *ptr; // a pointer to the allocated block for magic checking
     char data[1]; // the pointer where the real data is pointed at. b->data is what kmalloc returns
     // The reason we use data[1] is that c returns the address of array by default, 
     // whereas if we were to use ```char data;```, b-> returns the data instead of the address.
@@ -32,13 +32,13 @@ struct mem_block {
 static void *base = NULL;
 static int count = 0;
 
-#define SLAB_BLOCK_SIZE 	(sizeof(struct mem_block) - 1)
+#define SLAB_HEADER_SIZE 	(sizeof(struct mem_block) - 1)
 #define align4(x) 	(((((x)-1)>>2)<<2)+4)
 
 void kprintblock(struct mem_block *b) {
     char *prev, *next;
-    prev = (char *)(b->prev != NULL ? (char *)b->prev->data : (char *)b->prev);
-    next = (char *)(b->next != NULL ? (char *)b->next->data : (char *)b->next);
+    prev = (b->prev ? b->prev->data : (char *)b->prev);
+    next = (b->next ? b->next->data : (char *)b->next);
     kprintf("0x%08x size %4d prev 0x%08x next 0x%08x ra %08x %s\n",
         b->data,
         b->size, 
@@ -84,21 +84,23 @@ struct mem_block *find_block(struct mem_block **first , size_t size) {
 struct mem_block* split_block(struct mem_block *b, size_t s)
 {
     struct mem_block *new;
-    new = (struct mem_block *)(b->data + b->size - s - SLAB_BLOCK_SIZE);
+    new = (struct mem_block *)(b->data + b->size - s - SLAB_HEADER_SIZE);
     new->size = s;
     new->next = b->next;
     new->prev = b;
     new->free = true;
     new->ptr = new->data;
 
-    // KDEBUG(("input %d new 0x%08x size %d orisize %d\n", s, new, new->size, b->size));
-    b->size = b->size - s - SLAB_BLOCK_SIZE;
+    // KDEBUG(("size %d new 0x%08x size %d orisize %d\n", s, new->data, new->size, b->size));
+    b->size = b->size - s - SLAB_HEADER_SIZE;
+    
     b->next = new;
     if(b == base){
         base = new;
     }
     if (new->next)
         new->next->prev = new;
+    kprintblock(b);
     return new;
 }
 
@@ -112,8 +114,8 @@ struct mem_block *extend_heap(struct mem_block *first , size_t s)
     ptr_t *ptr;
     size_t round_s;
 
-    if(s < SLAB_BLOCK_SIZE){
-        s = SLAB_BLOCK_SIZE + 1;
+    if(s < SLAB_HEADER_SIZE){
+        s = SLAB_HEADER_SIZE + 1;
     }
 
     round_s = ALIGN1K_HB(s);
@@ -125,15 +127,17 @@ struct mem_block *extend_heap(struct mem_block *first , size_t s)
     }
     
     b = (struct mem_block *)ptr;
-    b->size = round_s - SLAB_BLOCK_SIZE;
+    b->size = round_s - SLAB_HEADER_SIZE;
     b->prev = NULL;
     b->next = first;
     b->ptr = b->data;
     b->free = true;
     if (first)
         first->prev = b;
+    if(!base)
+        base = b;
 
-    if (round_s - s > SLAB_BLOCK_SIZE * 2){
+    if (round_s - s > SLAB_HEADER_SIZE * 2){
         b2 = split_block(b, s);
         return b2;
     }
@@ -157,7 +161,7 @@ void *_kmalloc(size_t size, void* ra) {
         b = find_block(&first , s);
         if (b) {
             /* can we split */
-            if ((b->size - s) >= (SLAB_BLOCK_SIZE * 2)){
+            if ((b->size - s) >= (SLAB_HEADER_SIZE * 2)){
                 b2 = split_block(b, s);
                 b = b2;
             } 
@@ -170,8 +174,7 @@ void *_kmalloc(size_t size, void* ra) {
     } else {
         b = extend_heap(NULL , s);
         if (!b)
-            return (NULL);
-        base = b;        
+            return (NULL);    
     }
     b->ra = ra;
     b->free = false;
@@ -182,7 +185,7 @@ void *_kmalloc(size_t size, void* ra) {
 
 /* Get the block from and addr */
 struct mem_block *get_block(void *p){
-    return (void *)((int *)p - SLAB_BLOCK_SIZE);
+    return (void *)((int *)p - SLAB_HEADER_SIZE);
 }
 
 /* Valid addr for free */
@@ -198,7 +201,7 @@ struct mem_block *fusion(struct mem_block *b) {
     // KDEBUG(("before fusing %x ", b->data));
     // kprint_slab();
     if (next && next->free && ((int)(b->ptr) + b->size == (int)next)) {
-        b->size += SLAB_BLOCK_SIZE + next->size;
+        b->size += SLAB_HEADER_SIZE + next->size;
         b->next = next->next;
         if(next == base){
             base = b;
@@ -274,7 +277,7 @@ void add_free_mem(void* addr, size_t size){
 //         b = get_block(p);
 //         if (b->size >= s)
 //         {
-//             if (b->size - s >= (SLAB_BLOCK_SIZE + 4))
+//             if (b->size - s >= (SLAB_HEADER_SIZE + 4))
 //                 split_block(b, s);
 //         }
 //         else
@@ -283,10 +286,10 @@ void add_free_mem(void* addr, size_t size){
 //             next = b->next;
 //             if (next && next->free
 //                     &&    ((int)(b->ptr) + b->size == (int)next)
-//                     && (b->size + SLAB_BLOCK_SIZE + next->size) >= s)
+//                     && (b->size + SLAB_HEADER_SIZE + next->size) >= s)
 //             {
 //                 fusion(b);
-//                 if (b->size - s >= (SLAB_BLOCK_SIZE + 4))
+//                 if (b->size - s >= (SLAB_HEADER_SIZE + 4))
 //                     split_block(b, s);
 //             }
 //             else

@@ -122,7 +122,7 @@ void save_command_history(struct tty_state* state){
             return;
     }
     len = strlen(state->read_ptr);
-    cmd = kmalloc(sizeof(struct tty_command) + len);
+    cmd = kmalloc(sizeof(struct tty_command) + len + 1);
     if(!cmd)
         return;
     strcpy(cmd->command, state->read_ptr);
