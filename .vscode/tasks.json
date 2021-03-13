@@ -2,22 +2,8 @@
     "tasks": [
         {
             "type": "shell",
-            "label": "gcc-7 build active file",
-            "command": "/usr/bin/gcc-7",
-            "args": [
-                "-g",
-                "${file}",
-                "-o",
-                "${fileDirname}/${fileBasenameNoExtension}"
-            ],
-            "options": {
-                "cwd": "/usr/bin"
-            }
-        },
-        {
-            "type": "shell",
-            "label": "gcc-7 build makedisk",
-            "command": "/usr/bin/gcc-7",
+            "label": "GCC Build makedisk",
+            "command": "/usr/bin/gcc",
             "args": [
                 "-g",
                 "-D",

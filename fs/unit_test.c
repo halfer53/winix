@@ -19,7 +19,7 @@ int file_size(struct proc* who, int fd){
 
 int unit_test1(){
     struct proc pcurr2;
-    int ret, fd, fd2, fd3, fd4;
+    int ret, fd, fd2, fd3, fd4, i;
     int pipe_fd[2];
     struct stat statbuf, statbuf2;
     init_bitmap();
@@ -166,7 +166,7 @@ int unit_test1(){
 
     ret = sys_getdents(curr_scheduling_proc, fd3, dir, 5);
     assert(ret == sizeof(struct dirent) * 4);
-    for (int i = 0; i < 4; ++i) {
+    for (i = 0; i < 4; ++i) {
         assert(char32_strcmp(dir[i].d_name, dirent_array[i]) == 0);
     }
     ret = sys_getdents(curr_scheduling_proc, fd3, dir, 10);
@@ -225,6 +225,6 @@ int unit_test1(){
     ret = sys_close(curr_scheduling_proc, fd4);
     assert(ret == EBADF);
 
-
+    printf("filesystem unit test passed");
     return 0;
 }

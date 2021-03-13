@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "gcc-7 - Build and debug active file",
+            "name": "File System Run Makedisk",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/makedisk",
@@ -22,11 +22,11 @@
                     "ignoreFailures": true
                 }
             ],
-            "preLaunchTask": "gcc-7 build makedisk",
+            "preLaunchTask": "GCC Build makedisk",
             "miDebuggerPath": "/usr/bin/gdb"
         },
         {
-            "name": "fs unit test",
+            "name": "File System Run Unit Test",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/makedisk",
@@ -43,7 +43,7 @@
                     "ignoreFailures": true
                 }
             ],
-            "preLaunchTask": "gcc-7 build makedisk",
+            "preLaunchTask": "GCC Build makedisk",
             "miDebuggerPath": "/usr/bin/gdb"
         }
     ]
