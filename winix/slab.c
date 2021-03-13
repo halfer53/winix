@@ -100,7 +100,7 @@ struct mem_block* split_block(struct mem_block *b, size_t s)
     }
     if (new->next)
         new->next->prev = new;
-    kprintblock(b);
+    // kprintblock(b);
     return new;
 }
 
