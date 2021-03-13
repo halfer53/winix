@@ -33,7 +33,7 @@
 
 // Major and minor version numbers for WINIX.
 #define MAJOR_VERSION 2
-#define MINOR_VERSION 2
+#define MINOR_VERSION 3
 
 // Predefined, wramp board has 1024 pages in total,
 // which equals to 4 * 32
