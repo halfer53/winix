@@ -12,8 +12,10 @@ L_HEAD = winix/limits/limits_head.o
 L_TAIL = winix/limits/limits_tail.o
 KERNEL_O = winix/*.o kernel/system/*.o kernel/*.o fs/*.o fs/system/*.o driver/*.o include/disk.o
 KMAIN = kernel/main.s kernel/main.o 
-alldir = winix lib init user kernel fs driver
+ALLDIR = winix lib init user kernel fs driver
 FS_DEPEND = fs/*.c fs/system/*.c fs/makefs_only/*.c 
+DISK = include/disk.c
+SREC = $(shell find include/srec -name "*.srec")
 
 # Check if V options is set by user, if V=1, debug mode is set
 # e.g. make V=1 produces all the commands being executed through
@@ -24,7 +26,6 @@ endif
 ifndef KBUILD_VERBOSE
 	KBUILD_VERBOSE = 0
 endif
-
 ifeq ($(KBUILD_VERBOSE),1)
 	quiet =
 	Q =
@@ -40,13 +41,13 @@ export quiet
 export srctree \\
 export includes := $(shell find include -name "*.h")
 export CFLAGS := -D_DEBUG -D__wramp__
+export SREC_DIR := include/srec
+export TEXT_OFFSET := 2048
 
-
-
-all:| makedisk kbuild build_disk compile_disk
+all:| makedisk kbuild $(DISK)
 	$(Q)wlink $(LDFLAGS) -Ttext 1024 -v -o winix.srec \
 			$(L_HEAD) $(KERNEL_O) $(KLIB_O) $(L_TAIL) \
-							> include/srec/winix.verbose
+							> $(SREC_DIR)/winix.verbose
 ifeq ($(KBUILD_VERBOSE),0)
 	@echo "LD \t winix.srec"
 endif
@@ -56,23 +57,21 @@ makedisk: $(FS_DEPEND)
 	# $(Q)-rm -f $(KMAIN)
 	# $(Q)$(MAKE) -C tools
 
-kbuild: $(alldir)
-$(alldir): FORCE
+kbuild: $(ALLDIR)
+$(ALLDIR): FORCE
 	$(Q)$(MAKE) $(build)=$@
 
-build_disk: FORCE
-	$(Q)./makedisk -t 2048 -o include/disk.c -s include/srec
+$(DISK): $(SREC)
+	$(Q)./makedisk -t $(TEXT_OFFSET) -o $(DISK) -s $(SREC_DIR)
 ifeq ($(KBUILD_VERBOSE),0)
 	@echo "LD \t disk.c"
 endif
-
-compile_disk: FORCE
 	$(Q)$(MAKE) $(build)=include
 
 clean:
 	$(Q)rm -f makedisk
-	$(Q)rm -f include/srec/*
-	$(Q)$(MAKE) $(cleanall)='$(alldir)'
+	$(Q)rm -f $(SREC_DIR)/*
+	$(Q)$(MAKE) $(cleanall)='$(ALLDIR)'
 
 d-verbose:
 	$(MAKE) all CFLAGS=-D_DEBUG=2
@@ -84,9 +83,6 @@ stat:
 	@find . -name "*.h" -exec cat {} \; | wc -l
 	@echo "Assembly LoC: "
 	@find . -name "*.s" -exec cat {} \; | wc -l
-
-test:
-	gcc -D_GCC_DEBUG -I./include test.c winix/bitmap.c winix/mm.c
 
 FORCE:
 

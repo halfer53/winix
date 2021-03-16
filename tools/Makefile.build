@@ -3,7 +3,7 @@
 # Building
 # ==========================================================================
 
-include_srec_dir := include/srec
+
 src := $(obj)
 srcdepend := $(src)/.depend
 
@@ -38,7 +38,7 @@ objects := $(addprefix $(src)/, $(obj-y) $(asm-y:%.s=%.o))
 assembly := $(addprefix $(src)/, $(obj-y:%.o=%.s))
 source := $(addprefix $(src)/, $(obj-y:%.o=%.c))
 srecobj := $(srec-y)
-# srecobj := $(addprefix $(include_srec_dir)/, $(srec-y))
+# srecobj := $(addprefix $(SREC_DIR)/, $(srec-y))
 srecobj := $(addprefix $(src)/, $(srec-y))
 # srecdep := $(foreach dep, $(srec-y), $(addprefix $(src)/, $($(dep))) )
 
@@ -69,9 +69,8 @@ $(subdir-y): FORCE
 %.srec : $$(%.srec)
 	$(eval $@_SRC := $(addprefix $(src)/,$($(notdir $@):.o=.c)))
 	$(eval $@_FILE := $(notdir $(@:.srec=)))
-	# @echo $($@_SRC) "|" $($@_OBJ) "|" $@ "|" $($@) "|" $^
-	$(Q)wlink -Ttext 2048 -v -o $(src)/$(notdir $@) $^ $(shell $(get_libs) $($@_SRC)) > $(include_srec_dir)/$($@_FILE).verbose
-	$(Q)cp $(src)/$(notdir $@) $(include_srec_dir)/$(notdir $@)
+	$(Q)wlink -Ttext $(TEXT_OFFSET) -v -o $(src)/$(notdir $@) $^ $(shell $(get_libs) $($@_SRC)) > $(SREC_DIR)/$($@_FILE).verbose
+	$(Q)cp $(src)/$(notdir $@) $(SREC_DIR)/$(notdir $@)
 ifeq ($(KBUILD_VERBOSE),0)
 	@echo "LD \t $($@_FILE).srec"
 endif
