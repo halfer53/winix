@@ -32,19 +32,15 @@ include tools/Kbuild.include
 
 subdir-y := $(addprefix $(src)/, $(patsubst %/,%, $(filter %/,$(obj-y))))
 obj-y := $(filter-out %/,$(obj-y))
-userobj-y := $(filter-out %/,$(usr-y))
 
 objects := $(addprefix $(src)/, $(obj-y) $(asm-y:%.s=%.o))
 assembly := $(addprefix $(src)/, $(obj-y:%.o=%.s))
 source := $(addprefix $(src)/, $(obj-y:%.o=%.c))
 srecobj := $(srec-y)
 
-
-libs := $(shell find lib -name "*.o")
-
 PHONY := __build
 
-__build: $(objects) $(srcdepend) $(subdir-y) $(srecobj)
+__build: $(assembly) $(objects) $(srcdepend) $(subdir-y) $(srecobj)
 $(assembly): %.s: %.c 
 	$(Q)wcc $(CFLAGS) -S -N -I./include/posix_include -I./include -o $@ $<
 ifeq ($(KBUILD_VERBOSE),0)
@@ -63,10 +59,11 @@ $(srcdepend): $(source) $(includes)
 $(subdir-y): FORCE
 	$(Q)$(MAKE) $(build)=$@
 
-$(srecobj): $(objects)
+$(srecobj): 
 	$(eval $@_SRC := $(addprefix $(src)/,$($(notdir $@):.o=.c)))
 	$(eval $@_OBJ := $(addprefix $(src)/,$($(notdir $@))))
 	$(eval $@_FILE := $(notdir $(@:.srec=)))
+	# @echo $($@_SRC) "|" $($@_OBJ) "|" $@ "|" $($@) "|" $<
 	$(Q)wlink -Ttext 2048 -v -o include/srec/$@ $($@_OBJ) $(shell $(get_libs) $($@_SRC)) > include/srec/$($@_FILE).verbose
 ifeq ($(KBUILD_VERBOSE),0)
 	@echo "LD \t $($@_FILE).srec"
