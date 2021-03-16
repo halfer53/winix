@@ -3,6 +3,7 @@
 # Building
 # ==========================================================================
 
+srecdir := include/srec
 src := $(obj)
 srcdepend := $(src)/.depend
 
@@ -36,7 +37,9 @@ obj-y := $(filter-out %/,$(obj-y))
 objects := $(addprefix $(src)/, $(obj-y) $(asm-y:%.s=%.o))
 assembly := $(addprefix $(src)/, $(obj-y:%.o=%.s))
 source := $(addprefix $(src)/, $(obj-y:%.o=%.c))
-srecobj := $(srec-y)
+# srecobj := $(srec-y)
+srecobj := $(addprefix $(srecdir)/, $(srec-y))
+srecdep := $(foreach dep, $(srec-y), $(addprefix $(src)/, $($(dep))) )
 
 PHONY := __build
 
@@ -59,15 +62,17 @@ $(srcdepend): $(source) $(includes)
 $(subdir-y): FORCE
 	$(Q)$(MAKE) $(build)=$@
 
-$(srecobj): 
+# todo https://stackoverflow.com/questions/45156678/makefile-pattern-in-prerequisite-variable
+$(srecobj): $(srecdep)
 	$(eval $@_SRC := $(addprefix $(src)/,$($(notdir $@):.o=.c)))
 	$(eval $@_OBJ := $(addprefix $(src)/,$($(notdir $@))))
 	$(eval $@_FILE := $(notdir $(@:.srec=)))
-	# @echo $($@_SRC) "|" $($@_OBJ) "|" $@ "|" $($@) "|" $<
-	$(Q)wlink -Ttext 2048 -v -o include/srec/$@ $($@_OBJ) $(shell $(get_libs) $($@_SRC)) > include/srec/$($@_FILE).verbose
+	# @echo $($@_SRC) "|" $($@_OBJ) "|" $@ "|" $($@) "|" $^
+	$(Q)wlink -Ttext 2048 -v -o $(srecdir)/$(notdir $@) $($@_OBJ) $(shell $(get_libs) $($@_SRC)) > $(srecdir)/$($@_FILE).verbose
 ifeq ($(KBUILD_VERBOSE),0)
 	@echo "LD \t $($@_FILE).srec"
 endif
+
 
 FORCE:
 
