@@ -34,9 +34,8 @@
 #define __set_errno(val)    ((*ERRNO_PTR) = (val))        
 #endif
 
-extern int __errno;          /* place where the error numbers go */
-
-
+#define ESTR_SIZ    (16)
+extern char estr[ESTR_SIZ];
 
 /* Here are the numerical values of the error numbers. */
 #define _NERROR              40  /* number of errors */  

@@ -3,14 +3,13 @@
 #include <stddef.h>
 #include <stdio.h>
 
-#define ESTR_SIZ    (16)
 
 FILE _stdin = {0, 0, 0, 0 , 0, 0};
 FILE _stdout = {0, 1, 0, 0 , 0, 0};
 FILE _stderr = {0, 2, 0, 0 , 0, 0};
 FILE *stdin = &_stdin, *stdout = &_stdout, *stderr = &_stderr;
 
-static char estr[ESTR_SIZ];
+char estr[ESTR_SIZ];
 
 // int __dprintf(int fd, const char *format, void* args){
 //     struct message m;
@@ -46,7 +45,7 @@ char* strerror(int usrerrno){
     return estr;
 }
 
-void perror(const char *s){
-    __strerror(estr, ESTR_SIZ, errno);
-    dprintf(2, "%s: %s\n", s, estr);
-}
+// void perror(const char *s){
+//     __strerror(estr, ESTR_SIZ, errno);
+//     dprintf(2, "%s: %s\n", s, estr);
+// }

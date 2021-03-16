@@ -22,7 +22,7 @@
 #include <sys/stat.h>
 #include <signal.h>
 #include <stdio.h>
-
+#include <errno.h>
 
 #define _NSYSCALL               54
 /**
@@ -83,13 +83,6 @@
 #define GETCWD          52
 #define TFORK           53
 
-#define DECLARE_SYSCALL(function, params, syscall_num, passing_codes)\
-function params{\
-    struct message m;\
-    passing_codes;\
-    return _syscall(syscall_num, &m);\
-}\
-
 
 #define WINFO_PS            1
 #define WINFO_MEM           2
@@ -97,6 +90,8 @@ function params{\
 #define WINFO_TRACE_SYSCALL (4)
 #define WINFO_DISABLE_TRACE (5)
 #define WINFO_DEBUG_IPC     6
+
+extern const char **_environ;
 
 #ifndef MAKEFS_STANDALONE
 
@@ -213,6 +208,20 @@ int brk(void *addr);
 #define statfs(path, buf)           (wramp_syscall(STATFS, path, buf))
 #define getcwd(buf, size)           (ptr_wramp_syscall(GETCWD, size, buf))
 #define tfork()                     (wramp_syscall(TFORK))
+
+
+#define execv(path1, argv1) \
+do { \
+    init_environ(); \
+    execve(path1, argv1, _environ); \
+    exit(1); \
+}while(0)
+
+#define perror(s) \
+do{ \
+    __strerror(estr, ESTR_SIZ, errno); \
+    dprintf(2, "%s: %s\n", s, estr); \
+}while(0)
 
 #endif //_SYSTEM
 #endif //__wramp__

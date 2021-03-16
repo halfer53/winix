@@ -122,7 +122,7 @@ int main(int argc, char **argv)
   pid = vfork();
   if (pid == 0)
   {
-    i = execv(shell_path, shell_argv);
+    execv(shell_path, shell_argv);
     return 1;
   }
 
