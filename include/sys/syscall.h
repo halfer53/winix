@@ -24,6 +24,11 @@
 #include <stdio.h>
 #include <errno.h>
 
+
+#ifndef NULL
+#define	NULL		((void *)0)
+#endif
+
 #define _NSYSCALL               54
 /**
  * System Call Numbers
@@ -153,6 +158,7 @@ clock_t times(struct tms *buf);
 pid_t waitpid(pid_t pid, int *status, int options);
 pid_t tfork();
 int brk(void *addr);
+void init_environ();
 
 #ifdef __wramp__
 #ifndef _SYSTEM
@@ -209,6 +215,17 @@ int brk(void *addr);
 #define getcwd(buf, size)           (ptr_wramp_syscall(GETCWD, size, buf))
 #define tfork()                     (wramp_syscall(TFORK))
 
+
+
+
+#define __ALIGN1K(x) 	    (((((x))>>10)<<10)+1023)
+#define __get_env_address() (__ALIGN1K((int)get_sp()))
+#define __get_env()         (*((const char ***) __get_env_address()))
+
+#define init_environ()  \
+do{ \
+    _environ = __get_env(); \
+}while(0)
 
 #define execv(path1, argv1) \
 do { \

@@ -3,6 +3,7 @@
 
 #include <stddef.h>
 #include <sys/types.h>
+#include	<sys/syscall.h>
 
 #define EXIT_SUCCESS 0
 #define EXIT_FAILURE 1

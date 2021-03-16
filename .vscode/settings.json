@@ -20,7 +20,8 @@
         "bitmap.h": "c",
         "tty.h": "c",
         "types.h": "c",
-        "cache.h": "c"
+        "cache.h": "c",
+        "stdlib.h": "c"
     },
     "files.exclude": {
         "**/*.o": true,

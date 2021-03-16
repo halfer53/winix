@@ -37,7 +37,7 @@ struct dirent *readdir(DIR *directory);
 int closedir(DIR *directory);
 const char **get_environ();
 
-#define environ     (get_environ())
+#define environ     ( _environ ? _environ : __get_env())
 
 
 #endif /* !_SYS_UNISTD_H_ */

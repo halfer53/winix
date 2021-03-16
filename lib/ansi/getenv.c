@@ -6,8 +6,6 @@
 
 #include	<stdlib.h>
 
-extern const char **_environ;
-
 char *getenv(const char *name)
 {
 	const char **v;
