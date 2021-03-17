@@ -215,32 +215,23 @@ void init_environ();
 #define getcwd(buf, size)           (ptr_wramp_syscall(GETCWD, size, buf))
 #define tfork()                     (wramp_syscall(TFORK))
 
-
-
+#endif //_SYSTEM
 
 #define __ALIGN1K(x) 	    (((((x))>>10)<<10)+1023)
 #define __get_env_address() (__ALIGN1K((int)get_sp()))
-#define __get_env()         (*((const char ***) __get_env_address()))
+#define __get_env_ptr()     (*((const char ***) __get_env_address()))
+#define __get_env()         (_environ ? _environ : __get_env_ptr()) 
 
 #define init_environ()  \
 do{ \
-    _environ = __get_env(); \
+    if(!_environ){ \
+        _environ = __get_env(); \
+    } \
 }while(0)
 
-#define execv(path1, argv1) \
-do { \
-    init_environ(); \
-    execve(path1, argv1, _environ); \
-    exit(1); \
-}while(0)
+#define execv(path, argv)       execve(path, argv, __get_env()) 
+#define perror(s)               dprintf(STDERR_FILENO, "%s: %s\n", s, strerror(errno))
 
-#define perror(s) \
-do{ \
-    __strerror(estr, ESTR_SIZ, errno); \
-    dprintf(2, "%s: %s\n", s, estr); \
-}while(0)
-
-#endif //_SYSTEM
 #endif //__wramp__
 
 #endif //MAKEFS_STANDALONE

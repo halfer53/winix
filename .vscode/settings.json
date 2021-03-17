@@ -21,7 +21,8 @@
         "tty.h": "c",
         "types.h": "c",
         "cache.h": "c",
-        "stdlib.h": "c"
+        "stdlib.h": "c",
+        "stdio.h": "c"
     },
     "files.exclude": {
         "**/*.o": true,
