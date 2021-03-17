@@ -221,13 +221,7 @@ void init_environ();
 #define __get_env_address() (__ALIGN1K((int)get_sp()))
 #define __get_env_ptr()     (*((const char ***) __get_env_address()))
 #define __get_env()         (_environ ? _environ : __get_env_ptr()) 
-
-#define init_environ()  \
-do{ \
-    if(!_environ){ \
-        _environ = __get_env(); \
-    } \
-}while(0)
+#define init_environ()      (_environ = __get_env())
 
 #define execv(path, argv)       execve(path, argv, __get_env()) 
 #define perror(s)               dprintf(STDERR_FILENO, "%s: %s\n", s, strerror(errno))
