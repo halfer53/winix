@@ -26,6 +26,7 @@
     },
     "files.exclude": {
         "**/*.o": true,
-        "**/*.s": true
+        "**/*.s": true,
+        "**/*.srec": true
     }
 }
