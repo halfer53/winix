@@ -92,7 +92,8 @@ PRIVATE int build_signal_ctx(struct proc *who, int signum){
  *                return ERR if the user needs to handle the signal
  */
 PRIVATE int sys_sig_handler(struct proc *who, int signum){
-    if(who->sig_table[signum].sa_handler == SIG_DFL){
+    sighandler_t handler = who->sig_table[signum].sa_handler;
+    if(handler == SIG_DFL){
 
         switch(signum){
             case SIGCONT:
@@ -121,7 +122,7 @@ PRIVATE int sys_sig_handler(struct proc *who, int signum){
         return OK;
     }
     // if it's ignored
-    else if(who->sig_table[signum].sa_handler == SIG_IGN){
+    else if(handler == SIG_IGN){
         struct proc* mp;
         switch(signum){
             case SIGABRT:
