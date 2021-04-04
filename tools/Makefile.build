@@ -67,12 +67,10 @@ $(subdir-y): FORCE
 
 .SECONDEXPANSION:
 %.srec : $$(%.srec)
-	$(eval $@_SRC := $(addprefix $(src)/,$($(notdir $@):.o=.c)))
-	$(eval $@_FILE := $(notdir $(@:.srec=)))
-	$(Q)wlink -Ttext $(TEXT_OFFSET) -v -o $(src)/$(notdir $@) $^ $(shell $(get_libs) $($@_SRC)) > $(SREC_DIR)/$($@_FILE).verbose
-	$(Q)cp $(src)/$(notdir $@) $(SREC_DIR)/$(notdir $@)
+	$(Q)wlink -Ttext $(TEXT_OFFSET) -v -o $@ $^ $(shell $(get_libs) $^) > $(SREC_DIR)/$(notdir $(@:.srec=)).verbose
+	$(Q)cp $@ $(SREC_DIR)/$(notdir $@)
 ifeq ($(KBUILD_VERBOSE),0)
-	@echo "LD \t $($@_FILE).srec"
+	@echo "LD \t $@"
 endif
 
 FORCE:

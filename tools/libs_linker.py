@@ -29,8 +29,6 @@ built_in = {
 	"sys/ipc.h": {IPC}
 }
 
-dir_path = ""
-
 def get_all_files(libs):
 	ret = ''
 	for lib in libs:
@@ -64,19 +62,19 @@ def get_sys_include(line):
 			return built_in[filename]
 	return set()
 
-def get_local_include(line):
-	global dir_path
+def get_local_include(line, dir_path):
 	i,j = include_iterate('"', '"',line)
 	if(j > i + 1):
 		filename = line[i:j]
 		return do_include_search(dir_path + filename)
 	return set()
 
-def do_include_search(filename):
+def do_include_search(filename : str):
 	libs = set()
-	global dir_path
 	dir_path = os.path.dirname(os.path.realpath(filename)) + '/'
 	# print(dir_path)
+	if filename.endswith('.o'):
+		filename = filename.replace('.o', '.c')
 	with open(filename) as f:
 		tocontinue = True
 		for line in f:
@@ -85,7 +83,7 @@ def do_include_search(filename):
 				if "<" in line:
 					tlib = get_sys_include(line)
 				else:
-					tlib = get_local_include(line)
+					tlib = get_local_include(line, dir_path)
 				if(len(tlib) > 0):
 					libs.update(tlib)
 	return libs	
