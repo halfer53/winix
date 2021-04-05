@@ -9,6 +9,8 @@ PHONY := all __clean
 
 all: __cleanall
 	@echo > /dev/null
+	$(Q)rm -f $(SREC_INCLUDE)/*.verbose
+	$(Q)rm -f $(SREC_INCLUDE)/*.srec
 
 __cleanall: $(obj)
 $(obj): FORCE

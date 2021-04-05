@@ -38,7 +38,7 @@ objects := $(addprefix $(src)/, $(obj-y) $(asm-y:%.s=%.o))
 assembly := $(addprefix $(src)/, $(obj-y:%.o=%.s))
 source := $(addprefix $(src)/, $(obj-y:%.o=%.c))
 srecobj := $(srec-y)
-# srecobj := $(addprefix $(SREC_DIR)/, $(srec-y))
+# srecobj := $(addprefix $(SREC_INCLUDE)/, $(srec-y))
 srecobj := $(addprefix $(src)/, $(srec-y))
 # srecdep := $(foreach dep, $(srec-y), $(addprefix $(src)/, $($(dep))) )
 
@@ -67,8 +67,8 @@ $(subdir-y): FORCE
 
 .SECONDEXPANSION:
 %.srec : $$(%.srec)
-	$(Q)wlink -Ttext $(TEXT_OFFSET) -v -o $@ $^ $(shell $(get_libs) $^) > $(SREC_DIR)/$(notdir $(@:.srec=)).verbose
-	$(Q)cp $@ $(SREC_DIR)/$(notdir $@)
+	$(Q)wlink -Ttext $(TEXT_OFFSET) -v -o $@ $^ $(shell $(get_libs) $^) > $(SREC_INCLUDE)/$(notdir $(@:.srec=)).verbose
+	$(Q)cp $@ $(SREC_INCLUDE)/$(notdir $@)
 ifeq ($(KBUILD_VERBOSE),0)
 	@echo "LD \t $@"
 endif
