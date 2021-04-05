@@ -30,7 +30,6 @@ typedef struct {int m3i1, m3i2; void *m3p1, *m3p2; void(*m3f1)(void), *m3f2; } m
 typedef struct message{
     int src;
     int type;
-    int ptr_num;
     union {
         mess_1 m_m1;
         mess_2 m_m2;

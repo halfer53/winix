@@ -154,19 +154,16 @@ void set_syscall_mesg_exception(int operation, ptr_t* sp, struct message *m, str
         m->m1_i1 = *sp++;
         m->m1_p1 = (void*)*sp++;
         m->m1_i2 = *sp;
-        m->ptr_num = 1;
         break;
         
     case SIGACTION:
         m->m1_i1 = *(sp + 3);
     case EXECVE:
         m->m1_p3 = (void*)*(sp + 2);
-        m->ptr_num++;
     case STAT:
     case LINK:
     case STATFS:
         m->m1_p2 = (void *)*(sp + 1);
-        m->ptr_num++;
     case TIMES:
     case BRK:
     case SIGPENDING:
@@ -174,14 +171,12 @@ void set_syscall_mesg_exception(int operation, ptr_t* sp, struct message *m, str
     case CHDIR:
     case UNLINK:
         m->m1_p1 = (void*)*sp;
-        m->ptr_num++;
         break;
     
     case DPRINTF:
         m->m1_i1 = *sp++;
         m->m1_p1 = (void *)*sp++;
         m->m1_p2 = (void *)*sp;
-        m->ptr_num = 2;
         break;
 
     // This is bit hacky, since C89 does not support variadic macro, so we have to 
