@@ -46,13 +46,9 @@
 #define DISK_SIZE   (DISK_PAGE_NR * BLOCK_SIZE)
 #define DISK_SIZE_WORD   (DISK_PAGE_NR * BLOCK_SIZE_WORD)
 
-/* MAKE_UNIX_TIME is defined in Makefile */
-#ifndef MAKE_UNIX_TIME
-#define MAKE_UNIX_TIME  (0)
-#endif
 
-#define get_start_unix_time()   (MAKE_UNIX_TIME)
-#define get_unix_time()         (get_start_unix_time() + get_uptime())
+extern unsigned int start_unix_time;
+#define get_unix_time()         (start_unix_time + (get_uptime() / get_hz()))
 
 extern char DISK_RAW[DISK_SIZE];
 

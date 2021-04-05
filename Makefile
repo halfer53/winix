@@ -1,4 +1,4 @@
-.PHONY := kbuild all clean stat
+.PHONY := kbuild all clean stat include_build
 
 srctree := $(shell pwd)
 include tools/Kbuild.include
@@ -26,9 +26,9 @@ export includes := $(shell find include -name "*.h")
 export TEXT_OFFSET := 2048
 export SREC_INCLUDE := include/srec
 export INCLUDE_PATH := -I./include/posix_include -I./include
-export MAKE_UNIX_TIME := $(shell date +%s)
+export CURR_UNIX_TIME := $(shell date +%s)
 export WINIX_CFLAGS := -D__wramp__
-export COMMON_CFLAGS := -DTEXT_OFFSET=$(TEXT_OFFSET) -DMAKE_UNIX_TIME=$(MAKE_UNIX_TIME) -D_DEBUG 
+export COMMON_CFLAGS := -DTEXT_OFFSET=$(TEXT_OFFSET) -D_DEBUG 
 export CFLAGS := $(WINIX_CFLAGS) $(COMMON_CFLAGS)
 
 # List of user libraries used by the kernel
@@ -37,13 +37,14 @@ KLIB_O = lib/syscall/wramp_syscall.o lib/ipc/ipc.o \
 		lib/syscall/debug.o lib/posix/_sigset.o lib/ansi/rand.o
 L_HEAD = winix/limits/limits_head.o
 L_TAIL = winix/limits/limits_tail.o
-KERNEL_O = winix/*.o kernel/system/*.o kernel/*.o fs/*.o fs/system/*.o driver/*.o include/disk.o
+KERNEL_O = winix/*.o kernel/system/*.o kernel/*.o fs/*.o fs/system/*.o driver/*.o include/*.o
 ALLDIR = winix lib init user kernel fs driver
 FS_DEPEND = fs/*.c fs/system/*.c fs/makefs_only/*.c 
 DISK = include/disk.c
+START_TIME_FILE = include/startup_time.c
 SREC = $(shell find $(SREC_INCLUDE) -name "*.srec")
 
-all:| makedisk kbuild $(DISK)
+all:| makedisk kbuild $(DISK) include_build
 	$(Q)wlink $(LDFLAGS) -Ttext 1024 -v -o winix.srec \
 			$(L_HEAD) $(KERNEL_O) $(KLIB_O) $(L_TAIL) \
 							> $(SREC_INCLUDE)/winix.verbose
@@ -59,10 +60,13 @@ $(ALLDIR): FORCE
 	$(Q)$(MAKE) $(build)=$@
 
 $(DISK): $(SREC)
-	$(Q)./makedisk -t $(TEXT_OFFSET) -o $(DISK) -s $(SREC_INCLUDE) -u $(MAKE_UNIX_TIME)
+	$(Q)./makedisk -t $(TEXT_OFFSET) -o $(DISK) -s $(SREC_INCLUDE) -u $(CURR_UNIX_TIME)
 ifeq ($(KBUILD_VERBOSE),0)
 	@echo "LD \t disk.c"
 endif
+	
+include_build:
+	$(Q)echo "unsigned int start_unix_time=$(CURR_UNIX_TIME);\n" > $(START_TIME_FILE)
 	$(Q)$(MAKE) $(build)=include
 
 clean:

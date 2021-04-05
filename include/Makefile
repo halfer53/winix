@@ -1,1 +1,1 @@
-obj-y += disk.o
+obj-y += disk.o startup_time.o

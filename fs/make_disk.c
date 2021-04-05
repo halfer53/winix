@@ -76,6 +76,7 @@ static error_t parse_opt (int key, char *arg, struct argp_state *state)
             break;
         case 'u':
             arguments->unix_time = arg ? (unsigned int)strtoul(arg, NULL, 10) : 0;
+            set_start_unix_time(arguments->unix_time);
             // printf("%ld\n", arguments->unix_time);
             break;
 

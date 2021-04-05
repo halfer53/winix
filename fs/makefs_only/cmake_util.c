@@ -71,6 +71,12 @@ clock_t get_uptime(){
     return 0;
 }
 
+clock_t start_unix_time = 0;
+
+void set_start_unix_time(clock_t t){
+    start_unix_time = t;
+}
+
 
 
 
