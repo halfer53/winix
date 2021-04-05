@@ -26,8 +26,8 @@ export includes := $(shell find include -name "*.h")
 export TEXT_OFFSET := 2048
 export SREC_INCLUDE := include/srec
 export INCLUDE_PATH := -I./include/posix_include -I./include
-export CFLAGS := -D__wramp__ -DTEXT_OFFSET=$(TEXT_OFFSET) -D_DEBUG 
-
+export MAKE_UNIX_TIME := $(shell date +%s)
+export CFLAGS := -D__wramp__ -DTEXT_OFFSET=$(TEXT_OFFSET) -DMAKE_UNIX_TIME=$(MAKE_UNIX_TIME) -D_DEBUG 
 
 # List of user libraries used by the kernel
 KLIB_O = lib/syscall/wramp_syscall.o lib/ipc/ipc.o \
@@ -57,7 +57,7 @@ $(ALLDIR): FORCE
 	$(Q)$(MAKE) $(build)=$@
 
 $(DISK): $(SREC)
-	$(Q)./makedisk -t $(TEXT_OFFSET) -o $(DISK) -s $(SREC_INCLUDE)
+	$(Q)./makedisk -t $(TEXT_OFFSET) -o $(DISK) -s $(SREC_INCLUDE) -u $(MAKE_UNIX_TIME)
 ifeq ($(KBUILD_VERBOSE),0)
 	@echo "LD \t disk.c"
 endif

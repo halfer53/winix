@@ -38,6 +38,7 @@ static struct argp_option options[] = {
         {"debug",  'd', 0,      OPTION_ARG_OPTIONAL,  "Is Debugging" },
         {"output",   'o', "OUTPUT", 0, "Output Path" },
         {"source",   's', "SOURCE", 0, "Source Path" },
+        {"unix time",   'u', "UNIX_TIME", 0, "Unix Time" },
         {0}
 };
 
@@ -48,6 +49,7 @@ struct arguments
     char *source_path;
     int debug;
     int do_unit_test;
+    unsigned int unix_time;
     int offset;
 };
 
@@ -72,6 +74,8 @@ static error_t parse_opt (int key, char *arg, struct argp_state *state)
         case 's':
             arguments->source_path = arg;
             break;
+        case 'u':
+            arguments->unix_time = arg ? atoi(arg) : 0;
 
         default:
             return 0;
@@ -85,6 +89,7 @@ static struct argp argp = { options, parse_opt, args_doc, doc };
 
 void write_disk(char* path){
     char curr_dir[100];
+    int i;
     char filename[] = "disk.c";
     char str2[] = "unsigned int DISK_RAW[] = {\n";
     char str3[] = "};\n";
@@ -96,7 +101,7 @@ void write_disk(char* path){
     fp = fopen(path, "w");
     fprintf(fp, "%s", str2);
 
-    for(int i = 0; i < DISK_SIZE_WORD; i++){
+    for(i = 0; i < DISK_SIZE_WORD; i++){
         fprintf(fp, "\t0x%08x,\n", *val++);
     }
     fprintf(fp, "%s\n\n", str3);
