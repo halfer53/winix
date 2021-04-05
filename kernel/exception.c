@@ -200,7 +200,8 @@ PRIVATE void syscall_handler() {
         m->type = operation;
         dest = SYSTEM;
         sp++;
-        set_message_for_syscall(operation, sp, m, curr_scheduling_proc);
+        m->ptr_num = 0;
+        set_message_for_syscall_in_exception(operation, sp, m, curr_scheduling_proc);
         operation = WINIX_SENDREC;
         
     }else{ // traditional IPC mode

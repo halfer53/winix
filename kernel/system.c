@@ -26,9 +26,9 @@ PRIVATE struct message m;
 PRIVATE int who_proc_nr;
 PRIVATE int curr_syscall;
 PRIVATE struct proc *who;
-bool trace_syscall = false;
-
 PRIVATE ucontext_t recv_ctx;
+
+bool trace_syscall = false;
 
 /**
  * Entry point for system task.
@@ -114,7 +114,7 @@ void syscall_region_begin(){
     ASSERT(who_proc_nr != SYSTEM); 
 }
 
-void set_message_for_syscall(int operation, ptr_t* sp, struct message *m, struct proc* who){
+void set_message_for_syscall_in_exception(int operation, ptr_t* sp, struct message *m, struct proc* who){
     switch (operation)
     {
     case LSEEK:
@@ -135,6 +135,7 @@ void set_message_for_syscall(int operation, ptr_t* sp, struct message *m, struct
     case SBRK:
         m->m1_i1 = *sp;
         break;
+
     case WAITPID:
     case STRERROR:
     case SIGPROCMASK:
@@ -153,16 +154,19 @@ void set_message_for_syscall(int operation, ptr_t* sp, struct message *m, struct
         m->m1_i1 = *sp++;
         m->m1_p1 = (void*)*sp++;
         m->m1_i2 = *sp;
+        m->ptr_num = 1;
         break;
         
     case SIGACTION:
         m->m1_i1 = *(sp + 3);
     case EXECVE:
         m->m1_p3 = (void*)*(sp + 2);
+        m->ptr_num++;
     case STAT:
     case LINK:
     case STATFS:
         m->m1_p2 = (void *)*(sp + 1);
+        m->ptr_num++;
     case TIMES:
     case BRK:
     case SIGPENDING:
@@ -170,12 +174,14 @@ void set_message_for_syscall(int operation, ptr_t* sp, struct message *m, struct
     case CHDIR:
     case UNLINK:
         m->m1_p1 = (void*)*sp;
+        m->ptr_num++;
         break;
     
     case DPRINTF:
         m->m1_i1 = *sp++;
         m->m1_p1 = (void *)*sp++;
         m->m1_p2 = (void *)*sp;
+        m->ptr_num = 2;
         break;
 
     // This is bit hacky, since C89 does not support variadic macro, so we have to 
@@ -187,6 +193,7 @@ void set_message_for_syscall(int operation, ptr_t* sp, struct message *m, struct
         m->m1_p1 = (void *)*sp++;
         m->m1_i1 = *sp++;
         m->m1_i2 = *sp++;
+        m->ptr_num = 1;
         break;
     
     case FCNTL:
@@ -195,6 +202,7 @@ void set_message_for_syscall(int operation, ptr_t* sp, struct message *m, struct
         m->m1_i1 = *sp++;
         m->m1_i2 = *sp++;
         m->m1_p1 = (void *)get_virtual_addr(sp, who);
+        m->ptr_num = 1;
         break;
 
     // case GETPID:

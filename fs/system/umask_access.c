@@ -36,7 +36,10 @@ int sys_access(struct proc* who, char* pathname, int mode){
 }
 
 int do_access(struct proc* who, struct message* msg){
-    char* buf = (char *) get_physical_addr(msg->m1_p1, who);
+    char *buf;
+    if(!is_vaddr_accessible(msg->m1_p1, who))
+        return EFAULT;
+    buf = (char *) get_physical_addr(msg->m1_p1, who);
     return sys_access(who, buf, msg->m1_i1);
 }
 
