@@ -2,7 +2,7 @@
 #define _FS_LRU_H_ 1
 
 #include <sys/types.h>
-#include <fs/const.h>
+#include <fs/common.h>
 #include <fs/inode.h>
 
 struct block_buffer

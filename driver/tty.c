@@ -5,7 +5,7 @@
 #include <kernel/kernel.h>
 #include <sys/tty.h>
 #include <sys/fcntl.h>
-#include <fs/const.h>
+#include <fs/common.h>
 #include <fs/cache.h>
 #include <fs/filp.h>
 #include <winix/dev.h>

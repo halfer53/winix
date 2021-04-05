@@ -7,7 +7,7 @@
 #include <sys/tty.h>
 #include <sys/fcntl.h>
 #include <sys/ipc.h>
-#include <fs/const.h>
+#include <fs/common.h>
 #include <sys/ioctl.h>
 
 char shell_path[] = "/bin/bash";

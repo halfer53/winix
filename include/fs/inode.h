@@ -3,7 +3,7 @@
 
 #include <sys/types.h>
 #include <fs/type.h>
-#include <fs/const.h>
+#include <fs/common.h>
 #include <winix/type.h>
 #include <winix/comm.h>
 

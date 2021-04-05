@@ -16,7 +16,7 @@
 #include <sys/dirent.h>
 #include <sys/unistd.h>
 #include <fs/type.h>
-#include <fs/const.h>
+#include <fs/common.h>
 #include <winix/type.h>
 #include <fs/inode.h>
 #include <fs/filp.h>
