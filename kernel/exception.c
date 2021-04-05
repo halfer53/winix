@@ -200,7 +200,6 @@ PRIVATE void syscall_handler() {
         m->type = operation;
         dest = SYSTEM;
         sp++;
-        m->ptr_num = 0;
         set_syscall_mesg_exception(operation, sp, m, curr_scheduling_proc);
         operation = WINIX_SENDREC;
         

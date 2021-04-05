@@ -188,7 +188,6 @@ void set_syscall_mesg_exception(int operation, ptr_t* sp, struct message *m, str
         m->m1_p1 = (void *)*sp++;
         m->m1_i1 = *sp++;
         m->m1_i2 = *sp++;
-        m->ptr_num = 1;
         break;
     
     case FCNTL:
@@ -197,7 +196,6 @@ void set_syscall_mesg_exception(int operation, ptr_t* sp, struct message *m, str
         m->m1_i1 = *sp++;
         m->m1_i2 = *sp++;
         m->m1_p1 = (void *)get_virtual_addr(sp, who);
-        m->ptr_num = 1;
         break;
 
     // case GETPID:
