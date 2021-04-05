@@ -253,7 +253,7 @@ int do_exit(struct proc *who, struct message *m){
     
     // if exit_magic, this means process is returned
     // from main, and exit syscall is triggered by
-    // prologue ( see system/execve.c). The return value
+    // epilogue ( see system/execve.c). The return value
     // in winix is stored in 1
     if(status == EXIT_MAGIC){
         status = who->ctx.m.regs[0];

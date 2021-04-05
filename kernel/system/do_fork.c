@@ -155,14 +155,9 @@ int do_vfork(struct proc* parent, struct message* m){
         copy_pcb(parent,child);
         child->time_used = child->sys_time_used = 0;
         child->parent = parent->proc_nr;
-
-        if(parent->thread_parent > 0){ // not a thread, cancel it
-            child->thread_parent = 0;
-        }
+        child->thread_parent = 0;
         
         syscall_reply2(VFORK, 0, child->proc_nr, m);
-        
-        
         parent->state |= STATE_VFORKING;
         return SUSPEND;
     }
