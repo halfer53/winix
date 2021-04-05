@@ -46,8 +46,7 @@ SREC = $(shell find $(SREC_INCLUDE) -name "*.srec")
 
 all:| makedisk kbuild $(DISK) include_build
 	$(Q)wlink $(LDFLAGS) -Ttext 1024 -v -o winix.srec \
-			$(L_HEAD) $(KERNEL_O) $(KLIB_O) $(L_TAIL) \
-							> $(SREC_INCLUDE)/winix.verbose
+	$(L_HEAD) $(KERNEL_O) $(KLIB_O) $(L_TAIL) > $(SREC_INCLUDE)/winix.verbose
 ifeq ($(KBUILD_VERBOSE),0)
 	@echo "LD \t winix.srec"
 endif
