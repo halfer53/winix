@@ -146,7 +146,7 @@ Similar to linux kbuild, **Winix** supports verbose option, you can debug Makefi
  - [signal](kernel/system/do_sigaction.c#L70)
  - [sbrk](kernel/system/do_brk.c#L85)
  - [statfs](fs/system/statfs.c#L43)
- - [getcwd](kernel/system.c#L341)
+ - [getcwd](fs/system/getcwd.c:54)
  - [tfork](kernel/system/do_fork.c#L172)
 
 ## Credits
