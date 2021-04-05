@@ -95,60 +95,59 @@ Similar to linux kbuild, **Winix** supports verbose option, you can debug Makefi
 
 ## Supported System Call
 
-```
-Name        Syscall Number
-TIMES           1
-EXIT            2
-FORK            3
-VFORK           4
-EXECVE          5
-BRK             6
-ALARM           7
-SIGACTION       8
-SIGRET          9
-WAITPID         10
-KILL            11
-GETPID          12
-WINFO           13
-STRERROR        14
-DPRINTF         15
-SYSCONF         16
-SIGSUSPEND      17
-SIGPENDING      18
-SIGPROCMASK     19
-SETPGID         20
-GETPGID         21
-OPEN            22
-READ            23
-WRITE           24
-CLOSE           25
-CREAT           26
-PIPE            27
-MKNOD           28
-CHDIR           29
-CHOWN           30
-CHMOD           31
-STAT            32
-FSTAT           33
-DUP             34
-DUP2            35
-LINK            36
-UNLINK          37
-GETDENT         38
-ACCESS          39
-MKDIR           40
-SYNC            41
-LSEEK           42
-UMASK           43
-FCNTL           44
-IOCTL           45
-SETSID          46
-CSLEEP          47
-GETPPID         48
-SIGNAL          49
-SBRK            50
-STATFS          51
-```
+ - [times](kernel/system/do_times.c:L23)
+ - [exit](kernel/system/do_exit_wait.c:L249)
+ - [fork](kernel/system/do_fork.c:L135)
+ - [vfork](kernel/system/do_fork.c:L152)
+ - [execve](kernel/system/do_execve.c:L48)
+ - [brk](kernel/system/do_brk.c:L94)
+ - [alarm](kernel/system/do_alarm.c:L29)
+ - [sigaction](kernel/system/do_sigaction.c:L44)
+ - [sigret](kernel/system/do_sigreturn.c:L19)
+ - [waitpid](kernel/system/do_exit_wait.c:L36)
+ - [kill](kernel/system/do_kill.c:L57)
+ - [getpid](kernel/system/do_getpid.c:L20)
+ - [winfo](kernel/system/do_winfo.c:L19)
+ - [strerror](kernel/system/do_dprintf.c:L21)
+ - [dprintf](kernel/system/do_dprintf.c:L52)
+ - [sysconf](kernel/system/do_sysconf.c:L4)
+ - [sigsuspend](kernel/system/do_sigsuspend.c:L18)
+ - [sigpending](kernel/system/do_sigpending.c:L17)
+ - [sigprocmask](kernel/system/do_sigprocmask.c:L20)
+ - [setpgid](kernel/system/do_setpgid.c:L3)
+ - [getpgid](kernel/system/do_getpgid.c:L4)
+ - [open](fs/system/open_close.c:L119)
+ - [read](fs/system/read_write.c:L28)
+ - [write](fs/system/read_write.c:L35)
+ - [close](fs/system/open_close.c:L137)
+ - [creat](fs/system/open_close.c:L128)
+ - [pipe](fs/system/pipe.c:L39)
+ - [mknod](fs/system/mknod.c:L44)
+ - [chdir](fs/system/chdir_mkdir.c:L68)
+ - [chown](fs/system/chown_chmod.c:L11)
+ - [chmod](fs/system/chown_chmod.c:L33)
+ - [stat](fs/system/stat.c:L47)
+ - [fstat](fs/system/stat.c:L56)
+ - [dup](fs/system/dup.c:L50)
+ - [dup2](fs/system/dup.c:L54)
+ - [link](fs/system/link_unlink.c:L72)
+ - [unlink](fs/system/link_unlink.c:L81)
+ - [getdent](fs/system/getdent.c:L58)
+ - [access](fs/system/umask_access.c:L38)
+ - [mkdir](fs/system/chdir_mkdir.c:L75)
+ - [sync](fs/system/sync.c:L6)
+ - [lseek](fs/system/lseek.c:L58)
+ - [umask](fs/system/umask_access.c:L14)
+ - [fcntl](fs/system/fcntl.c:L26)
+ - [ioctl](fs/system/ioctl.c:L15)
+ - [setsid](/kernel/system/do_setsid.c:L3)
+ - [csleep](kernel/system/do_csleep.c:L17)
+ - [getppid](kernel/system/do_getpid.c:L25)
+ - [signal](kernel/system/do_sigaction.c:L70)
+ - [sbrk](kernel/system/do_brk.c:L85)
+ - [statfs](fs/system/statfs.c:L43)
+ - [getcwd](kernel/system.c:L341)
+ - [tfork](kernel/system/do_fork.c:L172)
 
 ## Credits
 [Paul Monigatti](https://nz.linkedin.com/in/paulmonigatti)
