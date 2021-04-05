@@ -305,6 +305,6 @@ void init_exceptions() {
     _expt_stack_ptr += EXCEPTION_STACK_SIZE;
 
     wramp_set_handler(exception_handler);
-    RexTimer->Load = 2400 / get_hz(); // currently 60 Hz
+    RexTimer->Load = 2400 / HZ; // currently 60 Hz
     enable_interrupt();
 }

@@ -42,7 +42,7 @@
 // Number of words per page
 #define PAGE_LEN    1024
 
-#define get_hz()    (60)
+#define HZ    (60)
 
 
 #define DO_CLOCKTICK    (1)

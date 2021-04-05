@@ -48,7 +48,7 @@
 
 
 extern unsigned int start_unix_time;
-#define get_unix_time()         (start_unix_time + (get_uptime() / get_hz()))
+#define get_unix_time()         (start_unix_time + (get_uptime() / HZ))
 
 extern char DISK_RAW[DISK_SIZE];
 
