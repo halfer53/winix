@@ -1,5 +1,121 @@
 #include <stdio.h>
 #include <dirent.h>
+#include <stdbool.h>
+
+struct time_struct{
+    int date;
+    int month;
+    int currYear;
+    int hours;
+    int minutes;
+    int seconds;
+};
+
+// Function to convert unix time to
+// Human readable format
+int parse_unix_time(unsigned int seconds, struct time_struct* time)
+{ 
+    // Number of days in month
+    // in normal year
+    int daysOfMonth[] = { 31, 28, 31, 30, 31, 30,
+                          31, 31, 30, 31, 30, 31 };
+ 
+    int currYear, daysTillNow, extraTime,
+        extraDays, index, date, month, hours,
+        minutes, secondss, flag = 0;
+ 
+    // Calculate total days unix time T
+    daysTillNow = seconds / (24 * 60 * 60);
+    extraTime = seconds % (24 * 60 * 60);
+    currYear = 1970;
+ 
+    // Calculating currrent year
+    while (daysTillNow >= 365) {
+        if (currYear % 400 == 0
+            || (currYear % 4 == 0
+                && currYear % 100 != 0)) {
+            daysTillNow -= 366;
+        }
+        else {
+            daysTillNow -= 365;
+        }
+        currYear += 1;
+    }
+ 
+    // Updating extradays because it
+    // will give days till previous day
+    // and we have include current day
+    extraDays = daysTillNow + 1;
+ 
+    if (currYear % 400 == 0
+        || (currYear % 4 == 0
+            && currYear % 100 != 0))
+        flag = 1;
+ 
+    // Calculating MONTH and DATE
+    month = 0, index = 0;
+    if (flag == 1) {
+        while (true) {
+ 
+            if (index == 1) {
+                if (extraDays - 29 < 0)
+                    break;
+                month += 1;
+                extraDays -= 29;
+            }
+            else {
+                if (extraDays
+                        - daysOfMonth[index]
+                    < 0) {
+                    break;
+                }
+                month += 1;
+                extraDays -= daysOfMonth[index];
+            }
+            index += 1;
+        }
+    }
+    else {
+        while (true) {
+ 
+            if (extraDays
+                    - daysOfMonth[index]
+                < 0) {
+                break;
+            }
+            month += 1;
+            extraDays -= daysOfMonth[index];
+            index += 1;
+        }
+    }
+ 
+    // Current Month
+    if (extraDays > 0) {
+        month += 1;
+        date = extraDays;
+    }
+    else {
+        if (month == 2 && flag == 1)
+            date = 29;
+        else {
+            date = daysOfMonth[month - 1];
+        }
+    }
+ 
+    // Calculating HH:MM:YYYY
+    hours = extraTime / 3600;
+    minutes = (extraTime % 3600) / 60;
+    secondss = (extraTime % 3600) % 60;
+
+    time->date = date;
+    time->month = month;
+    time->currYear = currYear;
+    time->hours = hours;
+    time->minutes = minutes;
+    time->seconds = secondss;
+ 
+    return 0;
+}
 
 #define SHOW_HIDDEN     1
 #define LONG_FORMAT     2
@@ -9,6 +125,7 @@ static char permission_char[] = "-xwr";
 
 void print_long_format(char *pathname){
     struct stat statbuf;
+    struct time_struct time;
     char *p = buffer;
     int i, j, k, l;
     int ret;
@@ -28,7 +145,9 @@ void print_long_format(char *pathname){
         k = k >> 1;
     }
     *p = '\0';
-    printf("%s %2d %4d %s\n", buffer, statbuf.st_nlink, statbuf.st_size, pathname);
+    parse_unix_time(statbuf.st_atime, &time);
+    printf("%s %2d %4d %d/%d/%d %d:%d:%d %s\n", buffer, statbuf.st_nlink, statbuf.st_size, 
+            time.date, time.month, time.currYear, time.hours, time.minutes, time.seconds, pathname);
 }
 
 

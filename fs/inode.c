@@ -243,6 +243,7 @@ inode_t* alloc_inode(struct proc* who, struct device* parentdev, struct device* 
     struct block_buffer *imap, *ino_table_buffer;
     inode_t *inode;
     bool found = false;
+    clock_t unix_time = get_unix_time();
 
     sb = get_sb(parentdev);
     imap = get_imap(parentdev);
@@ -272,6 +273,9 @@ inode_t* alloc_inode(struct proc* who, struct device* parentdev, struct device* 
     inode->i_ctime = INODE_MOCK_UTC_TIME;
     bitmap_set_bit(inode_arch_map, INODE_ARC_MAP_LEN, inum);
     // KDEBUG(("alloc ino set bit %d\n", inum));
+    inode->i_ctime = unix_time;
+    inode->i_mtime = unix_time;
+    inode->i_atime = unix_time;
 
     sb->s_free_inodes -= 1;
     sb->s_inode_inuse += 1;

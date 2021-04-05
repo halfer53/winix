@@ -70,8 +70,6 @@ int _sys_open(struct proc *who, char *path, int flags, mode_t mode, dev_t devid)
             goto final;
         }
         inode->i_mode = dev->device_type | (mode & ~(who->umask));
-        inode->i_ctime = unix_time;
-        inode->i_mtime = unix_time;
     }
 
     if ((ret = get_fd(who, 0, &open_slot, &filp)))
@@ -96,7 +94,7 @@ int _sys_open(struct proc *who, char *path, int flags, mode_t mode, dev_t devid)
     filp->filp_flags = flags;
     who->fp_filp[open_slot] = filp;
     inode->i_atime = unix_time;
-    
+
     if ((ret = inode->i_dev->fops->open(inode->i_dev, filp)))
         goto final;
 
