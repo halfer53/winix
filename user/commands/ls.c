@@ -117,6 +117,33 @@ int parse_unix_time(unsigned int seconds, struct time_struct* time)
     return 0;
 }
 
+
+struct user_name{
+    uid_t uid;
+    char *str;
+};
+
+
+// currently user names are predefined cuz I am lazy
+struct user_name usernames[] = {
+    {0, "root"},
+    {0}
+};
+
+char *get_user_name(uid_t uid){
+    int i;
+    struct user_name* p = usernames;
+    while (p)
+    {
+        if(p->uid == uid)
+            return p->str;
+        p++;
+    }
+    return NULL;
+}
+
+#define get_group_name(id)  (get_user_name(id))
+
 #define SHOW_HIDDEN     1
 #define LONG_FORMAT     2
 
@@ -131,6 +158,7 @@ void print_long_format(char *pathname){
     int ret;
     int size_in_kb;
     mode_t mode;
+    char *username, *groupname;
     ret = stat(pathname, &statbuf);
     if(ret)
         return;
@@ -153,9 +181,11 @@ void print_long_format(char *pathname){
     size_in_kb = size_in_kb / 1024;
     if(!size_in_kb)
         size_in_kb = 1;
+    username = get_user_name(statbuf.st_uid);
+    groupname = get_group_name(statbuf.st_gid);
     parse_unix_time(statbuf.st_atime, &time);
-    printf("%s %2d %2dK %02d/%02d/%04d %02d:%02d:%02d %s\n", buffer, statbuf.st_nlink, size_in_kb, 
-            time.date, time.month, time.currYear, time.hours, time.minutes, time.seconds, pathname);
+    printf("%s %2d %s %s %2dK %02d/%02d/%04d %02d:%02d:%02d %s\n", buffer, statbuf.st_nlink, username, groupname,
+     size_in_kb, time.date, time.month, time.currYear, time.hours, time.minutes, time.seconds, pathname);
 }
 
 
