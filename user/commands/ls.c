@@ -129,6 +129,7 @@ void print_long_format(char *pathname){
     char *p = buffer;
     int i, j, k, l;
     int ret;
+    int size_in_kb;
     mode_t mode;
     ret = stat(pathname, &statbuf);
     if(ret)
@@ -145,8 +146,15 @@ void print_long_format(char *pathname){
         k = k >> 1;
     }
     *p = '\0';
+    size_in_kb = statbuf.st_size;
+#ifdef __wramp__
+    size_in_kb = size_in_kb * 4;
+#endif
+    size_in_kb = size_in_kb / 1024;
+    if(!size_in_kb)
+        size_in_kb = 1;
     parse_unix_time(statbuf.st_atime, &time);
-    printf("%s %2d %4d %02d/%02d/%04d %02d:%02d:%02d %s\n", buffer, statbuf.st_nlink, statbuf.st_size, 
+    printf("%s %2d %2dK %02d/%02d/%04d %02d:%02d:%02d %s\n", buffer, statbuf.st_nlink, size_in_kb, 
             time.date, time.month, time.currYear, time.hours, time.minutes, time.seconds, pathname);
 }
 
