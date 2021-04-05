@@ -3,8 +3,6 @@
 
 #include <ctype.h>
 
-#define isspace(c)    (c==' ')
-
 #define MAX_LINE        100  /* longest accepted command line */
 #define BUF_LEN         32
 #define MAX_COMMANDS    5
