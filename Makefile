@@ -27,7 +27,9 @@ export TEXT_OFFSET := 2048
 export SREC_INCLUDE := include/srec
 export INCLUDE_PATH := -I./include/posix_include -I./include
 export MAKE_UNIX_TIME := $(shell date +%s)
-export CFLAGS := -D__wramp__ -DTEXT_OFFSET=$(TEXT_OFFSET) -DMAKE_UNIX_TIME=$(MAKE_UNIX_TIME) -D_DEBUG 
+export WINIX_CFLAGS := -D__wramp__
+export COMMON_CFLAGS := -DTEXT_OFFSET=$(TEXT_OFFSET) -DMAKE_UNIX_TIME=$(MAKE_UNIX_TIME) -D_DEBUG 
+export CFLAGS := $(WINIX_CFLAGS) $(COMMON_CFLAGS)
 
 # List of user libraries used by the kernel
 KLIB_O = lib/syscall/wramp_syscall.o lib/ipc/ipc.o \
@@ -50,7 +52,7 @@ ifeq ($(KBUILD_VERBOSE),0)
 endif
 
 makedisk: $(FS_DEPEND)
-	$(Q)gcc -g -D MAKEFS_STANDALONE -w -I./include/fs_include -I./include $^ -o makedisk
+	$(Q)gcc -g -D MAKEFS_STANDALONE $(COMMON_CFLAGS) -w -I./include/fs_include -I./include $^ -o makedisk
 
 kbuild: $(ALLDIR)
 $(ALLDIR): FORCE

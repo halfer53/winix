@@ -19,12 +19,6 @@ assembly :=
 source :=
 targets :=
 subdir-y :=
-EXTRA_AFLAGS   :=
-EXTRA_CFLAGS   :=
-EXTRA_LDFLAGS  :=
-asflags-y  :=
-ccflags-y  :=
-ldflags-y  :=
 
 -include $(src)/Makefile
 include tools/Kbuild.include

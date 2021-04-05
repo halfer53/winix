@@ -75,7 +75,9 @@ static error_t parse_opt (int key, char *arg, struct argp_state *state)
             arguments->source_path = arg;
             break;
         case 'u':
-            arguments->unix_time = arg ? atoi(arg) : 0;
+            arguments->unix_time = arg ? (unsigned int)strtoul(arg, NULL, 10) : 0;
+            // printf("%ld\n", arguments->unix_time);
+            break;
 
         default:
             return 0;
