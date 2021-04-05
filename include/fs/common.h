@@ -15,7 +15,7 @@
 #define TO_WORD_SIZE(x) (x / 4)
 #define TO_CHAR_SIZE(x) (x * 4)
 #else
-#define SECTOR_SIZE 80
+#define SECTOR_SIZE 128
 #define BLOCK_SIZE  1024
 #define TO_WORD_SIZE(x) (x)
 #define TO_CHAR_SIZE(x) (x)
@@ -45,6 +45,14 @@
 #define DISK_PAGE_NR    (50)
 #define DISK_SIZE   (DISK_PAGE_NR * BLOCK_SIZE)
 #define DISK_SIZE_WORD   (DISK_PAGE_NR * BLOCK_SIZE_WORD)
+
+/* MAKE_UNIX_TIME is defined in Makefile */
+#ifndef MAKE_UNIX_TIME
+#define MAKE_UNIX_TIME  (0)
+#endif
+
+#define get_start_unix_time()   (MAKE_UNIX_TIME)
+#define get_unix_time()         (get_start_unix_time() + get_uptime())
 
 extern char DISK_RAW[DISK_SIZE];
 

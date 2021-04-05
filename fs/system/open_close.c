@@ -27,6 +27,7 @@ int _sys_open(struct proc *who, char *path, int flags, mode_t mode, dev_t devid)
     char string[DIRSIZ];
     struct device *dev;
     mode_t file_mode;
+    clock_t unix_time = get_unix_time();
 
     dev = get_dev(devid);
     if (!dev)
@@ -69,6 +70,8 @@ int _sys_open(struct proc *who, char *path, int flags, mode_t mode, dev_t devid)
             goto final;
         }
         inode->i_mode = dev->device_type | (mode & ~(who->umask));
+        inode->i_ctime = unix_time;
+        inode->i_mtime = unix_time;
     }
 
     if ((ret = get_fd(who, 0, &open_slot, &filp)))
@@ -92,6 +95,8 @@ int _sys_open(struct proc *who, char *path, int flags, mode_t mode, dev_t devid)
     filp->filp_mode = inode->i_mode;
     filp->filp_flags = flags;
     who->fp_filp[open_slot] = filp;
+    inode->i_atime = unix_time;
+    
     if ((ret = inode->i_dev->fops->open(inode->i_dev, filp)))
         goto final;
 

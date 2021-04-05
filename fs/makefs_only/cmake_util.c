@@ -27,7 +27,7 @@ void emulate_fork(struct proc* p1, struct proc* p2){
     *p2 = *p1;
     p2->proc_nr = procnr;
     p2->pid = pid;
-    for (int i = 0; i < OPEN_MAX; ++i) {
+    for (i = 0; i < OPEN_MAX; ++i) {
         file = p2->fp_filp[i];
         if(file){
             file->filp_count += 1;
@@ -65,6 +65,10 @@ void _assert(int expression, int line, char* filename) {
         printf("\nAssert Failed at line %d in %s\n",line,filename);
         _exit(1);
     }
+}
+
+clock_t get_uptime(){
+    return 0;
 }
 
 

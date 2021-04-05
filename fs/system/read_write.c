@@ -20,6 +20,8 @@ int sys_write(struct proc *who,int fd, void *buf, size_t count){
     file = who->fp_filp[fd];
     // KDEBUG(("write fd %d for dev %s\n", fd, file->filp_dev->init_name));
     ret = file->filp_dev->fops->write(file, buf, count, file->filp_pos);
+    if(ret > 0)
+        file->filp_ino->i_mtime = get_unix_time();
     return ret;
 }
 
