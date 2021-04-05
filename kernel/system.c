@@ -114,7 +114,7 @@ void syscall_region_begin(){
     ASSERT(who_proc_nr != SYSTEM); 
 }
 
-void set_message_for_syscall_in_exception(int operation, ptr_t* sp, struct message *m, struct proc* who){
+void set_syscall_mesg_exception(int operation, ptr_t* sp, struct message *m, struct proc* who){
     switch (operation)
     {
     case LSEEK:
