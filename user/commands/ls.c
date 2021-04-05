@@ -146,7 +146,7 @@ void print_long_format(char *pathname){
     }
     *p = '\0';
     parse_unix_time(statbuf.st_atime, &time);
-    printf("%s %2d %4d %d/%d/%d %d:%d:%d %s\n", buffer, statbuf.st_nlink, statbuf.st_size, 
+    printf("%s %2d %4d %02d/%02d/%04d %02d:%02d:%02d %s\n", buffer, statbuf.st_nlink, statbuf.st_size, 
             time.date, time.month, time.currYear, time.hours, time.minutes, time.seconds, pathname);
 }
 
