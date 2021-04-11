@@ -232,9 +232,14 @@ int exec_welf(struct proc* who, char* path, char *argv[], char *envp[], bool is_
     }
     build_user_stack(who, &argv_copy, &envp_copy);
     proc_memctl(who, (void *)0, PROC_NO_ACCESS);
+
+    if(trace_syscall){
+        KDEBUG(("%s[%d] calls execve() to excute %s\n", who->name, who->pid, path));
+    }
     set_proc(who, (void (*)())elf.binary_pc, path);
     ret = OK;
 
+    
     final:
     sys_close(who, fd);
     who->state = STATE_RUNNABLE;
