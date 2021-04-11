@@ -384,7 +384,7 @@ int do_fg(int argc, char **argv){
     int status;
     int ret;
 
-    ioctl(0, TIOCSPGRP, &last_stopped_pgid);
+    ioctl(0, TIOCSPGRP, last_stopped_pgid);
     ret =  kill(-last_stopped_pgid, SIGCONT);
     if(ret == 0){
         ret = waitpid(-last_stopped_pgid, &status, WUNTRACED);
