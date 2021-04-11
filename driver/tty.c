@@ -186,8 +186,8 @@ void tty_exception_handler( struct tty_state* state){
                 signal =SIGTSTP;
             
             if(state->controlling_session > 0 && state->foreground_group > 0){
+                // KDEBUG(("Send sig to foreground %d\n", state->foreground_group));
                 ret = sys_kill(SYSTEM_TASK, -(state->foreground_group), signal);
-                // KDEBUG(("C ret %d curr %p %d state %x\n", ret,curr_scheduling_proc,  curr_scheduling_proc->proc_nr, curr_scheduling_proc->state));
             }
             goto end;
         }
@@ -375,7 +375,7 @@ int tty_ioctl(struct filp* file, int request, ptr_t* ptr){
         break;
     case TIOCSPGRP:
         tty_data->foreground_group = (pid_t)*ptr;
-        // KDEBUG(("foreground to %d for %s, vir %x phy %x\n", (pid_t)*ptr, dev->init_name, arg, ptr));
+        // KDEBUG(("set foreground to %d\n", tty_data->foreground_group));
         break;
     case TIOCSCTTY:
         tty_data->controlling_session = who->session_id;

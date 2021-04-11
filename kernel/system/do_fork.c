@@ -173,7 +173,7 @@ int do_tfork(struct proc* parent, struct message* m){
         copy_pcb(parent,child);
         child->time_used = child->sys_time_used = 0;
         child->parent = parent->proc_nr;
-        child->pid = parent->pid;
+        // child->pid = parent->pid;
         if(parent->thread_parent > 0){
             child->thread_parent = parent->thread_parent;
         }else{
