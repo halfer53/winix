@@ -119,6 +119,7 @@ void set_syscall_mesg_exception(int operation, ptr_t* sp, struct message *m, str
     {
     case LSEEK:
         m->m1_i3 = *(sp + 2);
+    case EXIT:
     case KILL:
     case SETPGID:
     case DUP2:
