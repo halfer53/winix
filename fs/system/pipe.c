@@ -169,14 +169,16 @@ int pipe_read ( struct filp *filp, char *data, size_t count, off_t offset){
     struct message msg;
     struct inode* ino = filp->filp_ino;
 
+    // KDEBUG(("%s[%d] pipe read %d f_count %d i_count %d pos %d \n", 
+    //     curr_syscall_caller->name, curr_syscall_caller->proc_nr, ino->i_num, filp->filp_count, ino->i_count, filp->pipe->pos));
     if(filp->pipe_mode == FILP_PIPE_WRITE)
-        return 0;
-    if(filp->filp_ino->i_count == 1) // write end is closed
         return 0;
 
     offset = 0; //Pipe always read from start
     if(filp->pipe->pos == 0){
         if(filp->filp_flags & O_NONBLOCK)
+            return 0;
+        if(ino->i_count == 1) // write end is closed
             return 0;
 
         next = (struct pipe_waiting*)kmalloc(sizeof(struct pipe_waiting));
@@ -272,16 +274,41 @@ int pipe_open ( struct device* dev, struct filp *file){
 }
 
 int pipe_close ( struct device* dev, struct filp *file){
+    int ret;
     struct inode* ino = file->filp_ino;
+    struct pipe_waiting* next;
+    struct list_head *waiting;
+    struct message msg;
+    int (*fn)(struct proc*, struct filp*, char *, size_t, off_t);
     file->filp_count -= 1;
+    
     if(file->filp_count == 0){
         ino->i_count -= 1;
         if(ino->i_count == 0){
             // KDEBUG(("Releasing pipe %d\n", file->filp_ino->i_num));
             release_pages((ptr_t *)file->pipe->data, 1);
             kfree(file->pipe);
+        }else{
+            if(file->pipe_mode == FILP_PIPE_READ){
+                fn = _pipe_write;
+                waiting = &ino->pipe_writing_list;
+            }else{
+                fn = _pipe_read;
+                waiting = &ino->pipe_reading_list;
+            }
+            next = get_next_waiting(waiting);
+            if(next!= NULL){
+                // KDEBUG(("next waiting %s\n", next->who->name));
+                ret = fn(next->who, next->filp, next->data, next->count, next->offset);
+                next->who->flags &= ~STATE_WAITING;
+                syscall_reply2(next->sys_call_num, ret, next->who->proc_nr, &msg);
+                kfree(next);
+            }
         }
     }
+
+    // KDEBUG(("%s[%d] close file %d, mode %d, count %d ino count %d\n", curr_syscall_caller->name, curr_syscall_caller->proc_nr,
+    //     file->filp_ino->i_num, file->pipe_mode, file->filp_count, ino->i_count));
     return 0;
 }
 

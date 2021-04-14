@@ -166,7 +166,7 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
                         perror("pipe");
                         exit(1);
                     }
-                    fcntl(pipe_ptr[PIPE_READ], F_SETFL, O_NONBLOCK);
+                    // fcntl(pipe_ptr[PIPE_READ], F_SETFL, O_NONBLOCK);
                     // printf("pipeptr %x ret %d %d\n", pipe_ptr, pipe_ptr[PIPE_READ], pipe_ptr[PIPE_WRITE]);
 
                 }else if(cmd->outfile){ //if redirecting output and last command
@@ -189,8 +189,8 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
                             pipe_ptr = &pipe_fds[(i * 2)];
                             dup2(pipe_ptr[PIPE_WRITE], STDOUT_FILENO);
                             close(pipe_ptr[PIPE_WRITE]);
+                            close(pipe_ptr[PIPE_READ]);
                             // printf("cmd %d %s pipe  %d %d\n", i, buffer, pipe_ptr[PIPE_READ], pipe_ptr[PIPE_WRITE]);
-
                         }
                         // printf("cmd %d %s com %d, res %d\n", i, buffer,  cmd->numCommands, (i+1) < cmd->numCommands);
 
@@ -198,12 +198,19 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
                             prev_pipe_ptr = &pipe_fds[((i - 1) * 2)];
                             dup2(prev_pipe_ptr[PIPE_READ], STDIN_FILENO);
                             close(prev_pipe_ptr[PIPE_READ]);
+                            close(prev_pipe_ptr[PIPE_WRITE]);
                             // printf("cmd %d %s dup read %d\n", i, buffer, prev_pipe_ptr[PIPE_READ]);
                         }
                     }
                     cmd_start = cmd->cmdStart[i];
                     execv(buffer, &cmd->argv[cmd_start]);
                     exit(1);
+                }else{
+                    if( i > 0 ){
+                        prev_pipe_ptr = &pipe_fds[((i - 1) * 2)];
+                        close(prev_pipe_ptr[PIPE_READ]);
+                        close(prev_pipe_ptr[PIPE_WRITE]);
+                    }
                 }
             }else{
                 cmd_start = cmd->cmdStart[i];
