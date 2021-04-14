@@ -204,27 +204,23 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
                     cmd_start = cmd->cmdStart[i];
                     execv(buffer, &cmd->argv[cmd_start]);
                     exit(1);
-                }else{
-                    ret = wait(&status);
-                    
-                    // printf("parent awaken\n");
                 }
             }else{
                 cmd_start = cmd->cmdStart[i];
                 fprintf(stderr, "Unknown command '%s'\n", cmd->argv[cmd_start]);
                 exit_code = 1;
+                break;
             }
         }
 
-        // if(cmd->outfile){
-        //     dup2(saved_stdout,STDOUT_FILENO);
-        //     close(saved_stdout);
-        // }
-
-        // if(cmd->infile){
-        //     dup2(saved_stdin,STDIN_FILENO);
-        //     close(saved_stdin);
-        // }
+        while(1){
+            ret = wait(&status);
+            if(ret == -1 && errno == ECHILD){
+                break;
+            }else{
+                exit_code = WEXITSTATUS(status);
+            }
+        }
         exit(exit_code);
     }else{
         options =  WUNTRACED;
