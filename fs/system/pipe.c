@@ -288,6 +288,9 @@ int pipe_close ( struct device* dev, struct filp *file){
             // KDEBUG(("Releasing pipe %d\n", file->filp_ino->i_num));
             release_pages((ptr_t *)file->pipe->data, 1);
             kfree(file->pipe);
+            
+            // release inode
+            memset(ino, 0, sizeof(struct inode));
         }else{
             if(file->pipe_mode == FILP_PIPE_READ){
                 fn = _pipe_write;

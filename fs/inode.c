@@ -308,12 +308,9 @@ int release_inode(inode_t *inode){
     block_t zone_id;
     int i = 0;
     int ret;
-    if(!is_inode_in_use(inum, id)){
-        KDEBUG((" inode id %d not in use, cannot be released", inum));
-        return EINVAL;
-    }
     if(inode->i_count != 0){
         kprintf("[ERROR]: %d is in use before releasing\n", inum);
+        return EINVAL;
     }
     // KDEBUG(("releasing inode %d\n", inode->i_num));
 
@@ -325,7 +322,7 @@ int release_inode(inode_t *inode){
             inode->i_zone[i] = 0;
         }
     }
-
+    
     // assumping inum is smaller than 1024 for simplicity
     imap = get_block_buffer(sb->s_inode_tablenr, id);
     bitmap_clear_bit((unsigned int*)imap->block, BLOCK_SIZE_WORD, inum);
