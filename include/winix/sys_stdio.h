@@ -26,6 +26,7 @@ int kprintf_vm( struct filp* dev, const char *orignal_format, void *arg, ptr_t *
 int kputc(const int c);
 int kgetc_blocking(struct proc* who);
 int kprintf(const char *format, ...);
+int kprintf2(const char *format, ...);
 int kerror(const char *format, ...);
 int klog(const char *format, ...);
 int kwarn(const char *format, ...);

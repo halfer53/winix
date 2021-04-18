@@ -55,9 +55,6 @@ struct proc *pick_proc() {
     // Find the highest-priority non-empty queue
     for (i = 0; i < NUM_QUEUES; i++){
         if(mp = dequeue(ready_q[i])){
-            // if(is_debugging_sched()){
-            //     kprintf("|| %d || ", mp->proc_nr);
-            // }
             return mp;
         }
     }
@@ -112,7 +109,9 @@ void sched() {
             
     }while(curr_scheduling_proc == NULL || curr_scheduling_proc->state);
     
-
+    if(is_debugging_sched()){
+        kprintf2("| %d |", curr_scheduling_proc->proc_nr);
+    }
     // Reset quantum if needed
     if (curr_scheduling_proc->ticks_left <= 0) {
         curr_scheduling_proc->ticks_left = curr_scheduling_proc->quantum;

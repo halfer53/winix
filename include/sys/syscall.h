@@ -29,7 +29,7 @@
 #define	NULL		((void *)0)
 #endif
 
-#define _NSYSCALL               54
+#define _NSYSCALL               55
 /**
  * System Call Numbers
  **/
@@ -87,6 +87,7 @@
 #define STATFS          51
 #define GETCWD          52
 #define TFORK           53
+#define SCHED_YIELD     54
 
 
 #define WINFO_PS            1
@@ -159,6 +160,7 @@ pid_t waitpid(pid_t pid, int *status, int options);
 pid_t tfork();
 int brk(void *addr);
 void init_environ();
+void sched_yield();
 
 #ifdef __wramp__
 #ifndef _SYSTEM
@@ -214,6 +216,7 @@ void init_environ();
 #define statfs(path, buf)           (wramp_syscall(STATFS, path, buf))
 #define getcwd(buf, size)           (ptr_wramp_syscall(GETCWD, size, buf))
 #define tfork()                     (wramp_syscall(TFORK))
+#define sched_yield()               (wramp_syscall(SCHED_YIELD))
 
 #endif //_SYSTEM
 

@@ -164,7 +164,7 @@ int do_notify(int src, int dest, struct message *m) {
         // KDEBUG(("\nNOTIFY %d from %d type %d| ",dest, src ,m->type));
             
         // If destination is waiting, deliver message immediately.
-        if (pDest->state == STATE_RECEIVING) {
+        if (pDest->state == STATE_RECEIVING || pDest->state & STATE_STOPPED) {
 
             if(pDest->flags & DIRECT_SYSCALL){
                 set_reply_res_errno(pDest, m);
@@ -177,7 +177,9 @@ int do_notify(int src, int dest, struct message *m) {
             // Unblock receiver
             pDest->state &= ~STATE_RECEIVING;
             pDest->ctx.m.regs[0] = m->reply_res;
-            enqueue_head(ready_q[pDest->priority], pDest);
+            if(pDest->state == STATE_RUNNABLE){
+                enqueue_head(ready_q[pDest->priority], pDest);
+            }
         }else{
             pSrc = get_proc(src);
             syscall_num = m->type;

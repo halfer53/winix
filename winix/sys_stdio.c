@@ -199,13 +199,14 @@ struct printf_buffer{
 };
 
 static void flush_buffer_data(struct printf_buffer* tbuf, char* data, int len){
-    tbuf->total_count += tbuf->filp_write(tbuf->filp, data, len, tbuf->filp->filp_pos);
-}
+    int ret;
+    ret = tbuf->filp_write(tbuf->filp, data, len, tbuf->filp->filp_pos);
+    tbuf->total_count += ret;
+}   
 
 static void flush_buffer(struct printf_buffer* tbuf){
     if(tbuf->pos > 0){
         flush_buffer_data(tbuf, tbuf->buffer, tbuf->pos);
-        // tbuf->total_count += tbuf->filp_write(tbuf->filp, tbuf->buffer, tbuf->pos, tbuf->filp->filp_pos);
         tbuf->pos = 0;
     }
 }
