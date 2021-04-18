@@ -182,7 +182,7 @@ int tty_non_init_write(struct filp *file, char *data, size_t len, off_t offset){
 
 
 
-#define BUFFER_SIZ  (64)
+#define BUFFER_SIZ  (101)   // Column size in WRAMP is 100
 #define FORMAT_BUF_SIZ  (11)
 #define PADDING_BUFFER_SIZ (20)
 #define PADDING_NUM_BUF_SIZ (3)
