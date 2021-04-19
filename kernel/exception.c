@@ -136,8 +136,8 @@ PRIVATE void serial2_handler() {
  *   Scheduler is called (i.e. this handler does not return).
  **/
 PRIVATE void gpf_handler() {
-    ptr_t* sp;
     ptr_t* pc;
+    int sp;
     // is the current process a valid one?
     ASSERT(IS_PROCN_OK(curr_scheduling_proc->proc_nr));
     
@@ -145,6 +145,7 @@ PRIVATE void gpf_handler() {
     //     kprintf("Stack Overflow\n");
     
 #ifdef _DEBUG
+    sp = (int)(get_physical_addr(curr_scheduling_proc->ctx.m.sp, curr_scheduling_proc)) - (int)curr_scheduling_proc->stack_top;
     kprintf("\nGeneral Protection Fault: \"%s (%d)\" Rbase=0x%x \n",
         curr_scheduling_proc->name,
         curr_scheduling_proc->pid,
@@ -153,7 +154,7 @@ PRIVATE void gpf_handler() {
 
     kprintf("Virtual  ");
     PRINT_DEBUG_REG(get_virtual_addr(pc,curr_scheduling_proc),
-                                    curr_scheduling_proc->ctx.m.sp,
+                                    sp,
                                     curr_scheduling_proc->ctx.m.ra);
 
     kprintf("Physical ");
