@@ -22,7 +22,7 @@ built_in = {
 	"ucontext.h": {GEN},
 	"unistd.h": {POSIX, ANSI, STDLIB},
 	"util.h":	{UTIL},
-	"stdio.h":	{STDIO},
+	"stdio.h":	{STDIO, STDLIB},
 	"debug.h":	{DEBUG},
 	"dirent.h":	{POSIX, ANSI, STDLIB},
 	"regexp.h": {REGEX},

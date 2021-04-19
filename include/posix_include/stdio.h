@@ -37,6 +37,7 @@ typedef struct __iobuf {
 #define	_IOWRITING	0x100   // writing
 #define	_IOAPPEND	0x200   // can append
 #define _IOFIFO		0x400   // not used
+#define _IODEFAULT	0x800	// defualt stdin, stdout and stderr
 
 
 #ifndef SEEK_SET

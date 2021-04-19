@@ -22,7 +22,8 @@
         "types.h": "c",
         "cache.h": "c",
         "stdlib.h": "c",
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "cstdio": "c"
     },
     "files.exclude": {
         "**/*.o": true,
