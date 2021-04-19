@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <dirent.h>
 #include <stdbool.h>
+#include <string.h>
 
 struct time_struct{
     int date;
@@ -189,6 +190,7 @@ void print_long_format(char *pathname){
     // sched_yield();
 }
 
+#define PATH_LEN    (50)
 
 int do_ls(char* pathname, int flag){
    DIR* directory;
@@ -196,6 +198,8 @@ int do_ls(char* pathname, int flag){
    int ret;
    char *slash = "/";
    char *symbol;
+   char path_buffer[PATH_LEN];
+   
    if(pathname == NULL)
        pathname = ".";
    directory = opendir(pathname);
@@ -206,7 +210,10 @@ int do_ls(char* pathname, int flag){
            continue;
        }
        if(flag & LONG_FORMAT){
-           print_long_format((char *)dir->d_name);
+           strncpy(path_buffer, pathname, PATH_LEN);
+           strncat(path_buffer, "/", PATH_LEN);
+           strncat(path_buffer, (char *)dir->d_name, PATH_LEN);
+           print_long_format(path_buffer);
        }else{
            symbol = (dir->d_type == DT_DIR && *dir->d_name != '.')  ? slash : "";
             printf("%s%ls  ", symbol, dir->d_name);

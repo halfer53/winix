@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include <sys/syscall.h>
 #include <sys/fcntl.h>
 
