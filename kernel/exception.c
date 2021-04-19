@@ -138,14 +138,15 @@ PRIVATE void serial2_handler() {
 PRIVATE void gpf_handler() {
     ptr_t* pc;
     int sp;
+    int val;
     // is the current process a valid one?
     ASSERT(IS_PROCN_OK(curr_scheduling_proc->proc_nr));
-    
-    // if(*curr_scheduling_proc->stack_top != STACK_MAGIC)
-    //     kprintf("Stack Overflow\n");
-    
+
 #ifdef _DEBUG
     sp = (int)(get_physical_addr(curr_scheduling_proc->ctx.m.sp, curr_scheduling_proc)) - (int)curr_scheduling_proc->stack_top;
+    if(!is_vaddr_accessible(curr_scheduling_proc->ctx.m.sp, curr_scheduling_proc)){
+        kprintf("\nStack Overflow");
+    }
     kprintf("\nGeneral Protection Fault: \"%s (%d)\" Rbase=0x%x \n",
         curr_scheduling_proc->name,
         curr_scheduling_proc->pid,
