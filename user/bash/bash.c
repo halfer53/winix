@@ -199,9 +199,7 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
                             // printf("cmd %d %s dup read %d\n", i, buffer, prev_pipe_ptr[PIPE_READ]);
                         }
                     }
-                    printf("1 %d %x ", cmd_start, &cmd->argv[cmd_start]);
                     cmd_start = cmd->cmdStart[i];
-                    sched_yield();
                     execv(buffer, &cmd->argv[cmd_start]);
                     exit(1);
                 }else if( i > 0 ){
@@ -324,15 +322,15 @@ int help(int argc, char** argv){
 }
 
 int do_stest(int argc, char** argv){
-    static char test_str[] = "ls -la bin | grep snake | wc";
-    int limit = 10;
+    static char test_str[] = "ls -la bin | wc";
+    int limit = 20;
     int i;
     for(i = 0; i < limit; i++){
         if(i == limit - 1){
             enable_syscall_tracing();
             wramp_syscall(WINFO, WINFO_DEBUG_SCHEDULING);
         }
-        printf("WINIX> ");
+        printf("%d WINIX> ", i);
         exec_cmd(test_str);
     }
     return 0;
