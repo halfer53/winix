@@ -323,12 +323,12 @@ int help(int argc, char** argv){
 
 int do_stest(int argc, char** argv){
     static char test_str[] = "ls -la bin | wc";
-    int limit = 20;
+    int limit = 3;
     int i;
     for(i = 0; i < limit; i++){
         if(i == limit - 1){
             enable_syscall_tracing();
-            wramp_syscall(WINFO, WINFO_DEBUG_SCHEDULING);
+            wramp_syscall(WINFO, WINFO_DEBUG_SCHEDULING, NULL, 50);
         }
         printf("%d WINIX> ", i);
         exec_cmd(test_str);

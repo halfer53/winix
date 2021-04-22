@@ -48,7 +48,7 @@ int do_winfo(struct proc *who, struct message *m){
             break;
         
         case WINFO_DEBUG_SCHEDULING:
-            debug_scheduling(999);
+            debug_scheduling(m->m1_i2);
             break;
 
         default:

@@ -136,7 +136,6 @@ void set_syscall_mesg_exception(int operation, ptr_t* sp, struct message *m, str
     case DUP2:
         m->m1_i2 = *(sp + 1);
     case ALARM:
-    case WINFO:
     case SYSCONF:
     case SIGSUSPEND:
     case GETPGID:
@@ -149,6 +148,7 @@ void set_syscall_mesg_exception(int operation, ptr_t* sp, struct message *m, str
         break;
 
     case WAITPID:
+    case WINFO:
     case STRERROR:
     case SIGPROCMASK:
     case READ:
