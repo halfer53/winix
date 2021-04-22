@@ -11,7 +11,7 @@ struct device pipe_dev;
 static char* name = "pipe";
 static ino_t next_inum = 2;
 static dev_t pipe_devid = MAKEDEV(2, 1);
-#define PIPE_LIMIT  (BLOCK_SIZE)
+#define PIPE_LIMIT  (PAGE_LEN)
 
 struct pipe_waiting{
     struct proc* who;
@@ -115,7 +115,6 @@ int sys_pipe(struct proc* who, int fd[2]){
 struct pipe_waiting* get_next_waiting(struct list_head *waiting_list){
     struct pipe_waiting *p1, *p2;
     list_for_each_entry_safe(struct pipe_waiting, p1, p2, waiting_list, list){
-        list_del(&p1->list);
         return p1;
     }
     return NULL;
@@ -146,20 +145,24 @@ static int _pipe_read(struct proc* who, struct filp *filp, char *data, size_t co
         *data++ = pipe_data[i];
     }
     ret = (int)(i);
+    // KDEBUG(("%s[%d] pipe read ret %d \n", 
+    //     who->name, curr_syscall_caller->proc_nr, ret));
     shift_pipe_data(filp, i);
     return ret;
 }
 
 static int _pipe_write(struct proc* who, struct filp *filp, char *data, size_t count, off_t offset){
     int ret, i;
-    char *data_start = filp->pipe->data;
+    char *data_start = filp->pipe->data, *p = data;
     off_t off = filp->pipe->pos, end;
     end = (off + count) < PIPE_LIMIT ? (off + count) : PIPE_LIMIT;
     for(i = off; i < end; i++){
-        data_start[i] = *data++;
+        data_start[i] = *p++;
     }
     ret = (int)(i - off);
     filp->pipe->pos += ret;
+    // KDEBUG((" proc %d writing data 0x%x ret %d pipe->pos %d\n",
+    //     who->proc_nr, data, ret, filp->pipe->pos));
     return ret;
 }
 
@@ -169,8 +172,6 @@ int pipe_read ( struct filp *filp, char *data, size_t count, off_t offset){
     struct message msg;
     struct inode* ino = filp->filp_ino;
 
-    // KDEBUG(("%s[%d] pipe read %d f_count %d i_count %d pos %d \n", 
-    //     curr_syscall_caller->name, curr_syscall_caller->proc_nr, ino->i_num, filp->filp_count, ino->i_count, filp->pipe->pos));
     if(filp->pipe_mode == FILP_PIPE_WRITE)
         return 0;
 
@@ -196,14 +197,15 @@ int pipe_read ( struct filp *filp, char *data, size_t count, off_t offset){
         return SUSPEND;
     }
     ret = _pipe_read(curr_syscall_caller, filp, data, count, offset);
-    if(ret == 0)
-        return ret;
+
     next = get_next_waiting(&ino->pipe_writing_list);
-    if(next!= NULL){
+    if(next!= NULL && (next->count < (PIPE_LIMIT - filp->pipe->pos))){
         // KDEBUG(("pipe: proc %d is awaken for writing\n", next->who->proc_nr));
+        list_del(&next->list);
         ret2 = _pipe_write(next->who, next->filp, next->data, next->count, next->offset);
         next->who->flags &= ~STATE_WAITING;
         syscall_reply2(next->sys_call_num, ret2, next->who->proc_nr, &msg);
+        kfree(next->data);
         kfree(next);
     }
     return ret;
@@ -234,33 +236,41 @@ int pipe_write ( struct filp *filp, char *data, size_t count, off_t offset){
         return ENOSPC;
 
     if(count > (PIPE_LIMIT - filp->pipe->pos)){
+        char *p, *p2;
+        int len = count;
         if(filp->filp_flags & O_NONBLOCK)
             return 0;
         
         next = (struct pipe_waiting*)kmalloc(sizeof(struct pipe_waiting));
         if(!next)
             return ENOMEM;
-
+        p = (char *)kmalloc(count);
+        if(!next){
+            kfree(next);
+            return ENOMEM;
+        }
+        p2 = p;
+        while(len--){
+            *p2++ = *data++;
+        }
         curr_syscall_caller->flags |= STATE_WAITING;
         next->who = curr_syscall_caller;
         next->filp = filp;
-        next->data = data;
+        next->data = p;
         next->count = count;
         next->offset = offset;
         next->sys_call_num = WRITE;
         list_add(&next->list, &ino->pipe_writing_list);
-        // KDEBUG(("pipe: proc %d writing inode num %d is blocked \n",
-        //         curr_syscall_caller->pid, filp->filp_ino->i_num));
+        // KDEBUG(("pipe: proc %d writing from 0x%x %d bytes is blocked\n",
+        //         curr_syscall_caller->pid, data, count));
+        // KDEBUG(("\n"));
         return SUSPEND;
     }
     ret = _pipe_write(curr_syscall_caller, filp, data, count, offset);
-    if(ret == 0)
-        return ret;
-//    KDEBUG(("proc %d writing %s ret %d pipe->pos %d\n",
-//            curr_syscall_caller->proc_nr, data, ret, filp->pipe->pos));
     next = get_next_waiting(&ino->pipe_reading_list);
     if(next!= NULL){
         // KDEBUG(("pipe: proc %d is awaken for reading\n", next->who->proc_nr));
+        list_del(&next->list);
         ret2 = _pipe_read(next->who, next->filp, next->data, next->count, next->offset);
         next->who->flags &= ~STATE_WAITING;
         syscall_reply2(next->sys_call_num, ret2, next->who->proc_nr, &msg);
@@ -302,6 +312,7 @@ int pipe_close ( struct device* dev, struct filp *file){
             next = get_next_waiting(waiting);
             if(next!= NULL){
                 // KDEBUG(("next waiting %s\n", next->who->name));
+                list_del(&next->list);
                 ret = fn(next->who, next->filp, next->data, next->count, next->offset);
                 next->who->flags &= ~STATE_WAITING;
                 syscall_reply2(next->sys_call_num, ret, next->who->proc_nr, &msg);

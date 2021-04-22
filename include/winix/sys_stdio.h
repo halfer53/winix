@@ -15,6 +15,7 @@
 #define _W_SYS_STDIO_H_ 1
 
 #include <fs/filp.h>
+#include <winix/rex.h>
 
 extern const char *errlist[_NERROR];
 const char* kstr_error(int err);
@@ -32,6 +33,6 @@ int klog(const char *format, ...);
 int kwarn(const char *format, ...);
 
 int kputs(const char *s);
-
+int tty_write_rex(RexSp_t* rex, char* data, size_t len);
 
 #endif
