@@ -100,6 +100,7 @@ void syscall_region_begin(){
     set_bill_ptr(who);
     SYSTEM_TASK->flags |= BILLABLE;
     curr_syscall = m.type;
+    who->syscall_start_time = get_uptime();
 
     // the following two are defensive statements
     // to ensure the caller is suspended while the system
@@ -112,6 +113,14 @@ void syscall_region_begin(){
     // Make sure system doesn't send a message to itself
     
     ASSERT(who_proc_nr != SYSTEM); 
+}
+
+void syscall_region_end(){
+    SYSTEM_TASK->flags &= ~BILLABLE;
+    // reset messages
+    memset(&m, 0, sizeof(struct message));
+    who_proc_nr = 0;
+    curr_syscall = 0;
 }
 
 void set_syscall_mesg_exception(int operation, ptr_t* sp, struct message *m, struct proc* who){
@@ -225,14 +234,6 @@ void set_reply_res_errno(struct proc* who, struct message *m){
     }
 }
 
-void syscall_region_end(){
-    SYSTEM_TASK->flags &= ~BILLABLE;
-    // reset messages
-    memset(&m, 0, sizeof(struct message));
-    who_proc_nr = 0;
-    curr_syscall = 0;
-}
-
 int no_syscall(struct proc* who, struct message* m){
     KDEBUG(("Process \"%s (%d)\" performed unknown system call %d\r\n", 
         who->name, who->pid, m->type));
@@ -270,13 +271,15 @@ int syscall_reply2(int syscall_num, int reply, int dest, struct message* m){
     char buf[32];
     char* p = buf;
     struct proc* pDest = get_proc(dest);
+    clock_t curr_time = get_uptime();
+    clock_t time_diff = curr_time - pDest->syscall_start_time;
     if(trace_syscall && syscall_num > 0 && syscall_num < _NSYSCALL){
         if(reply < 0){
             p = (char*)kstr_error(reply);
         }else{
             kputd_buf(reply, buf);
         }
-        KDEBUG(("Syscall %s return %s to Proc %s[%d]\n",syscall_str[syscall_num] , p, pDest->name, dest));
+        KDEBUG(("Syscall %s return %s to Proc %s[%d], took %d\n",syscall_str[syscall_num] , p, pDest->name, dest, time_diff));
     }
     if(pDest){
         m->type = syscall_num;

@@ -32,7 +32,7 @@ void usage();
 
 void regdump(regexp *s);
 
-#define MAXLINE (100)
+#define MAXLINE (101)
 int status = 1;
 char *progname;
 int pmflag = 1;	 /* print lines which match */

@@ -179,6 +179,7 @@ typedef struct proc {
     int parent;                    	// proc_index of parent
     int thread_parent;              // proc_index of parent whom share the memory except stack
     int flags;                	    // information flags
+    clock_t syscall_start_time;
 
     /* Process Table Index */
     int proc_nr;                	// Index in the process table
