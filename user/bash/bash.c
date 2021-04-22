@@ -29,6 +29,7 @@ CMD_PROTOTYPE(cmd_kill);
 CMD_PROTOTYPE(print_pid);
 CMD_PROTOTYPE(mem_info);
 CMD_PROTOTYPE(do_trace_syscall);
+CMD_PROTOTYPE(do_untrace_syscall);
 CMD_PROTOTYPE(help);
 CMD_PROTOTYPE(cmd_exit);
 CMD_PROTOTYPE(printenv);
@@ -42,6 +43,7 @@ CMD_PROTOTYPE(do_fg);
 struct cmd_internal builtin_commands[] = {
     { printenv, "env" },
     { do_trace_syscall, "trace"},
+    { do_untrace_syscall, "untrace"},
     { cmd_bash, "bash"},
     { slab, "slab"},
     { cmd_kill, "kill"},
@@ -336,6 +338,10 @@ int do_cls(int argc, char** argv){
 
 int do_trace_syscall(int argc, char** argv){
     return enable_syscall_tracing();
+}
+
+int do_untrace_syscall(int argc, char** argv){
+    return disable_syscall_tracing();
 }
 
 // Print the system wise memory info
