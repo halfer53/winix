@@ -37,6 +37,7 @@ CMD_PROTOTYPE(cmd_bash);
 CMD_PROTOTYPE(do_cd);
 CMD_PROTOTYPE(do_cls);
 CMD_PROTOTYPE(do_fg);
+CMD_PROTOTYPE(do_stest);
 
 
 // Command handling
@@ -54,6 +55,7 @@ struct cmd_internal builtin_commands[] = {
     { do_cd, "cd"},
     { do_cls, "clear"},
     { do_fg, "fg"},
+    { do_stest, "stest"},
     { 0, NULL}
 };
 
@@ -65,7 +67,6 @@ void init_shell(){
     ioctl(STDIN_FILENO, TIOCSCTTY);
     ioctl(STDIN_FILENO, TIOCSPGRP, pgid);
 }
-
 
 int main() {
     int ret, len, newline_pos;
@@ -98,7 +99,7 @@ int main() {
             buf[newline_pos] = '\0';
         }
 
-        exec_cmd(buf, NULL);
+        exec_cmd(buf);
 
         write(history_fd, prev_cmd, len);
     }
@@ -109,10 +110,6 @@ int search_path(char* path, char* name){
     strcpy(path, "/bin/");
     strcat(path, name);
     return access(path, F_OK);
-}
-
-int _exec_cmd_pipe(struct cmdLine *cmd, int cmd1_idx, int cmd2_idx, int prev_fd, int next_fd){
-    return 0;
 }
 
 #define PIPE_READ   (0)
@@ -207,12 +204,14 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
                     cmd_start = cmd->cmdStart[i];
                     execv(buffer, &cmd->argv[cmd_start]);
                     exit(1);
-                }else{
-                    if( i > 0 ){
-                        prev_pipe_ptr = &pipe_fds[((i - 1) * 2)];
-                        close(prev_pipe_ptr[PIPE_READ]);
-                        close(prev_pipe_ptr[PIPE_WRITE]);
-                    }
+                }else if( i > 0 ){
+                    prev_pipe_ptr = &pipe_fds[((i - 1) * 2)];
+                    // printf("%d 0x%x 0x%x 0x%x ",i, pipe_fds, prev_pipe_ptr, get_sp());
+                    close(prev_pipe_ptr[PIPE_READ]);
+                    // printf("1 ");
+                    close(prev_pipe_ptr[PIPE_WRITE]);
+                    // printf("2 ");
+
                 }
             }else{
                 cmd_start = cmd->cmdStart[i];
@@ -245,7 +244,7 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
     return 0;
 }
 
-int exec_cmd(char *line, int tpipe[2]){
+int exec_cmd(char *line){
     struct cmdLine cmd;
     int ret;
     char *p;
@@ -324,6 +323,20 @@ int help(int argc, char** argv){
     while(handler && handler->name != NULL) {
         printf(" * %s\n",handler->name);
         handler++;
+    }
+    return 0;
+}
+
+int do_stest(int argc, char** argv){
+    static char test_str[] = "ls -la bin | grep snake | wc";
+    int limit = 10;
+    int i;
+    for(i = 0; i < limit; i++){
+        if(i == limit - 1){
+            enable_syscall_tracing();
+        }
+        printf("WINIX> ");
+        exec_cmd(test_str);
     }
     return 0;
 }

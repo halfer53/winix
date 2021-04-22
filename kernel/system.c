@@ -271,15 +271,13 @@ int syscall_reply2(int syscall_num, int reply, int dest, struct message* m){
     char buf[32];
     char* p = buf;
     struct proc* pDest = get_proc(dest);
-    clock_t curr_time = get_uptime();
-    clock_t time_diff = curr_time - pDest->syscall_start_time;
     if(trace_syscall && syscall_num > 0 && syscall_num < _NSYSCALL){
         if(reply < 0){
             p = (char*)kstr_error(reply);
         }else{
             kputd_buf(reply, buf);
         }
-        KDEBUG(("Syscall %s return %s to Proc %s[%d], took %d\n",syscall_str[syscall_num] , p, pDest->name, dest, time_diff));
+        KDEBUG(("Syscall %s return %s to Proc %s[%d]\n",syscall_str[syscall_num] , p, pDest->name, dest));
     }
     if(pDest){
         m->type = syscall_num;
