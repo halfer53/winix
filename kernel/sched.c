@@ -32,7 +32,7 @@ void init_sched(){
 void rebalance_queues(int proc_nr, clock_t time){
     struct proc* curr;
     foreach_proc(curr){
-        curr->priority = MAX_PRIORITY;
+        curr->priority = DEFAULT_PRIORITY;
     }
 
     new_timer(SYSTEM_TASK, &sched_timer, REBALANCE_TIMEOUT, rebalance_queues);
