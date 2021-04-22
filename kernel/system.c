@@ -46,6 +46,8 @@ void system_main() {
         winix_receive(mesg);
         who_proc_nr = mesg->src;
         who = get_proc(who_proc_nr);
+        if(!who)
+            continue;
 
         syscall_region_begin();
 
