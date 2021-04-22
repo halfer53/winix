@@ -53,7 +53,7 @@ struct proc *pick_proc() {
     struct proc* mp;
 
     // Find the highest-priority non-empty queue
-    for (i = 0; i < NUM_QUEUES; i++){
+    for (i = MAX_PRIORITY; i >= MIN_PRIORITY; i--){
         if(mp = dequeue(ready_q[i])){
             return mp;
         }
@@ -92,8 +92,8 @@ void sched() {
             // if already at the lowest ready queue, for every REBALANCE_TIMEOUT timer interrupts
             // rebalance_queue is called which bumps every processes in the top
             // ready queue
-            if(IS_USER_PROC(curr_scheduling_proc) && curr_scheduling_proc->priority < MIN_PRIORITY ){
-                curr_scheduling_proc->priority++;
+            if(IS_USER_PROC(curr_scheduling_proc) && curr_scheduling_proc->priority > MIN_PRIORITY ){
+                curr_scheduling_proc->priority--;
             }
             enqueue_tail(ready_q[curr_scheduling_proc->priority], curr_scheduling_proc);
             

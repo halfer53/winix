@@ -47,8 +47,9 @@
 
 // Scheduling
 #define NUM_QUEUES              	5
-#define MAX_PRIORITY            	0
-#define MIN_PRIORITY            	4
+#define MAX_PRIORITY            	4
+#define MIN_PRIORITY            	0
+#define DEFAULT_PRIORITY            3
 
 // Max string len for a process name 
 //(including NULL terminator)
