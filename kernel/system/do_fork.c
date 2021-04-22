@@ -47,6 +47,10 @@ int copy_pcb(struct proc* parent, struct proc* child){
             file->filp_count += 1;
         }
     }
+
+    if(parent->priority > MIN_PRIORITY) // let child run first
+        parent->priority--;
+    parent->ticks_left = 0;
     return OK;
 }
 
@@ -190,9 +194,7 @@ int do_tfork(struct proc* parent, struct message* m){
         child->stack_top = new_stack;
 
         syscall_reply2(TFORK, 0, child->proc_nr, m);
-        if(parent->priority > MIN_PRIORITY) // let child run first
-            parent->priority--;
-        
+
         return child->proc_nr;
     }
     return EAGAIN;
