@@ -235,8 +235,8 @@ void set_reply_res_errno(struct proc* who, struct message *m){
 }
 
 int no_syscall(struct proc* who, struct message* m){
-    KDEBUG(("Process \"%s (%d)\" performed unknown system call %d\r\n", 
-        who->name, who->pid, m->type));
+    klog("Process \"%s (%d)\" performed unknown system call %d\r\n", 
+        who->name, who->pid, m->type);
     return ENOSYS;
 }
 
@@ -277,7 +277,7 @@ int syscall_reply2(int syscall_num, int reply, int dest, struct message* m){
         }else{
             kputd_buf(reply, buf);
         }
-        KDEBUG(("Syscall %s return %s to Proc %s[%d]\n",syscall_str[syscall_num] , p, pDest->name, dest));
+        klog("Syscall %s return %s to Proc %s[%d]\n",syscall_str[syscall_num] , p, pDest->name, dest);
     }
     if(pDest){
         m->type = syscall_num;

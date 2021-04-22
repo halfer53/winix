@@ -114,8 +114,8 @@ PRIVATE int sys_sig_handler(struct proc *who, int signum){
                 break;
             
             default:
-                KDEBUG(("Signal %d: terminate process \"%s [%d]\"\n"
-                                        ,signum,who->name,who->pid));
+                klog("Signal %d: terminate process \"%s [%d]\"\n"
+                                        ,signum,who->name,who->pid);
                 // KDEBUG(("Signal curr %x\n", curr_scheduling_proc));
                 exit_proc(who, 0, signum);
         }

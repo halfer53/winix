@@ -261,7 +261,7 @@ int do_exit(struct proc *who, struct message *m){
         status = who->ctx.m.regs[0];
     }
     if(trace_syscall){
-        KDEBUG(("%s[%d] exit status %d signal %d\n",who->name, who->pid, status, signum));
+        klog("%s[%d] exit status %d signal %d\n",who->name, who->pid, status, signum);
     }
     exit_proc(who, status, signum);
     

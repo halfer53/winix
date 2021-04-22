@@ -189,7 +189,7 @@ struct block_buffer *get_block_buffer(block_t blocknr, struct device* dev){
     // printf("ret blk %d %d\n", blocknr, ret);
 
     if (ret != BLOCK_SIZE) {
-        KDEBUG(("dev io return %d for %d\n", ret, tbuf->b_blocknr));
+        // KDEBUG(("dev io return %d for %d\n", ret, tbuf->b_blocknr));
         dev->bops->release_block(tbuf);
         tbuf->initialised = false;
         enqueue_buf(tbuf);

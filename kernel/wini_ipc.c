@@ -107,7 +107,7 @@ int do_receive(struct message *m) {
                 p = get_proc(i);
                 *m = *(p->message);
                 if(is_debugging_ipc()){
-                    KDEBUG(("%d notify queue %d type %d\n", curr_scheduling_proc->proc_nr, p->proc_nr, m->type));
+                    klog("%d notify queue %d type %d\n", curr_scheduling_proc->proc_nr, p->proc_nr, m->type);
                 }
                 return OK;
             }
