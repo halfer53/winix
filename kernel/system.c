@@ -65,7 +65,7 @@ void system_main() {
             case DONTREPLY:
                 break;
             default:
-                syscall_reply2(mesg->type, reply, who_proc_nr, mesg);
+                syscall_reply2(curr_syscall, reply, who_proc_nr, mesg);
         }
 
         syscall_region_end();

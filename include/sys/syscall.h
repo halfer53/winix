@@ -96,6 +96,7 @@
 #define WINFO_TRACE_SYSCALL (4)
 #define WINFO_DISABLE_TRACE (5)
 #define WINFO_DEBUG_IPC     6
+#define WINFO_DEBUG_SCHEDULING  7
 
 extern const char **_environ;
 

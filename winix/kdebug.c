@@ -78,28 +78,13 @@ void stop_debug_syscall(){
     _debug_syscall = 0;
 }
 
-void kprintf_syscall_reply(int reply){
-    if(_debug_syscall > 0){
-        kprintf("\n%s\t reply %d |",syscall_str[curr_syscall_num()], reply);
-        _debug_syscall--;
-    }
-}
-
-void kprintf_syscall_request(int type, pid_t from){
-    if(_debug_syscall > 0){
-        kprintf("\n%s\t from %d |", syscall_str[type], from);
-        _debug_syscall--;
-    }
-    
-}
-
 void kreport_readyqueue(){
     int i,j;
     struct proc* curr;
     kprintf(" q| ");
     for (i = 0; i < NUM_QUEUES; i++) {
         curr = ready_q[i][HEAD];
-        while(curr != NULL)
+    while(curr != NULL)
         {
             kprintf("%d ", curr->proc_nr);
             curr = curr->next;

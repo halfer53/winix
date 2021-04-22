@@ -141,7 +141,8 @@ PRIVATE void gpf_handler() {
     int val;
     // is the current process a valid one?
     ASSERT(IS_PROCN_OK(curr_scheduling_proc->proc_nr));
-
+    trace_syscall = false;
+    stop_debug_scheduling();
 #ifdef _DEBUG
     sp = (int)(get_physical_addr(curr_scheduling_proc->ctx.m.sp, curr_scheduling_proc)) - (int)curr_scheduling_proc->stack_top;
     if(!is_vaddr_accessible(curr_scheduling_proc->ctx.m.sp, curr_scheduling_proc)){

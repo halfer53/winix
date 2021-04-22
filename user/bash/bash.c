@@ -179,9 +179,7 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
                     close(sout);
                 }
 
-                second_pid = tfork();
-
-                if(second_pid == 0){ // child, actual command
+                if(tfork() == 0){ // child, actual command
                     if(cmd->numCommands > 1){
                         
                         if((i+1) < cmd->numCommands ){ // not the last command
@@ -201,17 +199,15 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
                             // printf("cmd %d %s dup read %d\n", i, buffer, prev_pipe_ptr[PIPE_READ]);
                         }
                     }
+                    printf("1 %d %x ", cmd_start, &cmd->argv[cmd_start]);
                     cmd_start = cmd->cmdStart[i];
+                    sched_yield();
                     execv(buffer, &cmd->argv[cmd_start]);
                     exit(1);
                 }else if( i > 0 ){
                     prev_pipe_ptr = &pipe_fds[((i - 1) * 2)];
-                    // printf("%d 0x%x 0x%x 0x%x ",i, pipe_fds, prev_pipe_ptr, get_sp());
                     close(prev_pipe_ptr[PIPE_READ]);
-                    // printf("1 ");
                     close(prev_pipe_ptr[PIPE_WRITE]);
-                    // printf("2 ");
-
                 }
             }else{
                 cmd_start = cmd->cmdStart[i];
@@ -334,6 +330,7 @@ int do_stest(int argc, char** argv){
     for(i = 0; i < limit; i++){
         if(i == limit - 1){
             enable_syscall_tracing();
+            wramp_syscall(WINFO, WINFO_DEBUG_SCHEDULING);
         }
         printf("WINIX> ");
         exec_cmd(test_str);

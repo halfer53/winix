@@ -110,7 +110,7 @@ void sched() {
     }while(curr_scheduling_proc == NULL || curr_scheduling_proc->state);
     
     if(is_debugging_sched()){
-        kprintf2("| %d |", curr_scheduling_proc->proc_nr);
+        kprintf2("|%d| ", curr_scheduling_proc->proc_nr);
     }
     // Reset quantum if needed
     if (curr_scheduling_proc->ticks_left <= 0) {
