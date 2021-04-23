@@ -69,30 +69,6 @@ const char* kstr_error(int err){
     return errlist[err];
 }
 
-
-// int  kputf_buf(float fVal, char* ori_buf, int afterpoint)
-// {
-//     int dVal, dec;
-//     char *buf = ori_buf;
-
-//     fVal += (float)0.005;   // added after a comment from Matt McNabb, see below.
-
-//     dVal = (int)fVal;
-//     dec = (int)(fVal * 100) % 100;
-
-//     *buf++ = (dec % 10) + '0';
-//     *buf++ = (dec / 10) + '0';
-//     *buf++ = '.';
-
-//     while (dVal > 0 && afterpoint--)
-//     {
-//         *buf++ = (dVal % 10) + '0';
-//         dVal /= 10;
-//     }
-
-//     return buf - ori_buf;
-// }
-
 /**
  * print value of n in hexadecimal string format
  * into the buffer
@@ -329,7 +305,7 @@ int kprintf_vm( struct filp* file, const char *orignal_format, void *arg, ptr_t 
                 token = ZERO;
                 format++;
             }
-            
+
             padding_len = pass_number(&format);
 
             if(*format == 'l'){
