@@ -69,6 +69,30 @@ const char* kstr_error(int err){
     return errlist[err];
 }
 
+
+// int  kputf_buf(float fVal, char* ori_buf, int afterpoint)
+// {
+//     int dVal, dec;
+//     char *buf = ori_buf;
+
+//     fVal += (float)0.005;   // added after a comment from Matt McNabb, see below.
+
+//     dVal = (int)fVal;
+//     dec = (int)(fVal * 100) % 100;
+
+//     *buf++ = (dec % 10) + '0';
+//     *buf++ = (dec / 10) + '0';
+//     *buf++ = '.';
+
+//     while (dVal > 0 && afterpoint--)
+//     {
+//         *buf++ = (dVal % 10) + '0';
+//         dVal /= 10;
+//     }
+
+//     return buf - ori_buf;
+// }
+
 /**
  * print value of n in hexadecimal string format
  * into the buffer
@@ -180,12 +204,10 @@ int tty_non_init_write(struct filp *file, char *data, size_t len, off_t offset){
 }
 
 
-
-
 #define BUFFER_SIZ  (101)   // Column size in WRAMP is 100
 #define FORMAT_BUF_SIZ  (11)
 #define PADDING_BUFFER_SIZ (20)
-#define PADDING_NUM_BUF_SIZ (3)
+#define PADDING_NUM_BUF_SIZ (8)
 // static char buffer[BUFFER_SIZ];
 
 
@@ -245,6 +267,24 @@ static void fill_padding(struct printf_buffer* tbuf, char token, int len){
     }
 }
 
+static int pass_number(char **s_format){
+    char *format = *s_format;
+    int ret = 0;
+    char padding_num_buffer[PADDING_NUM_BUF_SIZ];
+    int padding_num_buffer_count = 0;
+
+    while(isdigit(*format) && (padding_num_buffer_count < (PADDING_NUM_BUF_SIZ - 1))){
+        padding_num_buffer[padding_num_buffer_count++] = *format++;
+    }
+
+    if(padding_num_buffer_count > 0 ){
+        padding_num_buffer[padding_num_buffer_count] = '\0';
+        ret = atoi(padding_num_buffer);
+    }
+    *s_format = format;
+    return ret;
+}
+
 /**
  * virtual memory printf, this function is used by both kernel and user process
  * @param  format    
@@ -264,9 +304,7 @@ int kprintf_vm( struct filp* file, const char *orignal_format, void *arg, ptr_t 
     char* format = (char*)orignal_format;
     char prev;
     char token;
-    char padding_num_buffer[PADDING_NUM_BUF_SIZ];
-    int padding_num_buffer_count;
-
+    
     memset(this_buffer, 0, sizeof(struct printf_buffer));
     this_buffer->limit = BUFFER_SIZ;
     filp_write = file ? file->filp_dev->fops->write : tty_non_init_write;
@@ -277,8 +315,6 @@ int kprintf_vm( struct filp* file, const char *orignal_format, void *arg, ptr_t 
 
         if(*format == '%') {
             format++;
-            padding_len = 0;
-            padding_num_buffer_count = 0;
             padding_direction = LEFT_PADDING;
             format_ptr = format_buffer;
             token = SPACE;
@@ -289,22 +325,12 @@ int kprintf_vm( struct filp* file, const char *orignal_format, void *arg, ptr_t 
                 format++;
                 padding_direction = RIGHT_PADDING;
             }
-
             if(*format == '0'){
                 token = ZERO;
                 format++;
             }
             
-            while(isdigit(*format) && (padding_num_buffer_count < (PADDING_NUM_BUF_SIZ - 1))){
-                padding_num_buffer[padding_num_buffer_count++] = *format++;
-            }
-
-            if(padding_num_buffer_count > 0 ){
-                padding_num_buffer[padding_num_buffer_count] = '\0';
-                padding_len = atoi(padding_num_buffer);
-                // kputs(padding_num_buffer);
-            }
-            
+            padding_len = pass_number(&format);
 
             if(*format == 'l'){
                 format++;
