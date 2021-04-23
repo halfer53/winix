@@ -322,8 +322,8 @@ int help(int argc, char** argv){
 }
 
 int do_stest(int argc, char** argv){
-    static char test_str[] = "ls -la bin | wc";
-    int limit = 3;
+    static char test_str[] = "ls -la bin | grep snake | wc";
+    int limit = 10;
     int i;
     for(i = 0; i < limit; i++){
         if(i == limit - 1){
