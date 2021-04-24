@@ -143,6 +143,31 @@ char *get_user_name(uid_t uid){
     return NULL;
 }
 
+
+void int2str(int value, int i, char* output){
+    int j;
+    while(i){
+        j = (value / i) % 10;
+        *output++ = '0' + j;
+        i /= 10;
+    }
+}
+
+void set_num_str(int value, char *buf){
+    int size, mod;
+    size = value / 4096;
+    mod = value % 4096;
+    int2str(size, 10, buf);
+    if(*buf == '0'){
+        *buf = ' ';
+    }
+    buf += 2;
+    *buf++ = '.';
+    int2str(mod, 10, buf);
+    buf += 2;
+    *buf = '\0';
+}
+
 #define get_group_name(id)  (get_user_name(id))
 
 #define SHOW_HIDDEN     1
@@ -154,10 +179,10 @@ static char permission_char[] = "-xwr";
 void print_long_format(char *pathname){
     struct stat statbuf;
     struct time_struct time;
+    char size_buf[10];
     char *p = buffer;
     int i, j, k, l;
     int ret;
-    int size_in_kb;
     mode_t mode;
     char *username, *groupname;
     ret = stat(pathname, &statbuf);
@@ -175,18 +200,12 @@ void print_long_format(char *pathname){
         k = k >> 1;
     }
     *p = '\0';
-    size_in_kb = statbuf.st_size;
-#ifdef __wramp__
-    size_in_kb = size_in_kb * 4;
-#endif
-    size_in_kb = size_in_kb / 1024;
-    if(!size_in_kb)
-        size_in_kb = 1;
+    set_num_str(statbuf.st_size, size_buf);
     username = get_user_name(statbuf.st_uid);
     groupname = get_group_name(statbuf.st_gid);
     parse_unix_time(statbuf.st_atime, &time);
-    printf("%s %2d %s %s %2dK %02d/%02d/%04d %02d:%02d:%02d %s\n", buffer, statbuf.st_nlink, username, groupname,
-     size_in_kb, time.date, time.month, time.currYear, time.hours, time.minutes, time.seconds, pathname);
+    printf("%s %2d %s %s %sKB %02d/%02d/%04d %02d:%02d:%02d %s\n", buffer, statbuf.st_nlink, username, groupname,
+     size_buf, time.date, time.month, time.currYear, time.hours, time.minutes, time.seconds, pathname);
 }
 
 #define PATH_LEN    (50)
