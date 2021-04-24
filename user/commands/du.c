@@ -11,11 +11,37 @@ void reset_path(char *dir_path, char *path){
     strncat(path, slash, PATH_LEN);
 }
 
+
+void int2str(int value, int i, char* output){
+    int j;
+    while(i){
+        j = (value / i) % 10;
+        *output++ = '0' + j;
+        i /= 10;
+    }
+}
+
+void set_num_str(int value, char *buf){
+    int size, mod;
+    size = value / 4096;
+    mod = value % 4096;
+    int2str(size, 10, buf);
+    if(*buf == '0'){
+        *buf = ' ';
+    }
+    buf += 2;
+    *buf++ = '.';
+    int2str(mod, 10, buf);
+    buf += 2;
+    *buf = '\0';
+}
+
 size_t count_dir_size(char *dir_path){
     struct dirent* dir;
     struct stat statbuf;
     size_t count = 0, ret;
     char *path;
+    char size_buf[10];
     DIR* directory = opendir(dir_path);
     if(!directory){
         fprintf(stderr, "err:%s\n", dir_path);
@@ -37,8 +63,8 @@ size_t count_dir_size(char *dir_path){
         }
         reset_path(dir_path, path);
     }
-    
-    printf("%-8d %s\n", count, dir_path);
+    set_num_str(count, size_buf);
+    printf("%s %s\n", size_buf, dir_path);
     closedir(directory);
     free(path);
     return count;
