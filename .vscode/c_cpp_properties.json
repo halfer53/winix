@@ -7,7 +7,7 @@
                 "${workspaceFolder}/include",
                 "${workspaceFolder}/**"
             ],
-            "defines": [],
+            "defines": ["_DEBUG"],
             "compilerPath": "/usr/bin/gcc",
             "cStandard": "c89",
             "cppStandard": "c++17",

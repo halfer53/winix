@@ -148,10 +148,11 @@ PRIVATE void gpf_handler() {
     if(!is_vaddr_accessible(curr_scheduling_proc->ctx.m.sp, curr_scheduling_proc)){
         kprintf("\nStack Overflow");
     }
-    kprintf("\nGeneral Protection Fault: \"%s (%d)\" Rbase=0x%x \n",
+    kprintf("\nGeneral Protection Fault: \"%s (%d)\" Rbase=0x%x Stack Top=0x%x\n",
         curr_scheduling_proc->name,
         curr_scheduling_proc->pid,
-        curr_scheduling_proc->ctx.rbase);
+        curr_scheduling_proc->ctx.rbase,
+        curr_scheduling_proc->stack_top);
     pc = get_physical_addr(get_pc_ptr(curr_scheduling_proc),curr_scheduling_proc);
 
     kprintf("Virtual  ");
