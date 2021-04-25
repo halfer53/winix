@@ -52,9 +52,9 @@ Winix includes full-featured kernel with process and memory management, in-memor
 
 Download the latest Rexsimulator from [Here](https://github.com/halfer53/rexsimulator/releases)
 
-Download the latest WINIX binary ```winix.srec``` from [Here](https://github.com/halfer53/winix/releases)
-
 N.B. `mono` is required to run in Linux environment, [Download Instruction](https://www.mono-project.com/download/stable/#download-lin)
+
+Download the latest WINIX binary ```winix.srec``` from [Here](https://github.com/halfer53/winix/releases)
 
 Run ```Rexsimulator.exe```
 
