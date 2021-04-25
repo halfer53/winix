@@ -19,7 +19,7 @@ int sys_close(struct proc *who, int fd)
 
 int root_fs_write(struct filp *filp, char *data, size_t count, off_t offset);
 
-int _sys_open(struct proc *who, char *path, int flags, mode_t mode, dev_t devid)
+int sys_open(struct proc *who, char *path, int flags, mode_t mode)
 {
     filp_t *filp;
     int i, open_slot, ret;
@@ -28,10 +28,6 @@ int _sys_open(struct proc *who, char *path, int flags, mode_t mode, dev_t devid)
     struct device *dev;
     mode_t file_mode;
     clock_t unix_time = get_unix_time();
-
-    dev = get_dev(devid);
-    if (!dev)
-        return ENXIO;
 
     if ((ret = eat_path(who, path, &lastdir, &inode, string)))
         return ret;
@@ -48,6 +44,7 @@ int _sys_open(struct proc *who, char *path, int flags, mode_t mode, dev_t devid)
         goto final;
     }
 
+    
     if (!inode && *string != '\0')
     {
 
@@ -56,7 +53,7 @@ int _sys_open(struct proc *who, char *path, int flags, mode_t mode, dev_t devid)
             ret = ENOENT;
             goto final;
         }
-
+        dev = lastdir->i_dev;
         inode = alloc_inode(who, dev, dev);
         if (!inode)
         {
@@ -108,12 +105,7 @@ final:
 
 int sys_creat(struct proc *who, char *path, mode_t mode)
 {
-    return _sys_open(who, path, O_CREAT | O_EXCL, mode, ROOT_DEV);
-}
-
-int sys_open(struct proc *who, char *path, int flags, mode_t mode)
-{
-    return _sys_open(who, path, flags, mode, ROOT_DEV);
+    return sys_open(who, path, O_CREAT | O_EXCL, mode);
 }
 
 int do_open(struct proc *who, struct message *msg)
