@@ -52,6 +52,7 @@ struct cmd_internal builtin_commands[] = {
     { mem_info, "free"},
     { cmd_exit, "exit"},
     { help, "help"},
+    { help, "?"},
     { do_cd, "cd"},
     { do_cls, "clear"},
     { do_fg, "fg"},
