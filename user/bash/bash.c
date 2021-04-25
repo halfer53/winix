@@ -134,7 +134,9 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
 
     pid = tfork();
     
-    if(!pid){
+    if(pid == -1){
+        perror("fork");
+    }else if(!pid){
         
         int i, ret, cmd_start;
         int exit_code = 0;
@@ -348,10 +350,12 @@ int do_cls(int argc, char** argv){
 }
 
 int do_trace_syscall(int argc, char** argv){
+    printf("Printing syscall tracing in Serial Port 2\n");
     return enable_syscall_tracing();
 }
 
 int do_untrace_syscall(int argc, char** argv){
+    printf("Syscall tracking disabled\n");
     return disable_syscall_tracing();
 }
 
