@@ -64,7 +64,7 @@ size_t count_dir_size(char *dir_path){
         reset_path(dir_path, path);
     }
     set_num_str(count, size_buf);
-    printf("%s %s\n", size_buf, dir_path);
+    printf("%sKB %s\n", size_buf, dir_path);
     closedir(directory);
     free(path);
     return count;
