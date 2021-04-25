@@ -39,8 +39,11 @@
 // which equals to 4 * 32
 #define MEM_MAP_LEN    4
 
-// Number of words per page
+#ifdef __x86_64__
+#define PAGE_LEN    4096
+#else
 #define PAGE_LEN    1024
+#endif
 
 #define HZ    (60)
 
