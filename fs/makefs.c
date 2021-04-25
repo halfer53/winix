@@ -11,14 +11,14 @@ unsigned int setBits(unsigned int n)
     return ret;
 }
 
-int makefs( char* disk_raw, size_t disk_size_words)
+int makefs( char* disk_raw, size_t disk_size)
 {
     char *pdisk = disk_raw;
     struct winix_dirent* pdir;
     const time_t now = INODE_MOCK_UTC_TIME;
     const int root_inode_num = 1;
     inode_t root_node;
-    unsigned int blocks_nr = disk_size_words / BLOCK_SIZE;
+    unsigned int blocks_nr = disk_size / BLOCK_SIZE;
     block_t sb_block_nr = 0;
     block_t blockmap_block_nr = 1;
     block_t inodemap_block_nr = 2;
