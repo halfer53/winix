@@ -54,6 +54,8 @@ Download the latest Rexsimulator from [Here](https://github.com/halfer53/rexsimu
 
 Download the latest WINIX binary ```winix.srec``` from [Here](https://github.com/halfer53/winix/releases)
 
+N.B. `mono` is required to run in Linux environment, [Download Instruction](https://www.mono-project.com/download/stable/#download-lin)
+
 Run ```Rexsimulator.exe```
 
 Click ```Quick Load```, select ```winix.srec```
