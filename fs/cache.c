@@ -85,7 +85,6 @@ int flush_all_buffer(){
     for(j = 0; j < LRU_LEN; j++){
         tbuf = &buf_table[j];
         if(tbuf->b_dirt){
-            // block_io(tbuf, WRITING);
             tbuf->b_dev->bops->flush_block(tbuf);
             tbuf->b_dirt = false;
         }
@@ -103,7 +102,6 @@ int flush_inode_zones(struct inode *ino){
             for(j = 0; j < LRU_LEN; j++){
                 tbuf = &buf_table[j];
                 if(tbuf->b_blocknr == zid && tbuf->b_dirt){
-                    // block_io(tbuf, WRITING);
                     tbuf->b_dev->bops->flush_block(tbuf);
                     tbuf->b_dirt = false;
                 }
@@ -111,17 +109,6 @@ int flush_inode_zones(struct inode *ino){
         }
     }
     return OK;
-}
-
-int block_io(struct block_buffer* tbuf, int flag){
-    off_t off = tbuf->b_blocknr * BLOCK_SIZE;
-//    KDEBUG(("block io blk %d off %d mode %s\n", tbuf->b_blocknr, off, flag == READING ? "read" : "write"));
-    if(flag == READING){
-        return tbuf->b_dev->dops->dev_read(tbuf->block, off, BLOCK_SIZE);
-    }else if(flag == WRITING){
-        return tbuf->b_dev->dops->dev_write(tbuf->block, off, BLOCK_SIZE);
-    }
-    return 0;
 }
 
 int put_block_buffer_immed(struct block_buffer* tbuf, struct device* dev){

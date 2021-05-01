@@ -46,7 +46,6 @@ struct block_buffer* dequeue_buf();
 void enqueue_buf(struct block_buffer *tbuf);
 void init_buf();
 int flush_inode_zones(struct inode *ino);
-int block_io(struct block_buffer* tbuf, int flag);
 int flush_all_buffer();
 void flush_super_block(struct device* dev);
 
