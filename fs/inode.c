@@ -270,7 +270,7 @@ inode_t* alloc_inode(struct proc* who, struct device* parentdev, struct device* 
     inode->i_gid = who->gid;
     inode->i_uid = who->uid;
     inode->i_count += 1;
-    inode->i_ctime = INODE_MOCK_UTC_TIME;
+    inode->i_ctime = get_unix_time();
     bitmap_set_bit(inode_arch_map, INODE_ARC_MAP_LEN, inum);
     // KDEBUG(("alloc ino set bit %d\n", inum));
     inode->i_ctime = unix_time;

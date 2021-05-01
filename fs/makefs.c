@@ -15,7 +15,7 @@ int makefs( char* disk_raw, size_t disk_size)
 {
     char *pdisk = disk_raw;
     struct winix_dirent* pdir;
-    const time_t now = INODE_MOCK_UTC_TIME;
+    const time_t now = start_unix_time;
     const int root_inode_num = 1;
     inode_t root_node;
     unsigned int blocks_nr = disk_size / BLOCK_SIZE;

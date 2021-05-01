@@ -48,9 +48,6 @@ struct inode_disk {
     block_t i_zone[NR_TZONES]; /* zone numbers for data blocks */
 };
 
-#define INODE_MOCK_UTC_TIME (1587268254)
-
-
 #define INODE_DISK_SIZE (sizeof(struct inode_disk))
 
 
