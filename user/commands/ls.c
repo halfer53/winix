@@ -146,11 +146,13 @@ char *get_user_name(uid_t uid){
 
 void int2str(int value, int i, char* output){
     int j;
+    char *p = output;
     while(i){
         j = (value / i) % 10;
         *output++ = '0' + j;
         i /= 10;
     }
+    *output = '\0';
 }
 
 void set_num_str(int value, char *buf){
@@ -172,14 +174,16 @@ void set_num_str(int value, char *buf){
 
 #define SHOW_HIDDEN     1
 #define LONG_FORMAT     2
+#define HUMAN_FORMAT    4
 
 static char buffer[128];
 static char permission_char[] = "-xwr";
 
-void print_long_format(char *pathname){
+void print_long_format(char *pathname, int flag){
     struct stat statbuf;
     struct time_struct time;
     char size_buf[10];
+    char *unit_s;
     char *p = buffer;
     int i, j, k, l;
     int ret;
@@ -200,12 +204,27 @@ void print_long_format(char *pathname){
         k = k >> 1;
     }
     *p = '\0';
-    set_num_str(statbuf.st_size, size_buf);
+    if(flag & HUMAN_FORMAT){
+        set_num_str(statbuf.st_size, size_buf);
+        unit_s = "KB";
+    }else{
+        char *p = size_buf;
+        int2str(statbuf.st_size, 10000, size_buf);
+        while(*p){
+            if(*p == '0'){
+                *p = ' ';
+            }else{
+                break;
+            }
+            p++;
+        }
+        unit_s = "";
+    }
     username = get_user_name(statbuf.st_uid);
     groupname = get_group_name(statbuf.st_gid);
     parse_unix_time(statbuf.st_atime, &time);
-    printf("%s %2d %s %s %sKB %02d/%02d/%04d %02d:%02d:%02d %s\n", buffer, statbuf.st_nlink, username, groupname,
-     size_buf, time.date, time.month, time.currYear, time.hours, time.minutes, time.seconds, pathname);
+    printf("%s %2d %s %s %s%s %02d/%02d/%04d %02d:%02d:%02d %s\n", buffer, statbuf.st_nlink, username, groupname,
+     size_buf, unit_s, time.date, time.month, time.currYear, time.hours, time.minutes, time.seconds, pathname);
 }
 
 #define PATH_LEN    (50)
@@ -231,7 +250,7 @@ int do_ls(char* pathname, int flag){
            strncpy(path_buffer, pathname, PATH_LEN);
            strncat(path_buffer, "/", PATH_LEN);
            strncat(path_buffer, (char *)dir->d_name, PATH_LEN);
-           print_long_format(path_buffer);
+           print_long_format(path_buffer, flag);
        }else{
            symbol = (dir->d_type == DT_DIR && *dir->d_name != '.')  ? slash : "";
             printf("%s%ls  ", symbol, dir->d_name);
@@ -243,7 +262,7 @@ int do_ls(char* pathname, int flag){
 }
 
 void usage(){
-    fprintf(stderr, "ls [-l] [-a] FOLDER\n");
+    fprintf(stderr, "ls [-l] [-a] [-h] FOLDER\n");
     exit(1);
 }
 
@@ -270,6 +289,9 @@ int main(int argc, char*argv[]){
                 break;
             case 'l':
                 flag |= LONG_FORMAT;
+                break;
+            case 'h':
+                flag |= HUMAN_FORMAT;
                 break;
             default:
                 usage();
