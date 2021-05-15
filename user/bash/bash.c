@@ -95,7 +95,7 @@ int main() {
 
         len = strlen(buf);
         newline_pos = len - 1;
-        strncpy(prev_cmd, buf, MAX_LINE);
+        strlcpy(prev_cmd, buf, MAX_LINE);
         if(buf[newline_pos] == '\n'){
             buf[newline_pos] = '\0';
         }

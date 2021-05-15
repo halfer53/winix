@@ -7,7 +7,7 @@
 char slash[] = "/";
 
 void reset_path(char *dir_path, char *path){
-    strncpy(path, dir_path, PATH_LEN);
+    strlcpy(path, dir_path, PATH_LEN);
     strncat(path, slash, PATH_LEN);
 }
 

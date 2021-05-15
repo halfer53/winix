@@ -69,6 +69,6 @@ int unit_test1();
 char32_t *char32_strcpy(char32_t *dest, const char *src);
 int char32_strcmp(const char32_t *s1, const char *s2);
 int char32_strlen(const char32_t *s);
-char32_t *char32_strncpy(char32_t *dest, const char *src, size_t n);
+char32_t *char32_strlcpy(char32_t *dest, const char *src, size_t n);
 
 #endif //FS_FS_METHODS_H

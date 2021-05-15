@@ -354,7 +354,7 @@ reg_t* alloc_kstack(struct proc *who, int size){
  */
 void set_proc(struct proc *p, void (*entry)(), const char *name) {
     p->ctx.m.pc = entry;
-    strncpy(p->name, name, PROC_NAME_LEN - 1);
+    strlcpy(p->name, name, PROC_NAME_LEN - 1);
 }
 
 /**

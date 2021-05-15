@@ -10,7 +10,7 @@ char32_t *char32_strcpy(char32_t *dest, const char *src) {
     return saved;
 }
 
-char32_t *char32_strncpy(char32_t *dest, const char *src, size_t n){
+char32_t *char32_strlcpy(char32_t *dest, const char *src, size_t n){
     char32_t *saved = dest;
     while (*src && n--) {
         *dest++ = *src++;

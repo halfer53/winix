@@ -93,7 +93,7 @@ int copy_stirng_array(struct string_array *arr, char* from[], struct proc* who, 
             goto err_free_all;
         }
         
-        strncpy(arr->array[i], physical, limit);
+        strlcpy(arr->array[i], physical, limit);
     }
     arr->array[i] = NULL;
     ret = OK;

@@ -247,7 +247,7 @@ int do_ls(char* pathname, int flag){
            continue;
        }
        if(flag & LONG_FORMAT){
-           strncpy(path_buffer, pathname, PATH_LEN);
+           strlcpy(path_buffer, pathname, PATH_LEN);
            strncat(path_buffer, "/", PATH_LEN);
            strncat(path_buffer, (char *)dir->d_name, PATH_LEN);
            print_long_format(path_buffer, flag);

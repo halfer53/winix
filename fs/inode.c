@@ -337,7 +337,7 @@ int release_inode(inode_t *inode){
 
 int fill_dirent(inode_t* ino, struct winix_dirent* curr, char* string){
     mode_t mode = ino->i_mode;
-    char32_strncpy(curr->dirent.d_name, string, DIRNAME_LEN);
+    char32_strlcpy(curr->dirent.d_name, string, DIRNAME_LEN);
     curr->dirent.d_ino = ino->i_num;
 
     if(mode & S_IFDIR){

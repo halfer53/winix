@@ -62,7 +62,7 @@ char *strcpy(char *dest, const char *src) {
     return saved;
 }
 
-char *strncpy(char *dest, const char *src, size_t n){
+char *strlcpy(char *dest, const char *src, size_t n){
     char *saved = dest;
     while (*src && n--) {
         *dest++ = *src++;

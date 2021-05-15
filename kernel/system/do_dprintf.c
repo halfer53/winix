@@ -32,7 +32,7 @@ int do_winix_strerror(struct proc* who, struct message* msg){
         return EINVAL;
     dst = (char*)get_physical_addr(msg->m1_p1, who);
     // KDEBUG(("errno %d from %s\n", usr_errno, who->name));
-    strncpy(dst, kstr_error(usr_errno), len);
+    strlcpy(dst, kstr_error(usr_errno), len);
     return 0;
 }
 

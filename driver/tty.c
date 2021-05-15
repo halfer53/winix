@@ -225,7 +225,7 @@ void tty_exception_handler( struct tty_state* state){
                     state->prev_history_cmd = NULL;
                 }else{
                     state->prev_history_cmd = t1;
-                    strncpy(state->bptr, t1->command, TTY_BUFFER_SIZ);
+                    strlcpy(state->bptr, t1->command, TTY_BUFFER_SIZ);
                     state->bptr += t1->len;
                     __kputs(rex, t1->command);
                 }
@@ -259,7 +259,7 @@ void tty_exception_handler( struct tty_state* state){
         if((is_new_line || state->bptr >= state->buffer_end ) && state->reader){
             *state->bptr = '\0';
             msg = get_exception_m();
-            strncpy(state->read_data, state->read_ptr, state->read_count);
+            strlcpy(state->read_data, state->read_ptr, state->read_count);
             syscall_reply2(READ, state->bptr - state->buffer, state->reader->proc_nr, msg);
             state->bptr = state->buffer;
             state->read_ptr = state->buffer;
@@ -301,7 +301,7 @@ int __tty_read(struct tty_state* state, char* data, size_t len){
     
     if(count > 0 && state->bptr > state->read_ptr){
         *state->bptr = '\0';
-        strncpy(data, state->read_ptr, count);
+        strlcpy(data, state->read_ptr, count);
         buffer_count -= count;
         state->read_ptr += count;
         // KDEBUG(("count %d buffer %d, ptr %x %x\n", count, buffer_count, state->bptr, state->read_ptr));

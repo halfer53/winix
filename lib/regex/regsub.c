@@ -48,9 +48,9 @@ char *dest;
 		} else if (prog->startp[no] != NULL && prog->endp[no] != NULL &&
 					prog->endp[no] > prog->startp[no]) {
 			len = prog->endp[no] - prog->startp[no];
-			(void) strncpy(dst, prog->startp[no], len);
+			(void) strlcpy(dst, prog->startp[no], len);
 			dst += len;
-			if (*(dst-1) == '\0') {	/* strncpy hit NUL. */
+			if (*(dst-1) == '\0') {	/* strlcpy hit NUL. */
 				regerror("damaged match string");
 				return;
 			}
