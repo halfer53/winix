@@ -37,7 +37,11 @@ int set_filp(struct proc* who, struct filp** _file, struct inode* inode){
 }
 
 int do_pipe(struct proc* who, struct message* msg){
-    int* fds = (int*)get_physical_addr(msg->m1_p1, who);
+    int* fds;
+    vptr_t* vp = msg->m1_p1;
+    if(!is_vaddr_accessible(vp, who))
+        return EFAULT;
+    fds = (int*)get_physical_addr(vp, who);
     return sys_pipe(who, fds);
 }
 
