@@ -125,7 +125,7 @@ void save_command_history(struct tty_state* state){
     cmd = kmalloc(sizeof(struct tty_command) + len + 1);
     if(!cmd)
         return;
-    strcpy(cmd->command, state->read_ptr);
+    strncpy(cmd->command, state->read_ptr, len);
     cmd->len = len;
     list_add(&cmd->list, &state->commands);
     // KDEBUG(("saving %s\n", state->read_ptr));

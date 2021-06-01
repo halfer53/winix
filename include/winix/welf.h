@@ -5,6 +5,7 @@
 #include <winix/type.h>
 
 #define WINIX_ELF_MAGIC  (0x19960503) // my birthday lol
+#define WINIX_ELF_NAME_LEN  (256)
 
 struct winix_elf{
     unsigned int magic;
@@ -36,7 +37,7 @@ struct srec_debug{
 };
 
 struct winix_elf_list{
-    char name[256];
+    char name[WINIX_ELF_NAME_LEN];
     struct winix_elf elf;
     unsigned int* binary_data;
     struct list_head list;
