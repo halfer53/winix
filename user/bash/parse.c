@@ -23,7 +23,7 @@ int parse(char *input_line, struct cmdLine *sc)
     int argc = 0;
     char* line;
 
-    strcpy(sc->buf, input_line);
+    strlcpy(sc->buf, input_line, MAX_LINE);
     line = sc->buf;
 
     sc->infile = sc->outfile = sc->argv[0] = NULL;

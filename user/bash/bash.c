@@ -107,9 +107,9 @@ int main() {
     return 0;
 }
 
-int search_path(char* path, char* name){
-    strcpy(path, "/bin/");
-    strcat(path, name);
+int search_path(char* path, int len, char* name){
+    strlcpy(path, "/bin/", len);
+    strncat(path, name, len);
     return access(path, F_OK);
 }
 
@@ -159,7 +159,7 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
 
         for(i = 0; i < cmd->numCommands; i++){
             cmd_start = cmd->cmdStart[i];
-            if(search_path(buffer, cmd->argv[cmd_start]) == 0){
+            if(search_path(buffer, 128, cmd->argv[cmd_start]) == 0){
                 pipe_ptr = &pipe_fds[(i * 2)];
                 
                 if((i < cmd->numCommands - 1)){ // not the last command, create new pipe

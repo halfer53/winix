@@ -92,7 +92,7 @@ int decode_srec_debug(char* filepath, struct srec_debug* result){
         fclose(f);
         return -1;
     }
-    strcpy(result->name, filename);
+    strlcpy(result->name, filename, WINIX_ELF_NAME_LEN);
     while(fgets(line, 1024, f)){
         if(strstr(line, text_size)){
             decode_segment_size(&result->text_size, text_size, line);
@@ -126,7 +126,7 @@ int decode_srec(char *path, int offset, struct srec_binary* result)
     line = malloc(len);
     filename = remove_extension(path);
 //    printf("filename is '%s' path = '%s'\n", filename, path);
-    strcpy(result->name, filename);
+    strlcpy(result->name, filename, WINIX_ELF_NAME_LEN);
     while(fgets(line, len, fp)){
         temp = winix_load_srec_mem_val(line, result);
         wordsLoaded += temp;

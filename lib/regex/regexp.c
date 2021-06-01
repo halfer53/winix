@@ -1017,7 +1017,7 @@ char *op;
 	char *p;
 	static char buf[50];
 
-	(void) strcpy(buf, ":");
+	(void) strlcpy(buf, ":", 50);
 
 	switch (OP(op)) {
 	case BOL:

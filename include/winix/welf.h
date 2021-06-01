@@ -19,7 +19,7 @@ struct winix_elf{
 
 
 struct srec_binary{
-    char name[256];
+    char name[WINIX_ELF_NAME_LEN];
     unsigned int binary_pc;
     unsigned int binary_offset;
     unsigned int binary_size;
@@ -29,7 +29,7 @@ struct srec_binary{
 };
 
 struct srec_debug{
-    char name[256];
+    char name[WINIX_ELF_NAME_LEN];
     unsigned int text_size;
     unsigned int data_size;
     unsigned int bss_size;

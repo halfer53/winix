@@ -2,16 +2,17 @@
 
 int setenv(const char *name, const char *value, int overwrite) {
 	char *buf;
+	int len;
 
 	if (!overwrite && getenv(name))
 		return 0;
-
+	len = strlen(name) + strlen(value) + 2;
 	/* Include sizes plus '=' and trailing null. */
-	if (!(buf = malloc(strlen(name) + strlen(value) + 2)))
+	if (!(buf = malloc(len)))
 		return -1;
 
-    strcpy(buf,name);
-    strcat(buf,"=");
-    strcat(buf,value);
+    strlcpy(buf,name, len);
+    strncat(buf,"=", len);
+    strncat(buf,value, len);
 	return putenv(buf);
 }

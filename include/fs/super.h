@@ -3,6 +3,8 @@
 
 #include <fs/inode.h>
 
+#define SUPERBLOCK_NAME_LEN    (32)
+
 struct superblock {
     unsigned int magic;
     unsigned int s_block_inuse;
@@ -23,7 +25,7 @@ struct superblock {
     unsigned int s_inode_table_size;
 
     int s_inode_per_block;
-    char32_t s_name[32];
+    char32_t s_name[SUPERBLOCK_NAME_LEN];
 };
 
 void arch_superblock(struct superblock* sb);

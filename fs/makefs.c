@@ -55,7 +55,7 @@ int makefs( char* disk_raw, size_t disk_size)
         inode_per_block, // inode per block
         NULL, // root inode
     };
-    char32_strcpy(superblock.s_name, rootfs_name);
+    char32_strlcpy(superblock.s_name, rootfs_name, SUPERBLOCK_NAME_LEN);
     // printf("block nr %d %d %d\n", blocks_nr, block_in_use, remaining_blocks);
     if(blocks_nr < 8){
         KDEBUG(("block nr %d\n", blocks_nr));
