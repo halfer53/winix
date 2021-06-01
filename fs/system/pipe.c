@@ -203,7 +203,7 @@ int pipe_read ( struct filp *filp, char *data, size_t count, off_t offset){
     ret = _pipe_read(curr_syscall_caller, filp, data, count, offset);
 
     next = get_next_waiting(&ino->pipe_writing_list);
-    if(next!= NULL && (next->count < (PIPE_LIMIT - filp->pipe->pos))){
+    if(next!= NULL ){
         // KDEBUG(("pipe: proc %d is awaken for writing\n", next->who->proc_nr));
         list_del(&next->list);
         ret2 = _pipe_write(next->who, next->filp, next->data, next->count, next->offset);
