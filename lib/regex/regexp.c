@@ -1085,7 +1085,7 @@ char *op;
 		break;
 	}
 	if (p != NULL)
-		(void) strcat(buf, p);
+		(void) strncat(buf, p, 50);
 	return(buf);
 }
 #endif

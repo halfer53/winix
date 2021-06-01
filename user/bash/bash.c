@@ -252,7 +252,7 @@ int exec_cmd(char *line){
 
     if(cmd.env && cmd.env_val){ // if a new environment variable is set
         buf = malloc(MAX_LINE);
-        parse_quotes(cmd.env_val, buf);
+        parse_quotes(cmd.env_val, buf, MAX_LINE);
         
         if(*buf){
             printf("setenv %s=%s\n", cmd.env, buf);

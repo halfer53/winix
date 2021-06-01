@@ -170,7 +170,7 @@ int parse(char *input_line, struct cmdLine *sc)
 #define DOUBLE_QUOTES   1
 #define SINGLE_QUOTE    2
 
-int parse_quotes(char *input, char* buffer){
+int parse_quotes(char *input, char* buffer, int buf_len){
     char* in = input;
     char* out = buffer;
     int mode = 0;
@@ -209,7 +209,7 @@ int parse_quotes(char *input, char* buffer){
             // concatenate the environment value to the output 
             // buffer
             *out = '\0';
-            strcat(out,envval);
+            strncat(out, envval, buf_len);
             out += strlen(envval);
             *in = bak_char;
         }else{
