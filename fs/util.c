@@ -3,13 +3,6 @@
 //
 #include "fs.h"
 
-char32_t *char32_strcpy(char32_t *dest, const char *src) {
-    char32_t *saved = dest;
-    while ((*dest++ = *src++));
-    *dest = 0;
-    return saved;
-}
-
 char32_t *char32_strlcpy(char32_t *dest, const char *src, size_t n){
     char32_t *saved = dest;
     while (*src && n--) {

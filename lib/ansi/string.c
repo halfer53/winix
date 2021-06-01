@@ -52,16 +52,6 @@ int strlen(const char *s) {
     return s - bak;
 }
 
-/**
- * copy the src into the destination string, the destination should be large enough to hold the src
- **/
-char *strcpy(char *dest, const char *src) {
-    char *saved = dest;
-    while (*dest++ = *src++);
-    *dest = 0;
-    return saved;
-}
-
 char *strlcpy(char *dest, const char *src, size_t n){
     char *saved = dest;
     while (*src && n--) {
