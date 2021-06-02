@@ -257,7 +257,7 @@ int main(int argc, char** argv){
     init_disk();
     init_dev();
     init_fs();
-    init_all_dev();
+    init_drivers();
 
     if(arguments.source_path && arguments.output_path){
         write_srec_to_disk(arguments.source_path, &arguments);

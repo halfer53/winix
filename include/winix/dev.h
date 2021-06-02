@@ -48,7 +48,7 @@ extern struct filp *tty1_filp;
 
 void init_dev();
 void init_root_fs();
-void init_all_dev();
+void init_drivers();
 int tty_write_rex(RexSp_t* rex, char* data, size_t len);
 
 #endif

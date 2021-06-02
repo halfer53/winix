@@ -32,7 +32,7 @@ void main() {
     init_dev();
     init_fs();
     init_tty();
-    init_all_dev();
+    init_drivers();
     
     init_mem_table();
     init_proc();

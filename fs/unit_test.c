@@ -33,7 +33,7 @@ int unit_test1(){
     init_dev();
     init_fs();
     init_tty();
-    init_all_dev();
+    init_drivers();
 
     mock_init_proc();
     fd = sys_open(curr_scheduling_proc, filename ,O_CREAT | O_RDWR, 0775);

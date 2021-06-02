@@ -8,7 +8,7 @@ void init_dev(){
     INIT_LIST_HEAD(&devices_list);
 }
 
-void init_all_dev(){
+void init_drivers(){
     struct device* dev;
     list_for_each_entry(struct device, dev, &devices_list, list){
         if(dev->dops && dev->dops->dev_init){
