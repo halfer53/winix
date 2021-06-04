@@ -49,6 +49,10 @@ int sys_mkdir(struct proc* who, char* pathname, mode_t mode){
     }
     ino->i_mode = S_IFDIR | (mode & ~(who->umask));
     bnr = alloc_block(ino, lastdir->i_dev);
+    if(bnr <= 0){
+        ret = bnr;
+        goto final;
+    }
     ino->i_zone[0] = bnr;
     ino->i_size = ino->i_sb->s_block_size;
     init_dirent(lastdir, ino);

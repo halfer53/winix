@@ -396,6 +396,8 @@ int add_inode_to_directory(struct proc* who, struct inode* dir, struct inode* in
         bnr = dir->i_zone[i];
         if(bnr == 0){
             bnr = alloc_block(dir, dir->i_dev);
+            if(bnr <= 0)
+                return bnr;
             dir->i_zone[i] = bnr;
         }
 
