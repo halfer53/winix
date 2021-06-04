@@ -111,11 +111,13 @@ static int retrieve_block(struct block_buffer *buf, struct device *dev, block_t 
     int blksize = sb->s_block_size;
     off_t off = bnr * blksize;
     buf->block = rootfs_disk + off;
+    buf->b_size = blksize;
     return blksize;
 }
 
 static int flush_block(struct block_buffer *buf){
-    return BLOCK_SIZE;
+    buf->block = NULL;
+    return buf->b_size;
 }
 
 static int release_block(struct block_buffer *buf){
