@@ -91,7 +91,7 @@ int alloc_block(inode_t *ino, struct device* id){
 
 int release_block(block_t bnr, struct device* id){
     struct superblock* sb = get_sb(id);
-    block_t bmap_nr = sb->s_blockmapnr + (bnr / BLOCK_SIZE);
+    block_t bmap_nr = sb->s_blockmapnr + (bnr / sb->s_block_size);
     struct block_buffer *bmap, *block;
     int ret;
     if(bnr > sb->s_blockmap_size){
@@ -99,12 +99,12 @@ int release_block(block_t bnr, struct device* id){
         return -1;
     }
     block = get_block_buffer(bnr, id);
-    memset(block->block, 0, BLOCK_SIZE);
+    memset(block->block, 0, sb->s_block_size);
     put_block_buffer_dirt(block);
 
     bmap = get_block_buffer(bmap_nr, id);
 
-    bitmap_clear_bit((unsigned int*)bmap->block, BLOCK_SIZE_WORD, bnr);
+    bitmap_clear_bit((unsigned int*)bmap->block, sb->s_block_size, bnr);
     sb->s_block_inuse -= 1;
     sb->s_free_blocks += 1;
     return put_block_buffer(bmap);
