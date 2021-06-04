@@ -116,11 +116,11 @@ static int retrieve_block(struct block_buffer *buf, struct device *dev, block_t 
 }
 
 static int flush_block(struct block_buffer *buf){
-    buf->block = NULL;
     return buf->b_size;
 }
 
 static int release_block(struct block_buffer *buf){
+    buf->block = NULL;
     return 0;
 }
 
@@ -134,17 +134,21 @@ static int buffered_init_block(struct block_buffer *buf){
 }
 
 static int buffered_retrieve_block(struct block_buffer *buf, struct device *dev, block_t bnr){
-    off_t off = bnr * BLOCK_SIZE;
-    return blk_dev_io_read(buf->block, off, BLOCK_SIZE);
+    struct superblock* sb = get_sb(dev);
+    int blksize = sb->s_block_size;
+    off_t off = bnr * blksize;
+    buf->b_size = blksize;
+    return blk_dev_io_read(buf->block, off, blksize);
 }
 
 static int buffered_flush_block(struct block_buffer *buf){
-    off_t off = buf->b_blocknr * BLOCK_SIZE;
-    return blk_dev_io_write(buf->block, off, BLOCK_SIZE);
+    off_t off = buf->b_blocknr * buf->b_size;
+    return blk_dev_io_write(buf->block, off, buf->b_size);
 }
 
 static int buffered_release_block(struct block_buffer *buf){
     release_pages((ptr_t *)buf->block, 1);
+    buf->block = NULL;
     return 0;
 }
 static struct block_operations bops = {buffered_init_block, buffered_retrieve_block, buffered_flush_block, buffered_release_block};
