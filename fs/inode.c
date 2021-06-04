@@ -128,13 +128,14 @@ size_t get_inode_total_size_word(struct inode* ino){
 
 int init_inode_non_disk(struct inode* ino, ino_t num, struct device* dev, struct superblock* sb){
     block_t bnr;
+    int blocksize = sb->s_block_size;
     ino->i_dev = dev;
     ino->i_sb = sb;
     ino->i_num = num;
     ino->i_total_size = get_inode_total_size_word(ino);
     if(sb){
-        bnr = ((num * sb->s_inode_size) / BLOCK_SIZE) + sb->s_inode_tablenr;
-        if(bnr * BLOCK_SIZE >= sb->s_inode_tablenr * BLOCK_SIZE + sb->s_inode_table_size){
+        bnr = ((num * sb->s_inode_size) / blocksize) + sb->s_inode_tablenr;
+        if(bnr * blocksize >= sb->s_inode_tablenr * blocksize + sb->s_inode_table_size){
             KDEBUG(("ino %d exceeding\n", num));
             return ERR;
         }
