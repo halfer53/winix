@@ -245,12 +245,14 @@ inode_t* alloc_inode(struct proc* who, struct device* parentdev, struct device* 
     inode_t *inode;
     bool found = false;
     clock_t unix_time = get_unix_time();
+    int blocksize;
 
     sb = get_sb(parentdev);
+    blocksize = sb->s_block_size;
     imap = get_imap(parentdev);
-    imap_end = imap->b_blocknr + (sb->s_blockmap_size / BLOCK_SIZE);
+    imap_end = imap->b_blocknr + (sb->s_blockmap_size / blocksize);
     while(imap->b_blocknr < imap_end){
-        inum = bitmap_search_from((unsigned int*)imap->block, BLOCK_SIZE_WORD, 0, 1);
+        inum = bitmap_search_from((unsigned int*)imap->block, blocksize, 0, 1);
         if(inum > 0){
             found = true;
             break;
@@ -263,7 +265,7 @@ inode_t* alloc_inode(struct proc* who, struct device* parentdev, struct device* 
         put_block_buffer(imap);
         return NULL;
     }
-    bitmap_set_bit((unsigned int*)imap->block, BLOCK_SIZE_WORD, inum);
+    bitmap_set_bit((unsigned int*)imap->block, blocksize, inum);
     put_block_buffer_dirt(imap);
 
     inode = get_free_inode_slot();
@@ -326,7 +328,7 @@ int release_inode(inode_t *inode){
     
     // assumping inum is smaller than 1024 for simplicity
     imap = get_block_buffer(sb->s_inode_tablenr, id);
-    bitmap_clear_bit((unsigned int*)imap->block, BLOCK_SIZE_WORD, inum);
+    bitmap_clear_bit((unsigned int*)imap->block, sb->s_block_size, inum);
     sb->s_inode_inuse -= 1;
     sb->s_free_inodes += 1;
     put_block_buffer_dirt(imap);
@@ -398,7 +400,7 @@ int add_inode_to_directory(struct proc* who, struct inode* dir, struct inode* in
         }
 
         buf = get_block_buffer(bnr, dir->i_dev);
-        end = (struct winix_dirent*)&buf->block[BLOCK_SIZE];
+        end = (struct winix_dirent*)&buf->block[dir->i_sb->s_block_size];
         curr = (struct winix_dirent*)buf->block;
         while(curr < end){
             if(curr->dirent.d_name[0] == '\0'){
@@ -430,7 +432,7 @@ int remove_inode_from_dir(struct proc* who, struct inode* dir, struct inode* tar
         if(bnr == 0)
             continue;
         buf = get_block_buffer(bnr, dir->i_dev);
-        end = (struct winix_dirent*)&buf->block[BLOCK_SIZE];
+        end = (struct winix_dirent*)&buf->block[dir->i_sb->s_block_size];
         curr = (struct winix_dirent*)buf->block;
         while(curr < end){
             if(curr->dirent.d_ino == target->i_num && char32_strcmp(curr->dirent.d_name, name) == 0){
