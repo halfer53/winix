@@ -34,6 +34,7 @@ int sys_mkdir(struct proc* who, char* pathname, mode_t mode){
     int ret = OK;
     bool is_dirty = false;
     block_t bnr;
+    struct block_buffer* blk;
 
     ret = eat_path(who, pathname, &lastdir, &ino, string);
     if(ret)
@@ -48,8 +49,9 @@ int sys_mkdir(struct proc* who, char* pathname, mode_t mode){
         goto final;
     }
     ino->i_mode = S_IFDIR | (mode & ~(who->umask));
-    ino->i_zone[0] = alloc_block(ino, lastdir->i_dev);
-    ino->i_size = BLOCK_SIZE;
+    blk = alloc_block(ino, lastdir->i_dev);
+    ino->i_zone[0] = blk;
+    ino->i_size = blk->b_size;
     init_dirent(lastdir, ino);
     ret = add_inode_to_directory(who, lastdir, ino, string);
     if(ret){
