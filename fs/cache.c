@@ -176,7 +176,7 @@ struct block_buffer *get_block_buffer(block_t blocknr, struct device* dev){
     ret = dev->bops->retrieve_block(tbuf, dev, blocknr);
     // printf("ret blk %d %d\n", blocknr, ret);
 
-    if (ret != BLOCK_SIZE) {
+    if (ret <= 0) {
         // KDEBUG(("dev io return %d for %d\n", ret, tbuf->b_blocknr));
         dev->bops->release_block(tbuf);
         tbuf->initialised = false;

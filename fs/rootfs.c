@@ -107,9 +107,11 @@ static int init_block(struct block_buffer *buf){
 }
 
 static int retrieve_block(struct block_buffer *buf, struct device *dev, block_t bnr){
-    off_t off = bnr * BLOCK_SIZE;
+    struct superblock* sb = get_sb(dev);
+    int blksize = sb->s_block_size;
+    off_t off = bnr * blksize;
     buf->block = rootfs_disk + off;
-    return BLOCK_SIZE;
+    return blksize;
 }
 
 static int flush_block(struct block_buffer *buf){
