@@ -123,7 +123,7 @@ blkcnt_t get_inode_blocks(struct inode* ino){
 
 size_t get_inode_total_size_word(struct inode* ino){
     blkcnt_t bnum = get_inode_blocks(ino);
-    return BLOCK_SIZE * bnum;
+    return ino->i_sb->s_block_size * bnum;
 }
 
 int init_inode_non_disk(struct inode* ino, ino_t num, struct device* dev, struct superblock* sb){
