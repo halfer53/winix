@@ -225,9 +225,9 @@ int put_inode(inode_t *inode, bool is_dirty){
     inode->i_count -= 1;
     if(!is_dirty)
         return OK;
-    sb = get_sb(inode->i_dev);
+    sb = inode->i_sb;
     inum = inode->i_num;
-    inode_block_offset = (inum * sb->s_inode_size) % BLOCK_SIZE;;
+    inode_block_offset = (inum * sb->s_inode_size) % sb->s_block_size;;
     buffer = get_block_buffer(inode->i_ndblock, inode->i_dev);
     dearch_inode(inode);
     memcpy(buffer->block + inode_block_offset, inode, INODE_DISK_SIZE);
