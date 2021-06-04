@@ -5,7 +5,7 @@
 
 int extend_file(struct filp* file, off_t count){
     off_t user_increment, allocated = 0;
-    int pages, i;
+    int pages, i, blksize;
     block_t bnr;
     struct inode* ino = file->filp_ino;
 
@@ -13,14 +13,17 @@ int extend_file(struct filp* file, off_t count){
         file->filp_pos = count;
         return count;
     }
+    blksize = ino->i_sb->s_block_size;
     user_increment = ALIGN1K( count - ino->i_total_size);
     for(i = 0; i < NR_TZONES; i++){
         bnr = ino->i_zone[i];
         if(bnr == 0 && user_increment > 0){
             bnr = alloc_block(ino, ino->i_dev);
+            if(bnr <= 0)
+                break;
             ino->i_zone[i] = bnr;
-            allocated += BLOCK_SIZE;
-            user_increment -= BLOCK_SIZE;
+            allocated += blksize;
+            user_increment -= blksize;
         }
     }
     return allocated;
