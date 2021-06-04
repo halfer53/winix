@@ -168,8 +168,8 @@ void dearch_inode(struct inode* ino){
 
 int read_inode(int num, struct inode** ret_ino, struct device* id){
     struct superblock* sb = get_sb(id);
-    block_t inode_block_nr = (num * sb->s_inode_size) / BLOCK_SIZE;
-    unsigned int offset = (num * sb->s_inode_size) % BLOCK_SIZE;
+    block_t inode_block_nr = (num * sb->s_inode_size) / sb->s_block_size;
+    unsigned int offset = (num * sb->s_inode_size) % sb->s_block_size;
     block_t blocknr = sb->s_inode_tablenr + inode_block_nr;
     struct block_buffer *buffer;
     struct inode* inode = get_free_inode_slot();
