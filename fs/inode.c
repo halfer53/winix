@@ -64,7 +64,7 @@ bool is_inode_in_use(int num, struct device* id){
 int alloc_block(inode_t *ino, struct device* id){
     struct superblock* sb = get_sb(id);
     struct block_buffer *bmap = get_block_buffer(sb->s_blockmapnr, id);
-    block_t bmap_end = sb->s_blockmapnr + (sb->s_blockmap_size / BLOCK_SIZE);
+    block_t bmap_end = sb->s_blockmapnr + (sb->s_blockmap_size / sb->s_block_size);
     block_t bnr = bmap->b_blocknr;
     int free_bit = -1;
     int ret;
