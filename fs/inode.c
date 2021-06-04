@@ -39,7 +39,7 @@ bool is_valid_inode_num(int num, struct device* id){
     if(num <= 0 || num >= NR_INODES)
         return false;
 
-    inodes_nr = sb->s_inode_per_block * (sb->s_inode_table_size / BLOCK_SIZE);
+    inodes_nr = sb->s_inode_per_block * (sb->s_inode_table_size / sb->s_block_size);
 //    KDEBUG(("is valid inode num: %d, inode per block %d, inodes_nr %d\n", num, sb->s_inode_per_block, inodes_nr));
     return num <= inodes_nr;
 }
