@@ -70,12 +70,12 @@ int alloc_block(inode_t *ino, struct device* id){
     int ret;
 
     while(bmap->b_blocknr < bmap_end){
-        free_bit = bitmap_search_from((unsigned int*) bmap->block, BLOCK_SIZE_WORD, 0, 1);
+        free_bit = bitmap_search_from((unsigned int*) bmap->block, sb->s_block_size, 0, 1);
         if(free_bit > 0){
-            bitmap_set_bit((unsigned int*)bmap->block, BLOCK_SIZE_WORD, free_bit);
+            bitmap_set_bit((unsigned int*)bmap->block, sb->s_block_size, free_bit);
             sb->s_block_inuse += 1;
             sb->s_free_blocks -= 1;
-            ino->i_total_size += BLOCK_SIZE;
+            ino->i_total_size += sb->s_block_size;
             put_block_buffer_dirt(bmap);
             // KDEBUG(("alloc_block %d for inode %d\n", free_bit, ino->i_num));
             return free_bit;
