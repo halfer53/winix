@@ -34,7 +34,7 @@ int blk_dev_io_read(char *buf, off_t off, size_t len){
         len = count;
     }
 
-//    KDEBUG(("dev read blk %d %d\n", off / BLOCK_SIZE, len));
+    // KDEBUG(("dev read blk %d %d\n", off / root_sb.s_block_size, len));
     ptr = rootfs_disk + off;
     while(count-- > 0){
         *buf++ = *ptr++;
@@ -52,7 +52,7 @@ int blk_dev_io_write(char *buf, off_t off, size_t len){
         count = rootfs_disk_size - off;
         len = count;
     }
-//    KDEBUG(("dev write blk %d %d\n", off / BLOCK_SIZE, len));
+    // KDEBUG(("dev write blk %d %d\n", off / root_sb.s_block_size, len));
     ptr = rootfs_disk + off;
     while(count-- > 0){
         *ptr++ = *buf++;
