@@ -13,13 +13,13 @@
 #ifdef __x86_64__
 #define SECTOR_SIZE 512
 #define BLOCK_SIZE  512
-#define TO_WORD_SIZE(x) (x / 4)
-#define TO_CHAR_SIZE(x) (x * 4)
+#define CHAR_TO_WORD(x) (x / 4)
+#define WORD_TO_CHAR(x) (x * 4)
 #else
 #define SECTOR_SIZE 128
 #define BLOCK_SIZE  128
-#define TO_WORD_SIZE(x) (x)
-#define TO_CHAR_SIZE(x) (x)
+#define CHAR_TO_WORD(x) (x)
+#define WORD_TO_CHAR(x) (x)
 #endif
 
 #define INODE_NUM   496

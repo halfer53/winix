@@ -56,7 +56,7 @@ bool is_inode_in_use(int num, struct device* id){
     buf = get_block_buffer(sb->s_inodemapnr, id);
     map_ptr = (unsigned int*)buf->block;
     // KDEBUG(("inode map %08x for inode %d\n", *map_ptr, num));
-    ret = is_bit_on((unsigned int*)buf->block, (int)TO_WORD_SIZE(sb->s_inodemap_size), num);
+    ret = is_bit_on((unsigned int*)buf->block, sb->s_inodemap_size, num);
     put_block_buffer(buf);
     return ret;
 }

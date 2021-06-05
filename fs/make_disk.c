@@ -178,7 +178,7 @@ void write_srec_list(struct list_head* lists){
         assert(fd >= 0);
         ret = sys_write(curr_scheduling_proc, fd, &pos->elf, elf_size);
         assert(ret == elf_size);
-        binary_size = TO_CHAR_SIZE(pos->elf.binary_size);
+        binary_size = WORD_TO_CHAR(pos->elf.binary_size);
         ret = sys_write(curr_scheduling_proc, fd, pos->binary_data,  binary_size);
         assert(ret == binary_size);
         ret = sys_close(curr_scheduling_proc, fd);
