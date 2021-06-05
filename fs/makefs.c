@@ -67,6 +67,11 @@ int makefs( char* disk_raw, size_t disk_size)
         return -1;
     }
 
+    if(free_inodes >= BLOCK_SIZE){
+        KDEBUG(("inodes num exceed block size"));
+        return -1;
+    }
+
     if(block_in_use >= 32){
         KDEBUG(("block in use %d\n", block_in_use));
         return -1;
