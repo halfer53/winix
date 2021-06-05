@@ -63,7 +63,7 @@ int send_sig(struct proc *who, int signum){
 void _assert(int expression, int line, char* filename) {
     if(!expression) {
         printf("\nAssert Failed at line %d in %s\n",line,filename);
-        abort();
+        _exit(1);
     }
 }
 

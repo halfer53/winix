@@ -13,7 +13,6 @@ struct block_buffer
     struct device* b_dev;            /* major | minor device where block resides */
     int b_dirt; // clean or dirty
     int b_count; // number of users on this buffer
-    int b_size; // block size
     bool initialised;
 };
 

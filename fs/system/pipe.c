@@ -11,7 +11,6 @@ struct device pipe_dev;
 static char* name = "pipe";
 static ino_t next_inum = 2;
 static dev_t pipe_devid = MAKEDEV(2, 1);
-struct superblock sb;
 #define PIPE_LIMIT  (PAGE_LEN)
 
 struct pipe_waiting{
@@ -73,7 +72,7 @@ int sys_pipe(struct proc* who, int fd[2]){
     inode->flags |= INODE_FLAG_PIPE;
     inode->i_count = 2;
     inode->i_nlinks = 1;
-    init_inode_non_disk(inode, get_next_ino(), &pipe_dev, &sb);
+    init_inode_non_disk(inode, get_next_ino(), &pipe_dev, NULL);
 
     ret1 = set_filp(who, &file1, inode);
     if(ret1 < 0){
@@ -339,6 +338,5 @@ int pipe_dev_open(){
 static struct filp_operations pipe_fops = {pipe_open, pipe_read, pipe_write, pipe_close};
 
 void init_pipe(){
-    sb.s_block_size = PAGE_LEN;
     register_device(&pipe_dev, name, pipe_devid, S_IFIFO, NULL, &pipe_fops);
 }

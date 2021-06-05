@@ -31,9 +31,8 @@ struct block_buffer *get_imap(struct device* id){
 struct block_buffer *get_inode_table(int num, struct device* id){
     struct superblock* sb = get_sb(id);
     struct block_buffer* buf;
-    int inode_size = num * sb->s_inode_size;
-    block_t bnr = inode_size / sb->s_block_size;
-    if(inode_size > sb->s_inode_table_size){
+    block_t bnr = (num * sb->s_inode_size) / BLOCK_SIZE;
+    if(bnr * BLOCK_SIZE > sb->s_inode_table_size){
         return NULL;
     }
     buf = get_block_buffer(sb->s_inode_tablenr + bnr, id);
@@ -176,7 +175,7 @@ struct block_buffer *get_block_buffer(block_t blocknr, struct device* dev){
     ret = dev->bops->retrieve_block(tbuf, dev, blocknr);
     // printf("ret blk %d %d\n", blocknr, ret);
 
-    if (ret <= 0) {
+    if (ret != BLOCK_SIZE) {
         // KDEBUG(("dev io return %d for %d\n", ret, tbuf->b_blocknr));
         dev->bops->release_block(tbuf);
         tbuf->initialised = false;

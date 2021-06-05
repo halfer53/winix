@@ -280,7 +280,7 @@ void tty2_handler(){
 }
 
 int __tty_init(RexSp_t* rex, struct device* dev, struct tty_state* state){
-    char* buf, c;
+    char* buf;
     dev->private = (void*)state;
     rex->Ctrl = (1 << 8) | 7; // 38400 bits per second, interrupt enabled for serial port
     buf = state->buffer;
@@ -290,9 +290,7 @@ int __tty_init(RexSp_t* rex, struct device* dev, struct tty_state* state){
     state->is_echoing = true;
     state->read_ptr = buf;
     INIT_LIST_HEAD(&state->commands);
-    c = '\n';
     state->prev_history_cmd = NULL;
-    tty_write_rex(rex, &c, 1); // write a new line after startup
     return 0;
 }
 

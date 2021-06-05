@@ -39,7 +39,7 @@ bool is_valid_inode_num(int num, struct device* id){
     if(num <= 0 || num >= NR_INODES)
         return false;
 
-    inodes_nr = sb->s_inode_per_block * (sb->s_inode_table_size / sb->s_block_size);
+    inodes_nr = sb->s_inode_per_block * (sb->s_inode_table_size / BLOCK_SIZE);
 //    KDEBUG(("is valid inode num: %d, inode per block %d, inodes_nr %d\n", num, sb->s_inode_per_block, inodes_nr));
     return num <= inodes_nr;
 }
@@ -56,7 +56,7 @@ bool is_inode_in_use(int num, struct device* id){
     buf = get_block_buffer(sb->s_inodemapnr, id);
     map_ptr = (unsigned int*)buf->block;
     // KDEBUG(("inode map %08x for inode %d\n", *map_ptr, num));
-    ret = is_bit_on((unsigned int*)buf->block, sb->s_inodemap_size, num);
+    ret = is_bit_on((unsigned int*)buf->block, (int)TO_WORD_SIZE(sb->s_inodemap_size), num);
     put_block_buffer(buf);
     return ret;
 }
@@ -64,18 +64,18 @@ bool is_inode_in_use(int num, struct device* id){
 int alloc_block(inode_t *ino, struct device* id){
     struct superblock* sb = get_sb(id);
     struct block_buffer *bmap = get_block_buffer(sb->s_blockmapnr, id);
-    block_t bmap_end = sb->s_blockmapnr + (sb->s_blockmap_size / sb->s_block_size);
+    block_t bmap_end = sb->s_blockmapnr + (sb->s_blockmap_size / BLOCK_SIZE);
     block_t bnr = bmap->b_blocknr;
     int free_bit = -1;
     int ret;
 
     while(bmap->b_blocknr < bmap_end){
-        free_bit = bitmap_search_from((unsigned int*) bmap->block, sb->s_block_size, 0, 1);
+        free_bit = bitmap_search_from((unsigned int*) bmap->block, BLOCK_SIZE_WORD, 0, 1);
         if(free_bit > 0){
-            bitmap_set_bit((unsigned int*)bmap->block, sb->s_block_size, free_bit);
+            bitmap_set_bit((unsigned int*)bmap->block, BLOCK_SIZE_WORD, free_bit);
             sb->s_block_inuse += 1;
             sb->s_free_blocks -= 1;
-            ino->i_total_size += sb->s_block_size;
+            ino->i_total_size += BLOCK_SIZE;
             put_block_buffer_dirt(bmap);
             // KDEBUG(("alloc_block %d for inode %d\n", free_bit, ino->i_num));
             return free_bit;
@@ -91,20 +91,20 @@ int alloc_block(inode_t *ino, struct device* id){
 
 int release_block(block_t bnr, struct device* id){
     struct superblock* sb = get_sb(id);
-    block_t bmap_nr = sb->s_blockmapnr + (bnr / sb->s_block_size);
+    block_t bmap_nr = sb->s_blockmapnr + (bnr / BLOCK_SIZE);
     struct block_buffer *bmap, *block;
     int ret;
-    if(bnr > CHAR_TO_WORD(sb->s_blockmap_size) * 8){
+    if(bnr > sb->s_blockmap_size){
         KDEBUG(("Invalid block id %d", bnr));
         return -1;
     }
     block = get_block_buffer(bnr, id);
-    memset(block->block, 0, sb->s_block_size);
+    memset(block->block, 0, BLOCK_SIZE);
     put_block_buffer_dirt(block);
 
     bmap = get_block_buffer(bmap_nr, id);
 
-    bitmap_clear_bit((unsigned int*)bmap->block, sb->s_block_size, bnr);
+    bitmap_clear_bit((unsigned int*)bmap->block, BLOCK_SIZE_WORD, bnr);
     sb->s_block_inuse -= 1;
     sb->s_free_blocks += 1;
     return put_block_buffer(bmap);
@@ -123,19 +123,18 @@ blkcnt_t get_inode_blocks(struct inode* ino){
 
 size_t get_inode_total_size_word(struct inode* ino){
     blkcnt_t bnum = get_inode_blocks(ino);
-    return ino->i_sb->s_block_size * bnum;
+    return BLOCK_SIZE * bnum;
 }
 
 int init_inode_non_disk(struct inode* ino, ino_t num, struct device* dev, struct superblock* sb){
     block_t bnr;
-    int blocksize = sb->s_block_size;
     ino->i_dev = dev;
     ino->i_sb = sb;
     ino->i_num = num;
     ino->i_total_size = get_inode_total_size_word(ino);
     if(sb){
-        bnr = ((num * sb->s_inode_size) / blocksize) + sb->s_inode_tablenr;
-        if(bnr * blocksize >= sb->s_inode_tablenr * blocksize + sb->s_inode_table_size){
+        bnr = ((num * sb->s_inode_size) / BLOCK_SIZE) + sb->s_inode_tablenr;
+        if(bnr * BLOCK_SIZE >= sb->s_inode_tablenr * BLOCK_SIZE + sb->s_inode_table_size){
             KDEBUG(("ino %d exceeding\n", num));
             return ERR;
         }
@@ -168,8 +167,8 @@ void dearch_inode(struct inode* ino){
 
 int read_inode(int num, struct inode** ret_ino, struct device* id){
     struct superblock* sb = get_sb(id);
-    block_t inode_block_nr = (num * sb->s_inode_size) / sb->s_block_size;
-    unsigned int offset = (num * sb->s_inode_size) % sb->s_block_size;
+    block_t inode_block_nr = (num * sb->s_inode_size) / BLOCK_SIZE;
+    unsigned int offset = (num * sb->s_inode_size) % BLOCK_SIZE;
     block_t blocknr = sb->s_inode_tablenr + inode_block_nr;
     struct block_buffer *buffer;
     struct inode* inode = get_free_inode_slot();
@@ -225,9 +224,9 @@ int put_inode(inode_t *inode, bool is_dirty){
     inode->i_count -= 1;
     if(!is_dirty)
         return OK;
-    sb = inode->i_sb;
+    sb = get_sb(inode->i_dev);
     inum = inode->i_num;
-    inode_block_offset = (inum * sb->s_inode_size) % sb->s_block_size;;
+    inode_block_offset = (inum * sb->s_inode_size) % BLOCK_SIZE;;
     buffer = get_block_buffer(inode->i_ndblock, inode->i_dev);
     dearch_inode(inode);
     memcpy(buffer->block + inode_block_offset, inode, INODE_DISK_SIZE);
@@ -245,14 +244,12 @@ inode_t* alloc_inode(struct proc* who, struct device* parentdev, struct device* 
     inode_t *inode;
     bool found = false;
     clock_t unix_time = get_unix_time();
-    int blocksize;
 
     sb = get_sb(parentdev);
-    blocksize = sb->s_block_size;
     imap = get_imap(parentdev);
-    imap_end = imap->b_blocknr + (sb->s_blockmap_size / blocksize);
+    imap_end = imap->b_blocknr + (sb->s_blockmap_size / BLOCK_SIZE);
     while(imap->b_blocknr < imap_end){
-        inum = bitmap_search_from((unsigned int*)imap->block, blocksize, 0, 1);
+        inum = bitmap_search_from((unsigned int*)imap->block, BLOCK_SIZE_WORD, 0, 1);
         if(inum > 0){
             found = true;
             break;
@@ -261,11 +258,11 @@ inode_t* alloc_inode(struct proc* who, struct device* parentdev, struct device* 
         bnr++;
         imap = get_block_buffer(bnr, parentdev);
     }
-    if(!found || inum >= sb->s_inode_limit){
+    if(!found){
         put_block_buffer(imap);
         return NULL;
     }
-    bitmap_set_bit((unsigned int*)imap->block, blocksize, inum);
+    bitmap_set_bit((unsigned int*)imap->block, BLOCK_SIZE_WORD, inum);
     put_block_buffer_dirt(imap);
 
     inode = get_free_inode_slot();
@@ -328,7 +325,7 @@ int release_inode(inode_t *inode){
     
     // assumping inum is smaller than 1024 for simplicity
     imap = get_block_buffer(sb->s_inode_tablenr, id);
-    bitmap_clear_bit((unsigned int*)imap->block, sb->s_block_size, inum);
+    bitmap_clear_bit((unsigned int*)imap->block, BLOCK_SIZE_WORD, inum);
     sb->s_inode_inuse -= 1;
     sb->s_free_inodes += 1;
     put_block_buffer_dirt(imap);
@@ -396,13 +393,11 @@ int add_inode_to_directory(struct proc* who, struct inode* dir, struct inode* in
         bnr = dir->i_zone[i];
         if(bnr == 0){
             bnr = alloc_block(dir, dir->i_dev);
-            if(bnr <= 0)
-                return bnr;
             dir->i_zone[i] = bnr;
         }
 
         buf = get_block_buffer(bnr, dir->i_dev);
-        end = (struct winix_dirent*)&buf->block[dir->i_sb->s_block_size];
+        end = (struct winix_dirent*)&buf->block[BLOCK_SIZE];
         curr = (struct winix_dirent*)buf->block;
         while(curr < end){
             if(curr->dirent.d_name[0] == '\0'){
@@ -434,7 +429,7 @@ int remove_inode_from_dir(struct proc* who, struct inode* dir, struct inode* tar
         if(bnr == 0)
             continue;
         buf = get_block_buffer(bnr, dir->i_dev);
-        end = (struct winix_dirent*)&buf->block[dir->i_sb->s_block_size];
+        end = (struct winix_dirent*)&buf->block[BLOCK_SIZE];
         curr = (struct winix_dirent*)buf->block;
         while(curr < end){
             if(curr->dirent.d_ino == target->i_num && char32_strcmp(curr->dirent.d_name, name) == 0){

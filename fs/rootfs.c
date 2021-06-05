@@ -34,7 +34,7 @@ int blk_dev_io_read(char *buf, off_t off, size_t len){
         len = count;
     }
 
-    // KDEBUG(("dev read blk %d %d\n", off / root_sb.s_block_size, len));
+//    KDEBUG(("dev read blk %d %d\n", off / BLOCK_SIZE, len));
     ptr = rootfs_disk + off;
     while(count-- > 0){
         *buf++ = *ptr++;
@@ -52,7 +52,7 @@ int blk_dev_io_write(char *buf, off_t off, size_t len){
         count = rootfs_disk_size - off;
         len = count;
     }
-    // KDEBUG(("dev write blk %d %d\n", off / root_sb.s_block_size, len));
+//    KDEBUG(("dev write blk %d %d\n", off / BLOCK_SIZE, len));
     ptr = rootfs_disk + off;
     while(count-- > 0){
         *ptr++ = *buf++;
@@ -61,16 +61,16 @@ int blk_dev_io_write(char *buf, off_t off, size_t len){
 }
 
 int blk_dev_init(){
+    struct superblock* sb;
     rootfs_disk_size = DISK_SIZE;
     rootfs_disk = DISK_RAW;
-
+#ifdef __wramp__
+    ASSERT(DISK_RAW[0] == SUPER_BLOCK_MAGIC);
+#endif
     memcpy(&root_sb, rootfs_disk, sizeof(struct superblock));
     arch_superblock(&root_sb);
     ASSERT(root_sb.magic == SUPER_BLOCK_MAGIC);
-    ASSERT(root_sb.s_block_size == BLOCK_SIZE);
-    #ifdef __wramp__
-    KDEBUG(("superblock: block in use %d inode table size %d\n", root_sb.s_block_inuse, root_sb.s_inode_table_size));
-    #endif
+    // KDEBUG(("sb block in use %d inode table size %d\n", sb->s_block_inuse, sb->s_inode_table_size));
     return 0;
 }
 
@@ -107,20 +107,16 @@ static int init_block(struct block_buffer *buf){
 }
 
 static int retrieve_block(struct block_buffer *buf, struct device *dev, block_t bnr){
-    struct superblock* sb = get_sb(dev);
-    int blksize = sb->s_block_size;
-    off_t off = bnr * blksize;
+    off_t off = bnr * BLOCK_SIZE;
     buf->block = rootfs_disk + off;
-    buf->b_size = blksize;
-    return blksize;
+    return BLOCK_SIZE;
 }
 
 static int flush_block(struct block_buffer *buf){
-    return buf->b_size;
+    return BLOCK_SIZE;
 }
 
 static int release_block(struct block_buffer *buf){
-    buf->block = NULL;
     return 0;
 }
 
@@ -134,21 +130,17 @@ static int buffered_init_block(struct block_buffer *buf){
 }
 
 static int buffered_retrieve_block(struct block_buffer *buf, struct device *dev, block_t bnr){
-    struct superblock* sb = get_sb(dev);
-    int blksize = sb->s_block_size;
-    off_t off = bnr * blksize;
-    buf->b_size = blksize;
-    return blk_dev_io_read(buf->block, off, blksize);
+    off_t off = bnr * BLOCK_SIZE;
+    return blk_dev_io_read(buf->block, off, BLOCK_SIZE);
 }
 
 static int buffered_flush_block(struct block_buffer *buf){
-    off_t off = buf->b_blocknr * buf->b_size;
-    return blk_dev_io_write(buf->block, off, buf->b_size);
+    off_t off = buf->b_blocknr * BLOCK_SIZE;
+    return blk_dev_io_write(buf->block, off, BLOCK_SIZE);
 }
 
 static int buffered_release_block(struct block_buffer *buf){
     release_pages((ptr_t *)buf->block, 1);
-    buf->block = NULL;
     return 0;
 }
 static struct block_operations bops = {buffered_init_block, buffered_retrieve_block, buffered_flush_block, buffered_release_block};
@@ -157,7 +149,7 @@ static struct block_operations bops = {buffered_init_block, buffered_retrieve_bl
 #endif
 
 int root_fs_read (struct filp *filp, char *data, size_t count, off_t offset){
-    int ret = 0, r, j, blksize;
+    int ret = 0, r, j;
     unsigned int len;
     off_t off, end_in_block;
     unsigned int curr_fp_index, fp_limit;
@@ -165,10 +157,9 @@ int root_fs_read (struct filp *filp, char *data, size_t count, off_t offset){
     inode_t *ino = NULL;
     struct block_buffer* buffer = NULL;
 
-    blksize = filp->filp_ino->i_sb->s_block_size;
-    curr_fp_index = offset / blksize;
-    off = offset % blksize;
-    fp_limit = (filp->filp_pos + count ) / blksize;
+    curr_fp_index = offset / BLOCK_SIZE;
+    off = offset % BLOCK_SIZE;
+    fp_limit = (filp->filp_pos + count ) / BLOCK_SIZE;
     ino = filp->filp_ino;
 
     for( ; curr_fp_index <= fp_limit; curr_fp_index++){
@@ -176,11 +167,11 @@ int root_fs_read (struct filp *filp, char *data, size_t count, off_t offset){
         if(bnr == 0)
             continue;
 
-        len = ((blksize - off) > count) ? count : blksize - off;
+        len = ((BLOCK_SIZE - off) > count) ? count : BLOCK_SIZE - off;
         len = (off + len) < ino->i_size ? len : ino->i_size - off;
         r = 0;
         if(filp->filp_flags & O_DIRECT){
-            off += bnr * blksize;
+            off += bnr * BLOCK_SIZE;
             r = filp->filp_dev->dops->dev_read(data, off, len);
             data += r;
         }else{
@@ -217,7 +208,7 @@ int root_fs_read (struct filp *filp, char *data, size_t count, off_t offset){
 // }
 
 int root_fs_write (struct filp *filp, char *data, size_t count, off_t offset){
-    int r, j, ret = 0, blksize;
+    int r, j, ret = 0;
     unsigned int len;
     off_t off;
     unsigned int curr_fp_index, fp_limit;
@@ -225,11 +216,9 @@ int root_fs_write (struct filp *filp, char *data, size_t count, off_t offset){
     inode_t *ino = NULL;
     struct block_buffer* buffer = NULL;
 
-    blksize = filp->filp_ino->i_sb->s_block_size;
-    curr_fp_index = offset / blksize;
-    off = offset % blksize;
-    fp_limit = (filp->filp_pos + count ) / blksize;
-    fp_limit = fp_limit < NR_TZONES ? fp_limit : NR_TZONES;
+    curr_fp_index = offset / BLOCK_SIZE;
+    off = offset % BLOCK_SIZE;
+    fp_limit = (filp->filp_pos + count ) / BLOCK_SIZE;
     ino = filp->filp_ino;
 
     for( ; curr_fp_index <= fp_limit; curr_fp_index++){
@@ -242,10 +231,10 @@ int root_fs_write (struct filp *filp, char *data, size_t count, off_t offset){
             }
         }
 
-        len = ((blksize - off) > count) ? count : blksize - off;
+        len = ((BLOCK_SIZE - off) > count) ? count : BLOCK_SIZE - off;
         r = 0;
         if(filp->filp_flags & O_DIRECT){
-            off += bnr * blksize;
+            off += bnr * BLOCK_SIZE;
             r = filp->filp_dev->dops->dev_write(data, off, len);
             data += r;
         } else{

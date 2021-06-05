@@ -7,23 +7,22 @@
 
 #define ROOT_INODE_NUM  1
 
-#define BLOCK_SIZE_WORD  (128)
-#define DISK_PAGE_NR    (400)
+#define BLOCK_SIZE_WORD  (1024)
 
 #ifdef __x86_64__
 #define SECTOR_SIZE 512
-#define BLOCK_SIZE  512
-#define CHAR_TO_WORD(x) (x / 4)
-#define WORD_TO_CHAR(x) (x * 4)
+#define BLOCK_SIZE  4096
+#define TO_WORD_SIZE(x) (x / 4)
+#define TO_CHAR_SIZE(x) (x * 4)
 #else
 #define SECTOR_SIZE 128
-#define BLOCK_SIZE  128
-#define CHAR_TO_WORD(x) (x)
-#define WORD_TO_CHAR(x) (x)
+#define BLOCK_SIZE  1024
+#define TO_WORD_SIZE(x) (x)
+#define TO_CHAR_SIZE(x) (x)
 #endif
 
 #define INODE_NUM   496
-#define NR_TZONES   40
+#define NR_TZONES   8
 
 #define NR_FILPS          32    /* # slots in filp table */
 #define NR_INODES         48    /* # slots in "in core" inode table */
@@ -43,7 +42,7 @@
 
 #define SUPER_BLOCK_MAGIC   (0xabcdefff)
 
-
+#define DISK_PAGE_NR    (50)
 #define DISK_SIZE   (DISK_PAGE_NR * BLOCK_SIZE)
 #define DISK_SIZE_WORD   (DISK_PAGE_NR * BLOCK_SIZE_WORD)
 

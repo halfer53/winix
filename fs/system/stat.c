@@ -15,7 +15,7 @@ void set_statbuf(struct inode* inode, struct stat* statbuf){
 #ifdef __wramp__
     statbuf->st_size *= 4; //convert words to bytes
 #endif
-    statbuf->st_blksize = inode->i_sb->s_block_size;
+    statbuf->st_blksize = BLOCK_SIZE;
     statbuf->st_blocks = get_inode_blocks(inode);
     statbuf->st_atime = inode->i_atime;
     statbuf->st_mtime = inode->i_mtime;

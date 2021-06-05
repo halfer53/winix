@@ -61,7 +61,7 @@ int advance(inode_t *dirp, char string[NAME_MAX]){
         if(dirp->i_zone[i] > 0 ){
             if((buffer = get_block_buffer(dirp->i_zone[i], dirp->i_dev)) != NULL){
                 dirstream = (struct winix_dirent*)buffer->block;
-                dirend = (struct winix_dirent* )&buffer->block[dirp->i_sb->s_block_size];
+                dirend = (struct winix_dirent* )&buffer->block[BLOCK_SIZE];
                 for(; dirstream < dirend; dirstream++ ){
                     if(char32_strcmp(dirstream->dirent.d_name, string) == 0){
                         inum = dirstream->dirent.d_ino;
@@ -87,7 +87,7 @@ int get_parent_inode_num(inode_t *dirp){
         if(dirp->i_zone[i] > 0 ){
             if((buffer = get_block_buffer(dirp->i_zone[i], dirp->i_dev)) != NULL){
                 dirstream = (struct winix_dirent*)buffer->block;
-                dirend = (struct winix_dirent* )&buffer->block[dirp->i_sb->s_block_size];
+                dirend = (struct winix_dirent* )&buffer->block[BLOCK_SIZE];
                 for(; dirstream < dirend; dirstream++ ){
                     if(char32_strcmp(dirstream->dirent.d_name, dot2) == 0){
                         inum = dirstream->dirent.d_ino;
@@ -114,7 +114,7 @@ int get_child_inode_name(inode_t* parent, inode_t* child, char string[NAME_MAX])
         if(parent->i_zone[i] > 0 ){
             if((buffer = get_block_buffer(parent->i_zone[i], parent->i_dev)) != NULL){
                 dirstream = (struct winix_dirent*)buffer->block;
-                dirend = (struct winix_dirent* )&buffer->block[parent->i_sb->s_block_size];
+                dirend = (struct winix_dirent* )&buffer->block[BLOCK_SIZE];
                 for(; dirstream < dirend; dirstream++ ){
                     if(dirstream->dirent.d_ino == child->i_num){
                         p = dirstream->dirent.d_name;

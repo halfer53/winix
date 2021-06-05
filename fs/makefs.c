@@ -19,22 +19,21 @@ int makefs( char* disk_raw, size_t disk_size)
     const int root_inode_num = 1;
     inode_t root_node;
     unsigned int blocks_nr = disk_size / BLOCK_SIZE;
-    int superblock_size = PAGE_LEN / BLOCK_SIZE;
     block_t sb_block_nr = 0;
-    block_t blockmap_block_nr = superblock_size;
-    block_t inodemap_block_nr = blockmap_block_nr + 1;
-    block_t inode_table_block_nr = inodemap_block_nr + 1;
-    unsigned int inode_tablesize = (int)(disk_size * 0.05);
+    block_t blockmap_block_nr = 1;
+    block_t inodemap_block_nr = 2;
+    block_t inode_table_block_nr = 3;
+    unsigned int inode_tablesize = (int)(blocks_nr * 0.02) * BLOCK_SIZE;
     block_t root_node_block_nr = inode_table_block_nr + (inode_tablesize / BLOCK_SIZE);
     block_t first_free_block = root_node_block_nr + 1;
     block_t block_in_use = root_node_block_nr + 1;
     block_t remaining_blocks = blocks_nr - block_in_use;
     unsigned int remaining_words = remaining_blocks * BLOCK_SIZE;
     int inode_per_block = BLOCK_SIZE / INODE_DISK_SIZE;
-    unsigned int inode_limit = inode_tablesize / INODE_DISK_SIZE;
-    unsigned int free_inodes = inode_limit - 1;
+    unsigned int free_inodes = inode_tablesize / INODE_DISK_SIZE - 1;
     unsigned int bitval = 0;
     struct superblock s2;
+
     struct superblock superblock = {
             SUPER_BLOCK_MAGIC, // magic
         block_in_use, // blocks in use
@@ -43,11 +42,10 @@ int makefs( char* disk_raw, size_t disk_size)
         free_inodes, // free inodes
         BLOCK_SIZE, // block size
             INODE_DISK_SIZE, // inode size
-            inode_limit,
             root_inode_num, // root inode number
 
         sb_block_nr,
-        PAGE_LEN,
+        BLOCK_SIZE,
             blockmap_block_nr, // block bitmap block index
             BLOCK_SIZE,
             inodemap_block_nr, // inode bitmap block index
@@ -61,15 +59,6 @@ int makefs( char* disk_raw, size_t disk_size)
     // printf("block nr %d %d %d\n", blocks_nr, block_in_use, remaining_blocks);
     if(blocks_nr < 8){
         KDEBUG(("block nr %d\n", blocks_nr));
-        return -1;
-    }
-    if(blocks_nr >= (BLOCK_SIZE) * 4){
-        KDEBUG(("blocks exceed block_size"));
-        return -1;
-    }
-
-    if(free_inodes >= (BLOCK_SIZE) * 4){
-        KDEBUG(("inodes num exceed block size"));
         return -1;
     }
 
@@ -92,7 +81,7 @@ int makefs( char* disk_raw, size_t disk_size)
 
     memcpy(&s2, &superblock, sizeof(struct superblock));
     dearch_superblock(&s2);
-    memcpy(pdisk, &s2, sizeof(struct superblock));
+    memcpy(pdisk, &s2, sizeof(superblock));
     pdisk += superblock.s_superblock_size;
 
     bitval = setBits(block_in_use);
@@ -115,9 +104,6 @@ int makefs( char* disk_raw, size_t disk_size)
     pdir++;
     fill_dirent(&root_node, pdir, "..");
 
-    memcpy(&s2, DISK_RAW, sizeof(struct superblock));
-
-    ASSERT(memcmp(&superblock, &s2, sizeof(struct superblock)) == 0);
     return 0;
     // return DISK_RAW;
 }

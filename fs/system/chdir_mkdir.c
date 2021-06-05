@@ -48,13 +48,8 @@ int sys_mkdir(struct proc* who, char* pathname, mode_t mode){
         goto final;
     }
     ino->i_mode = S_IFDIR | (mode & ~(who->umask));
-    bnr = alloc_block(ino, lastdir->i_dev);
-    if(bnr <= 0){
-        ret = bnr;
-        goto final;
-    }
-    ino->i_zone[0] = bnr;
-    ino->i_size = ino->i_sb->s_block_size;
+    ino->i_zone[0] = alloc_block(ino, lastdir->i_dev);
+    ino->i_size = BLOCK_SIZE;
     init_dirent(lastdir, ino);
     ret = add_inode_to_directory(who, lastdir, ino, string);
     if(ret){

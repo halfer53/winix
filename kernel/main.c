@@ -38,6 +38,7 @@ void main() {
     init_proc();
     init_sched();
     init_syscall_table();
+    
 
     init_kernel_tasks();
     start_init();
