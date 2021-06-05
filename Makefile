@@ -38,7 +38,8 @@ KLIB_O = lib/syscall/wramp_syscall.o lib/ipc/ipc.o \
 L_HEAD = winix/limits/limits_head.o
 L_TAIL = winix/limits/limits_tail.o
 KERNEL_O = winix/*.o kernel/system/*.o kernel/*.o fs/*.o fs/system/*.o driver/*.o include/*.o
-ALLDIR = winix lib init user kernel fs driver include
+ALLDIR = winix lib init user kernel fs driver
+ALLDIR_CLEAN = winix lib init user kernel fs driver include
 FS_DEPEND = fs/*.c fs/system/*.c fs/makefs_only/*.c 
 DISK = include/disk.c
 START_TIME_FILE = include/startup_time.c
@@ -70,7 +71,7 @@ include_build:
 
 clean:
 	$(Q)rm -f makedisk
-	$(Q)$(MAKE) $(cleanall)='$(ALLDIR)'
+	$(Q)$(MAKE) $(cleanall)='$(ALLDIR_CLEAN)'
 
 stat:
 	@echo "C Lines: "
