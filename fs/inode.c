@@ -94,7 +94,7 @@ int release_block(block_t bnr, struct device* id){
     block_t bmap_nr = sb->s_blockmapnr + (bnr / sb->s_block_size);
     struct block_buffer *bmap, *block;
     int ret;
-    if(bnr > sb->s_blockmap_size){
+    if(bnr > CHAR_TO_WORD(sb->s_blockmap_size) * 8){
         KDEBUG(("Invalid block id %d", bnr));
         return -1;
     }
