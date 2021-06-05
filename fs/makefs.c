@@ -46,7 +46,7 @@ int makefs( char* disk_raw, size_t disk_size)
             root_inode_num, // root inode number
 
         sb_block_nr,
-        BLOCK_SIZE,
+        PAGE_LEN,
             blockmap_block_nr, // block bitmap block index
             BLOCK_SIZE,
             inodemap_block_nr, // inode bitmap block index
