@@ -17,6 +17,9 @@ int file_size(struct proc* who, int fd){
     return statbuf.st_size;
 }
 
+char buffer[PAGE_LEN];
+char b2[PAGE_LEN];
+
 int unit_test1(){
     struct proc pcurr2;
     int ret, fd, fd2, fd3, fd4, i;
@@ -24,8 +27,6 @@ int unit_test1(){
     struct stat statbuf, statbuf2;
     init_bitmap();
     char *filename = "/foo.txt";
-    char buffer[BLOCK_SIZE];
-    char b2[BLOCK_SIZE];
 
     pcurr2.pid = 2;
     pcurr2.proc_nr = 2;
@@ -84,16 +85,16 @@ int unit_test1(){
     assert(ret == 5);
     assert(strcmp(buffer, "1234") == 0);
 
-    memset(buffer, 'a', BLOCK_SIZE - 1);
-    buffer[BLOCK_SIZE - 1] = 0;
-    ret = sys_write(&pcurr2, pipe_fd[1], buffer, BLOCK_SIZE);
-    assert(ret == BLOCK_SIZE);
+    memset(buffer, 'a', PAGE_LEN - 1);
+    buffer[PAGE_LEN - 1] = 0;
+    ret = sys_write(&pcurr2, pipe_fd[1], buffer, PAGE_LEN);
+    assert(ret == PAGE_LEN);
     ret = sys_write(&pcurr2, pipe_fd[1], "abc", 4);
     assert(ret == SUSPEND);
-    ret = sys_read(curr_scheduling_proc, pipe_fd[0], b2, BLOCK_SIZE);
-    assert(ret == BLOCK_SIZE);
+    ret = sys_read(curr_scheduling_proc, pipe_fd[0], b2, PAGE_LEN);
+    assert(ret == PAGE_LEN);
     assert(strcmp(buffer, b2) == 0);
-    ret = sys_read(curr_scheduling_proc, pipe_fd[0], b2, BLOCK_SIZE);
+    ret = sys_read(curr_scheduling_proc, pipe_fd[0], b2, PAGE_LEN);
     assert(ret == 4);
     assert(strcmp(b2, "abc") == 0);
 
@@ -116,7 +117,7 @@ int unit_test1(){
 //    ret = sys_write(&pcurr2, pipe_fd[1], "abc", 4);
 //    ret = sys_close(&pcurr2, pipe_fd[1]);
 //    assert(ret == 0);
-//    ret = sys_read(curr_scheduling_proc, pipe_fd[0], buffer, BLOCK_SIZE);
+//    ret = sys_read(curr_scheduling_proc, pipe_fd[0], buffer, PAGE_LEN);
 //    assert(ret == 0);
 
     ret = sys_access(curr_scheduling_proc, "/dev", F_OK);
