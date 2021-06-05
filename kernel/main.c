@@ -38,7 +38,7 @@ void main() {
     init_proc();
     init_sched();
     init_syscall_table();
-    
+    kprintf2("\n"); //start new line
 
     init_kernel_tasks();
     start_init();
