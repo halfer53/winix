@@ -30,15 +30,14 @@ void main() {
     
     init_bitmap();
     init_dev();
-    init_fs();
     init_tty();
+    init_fs();
     init_drivers();
     
     init_mem_table();
     init_proc();
     init_sched();
     init_syscall_table();
-    kprintf2("\n"); //start new line
 
     init_kernel_tasks();
     start_init();
