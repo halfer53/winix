@@ -116,8 +116,8 @@ int makefs( char* disk_raw, size_t disk_size)
     fill_dirent(&root_node, pdir, "..");
 
     memcpy(&s2, DISK_RAW, sizeof(struct superblock));
-    
-    ASSERT(memcmp(&superblock, &s2, sizeof(struct superblock)));
+
+    ASSERT(memcmp(&superblock, &s2, sizeof(struct superblock)) == 0);
     return 0;
     // return DISK_RAW;
 }
