@@ -24,14 +24,15 @@ int makefs( char* disk_raw, size_t disk_size)
     block_t blockmap_block_nr = superblock_size;
     block_t inodemap_block_nr = blockmap_block_nr + 1;
     block_t inode_table_block_nr = inodemap_block_nr + 1;
-    unsigned int inode_tablesize = (int)(blocks_nr * 0.02) * BLOCK_SIZE;
+    unsigned int inode_tablesize = (int)(disk_size * 0.02);
     block_t root_node_block_nr = inode_table_block_nr + (inode_tablesize / BLOCK_SIZE);
     block_t first_free_block = root_node_block_nr + 1;
     block_t block_in_use = root_node_block_nr + 1;
     block_t remaining_blocks = blocks_nr - block_in_use;
     unsigned int remaining_words = remaining_blocks * BLOCK_SIZE;
     int inode_per_block = BLOCK_SIZE / INODE_DISK_SIZE;
-    unsigned int free_inodes = inode_tablesize / INODE_DISK_SIZE - 1;
+    unsigned int inode_limit = inode_tablesize / INODE_DISK_SIZE;
+    unsigned int free_inodes = inode_limit - 1;
     unsigned int bitval = 0;
     struct superblock s2;
 
@@ -43,6 +44,7 @@ int makefs( char* disk_raw, size_t disk_size)
         free_inodes, // free inodes
         BLOCK_SIZE, // block size
             INODE_DISK_SIZE, // inode size
+            inode_limit,
             root_inode_num, // root inode number
 
         sb_block_nr,

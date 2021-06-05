@@ -13,6 +13,7 @@ struct superblock {
     unsigned int s_free_inodes;
     unsigned int s_block_size;
     unsigned int s_inode_size;
+    unsigned int s_inode_limit;
     unsigned int s_rootnr;
 
     block_t s_superblock_nr;
