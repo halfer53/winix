@@ -61,7 +61,6 @@ int blk_dev_io_write(char *buf, off_t off, size_t len){
 }
 
 int blk_dev_init(){
-    struct superblock* sb;
     rootfs_disk_size = DISK_SIZE;
     rootfs_disk = DISK_RAW;
 
@@ -69,7 +68,9 @@ int blk_dev_init(){
     arch_superblock(&root_sb);
     ASSERT(root_sb.magic == SUPER_BLOCK_MAGIC);
     ASSERT(root_sb.s_block_size == BLOCK_SIZE);
-    KDEBUG(("superblock: block in use %d inode table size %d\n", sb->s_block_inuse, sb->s_inode_table_size));
+    #ifdef __wramp__
+    KDEBUG(("superblock: block in use %d inode table size %d\n", root_sb.s_block_inuse, root_sb.s_inode_table_size));
+    #endif
     return 0;
 }
 
