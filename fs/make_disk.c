@@ -19,6 +19,7 @@
 #include <fs/fs_methods.h>
 #include <winix/list.h>
 #include <winix/dev.h>
+#include <winix/compiler.h>
 #include <fs/super.h>
 #include "makefs_only/srec_import.h"
 
@@ -167,7 +168,7 @@ void write_srec_list(struct list_head* lists){
     int binary_size;
     ret = sys_mkdir(curr_scheduling_proc, bin_path, 0x755);
     // printf("ret %d\n", ret);
-    assert(ret == 0);
+    ASSERT(ret == 0);
     list_for_each_entry_safe(struct winix_elf_list, pos, tmp, lists, list){
         strlcpy(path, bin_path, 256);
         strncat(path, "/", 256);
@@ -175,14 +176,14 @@ void write_srec_list(struct list_head* lists){
 //        printf("writing %s %x %x\n", pos->name, pos->binary_data[0], pos->binary_data[1]);
 
         fd = sys_creat(curr_scheduling_proc, path, 0x755);
-        assert(fd >= 0);
+        ASSERT(fd >= 0);
         ret = sys_write(curr_scheduling_proc, fd, &pos->elf, elf_size);
-        assert(ret == elf_size);
+        ASSERT(ret == elf_size);
         binary_size = WORD_TO_CHAR(pos->elf.binary_size);
         ret = sys_write(curr_scheduling_proc, fd, pos->binary_data,  binary_size);
-        assert(ret == binary_size);
+        ASSERT(ret == binary_size);
         ret = sys_close(curr_scheduling_proc, fd);
-        assert(ret == 0);
+        ASSERT(ret == 0);
         list_del(&pos->list);
         // debug_super_block(pos->name);
         free(pos);
