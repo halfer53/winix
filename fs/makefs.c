@@ -61,6 +61,10 @@ int makefs( char* disk_raw, size_t disk_size)
         KDEBUG(("block nr %d\n", blocks_nr));
         return -1;
     }
+    if(blocks_nr >= BLOCK_SIZE){
+        KDEBUG(("blocks exceed block_size"));
+        return -1;
+    }
 
     if(block_in_use >= 32){
         KDEBUG(("block in use %d\n", block_in_use));
