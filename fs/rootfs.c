@@ -67,10 +67,11 @@ int blk_dev_init(){
 #ifdef __wramp__
     ASSERT(DISK_RAW[0] == SUPER_BLOCK_MAGIC);
 #endif
+    KDEBUG(("sb block in use %d inode table size %d\n", sb->s_block_inuse, sb->s_inode_table_size));
     memcpy(&root_sb, rootfs_disk, sizeof(struct superblock));
     arch_superblock(&root_sb);
     ASSERT(root_sb.magic == SUPER_BLOCK_MAGIC);
-    // KDEBUG(("sb block in use %d inode table size %d\n", sb->s_block_inuse, sb->s_inode_table_size));
+    KDEBUG(("sb block in use %d inode table size %d\n", sb->s_block_inuse, sb->s_inode_table_size));
     return 0;
 }
 
