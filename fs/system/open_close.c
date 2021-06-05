@@ -27,6 +27,7 @@ int sys_open(struct proc *who, char *path, int flags, mode_t mode)
     char string[DIRSIZ];
     struct device *dev;
     mode_t file_mode;
+    bool is_new = false;
     clock_t unix_time = get_unix_time();
 
     if ((ret = eat_path(who, path, &lastdir, &inode, string)))
@@ -66,6 +67,7 @@ int sys_open(struct proc *who, char *path, int flags, mode_t mode)
             release_inode(inode);
             goto final;
         }
+        is_new = true;
         inode->i_mode = dev->device_type | (mode & ~(who->umask));
     }
 
@@ -99,7 +101,7 @@ int sys_open(struct proc *who, char *path, int flags, mode_t mode)
     // KDEBUG(("Open: path %s Last dir %d, ret inode %d\n", path, lastdir->i_num, inode->i_num));
 
 final:
-    put_inode(lastdir, false);
+    put_inode(lastdir, is_new);
     return ret;
 }
 
