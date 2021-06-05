@@ -261,7 +261,7 @@ inode_t* alloc_inode(struct proc* who, struct device* parentdev, struct device* 
         bnr++;
         imap = get_block_buffer(bnr, parentdev);
     }
-    if(!found){
+    if(!found || inum >= sb->s_inode_limit){
         put_block_buffer(imap);
         return NULL;
     }
