@@ -7,7 +7,7 @@
 
 #define ROOT_INODE_NUM  1
 
-#define BLOCK_SIZE_WORD  (1024)
+#define BLOCK_SIZE_WORD  (128)
 #define DISK_PAGE_NR    (400)
 
 #ifdef __x86_64__
@@ -23,7 +23,7 @@
 #endif
 
 #define INODE_NUM   496
-#define NR_TZONES   64
+#define NR_TZONES   40
 
 #define NR_FILPS          32    /* # slots in filp table */
 #define NR_INODES         48    /* # slots in "in core" inode table */

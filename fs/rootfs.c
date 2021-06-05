@@ -230,6 +230,7 @@ int root_fs_write (struct filp *filp, char *data, size_t count, off_t offset){
     curr_fp_index = offset / blksize;
     off = offset % blksize;
     fp_limit = (filp->filp_pos + count ) / blksize;
+    fp_limit = fp_limit < NR_TZONES ? fp_limit : NR_TZONES;
     ino = filp->filp_ino;
 
     for( ; curr_fp_index <= fp_limit; curr_fp_index++){
