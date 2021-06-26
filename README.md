@@ -8,7 +8,7 @@ Winix includes full-featured kernel with process and memory management, in-memor
 
 ## Demo
 
-### Playing Sake
+### Playing Snake
 ![play snake](demo/snake.gif)
 
 ### Using Pipe in bash
