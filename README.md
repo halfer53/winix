@@ -16,7 +16,7 @@ Winix includes full-featured kernel with process and memory management, in-memor
 
 ## Features
 
- - Kernel Memory Management: visual memory, page mapping
+ - Kernel Memory Management: virtual memory, page mapping
  - Process Management: Kernel thread, process creation
  - Exception control and interrupt handler
  - In-memory file system that supports most of the POSIX api
