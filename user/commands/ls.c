@@ -248,8 +248,8 @@ int do_ls(char* pathname, int flag){
        }
        if(flag & LONG_FORMAT){
            strlcpy(path_buffer, pathname, PATH_LEN);
-           strncat(path_buffer, "/", PATH_LEN);
-           strncat(path_buffer, (char *)dir->d_name, PATH_LEN);
+           strlcat(path_buffer, "/", PATH_LEN);
+           strlcat(path_buffer, (char *)dir->d_name, PATH_LEN);
            print_long_format(path_buffer, flag);
        }else{
            symbol = (dir->d_type == DT_DIR && *dir->d_name != '.')  ? slash : "";

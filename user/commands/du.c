@@ -8,7 +8,7 @@ char slash[] = "/";
 
 void reset_path(char *dir_path, char *path){
     strlcpy(path, dir_path, PATH_LEN);
-    strncat(path, slash, PATH_LEN);
+    strlcat(path, slash, PATH_LEN);
 }
 
 
@@ -53,7 +53,7 @@ size_t count_dir_size(char *dir_path){
     while((dir = readdir(directory)) != NULL){
         if(*dir->d_name == '.')
             continue;
-        strncat(path, (const char*)dir->d_name, PATH_LEN);
+        strlcat(path, (const char*)dir->d_name, PATH_LEN);
         if(dir->d_type == DT_DIR){
             count += count_dir_size(path);
         }else{

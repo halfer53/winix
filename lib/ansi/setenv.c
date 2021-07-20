@@ -12,7 +12,7 @@ int setenv(const char *name, const char *value, int overwrite) {
 		return -1;
 
     strlcpy(buf,name, len);
-    strncat(buf,"=", len);
-    strncat(buf,value, len);
+    strlcat(buf,"=", len);
+    strlcat(buf,value, len);
 	return putenv(buf);
 }

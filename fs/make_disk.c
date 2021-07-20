@@ -170,8 +170,8 @@ void write_srec_list(struct list_head* lists){
     assert(ret == 0);
     list_for_each_entry_safe(struct winix_elf_list, pos, tmp, lists, list){
         strlcpy(path, bin_path, 256);
-        strncat(path, "/", 256);
-        strncat(path, pos->name, 256);
+        strlcat(path, "/", 256);
+        strlcat(path, pos->name, 256);
 //        printf("writing %s %x %x\n", pos->name, pos->binary_data[0], pos->binary_data[1]);
 
         fd = sys_creat(curr_scheduling_proc, path, 0x755);

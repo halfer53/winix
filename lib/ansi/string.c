@@ -61,7 +61,7 @@ char *strlcpy(char *dest, const char *src, size_t n){
     return saved;
 }
 
-char *strncat(char *dest, const char *src, size_t n) {
+char *strlcat(char *dest, const char *src, size_t n) {
     char* saved = dest;
     size_t dst_len;
     while(*dest++);

@@ -109,7 +109,7 @@ int main() {
 
 int search_path(char* path, int len, char* name){
     strlcpy(path, "/bin/", len);
-    strncat(path, name, len);
+    strlcat(path, name, len);
     return access(path, F_OK);
 }
 

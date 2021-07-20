@@ -209,7 +209,7 @@ int parse_quotes(char *input, char* buffer, int buf_len){
             // concatenate the environment value to the output 
             // buffer
             *out = '\0';
-            strncat(out, envval, buf_len);
+            strlcat(out, envval, buf_len);
             out += strlen(envval);
             *in = bak_char;
         }else{
