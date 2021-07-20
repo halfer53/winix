@@ -1,6 +1,6 @@
 # WINIX OS
 
-![C/C++ CI](https://github.com/halfer53/winix/workflows/C/C++%20CI/badge.svg) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+![C/C++ CI](https://github.com/halfer53/winix/workflows/C/C++%20CI/badge.svg) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0) [![CodeFactor](https://www.codefactor.io/repository/github/halfer53/winix/badge/master)](https://www.codefactor.io/repository/github/halfer53/winix/overview/master)
 
 Winix is a minimal, hobbyist, educational and UNIX-style Operating System for the Waikato RISC Architecture Microprocessor (WRAMP). It is a hybrid kernel with usability and performance in mind. Winix is mainly inspired by Minix1, which is the OS I learnt when I was in university.
 
