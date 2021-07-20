@@ -158,10 +158,12 @@ void debug_super_block(char* str){
     printf("in use %d, remaining %d after %s\n", sb->s_block_inuse, sb->s_free_blocks, str);
 }
 
+#define PATH_LEN   (256)
+
 void write_srec_list(struct list_head* lists){
     static char bin_path[] = "/bin";
     struct winix_elf_list *pos, *tmp;
-    char path[256];
+    char path[PATH_LEN];
     int ret, fd, size;
     int elf_size = sizeof(struct winix_elf);
     int binary_size;
@@ -169,9 +171,9 @@ void write_srec_list(struct list_head* lists){
     // printf("ret %d\n", ret);
     assert(ret == 0);
     list_for_each_entry_safe(struct winix_elf_list, pos, tmp, lists, list){
-        strlcpy(path, bin_path, 256);
-        strlcat(path, "/", 256);
-        strlcat(path, pos->name, 256);
+        strlcpy(path, bin_path, PATH_LEN);
+        strncat(path, "/", PATH_LEN - 1);
+        strncat(path, pos->name, PATH_LEN - 1);
 //        printf("writing %s %x %x\n", pos->name, pos->binary_data[0], pos->binary_data[1]);
 
         fd = sys_creat(curr_scheduling_proc, path, 0x755);
