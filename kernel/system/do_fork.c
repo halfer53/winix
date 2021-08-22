@@ -171,7 +171,9 @@ int do_vfork(struct proc* parent, struct message* m){
 int do_tfork(struct proc* parent, struct message* m){
     struct proc* child;
     ptr_t* new_stack, *sp_physical, *old_stack;
-    vptr_t* vsp_relative_to_stack_top;
+    unsigned int *stack_ptr, *stack_bottom;
+    unsigned int vstack_top, vstack_bottom, val;
+    vptr_t* vsp_relative_to_stack_top, *vir_old_stack;
     reg_t** sp;
     if(child = get_free_proc_slot()){
         copy_pcb(parent,child);
@@ -193,19 +195,28 @@ int do_tfork(struct proc* parent, struct message* m){
         vsp_relative_to_stack_top = (vptr_t*)(get_physical_addr(*sp, child) - child->stack_top);
         sp_physical = (ptr_t *)(new_stack + (ptr_t)vsp_relative_to_stack_top) ;
         *sp = (reg_t *)get_virtual_addr(sp_physical, child);
-        // KDEBUG(("tfork %x %x for %d tp %d\n", new_stack, *sp, child->proc_nr, child->thread_parent));
         old_stack = child->stack_top;
         child->stack_top = new_stack;
-        // proc_memctl(child, old_stack, PROC_NO_ACCESS);
-        /* TODO: the current implementation of tfork result in concurrent access to the same page on rare occasions
-         This is because some of the variables saved in stack and heap still reference the memory oaddress of old stack after forking
-         Two possible Solution
-            1 : copy the parent's stack to a separate place, then swap on scheduling
-            2 : scan the stack, and replace the old addresses with new virtual addresses
-        */
 
+        stack_ptr = (unsigned int*)child->stack_top;
+        stack_bottom = (unsigned int*)stack_ptr + PAGE_LEN;
+        vir_old_stack = get_virtual_addr(old_stack, child);
+        vstack_top = (unsigned int)vir_old_stack;
+        vstack_bottom = (unsigned int)vir_old_stack + PAGE_LEN;
+
+        // change the virtual address referencing old stack to new stack
+        while (stack_ptr < stack_bottom) {
+            val = *stack_ptr;
+            if (val >= vstack_top && val < vstack_bottom) {
+                *stack_ptr = (unsigned int)get_virtual_addr(val - vstack_top + new_stack, child);
+                // KDEBUG(("old %x new %x\n", val, *stack_ptr));
+            }
+            stack_ptr++;
+        }
+
+        // KDEBUG(("tfork %x %x for %d tp %d\n", new_stack, *sp, child->proc_nr, child->thread_parent));
+        proc_memctl(child, vir_old_stack, PROC_NO_ACCESS);
         syscall_reply2(TFORK, 0, child->proc_nr, m);
-
         return child->proc_nr;
     }
     return EAGAIN;
