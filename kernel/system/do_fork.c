@@ -100,7 +100,7 @@ int copy_pregs(struct proc* parent, struct proc* child){
     child->message = (struct message *)get_physical_addr(*( sp + 2 ), child);
     child->heap_break = get_physical_addr(get_virtual_addr(parent->heap_break, parent), child);
     child->heap_bottom = get_physical_addr(get_virtual_addr(parent->heap_bottom, parent), child);
-    // child->stack_top = get_physical_addr(get_virtual_addr(parent->stack_top, parent), child);
+    child->stack_top = get_physical_addr(get_virtual_addr(parent->stack_top, parent), child);
     return OK;
 }
 
@@ -185,6 +185,10 @@ int do_tfork(struct proc* parent, struct message* m){
         }
 
         new_stack = user_get_free_page(child, GFP_HIGH);
+        if(new_stack == NULL){
+            release_proc_slot(child);
+            return ENOMEM;
+        }
         copy_page(new_stack, child->stack_top);
         sp = &child->ctx.m.sp;
         vsp_relative_to_stack_top = (vptr_t*)(get_physical_addr(*sp, child) - child->stack_top);
