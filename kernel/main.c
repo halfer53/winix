@@ -64,7 +64,7 @@ void start_init(){
     proc_set_default(init);
     init->state = STATE_RUNNABLE;
     init->flags = IN_USE;
-    init->pid = 1;
+    init->pid = INIT;
     ret = exec_welf(init, INIT_PATH, init_argv, initial_env, true);
     if(ret != OK && ret != DONTREPLY){
         kerror("%d\n", ret);
