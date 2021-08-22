@@ -1,7 +1,7 @@
 //
 // Created by bruce on 19/04/20.
 //
-
+#define __STDC_WANT_LIB_EXT1__ 1
 #include <fs/common.h>
 #include <fs/cache.h>
 #include <kernel/proc.h>
@@ -171,9 +171,7 @@ void write_srec_list(struct list_head* lists){
     // printf("ret %d\n", ret);
     assert(ret == 0);
     list_for_each_entry_safe(struct winix_elf_list, pos, tmp, lists, list){
-        strlcpy(path, bin_path, PATH_LEN);
-        strncat(path, "/", PATH_LEN - 1);
-        strncat(path, pos->name, PATH_LEN - 1);
+        snprintf(path, PATH_LEN, "%s%s%s", bin_path, "/", pos->name);
 //        printf("writing %s %x %x\n", pos->name, pos->binary_data[0], pos->binary_data[1]);
 
         fd = sys_creat(curr_scheduling_proc, path, 0x755);
