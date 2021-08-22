@@ -163,7 +163,8 @@ PRIVATE void gpf_handler() {
     kprintf("Physical ");
     PRINT_DEBUG_REG(pc, 
         get_physical_addr(curr_scheduling_proc->ctx.m.sp, curr_scheduling_proc),
-        get_physical_addr(curr_scheduling_proc->ctx.m.ra, curr_scheduling_proc));    
+        get_physical_addr(curr_scheduling_proc->ctx.m.ra, curr_scheduling_proc));  
+    kreport_ptable(curr_scheduling_proc);  
 
     // kprintf("Current Instruction: 0x%08x\n",*pc);
 #endif

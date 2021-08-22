@@ -170,7 +170,7 @@ int do_vfork(struct proc* parent, struct message* m){
 
 int do_tfork(struct proc* parent, struct message* m){
     struct proc* child;
-    ptr_t* new_stack, *sp_physical;
+    ptr_t* new_stack, *sp_physical, *old_stack;
     vptr_t* vsp_relative_to_stack_top;
     reg_t** sp;
     if(child = get_free_proc_slot()){
@@ -196,6 +196,14 @@ int do_tfork(struct proc* parent, struct message* m){
         *sp = (reg_t *)get_virtual_addr(sp_physical, child);
         // KDEBUG(("tfork %x %x for %d tp %d\n", new_stack, *sp, child->proc_nr, child->thread_parent));
         child->stack_top = new_stack;
+
+        // proc_memctl(child, old_stack, PROC_NO_ACCESS);
+        /* TODO: the current implementation of tfork result in concurrent access to the same page on rare occasions
+         This is because some of the variables saved in stack and heap still reference the memory oaddress of old stack after forking
+         Two possible Solution
+            1 : copy the parent's stack to a separate place, then swap on scheduling
+            2 : scan the stack, and replace the old addresses with new virtual addresses
+        */
 
         syscall_reply2(TFORK, 0, child->proc_nr, m);
 
