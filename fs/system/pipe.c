@@ -118,8 +118,8 @@ int sys_pipe(struct proc* who, int fd[2]){
 
 struct pipe_waiting* get_next_waiting(struct list_head *waiting_list){
     struct pipe_waiting *p1, *p2;
-    list_for_each_entry_safe(struct pipe_waiting, p1, p2, waiting_list, list){
-        return p1;
+    if(!list_empty(waiting_list)){
+        return list_entry(waiting_list->next, struct pipe_waiting, list);
     }
     return NULL;
 }
