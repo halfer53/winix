@@ -195,7 +195,7 @@ int winix_load_srec_mem_val(char *line, struct srec_binary* result)
     int addressLength = 0;
     int byteCount = 0;
     char buffer[128];
-    char tempBufferCount = 0;
+    int tempBufferCount = 0;
     int address = 0;
     byte data[255];
     int readChecksum = 0;
@@ -292,7 +292,7 @@ int winix_load_srec_mem_val(char *line, struct srec_binary* result)
     {
         tempBufferCount = substring(buffer, line, index, 2);
         // printf("temp byte value %s, value in base 10: %d,length %d\r\n",buffer,hex2int(buffer,tempBufferCount),tempBufferCount);
-        data[i] = hex2int(buffer, tempBufferCount);
+        data[i] = (byte)hex2int(buffer, tempBufferCount);
         // data[i] = (byte)Convert.ToInt32(line.substring(index, 2), 16);
         index += 2;
         checksum += data[i];
@@ -307,7 +307,7 @@ int winix_load_srec_mem_val(char *line, struct srec_binary* result)
     // printf("checksum %d\r\n",checksum );
     byteCheckSum = (byte)(checksum & 0xFF);
     // printf("checksum %d\r\n",byteCheckSum );
-    byteCheckSum = ~byteCheckSum;
+    byteCheckSum = (byte)~byteCheckSum;
     // printf("checksum %d\r\n",byteCheckSum );
     if (readChecksum != byteCheckSum)
     {
@@ -348,6 +348,8 @@ int winix_load_srec_mem_val(char *line, struct srec_binary* result)
         case 7: // entry point for the program.
             result->binary_pc = (unsigned int)address;
             return 0;
+        default:
+            return -1;
     }
 
     return wordsLoaded;

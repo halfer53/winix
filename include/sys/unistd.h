@@ -3,13 +3,6 @@
 
 #include <sys/dirent.h>
 
-/* access function */
-#define    F_OK        0    /* test for existence of file */
-#define    X_OK        0x01    /* test for execute or search permission */
-#define    W_OK        0x02    /* test for write permission */
-#define    R_OK        0x04    /* test for read permission */
-
-
 /* configurable pathname variables */
 #define    _PC_LINK_MAX        1
 #define    _PC_MAX_CANON        2

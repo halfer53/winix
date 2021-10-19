@@ -43,7 +43,10 @@ ALLDIR_CLEAN = winix lib init user kernel fs driver include
 FS_DEPEND = fs/*.c fs/system/*.c fs/makefs_only/*.c 
 DISK = include/disk.c
 START_TIME_FILE = include/startup_time.c
-GCC_FLAG = -Wimplicit-fallthrough -Wsequence-point -Wswitch-default -Wswitch-unreachable -Wswitch-enum -Wstringop-truncation -Wbool-compare -Wtautological-compare -Wfloat-equal -Wshadow=global -Wpointer-arith -Wpointer-compare -Wcast-align -Wcast-qual -Wwrite-strings -Wdangling-else -Wlogical-op -Wconversion
+GCC_FLAG = -w -Wimplicit-fallthrough -Wsequence-point -Wswitch-default -Wswitch-unreachable \
+		-Wswitch-enum -Wstringop-truncation -Wbool-compare -Wtautological-compare -Wfloat-equal \
+		-Wshadow=global -Wpointer-arith -Wpointer-compare -Wcast-align -Wcast-qual -Wwrite-strings \
+		-Wdangling-else -Wlogical-op -Wconversion
 SREC = $(shell find $(SREC_INCLUDE) -name "*.srec")
 
 all:| makedisk kbuild $(DISK) include_build
