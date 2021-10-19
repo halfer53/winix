@@ -23,6 +23,7 @@
 #define	EOF		(-1)
 #endif
 
-#define offsetof(st, m) ((size_t)&(((st *)0)->m))
+#define offsetof(st, m) \
+    ((size_t)((char *)&((st *)0)->m - (char *)0))
 
 #endif

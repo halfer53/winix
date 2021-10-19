@@ -32,7 +32,7 @@ int sys_mknod(struct proc* who, char *pathname, mode_t mode, dev_t devid);
 int sys_getdents(struct proc* who, int fd, struct dirent* dirp_dst, unsigned int count);
 
 int init_dirent(inode_t* dir, inode_t* ino);
-int fill_dirent(inode_t* ino, struct winix_dirent* curr, char* string);
+// int fill_dirent(inode_t* ino, struct winix_dirent* curr, char* string);
 bool has_file_access(struct proc* who, struct inode* ino, mode_t mode);
 int get_inode_by_path(struct proc* who, char *path, struct inode** inode);
 int alloc_block(inode_t *ino, struct device* id);
@@ -44,7 +44,7 @@ void init_pipe();
 int remove_inode_from_dir(struct proc* who,struct inode* dir, struct inode* target, char* name);
 int get_fd(struct proc *curr, int start, int *open_slot, filp_t **fpt);
 int add_inode_to_directory(struct proc* who,inode_t* dir, inode_t* ino, char* string);
-int register_device(struct device* dev, const char* name, dev_t id, mode_t type, struct device_operations*, struct filp_operations*);
+// int register_device(struct device* dev, const char* name, dev_t id, mode_t type, struct device_operations*, struct filp_operations*);
 int release_filp(struct filp* file);
 int release_inode(inode_t *inode);
 filp_t *get_filp(int fd);

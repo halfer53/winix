@@ -21,5 +21,6 @@ void mock_init_proc();
 void _assert(int expression, int line, char* filename);
 void init_tty();
 char *strlcpy(char *dest, const char *src, size_t n);
+void set_start_unix_time(clock_t t);
 
 #endif //FS_CMAKE_UTIL_H

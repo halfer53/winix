@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 
+int fill_dirent(inode_t* ino, struct winix_dirent* curr, char* string);
 char rootfs_name[] = "WINIX_ROOTFS";
 
 unsigned int setBits(unsigned int n)
@@ -53,7 +54,6 @@ int makefs( char* disk_raw, size_t disk_size)
         inode_table_block_nr, // inode table block index
             inode_tablesize,
         inode_per_block, // inode per block
-        NULL, // root inode
     };
     char32_strlcpy(superblock.s_name, rootfs_name, SUPERBLOCK_NAME_LEN);
     // printf("block nr %d %d %d\n", blocks_nr, block_in_use, remaining_blocks);

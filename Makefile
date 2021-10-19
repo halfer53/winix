@@ -46,7 +46,7 @@ START_TIME_FILE = include/startup_time.c
 GCC_FLAG = -Wimplicit-fallthrough -Wsequence-point -Wswitch-default -Wswitch-unreachable \
 		-Wswitch-enum -Wstringop-truncation -Wbool-compare -Wtautological-compare -Wfloat-equal \
 		-Wshadow=global -Wpointer-arith -Wpointer-compare -Wcast-align -Wcast-qual -Wwrite-strings \
-		-Wdangling-else -Wlogical-op
+		-Wdangling-else -Wlogical-op -Wunused -Wno-pointer-to-int-cast
 SREC = $(shell find $(SREC_INCLUDE) -name "*.srec")
 
 all:| makedisk kbuild $(DISK) include_build
@@ -57,7 +57,7 @@ ifeq ($(KBUILD_VERBOSE),0)
 endif
 
 makedisk: $(FS_DEPEND)
-	$(Q)gcc -g $(GCC_FLAG) -D MAKEFS_STANDALONE $(COMMON_CFLAGS) -I./include/fs_include -I./include $^ -o makedisk
+	$(Q)gcc -g -D MAKEFS_STANDALONE $(COMMON_CFLAGS) -I./include/fs_include -I./include $^ -o makedisk
 
 kbuild: $(ALLDIR)
 $(ALLDIR): FORCE

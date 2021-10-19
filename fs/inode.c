@@ -1,4 +1,5 @@
 #include "fs.h"
+int fill_dirent(inode_t* ino, struct winix_dirent* curr, char* string);
 
 #define INODE_ARC_MAP_LEN   (8)
 inode_t inode_table[NR_INODES];

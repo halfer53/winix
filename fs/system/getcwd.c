@@ -43,7 +43,10 @@ int sys_getcwd(struct proc* who, char* pathname, int size){
 
     }
     *--p = '/';
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpointer-to-int-cast"
     ret = (int)get_virtual_addr(p, who);
+#pragma GCC diagnostic pop
 
 end:
     put_inode(inode, false);

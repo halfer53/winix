@@ -50,6 +50,7 @@ void init_dev();
 void init_root_fs();
 void init_drivers();
 int tty_write_rex(RexSp_t* rex, char* data, size_t len);
+int register_device(struct device* dev, const char* name, dev_t id, mode_t type, struct device_operations*, struct filp_operations*);
 
 #endif
 

@@ -14,7 +14,7 @@ int __sys_fcntl(struct proc* who, int fd, int cmd, void* arg){
     case F_GETFL:
         return file->filp_flags;
     case F_SETFL:
-        file->filp_flags = *((int*)arg + (int)who->ctx.rbase); 
+        file->filp_flags = *((int*)arg + (int)((char *)who->ctx.rbase - (char *)0)); 
         break;
 
     default:
