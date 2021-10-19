@@ -14,7 +14,7 @@ void visualise_lru(){
     struct block_buffer* buf = lru_cache[FRONT];
     while(buf != NULL && limit > 0){
         unsigned int val = TBUF_NR(buf);
-        kprintf("%ld -> ", val);
+        kprintf("%d -> ", val);
         buf = buf->prev;
         limit--;
     }

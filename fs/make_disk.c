@@ -215,7 +215,7 @@ int write_srec_to_disk(char* path, struct arguments* arguments){
         {
             char *dot = strchr(dp->d_name, '.');
             char *extension_name = dot + 1;
-            sprintf(filename_qfd,"%s/%s", path, dp->d_name);
+            snprintf(filename_qfd, 256, "%s/%s", path, dp->d_name);
 
             if(strcmp(extension_name, "srec") == 0){
                 struct srec_binary *result = malloc(sizeof(struct srec_binary));

@@ -12,8 +12,9 @@
 #define TO_UPPER_CHAR(c) (c - 32)
 
 void print_srec_result(struct srec_binary* result, char* filename){
+    int j;
     printf("unsigned int %s_code[] = {\n", filename);
-    for(int j = 0; j < result->binary_idx; j++){
+    for(j = 0; j < result->binary_idx; j++){
         printf("0x%08x,\n", (unsigned int)result->binary_data[j]);
     }
     printf("};\n");

@@ -20,11 +20,11 @@ int tty_write ( struct filp *filp, char *data, size_t count, off_t offset){
     return count;
 }
 
-int tty_open ( struct inode* ino, struct filp *file){
+int tty_open ( struct device* dev, struct filp *file){
     return 0;
 }
 
-int tty_close ( struct inode* ino, struct filp *file){
+int tty_close ( struct device* dev, struct filp *file){
     return 0;
 }
 

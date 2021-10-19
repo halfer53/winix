@@ -16,7 +16,9 @@
 #include <sys/stat.h>
 #include <sys/fcntl.h>
 #include <sys/dirent.h>
+#ifndef MAKEFS_STANDALONE
 #include <sys/unistd.h>
+#endif
 #include <fs/type.h>
 #include <fs/common.h>
 #include <winix/type.h>

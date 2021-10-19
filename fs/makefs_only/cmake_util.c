@@ -50,14 +50,17 @@ void kfree(void *ptr){
 
 int syscall_reply(int reply, int dest, struct message* m){
     KDEBUG(("Syscall %d reply to %d\n", reply, dest));
+    return 0;
 }
 
 int syscall_reply2(int syscall_num, int reply, int dest, struct message* m){
     KDEBUG(("Syscall %d reply %d to Proc %d\n", syscall_num, reply, dest));
+    return 0;
 }
 
 int send_sig(struct proc *who, int signum){
     KDEBUG(("signal %d sent to %d\n", signum, who->proc_nr));
+    return 0;
 }
 
 void _assert(int expression, int line, char* filename) {
