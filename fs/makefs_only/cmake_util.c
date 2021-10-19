@@ -1,8 +1,8 @@
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <stdio.h>
-#include <unistd.h>
 #include "../fs.h"
+#include <unistd.h>
 
 #define MEM_SIZE (32 * 1024)
 int mem[MEM_SIZE];

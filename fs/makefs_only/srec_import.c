@@ -8,6 +8,7 @@
 #include <argp.h>
 #include <winix/welf.h>
 #include "srec_import.h"
+#include "cmake_util.h"
 
 #define TO_UPPER_CHAR(c) (c - 32)
 
@@ -50,7 +51,7 @@ int srec_add_binary(struct srec_binary* srec_result, unsigned int item){
     srec_result->binary_idx++;
     if(srec_result->binary_idx >= srec_result->binary_size){
         srec_result->binary_size += 1024;
-        srec_result->binary_data = realloc(srec_result->binary_data, sizeof(unsigned int) * srec_result->binary_size);
+        srec_result->binary_data = realloc(srec_result->binary_data, (size_t)(sizeof(unsigned int) * srec_result->binary_size));
         if(srec_result->binary_data == NULL){
             perror("realloc returned NULL ");
             abort();
@@ -70,7 +71,7 @@ static char data_size[] = ".data segment size = 0x";
 static char bss_size[] = ".bss segment size = 0x";
 
 int decode_segment_size(size_t* val, char* prefix, char* line){
-    int len = strlen(prefix);
+    int len = (int)strlen(prefix);
     char *strvalue = &line[len];
     if(strvalue[strlen(strvalue) - 1] == '\n'){
         strvalue[strlen(strvalue) - 1] = '\0';
@@ -78,7 +79,7 @@ int decode_segment_size(size_t* val, char* prefix, char* line){
     while(*strvalue && *strvalue == '0'){
         strvalue++;
     }
-    *val = hex2int(strvalue, strlen(strvalue));
+    *val = (size_t)hex2int(strvalue, (int)strlen(strvalue));
 //    printf(" size %s | %d %x\n",  strvalue, *val, *val);
     return 0;
 }
@@ -116,7 +117,7 @@ int decode_srec(char *path, int offset, struct srec_binary* result)
     size_t wordsLoaded = 0;
     FILE *fp;
     char *line = NULL;
-    size_t len = 10240;
+    int len = 10240;
     char *filename;
     init_srec_binary_struct(result);
     fp = fopen(path, "r");
@@ -124,17 +125,17 @@ int decode_srec(char *path, int offset, struct srec_binary* result)
         perror("Path cannot be found ");
         exit(EXIT_FAILURE);
     }
-    line = malloc(len);
+    line = malloc((unsigned int)len);
     filename = remove_extension(path);
 //    printf("filename is '%s' path = '%s'\n", filename, path);
     strlcpy(result->name, filename, WINIX_ELF_NAME_LEN);
     while(fgets(line, len, fp)){
         temp = winix_load_srec_mem_val(line, result);
-        wordsLoaded += temp;
+        wordsLoaded += (size_t)temp;
     };
     free(line);
 
-    result->binary_offset = offset;
+    result->binary_offset = (unsigned int)offset;
 //    print_srec_result(result, filename);
     return 0;
 }
