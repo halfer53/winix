@@ -41,7 +41,7 @@ bool is_vaddr_ok(vptr_t* addr,struct proc* who){
 
 void* kmalloc(unsigned int size){
     void* ret = &mem[curr];
-    curr += size;
+    curr += *(int *)&size;
     return ret;
 }
 void kfree(void *ptr){
