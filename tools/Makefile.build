@@ -61,7 +61,7 @@ $(subdir-y): FORCE
 
 .SECONDEXPANSION:
 %.srec : $$(%.srec)
-	$(Q)wlink -Ttext $(TEXT_OFFSET) -v -o $@ $^ $(shell $(get_libs) $^) > $(SREC_INCLUDE)/$(notdir $(@:.srec=)).verbose
+	$(Q)wlink -Ttext $(TEXT_OFFSET) -v -o $@ $^ `$(get_libs) $^` > $(SREC_INCLUDE)/$(notdir $(@:.srec=)).verbose
 	$(Q)cp $@ $(SREC_INCLUDE)/$(notdir $@)
 ifeq ($(KBUILD_VERBOSE),0)
 	@echo "LD \t $@"

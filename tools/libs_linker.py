@@ -16,29 +16,29 @@ REGEX = "lib/regex/"
 IPC = "lib/ipc/"
 
 built_in = {
-	"stdlib.h": {STDLIB, ANSI},
-	"string.h": {STRING},
-	"signal.h": {SIGNAL},
-	"ucontext.h": {GEN},
-	"unistd.h": {POSIX, ANSI, STDLIB},
-	"util.h":	{UTIL},
-	"stdio.h":	{STDIO, STDLIB},
-	"debug.h":	{DEBUG},
-	"dirent.h":	{POSIX, ANSI, STDLIB},
-	"regexp.h": {REGEX},
-	"sys/ipc.h": {IPC}
+	"stdlib.h": set([STDLIB, ANSI]),
+	"string.h": set([STRING]),
+	"signal.h": set([SIGNAL]),
+	"ucontext.h": set([GEN]),
+	"unistd.h": set([POSIX, ANSI, STDLIB]),
+	"util.h":	set([UTIL]),
+	"stdio.h":	set([STDIO, STDLIB]),
+	"debug.h":	set([DEBUG]),
+	"dirent.h":	set([POSIX, ANSI, STDLIB]),
+	"regexp.h": set([REGEX]),
+	"sys/ipc.h": set([IPC])
 }
 
 def get_all_files(libs):
-	ret = ''
+	ret = set()
 	for lib in libs:
 		if lib.endswith("/"):
 			for file in os.listdir(lib):
-				if file.endswith(".o") and 'env.o' != file:
-					ret += lib + file + ' '
+				if file.endswith(".o"):
+					ret.add(lib + file)
 		else:
-			ret += lib + ' '
-	return ret
+			ret.add(lib)
+	return ' '.join(ret)
 
 def include_iterate(start, end,line):
 	i = 0
@@ -76,7 +76,6 @@ def do_include_search(filename : str):
 	if filename.endswith('.o'):
 		filename = filename.replace('.o', '.c')
 	with open(filename) as f:
-		tocontinue = True
 		for line in f:
 			if "#include" in line:
 				tlib = set()
@@ -95,11 +94,6 @@ def main():
 	for i in range(1,len(sys.argv)):
 		tlib = do_include_search(sys.argv[i])
 		libs.update(tlib)
-
-	if STRING in libs and ANSI in libs:
-		libs.remove(STRING)
-	if SIGNAL in libs and POSIX in libs:
-		libs.remove(SIGNAL)
 		
 	print(get_all_files(libs), end='')
 
