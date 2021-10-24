@@ -21,6 +21,8 @@ jobs:
       run: sudo apt-get install xutils-dev
     - name: make
       run: make
+    - name: Unit Test
+      run: make unittest
     - uses: actions/upload-artifact@v2
       with:
         name: winix.srec
