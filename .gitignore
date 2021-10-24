@@ -14,7 +14,7 @@ kdbg.py
 tools/kdbg_srec/*.kdbg
 include/srec/*.verbose
 include/srec/*.srec
-makedisk
+fsutil
 fs/Debug/
 a.out
 include/*.c

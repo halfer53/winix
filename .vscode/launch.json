@@ -5,10 +5,10 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "File System Run Makedisk",
+            "name": "File System Run fsutil",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/makedisk",
+            "program": "${workspaceFolder}/fsutil",
             "args": ["-t", "2048", "-o", "include/disk.c", "-s", "include/srec"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
@@ -22,14 +22,14 @@
                     "ignoreFailures": true
                 }
             ],
-            "preLaunchTask": "GCC Build makedisk",
+            "preLaunchTask": "GCC Build fsutil",
             "miDebuggerPath": "/usr/bin/gdb"
         },
         {
             "name": "File System Run Unit Test",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/makedisk",
+            "program": "${workspaceFolder}/fsutil",
             "args": ["-d", "-t", "2048"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
@@ -43,7 +43,7 @@
                     "ignoreFailures": true
                 }
             ],
-            "preLaunchTask": "GCC Build makedisk",
+            "preLaunchTask": "GCC Build fsutil",
             "miDebuggerPath": "/usr/bin/gdb"
         }
     ]

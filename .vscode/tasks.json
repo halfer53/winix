@@ -2,7 +2,7 @@
     "tasks": [
         {
             "type": "shell",
-            "label": "GCC Build makedisk",
+            "label": "GCC Build fsutil",
             "command": "/usr/bin/gcc",
             "args": [
                 "-g",
@@ -32,7 +32,7 @@
                 "${workspaceFolder}/fs/system/*.c",
                 "${workspaceFolder}/fs/makefs_only/*.c",
                 "-o",
-                "${workspaceFolder}/makedisk"
+                "${workspaceFolder}/fsutil"
             ],
             "options": {
                 "cwd": "/usr/bin"

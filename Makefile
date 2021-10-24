@@ -49,7 +49,7 @@ GCC_FLAG = -Wimplicit-fallthrough -Wsequence-point -Wswitch-default -Wswitch-unr
 		-Wdangling-else -Wlogical-op -Wunused -Wno-pointer-to-int-cast
 SREC = $(shell find $(SREC_INCLUDE) -name "*.srec")
 
-all:| makedisk kbuild $(DISK) include_build
+all:| fsutil kbuild $(DISK) include_build
 	$(Q)wlink $(LDFLAGS) -Ttext 1024 -v -o winix.srec \
 	$(L_HEAD) $(KERNEL_O) $(KLIB_O) $(L_TAIL) > $(SREC_INCLUDE)/winix.verbose
 ifeq ($(KBUILD_VERBOSE),0)
@@ -57,17 +57,17 @@ ifeq ($(KBUILD_VERBOSE),0)
 endif
 
 unittest:
-	$(Q)./makedisk -d -t $(TEXT_OFFSET)
+	$(Q)./fsutil -d -t $(TEXT_OFFSET)
 
-makedisk: $(FS_DEPEND)
-	$(Q)gcc -g -D MAKEFS_STANDALONE $(COMMON_CFLAGS) -I./include/fs_include -I./include $^ -o makedisk
+fsutil: $(FS_DEPEND)
+	$(Q)gcc -g -D MAKEFS_STANDALONE $(COMMON_CFLAGS) -I./include/fs_include -I./include $^ -o fsutil
 
 kbuild: $(ALLDIR)
 $(ALLDIR): FORCE
 	$(Q)$(MAKE) $(build)=$@
 
 $(DISK): $(SREC)
-	$(Q)./makedisk -t $(TEXT_OFFSET) -o $(DISK) -s $(SREC_INCLUDE) -u $(CURR_UNIX_TIME)
+	$(Q)./fsutil -t $(TEXT_OFFSET) -o $(DISK) -s $(SREC_INCLUDE) -u $(CURR_UNIX_TIME)
 ifeq ($(KBUILD_VERBOSE),0)
 	@echo "LD \t disk.c"
 endif
@@ -77,7 +77,7 @@ include_build:
 	$(Q)$(MAKE) $(build)=include
 
 clean:
-	$(Q)rm -f makedisk
+	$(Q)rm -f fsutil
 	$(Q)$(MAKE) $(cleanall)='$(ALLDIR_CLEAN)'
 
 stat:
