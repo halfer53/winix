@@ -225,6 +225,6 @@ int unit_test1(){
     ret = sys_close(curr_scheduling_proc, fd4);
     assert(ret == EBADF);
 
-    printf("filesystem unit test passed");
+    printf("filesystem unit test passed\n");
     return 0;
 }
