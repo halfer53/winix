@@ -1,4 +1,4 @@
-.PHONY := kbuild all clean stat include_build
+.PHONY := kbuild all clean stat include_build unittest
 
 srctree := $(shell pwd)
 include tools/Kbuild.include
@@ -55,6 +55,9 @@ all:| makedisk kbuild $(DISK) include_build
 ifeq ($(KBUILD_VERBOSE),0)
 	@echo "LD \t winix.srec"
 endif
+
+unittest:
+	$(Q)./makedisk -d -t $(TEXT_OFFSET)
 
 makedisk: $(FS_DEPEND)
 	$(Q)gcc -g -D MAKEFS_STANDALONE $(COMMON_CFLAGS) -I./include/fs_include -I./include $^ -o makedisk
