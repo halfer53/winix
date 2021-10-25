@@ -21,7 +21,6 @@
 #include <winix/dev.h>
 #include <winix/bitmap.h>
 #include <winix/compiler.h>
-#include <winix/kstring.h>
 
 #ifdef FSUTIL
 

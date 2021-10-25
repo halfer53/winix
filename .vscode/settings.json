@@ -12,7 +12,6 @@
         "syscall.h": "c",
         "errno.h": "c",
         "fs.h": "c",
-        "kstring.h": "c",
         "kdebug.h": "c",
         "sys_stdio.h": "c",
         "mm.h": "c",
