@@ -30,6 +30,11 @@ export CURR_UNIX_TIME := $(shell date +%s)
 export WINIX_CFLAGS := -D__wramp__
 export COMMON_CFLAGS := -DTEXT_OFFSET=$(TEXT_OFFSET) -D_DEBUG 
 export CFLAGS := $(WINIX_CFLAGS) $(COMMON_CFLAGS)
+export GCC_FLAG := -Wimplicit-fallthrough -Wsequence-point -Wswitch-default -Wswitch-unreachable \
+		-Wswitch-enum -Wstringop-truncation -Wbool-compare -Wtautological-compare -Wfloat-equal \
+		-Wshadow=global -Wpointer-arith -Wpointer-compare -Wcast-align -Wcast-qual -Wwrite-strings \
+		-Wdangling-else -Wlogical-op -Wunused -Wpointer-to-int-cast -Wno-discarded-qualifiers \
+		-Wno-builtin-declaration-mismatch
 
 # List of user libraries used by the kernel
 KLIB_O = lib/syscall/wramp_syscall.o lib/ipc/ipc.o \
@@ -43,10 +48,6 @@ ALLDIR_CLEAN = winix lib init user kernel fs driver include
 FS_DEPEND = fs/*.c fs/system/*.c fs/fsutil/*.c winix/bitmap.c
 DISK = include/disk.c
 START_TIME_FILE = include/startup_time.c
-GCC_FLAG = -Werror -Wimplicit-fallthrough -Wsequence-point -Wswitch-default -Wswitch-unreachable \
-		-Wswitch-enum -Wstringop-truncation -Wbool-compare -Wtautological-compare -Wfloat-equal \
-		-Wshadow=global -Wpointer-arith -Wpointer-compare -Wcast-align -Wcast-qual -Wwrite-strings \
-		-Wdangling-else -Wlogical-op -Wunused -Wpointer-to-int-cast -Wno-discarded-qualifiers
 SREC = $(shell find $(SREC_INCLUDE) -name "*.srec")
 
 all:| fsutil kbuild $(DISK) include_build
@@ -60,7 +61,7 @@ unittest:
 	$(Q)./fsutil -d -t $(TEXT_OFFSET)
 
 fsutil: $(FS_DEPEND)
-	$(Q)gcc -g -DFSUTIL $(GCC_FLAG) $(COMMON_CFLAGS) -I./include/fs_include -I./include $^ -o fsutil
+	$(Q)gcc -g -DFSUTIL -Werror $(GCC_FLAG) $(COMMON_CFLAGS) -I./include/fs_include -I./include $^ -o fsutil
 
 kbuild: $(ALLDIR)
 $(ALLDIR): FORCE
