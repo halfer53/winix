@@ -44,7 +44,7 @@ all: __clean
 
 __clean: $(subdir-y)
 	$(Q)echo -n "" > $(srcdepend)
-	$(Q)rm -f $(objects) $(assembly) $(srecobj)
+	$(Q)rm -f $(objects) $(assembly) $(srecobj) .depend
 ifeq ($(KBUILD_VERBOSE),0)
 	@echo "RM \t $(obj)"
 endif
