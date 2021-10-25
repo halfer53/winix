@@ -6,7 +6,7 @@
 #include <fs/cache.h>
 #include <kernel/proc.h>
 #include <fs/super.h>
-#include "makefs_only/cmake_util.h"
+#include "fsutil/fsutil.h"
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
@@ -20,7 +20,7 @@
 #include <winix/list.h>
 #include <winix/dev.h>
 #include <fs/super.h>
-#include "makefs_only/srec_import.h"
+#include "fsutil/srec_import.h"
 
 void init_bitmap();
 

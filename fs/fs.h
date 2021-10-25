@@ -30,7 +30,7 @@
 #ifdef FSUTIL
 
 #include <stdio.h>
-#include "makefs_only/cmake_util.h"
+#include "fsutil/fsutil.h"
 
 #else // else not FSUTIL
 

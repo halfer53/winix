@@ -37,7 +37,7 @@
 
 #include <string.h>
 #include <stdio.h>
-#include "makefs_only/cmake_util.h"
+#include "fsutil/fsutil.h"
 #define kprintf(...) printf(__VA_ARGS__)
 #ifdef _DEBUG
     #define KDEBUG(token)   \

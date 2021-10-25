@@ -64,16 +64,7 @@ extern unsigned int TEXT_END, DATA_END, BSS_END;
 #define kprintf(...) printf(__VA_ARGS__)
 #define get_free_pages(num, flag)   kmalloc(num * PAGE_LEN)
 #define release_pages(ptr, num)     kfree(ptr)
-#ifdef _DEBUG
-    #define KDEBUG(token)   \
-    do{\
-        printf("[SYSTEM] "); \
-        printf token; \
-    }while(0)
-
-#else
-    #define KDEBUG(token)
-#endif
+#define klog(...)                   printf(__VA_ARGS__)
 
 #endif
 

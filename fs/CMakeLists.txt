@@ -14,9 +14,9 @@ set(SOURCE_FILES
         makefs.c
         path.c
         system/read_write.c
-        makefs_only/srec_import.c
-        makefs_only/sys_stdio.c
-        makefs_only/cmake_util.c make_disk.c makefs_only/cmake_util.h makefs_only/cmake_bitmap.c system/pipe.c makefs_only/tty.c system/stat.c system/lseek.c system/chdir_mkdir.c util.c system/chown_chmod.c system/dup.c system/link_unlink.c system/umask_access.c makefs_only/dir_util.c system/getdent.c makefs_only/srec_import.h unit_test.c system/sync.c system/mknod.c rootfs.c)
+        fsutil/srec_import.c
+        fsutil/sys_stdio.c
+        fsutil/cmake_util.c make_disk.c fsutil/fsutil.h fsutil/cmake_bitmap.c system/pipe.c fsutil/tty.c system/stat.c system/lseek.c system/chdir_mkdir.c util.c system/chown_chmod.c system/dup.c system/link_unlink.c system/umask_access.c fsutil/dir_util.c system/getdent.c fsutil/srec_import.h unit_test.c system/sync.c system/mknod.c rootfs.c)
 
 include_directories(../include/fs_include)
 include_directories(../include)
