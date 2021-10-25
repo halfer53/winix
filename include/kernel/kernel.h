@@ -58,7 +58,7 @@
 extern unsigned int TEXT_BEGIN, DATA_BEGIN, BSS_BEGIN;
 extern unsigned int TEXT_END, DATA_END, BSS_END;
 
-#ifdef MAKEFS_STANDALONE
+#ifdef FSUTIL
 
 #include <stdio.h>
 #define kprintf(...) printf(__VA_ARGS__)

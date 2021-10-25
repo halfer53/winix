@@ -20,7 +20,7 @@ set(SOURCE_FILES
 
 include_directories(../include/fs_include)
 include_directories(../include)
-add_compile_definitions(MAKEFS_STANDALONE)
+add_compile_definitions(FSUTIL)
 add_compile_definitions(_DEBUG)
 
 add_executable(fs ${SOURCE_FILES})

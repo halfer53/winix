@@ -100,7 +100,7 @@
 
 extern const char **_environ;
 
-#ifndef MAKEFS_STANDALONE
+#ifndef FSUTIL
 
 // int _syscall(int syscall_num, struct message *m);
 int wramp_syscall(int num, ...);
@@ -232,6 +232,6 @@ void sched_yield();
 
 #endif //__wramp__
 
-#endif //MAKEFS_STANDALONE
+#endif //FSUTIL
 
 #endif

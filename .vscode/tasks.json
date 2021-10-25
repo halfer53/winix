@@ -25,7 +25,7 @@
                 "-Wlogical-op",
                 "-Wunused",
                 "-D",
-                "MAKEFS_STANDALONE",
+                "FSUTIL",
                 "-I${workspaceFolder}/include/fs_include",
                 "-I${workspaceFolder}/include",
                 "${workspaceFolder}/fs/*.c",

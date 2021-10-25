@@ -33,7 +33,7 @@
 #include <winix/kstring.h>
 #include <fs/fs_methods.h>
 
-#ifdef MAKEFS_STANDALONE
+#ifdef FSUTIL
 
 #include <string.h>
 #include <stdio.h>
@@ -49,14 +49,14 @@
     #define KDEBUG(token)
 #endif
 
-#else // else not MAKEFS_STANDALONE
+#else // else not FSUTIL
 
 #include <winix/sys_stdio.h>
 #include <winix/slab.h>
 #include <winix/kdebug.h>
 #include <string.h>
 
-#endif // MAKEFS_STANDALONE
+#endif // FSUTIL
 
 #endif
 
