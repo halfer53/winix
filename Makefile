@@ -34,7 +34,7 @@ export GCC_FLAG := -Wimplicit-fallthrough -Wsequence-point -Wswitch-default -Wsw
 		-Wswitch-enum -Wstringop-truncation -Wbool-compare -Wtautological-compare -Wfloat-equal \
 		-Wshadow=global -Wpointer-arith -Wpointer-compare -Wcast-align -Wcast-qual -Wwrite-strings \
 		-Wdangling-else -Wlogical-op -Wunused -Wpointer-to-int-cast -Wno-discarded-qualifiers \
-		-Wno-builtin-declaration-mismatch
+		-Wno-builtin-declaration-mismatch -pedantic
 
 # List of user libraries used by the kernel
 KLIB_O = lib/syscall/wramp_syscall.o lib/ipc/ipc.o \
