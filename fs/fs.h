@@ -8,10 +8,6 @@
 #include <sys/stat.h>
 #include <sys/fcntl.h>
 #include <sys/dirent.h>
-#ifndef FSUTIL
-#include <sys/unistd.h>
-#endif
-#include <stdbool.h>
 
 #include <fs/type.h>
 #include <fs/common.h>
@@ -34,6 +30,7 @@
 
 #else // else not FSUTIL
 
+#include <sys/unistd.h>
 #include <winix/sys_stdio.h>
 #include <winix/slab.h>
 #include <winix/kdebug.h>

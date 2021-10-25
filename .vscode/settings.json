@@ -25,7 +25,8 @@
         "stdio.h": "c",
         "cstdio": "c",
         "fs_methods.h": "c",
-        "stdbool.h": "c"
+        "stdbool.h": "c",
+        "fsutil.h": "c"
     },
     "files.exclude": {
         "**/*.o": true,
