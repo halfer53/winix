@@ -24,6 +24,8 @@
                 "-Wdangling-else",
                 "-Wlogical-op",
                 "-Wunused",
+                "-Wpointer-to-int-cast",
+                "-Wno-discarded-qualifiers",
                 "-DFSUTIL",
                 "-I${workspaceFolder}/include/fs_include",
                 "-I${workspaceFolder}/include",

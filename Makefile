@@ -46,7 +46,7 @@ START_TIME_FILE = include/startup_time.c
 GCC_FLAG = -Wimplicit-fallthrough -Wsequence-point -Wswitch-default -Wswitch-unreachable \
 		-Wswitch-enum -Wstringop-truncation -Wbool-compare -Wtautological-compare -Wfloat-equal \
 		-Wshadow=global -Wpointer-arith -Wpointer-compare -Wcast-align -Wcast-qual -Wwrite-strings \
-		-Wdangling-else -Wlogical-op -Wunused -Wno-pointer-to-int-cast
+		-Wdangling-else -Wlogical-op -Wunused -Wpointer-to-int-cast -Wno-discarded-qualifiers
 SREC = $(shell find $(SREC_INCLUDE) -name "*.srec")
 
 all:| fsutil kbuild $(DISK) include_build
