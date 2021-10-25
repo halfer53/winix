@@ -30,11 +30,8 @@
 #else // else not FSUTIL
 
 #include <sys/unistd.h>
-#include <winix/sys_stdio.h>
-#include <winix/slab.h>
-#include <winix/kdebug.h>
 
-#endif // FSUTIL
+#endif // end of FSUTIL
 
 #endif
 
