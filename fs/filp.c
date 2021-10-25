@@ -4,7 +4,7 @@
 static filp_t fd_table[NR_FILPS];
 
 int get_fd(struct proc *curr, int start, int *open_slot, filp_t **fpt){
-    int i, idx_bak;
+    int i;
     bool found = false;
     filp_t *f;
 

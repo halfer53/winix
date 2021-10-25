@@ -61,7 +61,6 @@ int blk_dev_io_write(char *buf, off_t off, size_t len){
 }
 
 int blk_dev_init(){
-    struct superblock* sb;
     rootfs_disk_size = DISK_SIZE;
     rootfs_disk = DISK_RAW;
 #ifdef __wramp__
@@ -149,9 +148,9 @@ static struct block_operations bops = {buffered_init_block, buffered_retrieve_bl
 #endif
 
 int root_fs_read (struct filp *filp, char *data, size_t count, off_t offset){
-    int ret = 0, r, j;
+    int ret = 0, r;
     unsigned int len;
-    off_t off, end_in_block;
+    off_t off;
     unsigned int curr_fp_index, fp_limit;
     block_t bnr;
     inode_t *ino = NULL;
@@ -208,7 +207,7 @@ int root_fs_read (struct filp *filp, char *data, size_t count, off_t offset){
 // }
 
 int root_fs_write (struct filp *filp, char *data, size_t count, off_t offset){
-    int r, j, ret = 0;
+    int r, ret = 0;
     unsigned int len;
     off_t off;
     unsigned int curr_fp_index, fp_limit;

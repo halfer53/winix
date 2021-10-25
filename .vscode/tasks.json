@@ -6,6 +6,7 @@
             "command": "/usr/bin/gcc",
             "args": [
                 "-g",
+                "-Werror",
                 "-Wimplicit-fallthrough",
                 "-Wsequence-point",
                 "-Wswitch-default",

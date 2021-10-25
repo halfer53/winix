@@ -13,7 +13,7 @@ const char * dirent_array[] = {
 
 int file_size(struct proc* who, int fd){
     struct stat statbuf;
-    int ret = sys_fstat(who, fd, &statbuf);
+    (void)sys_fstat(who, fd, &statbuf);
     return statbuf.st_size;
 }
 

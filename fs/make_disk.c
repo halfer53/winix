@@ -93,7 +93,6 @@ static struct argp argp = { options, parse_opt, args_doc, doc };
 void write_disk(char* path){
     char curr_dir[100];
     int i;
-    char filename[] = "disk.c";
     char str2[] = "unsigned int DISK_RAW[] = {\n";
     char str3[] = "};\n";
     unsigned int *val = (unsigned int*)DISK_RAW;
@@ -164,7 +163,7 @@ void write_srec_list(struct list_head* lists){
     static char bin_path[] = "/bin";
     struct winix_elf_list *pos, *tmp;
     char path[PATH_LEN];
-    int ret, fd, size;
+    int ret, fd;
     int elf_size = sizeof(struct winix_elf);
     int binary_size;
     ret = sys_mkdir(curr_scheduling_proc, bin_path, 0x755);
