@@ -113,7 +113,6 @@ int decode_srec_debug(char* filepath, struct srec_debug* result){
 int decode_srec(char *path, int offset, struct srec_binary* result)
 {
     int temp = 0;
-    size_t *memory_values;
     size_t wordsLoaded = 0;
     FILE *fp;
     char *line = NULL;
@@ -200,11 +199,9 @@ int winix_load_srec_mem_val(char *line, struct srec_binary* result)
     int address = 0;
     byte data[255];
     int readChecksum = 0;
-    int datalength = 0;
     size_t memVal = 0;
     int i = 0;
     int j = 0;
-    static int debug = 1;
 
     // printf("%s\r\n",line);
     // printf("loop %d\n",linecount );

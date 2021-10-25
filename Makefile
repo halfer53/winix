@@ -60,7 +60,7 @@ unittest:
 	$(Q)./fsutil -d -t $(TEXT_OFFSET)
 
 fsutil: $(FS_DEPEND)
-	$(Q)gcc -g -DFSUTIL $(COMMON_CFLAGS) -I./include/fs_include -I./include $^ -o fsutil
+	$(Q)gcc -g -DFSUTIL $(GCC_FLAG) $(COMMON_CFLAGS) -I./include/fs_include -I./include $^ -o fsutil
 
 kbuild: $(ALLDIR)
 $(ALLDIR): FORCE
