@@ -4,7 +4,6 @@ int sys_close(struct proc *who, int fd)
 {
     filp_t *filp;
     int ret;
-    struct inode *ino;
     if (!is_fd_opened_and_valid(who, fd))
         return EBADF;
 
@@ -22,11 +21,10 @@ int root_fs_write(struct filp *filp, char *data, size_t count, off_t offset);
 int sys_open(struct proc *who, char *path, int flags, mode_t mode)
 {
     filp_t *filp;
-    int i, open_slot, ret;
+    int open_slot, ret;
     inode_t *inode = NULL, *lastdir = NULL;
     char string[DIRSIZ];
     struct device *dev;
-    mode_t file_mode;
     clock_t unix_time = get_unix_time();
 
     if ((ret = eat_path(who, path, &lastdir, &inode, string)))

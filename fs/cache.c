@@ -80,7 +80,7 @@ void enqueue_buf(struct block_buffer *tbuf) {
 }
 
 int flush_all_buffer(){
-    int j, ret;
+    int j;
     struct block_buffer* tbuf;
     for(j = 0; j < LRU_LEN; j++){
         tbuf = &buf_table[j];
@@ -205,7 +205,6 @@ void flush_super_block(struct device* dev){
 void init_buf(){
     int i=0;
     struct block_buffer *tbuf = NULL, *prevbuf = NULL;
-    char *val;
     for(i = 0; i < LRU_LEN; i++){
         tbuf = &buf_table[i];
         memset(tbuf, 0, sizeof(struct block_buffer));

@@ -50,7 +50,7 @@ int sys_unlink(struct proc* who, char *path){
 
     if(S_ISDIR(ino->i_mode)){
         ret = EISDIR;
-        goto final;
+        goto inode_err;
     }
 
     ret = remove_inode_from_dir(who, lastdir, ino, string);

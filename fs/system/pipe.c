@@ -8,7 +8,7 @@
 #include <winix/mm.h>
 
 struct device pipe_dev;
-static char* name = "pipe";
+static const char* name = "pipe";
 static ino_t next_inum = 2;
 static dev_t pipe_devid = MAKEDEV(2, 1);
 #define PIPE_LIMIT  (PAGE_LEN)
@@ -29,7 +29,6 @@ ino_t get_next_ino(){
 
 int set_filp(struct proc* who, struct filp** _file, struct inode* inode){
     int ret, open_slot;
-    struct filp* file;
     ret = get_fd(who, 0, &open_slot, _file);
     if(ret)
         return ret;
@@ -117,7 +116,6 @@ int sys_pipe(struct proc* who, int fd[2]){
 }
 
 struct pipe_waiting* get_next_waiting(struct list_head *waiting_list){
-    struct pipe_waiting *p1, *p2;
     if(!list_empty(waiting_list)){
         return list_entry(waiting_list->next, struct pipe_waiting, list);
     }

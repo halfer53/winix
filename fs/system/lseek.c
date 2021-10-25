@@ -5,7 +5,7 @@
 
 int extend_file(struct filp* file, off_t count){
     off_t user_increment, allocated = 0;
-    int pages, i;
+    int i;
     block_t bnr;
     struct inode* ino = file->filp_ino;
 

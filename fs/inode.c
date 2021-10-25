@@ -1,5 +1,5 @@
 #include "fs.h"
-int fill_dirent(inode_t* ino, struct winix_dirent* curr, char* string);
+int fill_dirent(inode_t* ino, struct winix_dirent* curr, const char* string);
 
 #define INODE_ARC_MAP_LEN   (8)
 inode_t inode_table[NR_INODES];
@@ -49,13 +49,11 @@ bool is_inode_in_use(int num, struct device* id){
     bool ret;
     struct superblock* sb = get_sb(id);
     struct block_buffer *buf;
-    unsigned int *map_ptr;
     // KDEBUG(("is inode in use %d, inode map nr %d\n", num, sb->s_inodemapnr));
     if(!is_valid_inode_num(num, id)){
         return false;
     }
     buf = get_block_buffer(sb->s_inodemapnr, id);
-    map_ptr = (unsigned int*)buf->block;
     // KDEBUG(("inode map %08x for inode %d\n", *map_ptr, num));
     ret = is_bit_on((unsigned int*)buf->block, (int)TO_WORD_SIZE(sb->s_inodemap_size), num);
     put_block_buffer(buf);
@@ -68,7 +66,6 @@ int alloc_block(inode_t *ino, struct device* id){
     block_t bmap_end = sb->s_blockmapnr + (sb->s_blockmap_size / BLOCK_SIZE);
     block_t bnr = bmap->b_blocknr;
     int free_bit = -1;
-    int ret;
 
     while(bmap->b_blocknr < bmap_end){
         free_bit = bitmap_search_from((unsigned int*) bmap->block, BLOCK_SIZE_WORD, 0, 1);
@@ -94,7 +91,6 @@ int release_block(block_t bnr, struct device* id){
     struct superblock* sb = get_sb(id);
     block_t bmap_nr = sb->s_blockmapnr + (bnr / BLOCK_SIZE);
     struct block_buffer *bmap, *block;
-    int ret;
     if(bnr > sb->s_blockmap_size){
         KDEBUG(("Invalid block id %d", bnr));
         return -1;
@@ -216,7 +212,6 @@ inode_t* get_inode(int num, struct device* id){
 
 int put_inode(inode_t *inode, bool is_dirty){
     struct superblock* sb;
-    int i = 0;
     int inum;
     unsigned int inode_block_offset;
     struct block_buffer *buffer;
@@ -239,9 +234,9 @@ int put_inode(inode_t *inode, bool is_dirty){
 
 inode_t* alloc_inode(struct proc* who, struct device* parentdev, struct device* inodev){
     struct superblock* sb;
-    int inum = 0, ret = 0;
+    int inum = 0;
     block_t imap_end = 0, bnr = 0;
-    struct block_buffer *imap, *ino_table_buffer;
+    struct block_buffer *imap;
     inode_t *inode;
     bool found = false;
     clock_t unix_time = get_unix_time();
@@ -284,10 +279,8 @@ inode_t* alloc_inode(struct proc* who, struct device* parentdev, struct device* 
 }
 
 int truncate_inode(inode_t *inode){
-    struct block_buffer *imap;
     block_t zone_id;
     int i = 0;
-    int ret;
 
     for(i = 0; i < NR_TZONES; i++){
         zone_id = inode->i_zone[i];
@@ -308,7 +301,6 @@ int release_inode(inode_t *inode){
     struct block_buffer *imap;
     block_t zone_id;
     int i = 0;
-    int ret;
     if(inode->i_count != 0){
         kprintf("[ERROR]: %d is in use before releasing\n", inum);
         return EINVAL;
@@ -336,7 +328,7 @@ int release_inode(inode_t *inode){
 }
 
 
-int fill_dirent(inode_t* ino, struct winix_dirent* curr, char* string){
+int fill_dirent(inode_t* ino, struct winix_dirent* curr, const char* string){
     mode_t mode = ino->i_mode;
     char32_strlcpy(curr->dirent.d_name, string, DIRNAME_LEN);
     curr->dirent.d_ino = ino->i_num;
@@ -378,7 +370,7 @@ int init_dirent(inode_t* dir, inode_t* ino){
 
 
 int add_inode_to_directory(struct proc* who, struct inode* dir, struct inode* ino, char* string){
-    int i, j, ret;
+    int i;
     block_t bnr;
     struct winix_dirent* curr, *end;
     struct block_buffer* buf;
@@ -420,7 +412,6 @@ int remove_inode_from_dir(struct proc* who, struct inode* dir, struct inode* tar
     block_t bnr;
     struct block_buffer* buf;
     struct winix_dirent *curr, *end;
-    int ret;
 
     if(!has_file_access(who, dir, W_OK))
         return EACCES;

@@ -33,7 +33,6 @@ int sys_mkdir(struct proc* who, char* pathname, mode_t mode){
     struct inode *lastdir = NULL, *ino = NULL;
     int ret = OK;
     bool is_dirty = false;
-    block_t bnr;
 
     ret = eat_path(who, pathname, &lastdir, &ino, string);
     if(ret)

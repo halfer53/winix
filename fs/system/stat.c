@@ -23,7 +23,6 @@ void set_statbuf(struct inode* inode, struct stat* statbuf){
 }
 
 int sys_fstat(struct proc* who, int fd, struct stat* statbuf){
-    int ret;
     struct filp* file;
     if(!is_fd_opened_and_valid(who, fd))
         return EBADF;
