@@ -52,12 +52,29 @@
 
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
 
-
-
 #define STR_MALLEN(x) (strlen(x) + 1)
 
 // Memory limits
 extern unsigned int TEXT_BEGIN, DATA_BEGIN, BSS_BEGIN;
 extern unsigned int TEXT_END, DATA_END, BSS_END;
+
+#ifdef MAKEFS_STANDALONE
+
+#include <stdio.h>
+#define kprintf(...) printf(__VA_ARGS__)
+#define get_free_pages(num, flag)   kmalloc(num * PAGE_LEN)
+#define release_pages(ptr, num)     kfree(ptr)
+#ifdef _DEBUG
+    #define KDEBUG(token)   \
+    do{\
+        printf("[SYSTEM] "); \
+        printf token; \
+    }while(0)
+
+#else
+    #define KDEBUG(token)
+#endif
+
+#endif
 
 #endif

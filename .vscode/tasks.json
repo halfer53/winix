@@ -31,6 +31,7 @@
                 "${workspaceFolder}/fs/*.c",
                 "${workspaceFolder}/fs/system/*.c",
                 "${workspaceFolder}/fs/makefs_only/*.c",
+                "${workspaceFolder}/winix/bitmap.c",
                 "-o",
                 "${workspaceFolder}/fsutil"
             ],
