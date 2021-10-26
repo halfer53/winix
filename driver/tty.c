@@ -15,7 +15,7 @@
 #include <winix/list.h>
 #include <string.h>
 #include <ctype.h>
-#include <winix/sigsend.h>
+#include <winix/ksignal.h>
 
 
 #define CTRL_A  (1)

@@ -13,7 +13,7 @@
 */
 #include <kernel/kernel.h>
 #include <kernel/exception.h>
-#include <winix/sigsend.h>
+#include <winix/ksignal.h>
 
 /**
     addui $sp, $sp, 1

@@ -4,7 +4,7 @@
 
 #include "../fs.h"
 #include <winix/list.h>
-#include <winix/sigsend.h>
+#include <winix/ksignal.h>
 #include <winix/mm.h>
 
 struct device pipe_dev;

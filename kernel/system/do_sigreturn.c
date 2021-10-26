@@ -14,7 +14,7 @@
  * 
 */
 #include <kernel/kernel.h>
-#include <winix/sigsend.h>
+#include <winix/ksignal.h>
 
 int do_sigreturn(struct proc *who, struct message *m){
     reg_t *sp;

@@ -1,5 +1,5 @@
 #include <kernel/kernel.h>
-#include <winix/sigsend.h>
+#include <winix/ksignal.h>
 /**
  * Syscall in this file: sigprocmask
  * Input:   m1_i1: how
