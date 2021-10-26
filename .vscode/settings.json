@@ -28,7 +28,8 @@
         "fsutil.h": "c",
         "stddef.h": "c",
         "wini_ipc.h": "c",
-        "comm.h": "c"
+        "comm.h": "c",
+        "compiler.h": "c"
     },
     "files.exclude": {
         "**/*.o": true,

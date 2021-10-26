@@ -108,7 +108,6 @@ struct mem_block* split_block(struct mem_block *b, size_t s)
 /* return NULL if things go wrong */
 struct mem_block *extend_heap(struct mem_block *first , size_t s)
 {
-    int *sb;
     struct mem_block *b, *b2;
     ptr_t *ptr;
     size_t round_s;
@@ -189,7 +188,6 @@ struct mem_block *get_block(void *p){
 /* Valid addr for free */
 bool valid_addr(void *p)
 {
-    struct mem_block *b;
     bool result = p && (get_block(p))->ptr == p;
     return result;
 }
@@ -198,7 +196,7 @@ struct mem_block *fusion(struct mem_block *b) {
     struct mem_block* next = b->next;
     // KDEBUG(("before fusing %x ", b->data));
     // kprint_slab();
-    if (next && next->free && ((int)(b->ptr) + b->size == (int)next)) {
+    if (next && next->free && ((char *)(b->ptr) + b->size == (char *)next)) {
         b->size += SLAB_HEADER_SIZE + next->size;
         b->next = next->next;
         if(next == base){

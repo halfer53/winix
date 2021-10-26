@@ -246,7 +246,7 @@ static void fill_padding(struct printf_buffer* tbuf, char token, int len){
 }
 
 static int pass_number(const char **s_format){
-    char *format = *s_format;
+    const char *format = *s_format;
     int ret = 0;
     char padding_num_buffer[PADDING_NUM_BUF_SIZ];
     int padding_num_buffer_count = 0;
