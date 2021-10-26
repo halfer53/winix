@@ -19,6 +19,7 @@ else
 	Q = @
 endif
 
+export NO_MAKE_DEPEND := $(N)
 export KBUILD_VERBOSE
 export Q
 export srctree \\

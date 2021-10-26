@@ -35,7 +35,7 @@ srecobj := $(addprefix $(src)/, $(srec-y))
 
 PHONY := __build
 
-__build: $(assembly) $(objects) $(srcdepend) $(subdir-y) $(srecobj)
+__build: $(assembly) $(objects) $(subdir-y) $(srecobj)
 $(assembly): %.s: %.c 
 #$(Q)gcc $(CFLAGS) $(GCC_FLAG) -S -N -I./include/posix_include -I./include $<
 	$(Q)wcc $(CFLAGS) -S -N -I./include/posix_include -I./include -o $@ $<
@@ -49,8 +49,10 @@ ifeq ($(KBUILD_VERBOSE),0)
 	@echo "AS \t $<"
 endif
 
+ifneq ($(NO_MAKE_DEPEND),1)
 $(srcdepend): $(source) $(includes)
 	$(Q)makedepend -o.s -f- -I./include/posix_include -I./include $(source) > $(srcdepend)
+endif
 
 $(subdir-y): FORCE
 	$(Q)$(MAKE) $(build)=$@

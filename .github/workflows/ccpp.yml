@@ -17,11 +17,9 @@ jobs:
       run: echo "ACTIONS_ALLOW_UNSECURE_COMMANDS=true" >> "${GITHUB_ENV}"
     - name: path
       run: echo "${{github.workspace}}/tools/bin" >> "${GITHUB_PATH}"
-    - name: makedepend
-      run: sudo apt-get install xutils-dev
     - name: make
-      run: make
-    - name: Unit Test
+      run: make N=1
+    - name: unit test
       run: make unittest
     - uses: actions/upload-artifact@v2
       with:
