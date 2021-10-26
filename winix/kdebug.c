@@ -79,7 +79,7 @@ void stop_debug_syscall(){
 }
 
 void kreport_readyqueue(){
-    int i,j;
+    int i;
     struct proc* curr;
     kprintf(" q| ");
     for (i = 0; i < NUM_QUEUES; i++) {

@@ -1,7 +1,7 @@
-#include <stdio.h>
-#include <stdlib.h>
+#include <kernel/kernel.h>
+#include <winix/sys_stdio.h>
 
-static char rcsid[] = "$Id$";
+// static char rcsid[] = "$Id$";
 
 struct callsite {
 	char *file, *name;
