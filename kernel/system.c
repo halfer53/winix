@@ -23,7 +23,7 @@
 #include <fs/super.h>
 
 PRIVATE struct message _message;
-PRIVATE int who_proc_nr;
+PRIVATE int curr_caller_proc_nr;
 PRIVATE int curr_syscall;
 PRIVATE struct proc *curr_caller;
 PRIVATE ucontext_t recv_ctx;
@@ -44,8 +44,8 @@ void system_main() {
     while(true) {
         // get a message
         winix_receive(mesg);
-        who_proc_nr = mesg->src;
-        curr_caller = get_proc(who_proc_nr);
+        curr_caller_proc_nr = mesg->src;
+        curr_caller = get_proc(curr_caller_proc_nr);
         if(!curr_caller)
             continue;
 
@@ -67,7 +67,7 @@ void system_main() {
             case DONTREPLY:
                 break;
             default:
-                syscall_reply2(curr_syscall, reply, who_proc_nr, mesg);
+                syscall_reply2(curr_syscall, reply, curr_caller_proc_nr, mesg);
         }
 
         syscall_region_end();
@@ -114,14 +114,14 @@ void syscall_region_begin(){
     SET_CALLER(curr_caller);
     // Make sure system doesn't send a message to itself
     
-    ASSERT(who_proc_nr != SYSTEM); 
+    ASSERT(curr_caller_proc_nr != SYSTEM); 
 }
 
 void syscall_region_end(){
     SYSTEM_TASK->flags &= ~BILLABLE;
     // reset messages
     memset(&_message, 0, sizeof(struct message));
-    who_proc_nr = 0;
+    curr_caller_proc_nr = 0;
     curr_syscall = 0;
 }
 
@@ -258,7 +258,7 @@ struct message *curr_mesg(){
 }
 
 int curr_proc_nr(){
-    return who_proc_nr;
+    return curr_caller_proc_nr;
 }
 
 int curr_syscall_num(){
@@ -266,7 +266,7 @@ int curr_syscall_num(){
 }
 
 bool is_in_syscall(struct proc* who){
-    return who->state & STATE_RECEIVING && who_proc_nr == who->proc_nr;
+    return who->state & STATE_RECEIVING && curr_caller_proc_nr == who->proc_nr;
 }
 
 int syscall_reply(int reply, int dest,struct message* m){
