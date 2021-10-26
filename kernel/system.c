@@ -22,10 +22,10 @@
 #include <winix/welf.h>
 #include <fs/super.h>
 
-PRIVATE struct message m;
+PRIVATE struct message _message;
 PRIVATE int who_proc_nr;
 PRIVATE int curr_syscall;
-PRIVATE struct proc *who;
+PRIVATE struct proc *curr_caller;
 PRIVATE ucontext_t recv_ctx;
 
 bool trace_syscall = false;
@@ -36,7 +36,7 @@ bool trace_syscall = false;
 void system_main() {
     int reply;
     syscall_handler_t handler;
-    struct message* mesg = &m;
+    struct message* mesg = &_message;
 
     kreport_sysinfo();
     getcontext(&recv_ctx);
@@ -45,8 +45,8 @@ void system_main() {
         // get a message
         winix_receive(mesg);
         who_proc_nr = mesg->src;
-        who = get_proc(who_proc_nr);
-        if(!who)
+        curr_caller = get_proc(who_proc_nr);
+        if(!curr_caller)
             continue;
 
         syscall_region_begin();
@@ -59,7 +59,7 @@ void system_main() {
         if(!handler)
             handler = syscall_not_implemented;
         
-        reply = handler(who, mesg);
+        reply = handler(curr_caller, mesg);
         
 
         switch(reply){
@@ -95,23 +95,23 @@ void system_main() {
 }
 
 void syscall_region_begin(){
-    ASSERT(who != NULL);
+    ASSERT(curr_caller != NULL);
 
     // Bill the user proc's sys_used_time while executing syscall
     // on behalf of the user process
-    set_bill_ptr(who);
+    set_bill_ptr(curr_caller);
     SYSTEM_TASK->flags |= BILLABLE;
-    curr_syscall = m.type;
-    who->syscall_start_time = get_uptime();
+    curr_syscall = _message.type;
+    curr_caller->syscall_start_time = get_uptime();
 
     // the following two are defensive statements
     // to ensure the caller is suspended while the system
     // is handling the system call
 
-    who->state |= STATE_RECEIVING;
+    curr_caller->state |= STATE_RECEIVING;
     // dequeue_schedule(who);
     
-    SET_CALLER(who);
+    SET_CALLER(curr_caller);
     // Make sure system doesn't send a message to itself
     
     ASSERT(who_proc_nr != SYSTEM); 
@@ -120,7 +120,7 @@ void syscall_region_begin(){
 void syscall_region_end(){
     SYSTEM_TASK->flags &= ~BILLABLE;
     // reset messages
-    memset(&m, 0, sizeof(struct message));
+    memset(&_message, 0, sizeof(struct message));
     who_proc_nr = 0;
     curr_syscall = 0;
 }
@@ -254,7 +254,7 @@ int syscall_not_implemented(struct proc* who, struct message *m){
 }
 
 struct message *curr_mesg(){
-    return &m;
+    return &_message;
 }
 
 int curr_proc_nr(){
@@ -276,11 +276,11 @@ int syscall_reply(int reply, int dest,struct message* m){
 
 int syscall_reply2(int syscall_num, int reply, int dest, struct message* m){
     char buf[32];
-    char* p = buf;
+    const char* p = buf;
     struct proc* pDest = get_proc(dest);
     if(trace_syscall && syscall_num > 0 && syscall_num < _NSYSCALL){
         if(reply < 0){
-            p = (char*)kstr_error(reply);
+            p = kstr_error(reply);
         }else{
             kputd_buf(reply, buf);
         }
