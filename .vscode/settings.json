@@ -25,7 +25,10 @@
         "cstdio": "c",
         "fs_methods.h": "c",
         "stdbool.h": "c",
-        "fsutil.h": "c"
+        "fsutil.h": "c",
+        "stddef.h": "c",
+        "wini_ipc.h": "c",
+        "comm.h": "c"
     },
     "files.exclude": {
         "**/*.o": true,

@@ -1,6 +1,7 @@
 #ifndef _K_COMPILER_H_
 #define _K_COMPILER_H_ 1
 
+void _panic(const char *str, const char* file);
 void _assert(int expression, int line, char* filename);
 
 #define BUILD_BUG_ON(condition) extern int build_bug_on[(condition) ? 0 : 1]

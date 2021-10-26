@@ -20,6 +20,7 @@
 #include <sys/dirent.h>
 #include <sys/statfs.h>
 #include <sys/stat.h>
+#include <sys/times.h>
 #include <signal.h>
 #include <stdio.h>
 #include <errno.h>

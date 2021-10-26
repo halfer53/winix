@@ -3,7 +3,7 @@
 
 #include <stddef.h>
 #include <sys/types.h>
-#include	<sys/syscall.h>
+#include <sys/syscall.h>
 
 #define EXIT_SUCCESS 0
 #define EXIT_FAILURE 1
@@ -21,5 +21,6 @@ int putenv(char *name);
 int setenv(const char *name, const char *value, int overwrite);
 void srand(unsigned int seed);
 int rand(void);
+int atoi(char *str);
 
 #endif

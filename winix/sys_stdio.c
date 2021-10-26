@@ -17,6 +17,8 @@
 #include <ctype.h>
 #include <winix/dev.h>
 
+int atoi(char *str);
+
 const char *errlist[_NERROR] = {
     0,			/* EGENERIC */    
     "EPERM",    /* EPERM */
@@ -148,7 +150,7 @@ int kputd_buf(int n, char *buf) {
 int kputs_vm_buf(char *s, void *who_rbase, char *buf) {
     char *sp = s;
     int offset = 0;
-    sp += (int)who_rbase;
+    sp += (int)((char *)who_rbase - (char *)0);
     while(*sp){
         *buf++ = *sp++;
         offset++;
@@ -243,7 +245,7 @@ static void fill_padding(struct printf_buffer* tbuf, char token, int len){
     }
 }
 
-static int pass_number(char **s_format){
+static int pass_number(const char **s_format){
     char *format = *s_format;
     int ret = 0;
     char padding_num_buffer[PADDING_NUM_BUF_SIZ];
@@ -277,8 +279,7 @@ int kprintf_vm( struct filp* file, const char *orignal_format, void *arg, ptr_t 
     int padding_direction;
     int format_buf_len;
     int (*filp_write)(struct filp *, char *, size_t, off_t );
-    char* format = (char*)orignal_format;
-    char prev;
+    const char* format = (const char*)orignal_format;
     char token;
     
     memset(this_buffer, 0, sizeof(struct printf_buffer));
@@ -313,7 +314,6 @@ int kprintf_vm( struct filp* file, const char *orignal_format, void *arg, ptr_t 
                 //ignore
             }
 
-            prev = *format;
             switch(*format) {
                 
                 case 'd':
@@ -326,7 +326,7 @@ int kprintf_vm( struct filp* file, const char *orignal_format, void *arg, ptr_t 
                     break;
 
                 case 's':
-                    format_ptr = *(char **)arg + (int)who_rbase;
+                    format_ptr = *(char **)arg + (unsigned long)who_rbase;
                     if(format_ptr){
                         format_buf_len = strlen(format_ptr);
                     }
