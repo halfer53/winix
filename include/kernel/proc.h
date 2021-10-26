@@ -291,6 +291,8 @@ int exec_welf(struct proc* who, char* path, char *argv[], char *envp[], bool is_
 void release_proc_mem(struct proc *who);
 int alloc_mem_welf(struct proc* who, struct winix_elf* elf, int stack_size, int heap_size);
 void task_exit();
+void exit_proc(struct proc *who, int status, int signum);
+int check_waiting(struct proc* who);
 void wramp_break();
 
 #define release_proc_slot(p)    release_zombie(p)

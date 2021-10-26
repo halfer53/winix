@@ -24,6 +24,8 @@
 int send_sig(struct proc *who, int signum);
 int cause_sig(struct proc *who, int signum);
 int is_sigpending(struct proc* who);
+int handle_sig(struct proc* who, int signum);
+int handle_pendingsig(struct proc* who);
 
 #define SIG_FRAME_CODE_LEN  (2)
 
