@@ -293,6 +293,7 @@ int alloc_mem_welf(struct proc* who, struct winix_elf* elf, int stack_size, int 
 void task_exit();
 void exit_proc(struct proc *who, int status, int signum);
 int check_waiting(struct proc* who);
+int dequeue_schedule( struct proc *h);
 void wramp_break();
 
 #define release_proc_slot(p)    release_zombie(p)
