@@ -63,12 +63,15 @@ unittest:
 
 fsutil: $(FS_DEPEND)
 	$(Q)gcc -g -DFSUTIL -Werror $(GCC_FLAG) $(COMMON_CFLAGS) -I./include/fs_include -I./include $^ -o fsutil
+ifeq ($(KBUILD_VERBOSE),0)
+	@echo "CC \t fsutil"
+endif
 
 kbuild: $(ALLDIR)
 $(ALLDIR): FORCE
 	$(Q)$(MAKE) $(build)=$@
 
-$(DISK): $(SREC)
+$(DISK): $(SREC) fsutil
 	$(Q)./fsutil -t $(TEXT_OFFSET) -o $(DISK) -s $(SREC_INCLUDE) -u $(CURR_UNIX_TIME)
 ifeq ($(KBUILD_VERBOSE),0)
 	@echo "LD \t disk.c"
