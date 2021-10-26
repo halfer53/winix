@@ -130,11 +130,13 @@ void set_syscall_mesg_exception(int operation, ptr_t* sp, struct message *m, str
     {
     case LSEEK:
         m->m1_i3 = *(sp + 2);
+        /* FALLTHRU */
     case EXIT:
     case KILL:
     case SETPGID:
     case DUP2:
         m->m1_i2 = *(sp + 1);
+        /* FALLTHRU */
     case ALARM:
     case SYSCONF:
     case SIGSUSPEND:
@@ -170,12 +172,15 @@ void set_syscall_mesg_exception(int operation, ptr_t* sp, struct message *m, str
         
     case SIGACTION:
         m->m1_i1 = *(sp + 3);
+        /* FALLTHRU */
     case EXECVE:
         m->m1_p3 = (void*)*(sp + 2);
+        /* FALLTHRU */
     case STAT:
     case LINK:
     case STATFS:
         m->m1_p2 = (void *)*(sp + 1);
+        /* FALLTHRU */
     case TIMES:
     case BRK:
     case SIGPENDING:
