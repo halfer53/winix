@@ -34,6 +34,8 @@ bool is_vaddr_ok(vptr_t* addr,struct proc* who);
 #define user_free_page(who,page)        (user_release_pages((who),(page),1))
 
 int next_free_page_index();
+int peek_next_free_page();
+int peek_last_free_page();
 
 void* dup_vm(struct proc* parent, struct proc* child);
 void kreport_ptable(struct proc* who);

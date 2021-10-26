@@ -125,7 +125,8 @@ void syscall_region_end(){
     curr_syscall = 0;
 }
 
-void set_syscall_mesg_exception(int operation, ptr_t* sp, struct message *m, struct proc* who){
+void set_syscall_mesg_exception(int operation, ptr_t* osp, struct message *m, struct proc* who){
+    unsigned long *sp = (unsigned long*)osp;
     switch (operation)
     {
     case LSEEK:
