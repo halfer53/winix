@@ -86,8 +86,8 @@ int do_send(int dest, struct message *m) {
  * Returns:            0
  **/
 int do_receive(struct message *m) {
-    struct proc *p, *bak;
-    int i, pending;
+    struct proc *p;
+    int i;
 
     // if(!list_empty(&curr_scheduling_proc->notify_queue)){
     //     // KDEBUG(("not empty"));
@@ -152,7 +152,7 @@ int do_receive(struct message *m) {
  **/
 int do_notify(int src, int dest, struct message *m) {
     struct proc *pDest, *pSrc;
-    int reply, syscall_num;
+    int syscall_num;
     char *msg_type = "";
     // Is the destination valid?
     if (pDest = get_proc(dest)) {
