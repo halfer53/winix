@@ -131,7 +131,6 @@ ptr_t* user_get_free_pages(struct proc* who, int length, int flags){
  * @return      
  */
 int get_free_pages_from(ptr_t* addr, int size){
-    int ret;
     int paged, page_num;
 
     // kprintf("extending from 0x%x with size %d\n", addr, size);
@@ -184,7 +183,7 @@ int peek_last_free_page(){
  */
 int release_pages(ptr_t* page, int len){
     int page_index;
-    if((int)page % PAGE_LEN != 0)
+    if((unsigned long)page % PAGE_LEN != 0)
         return ERR;
     page_index = PADDR_TO_PAGED(page);
     return bitmap_clear_nbits(mem_map, MEM_MAP_LEN, page_index, len);
@@ -240,7 +239,7 @@ void release_proc_mem(struct proc *who){
         user_release_pages(who, who->stack_top, 1);
     }else{
         int page_len = (int)(who->heap_bottom + 1 - who->mem_start) / PAGE_LEN;
-        int start_page = (int)who->mem_start / PAGE_LEN;
+        int start_page = (unsigned long)who->mem_start / PAGE_LEN;
         bitmap_clear_nbits(mem_map, MEM_MAP_LEN, start_page, page_len );
         // bitmap_xor(mem_map, who->ctx.ptable, MEM_MAP_LEN);
         bitmap_clear(who->ctx.ptable, PTABLE_LEN);
@@ -271,10 +270,10 @@ void kreport_sysmap(){
 
 
 void init_mem_table() {
-    int len, i;
-    uint32_t free_mem_begin;
+    int len;
+    unsigned long free_mem_begin;
 
-    free_mem_begin = (uint32_t)&BSS_END;
+    free_mem_begin = (unsigned long)&BSS_END;
     free_mem_begin |= 0x03ff;
     free_mem_begin++;
     len = free_mem_begin / PAGE_LEN;

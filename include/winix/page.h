@@ -24,8 +24,8 @@ int align_page(int len);
 #define get_physical_addr(va,proc)      (((ptr_t*)(va))+(unsigned long)(proc)->ctx.rbase)
 #define get_virtual_addr(pa,proc)       (((ptr_t*)(pa))-(unsigned long)(proc)->ctx.rbase)
 
-#define PAGE_TO_PADDR(_index)           ((ptr_t *)((_index) * PAGE_LEN))
-#define PADDR_TO_PAGED(addr)            ((int)(addr) / PAGE_LEN)
+#define PAGE_TO_PADDR(_index)           ((ptr_t *)((unsigned long)(_index) * PAGE_LEN))
+#define PADDR_TO_PAGED(addr)            ((unsigned long)(addr) / PAGE_LEN)
 #define PADDR_TO_NUM_PAGES(addr)        ((int)align_page(addr) / PAGE_LEN)
 
 #define PAGE_TO_VADDR(_index,who)       (get_virtual_addr(PAGE_TO_PADDR(_index),who))

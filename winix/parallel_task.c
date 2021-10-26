@@ -72,6 +72,9 @@ void parallel_main() {
             case 3:
                 task_exit();
                 return; // exit
+            
+            default:
+                break;
         }
         
         // Display the number
@@ -82,6 +85,9 @@ void parallel_main() {
                 
             case DEC:
                 printDec(n);
+                break;
+            
+            default:
                 break;
         }
     }
