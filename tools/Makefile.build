@@ -31,18 +31,13 @@ obj-y := $(filter-out %/,$(obj-y))
 objects := $(addprefix $(src)/, $(obj-y) $(asm-y:%.s=%.o))
 assembly := $(addprefix $(src)/, $(obj-y:%.o=%.s))
 source := $(addprefix $(src)/, $(obj-y:%.o=%.c))
-srecobj := $(srec-y)
-# srecobj := $(addprefix $(SREC_INCLUDE)/, $(srec-y))
 srecobj := $(addprefix $(src)/, $(srec-y))
-# srecdep := $(foreach dep, $(srec-y), $(addprefix $(src)/, $($(dep))) )
+
+PHONY := __build __lint
 
 
-PHONY := __build 
-
-
-__build: $(assembly) $(objects) $(srcdepend) $(subdir-y) $(srecobj) 
+__build: $(assembly) $(objects) $(srcdepend) $(subdir-y) $(srecobj)
 $(assembly): %.s: %.c 
-# $(Q)gcc $(CFLAGS) $(GCC_FLAG) -S -N -I./include/posix_include -I./include $< 
 	$(Q)wcc $(CFLAGS) -S -N -I./include/posix_include -I./include -o $@ $<
 ifeq ($(KBUILD_VERBOSE),0)
 	@echo "CC \t $<"
@@ -66,6 +61,11 @@ $(subdir-y): FORCE
 	$(Q)cp $@ $(SREC_INCLUDE)/$(notdir $@)
 ifeq ($(KBUILD_VERBOSE),0)
 	@echo "LD \t $@"
+endif
+
+__lint: 
+ifneq ($(source),)
+	$(Q)gcc $(CFLAGS) $(GCC_FLAG) -S -N -I./include/posix_include -I./include $(source)
 endif
 
 FORCE:
