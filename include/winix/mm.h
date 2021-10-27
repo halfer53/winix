@@ -27,6 +27,7 @@ ptr_t* user_get_free_pages(struct proc* who, int length, int flags);
 bool is_vaddr_ok(vptr_t* addr,struct proc* who);
 void add_free_mem(void* addr, size_t size);
 void kprint_slab();
+int user_get_free_pages_from(struct proc* who, ptr_t* addr, int size);
 
 #define is_vaddr_accessible(addr, who) is_vaddr_ok((vptr_t*)addr, who)
 #define free_page(page)         (release_pages((page),1))

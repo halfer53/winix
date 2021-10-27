@@ -45,7 +45,6 @@
 ptr_t* sys_sbrk(struct proc *who, int size){
     ptr_t* next_page;
     int err;
-    void* oheap;
     int residual, request_size;
 
     if(size == 0)
@@ -84,7 +83,7 @@ ret_result:
 
 int do_sbrk(struct proc* who, struct message *m){
     ptr_t* ret = sys_sbrk(who, m->m1_i1);
-    return (int)get_virtual_addr(ret, who);
+    return (int)(get_virtual_addr(ret, who) - (vptr_t*)0);
 }
 
 // syscall for brk()
@@ -94,9 +93,8 @@ int do_sbrk(struct proc* who, struct message *m){
 int do_brk(struct proc *who, struct message *m){
     int size;
     ptr_t* new_brk;
-    vptr_t* vaddr = m->m1_p1, *vheapbrk;
+    vptr_t* vaddr = m->m1_p1;
     ptr_t* addr = get_physical_addr(m->m1_p1, who);
-    ptr_t* heap_top;
 
     
     m->m1_p1 = get_virtual_addr(who->heap_break, who);
@@ -111,7 +109,7 @@ int do_brk(struct proc *who, struct message *m){
         return OK;
     }
 
-    size = (int)addr - (int)who->heap_break;
+    size = (int)((unsigned long)addr - (unsigned long)who->heap_break);
     new_brk = sys_sbrk(who, size);
     if(new_brk == NULL)
         return ENOMEM;
