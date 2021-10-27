@@ -19,7 +19,6 @@ DIR *opendir(const char *pathname){
 }
 
 struct dirent *readdir(DIR *directory){
-   struct dirent* dir;
    int ret;
 
    if(directory->limit){

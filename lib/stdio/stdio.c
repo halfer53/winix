@@ -54,7 +54,7 @@ int fclose(FILE *stream){
 
 int getc(FILE* stream){
     int ret;
-    unsigned char* buf_end, *buf_count_end;
+    unsigned char* buf_end;
     if(stream->_flags & _IOEOF)
         return EOF;
 

@@ -2,7 +2,6 @@
 int atoi(char *str)
 {
     int res = 0; // Initialize result
-    int i;
     char* p = str;
     // Iterate through all characters of input string and
     // update result
