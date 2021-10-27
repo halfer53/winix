@@ -3,6 +3,7 @@
 
 #define REBALANCE_TIMEOUT   (36)
 
+void init_sched();
 void rebalance_queues(int proc_nr, clock_t time);
 void sched();
 struct proc *pick_proc();

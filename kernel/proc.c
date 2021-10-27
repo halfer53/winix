@@ -18,6 +18,7 @@
 #include <winix/srec.h>
 #include <winix/welf.h>
 #include <winix/list.h>
+#include <winix/bitmap.h>
 
 // Linked lists are defined by a head and tail pointer.
 
@@ -184,7 +185,6 @@ void enqueue_tail(struct proc **q, struct proc *proc) {
  *   proc    The proc struct to add to the list.
  **/
 void enqueue_head(struct proc **q, struct proc *proc) {
-    struct proc *curr = NULL;
     if (q[HEAD] == NULL) {
         proc->next = NULL;
         q[HEAD] = q[TAIL] = proc;
@@ -334,7 +334,6 @@ void proc_set_default(struct proc *p) {
  * @return      virtual address of the stack
  */
 reg_t* alloc_kstack(struct proc *who, int size){
-    int index;
     ptr_t *addr, *stack_top;
 
     if(size % PAGE_LEN == 0){
@@ -454,7 +453,6 @@ int alloc_mem_welf(struct proc* who, struct winix_elf* elf, int stack_size, int 
     int proc_len;
     int td_aligned;
     ptr_t *bss_start;
-    int bss_size;
     ptr_t* mem_start;
 
     if(elf->magic != WINIX_ELF_MAGIC)

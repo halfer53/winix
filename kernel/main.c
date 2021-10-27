@@ -14,8 +14,10 @@
 
 #include <kernel/kernel.h>
 #include <kernel/table.h>
-#include <winix/bitmap.h>
 #include <fs/fs_methods.h>
+#include <kernel/sched.h>
+#include <winix/bitmap.h>
+#include <winix/dev.h>
 
 void init_kernel_tasks();
 void start_init();
