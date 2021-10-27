@@ -107,7 +107,7 @@ int substring(char* buffer, char* original, int start_index, int length) {
 
 
 char *index(const char *string, int c){
-    char *s = (char *)string;
+    const char *s = string;
     while(*s && *s != c)
         s++;
     return *s ? s : NULL;
@@ -133,8 +133,8 @@ int compare(const char *X, const char *Y)
 // Function to implement strstr() function
 char* strstr(const char* haystack, const char* needle)
 {
-    char *X = (char *)haystack;
-    char *Y = (char *)needle;
+    const char *X = haystack;
+    const char *Y = needle;
 	while (*X != '\0')
 	{
 		if ((*X == *Y) && compare(X, Y))
@@ -166,7 +166,7 @@ size_t strspn(const char *s1, const char *s2)
 
 void *memmove(void *dest, const void *src, size_t n)
 {
-	char* from = (char*) src;
+	const char* from = (const char*) src;
 	char* to = (char*) dest;
 
 	if (from == to || n == 0)
