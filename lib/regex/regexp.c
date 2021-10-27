@@ -170,7 +170,7 @@ const char *exp;
 		FAIL("NULL argument to regcomp");
 
 	/* First pass: determine size, legality. */
-	co.regparse = (char *)exp;
+	co.regparse = (char *)(unsigned long)exp;
 	co.regnpar = 1;
 	co.regsize = 0L;
 	co.regdummy[0] = NOTHING;
@@ -190,7 +190,7 @@ const char *exp;
 		FAIL("out of space");
 
 	/* Second pass: emit code. */
-	co.regparse = (char *)exp;
+	co.regparse = (char *)(unsigned long)exp;
 	co.regnpar = 1;
 	co.regcode = r->program;
 	regc(&co, MAGIC);
@@ -383,6 +383,7 @@ int *flagp;
 	case '*':	*flagp = WORST|SPSTART;			break;
 	case '+':	*flagp = WORST|SPSTART|HASWIDTH;	break;
 	case '?':	*flagp = WORST;				break;
+	default:	break;
 	}
 
 	if (op == '*' && (flags&SIMPLE))
@@ -666,7 +667,7 @@ regexec(prog, str)
 regexp *prog;
 const char *str;
 {
-	char *string = (char *)str;	/* avert const poisoning */
+	const char *string = (char *)(unsigned long)str;	/* avert const poisoning */
 	char *s;
 	struct exec ex;
 
