@@ -1,4 +1,5 @@
 #include "../fs.h"
+#include <kernel/clock.h>
 
 int sys_close(struct proc *who, int fd)
 {

@@ -11,13 +11,9 @@
 /*
  - regsub - perform substitutions after a regexp match
  */
-void
-regsub(rp, source, dest)
-const regexp *rp;
-const char *source;
-char *dest;
+void regsub(const regexp *rp, const char *source, char *dest)
 {
-	register regexp * const prog = (const regexp *)rp;
+	register const regexp * prog = (const regexp *)rp;
 	register char *src = (char *)(unsigned long)source;
 	register char *dst = dest;
 	register char c;

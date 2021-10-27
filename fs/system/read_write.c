@@ -1,5 +1,5 @@
 #include "../fs.h"
-#include <winix/sys_stdio.h>
+#include <kernel/clock.h>
 
 int sys_read(struct proc *who,int fd, void *buf, size_t count){
     struct filp* file;

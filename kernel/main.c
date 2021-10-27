@@ -26,7 +26,7 @@ void start_bins();
 /**
  * Entry point for WINIX.
  **/
-void main() {
+int main() {
     int bss_len = &BSS_END - &BSS_BEGIN;
     memset(&BSS_BEGIN, 0, bss_len);
     
@@ -47,6 +47,9 @@ void main() {
 
     init_exceptions();
     sched();
+    // c standard requires main to return int, satisfy them
+    // in kernel, this is never reached
+    return 0;
 }
 
 void init_kernel_tasks(){

@@ -250,7 +250,7 @@ int do_ls(char* pathname, int flag){
            print_long_format(path_buffer, flag);
        }else{
            symbol = (dir->d_type == DT_DIR && *dir->d_name != '.')  ? slash : "";
-            printf("%s%ls  ", symbol, dir->d_name);
+            printf("%s%s  ", symbol, (char *)dir->d_name);
        }
        
    }

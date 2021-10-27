@@ -60,10 +60,15 @@ int send_sig(struct proc *who, int signum){
 }
 
 void _assert(int expression, int line, char* filename) {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
     if(!expression) {
+        char *p = NULL;
         printf("\nAssert Failed at line %d in %s\n",line,filename);
-        exit(1);
+        // trigger segment fault in order to inspect variables in debugger
+        p = 0;
     }
+#pragma GCC diagnostic pop
 }
 
 clock_t get_uptime(){

@@ -558,13 +558,10 @@ static char *regnode(struct comp *cp, char op)
 /*
  - regc - emit (if appropriate) a byte of code
  */
-static void
-regc(cp, b)
-struct comp *cp;
-char b;
+static void regc(struct comp *cp, char c)
 {
 	if (EMITTING(cp))
-		*cp->regcode++ = b;
+		*cp->regcode++ = c;
 	else
 		cp->regsize++;
 }
@@ -688,24 +685,24 @@ const char *str;
 		return(0);
 
 	/* Mark beginning of line for ^ . */
-	ex.regbol = string;
+	ex.regbol = (char *)(unsigned long)string;
 	ex.regstartp = prog->startp;
 	ex.regendp = prog->endp;
 
 	/* Simplest case:  anchored match need be tried only once. */
 	if (prog->reganch)
-		return(regtry(&ex, prog, string));
+		return(regtry(&ex, prog, (char *)(unsigned long)string));
 
 	/* Messy cases:  unanchored match. */
 	if (prog->regstart != '\0') {
 		/* We know what char it must start with. */
-		for (s = string; s != NULL; s = strchr(s+1, prog->regstart))
+		for (s = (char *)(unsigned long)string; s != NULL; s = strchr(s+1, prog->regstart))
 			if (regtry(&ex, prog, s))
 				return(1);
 		return(0);
 	} else {
 		/* We don't -- general case. */
-		for (s = string; !regtry(&ex, prog, s); s++)
+		for (s = (char *)(unsigned long)string; !regtry(&ex, prog, s); s++)
 			if (*s == '\0')
 				return(0);
 		return(1);

@@ -31,7 +31,7 @@ int putenv(char *name)
 		*r = '\0';
 
 		if (v != NULL) {
-			while ((p = *v) != NULL) {
+			while ((p = (char *)(unsigned long)*v) != NULL) {
 				q = name;
 				while (*q && (*q++ == *p++))
 					/* EMPTY */ ;

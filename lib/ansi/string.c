@@ -110,7 +110,7 @@ char *index(const char *string, int c){
     const char *s = string;
     while(*s && *s != c)
         s++;
-    return *s ? s : NULL;
+    return (char *)(unsigned long)(*s ? s : NULL);
 }
 
 #include <stdio.h>
@@ -138,7 +138,7 @@ char* strstr(const char* haystack, const char* needle)
 	while (*X != '\0')
 	{
 		if ((*X == *Y) && compare(X, Y))
-			return X;
+			return (char *)(unsigned long)X;
 		X++;
 	}
 
