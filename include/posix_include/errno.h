@@ -29,7 +29,7 @@
 #define __set_errno(val)   
 #else
 #   define _SIGN 
-#define ERRNO_PTR           ((int *)( (((unsigned int)get_sp()) >> 10 << 10) + 1))
+#define ERRNO_PTR           ((unsigned int *)( (((unsigned long)get_sp()) >> 10 << 10) + 1))
 #define errno   (*ERRNO_PTR)
 #define __set_errno(val)    ((*ERRNO_PTR) = (val))        
 #endif
