@@ -14,6 +14,7 @@
  * 
 */
 #include <kernel/kernel.h>
+#include <winix/ksignal.h>
 
 int sys_kill(struct proc* who, pid_t pid, int signum){
     struct proc* to;

@@ -138,9 +138,7 @@ int sys_fork(struct proc *parent) {
 
 int do_fork(struct proc *who, struct message *m){
     int child_pr;
-    struct proc* child;
     child_pr = sys_fork(who);
-    
     
     // if an error is encounted
     if(child_pr < 0)
@@ -171,8 +169,8 @@ int do_vfork(struct proc* parent, struct message* m){
 int do_tfork(struct proc* parent, struct message* m){
     struct proc* child;
     ptr_t* new_stack, *sp_physical, *old_stack;
-    unsigned int *stack_ptr, *stack_bottom;
-    unsigned int vstack_top, vstack_bottom, val;
+    unsigned long *stack_ptr, *stack_bottom;
+    unsigned long vstack_top, vstack_bottom, val;
     vptr_t* vsp_relative_to_stack_top, *vir_old_stack;
     reg_t** sp;
     if(child = get_free_proc_slot()){
@@ -193,22 +191,22 @@ int do_tfork(struct proc* parent, struct message* m){
         copy_page(new_stack, child->stack_top);
         sp = &child->ctx.m.sp;
         vsp_relative_to_stack_top = (vptr_t*)(get_physical_addr(*sp, child) - child->stack_top);
-        sp_physical = (ptr_t *)(new_stack + (ptr_t)vsp_relative_to_stack_top) ;
+        sp_physical = (ptr_t *)(new_stack + (unsigned long)vsp_relative_to_stack_top) ;
         *sp = (reg_t *)get_virtual_addr(sp_physical, child);
         old_stack = child->stack_top;
         child->stack_top = new_stack;
 
-        stack_ptr = (unsigned int*)child->stack_top;
-        stack_bottom = (unsigned int*)stack_ptr + PAGE_LEN;
+        stack_ptr = (unsigned long*)child->stack_top;
+        stack_bottom = (unsigned long*)stack_ptr + PAGE_LEN;
         vir_old_stack = get_virtual_addr(old_stack, child);
-        vstack_top = (unsigned int)vir_old_stack;
-        vstack_bottom = (unsigned int)vir_old_stack + PAGE_LEN;
+        vstack_top = (unsigned long)vir_old_stack;
+        vstack_bottom = (unsigned long)vir_old_stack + PAGE_LEN;
 
         // change the virtual address referencing old stack to new stack
         while (stack_ptr < stack_bottom) {
             val = *stack_ptr;
             if (val >= vstack_top && val < vstack_bottom) {
-                *stack_ptr = (unsigned int)get_virtual_addr(val - vstack_top + new_stack, child);
+                *stack_ptr = (unsigned long)get_virtual_addr(val - vstack_top + new_stack, child);
                 // KDEBUG(("old %x new %x\n", val, *stack_ptr));
             }
             stack_ptr++;
