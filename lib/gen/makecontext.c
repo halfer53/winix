@@ -14,7 +14,7 @@ void _ctx_end(ucontext_t *ucp){
 
 void makecontext(ucontext_t *ucp, void (*  func)(), int argc, ...){
     int *args = &argc + 1;
-    unsigned int *sp;
+    unsigned long *sp;
 
     if(ucp == NULL || ucp->uc_stack.ss_sp == NULL 
             || ucp->uc_stack.ss_size < MINSIGSTKSZ){
@@ -23,12 +23,12 @@ void makecontext(ucontext_t *ucp, void (*  func)(), int argc, ...){
         
 
     ucp->uc_mcontext.pc = (void (*)())&_ctx_start;
-    ucp->uc_mcontext.regs[7] = (unsigned int)&_ctx_end; // reg 8
+    ucp->uc_mcontext.regs[7] = (unsigned int)(unsigned long)&_ctx_end; // reg 8
 
     // allocate stack for the ucp context
-    sp = (unsigned int*)ucp->uc_stack.ss_sp + ucp->uc_stack.ss_size - 1;
+    sp = (unsigned long*)ucp->uc_stack.ss_sp + ucp->uc_stack.ss_size - 1;
     sp -= argc + 3;
-    ucp->uc_mcontext.sp = sp;
+    ucp->uc_mcontext.sp = (unsigned int *)sp;
 
     /**
      *  Arrange the stack as follows:
@@ -48,11 +48,11 @@ void makecontext(ucontext_t *ucp, void (*  func)(), int argc, ...){
      *  is the address of the _ctx_end, then _ctx_end is called.
      *     
     **/
-    *sp++ = (unsigned int)func;
+    *sp++ = (unsigned long)func;
     *sp++ = argc;
     memcpy(sp,args,argc);
     sp += argc;
-    *sp = (unsigned int)ucp;
+    *sp = (unsigned long)ucp;
 }
 
 

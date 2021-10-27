@@ -23,7 +23,7 @@ char *getenv(const char *name)
 			q++;
 		if (*q || (*p != '='))
 			continue;
-		return (char *)p + 1;
+		return (char *)(unsigned long)(p + 1);
 	}
 	return (char *)NULL;
 }
