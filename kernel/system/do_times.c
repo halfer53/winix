@@ -19,10 +19,10 @@
 */
 #include <kernel/kernel.h>
 #include <sys/times.h>
+#include <kernel/clock.h>
 
 int do_times(struct proc *who, struct message *m){
     vptr_t *vp = m->m1_p1;
-    ptr_t *p;
     struct tms* buf;
     if(vp && !is_vaddr_accessible(vp, who))
         return EFAULT;

@@ -45,8 +45,6 @@ int do_sigaction(struct proc *who, struct message *m){
     int signum = m->m1_i1;
     struct sigaction* act = m->m1_p1;
     struct sigaction* oact = m->m1_p2;
-    int flags;
-
 
     if(!is_vaddr_ok((vptr_t *)act, who))
         return EFAULT;
@@ -72,11 +70,11 @@ int do_signal(struct proc* who, struct message *m){
     int signum = m->m1_i1;
     void *restorer = m->m1_p1;
     
-    sa.sa_handler = (sighandler_t)m->m1_i2;
+    sa.sa_handler = (sighandler_t)(unsigned long)m->m1_i2;
     sa.sa_flags = SA_RESETHAND;
     sa.sa_mask = 0xffff;
     if(sys_sigaction(who, signum, &sa, &oldsa, restorer))
-        return (int)SIG_ERR;
-    return (int)oldsa.sa_handler;
+        return (int)((unsigned long)SIG_ERR);
+    return (int)((unsigned long)oldsa.sa_handler);
 }
 

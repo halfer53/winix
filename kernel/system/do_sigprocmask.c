@@ -18,7 +18,7 @@
 */
 
 int do_sigprocmask(struct proc* who, struct message* m){
-    sigset_t set, set_bak;
+    sigset_t set;
     sigset_t *pset, *pblocked;
     int i;
     int how = m->m1_i1;

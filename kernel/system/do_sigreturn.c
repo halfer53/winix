@@ -18,7 +18,6 @@
 
 int do_sigreturn(struct proc *who, struct message *m){
     reg_t *sp;
-    struct proc *systask;
     int signum = m->m1_i1;
 
     sp = get_physical_addr(who->ctx.m.sp,who);
