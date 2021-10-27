@@ -17,8 +17,11 @@
 #include <kernel/exception.h>
 #include <winix/rex.h>
 #include <kernel/clock.h>
+#include <kernel/sched.h>
+#include <winix/ksignal.h>
 
-PRIVATE struct message m;
+
+PRIVATE struct message _message;
 PRIVATE int* _expt_stack_ptr;
 
 // Number of exception sources
@@ -89,7 +92,7 @@ int* get_exception_stack_bottom(){
 }
 
 struct message* get_exception_m(){
-    return &m;
+    return &_message;
 }
 
 /**
@@ -137,14 +140,11 @@ PRIVATE void serial2_handler() {
  **/
 PRIVATE void gpf_handler() {
     ptr_t* pc;
-    int sp;
-    int val;
     // is the current process a valid one?
     ASSERT(IS_PROCN_OK(curr_scheduling_proc->proc_nr));
     trace_syscall = false;
     stop_debug_scheduling();
 #ifdef _DEBUG
-    sp = (int)(get_physical_addr(curr_scheduling_proc->ctx.m.sp, curr_scheduling_proc)) - (int)curr_scheduling_proc->stack_top;
     if(!is_vaddr_accessible(curr_scheduling_proc->ctx.m.sp, curr_scheduling_proc)){
         kprintf("\nStack Overflow");
     }
@@ -157,7 +157,7 @@ PRIVATE void gpf_handler() {
 
     kprintf("Virtual  ");
     PRINT_DEBUG_REG(get_virtual_addr(pc,curr_scheduling_proc),
-                                    sp,
+                                    curr_scheduling_proc->ctx.m.sp,
                                     curr_scheduling_proc->ctx.m.ra);
 
     kprintf("Physical ");
@@ -186,9 +186,7 @@ PRIVATE void gpf_handler() {
 PRIVATE void syscall_handler() {
     int dest, operation;
     struct message *m;
-    struct proc* target;
     int *retval;
-    int reply;
     ptr_t *sp;
 
     if(!curr_scheduling_proc )
@@ -199,7 +197,6 @@ PRIVATE void syscall_handler() {
     operation = *(sp);                // Operation is the first parameter on the stack
 
     if(operation > 0 && operation < _NSYSCALL){ // direct syscall mode
-        // m = (struct message*)sys_sbrk(curr_scheduling_proc, sizeof(struct message));
         m = USER_TMP_MESSAGE(curr_scheduling_proc);
         curr_scheduling_proc->flags |= DIRECT_SYSCALL;
         m->type = operation;
@@ -209,9 +206,8 @@ PRIVATE void syscall_handler() {
         operation = WINIX_SENDREC;
         
     }else{ // traditional IPC mode
-
         dest = *(sp+1);                // Destination is second parameter on the stack
-        m = (struct message *)get_physical_addr(*(sp+ 2), curr_scheduling_proc);  // Message is the third parameter
+        m = (struct message *)get_physical_addr(*((unsigned long*)(sp+ 2)), curr_scheduling_proc);  // Message is the third parameter
     }
 
     m->src = curr_scheduling_proc->proc_nr;            // Don't trust the who to specify their own source process number
@@ -221,7 +217,7 @@ PRIVATE void syscall_handler() {
     switch(operation) {
         case WINIX_SENDREC:
             curr_scheduling_proc->state |= STATE_RECEIVING;
-            // fall through to send
+            /* FALLTHRU */
 
         case WINIX_SEND:
             *retval = do_send(dest, m);

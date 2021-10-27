@@ -17,6 +17,7 @@
 #include <kernel/table.h>
 #include <kernel/exception.h>
 #include <winix/rex.h>
+#include <kernel/sched.h>
 
 // System uptime, stored as number of timer interrupts since boot
 PRIVATE clock_t system_uptime = 0;
