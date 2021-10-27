@@ -15,6 +15,7 @@
 */
 #include <kernel/kernel.h>
 #include <kernel/clock.h>
+#include <winix/ksignal.h>
 
 void deliver_alarm(int proc_nr, clock_t time){
     struct proc* who = get_proc(proc_nr);
