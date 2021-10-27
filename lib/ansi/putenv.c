@@ -12,7 +12,7 @@
 
 int putenv(char *name)
 {
-	char **v, **ev;
+	const char **v;
 	char *r;
 	static int size = 0;
 	/* When size != 0, it contains the number of entries in the
@@ -24,8 +24,7 @@ int putenv(char *name)
     if(_environ == NULL)
         init_environ();
 	if (_environ == NULL) return 1;
-	v = (char **)_environ;
-	ev = (char **)_environ;
+	v = _environ;
 	if (r = strchr(name, '=')) {
 		char *p, *q;
 
@@ -49,11 +48,11 @@ int putenv(char *name)
 			}
 		}
 		*r = '=';
-		v = (char **)_environ;
+		v = _environ;
 	}
 
 	if (!size) {
-		char **p;
+		const char **p;
 		int i = 0;
 
 		if (v){
@@ -65,14 +64,14 @@ int putenv(char *name)
 		if (!(v = malloc(rounded(i) * sizeof(char **))))
 			return 1;
 		size = i;
-		p = (char **)_environ;
-		_environ = (const char **)v;
+		p = _environ;
+		_environ = v;
 		while (*v++ = *p++);		/* copy the environment */
-		v = (char **)_environ;
+		v = _environ;
 	} else if (!(size % ENTRY_INC)) {
 		if (!(v = realloc((void *)_environ, rounded(size) * sizeof(char **))))
 			return 1;
-		_environ = (const char **)v;
+		_environ = v;
 	}
 	v[size - 1] = name;
 	v[size] = NULL;
