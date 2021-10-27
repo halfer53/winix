@@ -28,6 +28,7 @@
 #include <winix/dev.h>
 #include <fs/inode.h>
 #include <fs/fs_methods.h>
+#include <winix/ksignal.h>
 
 int get_wstats(struct proc* child){
     return (child->exit_status << 8) | (child->sig_status & 0x7f);
@@ -35,7 +36,6 @@ int get_wstats(struct proc* child){
 
 int do_waitpid(struct proc *parent, struct message *mesg){
     struct proc *child;
-    struct wait_info* wi;
     pid_t pid;
     vptr_t* vptr;
     ptr_t *ptr;
@@ -130,7 +130,6 @@ void clear_proc_mesg(struct proc *who){
 
 int check_waiting(struct proc* who){
     struct proc* parent = get_proc(who->parent);
-    int children = 0;
     ptr_t *ptr;
     struct message* mesg = curr_mesg();
 
@@ -195,7 +194,7 @@ void exit_proc_in_interrupt(struct proc* who, int exit_val,int signum){
 
 void exit_proc(struct proc *who, int status, int signum){
     struct proc *mp;
-    int children = 0, i;
+    int i;
     struct filp* file;
     struct message* mesg;
     struct proc* parent;
@@ -251,7 +250,6 @@ void exit_proc(struct proc *who, int status, int signum){
 int do_exit(struct proc *who, struct message *m){
     int status = m->m1_i1;
     int signum = m->m1_i2;
-    struct proc* parent = get_proc(who->parent);
     
     // if exit_magic, this means process is returned
     // from main, and exit syscall is triggered by
