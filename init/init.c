@@ -43,7 +43,7 @@ void block_signals()
 }
 
 void init_dev(){
-  int fd, ret;
+  int ret;
 
   ret = mkdir("/dev", 0x755);
   CHECK_SYSCALL(ret == 0);
@@ -64,10 +64,13 @@ void init_tty(){
   fd = open("/dev/tty1", O_RDONLY);
   CHECK_SYSCALL(fd == 0);
   ret = dup(fd);
+  CHECK_SYSCALL(ret == 1);
   ret = dup(fd);
+  CHECK_SYSCALL(ret == 2);
   setpgid(0, 0);
   pgid = getpgid(0);
-  ioctl(STDIN_FILENO, TIOCSPGRP, pgid);
+  ret = ioctl(STDIN_FILENO, TIOCSPGRP, pgid);
+  CHECK_SYSCALL(ret == 0);
 }
 
 void write_dummy_file(){
@@ -111,10 +114,7 @@ void start_init_routine(){
 
 int main(int argc, char **argv)
 {
-  struct message m;
-  struct stat statbuf;
   pid_t pid;
-  int i, ret, fd, read_nr;
 
   init_dev();
   init_tty();
