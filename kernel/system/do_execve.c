@@ -63,7 +63,7 @@ int copy_stirng_array(struct string_array *arr, char* from[], struct proc* who, 
     int limit = 32;
     int count = 32;
     int size = 0, i, strsize, j, ret;
-    char* ptr, *physical;
+    char* physical;
     char **pptr = from;
 
     arr->size = 0;
@@ -104,8 +104,7 @@ int copy_stirng_array(struct string_array *arr, char* from[], struct proc* who, 
         for( j = 0; j < i; j++){
             kfree(arr->array[j]);
         }
-    err_free_array:
-        kfree(arr->array);
+    kfree(arr->array);
     final:
     return ret;
 }
@@ -126,17 +125,17 @@ void copy_sarray_to_heap(struct proc* who, struct string_array* arr, ptr_t* p){
     int i, len;
     for(i = 0; i < arr->size - 1; i++){
         len = strlen(arr->array[i]) + 1;
-        *p++ = (unsigned int)copyto_user_heap(who, arr->array[i], len);
+        *p++ = (unsigned int)(unsigned long)copyto_user_heap(who, arr->array[i], len);
     }
     *p = 0;
 }
 
 int build_user_stack(struct proc* who, struct string_array* argv, struct string_array* env){
     struct initial_frame init_stack;
-    ptr_t* sp_btm;
-    ptr_t *env_ptr = NULL, *p, *argv_ptr = NULL;
+    unsigned long* sp_btm;
+    ptr_t *env_ptr = NULL, *argv_ptr = NULL;
 
-    sp_btm = get_physical_addr(align_page((int)who->ctx.m.sp) - 1,who);
+    sp_btm = (unsigned long*)get_physical_addr((unsigned long)align_page((int)(unsigned long)who->ctx.m.sp) - 1,who);
 
     memset(&init_stack, 0, sizeof(init_stack));
 
@@ -155,7 +154,7 @@ int build_user_stack(struct proc* who, struct string_array* argv, struct string_
         env_ptr = (ptr_t*)kmalloc(env->size);
         if(env_ptr){
             copy_sarray_to_heap(who, env, env_ptr);
-            *sp_btm = (vptr_t)copyto_user_heap(who, env_ptr, env->size);
+            *sp_btm = (unsigned long)copyto_user_heap(who, env_ptr, env->size);
             // KDEBUG(("build stack env %p physical %p\n", *sp_btm , get_physical_addr(*sp_btm, who)));
             kfree(env_ptr);
         }
@@ -179,11 +178,8 @@ int build_user_stack(struct proc* who, struct string_array* argv, struct string_
 }
 
 int exec_welf(struct proc* who, char* path, char *argv[], char *envp[], bool is_new){
-    int ret, fd, i, remaining, curr, bss_start;
+    int ret, fd;
     struct winix_elf elf;
-    struct inode* ino;
-    block_t bnr;
-    struct block_buffer* buffer;
     struct string_array argv_copy, envp_copy;
     struct proc* parent = get_proc(who->parent);
     struct message m;
@@ -219,10 +215,8 @@ int exec_welf(struct proc* who, char* path, char *argv[], char *envp[], bool is_
     if(ret)
         goto final;
 
-    ino = who->fp_filp[fd]->filp_ino;
     // KDEBUG(("elf %s %x %x size: %d %d %d %d\n", path, elf.binary_offset, elf.binary_pc,
         // elf.binary_size, elf.text_size, elf.data_size, elf.bss_size));
-    // KDEBUG(("inode size %d %d \n", ino->i_size, ino->i_total_size ));
 
     ret = sys_read(who, fd, who->ctx.rbase + elf.binary_offset, elf.binary_size);
     if(ret != elf.binary_size){
@@ -236,7 +230,7 @@ int exec_welf(struct proc* who, char* path, char *argv[], char *envp[], bool is_
     if(trace_syscall){
         klog("%s[%d] calls execve() to excute %s\n", who->name, who->pid, path);
     }
-    set_proc(who, (void (*)())elf.binary_pc, path);
+    set_proc(who, (void (*)())(unsigned long)elf.binary_pc, path);
     ret = OK;
 
     
