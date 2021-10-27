@@ -163,7 +163,7 @@ void move_cursor(RexSp_t* rex, int num, int direction){
 }   
 
 void tty_exception_handler( struct tty_state* state){
-    int val, stat, ret, is_new_line;
+    int val, stat, is_new_line;
     struct message* msg;
     RexSp_t *rex = state->rex;
     
@@ -187,7 +187,7 @@ void tty_exception_handler( struct tty_state* state){
             
             if(state->controlling_session > 0 && state->foreground_group > 0){
                 // KDEBUG(("Send sig to foreground %d\n", state->foreground_group));
-                ret = sys_kill(SYSTEM_TASK, -(state->foreground_group), signal);
+                (void)sys_kill(SYSTEM_TASK, -(state->foreground_group), signal);
             }
             goto end;
         }
@@ -196,7 +196,7 @@ void tty_exception_handler( struct tty_state* state){
             goto end;
         }
         else if(val == CTRL_D){
-            ret = sys_kill(SYSTEM_TASK, -(state->foreground_group), SIGKILL);
+            (void)sys_kill(SYSTEM_TASK, -(state->foreground_group), SIGKILL);
             goto end;
         }
         else if(val == CTRL_L){
@@ -207,8 +207,6 @@ void tty_exception_handler( struct tty_state* state){
         else if(val == CTRL_P || val == CTRL_N){ // control p or n, to navigate through history
             struct tty_command* t1;
             bool found = false;
-            int len;
-
             
             if(state->prev_history_cmd){
                 t1 = (val == CTRL_P) ? list_next_entry(struct tty_command, state->prev_history_cmd, list) : 
