@@ -2,7 +2,7 @@
 #include <winix/list.h>
 #include <kernel/clock.h>
 
-struct message m;
+struct message _message;
 
 void wakeup_process(int proc_nr, clock_t time){
     struct proc* p;
@@ -10,7 +10,7 @@ void wakeup_process(int proc_nr, clock_t time){
     if(p){
         if(p->state & STATE_ZOMBIE)
             return;
-        syscall_reply2(CSLEEP, 0, proc_nr, &m);
+        syscall_reply2(CSLEEP, 0, proc_nr, &_message);
     }
 }
 
