@@ -39,7 +39,7 @@ void set_num_str(int value, char *buf){
 size_t count_dir_size(char *dir_path){
     struct dirent* dir;
     struct stat statbuf;
-    size_t count = 0, ret;
+    size_t count = 0;
     char *path;
     char size_buf[10];
     DIR* directory = opendir(dir_path);
@@ -57,7 +57,7 @@ size_t count_dir_size(char *dir_path){
         if(dir->d_type == DT_DIR){
             count += count_dir_size(path);
         }else{
-            ret = stat(path, &statbuf);
+            (void)stat(path, &statbuf);
             // printf("stat %s %d size %d\n", dir->d_name, ret, statbuf.st_size);
             count += (size_t)statbuf.st_size;
         }

@@ -1,8 +1,4 @@
-#include <sys/types.h>
-#include <sys/ipc.h>
-#include <stdio.h>
 #include "../fs.h"
-#include <unistd.h>
 
 #define MEM_SIZE (32 * 1024)
 int mem[MEM_SIZE];
@@ -66,7 +62,7 @@ int send_sig(struct proc *who, int signum){
 void _assert(int expression, int line, char* filename) {
     if(!expression) {
         printf("\nAssert Failed at line %d in %s\n",line,filename);
-        _exit(1);
+        exit(1);
     }
 }
 

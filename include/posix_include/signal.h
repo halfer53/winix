@@ -89,5 +89,6 @@ int sigdelset(sigset_t *, int);
 int sigemptyset(sigset_t *);
 int sigfillset(sigset_t *);
 int sigismember(sigset_t *, int);
+int raise(int signum);
 
 #endif

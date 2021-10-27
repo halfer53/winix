@@ -29,7 +29,8 @@
         "stddef.h": "c",
         "wini_ipc.h": "c",
         "comm.h": "c",
-        "compiler.h": "c"
+        "compiler.h": "c",
+        "parse.h": "c"
     },
     "files.exclude": {
         "**/*.o": true,

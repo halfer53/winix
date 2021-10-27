@@ -130,8 +130,7 @@ void match(char *name, regexp *exp)
 		lineno++;
 		if (cr == 0)
 		{
-			fprintf(stderr, "Line too long in ");
-			fprintf(stderr, name == 0 ? "stdin" : name);
+			fprintf(stderr, "Line too long in %s\n", name ? name : "stdin");
 		}
 		else{
 			*cr = '\0';

@@ -7,7 +7,7 @@
 static char buffer[256];
 
 int main(int argc, char *argv[]){
-    int i, ret;
+    int ret;
     char *src, *dest, *p, *buf;
     int src_fd, dest_fd;
     struct stat src_buf, dest_buf;

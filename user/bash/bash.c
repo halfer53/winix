@@ -14,6 +14,8 @@
 
 #include "bash.h"
 
+int exec_cmd(char *line);
+
 static char history_file[] = ".bash_history";
 
 // Input buffer & tokeniser
@@ -71,7 +73,6 @@ void init_shell(){
 
 int main() {
     int ret, len, newline_pos;
-    char *c;
     int history_fd;
 
     init_shell();
@@ -122,9 +123,7 @@ int search_path(char* path, int len, char* name){
 int _exec_cmd(char *line, struct cmdLine *cmd) {
     char buffer[128];
     int status, options;
-    pid_t pid, second_pid;
-    sigset_t sigmask = 0;
-    int saved_stdin, saved_stdout;
+    pid_t pid;
     int sin = STDIN_FILENO, sout = STDOUT_FILENO;
 
     if(cmd->argc == 0)
@@ -243,22 +242,20 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
 
 int exec_cmd(char *line){
     struct cmdLine cmd;
-    int ret;
-    char *p;
-    char* buf;
+    char* buffer;
     struct cmd_internal *handler = NULL;
 
-    ret = parse(line,&cmd);
+    (void)parse(line,&cmd);
 
     if(cmd.env && cmd.env_val){ // if a new environment variable is set
-        buf = malloc(MAX_LINE);
-        parse_quotes(cmd.env_val, buf, MAX_LINE);
+        buffer = malloc(MAX_LINE);
+        parse_quotes(cmd.env_val, buffer, MAX_LINE);
         
-        if(*buf){
-            printf("setenv %s=%s\n", cmd.env, buf);
-            setenv(cmd.env, buf, 1);
+        if(*buffer){
+            printf("setenv %s=%s\n", cmd.env, buffer);
+            setenv(cmd.env, buffer, 1);
         }
-        free(buf);
+        free(buffer);
         return 0;
     }
 
@@ -361,8 +358,7 @@ int do_untrace_syscall(int argc, char** argv){
 
 // Print the system wise memory info
 int mem_info(int argc, char** argv){
-    
-    int ret = wramp_syscall(WINFO, WINFO_MEM);
+    (void)wramp_syscall(WINFO, WINFO_MEM);
     return 0;
 }
 

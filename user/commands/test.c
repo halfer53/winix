@@ -71,7 +71,6 @@ int main(int argc, char **argv){
 }
 
 int test_nohandler(int argc, char** argv){
-    int i;
     struct cmd_internal* handler;
     handler = test_commands;
     printf("Available Test Options\n");
@@ -83,9 +82,6 @@ int test_nohandler(int argc, char** argv){
 }
 
 int test_while(int argc, char** argv){
-    char buf[2];
-    int ret, foo;
-    int fd;
     while(1);
     return 0;
 }
@@ -115,7 +111,6 @@ void term_handler(int signum){
 
 int test_signal(int argc, char **argv){
     struct sigaction sa;
-    int i;
     sigset_t set, prevset;
 
     // Check out what would happen after changing
@@ -190,8 +185,7 @@ int test_deadlock(int argc, char **argv){
         kill(pid,SIGKILL);
         wait(NULL);
     }else{
-        int ret;
-        ret = winix_send(getppid(),&m);
+        (void)winix_send(getppid(),&m);
         while(1);
     }
     return 0;
@@ -208,13 +202,17 @@ void usr2h(int sig){
 }
 
 int test_float(int argc, char **argv){
-    int foo;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
+    int foo, zero = 0;
 
     signal(SIGFPE, SIG_IGN);
-    foo = 1 / 0;
+    printf("dividing by 0\n");
+    foo = 1 / zero;
     signal(SIGFPE, SIG_DFL);
-    
+
     return 0;
+#pragma GCC diagnostic pop
 }
 
 void stack_overflow(int a){

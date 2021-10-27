@@ -7,7 +7,7 @@
 static char buffer[BUFFER_SIZ];
 
 int main(int argc, char *argv[]){
-    int fd, ret, dest_fd;
+    int ret;
     struct stat statbuf, dest_statbuf;
     char *path, *dest;
 

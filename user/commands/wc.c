@@ -31,13 +31,13 @@ int lflag = 0; /* Count lines */
 int wflag = 0; /* Count words */
 int cflag = 0; /* Count characters */
 
-long lcount; /* Count of lines */
-long wcount; /* Count of words */
-long ccount; /* Count of characters */
+int lcount; /* Count of lines */
+int wcount; /* Count of words */
+int ccount; /* Count of characters */
 
-long ltotal; /* Total count of lines */
-long wtotal; /* Total count of words */
-long ctotal; /* Total count of characters */
+int ltotal; /* Total count of lines */
+int wtotal; /* Total count of words */
+int ctotal; /* Total count of characters */
 
 void count()
 {
@@ -82,7 +82,6 @@ int main(int argc, char *argv[])
     int k;
     char *cp;
     int tflag, files;
-    int i;
     int fd;
 
     /* Get flags. */

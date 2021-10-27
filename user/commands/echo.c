@@ -4,8 +4,7 @@
 static char buffer[128];
 
 int main(int argc, char *argv[]){
-    char *p, *dest, *dest_bak;
-    int len;
+    char *p, *dest;
     char c;
     if(argc < 2)
         return 1;

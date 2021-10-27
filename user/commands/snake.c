@@ -6,6 +6,7 @@
 #include <sys/ioctl.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <string.h>
 
 #define NUM_COLS  (100)
 #define NUM_ROWS  (31)
@@ -48,7 +49,6 @@ struct point* new_point(int x, int y){
 }
 
 struct point* new_food(){
-    struct point* p;
     int x = (rand() % (NUM_COLS -2 )) + 1;
     int y = (rand() % (NUM_ROWS -1 )) + 1;
     return new_point(x, y);
@@ -111,7 +111,7 @@ void print_instruction(){
 void print_border(struct board_struct* board){
     char *buffer = malloc(NUM_COLS);
     char *buf = buffer;
-    int i,j, end = NUM_COLS - 2;
+    int i, end = NUM_COLS - 2;
     for(i = 0; i < end; i++){
         *buf++ = '-';
     }
@@ -175,9 +175,7 @@ void debug_board(struct board_struct* board){
 
 enum direction get_direction(struct board_struct* board){
     static char input[INPUT_SIZ];
-    enum direction newdir;
     enum direction dir = board->dir;
-    int i;
     //non blocking
     int ret = read(board->ofd, input, INPUT_SIZ);
     if(ret > 0){

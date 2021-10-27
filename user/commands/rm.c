@@ -3,7 +3,7 @@
 
 
 int main(int argc, char *argv[]){
-    int fd, ret;
+    int ret;
     struct stat statbuf;
     char *path = *++argv;
     if(argc < 2){

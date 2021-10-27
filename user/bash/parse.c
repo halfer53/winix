@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 #include "parse.h"
 
 static int isShellSymb(char c) {
@@ -173,14 +174,11 @@ int parse(char *input_line, struct cmdLine *sc)
 int parse_quotes(char *input, char* buffer, int buf_len){
     char* in = input;
     char* out = buffer;
-    int mode = 0;
 
     if(*in == '"'){
         in++;
-        mode = DOUBLE_QUOTES;
     }else if(*in == '\''){
         in++;
-        mode = SINGLE_QUOTE;
     }
         
     while(*in){

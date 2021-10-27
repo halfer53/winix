@@ -132,7 +132,6 @@ struct user_name usernames[] = {
 };
 
 char *get_user_name(uid_t uid){
-    int i;
     struct user_name* p = usernames;
     while (p)
     {
@@ -146,7 +145,6 @@ char *get_user_name(uid_t uid){
 
 void int2str(int value, int i, char* output){
     int j;
-    char *p = output;
     while(i){
         j = (value / i) % 10;
         *output++ = '0' + j;
@@ -185,7 +183,7 @@ void print_long_format(char *pathname, int flag){
     char size_buf[10];
     char *unit_s;
     char *p = buffer;
-    int i, j, k, l;
+    int i, j, k;
     int ret;
     mode_t mode;
     char *username, *groupname;
@@ -208,15 +206,15 @@ void print_long_format(char *pathname, int flag){
         set_num_str(statbuf.st_size, size_buf);
         unit_s = "KB";
     }else{
-        char *p = size_buf;
+        char *bufptr = size_buf;
         int2str(statbuf.st_size, 10000, size_buf);
-        while(*p){
-            if(*p == '0'){
-                *p = ' ';
+        while(*bufptr){
+            if(*bufptr == '0'){
+                *bufptr = ' ';
             }else{
                 break;
             }
-            p++;
+            bufptr++;
         }
         unit_s = "";
     }
@@ -232,7 +230,6 @@ void print_long_format(char *pathname, int flag){
 int do_ls(char* pathname, int flag){
    DIR* directory;
    struct dirent* dir;
-   int ret;
    char *slash = "/";
    char *symbol;
    char path_buffer[PATH_LEN];
@@ -268,10 +265,9 @@ void usage(){
 
 int main(int argc, char*argv[]){
     char* path = ".";
-    int ret, flag = 0, i = 0;
+    int ret, flag = 0;
     int k;
     char *cp;
-    int fd;
 
     /* Get flags. */
     k = 1;
