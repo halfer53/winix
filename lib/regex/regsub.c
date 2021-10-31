@@ -11,10 +11,14 @@
 /*
  - regsub - perform substitutions after a regexp match
  */
-void regsub(const regexp *rp, const char *source, char *dest)
+void
+regsub(rp, source, dest)
+const regexp *rp;
+const char *source;
+char *dest;
 {
-	register const regexp * prog = (const regexp *)rp;
-	register char *src = (char *)(unsigned long)source;
+	register regexp * const prog = (regexp *)rp;
+	register char *src = (char *)source;
 	register char *dst = dest;
 	register char c;
 	register int no;

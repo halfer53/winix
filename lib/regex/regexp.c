@@ -170,7 +170,7 @@ const char *exp;
 		FAIL("NULL argument to regcomp");
 
 	/* First pass: determine size, legality. */
-	co.regparse = (char *)(unsigned long)exp;
+	co.regparse = (char *)exp;
 	co.regnpar = 1;
 	co.regsize = 0L;
 	co.regdummy[0] = NOTHING;
@@ -190,7 +190,7 @@ const char *exp;
 		FAIL("out of space");
 
 	/* Second pass: emit code. */
-	co.regparse = (char *)(unsigned long)exp;
+	co.regparse = (char *)exp;
 	co.regnpar = 1;
 	co.regcode = r->program;
 	regc(&co, MAGIC);
@@ -383,7 +383,6 @@ int *flagp;
 	case '*':	*flagp = WORST|SPSTART;			break;
 	case '+':	*flagp = WORST|SPSTART|HASWIDTH;	break;
 	case '?':	*flagp = WORST;				break;
-	default:	break;
 	}
 
 	if (op == '*' && (flags&SIMPLE))
@@ -558,10 +557,13 @@ static char *regnode(struct comp *cp, char op)
 /*
  - regc - emit (if appropriate) a byte of code
  */
-static void regc(struct comp *cp, char c)
+static void
+regc(cp, b)
+struct comp *cp;
+char b;
 {
 	if (EMITTING(cp))
-		*cp->regcode++ = c;
+		*cp->regcode++ = b;
 	else
 		cp->regsize++;
 }
@@ -664,7 +666,7 @@ regexec(prog, str)
 regexp *prog;
 const char *str;
 {
-	const char *string = (char *)(unsigned long)str;	/* avert const poisoning */
+	char *string = (char *)str;	/* avert const poisoning */
 	char *s;
 	struct exec ex;
 
@@ -685,24 +687,24 @@ const char *str;
 		return(0);
 
 	/* Mark beginning of line for ^ . */
-	ex.regbol = (char *)(unsigned long)string;
+	ex.regbol = string;
 	ex.regstartp = prog->startp;
 	ex.regendp = prog->endp;
 
 	/* Simplest case:  anchored match need be tried only once. */
 	if (prog->reganch)
-		return(regtry(&ex, prog, (char *)(unsigned long)string));
+		return(regtry(&ex, prog, string));
 
 	/* Messy cases:  unanchored match. */
 	if (prog->regstart != '\0') {
 		/* We know what char it must start with. */
-		for (s = (char *)(unsigned long)string; s != NULL; s = strchr(s+1, prog->regstart))
+		for (s = string; s != NULL; s = strchr(s+1, prog->regstart))
 			if (regtry(&ex, prog, s))
 				return(1);
 		return(0);
 	} else {
 		/* We don't -- general case. */
-		for (s = (char *)(unsigned long)string; !regtry(&ex, prog, s); s++)
+		for (s = string; !regtry(&ex, prog, s); s++)
 			if (*s == '\0')
 				return(0);
 		return(1);
