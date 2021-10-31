@@ -383,6 +383,7 @@ int *flagp;
 	case '*':	*flagp = WORST|SPSTART;			break;
 	case '+':	*flagp = WORST|SPSTART|HASWIDTH;	break;
 	case '?':	*flagp = WORST;				break;
+	default:	break;
 	}
 
 	if (op == '*' && (flags&SIMPLE))
@@ -557,10 +558,7 @@ static char *regnode(struct comp *cp, char op)
 /*
  - regc - emit (if appropriate) a byte of code
  */
-static void
-regc(cp, b)
-struct comp *cp;
-char b;
+static void regc(struct comp *cp, char b)
 {
 	if (EMITTING(cp))
 		*cp->regcode++ = b;
@@ -1089,3 +1087,4 @@ char *op;
 	return(buf);
 }
 #endif
+
