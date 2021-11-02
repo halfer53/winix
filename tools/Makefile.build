@@ -37,7 +37,7 @@ PHONY := __build
 
 __build: $(assembly) $(objects) $(subdir-y) $(srecobj)
 $(assembly): %.s: %.c 
-	$(Q)gcc $(CFLAGS) $(GCC_FLAG) -S -N -I./include/posix_include -I./include $<
+	$(Q)gcc $(CFLAGS) $(GCC_FLAG) -S -N -I./include/posix_include -I./include $< -o /tmp/$(notdir $@)
 	$(Q)wcc $(CFLAGS) -S -N -I./include/posix_include -I./include -o $@ $<
 ifeq ($(KBUILD_VERBOSE),0)
 	@echo "CC \t $<"
