@@ -8,22 +8,22 @@
 
 char *getenv(const char *name)
 {
-	const char **v;
+    const char **v;
     const char *p, *q;
     
     if(_environ == NULL)
         init_environ();
-	if (name == NULL || _environ == NULL)
-		return (char *)NULL;
-	
-	v = _environ;
-	while ((p = *v++) != NULL) {
-		q = name;
-		while (*q && (*q == *p++))
-			q++;
-		if (*q || (*p != '='))
-			continue;
-		return (char *)(unsigned long)(p + 1);
-	}
-	return (char *)NULL;
+    if (name == NULL || _environ == NULL)
+        return (char *)NULL;
+
+    v = _environ;
+    while ((p = *v++) != NULL) {
+        q = name;
+        while (*q && (*q == *p++))
+            q++;
+        if (*q || (*p != '='))
+            continue;
+        return (char *)(unsigned long)(p + 1);
+    }
+    return (char *)NULL;
 }
