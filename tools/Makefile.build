@@ -36,7 +36,8 @@ srecobj := $(addprefix $(src)/, $(srec-y))
 PHONY := __build
 
 __build: $(assembly) $(objects) $(subdir-y) $(srecobj)
-$(assembly): %.s: %.c 
+$(assembly): %.s: %.c
+#gcc is only used for linting, wcc is the real compiler
 	$(Q)gcc $(CFLAGS) $(GCC_FLAG) -S -N -I./include/posix_include -I./include $< -o /tmp/$(notdir $@)
 	$(Q)wcc $(CFLAGS) -S -N -I./include/posix_include -I./include -o $@ $<
 ifeq ($(KBUILD_VERBOSE),0)
