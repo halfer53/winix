@@ -6,11 +6,6 @@ from uuid import uuid4
 from shutil import rmtree
 from tempfile import mkdtemp
 
-userfile_dir = {
-    "shell.verbose":"user/",
-    "init.verbose":"init/"
-}
-
 def main():
     if(len(sys.argv) < 2):
         print("Plz provide the PC address when kernel crashed")
@@ -70,9 +65,6 @@ def main():
     try:
         tmp_filename = basedir + "/" + str(uuid4())
 
-        # if(in_file in userfile_dir):
-        #     filename = userfile_dir[in_file] + filename
-
         wcc_cmd = ["wcc","-N", "-g", "-S", "-I" + main_path + "/include/posix_include", "-I" + main_path + "/include",\
                         "-D__wramp__", "-D_DEBUG","-o",tmp_filename, main_path+"/"+filename, ]
 
@@ -91,7 +83,6 @@ def main():
         loc = "0"
         curr_count = 0
         next_incr = 0
-        in_text_seg = False
         prev_line = ""
         prev_name = ""
         prev_name_index = 0
