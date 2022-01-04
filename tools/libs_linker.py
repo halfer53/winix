@@ -1,5 +1,5 @@
 import sys
-import os
+from os import path, listdir
 
 ENVIRON = "lib/ansi/env.o"
 ANSI = "lib/ansi/"
@@ -33,7 +33,7 @@ def get_all_files(libs):
 	ret = set()
 	for lib in libs:
 		if lib.endswith("/"):
-			for file in os.listdir(lib):
+			for file in listdir(lib):
 				if file.endswith(".o"):
 					ret.add(lib + file)
 		else:
@@ -71,7 +71,7 @@ def get_local_include(line, dir_path):
 
 def do_include_search(filename : str):
 	libs = set()
-	dir_path = os.path.dirname(os.path.realpath(filename)) + '/'
+	dir_path = path.dirname(path.realpath(filename)) + '/'
 	# print(dir_path)
 	if filename.endswith('.o'):
 		filename = filename.replace('.o', '.c')
