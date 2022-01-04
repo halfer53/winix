@@ -23,7 +23,11 @@ typedef unsigned int off_t;
 # define __off_t_defined
 #endif
 
+#ifndef __time_t_defined
 typedef unsigned int time_t;
+#define __time_t_defined
+#endif
+
 typedef unsigned int nlink_t;
 typedef int pid_t;
 typedef unsigned int blksize_t;
