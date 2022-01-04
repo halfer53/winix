@@ -1,35 +1,22 @@
 #!/usr/bin/python3
 import sys
-import subprocess
-import os
-import glob
-import uuid
-import shutil
-import tempfile
-from contextlib import contextmanager
+from subprocess import call
+from os import path
+from uuid import uuid4
+from shutil import rmtree
+from tempfile import mkdtemp
 
 userfile_dir = {
     "shell.verbose":"user/",
     "init.verbose":"init/"
 }
 
-@contextmanager
-def tmpdir():
-    path = tempfile.mkdtemp()
-    try:
-        yield path
-    finally:
-        try:
-            shutil.rmtree(path)
-        except IOError:
-            sys.stderr.write("fail to clean up temporary directies")
-
 def main():
     if(len(sys.argv) < 2):
         print("Plz provide the PC address when kernel crashed")
         return 0
 
-    main_path = os.path.dirname(os.path.realpath(__file__)) + "/.."
+    main_path = path.dirname(path.realpath(__file__)) + "/.."
     rpath = "include/srec"
     in_file = "winix.verbose"
     
@@ -79,8 +66,9 @@ def main():
     # print(in_file)
     # print(target_segment)
 
-    with tmpdir() as basedir:
-        tmp_filename = basedir + "/" + str(uuid.uuid4())
+    basedir = mkdtemp()
+    try:
+        tmp_filename = basedir + "/" + str(uuid4())
 
         # if(in_file in userfile_dir):
         #     filename = userfile_dir[in_file] + filename
@@ -89,10 +77,10 @@ def main():
                         "-D__wramp__", "-D_DEBUG","-o",tmp_filename, main_path+"/"+filename, ]
 
         print(" ".join(wcc_cmd))
-        result = subprocess.call(wcc_cmd, stderr=sys.stderr)
+        result = call(wcc_cmd, stderr=sys.stderr)
         if(result != 0):
             tmpfilename = filename.replace(".c",".s")
-            if(os.path.isfile(main_path+"/" +  tmpfilename)):
+            if(path.isfile(main_path+"/" +  tmpfilename)):
                 print("Line " + str(target_line_num) + \
                             " in file "+tmpfilename)
                 return 0
@@ -180,6 +168,11 @@ def main():
 
         if(target_segment == ".text" and curr_count != target_line_num):
             print("Instruction not found ")
+    finally:
+        try:
+            rmtree(basedir)
+        except IOError:
+            sys.stderr.write("fail to clean up temporary directies")
 
 if __name__ == '__main__':
     main()
