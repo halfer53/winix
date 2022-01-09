@@ -44,7 +44,7 @@ KLIB_O = lib/syscall/wramp_syscall.o lib/ipc/ipc.o \
 L_HEAD = winix/limits/limits_head.o
 L_TAIL = winix/limits/limits_tail.o
 KERNEL_O = winix/*.o kernel/system/*.o kernel/*.o fs/*.o fs/system/*.o driver/*.o include/*.o
-ALLDIR = winix lib init user kernel fs driver
+ALLDIR = lib init user kernel fs driver winix
 ALLDIR_CLEAN = winix lib init user kernel fs driver include
 FS_DEPEND = fs/*.c fs/system/*.c fs/fsutil/*.c winix/bitmap.c
 DISK = include/disk.c
@@ -62,20 +62,20 @@ unittest:
 	$(Q)./fsutil -d -t $(TEXT_OFFSET)
 
 fsutil: $(FS_DEPEND)
-	$(Q)gcc -g -DFSUTIL $(GCC_FLAG) $(COMMON_CFLAGS) -I./include/fs_include -I./include $^ -o fsutil
 ifeq ($(KBUILD_VERBOSE),0)
 	@echo "CC \t fsutil"
 endif
+	$(Q)gcc -g -DFSUTIL $(GCC_FLAG) $(COMMON_CFLAGS) -I./include/fs_include -I./include $^ -o fsutil
 
 kbuild: $(ALLDIR)
 $(ALLDIR): FORCE
 	$(Q)$(MAKE) $(build)=$@
 
 $(DISK): $(SREC) fsutil
-	$(Q)./fsutil -t $(TEXT_OFFSET) -o $(DISK) -s $(SREC_INCLUDE) -u $(CURR_UNIX_TIME)
 ifeq ($(KBUILD_VERBOSE),0)
 	@echo "LD \t disk.c"
 endif
+	$(Q)./fsutil -t $(TEXT_OFFSET) -o $(DISK) -s $(SREC_INCLUDE) -u $(CURR_UNIX_TIME)
 	
 include_build:
 	$(Q)echo "unsigned int start_unix_time=$(CURR_UNIX_TIME);\n" > $(START_TIME_FILE)
