@@ -18,7 +18,7 @@ jobs:
     - name: path
       run: echo "${{github.workspace}}/tools/bin" >> "${GITHUB_PATH}"
     - name: make
-      run: make N=1
+      run: make N=1 -j$(nproc)
     - name: unit test
       run: make unittest
     - uses: actions/upload-artifact@v2

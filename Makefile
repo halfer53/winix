@@ -1,4 +1,4 @@
-.PHONY := kbuild all clean stat include_build unittest
+.PHONY := kbuild all clean stat include_build unittest buildlib
 
 srctree := $(shell pwd)
 include tools/Kbuild.include
@@ -44,14 +44,19 @@ KLIB_O = lib/syscall/wramp_syscall.o lib/ipc/ipc.o \
 L_HEAD = winix/limits/limits_head.o
 L_TAIL = winix/limits/limits_tail.o
 KERNEL_O = winix/*.o kernel/system/*.o kernel/*.o fs/*.o fs/system/*.o driver/*.o include/*.o
-ALLDIR = lib init user kernel fs driver winix
+ALLDIR = init user kernel fs driver winix
 ALLDIR_CLEAN = winix lib init user kernel fs driver include
 FS_DEPEND = fs/*.c fs/system/*.c fs/fsutil/*.c winix/bitmap.c
 DISK = include/disk.c
 START_TIME_FILE = include/startup_time.c
 SREC = $(shell find $(SREC_INCLUDE) -name "*.srec")
 
-all:| fsutil kbuild $(DISK) include_build
+all:
+	$(Q)$(MAKE) fsutil
+	$(Q)$(MAKE) buildlib
+	$(Q)$(MAKE) kbuild
+	$(Q)$(MAKE) $(DISK)
+	$(Q)$(MAKE) include_build
 	$(Q)wlink $(LDFLAGS) -Ttext 1024 -v -o winix.srec \
 	$(L_HEAD) $(KERNEL_O) $(KLIB_O) $(L_TAIL) > $(SREC_INCLUDE)/winix.verbose
 ifeq ($(KBUILD_VERBOSE),0)
@@ -66,6 +71,9 @@ ifeq ($(KBUILD_VERBOSE),0)
 	@echo "CC \t fsutil"
 endif
 	$(Q)gcc -g -DFSUTIL $(GCC_FLAG) $(COMMON_CFLAGS) -I./include/fs_include -I./include $^ -o fsutil
+
+buildlib:
+	$(Q)$(MAKE) $(build)=lib
 
 kbuild: $(ALLDIR)
 $(ALLDIR): FORCE
