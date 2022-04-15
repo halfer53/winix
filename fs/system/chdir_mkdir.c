@@ -31,7 +31,7 @@ int sys_chdir(struct proc* who, char* pathname){
 int sys_mkdir(struct proc* who, char* pathname, mode_t mode){
     char string[DIRSIZ];
     struct inode *lastdir = NULL, *ino = NULL;
-    int ret = OK;
+    int ret = OK, bnr;
     bool is_dirty = false;
 
     ret = eat_path(who, pathname, &lastdir, &ino, string);
@@ -47,7 +47,12 @@ int sys_mkdir(struct proc* who, char* pathname, mode_t mode){
         goto final;
     }
     ino->i_mode = S_IFDIR | (mode & ~(who->umask));
-    ino->i_zone[0] = alloc_block(ino, lastdir->i_dev);
+    bnr = alloc_block(ino, lastdir->i_dev);
+    if ( bnr <= 0){
+        ret = bnr;
+        goto final;
+    }
+    ino->i_zone[0] = bnr;
     ino->i_size = BLOCK_SIZE;
     init_dirent(lastdir, ino);
     ret = add_inode_to_directory(who, lastdir, ino, string);
