@@ -61,6 +61,12 @@ extern unsigned int TEXT_END, DATA_END, BSS_END;
 #define get_free_pages(num, flag)   kmalloc(num * PAGE_LEN)
 #define release_pages(ptr, num)     kfree(ptr)
 #define klog(...)                   printf(__VA_ARGS__)
+#define kwarn(...)                  \
+do{ \
+printf("WARN: ");       \
+printf(__VA_ARGS__);    \
+}while(0)
+
 
 #endif
 
