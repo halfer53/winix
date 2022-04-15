@@ -34,29 +34,40 @@ void test_given_o_creat_when_open_file_should_return_0(){
     assert(ret == 0);
 }
 
-int unit_test1(){
+void test_two_file_descriptors_when_dupping_file_should_behave_the_same(){
     int ret, fd, fd2;
     
     fd = sys_open(curr_scheduling_proc, filename ,O_CREAT | O_RDWR, 0775);
     assert(fd == 0);
+    
     fd2 = sys_dup(curr_scheduling_proc, fd);
     assert(fd2 == fd + 1);
 
     ret = sys_write(curr_scheduling_proc, fd, "abc", 3);
     assert(ret == 3);
+
     ret = sys_write(curr_scheduling_proc, fd, "def", 4);
     assert(ret == 4);
+
     ret = sys_read(curr_scheduling_proc, fd, buffer, 100);
     assert(ret == 0);
+
     ret = sys_lseek(curr_scheduling_proc, fd2, 0, SEEK_SET);
     assert(ret == 0);
+
     ret = sys_read(curr_scheduling_proc, fd, buffer, 100);
     assert(ret == 7);
     assert(strcmp(buffer, "abcdef") == 0);
+
     ret = sys_close(curr_scheduling_proc, fd);
     assert(ret == 0);
+
     ret = sys_close(curr_scheduling_proc, fd2);
     assert(ret == 0);
+}
+
+int unit_test1(){
+    int ret, fd;
 
     fd = sys_open(curr_scheduling_proc, filename ,O_RDONLY, 0x0775);
     assert(fd == 0);
@@ -250,6 +261,7 @@ int unit_test_driver(){
 
 int _run_unit_tests(){
     test_given_o_creat_when_open_file_should_return_0();
+    test_two_file_descriptors_when_dupping_file_should_behave_the_same();
 }
 
 int run_unit_tests(){
