@@ -21,7 +21,18 @@ int file_size(struct proc* who, int fd){
     return statbuf.st_size;
 }
 
+void test_given_o_creat_when_open_file_should_return_0(){
+    int ret, fd;
+    
+    fd = sys_open(curr_scheduling_proc, filename ,O_CREAT | O_RDWR, 0775);
+    assert(fd == 0);
 
+    ret = sys_close(curr_scheduling_proc, fd);
+    assert(ret == 0);
+
+    ret = sys_unlink(curr_scheduling_proc, filename);
+    assert(ret == 0);
+}
 
 int unit_test1(){
     int ret, fd, fd2;
@@ -237,6 +248,10 @@ int unit_test_driver(){
     assert(ret == EBADF);
 }
 
+int _run_unit_tests(){
+    test_given_o_creat_when_open_file_should_return_0();
+}
+
 int run_unit_tests(){
 
     init_bitmap();
@@ -247,6 +262,7 @@ int run_unit_tests(){
 
     mock_init_proc();
 
+    _run_unit_tests();
     unit_test1();
     unit_test2();
     unit_test3();
