@@ -59,6 +59,12 @@ int unit_test1(){
     ret = sys_close(curr_scheduling_proc, fd);
     assert(ret == 0);
 
+    ret = sys_unlink(curr_scheduling_proc, filename);
+    assert(ret == 0);
+
+    ret = sys_open(curr_scheduling_proc, filename ,O_RDONLY, 0x0775);
+    assert(ret == ENOENT); 
+
     return 0;
 }
 
@@ -191,10 +197,6 @@ int unit_test3(){
 
     ret = sys_access(curr_scheduling_proc, "/dev/bar.txt", F_OK);
     assert(ret == ENOENT);
-
-    ret = sys_unlink(curr_scheduling_proc, filename);
-    assert(ret == 0);
-
 
     ret = sys_close(curr_scheduling_proc, fd);
     assert(ret == 0);
