@@ -19,6 +19,8 @@ int sys_close(struct proc *who, int fd)
 
 int root_fs_write(struct filp *filp, char *data, size_t count, off_t offset);
 
+#define IS_NEW_FILE(inode, string) (!inode && *string != '\0')
+
 int sys_open(struct proc *who, char *path, int flags, mode_t mode)
 {
     filp_t *filp;
@@ -27,6 +29,7 @@ int sys_open(struct proc *who, char *path, int flags, mode_t mode)
     char string[DIRSIZ];
     struct device *dev;
     clock_t unix_time = get_unix_time();
+    bool is_new = false;
 
     if ((ret = eat_path(who, path, &lastdir, &inode, string)))
         return ret;
@@ -42,9 +45,8 @@ int sys_open(struct proc *who, char *path, int flags, mode_t mode)
         ret = EISDIR;
         goto final;
     }
-
     
-    if (!inode && *string != '\0')
+    if (IS_NEW_FILE(inode, string))
     {
 
         if (!(flags & O_CREAT))
@@ -95,10 +97,11 @@ int sys_open(struct proc *who, char *path, int flags, mode_t mode)
         goto final;
 
     ret = open_slot;
+    is_new = true;
     // KDEBUG(("Open: path %s Last dir %d, ret inode %d\n", path, lastdir->i_num, inode->i_num));
 
 final:
-    put_inode(lastdir, false);
+    put_inode(lastdir, is_new);
     return ret;
 }
 
