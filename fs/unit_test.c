@@ -47,6 +47,22 @@ void test_when_creating_file_should_return_0(){
     assert(ret == 0);
 }
 
+void test_given_opening_file_when_deleting_file_should_return_error(){
+    int ret, fd;
+    
+    fd = sys_creat(curr_scheduling_proc, filename , O_RDWR);
+    assert(fd == 0);
+
+    ret = sys_close(curr_scheduling_proc, fd);
+    assert(ret == 0);
+
+    ret = sys_unlink(curr_scheduling_proc, filename);
+    assert(ret == 0);
+
+    ret = sys_open(curr_scheduling_proc, filename , O_RDWR, 0775);
+    assert(ret == ENOENT);
+}
+
 void test_given_two_file_descriptors_when_dupping_file_should_behave_the_same(){
     int ret, fd, fd2;
     
@@ -285,6 +301,7 @@ int unit_test_driver(){
 int _run_unit_tests(){
     test_given_o_creat_when_open_file_should_return_0();
     test_when_creating_file_should_return_0();
+    test_given_opening_file_when_deleting_file_should_return_error();
     test_given_two_file_descriptors_when_dupping_file_should_behave_the_same();
 }
 
