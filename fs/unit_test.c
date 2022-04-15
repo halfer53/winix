@@ -103,28 +103,35 @@ void test_given_two_file_descriptors_when_dupping_file_should_behave_the_same(){
 
     ret = sys_close(curr_scheduling_proc, fd2);
     assert(ret == 0);
+
+    ret = sys_unlink(curr_scheduling_proc, filename);
+    assert(ret == 0);
 }
 
-int unit_test1(){
+int test_given_file_data_when_open_and_closing_file_should_persist(){
     int ret, fd;
 
-    fd = sys_open(curr_scheduling_proc, filename ,O_RDONLY, 0x0775);
+    fd = sys_open(curr_scheduling_proc, filename , O_CREAT | O_RDONLY, 0x0775);
     assert(fd == 0);
+    
+    ret = sys_write(curr_scheduling_proc, fd, "abcdef", 7);
+    assert(ret == 7);
+
+    ret = sys_close(curr_scheduling_proc, fd);
+    assert(ret == 0);
+
+    fd = sys_open(curr_scheduling_proc, filename , O_RDONLY, 0x0775);
     assert(file_size(curr_scheduling_proc, fd) == 7);
+
     ret = sys_read(curr_scheduling_proc, fd, buffer, 100);
     assert(ret == 7);
     assert(strcmp(buffer, "abcdef") == 0);
-    ret = sys_read(curr_scheduling_proc, fd, buffer, 100);
-    assert(ret == 0);
 
     ret = sys_close(curr_scheduling_proc, fd);
     assert(ret == 0);
 
     ret = sys_unlink(curr_scheduling_proc, filename);
     assert(ret == 0);
-
-    ret = sys_open(curr_scheduling_proc, filename ,O_RDONLY, 0x0775);
-    assert(ret == ENOENT); 
 
     return 0;
 }
@@ -298,13 +305,6 @@ int unit_test_driver(){
     assert(ret == EBADF);
 }
 
-int _run_unit_tests(){
-    test_given_o_creat_when_open_file_should_return_0();
-    test_when_creating_file_should_return_0();
-    test_given_opening_file_when_deleting_file_should_return_error();
-    test_given_two_file_descriptors_when_dupping_file_should_behave_the_same();
-}
-
 int run_unit_tests(){
 
     init_bitmap();
@@ -315,8 +315,12 @@ int run_unit_tests(){
 
     mock_init_proc();
 
-    _run_unit_tests();
-    unit_test1();
+    test_given_o_creat_when_open_file_should_return_0();
+    test_when_creating_file_should_return_0();
+    test_given_opening_file_when_deleting_file_should_return_error();
+    test_given_two_file_descriptors_when_dupping_file_should_behave_the_same();
+    test_given_file_data_when_open_and_closing_file_should_persist();
+    
     unit_test2();
     unit_test3();
     unit_test_driver();
