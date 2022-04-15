@@ -64,15 +64,11 @@ int unit_test1(){
 
 int unit_test2(){
     struct proc pcurr2;
-    int ret, fd, fd2, fd3, fd4, i;
+    int ret;
     int pipe_fd[2];
-    struct stat statbuf, statbuf2;
 
     pcurr2.pid = 2;
     pcurr2.proc_nr = 2;
-
-    
-//    sys_close(curr_scheduling_proc, fd);
 
     ret = sys_pipe(curr_scheduling_proc, pipe_fd);
     assert(ret == 0);
@@ -119,11 +115,14 @@ int unit_test2(){
     assert(ret == 0);
     ret = sys_close(&pcurr2, pipe_fd[1]);
     assert(ret == 0);
-//    ret = sys_write(&pcurr2, pipe_fd[1], "abc", 4);
-//    ret = sys_close(&pcurr2, pipe_fd[1]);
-//    assert(ret == 0);
-//    ret = sys_read(curr_scheduling_proc, pipe_fd[0], buffer, BLOCK_SIZE);
-//    assert(ret == 0);
+
+    
+    return 0;
+}
+
+int unit_test3(){
+    int ret, fd, fd2, fd3, fd4, i;
+    struct stat statbuf, statbuf2;
 
     ret = sys_access(curr_scheduling_proc, "/dev", F_OK);
     assert(ret != 0);
@@ -231,11 +230,7 @@ int unit_test2(){
     ret = sys_close(curr_scheduling_proc, fd4);
     assert(ret == EBADF);
 
-    printf("filesystem unit test passed\n");
-    return 0;
-}
-
-int unit_test3(){
+    
     return 0;
 }
 
@@ -251,5 +246,8 @@ int run_unit_tests(){
 
     unit_test1();
     unit_test2();
+    unit_test3();
+    printf("filesystem unit test passed\n");
+    return 0;
 }
 
