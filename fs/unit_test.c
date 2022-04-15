@@ -11,31 +11,28 @@ const char * dirent_array[] = {
         "bar2.txt"
 };
 
+char *filename = "/foo.txt";
+char buffer[BLOCK_SIZE];
+char buffer2[BLOCK_SIZE];
+
 int file_size(struct proc* who, int fd){
     struct stat statbuf;
     (void)sys_fstat(who, fd, &statbuf);
     return statbuf.st_size;
 }
 
+
+
 int unit_test1(){
     struct proc pcurr2;
     int ret, fd, fd2, fd3, fd4, i;
     int pipe_fd[2];
     struct stat statbuf, statbuf2;
-    init_bitmap();
-    char *filename = "/foo.txt";
-    char buffer[BLOCK_SIZE];
-    char b2[BLOCK_SIZE];
 
     pcurr2.pid = 2;
     pcurr2.proc_nr = 2;
 
-    init_dev();
-    init_fs();
-    init_tty();
-    init_drivers();
-
-    mock_init_proc();
+    
     fd = sys_open(curr_scheduling_proc, filename ,O_CREAT | O_RDWR, 0775);
     assert(fd == 0);
     fd2 = sys_dup(curr_scheduling_proc, fd);
@@ -90,12 +87,12 @@ int unit_test1(){
     assert(ret == BLOCK_SIZE);
     ret = sys_write(&pcurr2, pipe_fd[1], "abc", 4);
     assert(ret == SUSPEND);
-    ret = sys_read(curr_scheduling_proc, pipe_fd[0], b2, BLOCK_SIZE);
+    ret = sys_read(curr_scheduling_proc, pipe_fd[0], buffer2, BLOCK_SIZE);
     assert(ret == BLOCK_SIZE);
-    assert(strcmp(buffer, b2) == 0);
-    ret = sys_read(curr_scheduling_proc, pipe_fd[0], b2, BLOCK_SIZE);
+    assert(strcmp(buffer, buffer2) == 0);
+    ret = sys_read(curr_scheduling_proc, pipe_fd[0], buffer2, BLOCK_SIZE);
     assert(ret == 4);
-    assert(strcmp(b2, "abc") == 0);
+    assert(strcmp(buffer2, "abc") == 0);
 
     sys_close(curr_scheduling_proc, pipe_fd[0]);
     ret = sys_write(&pcurr2, pipe_fd[1], "a", 2);
@@ -228,3 +225,21 @@ int unit_test1(){
     printf("filesystem unit test passed\n");
     return 0;
 }
+
+int unit_test2(){
+    
+}
+
+int run_unit_tests(){
+
+    init_bitmap();
+    init_dev();
+    init_fs();
+    init_tty();
+    init_drivers();
+
+    mock_init_proc();
+
+    unit_test1();
+}
+

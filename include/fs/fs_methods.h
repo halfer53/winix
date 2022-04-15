@@ -66,7 +66,7 @@ int put_inode(inode_t *inode, bool is_dirty);
 inode_t* alloc_inode(struct proc* who, struct device*, struct device*);
 int truncate_inode(inode_t *inode);
 void init_inode();
-int unit_test1();
+int run_unit_tests();
 
 int char32_strcmp(const char32_t *s1, const char *s2);
 int char32_strlen(const char32_t *s);

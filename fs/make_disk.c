@@ -262,7 +262,7 @@ int main(int argc, char** argv){
         write_srec_to_disk(arguments.source_path, &arguments);
         write_disk(arguments.output_path);
     }else if(arguments.debug){
-        unit_test1();
+        run_unit_tests();
     }
 
 //    do_tests();
