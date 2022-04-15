@@ -116,13 +116,13 @@ int unit_test2(){
     ret = sys_close(&pcurr2, pipe_fd[1]);
     assert(ret == 0);
 
-    
     return 0;
 }
 
 int unit_test3(){
-    int ret, fd, fd2, fd3, fd4, i;
+    int ret, fd, fd2, i;
     struct stat statbuf, statbuf2;
+    struct dirent dir[4];
 
     ret = sys_access(curr_scheduling_proc, "/dev", F_OK);
     assert(ret != 0);
@@ -165,16 +165,15 @@ int unit_test3(){
     assert(statbuf.st_nlink == 2);
     assert(statbuf.st_mode == 0x777);
 
-    fd3 = sys_open(curr_scheduling_proc, "/dev", O_RDONLY, 0);
-    assert(fd3 >= 0);
-    struct dirent dir[4];
+    fd2 = sys_open(curr_scheduling_proc, "/dev", O_RDONLY, 0);
+    assert(fd2 == 1);
 
-    ret = sys_getdents(curr_scheduling_proc, fd3, dir, 5);
+    ret = sys_getdents(curr_scheduling_proc, fd2, dir, 5);
     assert(ret == sizeof(struct dirent) * 4);
     for (i = 0; i < 4; ++i) {
         assert(char32_strcmp(dir[i].d_name, dirent_array[i]) == 0);
     }
-    ret = sys_getdents(curr_scheduling_proc, fd3, dir, 10);
+    ret = sys_getdents(curr_scheduling_proc, fd2, dir, 10);
     assert(ret == 0);
 
     ret = sys_unlink(curr_scheduling_proc, "/dev/bar2.txt");
@@ -196,25 +195,33 @@ int unit_test3(){
     ret = sys_unlink(curr_scheduling_proc, filename);
     assert(ret == 0);
 
-    fd2 = sys_dup(curr_scheduling_proc, fd);
-    assert(fd2 >= 0);
 
+    ret = sys_close(curr_scheduling_proc, fd);
+    assert(ret == 0);
 
+    ret = sys_close(curr_scheduling_proc, fd2);
+    assert(ret == 0);
+    
+    return 0;
+}
+
+int unit_test_driver(){
+    int ret, fd, fd2, fd3;
 
     ret = sys_mknod(curr_scheduling_proc, "/dev/tty", O_RDWR, MAKEDEV(3, 1));
     assert(ret == 0);
 
-    fd3 = sys_open(curr_scheduling_proc, "/dev/tty", O_RDWR, 0);
-    assert(fd >= 0);
+    fd = sys_open(curr_scheduling_proc, "/dev/tty", O_RDWR, 0);
+    assert(fd == 0);
 
-    ret = sys_read(curr_scheduling_proc, fd3, buffer, 3);
+    ret = sys_read(curr_scheduling_proc, fd, buffer, 3);
     assert(ret == 3);
     assert(strcmp(buffer, "tt") == 0);
 
-    fd4 = sys_dup2(curr_scheduling_proc, fd3, fd2);
-    assert(fd4 == fd2);
+    fd2 = sys_dup2(curr_scheduling_proc, fd, 1);
+    assert(1 == fd2);
 
-    ret = sys_read(curr_scheduling_proc, fd4, buffer, 4);
+    ret = sys_read(curr_scheduling_proc, fd2, buffer, 4);
     assert(ret == 4);
     assert(strcmp(buffer, "ttt") == 0);
 
@@ -225,13 +232,7 @@ int unit_test3(){
     assert(ret == 0);
 
     ret = sys_close(curr_scheduling_proc, fd3);
-    assert(ret == 0);
-
-    ret = sys_close(curr_scheduling_proc, fd4);
     assert(ret == EBADF);
-
-    
-    return 0;
 }
 
 int run_unit_tests(){
@@ -247,6 +248,7 @@ int run_unit_tests(){
     unit_test1();
     unit_test2();
     unit_test3();
+    unit_test_driver();
     printf("filesystem unit test passed\n");
     return 0;
 }
