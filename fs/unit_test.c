@@ -24,14 +24,7 @@ int file_size(struct proc* who, int fd){
 
 
 int unit_test1(){
-    struct proc pcurr2;
-    int ret, fd, fd2, fd3, fd4, i;
-    int pipe_fd[2];
-    struct stat statbuf, statbuf2;
-
-    pcurr2.pid = 2;
-    pcurr2.proc_nr = 2;
-
+    int ret, fd, fd2;
     
     fd = sys_open(curr_scheduling_proc, filename ,O_CREAT | O_RDWR, 0775);
     assert(fd == 0);
@@ -54,7 +47,6 @@ int unit_test1(){
     ret = sys_close(curr_scheduling_proc, fd2);
     assert(ret == 0);
 
-
     fd = sys_open(curr_scheduling_proc, filename ,O_RDONLY, 0x0775);
     assert(fd == 0);
     assert(file_size(curr_scheduling_proc, fd) == 7);
@@ -63,6 +55,23 @@ int unit_test1(){
     assert(strcmp(buffer, "abcdef") == 0);
     ret = sys_read(curr_scheduling_proc, fd, buffer, 100);
     assert(ret == 0);
+
+    ret = sys_close(curr_scheduling_proc, fd);
+    assert(ret == 0);
+
+    return 0;
+}
+
+int unit_test2(){
+    struct proc pcurr2;
+    int ret, fd, fd2, fd3, fd4, i;
+    int pipe_fd[2];
+    struct stat statbuf, statbuf2;
+
+    pcurr2.pid = 2;
+    pcurr2.proc_nr = 2;
+
+    
 //    sys_close(curr_scheduling_proc, fd);
 
     ret = sys_pipe(curr_scheduling_proc, pipe_fd);
@@ -128,8 +137,8 @@ int unit_test1(){
     ret = sys_access(curr_scheduling_proc, "/dev/bar.txt", F_OK);
     assert(ret != 0);
 
-    ret = sys_creat(curr_scheduling_proc, "/dev/bar.txt", 0x777);
-    assert(ret > 0);
+    fd = sys_creat(curr_scheduling_proc, "/dev/bar.txt", 0x777);
+    assert(fd == 0);
 
     ret = sys_access(curr_scheduling_proc, "/dev/bar.txt", F_OK);
     assert(ret == 0);
@@ -226,8 +235,8 @@ int unit_test1(){
     return 0;
 }
 
-int unit_test2(){
-    
+int unit_test3(){
+    return 0;
 }
 
 int run_unit_tests(){
@@ -241,5 +250,6 @@ int run_unit_tests(){
     mock_init_proc();
 
     unit_test1();
+    unit_test2();
 }
 
