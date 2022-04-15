@@ -49,6 +49,10 @@ Winix includes full-featured kernel with process and memory management, in-memor
  - [du](user/commands/du.c)
  - [ln](user/commands/ln.c)
 
+## Unit Test
+
+[unit_test.c](fs/unit_test.c)
+
 ## How to Run
 
 Download the latest Rexsimulator from [Here](https://github.com/halfer53/rexsimulator/releases)

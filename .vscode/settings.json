@@ -30,7 +30,8 @@
         "wini_ipc.h": "c",
         "comm.h": "c",
         "compiler.h": "c",
-        "parse.h": "c"
+        "parse.h": "c",
+        "assert.h": "c"
     },
     "files.exclude": {
         "**/*.o": true,
