@@ -413,7 +413,7 @@ void test_given_access_when_under_folder_should_return_enoent(){
     _reset_fs();
 }
 
-void test_given_stat_when_two_files_are_linked_should_return_same(){
+void test_given_link_stat_when_two_files_are_linked_should_return_same(){
     int fd, ret;
     struct stat statbuf, statbuf2;
 
@@ -463,6 +463,11 @@ void test_given_chdir_when_dir_is_valid_should_succeed(){
     assert(curr_scheduling_proc->fp_workdir->i_num == statbuf.st_ino);
 
     _reset_fs();
+}
+
+void test_given_chmod_when_file_not_present_should_return_enonent(){
+    int ret = sys_chmod(curr_scheduling_proc, "/notexists", O_RDONLY);
+    assert(ret == ENOENT);
 }
 
 int unit_test3(){
@@ -584,10 +589,11 @@ int main(){
     test_given_access_when_file_exists_should_return_0();
     test_given_access_when_folder_exists_should_return_0();
     test_given_access_when_under_folder_should_return_enoent();
-    test_given_stat_when_two_files_are_linked_should_return_same();
+    test_given_link_stat_when_two_files_are_linked_should_return_same();
     test_given_chdir_when_dir_not_present_should_return_eexist();
     test_given_chdir_when_path_is_file_should_return_eexist();
     test_given_chdir_when_dir_is_valid_should_succeed();
+    test_given_chmod_when_file_not_present_should_return_enonent();
     
     unit_test3();
     unit_test3();
