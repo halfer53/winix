@@ -280,36 +280,39 @@ void test_given_read_when_data_is_written_should_return_data(){
     _close_pipe(pipe_fd, &pcurr2);
 }
 
-int unit_test2(){
+void test_given_read_when_pipe_is_full_should_return_data(){
     struct proc pcurr2;
     int ret;
     int pipe_fd[2];
 
     _init_pipe(pipe_fd, &pcurr2);
 
-    ret = sys_write(&pcurr2, pipe_fd[1], "5678", 5);
-    assert(ret == 5);
+    memset(buffer, 'a', PAGE_LEN - 1);
+    buffer[PAGE_LEN - 1] = 0;
 
-    ret = sys_read(curr_scheduling_proc, pipe_fd[0], buffer, 100);
-    assert(ret == 5);
-    assert(strcmp(buffer, "5678") == 0);
-
-    memset(buffer, 'a', BLOCK_SIZE - 1);
-    buffer[BLOCK_SIZE - 1] = 0;
-
-    ret = sys_write(&pcurr2, pipe_fd[1], buffer, BLOCK_SIZE);
-    assert(ret == BLOCK_SIZE);
+    ret = sys_write(&pcurr2, pipe_fd[1], buffer, PAGE_LEN);
+    assert(ret == PAGE_LEN);
 
     ret = sys_write(&pcurr2, pipe_fd[1], "abc", 4);
     assert(ret == SUSPEND);
 
-    ret = sys_read(curr_scheduling_proc, pipe_fd[0], buffer2, BLOCK_SIZE);
-    assert(ret == BLOCK_SIZE);
+    ret = sys_read(curr_scheduling_proc, pipe_fd[0], buffer2, PAGE_LEN);
+    assert(ret == PAGE_LEN);
     assert(strcmp(buffer, buffer2) == 0);
 
-    ret = sys_read(curr_scheduling_proc, pipe_fd[0], buffer2, BLOCK_SIZE);
+    ret = sys_read(curr_scheduling_proc, pipe_fd[0], buffer2, PAGE_LEN);
     assert(ret == 4);
     assert(strcmp(buffer2, "abc") == 0);
+
+    _close_pipe(pipe_fd, &pcurr2);
+}
+
+int unit_test2(){
+    struct proc pcurr2;
+    int ret;
+    int pipe_fd[2];
+
+    _init_pipe(pipe_fd, &pcurr2);
 
     sys_close(curr_scheduling_proc, pipe_fd[0]);
     ret = sys_write(&pcurr2, pipe_fd[1], "a", 2);
@@ -467,6 +470,7 @@ int main(){
     test_given_close_when_file_closed_should_return_ebadf();
     test_given_read_when_proc_was_suspended_should_return();
     test_given_read_when_data_is_written_should_return_data();
+    test_given_read_when_pipe_is_full_should_return_data();
     
     unit_test2();
     unit_test3();
