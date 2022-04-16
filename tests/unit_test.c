@@ -421,14 +421,8 @@ int unit_test3(){
     ret = sys_mkdir(curr_scheduling_proc, DIR_NAME, 0x755);
     assert(ret == 0);
 
-    ret = sys_access(curr_scheduling_proc, DIR_FILE1, F_OK);
-    assert(ret != 0);
-
     fd = sys_creat(curr_scheduling_proc, DIR_FILE1, 0x777);
     assert(fd == 0);
-
-    ret = sys_access(curr_scheduling_proc, DIR_FILE1, F_OK);
-    assert(ret == 0);
 
     ret = sys_chdir(curr_scheduling_proc, DIR_NAME);
     assert(ret == 0);
@@ -524,13 +518,7 @@ int unit_test_driver(){
 int main(){
 
     init_bitmap();
-    init_disk();
-    init_dev();
-    init_fs();
-    init_tty();
-    init_drivers();
-
-    mock_init_proc();
+    _reset_fs();
 
     test_given_o_creat_when_open_file_should_return_0();
     test_when_creating_file_should_return_0();
