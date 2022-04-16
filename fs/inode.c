@@ -305,7 +305,7 @@ int release_inode(inode_t *inode){
     block_t zone_id;
     int i = 0;
     if(inode->i_count != 0){
-        kprintf("[ERROR]: %d is in use before releasing\n", inum);
+        kwarn("%d is in use before releasing\n", inum);
         return EINVAL;
     }
     // KDEBUG(("releasing inode %d\n", inode->i_num));
