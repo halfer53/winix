@@ -12,9 +12,10 @@ const char * dirent_array[] = {
 };
 
 const char *FILE1 = "/foo.txt";
-const char *DIR_NAME = "/dev/";
-const char *DIR_FILE1 = "/dev/bar.txt";
-const char *DIR_FILE2 = "/dev/bar2.txt";
+const char *FILE2 = "/foo.txt";
+const char *DIR_NAME = "/dir/";
+const char *DIR_FILE1 = "/dir/bar.txt";
+const char *DIR_FILE2 = "/dir/bar2.txt";
 char buffer[PAGE_LEN];
 char buffer2[PAGE_LEN];
 
@@ -487,6 +488,9 @@ int unit_test3(){
 
 int unit_test_driver(){
     int ret, fd, fd2, fd3;
+
+    ret = sys_mkdir(curr_scheduling_proc, "/dev", 0x755);
+    assert(ret == 0);
 
     ret = sys_mknod(curr_scheduling_proc, "/dev/tty", O_RDWR, MAKEDEV(3, 1));
     assert(ret == 0);
