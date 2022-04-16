@@ -29,8 +29,8 @@
             "name": "File System Run Unit Test",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/fsutil",
-            "args": ["-d", "-t", "2048"],
+            "program": "${workspaceFolder}/unittest",
+            "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
@@ -43,7 +43,7 @@
                     "ignoreFailures": true
                 }
             ],
-            "preLaunchTask": "GCC Build fsutil",
+            "preLaunchTask": "GCC Build unittest",
             "miDebuggerPath": "/usr/bin/gdb"
         }
     ]
