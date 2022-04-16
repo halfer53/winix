@@ -145,20 +145,19 @@ void _init_pipe(int pipe_fd[2], struct proc* pcurr2){
     emulate_fork(curr_scheduling_proc, pcurr2);
 }
 
-void _close_pipe(int pipe_fd[2], struct proc* pcurr2){
+void __close_pipe(int pipe_fd[2], struct proc* process){
     int ret;
 
-    ret = sys_close(curr_scheduling_proc, pipe_fd[0]);
+    ret = sys_close(process, pipe_fd[0]);
     assert(ret == 0);
 
-    ret = sys_close(pcurr2, pipe_fd[0]);
+    ret = sys_close(process, pipe_fd[1]);
     assert(ret == 0);
+}
 
-    ret = sys_close(curr_scheduling_proc, pipe_fd[1]);
-    assert(ret == 0);
-
-    ret = sys_close(pcurr2, pipe_fd[1]);
-    assert(ret == 0);
+void _close_pipe(int pipe_fd[2], struct proc* pcurr2){
+    __close_pipe(pipe_fd, curr_scheduling_proc);
+    __close_pipe(pipe_fd, pcurr2);
 }
 
 void test_given_read_when_no_data_in_pipe_should_return_suspend(){
