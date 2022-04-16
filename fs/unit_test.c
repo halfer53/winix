@@ -39,6 +39,18 @@ void test_given_o_creat_when_open_file_should_return_0(){
     _close_delete_file(fd, filename);
 }
 
+void test_given_close_when_file_closed_should_return_ebadf(){
+    int fd, ret;
+    
+    fd = sys_open(curr_scheduling_proc, filename ,O_CREAT | O_RDWR, 0775);
+    assert(fd == 0);
+
+    _close_delete_file(fd, filename);
+
+    ret = sys_close(curr_scheduling_proc, fd);
+    assert(ret == EBADF);
+}
+
 void test_when_creating_file_should_return_0(){
     int fd;
     
@@ -421,6 +433,7 @@ int run_unit_tests(){
     test_given_write_when_pipe_is_full_should_return_suspend();
     test_given_read_when_fd_is_closed_return_ebadf();
     test_given_write_when_fd_is_closed_return_ebadf();
+    test_given_close_when_file_closed_should_return_ebadf();
     
     unit_test2();
     unit_test3();
