@@ -307,7 +307,7 @@ void test_given_read_when_pipe_is_full_should_return_data(){
     _close_pipe(pipe_fd, &pcurr2);
 }
 
-void test_given_write_when_read_fd_are_closed_should_return_sigpipe(){
+void test_given_write_when_one_read_fd_s_closed_should_return_success(){
     struct proc pcurr2;
     int ret;
     int pipe_fd[2];
@@ -319,6 +319,23 @@ void test_given_write_when_read_fd_are_closed_should_return_sigpipe(){
 
     ret = sys_write(&pcurr2, pipe_fd[1], "a", 2);
     assert(ret == 2);
+
+    ret = sys_read(&pcurr2, pipe_fd[0], buffer, 2);
+    assert(ret == 2);
+    assert(strcmp("a", buffer) == 0);
+
+    _close_pipe(pipe_fd, &pcurr2);
+}
+
+void test_given_write_when_read_fd_are_closed_should_return_sigpipe(){
+    struct proc pcurr2;
+    int ret;
+    int pipe_fd[2];
+
+    _init_pipe(pipe_fd, &pcurr2);
+
+    ret = sys_close(curr_scheduling_proc, pipe_fd[0]);
+    assert(ret == 0);
 
     ret = sys_close(&pcurr2, pipe_fd[0]);
     assert(ret == 0);
@@ -500,6 +517,7 @@ int main(){
     test_given_read_when_data_is_written_should_return_data();
     test_given_read_when_pipe_is_full_should_return_data();
     test_given_write_when_read_fd_are_closed_should_return_sigpipe();
+    test_given_write_when_one_read_fd_s_closed_should_return_success();
     
     unit_test2();
     unit_test3();
