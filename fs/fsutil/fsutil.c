@@ -33,7 +33,6 @@ static char args_doc[] = "-d -s [Source Path] -o [Output Path]";
 /* The options we understand. */
 static struct argp_option options[] = {
         {"offset",  't', "OFFSET1",      0,  "Srec Text Segment Offset" },
-        {"debug",  'd', 0,      OPTION_ARG_OPTIONAL,  "Is Debugging" },
         {"output",   'o', "OUTPUT", 0, "Output Path" },
         {"source",   's', "SOURCE", 0, "Source Path" },
         {"unix time",   'u', "UNIX_TIME", 0, "Unix Time" },
@@ -62,9 +61,6 @@ static error_t parse_opt (int key, char *arg, struct argp_state *state)
     {
         case 't':
             arguments->offset = arg ? atoi(arg) : 2048;
-            break;
-        case 'd':
-            arguments->debug = true;
             break;
         case 'o':
             arguments->output_path = arg;
@@ -232,12 +228,11 @@ int main(int argc, char** argv){
     arguments.debug = false;
     arguments.offset = 2048;
     argp_parse (&argp, argc, argv, 0, 0, &arguments);
-    if( arguments.source_path == NULL && arguments.output_path == NULL && arguments.debug == false){
+    if( arguments.source_path == NULL && arguments.output_path == NULL ){
         fprintf(stderr,"Format ERROR: source file = %s\n"
                        "output file = %s\n"
-                       "is debug %d\n"
                        "Offset %d\n",
-                arguments.source_path, arguments.output_path, arguments.debug, arguments.offset);
+                arguments.source_path, arguments.output_path, arguments.offset);
         return 1;
     }
 
