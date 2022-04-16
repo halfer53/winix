@@ -161,8 +161,17 @@ void _close_pipe(int pipe_fd[2], struct proc* pcurr2){
     assert(ret == 0);
 }
 
-void test_given_write_when_opening_pipe_should_return_no_chars(){
-    
+void test_given_read_when_no_data_in_pipe_should_return_suspend(){
+    struct proc pcurr2;
+    int ret;
+    int pipe_fd[2];
+
+    _init_pipe(pipe_fd, &pcurr2);
+
+    ret = sys_read(curr_scheduling_proc, pipe_fd[0], buffer, 100);
+    assert(ret == SUSPEND);
+
+    _close_pipe(pipe_fd, &pcurr2);
 }
 
 int unit_test2(){
