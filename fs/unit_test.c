@@ -173,6 +173,19 @@ void test_given_read_when_no_data_in_pipe_should_return_suspend(){
     _close_pipe(pipe_fd, &pcurr2);
 }
 
+void test_given_write_when_no_data_in_pipe_should_return_succeed(){
+    struct proc pcurr2;
+    int ret;
+    int pipe_fd[2];
+
+    _init_pipe(pipe_fd, &pcurr2);
+
+    ret = sys_write(curr_scheduling_proc, pipe_fd[1], "a", 1);
+    assert(ret == 1);
+
+    _close_pipe(pipe_fd, &pcurr2);
+}
+
 int unit_test2(){
     struct proc pcurr2;
     int ret;
@@ -359,6 +372,7 @@ int run_unit_tests(){
     test_given_two_file_descriptors_when_dupping_file_should_behave_the_same();
     test_given_file_data_when_open_and_closing_file_should_persist();
     test_given_read_when_no_data_in_pipe_should_return_suspend();
+    test_given_write_when_no_data_in_pipe_should_return_succeed();
     
     unit_test2();
     unit_test3();
