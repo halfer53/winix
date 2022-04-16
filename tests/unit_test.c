@@ -52,7 +52,7 @@ void test_given_o_creat_when_open_file_should_return_0(){
     _close_delete_file(fd, FILE1);
 }
 
-void test_given_close_when_file_closed_should_return_ebadf(){
+void test_given_pipe_close_when_file_closed_should_return_ebadf(){
     int fd, ret;
     
     fd = sys_open(curr_scheduling_proc, FILE1 ,O_CREAT | O_RDWR, 0775);
@@ -73,7 +73,7 @@ void test_when_creating_file_should_return_0(){
     _close_delete_file(fd, FILE1);
 }
 
-void test_given_read_when_fd_is_closed_return_ebadf(){
+void test_given_pipe_read_when_fd_is_closed_return_ebadf(){
     int ret, fd;
     
     fd = sys_creat(curr_scheduling_proc, FILE1 , O_RDWR);
@@ -89,7 +89,7 @@ void test_given_read_when_fd_is_closed_return_ebadf(){
     assert(ret == 0);
 }
 
-void test_given_write_when_fd_is_closed_return_ebadf(){
+void test_given_pipe_write_when_fd_is_closed_return_ebadf(){
     int ret, fd;
     
     fd = sys_creat(curr_scheduling_proc, FILE1 , O_RDWR);
@@ -209,7 +209,7 @@ void _close_pipe(int pipe_fd[2], struct proc* pcurr2){
     __close_pipe(pipe_fd, pcurr2);
 }
 
-void test_given_read_when_no_data_in_pipe_should_return_suspend(){
+void test_given_pipe_read_when_no_data_in_pipe_should_return_suspend(){
     struct proc pcurr2;
     int ret;
     int pipe_fd[2];
@@ -222,7 +222,7 @@ void test_given_read_when_no_data_in_pipe_should_return_suspend(){
     _close_pipe(pipe_fd, &pcurr2);
 }
 
-void test_given_write_when_no_data_in_pipe_should_return_succeed(){
+void test_given_pipe_write_when_no_data_in_pipe_should_return_succeed(){
     struct proc pcurr2;
     int ret;
     int pipe_fd[2];
@@ -235,7 +235,7 @@ void test_given_write_when_no_data_in_pipe_should_return_succeed(){
     _close_pipe(pipe_fd, &pcurr2);
 }
 
-void test_given_write_when_pipe_is_full_should_return_suspend(){
+void test_given_pipe_write_when_pipe_is_full_should_return_suspend(){
     struct proc pcurr2;
     int ret;
     int pipe_fd[2];
@@ -251,7 +251,7 @@ void test_given_write_when_pipe_is_full_should_return_suspend(){
     _close_pipe(pipe_fd, &pcurr2);
 }
 
-void test_given_read_when_proc_was_suspended_should_return(){
+void test_given_pipe_read_when_proc_was_suspended_should_return(){
     struct proc pcurr2;
     int ret;
     int pipe_fd[2];
@@ -271,7 +271,7 @@ void test_given_read_when_proc_was_suspended_should_return(){
     _close_pipe(pipe_fd, &pcurr2);
 }
 
-void test_given_read_when_data_is_written_should_return_data(){
+void test_given_pipe_read_when_data_is_written_should_return_data(){
     struct proc pcurr2;
     int ret;
     int pipe_fd[2];
@@ -288,7 +288,7 @@ void test_given_read_when_data_is_written_should_return_data(){
     _close_pipe(pipe_fd, &pcurr2);
 }
 
-void test_given_read_when_pipe_is_full_should_return_data(){
+void test_given_pipe_read_when_pipe_is_full_should_return_data(){
     struct proc pcurr2;
     int ret;
     int pipe_fd[2];
@@ -315,7 +315,7 @@ void test_given_read_when_pipe_is_full_should_return_data(){
     _close_pipe(pipe_fd, &pcurr2);
 }
 
-void test_given_write_when_one_read_fd_s_closed_should_return_success(){
+void test_given_pipe_write_when_one_read_fd_s_closed_should_return_success(){
     struct proc pcurr2;
     int ret;
     int pipe_fd[2];
@@ -335,7 +335,7 @@ void test_given_write_when_one_read_fd_s_closed_should_return_success(){
     _close_pipe(pipe_fd, &pcurr2);
 }
 
-void test_given_write_when_read_fd_are_closed_should_return_sigpipe(){
+void test_given_pipe_write_when_read_fd_are_closed_should_return_sigpipe(){
     struct proc pcurr2;
     int ret;
     int pipe_fd[2];
@@ -355,7 +355,7 @@ void test_given_write_when_read_fd_are_closed_should_return_sigpipe(){
     _close_pipe(pipe_fd, &pcurr2);
 }
 
-void test_given_write_when_read_fd_closed_and_sigpipe_ignored_should_return_epipe(){
+void test_given_pipe_write_when_read_fd_closed_and_sigpipe_ignored_should_return_epipe(){
     struct proc pcurr2;
     int ret;
     int pipe_fd[2];
@@ -573,59 +573,6 @@ void test_given_getdents_when_files_in_folder_should_return_files(){
     _reset_fs();
 }
 
-int unit_test3(){
-    int ret, fd, fd2, i;
-    struct stat statbuf, statbuf2;
-    struct dirent dir[5];
-    _reset_fs();
-
-    ret = sys_mkdir(curr_scheduling_proc, DIR_NAME, O_RDWR);
-    assert(ret == 0);
-
-    fd = sys_creat(curr_scheduling_proc, DIR_FILE1, O_RDWR);
-    assert(fd == 0);
-
-    ret = sys_link(curr_scheduling_proc, DIR_FILE1, DIR_FILE2);
-    assert(ret == 0);
-
-    fd2 = sys_open(curr_scheduling_proc, DIR_NAME, O_RDONLY, 0);
-    assert(fd2 == 1);
-
-    ret = sys_getdents(curr_scheduling_proc, fd2, dir, 5);
-    size_t dirent_size = sizeof(struct dirent);
-    size_t desired = dirent_size * 4;
-    assert(ret == desired);
-    for (i = 0; i < 4; ++i) {
-        assert(char32_strcmp(dir[i].d_name, dirent_array[i]) == 0);
-    }
-    ret = sys_getdents(curr_scheduling_proc, fd2, dir, 10);
-    assert(ret == 0);
-
-    ret = sys_unlink(curr_scheduling_proc, DIR_FILE2);
-    assert(ret == 0);
-
-    ret = sys_stat(curr_scheduling_proc, DIR_FILE1, &statbuf);
-    assert(ret == 0);
-    assert(statbuf.st_nlink == 1);
-
-    ret = sys_stat(curr_scheduling_proc, DIR_FILE2, &statbuf2);
-    assert(ret == ENOENT);
-
-    ret = sys_unlink(curr_scheduling_proc, DIR_FILE1);
-    assert(ret == 0);
-
-    ret = sys_access(curr_scheduling_proc, DIR_FILE1, F_OK);
-    assert(ret == ENOENT);
-
-    ret = sys_close(curr_scheduling_proc, fd);
-    assert(ret == 0);
-
-    ret = sys_close(curr_scheduling_proc, fd2);
-    assert(ret == 0);
-    
-    return 0;
-}
-
 int unit_test_driver(){
     int ret, fd, fd2, fd3;
 
@@ -669,18 +616,18 @@ int main(){
     test_given_opening_file_when_deleting_file_should_return_error();
     test_given_two_file_descriptors_when_dupping_file_should_behave_the_same();
     test_given_file_data_when_open_and_closing_file_should_persist();
-    test_given_read_when_no_data_in_pipe_should_return_suspend();
-    test_given_write_when_no_data_in_pipe_should_return_succeed();
-    test_given_write_when_pipe_is_full_should_return_suspend();
-    test_given_read_when_fd_is_closed_return_ebadf();
-    test_given_write_when_fd_is_closed_return_ebadf();
-    test_given_close_when_file_closed_should_return_ebadf();
-    test_given_read_when_proc_was_suspended_should_return();
-    test_given_read_when_data_is_written_should_return_data();
-    test_given_read_when_pipe_is_full_should_return_data();
-    test_given_write_when_read_fd_are_closed_should_return_sigpipe();
-    test_given_write_when_one_read_fd_s_closed_should_return_success();
-    test_given_write_when_read_fd_closed_and_sigpipe_ignored_should_return_epipe();
+    test_given_pipe_read_when_no_data_in_pipe_should_return_suspend();
+    test_given_pipe_write_when_no_data_in_pipe_should_return_succeed();
+    test_given_pipe_write_when_pipe_is_full_should_return_suspend();
+    test_given_pipe_read_when_fd_is_closed_return_ebadf();
+    test_given_pipe_write_when_fd_is_closed_return_ebadf();
+    test_given_pipe_close_when_file_closed_should_return_ebadf();
+    test_given_pipe_read_when_proc_was_suspended_should_return();
+    test_given_pipe_read_when_data_is_written_should_return_data();
+    test_given_pipe_read_when_pipe_is_full_should_return_data();
+    test_given_pipe_write_when_read_fd_are_closed_should_return_sigpipe();
+    test_given_pipe_write_when_one_read_fd_s_closed_should_return_success();
+    test_given_pipe_write_when_read_fd_closed_and_sigpipe_ignored_should_return_epipe();
     test_given_access_when_file_not_exist_should_return_enoent();
     test_given_access_when_file_exists_should_return_0();
     test_given_access_when_folder_exists_should_return_0();
@@ -696,8 +643,6 @@ int main(){
     test_given_getdents_when_no_files_in_folder_should_return_default_files();
     test_given_getdents_when_files_in_folder_should_return_files();
     
-    unit_test3();
-    unit_test3();
     unit_test_driver();
     printf("filesystem unit test passed\n");
     return 0;
