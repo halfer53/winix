@@ -435,6 +435,31 @@ void test_given_link_stat_when_two_files_are_linked_should_return_same(){
     _reset_fs();
 }
 
+
+void test_given_link_stat_when_one_file_deleted_should_return_1_nlink(){
+    int fd, ret;
+    struct stat statbuf;
+
+    fd = sys_creat(curr_scheduling_proc, FILE1, O_RDWR);
+    assert(fd == 0);
+
+    ret = sys_link(curr_scheduling_proc, FILE1, FILE2);
+    assert(ret == 0);
+
+    ret = sys_stat(curr_scheduling_proc, FILE1, &statbuf);
+    assert(ret == 0);
+    assert(statbuf.st_nlink == 2);
+
+    ret = sys_unlink(curr_scheduling_proc, FILE1);
+    assert(ret == 0);
+
+    ret = sys_stat(curr_scheduling_proc, FILE2, &statbuf);
+    assert(ret == 0);
+    assert(statbuf.st_nlink == 1);
+
+    _reset_fs();
+}
+
 void test_given_chdir_when_dir_not_present_should_return_eexist(){
     int ret = sys_chdir(curr_scheduling_proc, "/not_exist");
     assert(ret == EEXIST);
@@ -541,6 +566,10 @@ void test_given_getdents_when_files_in_folder_should_return_files(){
     for (i = 0; i < 4; ++i) {
         assert(char32_strcmp(dir[i].d_name, dirent_array[i]) == 0);
     }
+
+    ret = sys_getdents(curr_scheduling_proc, fd2, dir, 10);
+    assert(ret == 0);
+
     _reset_fs();
 }
 
@@ -657,6 +686,7 @@ int main(){
     test_given_access_when_folder_exists_should_return_0();
     test_given_access_when_under_folder_should_return_enoent();
     test_given_link_stat_when_two_files_are_linked_should_return_same();
+    test_given_link_stat_when_one_file_deleted_should_return_1_nlink();
     test_given_chdir_when_dir_not_present_should_return_eexist();
     test_given_chdir_when_path_is_file_should_return_eexist();
     test_given_chdir_when_dir_is_valid_should_succeed();
