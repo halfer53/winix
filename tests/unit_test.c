@@ -43,34 +43,34 @@ void _close_delete_file(int fd, char *name){
     assert(ret == 0);
 }
 
-void test_given_o_creat_when_open_file_should_return_0(){
+void test_given_open_when_flag_is_o_create_should_return_0(){
     int fd;
     
-    fd = sys_open(curr_scheduling_proc, FILE1 ,O_CREAT | O_RDWR, 0775);
+    fd = sys_open(curr_scheduling_proc, FILE1 ,O_CREAT, O_RDWR);
     assert(fd == 0);
 
     _close_delete_file(fd, FILE1);
 }
 
-void test_given_pipe_close_when_file_closed_should_return_ebadf(){
-    int fd, ret;
-    
-    fd = sys_open(curr_scheduling_proc, FILE1 ,O_CREAT | O_RDWR, 0775);
-    assert(fd == 0);
-
-    _close_delete_file(fd, FILE1);
-
-    ret = sys_close(curr_scheduling_proc, fd);
-    assert(ret == EBADF);
-}
-
-void test_when_creating_file_should_return_0(){
+void test_given_creat_when_file_not_present_should_return_0(){
     int fd;
     
     fd = sys_creat(curr_scheduling_proc, FILE1 , O_RDWR);
     assert(fd == 0);
 
     _close_delete_file(fd, FILE1);
+}
+
+void test_given_close_when_file_closed_should_return_ebadf(){
+    int fd, ret;
+    
+    fd = sys_open(curr_scheduling_proc, FILE1 ,O_CREAT, O_RDWR);
+    assert(fd == 0);
+
+    _close_delete_file(fd, FILE1);
+
+    ret = sys_close(curr_scheduling_proc, fd);
+    assert(ret == EBADF);
 }
 
 void test_given_pipe_read_when_fd_is_closed_return_ebadf(){
@@ -611,8 +611,9 @@ int main(){
     init_bitmap();
     _reset_fs();
 
-    test_given_o_creat_when_open_file_should_return_0();
-    test_when_creating_file_should_return_0();
+    test_given_open_when_flag_is_o_create_should_return_0();
+    test_given_creat_when_file_not_present_should_return_0();
+    test_given_close_when_file_closed_should_return_ebadf();
     test_given_opening_file_when_deleting_file_should_return_error();
     test_given_two_file_descriptors_when_dupping_file_should_behave_the_same();
     test_given_file_data_when_open_and_closing_file_should_persist();
@@ -621,7 +622,6 @@ int main(){
     test_given_pipe_write_when_pipe_is_full_should_return_suspend();
     test_given_pipe_read_when_fd_is_closed_return_ebadf();
     test_given_pipe_write_when_fd_is_closed_return_ebadf();
-    test_given_pipe_close_when_file_closed_should_return_ebadf();
     test_given_pipe_read_when_proc_was_suspended_should_return();
     test_given_pipe_read_when_data_is_written_should_return_data();
     test_given_pipe_read_when_pipe_is_full_should_return_data();
