@@ -288,11 +288,6 @@ void test_given_read_when_data_is_written_should_return_data(){
     _close_pipe(pipe_fd, &pcurr2);
 }
 
-void test_given_chdir_when_dir_not_present_should_return_eexist(){
-    int ret = sys_chdir(curr_scheduling_proc, "/not_exist");
-    assert(ret == EEXIST);
-}
-
 void test_given_read_when_pipe_is_full_should_return_data(){
     struct proc pcurr2;
     int ret;
@@ -440,17 +435,25 @@ void test_given_stat_when_two_files_are_linked_should_return_same(){
     _reset_fs();
 }
 
-int unit_test3(){
-    int ret, fd, fd2, i;
-    struct stat statbuf, statbuf2;
-    struct dirent dir[5];
-    _reset_fs();
+void test_given_chdir_when_dir_not_present_should_return_eexist(){
+    int ret = sys_chdir(curr_scheduling_proc, "/not_exist");
+    assert(ret == EEXIST);
+}
 
-    ret = sys_mkdir(curr_scheduling_proc, DIR_NAME, 0x755);
-    assert(ret == 0);
-
-    fd = sys_creat(curr_scheduling_proc, DIR_FILE1, 0x777);
+void test_given_chdir_when_path_is_file_should_return_eexist(){
+    int fd = sys_creat(curr_scheduling_proc, FILE1, O_RDWR);
     assert(fd == 0);
+
+    int ret = sys_chdir(curr_scheduling_proc, FILE1);
+    assert(ret == ENOTDIR);
+
+    _close_delete_file(fd, FILE1);
+}
+
+void test_given_chdir_when_dir_is_valid_should_succeed(){
+    struct stat statbuf;
+    int ret = sys_mkdir(curr_scheduling_proc, DIR_NAME, O_RDWR);
+    assert(ret == 0);
 
     ret = sys_chdir(curr_scheduling_proc, DIR_NAME);
     assert(ret == 0);
@@ -458,6 +461,21 @@ int unit_test3(){
     ret = sys_stat(curr_scheduling_proc, DIR_NAME, &statbuf);
     assert(ret == 0);
     assert(curr_scheduling_proc->fp_workdir->i_num == statbuf.st_ino);
+
+    _reset_fs();
+}
+
+int unit_test3(){
+    int ret, fd, fd2, i;
+    struct stat statbuf, statbuf2;
+    struct dirent dir[5];
+    _reset_fs();
+
+    ret = sys_mkdir(curr_scheduling_proc, DIR_NAME, O_RDWR);
+    assert(ret == 0);
+
+    fd = sys_creat(curr_scheduling_proc, DIR_FILE1, O_RDWR);
+    assert(fd == 0);
 
     ret = sys_link(curr_scheduling_proc, DIR_FILE1, DIR_FILE2);
     assert(ret == 0);
@@ -568,6 +586,8 @@ int main(){
     test_given_access_when_under_folder_should_return_enoent();
     test_given_stat_when_two_files_are_linked_should_return_same();
     test_given_chdir_when_dir_not_present_should_return_eexist();
+    test_given_chdir_when_path_is_file_should_return_eexist();
+    test_given_chdir_when_dir_is_valid_should_succeed();
     
     unit_test3();
     unit_test3();
