@@ -11,7 +11,7 @@ const char * dirent_array[] = {
         "bar2.txt"
 };
 
-const char *FOO_FILENAME = "/foo.txt";
+const char *FILE1 = "/foo.txt";
 const char *DIR_NAME = "/dev/";
 const char *DIR_FILE1 = "/dev/bar.txt";
 const char *DIR_FILE2 = "/dev/bar2.txt";
@@ -38,26 +38,26 @@ void _close_delete_file(int fd, char *name){
     ret = sys_close(curr_scheduling_proc, fd);
     assert(ret == 0);
 
-    ret = sys_unlink(curr_scheduling_proc, FOO_FILENAME);
+    ret = sys_unlink(curr_scheduling_proc, FILE1);
     assert(ret == 0);
 }
 
 void test_given_o_creat_when_open_file_should_return_0(){
     int fd;
     
-    fd = sys_open(curr_scheduling_proc, FOO_FILENAME ,O_CREAT | O_RDWR, 0775);
+    fd = sys_open(curr_scheduling_proc, FILE1 ,O_CREAT | O_RDWR, 0775);
     assert(fd == 0);
 
-    _close_delete_file(fd, FOO_FILENAME);
+    _close_delete_file(fd, FILE1);
 }
 
 void test_given_close_when_file_closed_should_return_ebadf(){
     int fd, ret;
     
-    fd = sys_open(curr_scheduling_proc, FOO_FILENAME ,O_CREAT | O_RDWR, 0775);
+    fd = sys_open(curr_scheduling_proc, FILE1 ,O_CREAT | O_RDWR, 0775);
     assert(fd == 0);
 
-    _close_delete_file(fd, FOO_FILENAME);
+    _close_delete_file(fd, FILE1);
 
     ret = sys_close(curr_scheduling_proc, fd);
     assert(ret == EBADF);
@@ -66,16 +66,16 @@ void test_given_close_when_file_closed_should_return_ebadf(){
 void test_when_creating_file_should_return_0(){
     int fd;
     
-    fd = sys_creat(curr_scheduling_proc, FOO_FILENAME , O_RDWR);
+    fd = sys_creat(curr_scheduling_proc, FILE1 , O_RDWR);
     assert(fd == 0);
 
-    _close_delete_file(fd, FOO_FILENAME);
+    _close_delete_file(fd, FILE1);
 }
 
 void test_given_read_when_fd_is_closed_return_ebadf(){
     int ret, fd;
     
-    fd = sys_creat(curr_scheduling_proc, FOO_FILENAME , O_RDWR);
+    fd = sys_creat(curr_scheduling_proc, FILE1 , O_RDWR);
     assert(fd == 0);
 
     ret = sys_close(curr_scheduling_proc, fd);
@@ -84,14 +84,14 @@ void test_given_read_when_fd_is_closed_return_ebadf(){
     ret = sys_read(curr_scheduling_proc, fd, buffer, PAGE_LEN);
     assert(ret == EBADF);
 
-    ret = sys_unlink(curr_scheduling_proc, FOO_FILENAME);
+    ret = sys_unlink(curr_scheduling_proc, FILE1);
     assert(ret == 0);
 }
 
 void test_given_write_when_fd_is_closed_return_ebadf(){
     int ret, fd;
     
-    fd = sys_creat(curr_scheduling_proc, FOO_FILENAME , O_RDWR);
+    fd = sys_creat(curr_scheduling_proc, FILE1 , O_RDWR);
     assert(fd == 0);
 
     ret = sys_close(curr_scheduling_proc, fd);
@@ -100,26 +100,26 @@ void test_given_write_when_fd_is_closed_return_ebadf(){
     ret = sys_write(curr_scheduling_proc, fd, buffer, PAGE_LEN);
     assert(ret == EBADF);
 
-    ret = sys_unlink(curr_scheduling_proc, FOO_FILENAME);
+    ret = sys_unlink(curr_scheduling_proc, FILE1);
     assert(ret == 0);
 }
 
 void test_given_opening_file_when_deleting_file_should_return_error(){
     int ret, fd;
     
-    fd = sys_creat(curr_scheduling_proc, FOO_FILENAME , O_RDWR);
+    fd = sys_creat(curr_scheduling_proc, FILE1 , O_RDWR);
     assert(fd == 0);
 
-    _close_delete_file(fd, FOO_FILENAME);
+    _close_delete_file(fd, FILE1);
 
-    ret = sys_open(curr_scheduling_proc, FOO_FILENAME , O_RDWR, 0775);
+    ret = sys_open(curr_scheduling_proc, FILE1 , O_RDWR, 0775);
     assert(ret == ENOENT);
 }
 
 void test_given_two_file_descriptors_when_dupping_file_should_behave_the_same(){
     int ret, fd, fd2;
     
-    fd = sys_open(curr_scheduling_proc, FOO_FILENAME ,O_CREAT | O_RDWR, 0775);
+    fd = sys_open(curr_scheduling_proc, FILE1 ,O_CREAT | O_RDWR, 0775);
     assert(fd == 0);
     
     fd2 = sys_dup(curr_scheduling_proc, fd);
@@ -157,14 +157,14 @@ void test_given_two_file_descriptors_when_dupping_file_should_behave_the_same(){
     ret = sys_close(curr_scheduling_proc, fd2);
     assert(ret == 0);
 
-    ret = sys_unlink(curr_scheduling_proc, FOO_FILENAME);
+    ret = sys_unlink(curr_scheduling_proc, FILE1);
     assert(ret == 0);
 }
 
 void test_given_file_data_when_open_and_closing_file_should_persist(){
     int ret, fd;
 
-    fd = sys_open(curr_scheduling_proc, FOO_FILENAME , O_CREAT | O_RDONLY, 0x0775);
+    fd = sys_open(curr_scheduling_proc, FILE1 , O_CREAT | O_RDONLY, 0x0775);
     assert(fd == 0);
     
     ret = sys_write(curr_scheduling_proc, fd, "abcdef", 7);
@@ -173,7 +173,7 @@ void test_given_file_data_when_open_and_closing_file_should_persist(){
     ret = sys_close(curr_scheduling_proc, fd);
     assert(ret == 0);
 
-    fd = sys_open(curr_scheduling_proc, FOO_FILENAME , O_RDONLY, 0x0775);
+    fd = sys_open(curr_scheduling_proc, FILE1 , O_RDONLY, 0x0775);
     assert(file_size(curr_scheduling_proc, fd) == 7);
 
     ret = sys_read(curr_scheduling_proc, fd, buffer, 100);
@@ -183,7 +183,7 @@ void test_given_file_data_when_open_and_closing_file_should_persist(){
     ret = sys_close(curr_scheduling_proc, fd);
     assert(ret == 0);
 
-    ret = sys_unlink(curr_scheduling_proc, FOO_FILENAME);
+    ret = sys_unlink(curr_scheduling_proc, FILE1);
     assert(ret == 0);
 }
 
@@ -375,19 +375,19 @@ void test_given_write_when_read_fd_closed_and_sigpipe_ignored_should_return_epip
 }
 
 void test_given_access_when_file_not_exist_should_return_enoent(){
-    int ret = sys_access(curr_scheduling_proc, FOO_FILENAME, F_OK);
+    int ret = sys_access(curr_scheduling_proc, FILE1, F_OK);
     assert(ret == ENOENT);
 }
 
 void test_given_access_when_file_exists_should_return_0(){
     int ret;
-    ret = sys_creat(curr_scheduling_proc, FOO_FILENAME, 0x755);
+    ret = sys_creat(curr_scheduling_proc, FILE1, 0x755);
     assert(ret == 0);
 
-    ret = sys_access(curr_scheduling_proc, FOO_FILENAME, F_OK);
+    ret = sys_access(curr_scheduling_proc, FILE1, F_OK);
     assert(ret == 0);
 
-    _close_delete_file(0, FOO_FILENAME);
+    _close_delete_file(0, FILE1);
 }
 
 void test_given_access_when_folder_exists_should_return_0(){
