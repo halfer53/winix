@@ -108,7 +108,7 @@ void test_given_two_file_descriptors_when_dupping_file_should_behave_the_same(){
     assert(ret == 0);
 }
 
-int test_given_file_data_when_open_and_closing_file_should_persist(){
+void test_given_file_data_when_open_and_closing_file_should_persist(){
     int ret, fd;
 
     fd = sys_open(curr_scheduling_proc, filename , O_CREAT | O_RDONLY, 0x0775);
@@ -132,8 +132,37 @@ int test_given_file_data_when_open_and_closing_file_should_persist(){
 
     ret = sys_unlink(curr_scheduling_proc, filename);
     assert(ret == 0);
+}
 
-    return 0;
+void _init_pipe(int pipe_fd[2], struct proc* pcurr2){
+    int ret;
+    pcurr2->pid = 2;
+    pcurr2->proc_nr = 2;
+
+    ret = sys_pipe(curr_scheduling_proc, pipe_fd);
+    assert(ret == 0);
+
+    emulate_fork(curr_scheduling_proc, pcurr2);
+}
+
+void _close_pipe(int pipe_fd[2], struct proc* pcurr2){
+    int ret;
+
+    ret = sys_close(curr_scheduling_proc, pipe_fd[0]);
+    assert(ret == 0);
+
+    ret = sys_close(pcurr2, pipe_fd[0]);
+    assert(ret == 0);
+
+    ret = sys_close(curr_scheduling_proc, pipe_fd[1]);
+    assert(ret == 0);
+
+    ret = sys_close(pcurr2, pipe_fd[1]);
+    assert(ret == 0);
+}
+
+void test_given_write_when_opening_pipe_should_return_no_chars(){
+    
 }
 
 int unit_test2(){
@@ -141,34 +170,35 @@ int unit_test2(){
     int ret;
     int pipe_fd[2];
 
-    pcurr2.pid = 2;
-    pcurr2.proc_nr = 2;
+    _init_pipe(pipe_fd, &pcurr2);
 
-    ret = sys_pipe(curr_scheduling_proc, pipe_fd);
-    assert(ret == 0);
-    emulate_fork(curr_scheduling_proc, &pcurr2);
     ret = sys_read(curr_scheduling_proc, pipe_fd[0], buffer, 100);
     assert(ret == SUSPEND);
-    ret = sys_write(&pcurr2, pipe_fd[1], "1234", 5);
-    assert(ret == 5);
-    assert(strcmp(buffer, "1234") == 0);
-    buffer[0] = 0;
 
     ret = sys_write(&pcurr2, pipe_fd[1], "1234", 5);
     assert(ret == 5);
+    assert(strcmp(buffer, "1234") == 0);
+
+    ret = sys_write(&pcurr2, pipe_fd[1], "5678", 5);
+    assert(ret == 5);
+
     ret = sys_read(curr_scheduling_proc, pipe_fd[0], buffer, 100);
     assert(ret == 5);
-    assert(strcmp(buffer, "1234") == 0);
+    assert(strcmp(buffer, "5678") == 0);
 
     memset(buffer, 'a', BLOCK_SIZE - 1);
     buffer[BLOCK_SIZE - 1] = 0;
+
     ret = sys_write(&pcurr2, pipe_fd[1], buffer, BLOCK_SIZE);
     assert(ret == BLOCK_SIZE);
+
     ret = sys_write(&pcurr2, pipe_fd[1], "abc", 4);
     assert(ret == SUSPEND);
+
     ret = sys_read(curr_scheduling_proc, pipe_fd[0], buffer2, BLOCK_SIZE);
     assert(ret == BLOCK_SIZE);
     assert(strcmp(buffer, buffer2) == 0);
+
     ret = sys_read(curr_scheduling_proc, pipe_fd[0], buffer2, BLOCK_SIZE);
     assert(ret == 4);
     assert(strcmp(buffer2, "abc") == 0);
