@@ -13,8 +13,8 @@ const char * dirent_array[] = {
 
 const char *FOO_FILENAME = "/foo.txt";
 const char *DIR_NAME = "/dev/";
-const char *DIR_FILE1 = "/dev/";
-const char *DIR_FILE2 = "/dev/";
+const char *DIR_FILE1 = "/dev/bar.txt";
+const char *DIR_FILE2 = "/dev/bar2.txt";
 char buffer[PAGE_LEN];
 char buffer2[PAGE_LEN];
 
@@ -401,13 +401,13 @@ void test_given_access_when_folder_exists_should_return_0(){
     _reset_fs();
 }
 
-void test_given_access_when_folder_exists_should_return_0(){
+void test_given_access_when_under_folder_should_return_enoent(){
     int ret;
     ret = sys_mkdir(curr_scheduling_proc, DIR_NAME, 0x755);
     assert(ret == 0);
 
-    ret = sys_access(curr_scheduling_proc, DIR_NAME, F_OK);
-    assert(ret == 0);
+    ret = sys_access(curr_scheduling_proc, DIR_FILE1, F_OK);
+    assert(ret == ENOENT);
 
     _reset_fs();
 }
@@ -552,6 +552,7 @@ int main(){
     test_given_access_when_file_not_exist_should_return_enoent();
     test_given_access_when_file_exists_should_return_0();
     test_given_access_when_folder_exists_should_return_0();
+    test_given_access_when_under_folder_should_return_enoent();
     
     unit_test3();
     unit_test3();
