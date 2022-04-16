@@ -13,6 +13,8 @@ const char * dirent_array[] = {
 
 const char *FOO_FILENAME = "/foo.txt";
 const char *DIR_NAME = "/dev/";
+const char *DIR_FILE1 = "/dev/";
+const char *DIR_FILE2 = "/dev/";
 char buffer[PAGE_LEN];
 char buffer2[PAGE_LEN];
 
@@ -399,6 +401,16 @@ void test_given_access_when_folder_exists_should_return_0(){
     _reset_fs();
 }
 
+void test_given_access_when_folder_exists_should_return_0(){
+    int ret;
+    ret = sys_mkdir(curr_scheduling_proc, DIR_NAME, 0x755);
+    assert(ret == 0);
+
+    ret = sys_access(curr_scheduling_proc, DIR_NAME, F_OK);
+    assert(ret == 0);
+
+    _reset_fs();
+}
 
 int unit_test3(){
     int ret, fd, fd2, i;
@@ -409,16 +421,13 @@ int unit_test3(){
     ret = sys_mkdir(curr_scheduling_proc, DIR_NAME, 0x755);
     assert(ret == 0);
 
-    ret = sys_access(curr_scheduling_proc, DIR_NAME, F_OK);
-    assert(ret == 0);
-
-    ret = sys_access(curr_scheduling_proc, "/dev/bar.txt", F_OK);
+    ret = sys_access(curr_scheduling_proc, DIR_FILE1, F_OK);
     assert(ret != 0);
 
-    fd = sys_creat(curr_scheduling_proc, "/dev/bar.txt", 0x777);
+    fd = sys_creat(curr_scheduling_proc, DIR_FILE1, 0x777);
     assert(fd == 0);
 
-    ret = sys_access(curr_scheduling_proc, "/dev/bar.txt", F_OK);
+    ret = sys_access(curr_scheduling_proc, DIR_FILE1, F_OK);
     assert(ret == 0);
 
     ret = sys_chdir(curr_scheduling_proc, DIR_NAME);
@@ -428,16 +437,16 @@ int unit_test3(){
     assert(ret == 0);
     assert(curr_scheduling_proc->fp_workdir->i_num == statbuf.st_ino);
 
-    ret = sys_link(curr_scheduling_proc, "/dev/bar.txt", "/dev/bar2.txt");
+    ret = sys_link(curr_scheduling_proc, DIR_FILE1, DIR_FILE2);
     assert(ret == 0);
 
-    ret = sys_chmod(curr_scheduling_proc, "/dev/bar.txt", 0x777);
+    ret = sys_chmod(curr_scheduling_proc, DIR_FILE1, 0x777);
     assert(ret == 0);
 
-    ret = sys_stat(curr_scheduling_proc, "/dev/bar.txt", &statbuf);
+    ret = sys_stat(curr_scheduling_proc, DIR_FILE1, &statbuf);
     assert(ret == 0);
 
-    ret = sys_stat(curr_scheduling_proc, "/dev/bar2.txt", &statbuf2);
+    ret = sys_stat(curr_scheduling_proc, DIR_FILE2, &statbuf2);
     assert(ret == 0);
     assert(statbuf.st_ino == statbuf2.st_ino);
     assert(statbuf.st_dev == statbuf2.st_dev);
@@ -457,20 +466,20 @@ int unit_test3(){
     ret = sys_getdents(curr_scheduling_proc, fd2, dir, 10);
     assert(ret == 0);
 
-    ret = sys_unlink(curr_scheduling_proc, "/dev/bar2.txt");
+    ret = sys_unlink(curr_scheduling_proc, DIR_FILE2);
     assert(ret == 0);
 
-    ret = sys_stat(curr_scheduling_proc, "/dev/bar.txt", &statbuf);
+    ret = sys_stat(curr_scheduling_proc, DIR_FILE1, &statbuf);
     assert(ret == 0);
     assert(statbuf.st_nlink == 1);
 
-    ret = sys_stat(curr_scheduling_proc, "/dev/bar2.txt", &statbuf2);
+    ret = sys_stat(curr_scheduling_proc, DIR_FILE2, &statbuf2);
     assert(ret == ENOENT);
 
-    ret = sys_unlink(curr_scheduling_proc, "/dev/bar.txt");
+    ret = sys_unlink(curr_scheduling_proc, DIR_FILE1);
     assert(ret == 0);
 
-    ret = sys_access(curr_scheduling_proc, "/dev/bar.txt", F_OK);
+    ret = sys_access(curr_scheduling_proc, DIR_FILE1, F_OK);
     assert(ret == ENOENT);
 
     ret = sys_close(curr_scheduling_proc, fd);
