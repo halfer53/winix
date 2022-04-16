@@ -342,7 +342,7 @@ void test_given_write_when_read_fd_are_closed_should_return_sigpipe(){
     _close_pipe(pipe_fd, &pcurr2);
 }
 
-int unit_test2(){
+void test_given_write_when_read_fd_closed_and_sigpipe_ignored_should_return_epipe(){
     struct proc pcurr2;
     int ret;
     int pipe_fd[2];
@@ -352,26 +352,14 @@ int unit_test2(){
     ret = sys_close(curr_scheduling_proc, pipe_fd[0]);
     assert(ret == 0);
 
-    ret = sys_write(&pcurr2, pipe_fd[1], "a", 2);
-    assert(ret == 2);
-
     ret = sys_close(&pcurr2, pipe_fd[0]);
     assert(ret == 0);
-
-    ret = sys_write(&pcurr2, pipe_fd[1], "a", 2);
-    assert(ret == SUSPEND);
-    assert(pcurr2.sig_pending & (1 << SIGPIPE));
-
+    
     pcurr2.sig_table[SIGPIPE].sa_handler = SIG_IGN;
     ret = sys_write(&pcurr2, pipe_fd[1], "a", 2);
     assert(ret == EPIPE);
 
-    ret = sys_close(curr_scheduling_proc, pipe_fd[1]);
-    assert(ret == 0);
-    ret = sys_close(&pcurr2, pipe_fd[1]);
-    assert(ret == 0);
-
-    return 0;
+    _close_pipe(pipe_fd, &pcurr2);
 }
 
 int unit_test3(){
@@ -513,8 +501,8 @@ int main(){
     test_given_read_when_pipe_is_full_should_return_data();
     test_given_write_when_read_fd_are_closed_should_return_sigpipe();
     test_given_write_when_one_read_fd_s_closed_should_return_success();
+    test_given_write_when_read_fd_closed_and_sigpipe_ignored_should_return_epipe();
     
-    unit_test2();
     unit_test3();
     unit_test_driver();
     printf("filesystem unit test passed\n");
