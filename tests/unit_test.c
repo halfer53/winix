@@ -504,6 +504,20 @@ void test_given_chmod_stat_when_folder_present_should_return_0(){
     _reset_fs();
 }
 
+void test_given_getdents_when_no_files_in_folder_should_return_default_files(){
+    struct dirent dir[5];
+    int i;
+    int fd = sys_open(curr_scheduling_proc, "/", 0, O_RDONLY);
+    int ret = sys_getdents(curr_scheduling_proc, fd, dir, 5);
+    assert(ret == sizeof(struct dirent) * 2);
+    for(i = 0; i < 2; i++){
+        assert(char32_strcmp(dir[i].d_name, dirent_array[i]) == 0);
+    }
+
+    ret = sys_close(curr_scheduling_proc, fd);
+    assert(ret == 0);
+}
+
 int unit_test3(){
     int ret, fd, fd2, i;
     struct stat statbuf, statbuf2;
@@ -518,13 +532,6 @@ int unit_test3(){
 
     ret = sys_link(curr_scheduling_proc, DIR_FILE1, DIR_FILE2);
     assert(ret == 0);
-
-    ret = sys_chmod(curr_scheduling_proc, DIR_FILE1, 0x777);
-    assert(ret == 0);
-
-    ret = sys_stat(curr_scheduling_proc, DIR_FILE1, &statbuf);
-    assert(ret == 0);
-    assert(statbuf.st_mode == 0x777);
 
     fd2 = sys_open(curr_scheduling_proc, DIR_NAME, O_RDONLY, 0);
     assert(fd2 == 1);
@@ -630,6 +637,7 @@ int main(){
     test_given_chmod_when_file_not_present_should_return_enonent();
     test_given_chmod_stat_when_file_present_should_return_0();
     test_given_chmod_stat_when_folder_present_should_return_0();
+    test_given_getdents_when_no_files_in_folder_should_return_default_files();
     
     unit_test3();
     unit_test3();
