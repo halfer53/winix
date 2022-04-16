@@ -28,6 +28,7 @@
                 "-Wpointer-to-int-cast",
                 "-Wno-discarded-qualifiers",
                 "-DFSUTIL",
+                "-D_DEBUG",
                 "-I${workspaceFolder}/include/fs_include",
                 "-I${workspaceFolder}/include",
                 "${workspaceFolder}/fs/*.c",
