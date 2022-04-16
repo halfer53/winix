@@ -68,6 +68,7 @@ int sys_open(struct proc *who, char *path, int flags, mode_t mode)
             goto final;
         }
         inode->i_mode = dev->device_type | (mode & ~(who->umask));
+        is_new = true;
     }
 
     if ((ret = get_fd(who, 0, &open_slot, &filp)))
@@ -88,7 +89,7 @@ int sys_open(struct proc *who, char *path, int flags, mode_t mode)
         filp->filp_pos = inode->i_size;
     }
     
-    filp->filp_mode = inode->i_mode;
+    filp->filp_mode = mode;
     filp->filp_flags = flags;
     who->fp_filp[open_slot] = filp;
     inode->i_atime = unix_time;
@@ -97,7 +98,6 @@ int sys_open(struct proc *who, char *path, int flags, mode_t mode)
         goto final;
 
     ret = open_slot;
-    is_new = true;
     // KDEBUG(("Open: path %s Last dir %d, ret inode %d\n", path, lastdir->i_num, inode->i_num));
 
 final:
