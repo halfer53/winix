@@ -80,7 +80,7 @@
                 "${workspaceFolder}/winix/bitmap.c",
                 "${workspaceFolder}/tests/*.c",
                 "-o",
-                "${workspaceFolder}/fsutil"
+                "${workspaceFolder}/unittest"
             ],
             "options": {
                 "cwd": "/usr/bin"
