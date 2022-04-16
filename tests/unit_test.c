@@ -364,8 +364,23 @@ void test_given_write_when_read_fd_closed_and_sigpipe_ignored_should_return_epip
 }
 
 void test_given_access_when_file_not_exist_should_return_enoent(){
-    int ret = sys_access(curr_scheduling_proc, DIR_NAME, F_OK);
+    int ret = sys_access(curr_scheduling_proc, FOO_FILENAME, F_OK);
     assert(ret == ENOENT);
+}
+
+void test_given_access_when_file_exists_should_return_0(){
+    int ret;
+    ret = sys_creat(curr_scheduling_proc, FOO_FILENAME, 0x755);
+    assert(ret == 0);
+
+    ret = sys_access(curr_scheduling_proc, FOO_FILENAME, F_OK);
+    assert(ret == 0);
+
+    ret = sys_unlink(curr_scheduling_proc, FOO_FILENAME);
+    assert(ret == 0);
+
+    ret = sys_close(curr_scheduling_proc, 0);
+    assert(ret == 0);
 }
 
 int unit_test3(){
@@ -506,6 +521,7 @@ int main(){
     test_given_write_when_one_read_fd_s_closed_should_return_success();
     test_given_write_when_read_fd_closed_and_sigpipe_ignored_should_return_epipe();
     test_given_access_when_file_not_exist_should_return_enoent();
+    test_given_access_when_file_exists_should_return_0();
     
     unit_test3();
     unit_test_driver();
