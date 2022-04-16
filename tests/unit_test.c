@@ -362,13 +362,15 @@ void test_given_write_when_read_fd_closed_and_sigpipe_ignored_should_return_epip
     _close_pipe(pipe_fd, &pcurr2);
 }
 
+void test_given_access_when_file_not_exist_should_return_enoent(){
+    int ret = sys_access(curr_scheduling_proc, "/dev", F_OK);
+    assert(ret == ENOENT);
+}
+
 int unit_test3(){
     int ret, fd, fd2, i;
     struct stat statbuf, statbuf2;
     struct dirent dir[4];
-
-    ret = sys_access(curr_scheduling_proc, "/dev", F_OK);
-    assert(ret != 0);
 
     ret = sys_mkdir(curr_scheduling_proc, "/dev", 0x755);
     assert(ret == 0);
@@ -502,6 +504,7 @@ int main(){
     test_given_write_when_read_fd_are_closed_should_return_sigpipe();
     test_given_write_when_one_read_fd_s_closed_should_return_success();
     test_given_write_when_read_fd_closed_and_sigpipe_ignored_should_return_epipe();
+    test_given_access_when_file_not_exist_should_return_enoent();
     
     unit_test3();
     unit_test_driver();
