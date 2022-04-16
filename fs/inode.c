@@ -84,7 +84,7 @@ int alloc_block(inode_t *ino, struct device* id){
         bnr++;
         bmap = get_block_buffer(bnr, id);
     }
-    KDEBUG(("no free block id found for dev %d", id->dev_id));
+    kwarn("no free block id found for dev %d", id->dev_id);
     put_block_buffer(bmap);
     return ENOSPC;
 }
@@ -94,7 +94,7 @@ int release_block(block_t bnr, struct device* id){
     block_t bmap_nr = sb->s_blockmapnr + (bnr / BLOCK_SIZE);
     struct block_buffer *bmap, *block;
     if(bnr > sb->s_blockmap_size){
-        KDEBUG(("Invalid block id %d", bnr));
+        kwarn("Invalid block id %d", bnr);
         return -1;
     }
     block = get_block_buffer(bnr, id);
@@ -134,7 +134,7 @@ int init_inode_non_disk(struct inode* ino, ino_t num, struct device* dev, struct
     if(sb){
         bnr = ((num * sb->s_inode_size) / BLOCK_SIZE) + sb->s_inode_tablenr;
         if(bnr * BLOCK_SIZE >= sb->s_inode_tablenr * BLOCK_SIZE + sb->s_inode_table_size){
-            KDEBUG(("ino %d exceeding\n", num));
+            kwarn("ino %d exceeding\n", num);
             return ERR;
         }
         ino->i_ndblock = bnr;
@@ -205,7 +205,8 @@ inode_t* get_inode(int num, struct device* id){
 
     ret = read_inode(num, &rep, id);
     if(ret){
-        KDEBUG(("ERR: read inode %d return %d\n", num, ret));
+        kwarn("ERR: read inode %d return %d\n", num, ret);
+        return NULL;
     }
 
     return rep;
