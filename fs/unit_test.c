@@ -21,12 +21,8 @@ int file_size(struct proc* who, int fd){
     return statbuf.st_size;
 }
 
-void test_given_o_creat_when_open_file_should_return_0(){
-    int ret, fd;
-    
-    fd = sys_open(curr_scheduling_proc, filename ,O_CREAT | O_RDWR, 0775);
-    assert(fd == 0);
-
+void _close_delete_file(int fd, char *name){
+    int ret;
     ret = sys_close(curr_scheduling_proc, fd);
     assert(ret == 0);
 
@@ -34,17 +30,22 @@ void test_given_o_creat_when_open_file_should_return_0(){
     assert(ret == 0);
 }
 
+void test_given_o_creat_when_open_file_should_return_0(){
+    int fd;
+    
+    fd = sys_open(curr_scheduling_proc, filename ,O_CREAT | O_RDWR, 0775);
+    assert(fd == 0);
+
+    _close_delete_file(fd, filename);
+}
+
 void test_when_creating_file_should_return_0(){
-    int ret, fd;
+    int fd;
     
     fd = sys_creat(curr_scheduling_proc, filename , O_RDWR);
     assert(fd == 0);
 
-    ret = sys_close(curr_scheduling_proc, fd);
-    assert(ret == 0);
-
-    ret = sys_unlink(curr_scheduling_proc, filename);
-    assert(ret == 0);
+    _close_delete_file(fd, filename);
 }
 
 void test_given_read_when_fd_is_closed_return_ebadf(){
@@ -85,11 +86,7 @@ void test_given_opening_file_when_deleting_file_should_return_error(){
     fd = sys_creat(curr_scheduling_proc, filename , O_RDWR);
     assert(fd == 0);
 
-    ret = sys_close(curr_scheduling_proc, fd);
-    assert(ret == 0);
-
-    ret = sys_unlink(curr_scheduling_proc, filename);
-    assert(ret == 0);
+    _close_delete_file(fd, filename);
 
     ret = sys_open(curr_scheduling_proc, filename , O_RDWR, 0775);
     assert(ret == ENOENT);
