@@ -312,13 +312,14 @@ int pipe_close ( struct device* dev, struct filp *file){
                 waiting = &ino->pipe_reading_list;
             }
             next = get_next_waiting(waiting);
-            if(next!= NULL){
+            while (next){
                 // KDEBUG(("next waiting %s\n", next->who->name));
                 list_del(&next->list);
                 ret = fn(next->who, next->filp, next->data, next->count, next->offset);
                 next->who->flags &= ~STATE_WAITING;
                 syscall_reply2(next->sys_call_num, ret, next->who->proc_nr, &msg);
                 kfree(next);
+                next = get_next_waiting(waiting);
             }
         }
     }
