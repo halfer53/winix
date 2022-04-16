@@ -47,6 +47,38 @@ void test_when_creating_file_should_return_0(){
     assert(ret == 0);
 }
 
+void test_given_read_when_fd_is_closed_return_ebadf(){
+    int ret, fd;
+    
+    fd = sys_creat(curr_scheduling_proc, filename , O_RDWR);
+    assert(fd == 0);
+
+    ret = sys_close(curr_scheduling_proc, fd);
+    assert(ret == 0);
+
+    ret = sys_read(curr_scheduling_proc, fd, buffer, PAGE_LEN);
+    assert(ret == EBADF);
+
+    ret = sys_unlink(curr_scheduling_proc, filename);
+    assert(ret == 0);
+}
+
+void test_given_write_when_fd_is_closed_return_ebadf(){
+    int ret, fd;
+    
+    fd = sys_creat(curr_scheduling_proc, filename , O_RDWR);
+    assert(fd == 0);
+
+    ret = sys_close(curr_scheduling_proc, fd);
+    assert(ret == 0);
+
+    ret = sys_write(curr_scheduling_proc, fd, buffer, PAGE_LEN);
+    assert(ret == EBADF);
+
+    ret = sys_unlink(curr_scheduling_proc, filename);
+    assert(ret == 0);
+}
+
 void test_given_opening_file_when_deleting_file_should_return_error(){
     int ret, fd;
     
@@ -390,6 +422,8 @@ int run_unit_tests(){
     test_given_read_when_no_data_in_pipe_should_return_suspend();
     test_given_write_when_no_data_in_pipe_should_return_succeed();
     test_given_write_when_pipe_is_full_should_return_suspend();
+    test_given_read_when_fd_is_closed_return_ebadf();
+    test_given_write_when_fd_is_closed_return_ebadf();
     
     unit_test2();
     unit_test3();
