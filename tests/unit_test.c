@@ -187,13 +187,8 @@ void _init_pipe(int pipe_fd[2], struct proc* pcurr2){
 }
 
 void __close_pipe(int pipe_fd[2], struct proc* process){
-    int ret;
-
-    ret = sys_close(process, pipe_fd[0]);
-    assert(ret == 0);
-
-    ret = sys_close(process, pipe_fd[1]);
-    assert(ret == 0);
+    sys_close(process, pipe_fd[0]);
+    sys_close(process, pipe_fd[1]);
 }
 
 void _close_pipe(int pipe_fd[2], struct proc* pcurr2){
@@ -342,7 +337,7 @@ void test_given_write_when_read_fd_are_closed_should_return_sigpipe(){
     
     ret = sys_write(&pcurr2, pipe_fd[1], "a", 2);
     assert(ret == SUSPEND);
-    assert(sigismember(&pcurr2.sig_pending, SIGPIPE));
+    assert(pcurr2.sig_pending & (1 << SIGPIPE));
 
     _close_pipe(pipe_fd, &pcurr2);
 }
@@ -365,7 +360,7 @@ int unit_test2(){
 
     ret = sys_write(&pcurr2, pipe_fd[1], "a", 2);
     assert(ret == SUSPEND);
-    assert(sigismember(&pcurr2.sig_pending, SIGPIPE));
+    assert(pcurr2.sig_pending & (1 << SIGPIPE));
 
     pcurr2.sig_table[SIGPIPE].sa_handler = SIG_IGN;
     ret = sys_write(&pcurr2, pipe_fd[1], "a", 2);
