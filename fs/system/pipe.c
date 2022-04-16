@@ -296,6 +296,23 @@ int pipe_close ( struct device* dev, struct filp *file){
     
     if(file->filp_count == 0){
         ino->i_count -= 1;
+        if(file->pipe_mode == FILP_PIPE_READ){
+            fn = _pipe_write;
+            waiting = &ino->pipe_writing_list;
+        }else{
+            fn = _pipe_read;
+            waiting = &ino->pipe_reading_list;
+        }
+        next = get_next_waiting(waiting);
+        while (next){
+            // KDEBUG(("next waiting %s\n", next->who->name));
+            list_del(&next->list);
+            ret = fn(next->who, next->filp, next->data, next->count, next->offset);
+            next->who->flags &= ~STATE_WAITING;
+            syscall_reply2(next->sys_call_num, ret, next->who->proc_nr, &msg);
+            kfree(next);
+            next = get_next_waiting(waiting);
+        }
         if(ino->i_count == 0){
             // KDEBUG(("Releasing pipe %d\n", file->filp_ino->i_num));
             release_pages((ptr_t *)file->pipe->data, 1);
@@ -303,24 +320,6 @@ int pipe_close ( struct device* dev, struct filp *file){
             
             // release inode
             memset(ino, 0, sizeof(struct inode));
-        }else{
-            if(file->pipe_mode == FILP_PIPE_READ){
-                fn = _pipe_write;
-                waiting = &ino->pipe_writing_list;
-            }else{
-                fn = _pipe_read;
-                waiting = &ino->pipe_reading_list;
-            }
-            next = get_next_waiting(waiting);
-            while (next){
-                // KDEBUG(("next waiting %s\n", next->who->name));
-                list_del(&next->list);
-                ret = fn(next->who, next->filp, next->data, next->count, next->offset);
-                next->who->flags &= ~STATE_WAITING;
-                syscall_reply2(next->sys_call_num, ret, next->who->proc_nr, &msg);
-                kfree(next);
-                next = get_next_waiting(waiting);
-            }
         }
     }
 

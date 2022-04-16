@@ -358,6 +358,7 @@ int run_unit_tests(){
     test_given_opening_file_when_deleting_file_should_return_error();
     test_given_two_file_descriptors_when_dupping_file_should_behave_the_same();
     test_given_file_data_when_open_and_closing_file_should_persist();
+    test_given_read_when_no_data_in_pipe_should_return_suspend();
     
     unit_test2();
     unit_test3();
