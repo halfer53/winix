@@ -8,7 +8,7 @@
 #include <argp.h>
 #include <winix/welf.h>
 #include "srec_import.h"
-#include "fsutil.h"
+#include "../mock/mock.h"
 
 #define TO_UPPER_CHAR(c) (c - 32)
 

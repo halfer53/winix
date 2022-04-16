@@ -25,7 +25,7 @@
 #ifdef FSUTIL
 
 #include <stdio.h>
-#include "fsutil/fsutil.h"
+#include "mock/mock.h"
 
 #else // else not FSUTIL
 

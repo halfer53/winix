@@ -46,7 +46,8 @@ L_TAIL = winix/limits/limits_tail.o
 KERNEL_O = winix/*.o kernel/system/*.o kernel/*.o fs/*.o fs/system/*.o driver/*.o include/*.o
 ALLDIR = init user kernel fs driver winix
 ALLDIR_CLEAN = winix lib init user kernel fs driver include
-FS_DEPEND = fs/*.c fs/system/*.c fs/fsutil/*.c winix/bitmap.c
+FS_DEPEND = fs/*.c fs/system/*.c fs/mock/*.c winix/bitmap.c
+UNIT_TEST = tests/*.c
 DISK = include/disk.c
 START_TIME_FILE = include/startup_time.c
 SREC = $(shell find $(SREC_INCLUDE) -name "*.srec")
@@ -63,14 +64,20 @@ ifeq ($(KBUILD_VERBOSE),0)
 	@echo "LD \t winix.srec"
 endif
 
-unittest:
-	$(Q)./fsutil -d -t $(TEXT_OFFSET)
+test: $(FS_DEPEND) $(UNIT_TEST) 
+ifeq ($(KBUILD_VERBOSE),0)
+	@echo "CC \t unittest"
+endif
+	$(Q)gcc -g -DFSUTIL $(GCC_FLAG) $(COMMON_CFLAGS) -I./include/fs_include -I./include $^ -o unittest
+	$(Q)./unittest
 
-fsutil: $(FS_DEPEND)
+fsutil: $(FS_DEPEND) fs/fsutil/*.c 
 ifeq ($(KBUILD_VERBOSE),0)
 	@echo "CC \t fsutil"
 endif
 	$(Q)gcc -g -DFSUTIL $(GCC_FLAG) $(COMMON_CFLAGS) -I./include/fs_include -I./include $^ -o fsutil
+
+
 
 buildlib:
 	$(Q)$(MAKE) $(build)=lib

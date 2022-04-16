@@ -1,7 +1,7 @@
 //
 // Created by bruce on 9/05/20.
 //
-#include "fs.h"
+#include "../fs/fs.h"
 #include <assert.h>
 
 const char * dirent_array[] = {
@@ -413,9 +413,10 @@ int unit_test_driver(){
     assert(ret == EBADF);
 }
 
-int run_unit_tests(){
+int main(){
 
     init_bitmap();
+    init_disk();
     init_dev();
     init_fs();
     init_tty();

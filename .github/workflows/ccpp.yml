@@ -20,7 +20,7 @@ jobs:
     - name: make
       run: make N=1 -j$(nproc)
     - name: unit test
-      run: make unittest
+      run: make test
     - uses: actions/upload-artifact@v2
       with:
         name: winix.srec

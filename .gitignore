@@ -14,6 +14,7 @@ kdbg.py
 include/srec/*.verbose
 include/srec/*.srec
 /fsutil
+/unittest
 fs/Debug/
 a.out
 include/*.c
