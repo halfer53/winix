@@ -22,6 +22,15 @@ int file_size(struct proc* who, int fd){
     return statbuf.st_size;
 }
 
+void _reset_fs(){
+    init_disk();
+    init_dev();
+    init_fs();
+    init_tty();
+    init_drivers();
+    mock_init_proc();
+}
+
 void _close_delete_file(int fd, char *name){
     int ret;
     ret = sys_close(curr_scheduling_proc, fd);
@@ -386,7 +395,8 @@ void test_given_access_when_file_exists_should_return_0(){
 int unit_test3(){
     int ret, fd, fd2, i;
     struct stat statbuf, statbuf2;
-    struct dirent dir[4];
+    struct dirent dir[5];
+    _reset_fs();
 
     ret = sys_mkdir(curr_scheduling_proc, DIR_NAME, 0x755);
     assert(ret == 0);
@@ -430,7 +440,9 @@ int unit_test3(){
     assert(fd2 == 1);
 
     ret = sys_getdents(curr_scheduling_proc, fd2, dir, 5);
-    assert(ret == sizeof(struct dirent) * 4);
+    size_t dirent_size = sizeof(struct dirent);
+    size_t desired = dirent_size * 4;
+    assert(ret == desired);
     for (i = 0; i < 4; ++i) {
         assert(char32_strcmp(dir[i].d_name, dirent_array[i]) == 0);
     }
@@ -523,6 +535,7 @@ int main(){
     test_given_access_when_file_not_exist_should_return_enoent();
     test_given_access_when_file_exists_should_return_0();
     
+    unit_test3();
     unit_test3();
     unit_test_driver();
     printf("filesystem unit test passed\n");

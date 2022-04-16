@@ -12,11 +12,14 @@ struct proc *curr_scheduling_proc;
 struct proc *curr_syscall_caller;
 
 void init_disk(){
-    int ret = makefs(DISK_RAW, DISK_SIZE);
+    int ret;
+    memset(DISK_RAW, 0, DISK_SIZE);
+    ret = makefs(DISK_RAW, DISK_SIZE);
     assert(ret == 0);
 }
 
 void mock_init_proc(){
+    memset(&pcurr, 0, sizeof(struct proc));
     pcurr.proc_nr = 1;
     pcurr.pid = 1;
     curr_scheduling_proc = &pcurr;
