@@ -263,6 +263,23 @@ void test_given_read_when_proc_was_suspended_should_return(){
     _close_pipe(pipe_fd, &pcurr2);
 }
 
+void test_given_read_when_data_is_written_should_return_data(){
+    struct proc pcurr2;
+    int ret;
+    int pipe_fd[2];
+
+    _init_pipe(pipe_fd, &pcurr2);
+
+    ret = sys_write(&pcurr2, pipe_fd[1], "5678", 5);
+    assert(ret == 5);
+
+    ret = sys_read(curr_scheduling_proc, pipe_fd[0], buffer, 100);
+    assert(ret == 5);
+    assert(strcmp(buffer, "5678") == 0);
+
+    _close_pipe(pipe_fd, &pcurr2);
+}
+
 int unit_test2(){
     struct proc pcurr2;
     int ret;
@@ -449,6 +466,7 @@ int main(){
     test_given_write_when_fd_is_closed_return_ebadf();
     test_given_close_when_file_closed_should_return_ebadf();
     test_given_read_when_proc_was_suspended_should_return();
+    test_given_read_when_data_is_written_should_return_data();
     
     unit_test2();
     unit_test3();
