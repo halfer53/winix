@@ -11,7 +11,8 @@ const char * dirent_array[] = {
         "bar2.txt"
 };
 
-char *FOO_FILENAME = "/foo.txt";
+const char *FOO_FILENAME = "/foo.txt";
+const char *DIR_NAME = "/dev/";
 char buffer[PAGE_LEN];
 char buffer2[PAGE_LEN];
 
@@ -363,7 +364,7 @@ void test_given_write_when_read_fd_closed_and_sigpipe_ignored_should_return_epip
 }
 
 void test_given_access_when_file_not_exist_should_return_enoent(){
-    int ret = sys_access(curr_scheduling_proc, "/dev", F_OK);
+    int ret = sys_access(curr_scheduling_proc, DIR_NAME, F_OK);
     assert(ret == ENOENT);
 }
 
@@ -372,10 +373,10 @@ int unit_test3(){
     struct stat statbuf, statbuf2;
     struct dirent dir[4];
 
-    ret = sys_mkdir(curr_scheduling_proc, "/dev", 0x755);
+    ret = sys_mkdir(curr_scheduling_proc, DIR_NAME, 0x755);
     assert(ret == 0);
 
-    ret = sys_access(curr_scheduling_proc, "/dev", F_OK);
+    ret = sys_access(curr_scheduling_proc, DIR_NAME, F_OK);
     assert(ret == 0);
 
     ret = sys_access(curr_scheduling_proc, "/dev/bar.txt", F_OK);
@@ -387,10 +388,10 @@ int unit_test3(){
     ret = sys_access(curr_scheduling_proc, "/dev/bar.txt", F_OK);
     assert(ret == 0);
 
-    ret = sys_chdir(curr_scheduling_proc, "/dev");
+    ret = sys_chdir(curr_scheduling_proc, DIR_NAME);
     assert(ret == 0);
 
-    ret = sys_stat(curr_scheduling_proc, "/dev", &statbuf);
+    ret = sys_stat(curr_scheduling_proc, DIR_NAME, &statbuf);
     assert(ret == 0);
     assert(curr_scheduling_proc->fp_workdir->i_num == statbuf.st_ino);
 
@@ -410,7 +411,7 @@ int unit_test3(){
     assert(statbuf.st_nlink == 2);
     assert(statbuf.st_mode == 0x777);
 
-    fd2 = sys_open(curr_scheduling_proc, "/dev", O_RDONLY, 0);
+    fd2 = sys_open(curr_scheduling_proc, DIR_NAME, O_RDONLY, 0);
     assert(fd2 == 1);
 
     ret = sys_getdents(curr_scheduling_proc, fd2, dir, 5);
