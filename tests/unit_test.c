@@ -162,7 +162,7 @@ void test_given_two_file_descriptors_when_dupping_file_should_behave_the_same(){
     assert(ret == 0);
 }
 
-void test_given_file_data_when_open_and_closing_file_should_persist(){
+void test_given_read_when_open_and_closing_file_should_persistted_data(){
     int ret, fd;
 
     fd = sys_open(curr_scheduling_proc, FILE1 , O_CREAT | O_RDONLY, 0x0775);
@@ -616,7 +616,7 @@ int main(){
     test_given_close_when_file_closed_should_return_ebadf();
     test_given_opening_file_when_deleting_file_should_return_error();
     test_given_two_file_descriptors_when_dupping_file_should_behave_the_same();
-    test_given_file_data_when_open_and_closing_file_should_persist();
+    test_given_read_when_open_and_closing_file_should_persistted_data();
     test_given_pipe_read_when_no_data_in_pipe_should_return_suspend();
     test_given_pipe_write_when_no_data_in_pipe_should_return_succeed();
     test_given_pipe_write_when_pipe_is_full_should_return_suspend();
