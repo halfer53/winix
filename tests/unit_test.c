@@ -199,14 +199,14 @@ void _init_pipe(int pipe_fd[2], struct proc* pcurr2){
     emulate_fork(curr_scheduling_proc, pcurr2);
 }
 
-void __close_pipe(int pipe_fd[2], struct proc* process){
-    sys_close(process, pipe_fd[0]);
-    sys_close(process, pipe_fd[1]);
+void __close_pipe(int pipe_fd[2], struct proc* process, int num){
+    sys_close(process, pipe_fd[num]);
+    sys_close(process, pipe_fd[num]);
 }
 
 void _close_pipe(int pipe_fd[2], struct proc* pcurr2){
-    __close_pipe(pipe_fd, curr_scheduling_proc);
-    __close_pipe(pipe_fd, pcurr2);
+    __close_pipe(pipe_fd, curr_scheduling_proc, 0);
+    __close_pipe(pipe_fd, pcurr2, 1);
 }
 
 void test_given_pipe_read_when_no_data_in_pipe_should_return_suspend(){
@@ -257,9 +257,11 @@ void test_given_pipe_read_when_proc_was_suspended_should_return(){
     int pipe_fd[2];
 
     _init_pipe(pipe_fd, &pcurr2);
+    memset(buffer, 0, PAGE_LEN);
 
     ret = sys_read(curr_scheduling_proc, pipe_fd[0], buffer, 100);
     assert(ret == SUSPEND);
+    assert(*buffer == 0);
 
     ret = sys_write(&pcurr2, pipe_fd[1], "1234", 5);
     assert(ret == 5);
@@ -321,6 +323,7 @@ void test_given_pipe_write_when_one_read_fd_s_closed_should_return_success(){
     int pipe_fd[2];
 
     _init_pipe(pipe_fd, &pcurr2);
+    memset(buffer, 0, PAGE_LEN);
 
     ret = sys_close(curr_scheduling_proc, pipe_fd[0]);
     assert(ret == 0);
