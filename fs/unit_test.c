@@ -12,8 +12,8 @@ const char * dirent_array[] = {
 };
 
 char *filename = "/foo.txt";
-char buffer[BLOCK_SIZE];
-char buffer2[BLOCK_SIZE];
+char buffer[PAGE_LEN];
+char buffer2[PAGE_LEN];
 
 int file_size(struct proc* who, int fd){
     struct stat statbuf;
@@ -182,6 +182,22 @@ void test_given_write_when_no_data_in_pipe_should_return_succeed(){
 
     ret = sys_write(curr_scheduling_proc, pipe_fd[1], "a", 1);
     assert(ret == 1);
+
+    _close_pipe(pipe_fd, &pcurr2);
+}
+
+void test_given_write_when_pipe_is_full_should_return_suspend(){
+    struct proc pcurr2;
+    int ret;
+    int pipe_fd[2];
+
+    _init_pipe(pipe_fd, &pcurr2);
+
+    ret = sys_write(curr_scheduling_proc, pipe_fd[1], buffer, PAGE_LEN);
+    assert(ret == PAGE_LEN);
+
+    ret = sys_write(curr_scheduling_proc, pipe_fd[1], buffer, PAGE_LEN);
+    assert(ret == SUSPEND);
 
     _close_pipe(pipe_fd, &pcurr2);
 }
@@ -373,6 +389,7 @@ int run_unit_tests(){
     test_given_file_data_when_open_and_closing_file_should_persist();
     test_given_read_when_no_data_in_pipe_should_return_suspend();
     test_given_write_when_no_data_in_pipe_should_return_succeed();
+    test_given_write_when_pipe_is_full_should_return_suspend();
     
     unit_test2();
     unit_test3();
