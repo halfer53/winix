@@ -12,7 +12,7 @@ const char * dirent_array[] = {
 };
 
 const char *FILE1 = "/foo.txt";
-const char *FILE2 = "/foo.txt";
+const char *FILE2 = "/foo2.txt";
 const char *DIR_NAME = "/dir/";
 const char *DIR_FILE1 = "/dir/bar.txt";
 const char *DIR_FILE2 = "/dir/bar2.txt";
@@ -413,6 +413,28 @@ void test_given_access_when_under_folder_should_return_enoent(){
     _reset_fs();
 }
 
+void test_given_stat_when_two_files_are_linked_should_return_same(){
+    int fd, ret;
+    struct stat statbuf, statbuf2;
+
+    fd = sys_creat(curr_scheduling_proc, FILE1, O_RDWR);
+    assert(fd == 0);
+
+    ret = sys_link(curr_scheduling_proc, FILE1, FILE2);
+    assert(ret == 0);
+
+    ret = sys_stat(curr_scheduling_proc, FILE1, &statbuf);
+    assert(ret == 0);
+
+    ret = sys_stat(curr_scheduling_proc, FILE2, &statbuf2);
+    assert(ret == 0);
+    assert(statbuf.st_ino == statbuf2.st_ino);
+    assert(statbuf.st_dev == statbuf2.st_dev);
+    assert(statbuf.st_nlink == 2);
+
+    _reset_fs();
+}
+
 int unit_test3(){
     int ret, fd, fd2, i;
     struct stat statbuf, statbuf2;
@@ -440,12 +462,6 @@ int unit_test3(){
 
     ret = sys_stat(curr_scheduling_proc, DIR_FILE1, &statbuf);
     assert(ret == 0);
-
-    ret = sys_stat(curr_scheduling_proc, DIR_FILE2, &statbuf2);
-    assert(ret == 0);
-    assert(statbuf.st_ino == statbuf2.st_ino);
-    assert(statbuf.st_dev == statbuf2.st_dev);
-    assert(statbuf.st_nlink == 2);
     assert(statbuf.st_mode == 0x777);
 
     fd2 = sys_open(curr_scheduling_proc, DIR_NAME, O_RDONLY, 0);
@@ -545,6 +561,7 @@ int main(){
     test_given_access_when_file_exists_should_return_0();
     test_given_access_when_folder_exists_should_return_0();
     test_given_access_when_under_folder_should_return_enoent();
+    test_given_stat_when_two_files_are_linked_should_return_same();
     
     unit_test3();
     unit_test3();
