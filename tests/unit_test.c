@@ -288,6 +288,11 @@ void test_given_read_when_data_is_written_should_return_data(){
     _close_pipe(pipe_fd, &pcurr2);
 }
 
+void test_given_chdir_when_dir_not_present_should_return_eexist(){
+    int ret = sys_chdir(curr_scheduling_proc, "/not_exist");
+    assert(ret == EEXIST);
+}
+
 void test_given_read_when_pipe_is_full_should_return_data(){
     struct proc pcurr2;
     int ret;
@@ -562,6 +567,7 @@ int main(){
     test_given_access_when_folder_exists_should_return_0();
     test_given_access_when_under_folder_should_return_enoent();
     test_given_stat_when_two_files_are_linked_should_return_same();
+    test_given_chdir_when_dir_not_present_should_return_eexist();
     
     unit_test3();
     unit_test3();
