@@ -385,12 +385,20 @@ void test_given_access_when_file_exists_should_return_0(){
     ret = sys_access(curr_scheduling_proc, FOO_FILENAME, F_OK);
     assert(ret == 0);
 
-    ret = sys_unlink(curr_scheduling_proc, FOO_FILENAME);
+    _close_delete_file(0, FOO_FILENAME);
+}
+
+void test_given_access_when_folder_exists_should_return_0(){
+    int ret;
+    ret = sys_mkdir(curr_scheduling_proc, DIR_NAME, 0x755);
     assert(ret == 0);
 
-    ret = sys_close(curr_scheduling_proc, 0);
+    ret = sys_access(curr_scheduling_proc, DIR_NAME, F_OK);
     assert(ret == 0);
+
+    _reset_fs();
 }
+
 
 int unit_test3(){
     int ret, fd, fd2, i;
@@ -534,6 +542,7 @@ int main(){
     test_given_write_when_read_fd_closed_and_sigpipe_ignored_should_return_epipe();
     test_given_access_when_file_not_exist_should_return_enoent();
     test_given_access_when_file_exists_should_return_0();
+    test_given_access_when_folder_exists_should_return_0();
     
     unit_test3();
     unit_test3();
