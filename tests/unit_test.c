@@ -470,6 +470,23 @@ void test_given_chmod_when_file_not_present_should_return_enonent(){
     assert(ret == ENOENT);
 }
 
+void test_given_chmod_stat_when_file_present_should_return_0(){
+    int fd, ret;
+    struct stat statbuf;
+
+    fd = sys_creat(curr_scheduling_proc, FILE1, O_RDWR);
+    assert(fd == 0);
+
+    ret = sys_chmod(curr_scheduling_proc, FILE1, 0x777);
+    assert(ret == 0);
+
+    ret = sys_stat(curr_scheduling_proc, FILE1, &statbuf);
+    assert(ret == 0);
+    assert(statbuf.st_mode == 0x777);
+
+    _close_delete_file(fd, FILE1);
+}
+
 int unit_test3(){
     int ret, fd, fd2, i;
     struct stat statbuf, statbuf2;
@@ -594,6 +611,7 @@ int main(){
     test_given_chdir_when_path_is_file_should_return_eexist();
     test_given_chdir_when_dir_is_valid_should_succeed();
     test_given_chmod_when_file_not_present_should_return_enonent();
+    test_given_chmod_stat_when_file_present_should_return_0();
     
     unit_test3();
     unit_test3();
