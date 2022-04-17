@@ -76,6 +76,8 @@ void test_given_close_when_file_closed_should_return_ebadf(){
 
     ret = sys_close(curr_scheduling_proc, fd);
     assert(ret == EBADF);
+
+    reset_unit_test();
 }
 
 void test_given_read_when_fd_is_closed_return_ebadf(){
@@ -118,6 +120,8 @@ void test_given_open_when_deleting_file_should_return_error(){
 
     ret = sys_open(curr_scheduling_proc, FILE1 , O_RDWR, 0775);
     assert(ret == ENOENT);
+
+    reset_unit_test();
 }
 
 void test_given_dup_when_dupping_file_should_result_in_same_fd(){
@@ -211,7 +215,7 @@ void test_given_pipe_read_when_no_data_in_pipe_should_return_suspend(){
     ret = sys_read(curr_scheduling_proc, pipe_fd[0], buffer, 100);
     assert(ret == SUSPEND);
 
-    _close_pipe(pipe_fd, &pcurr2);
+    reset_unit_test();
 }
 
 void test_given_pipe_write_when_no_data_in_pipe_should_return_succeed(){
@@ -224,7 +228,7 @@ void test_given_pipe_write_when_no_data_in_pipe_should_return_succeed(){
     ret = sys_write(curr_scheduling_proc, pipe_fd[1], "a", 1);
     assert(ret == 1);
 
-    _close_pipe(pipe_fd, &pcurr2);
+    reset_unit_test();
 }
 
 void test_given_pipe_write_when_pipe_is_full_should_return_suspend(){
@@ -240,7 +244,7 @@ void test_given_pipe_write_when_pipe_is_full_should_return_suspend(){
     ret = sys_write(curr_scheduling_proc, pipe_fd[1], buffer, PAGE_LEN);
     assert(ret == SUSPEND);
 
-    _close_pipe(pipe_fd, &pcurr2);
+    reset_unit_test();
 }
 
 void test_given_pipe_read_when_proc_was_suspended_should_return(){
@@ -262,7 +266,7 @@ void test_given_pipe_read_when_proc_was_suspended_should_return(){
     ret = sys_write(&pcurr2, pipe_fd[1], "5678", 5);
     assert(ret == 5);
 
-    _close_pipe(pipe_fd, &pcurr2);
+    reset_unit_test();
 }
 
 void test_given_pipe_read_when_data_is_written_should_return_data(){
@@ -279,7 +283,7 @@ void test_given_pipe_read_when_data_is_written_should_return_data(){
     assert(ret == 5);
     assert(strcmp(buffer, "5678") == 0);
 
-    _close_pipe(pipe_fd, &pcurr2);
+    reset_unit_test();
 }
 
 void test_given_pipe_read_when_pipe_is_full_should_return_data(){
@@ -306,7 +310,7 @@ void test_given_pipe_read_when_pipe_is_full_should_return_data(){
     assert(ret == 4);
     assert(strcmp(buffer2, "abc") == 0);
 
-    _close_pipe(pipe_fd, &pcurr2);
+    reset_unit_test();
 }
 
 void test_given_pipe_read_when_writer_write_fd_closed_should_return_suspend(){
@@ -327,7 +331,7 @@ void test_given_pipe_read_when_writer_write_fd_closed_should_return_suspend(){
     assert(ret == 4);
     assert(strcmp(buffer, "abc") == 0);
 
-    _close_pipe(pipe_fd, &pcurr2);
+    reset_unit_test();
 }
 
 void test_given_pipe_read_when_reader_write_fd_closed_should_return_suspend(){
@@ -348,7 +352,7 @@ void test_given_pipe_read_when_reader_write_fd_closed_should_return_suspend(){
     assert(ret == 4);
     assert(strcmp(buffer, "abc") == 0);
 
-    _close_pipe(pipe_fd, &pcurr2);
+    reset_unit_test();
 }
 
 
@@ -369,7 +373,7 @@ void test_given_pipe_read_when_all_write_fds_closed_should_return_0(){
     ret = sys_read(&pcurr2, pipe_fd[0], buffer, 2);
     assert(ret == 0);
 
-    _close_pipe(pipe_fd, &pcurr2);
+    reset_unit_test();
 }
 
 void test_given_pipe_write_when_one_read_fd_s_closed_should_return_success(){
@@ -390,7 +394,7 @@ void test_given_pipe_write_when_one_read_fd_s_closed_should_return_success(){
     assert(ret == 2);
     assert(strcmp("a", buffer) == 0);
 
-    _close_pipe(pipe_fd, &pcurr2);
+    reset_unit_test();
 }
 
 void test_given_pipe_write_when_read_fd_are_closed_should_return_sigpipe(){
@@ -410,7 +414,7 @@ void test_given_pipe_write_when_read_fd_are_closed_should_return_sigpipe(){
     assert(ret == SUSPEND);
     assert(pcurr2.sig_pending & (1 << SIGPIPE));
 
-    _close_pipe(pipe_fd, &pcurr2);
+    reset_unit_test();
 }
 
 void test_given_pipe_write_when_read_fd_closed_and_sigpipe_ignored_should_return_epipe(){
@@ -430,12 +434,14 @@ void test_given_pipe_write_when_read_fd_closed_and_sigpipe_ignored_should_return
     ret = sys_write(&pcurr2, pipe_fd[1], "a", 2);
     assert(ret == EPIPE);
 
-    _close_pipe(pipe_fd, &pcurr2);
+    reset_unit_test();
 }
 
 void test_given_access_when_file_not_exist_should_return_enoent(){
     int ret = sys_access(curr_scheduling_proc, FILE1, F_OK);
     assert(ret == ENOENT);
+
+    reset_unit_test();
 }
 
 void test_given_access_when_file_exists_should_return_0(){
@@ -735,9 +741,7 @@ int main(){
     test_given_write_when_fd_is_closed_return_ebadf();
     test_given_open_when_deleting_file_should_return_error();
     test_given_dup_when_dupping_file_should_result_in_same_fd();
-
     
-
     test_given_pipe_read_when_no_data_in_pipe_should_return_suspend();
     test_given_pipe_write_when_no_data_in_pipe_should_return_succeed();
     test_given_pipe_write_when_pipe_is_full_should_return_suspend();
