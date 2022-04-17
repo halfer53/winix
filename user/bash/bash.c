@@ -65,12 +65,20 @@ struct cmd_internal builtin_commands[] = {
 };
 
 void init_shell(){
+    int ret;
+    ret = setsid();
+    if (ret != getpid()){
+        perror("setsid");
+    }
+    ret = ioctl(STDIN_FILENO, TIOCSCTTY);
+    if (ret != 0){
+        perror("TIOCSCTTY");
+    }
 #ifdef __wramp__
     signal(SIGINT, SIG_IGN);
     signal(SIGTSTP, SIG_IGN);
-    pgid = setsid();
     ioctl(STDIN_FILENO, TIOCSPGRP, &pgid);
-    ioctl(STDIN_FILENO, TIOCSCTTY);
+    
 #endif
 }
 
@@ -145,10 +153,12 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
 
         signal(SIGINT, SIG_DFL);
         signal(SIGTSTP, SIG_DFL);
-#ifdef __wramp__
-        setpgid(0, 0);
+        ret = setpgid(0, 0);
         last_pgid = getpgid(0);
-        ioctl(STDIN_FILENO, TIOCSPGRP, &last_pgid);
+        ret = ioctl(STDIN_FILENO, TIOCSPGRP, &last_pgid);
+        printf("pgid %d ret %d\n", last_pgid, ret);
+#ifdef __wramp__
+        
 #endif
         close(history_fd);
 
