@@ -23,7 +23,7 @@ const char* kstr_error(int err);
 int kputd_buf(int n, char *buf);
 int kputx_buf(int n,char *buf);
 int filp_kprint(struct filp* dev, const char* format, ...);
-int kprintf_vm( struct filp* dev, const char *orignal_format, void *arg, ptr_t *who_rbase);
+int kprintf_vm( struct filp* dev, const char *orignal_format, void *arg, struct proc* who);
 int kputc(const int c);
 int kgetc_blocking(struct proc* who);
 int kprintf(const char *format, ...);

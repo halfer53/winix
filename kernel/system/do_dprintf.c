@@ -63,5 +63,5 @@ int do_winix_dprintf(struct proc *who, struct message *m){
     file = who->fp_filp[fd];
     ptr = get_physical_addr(vp1,who);
     ptr2 = get_physical_addr(vp2,who);
-    return kprintf_vm(file, ptr, ptr2, who->ctx.rbase);
+    return kprintf_vm(file, ptr, ptr2, who);
 }

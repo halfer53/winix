@@ -62,6 +62,8 @@ const char *errlist[_NERROR] = {
     "ENOTEMPTY",    /* ENOTEMPTY */
 };
 
+static char NULL_STR[] = "(NULL)";
+
 const char* kstr_error(int err){
     if(err < 0){
         err = -err;
@@ -270,7 +272,7 @@ static int pass_number(const char **s_format){
  * @param  who_rbase rbase of the calling process
  * @return           number of bytes being printed
  */
-int kprintf_vm( struct filp* file, const char *orignal_format, void *arg, ptr_t *who_rbase){
+int kprintf_vm( struct filp* file, const char *orignal_format, void *arg, struct proc* who){
     char format_buffer[FORMAT_BUF_SIZ];
     struct printf_buffer _this_buffer;
     struct printf_buffer* this_buffer = &_this_buffer;
@@ -281,6 +283,7 @@ int kprintf_vm( struct filp* file, const char *orignal_format, void *arg, ptr_t 
     int (*filp_write)(struct filp *, char *, size_t, off_t );
     const char* format = (const char*)orignal_format;
     char token;
+    vptr_t* vformat_str;
     
     memset(this_buffer, 0, sizeof(struct printf_buffer));
     this_buffer->limit = BUFFER_SIZ;
@@ -326,10 +329,16 @@ int kprintf_vm( struct filp* file, const char *orignal_format, void *arg, ptr_t 
                     break;
 
                 case 's':
-                    format_ptr = *(char **)arg + (unsigned long)who_rbase;
-                    if(format_ptr){
-                        format_buf_len = strlen(format_ptr);
+                    vformat_str = *(vptr_t **)arg;
+                    if (!is_vaddr_accessible(vformat_str, who)){
+                        format_ptr = NULL_STR;
+                    }else{
+                        format_ptr = (char *)get_physical_addr(vformat_str, who);
+                        if (!format_ptr)
+                            format_ptr = NULL_STR;
                     }
+
+                    format_buf_len = strlen(format_ptr);
                     break;
 
                 case 'c':
@@ -374,21 +383,21 @@ int filp_kprint(struct filp* file, const char* format, ...){
     void *arg = &format;
     arg = ((char*)arg) + 1;
 
-    return kprintf_vm(file, format, arg, 0);
+    return kprintf_vm(file, format, arg, SYSTEM_TASK);
 }
 
 int kprintf(const char *format, ...) {
     void *arg = &format;
     arg = ((char*)arg) + 1;
 
-    return kprintf_vm(tty1_filp, format, arg, 0);
+    return kprintf_vm(tty1_filp, format, arg, SYSTEM_TASK);
 }
 
 int kprintf2(const char *format, ...) {
     void *arg = &format;
     arg = ((char*)arg) + 1;
 
-    return kprintf_vm(tty2_filp, format, arg, 0);
+    return kprintf_vm(tty2_filp, format, arg, SYSTEM_TASK);
 }
 
 int klog(const char *format, ...){
@@ -396,7 +405,7 @@ int klog(const char *format, ...){
     arg = ((char*)arg) + 1;
 
     kprintf2("[%d] ", get_uptime());
-    return kprintf_vm(tty2_filp,format, arg, 0);
+    return kprintf_vm(tty2_filp,format, arg, SYSTEM_TASK);
 }
 
 int kerror(const char *format, ...){
@@ -404,7 +413,7 @@ int kerror(const char *format, ...){
     arg = ((char*)arg) + 1;
 
     kprintf2("[%d] ERROR: ", get_uptime());
-    return kprintf_vm(tty2_filp, format, arg, 0);
+    return kprintf_vm(tty2_filp, format, arg, SYSTEM_TASK);
 }
 
 
@@ -413,7 +422,7 @@ int kwarn(const char *format, ...){
     arg = ((char*)arg) + 1;
 
     kprintf2("[%d] WARN: ", get_uptime());
-    return kprintf_vm(tty2_filp, format, arg, 0);
+    return kprintf_vm(tty2_filp, format, arg, SYSTEM_TASK);
 }
 
 
