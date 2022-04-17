@@ -374,7 +374,7 @@ int tty_ioctl(struct filp* file, int request, vptr_t* vptr){
         break;
     case TIOCSPGRP:
         tty_data->foreground_group = (pid_t)*get_physical_addr(*(ptr_t **)ptr, who);
-        KDEBUG(("set foreground to %d\n", tty_data->foreground_group));
+        // KDEBUG(("set foreground to %d\n", tty_data->foreground_group));
         break;
     case TIOCSCTTY:
         tty_data->controlling_session = who->session_id;
