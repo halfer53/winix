@@ -128,6 +128,31 @@ PRIVATE void serial2_handler() {
     RexSp2->Iack = 0;
 }
 
+void rewind_stack(struct proc* proc){
+    vptr_t vtext_start, vtext_end;
+    ptr_t *p = get_physical_addr(proc->ctx.m.sp, proc);
+    ptr_t *stack_end = proc->stack_top + USER_STACK_SIZE;
+    reg_t data;
+
+    if (p >= stack_end){
+        kprintf("stack pointer is not point to stack frame");
+        return;
+    }
+
+    vtext_start = (vptr_t)(get_virtual_addr(stack_end, proc) - (vptr_t*)0);
+    vtext_end = vtext_start + proc->text_size;
+
+    kprintf("vtext start %x end %x, stack p %x end %x\n", vtext_start, vtext_end, p, stack_end);
+    kprintf("Call Stack:\n");
+    while (p < stack_end){
+        data = *p;
+        if (vtext_start <= data && data <= vtext_end){
+            kprintf("  - 0x%x\n", data);
+        }
+        p++;
+    }
+}
+
 #define PRINT_DEBUG_REG(pc,sp,ra)\
     kprintf("$pc 0x%04x, $sp 0x%04x $ra 0x%04x\n",pc,sp,ra)
 
@@ -143,20 +168,23 @@ PRIVATE void gpf_handler() {
     // is the current process a valid one?
     ASSERT(IS_PROCN_OK(curr_scheduling_proc->proc_nr));
     trace_syscall = false;
-    stop_debug_scheduling();
+
 #ifdef _DEBUG
     if(!is_vaddr_accessible(curr_scheduling_proc->ctx.m.sp, curr_scheduling_proc)){
         kprintf("\nStack Overflow");
     }
-    kprintf("\nGeneral Protection Fault: \"%s (%d)\" Rbase=0x%x Stack Top=0x%x\n",
+    kprintf("\nGeneral Protection Fault: \"%s (%d)\"\n",
         curr_scheduling_proc->name,
-        curr_scheduling_proc->pid,
-        curr_scheduling_proc->ctx.rbase,
+        curr_scheduling_proc->pid);
+    kprintf("Rbase=0x%x Stack Top=0x%x\n", curr_scheduling_proc->ctx.rbase,
         curr_scheduling_proc->stack_top);
+    kprintf("vRbase=0x%x vStack Top=0x%x\n", 
+        get_virtual_addr(curr_scheduling_proc->ctx.rbase, curr_scheduling_proc),
+        get_virtual_addr(curr_scheduling_proc->stack_top, curr_scheduling_proc));
     pc = get_physical_addr(get_pc_ptr(curr_scheduling_proc),curr_scheduling_proc);
 
     kprintf("Virtual  ");
-    PRINT_DEBUG_REG(get_virtual_addr(pc,curr_scheduling_proc),
+    PRINT_DEBUG_REG(curr_scheduling_proc->ctx.m.pc,
                                     curr_scheduling_proc->ctx.m.sp,
                                     curr_scheduling_proc->ctx.m.ra);
 
@@ -166,7 +194,8 @@ PRIVATE void gpf_handler() {
         get_physical_addr(curr_scheduling_proc->ctx.m.ra, curr_scheduling_proc));  
     kreport_ptable(curr_scheduling_proc);  
 
-    // kprintf("Current Instruction: 0x%08x\n",*pc);
+    rewind_stack(curr_scheduling_proc);
+
 #endif
 
     
@@ -174,7 +203,7 @@ PRIVATE void gpf_handler() {
         _panic("kernel crashed",NULL);
 
     // Kill process and call scheduler.
-    send_sig(curr_scheduling_proc,SIGSEGV);
+    send_sig(curr_scheduling_proc, SIGSEGV);
     sched();
 }
 
