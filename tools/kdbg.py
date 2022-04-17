@@ -1,10 +1,10 @@
 #!/usr/bin/python3
+import subprocess
 import sys
 from subprocess import call
 from os import path
 from uuid import uuid4
 from shutil import rmtree
-from tempfile import mkdtemp
 
 def main():
     if(len(sys.argv) < 2):
@@ -24,6 +24,7 @@ def main():
     prevfile = ""
     target_segment = ""
     target_line_num = 0
+    instruction = ""
     addr = 0
     with open( filepath) as f:
         for line in f:
@@ -43,7 +44,9 @@ def main():
                         break
                     
             elif(len(line) > 0 and line[0] == '0'):
-                curr_addr = int(line.split(" ")[0],16)
+                splits = line.split(" ")
+                curr_addr = int(splits[0],16)
+                instruction = splits[2]
                 
                 if(target == curr_addr):
                     addr = curr_addr
@@ -56,114 +59,103 @@ def main():
     
     filename = prevfile.split(" ")[1].split(", ")[0].replace("'","")\
                     .replace(",","").replace(".o",".c")
-    # print(filename)
-    # print(target_line_num)
-    # print(in_file)
-    # print(target_segment)
+    print(f"target assembly line number {target_line_num} in {filename}")
 
-    basedir = mkdtemp()
-    try:
-        tmp_filename = basedir + "/" + str(uuid4())
+    tmp_filename = "/tmp/" + str(uuid4()) + ".s"
+    wcc_cmd = ["wcc","-N", "-g", "-S", "-I" + main_path + "/include/posix_include", "-I" + main_path + "/include",\
+                    "-D__wramp__", "-D_DEBUG","-o",tmp_filename, main_path+"/"+filename, ]
 
-        wcc_cmd = ["wcc","-N", "-g", "-S", "-I" + main_path + "/include/posix_include", "-I" + main_path + "/include",\
-                        "-D__wramp__", "-D_DEBUG","-o",tmp_filename, main_path+"/"+filename, ]
+    print(" ".join(wcc_cmd))
+    result = call(wcc_cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    if(result != 0):
+        tmpfilename = filename.replace(".c",".s")
+        if(path.isfile(main_path+"/" +  tmpfilename)):
+            print("Line " + str(target_line_num) + \
+                        " in file "+tmpfilename)
+            return 0
+        else:
+            print('Err')
+            return 1
 
-        print(" ".join(wcc_cmd))
-        result = call(wcc_cmd, stderr=sys.stderr)
-        if(result != 0):
-            tmpfilename = filename.replace(".c",".s")
-            if(path.isfile(main_path+"/" +  tmpfilename)):
-                print("Line " + str(target_line_num) + \
-                            " in file "+tmpfilename)
-                return 0
-            else:
-                print('Err')
-                return 1
+    loc = "0"
+    curr_count = 0
+    next_incr = 0
+    prev_line = ""
+    prev_name = ""
+    prev_name_index = 0
+    curr_seg = ""
+    seg_types = [".text\n", ".data\n", ".bss\n"]
+    
+    with open(tmp_filename, 'r') as f:
+        for line in f:
+            if(line[-2] == ':' and "L." not in line):
+                prev_name = line
+                prev_name_index = 0
 
-        loc = "0"
-        curr_count = 0
-        next_incr = 0
-        prev_line = ""
-        prev_name = ""
-        prev_name_index = 0
-        curr_seg = ""
-        seg_types = [".text\n", ".data\n", ".bss\n"]
-        
-        with open(tmp_filename, 'r') as f:
-            for line in f:
-                if(line[-2] == ':' and "L." not in line):
-                    prev_name = line
-                    prev_name_index = 0
+            elif(line[0] == '.'):
+                if(".loc" in line):
+                    loc = line[:-1].split(",")[1]
+                elif(line in seg_types):
+                    # print(curr_count)
+                    if(line == ".data\n" or line == ".bss\n"):
+                        curr_count = 0
+                    
+                    curr_seg = line.replace("\n","")
+                    # print("in "+curr_seg)
 
-                elif(line[0] == '.'):
-                    if(".loc" in line):
-                        loc = line[:-1].split(",")[1]
-                    elif(line in seg_types):
-                        # print(curr_count)
-                        if(line == ".data\n" or line == ".bss\n"):
-                            curr_count = 0
-                        
-                        curr_seg = line.replace("\n","")
-                        # print("in "+curr_seg)
-
-                elif(line[0] == '\t'):
-                    if(curr_seg == ""):
-                        next_incr = 1
-                        if(curr_count == target_line_num):
-                            print(".data: \n" + prev_name + "\tindex: " \
-                                + str(prev_name_index) + "\n" + line + "in file " \
-                                + filename)
+            elif(line[0] == '\t'):
+                if(curr_seg == ""):
+                    next_incr = 1
+                    if(curr_count == target_line_num):
+                        print(".data: \n" + prev_name + "\tindex: " \
+                            + str(prev_name_index) + "\n" + line + "in file " \
+                            + filename)
+                        break
+                elif(curr_seg == ".text"):
+                    next_incr = 1
+                    if(curr_seg == target_segment and \
+                            curr_count == target_line_num):
+                            print(f"Assembly: \n\t0x{instruction}\n {line}" , end="")
+                            print("Line: " + str(curr_count) + " in assembly file")
+                            print("Line: "+ loc + " in file "+filename)
                             break
-                    elif(curr_seg == ".text"):
-                        next_incr = 1
-                        if(curr_seg == target_segment and \
-                                curr_count == target_line_num):
-                                print("Assembly: \n" + line , end="")
-                                print("Line: " + str(curr_count) + " in assembly file")
-                                print("Line: "+ loc + " in file "+filename)
-                                break
+                    
+                elif(curr_seg == ".data"):
+                    if(".asciiz" in line):
+                        tmp_str = line.split(".asciiz")[1].strip().replace("\"","")
                         
-                    elif(curr_seg == ".data"):
-                        if(".asciiz" in line):
-                            tmp_str = line.split(".asciiz")[1].strip().replace("\"","")
-                            
-                            next_incr = len(tmp_str)
-                            # print(".data: "+line)
-                            if(curr_seg == target_segment and curr_count <= target_line_num\
-                                    and curr_count + next_incr >= target_line_num):
+                        next_incr = len(tmp_str)
+                        # print(".data: "+line)
+                        if(curr_seg == target_segment and curr_count <= target_line_num\
+                                and curr_count + next_incr >= target_line_num):
 
-                                    index_offset = curr_count + next_incr - target_line_num
-                                    print(".data: \n\tindex: " + str(index_offset)\
-                                             + "\n" + line[:-1] +"\nin file " + filename)
-                                    break
+                                index_offset = curr_count + next_incr - target_line_num
+                                print(".data: \n\tindex: " + str(index_offset)\
+                                            + "\n" + line[:-1] +"\nin file " + filename)
+                                break
 
-                    elif(curr_seg == ".bss"):
-                        if(".space" in line):
-                            bss_len = int(line.split(".space")[1].strip())
-                            # print(prev_line)
-                            # print(bss_len)
-                            next_incr = bss_len 
-                            
-                            if(curr_seg == target_segment and curr_count <= target_line_num \
-                                    and curr_count + next_incr >= target_line_num):
-                                    index_offset = curr_count + next_incr - target_line_num
-                                    print(".bss: \n" + prev_line[:-1] + "\n\tindex: " + \
-                                        str(index_offset) + "\n\tTotal number of words: " + \
-                                        str(bss_len) + "\nin file " + filename)
-                                    break
-                    print(str(curr_count), line, end='')
-                    prev_name_index += 1
-                    curr_count += next_incr
+                elif(curr_seg == ".bss"):
+                    if(".space" in line):
+                        bss_len = int(line.split(".space")[1].strip())
+                        # print(prev_line)
+                        # print(bss_len)
+                        next_incr = bss_len 
+                        
+                        if(curr_seg == target_segment and curr_count <= target_line_num \
+                                and curr_count + next_incr >= target_line_num):
+                                index_offset = curr_count + next_incr - target_line_num
+                                print(".bss: \n" + prev_line[:-1] + "\n\tindex: " + \
+                                    str(index_offset) + "\n\tTotal number of words: " + \
+                                    str(bss_len) + "\nin file " + filename)
+                                break
+                # print(str(curr_count), line, end='')
+                prev_name_index += 1
+                curr_count += next_incr
 
-                prev_line = line
+            prev_line = line
 
         if(target_segment == ".text" and curr_count != target_line_num):
             print("Instruction not found ")
-    finally:
-        try:
-            rmtree(basedir)
-        except IOError:
-            sys.stderr.write("fail to clean up temporary directies")
 
 if __name__ == '__main__':
     main()

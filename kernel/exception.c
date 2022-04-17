@@ -142,7 +142,6 @@ void rewind_stack(struct proc* proc){
     vtext_start = (vptr_t)(get_virtual_addr(proc->text_top, proc) - (vptr_t*)0);
     vtext_end = vtext_start + proc->text_size;
 
-    kprintf("vtext start %x end %x, stack p %x end %x\n", vtext_start, vtext_end, p, stack_end);
     kprintf("Call Stack:\n");
     while (p < stack_end){
         data = *p;
@@ -192,6 +191,7 @@ PRIVATE void gpf_handler() {
         get_physical_addr(curr_scheduling_proc->ctx.m.sp, curr_scheduling_proc),
         get_physical_addr(curr_scheduling_proc->ctx.m.ra, curr_scheduling_proc));  
     kreport_ptable(curr_scheduling_proc);  
+    kprintf("Current Instruction 0x%x\n", *pc);
 
     rewind_stack(curr_scheduling_proc);
 
