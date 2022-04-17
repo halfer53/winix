@@ -146,7 +146,7 @@ void rewind_stack(struct proc* proc){
     vptr_t *vtext_start, *vtext_end;
     ptr_t **p = (ptr_t **)get_physical_addr(proc->ctx.m.sp, proc);
     ptr_t **stack_end = (ptr_t **)proc->stack_top + USER_STACK_SIZE;
-    reg_t *data;
+    reg_t *data, *instruction;
     char *filename;
 
     if (p >= stack_end){
@@ -160,8 +160,8 @@ void rewind_stack(struct proc* proc){
     kprintf("Call Stack:\n");
     while (p < stack_end){
         data = *p;
-        if (vtext_start <= data && data <= vtext_end){
-            ptr_t *instruction = get_physical_addr(data, proc);
+        instruction = get_physical_addr(data, proc);
+        if (*instruction > 0x100000 && vtext_start <= data && data <= vtext_end){
             kprintf("  - Virtual Addr: 0x%x, Instruction: 0x%x\n", data, *instruction);
         }
         p++;

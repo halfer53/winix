@@ -126,7 +126,7 @@ def main():
                     and curr_count + next_incr >= target_line_num):
                     print(f"Assembly: \n\t0x{instruction}\n {line}")
                     print(f"Line: {idx} in assembly file")
-                    print("Line: "+ loc + " in file "+filename)
+                    print(f"Line: {loc} in file {filename}:{loc}")
                     found = True
                     break
                 # print(str(curr_count), line )
