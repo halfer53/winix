@@ -1,4 +1,4 @@
-.PHONY := kbuild all clean stat include_build unittest buildlib
+.PHONY := kbuild all clean stat include_build unittest buildlib test
 
 srctree := $(shell pwd)
 include tools/Kbuild.include
@@ -23,9 +23,10 @@ export NO_MAKE_DEPEND := $(N)
 export KBUILD_VERBOSE
 export Q
 export srctree \\
-export includes := $(shell find include -name "*.h")
-export TEXT_OFFSET := 2048
 export SREC_INCLUDE := include/srec
+export includes := $(shell find include -name "*.h")
+export SREC = $(shell find $(SREC_INCLUDE) -name "*.srec")
+export TEXT_OFFSET := 2048
 export INCLUDE_PATH := -I./include/posix_include -I./include
 export CURR_UNIX_TIME := $(shell date +%s)
 export WINIX_CFLAGS := -D__wramp__
@@ -47,11 +48,13 @@ KERNEL_O = winix/*.o kernel/system/*.o kernel/*.o fs/*.o fs/system/*.o driver/*.
 ALLDIR = init user kernel fs driver winix
 ALLDIR_CLEAN = winix lib init user kernel fs driver include
 FS_DEPEND = fs/*.c fs/system/*.c fs/mock/*.c winix/bitmap.c
-UNIT_TEST = $(shell find tests -name "*.c" -not -name "utest_runner.c")
+UNIT_TEST_DEPEND = $(shell find tests -name "*.c" -not -name "utest_runner.c")
+
 DISK = include/disk.c
 UTEST_RUNNER = tests/utest_runner.c
 START_TIME_FILE = include/startup_time.c
-SREC = $(shell find $(SREC_INCLUDE) -name "*.srec")
+UNIT_TEST = unittest
+FSUTIL = fsutil
 
 all:
 	$(Q)$(MAKE) fsutil
@@ -60,28 +63,28 @@ all:
 	$(Q)$(MAKE) $(DISK)
 	$(Q)$(MAKE) include_build
 	$(Q)wlink $(LDFLAGS) -Ttext 1024 -v -o winix.srec \
-	$(L_HEAD) $(KERNEL_O) $(KLIB_O) $(L_TAIL) > $(SREC_INCLUDE)/winix.verbose
+		$(L_HEAD) $(KERNEL_O) $(KLIB_O) $(L_TAIL) > $(SREC_INCLUDE)/winix.verbose
 ifeq ($(KBUILD_VERBOSE),0)
 	@echo "LD \t winix.srec"
 endif
 
-$(UTEST_RUNNER): $(UNIT_TEST)
-	$(Q)python3 tools/utest_generator.py $(UNIT_TEST) > $(UTEST_RUNNER)
+$(UTEST_RUNNER): $(UNIT_TEST_DEPEND)
+	$(Q)python3 tools/utest_generator.py $(UNIT_TEST_DEPEND) > $(UTEST_RUNNER)
 
-test: $(FS_DEPEND) $(UNIT_TEST) $(UTEST_RUNNER)
+$(UNIT_TEST): $(FS_DEPEND) $(UNIT_TEST_DEPEND) $(UTEST_RUNNER)
 ifeq ($(KBUILD_VERBOSE),0)
-	@echo "CC \t unittest"
+	@echo "CC \t $(UNIT_TEST)"
 endif
-	$(Q)gcc -g -DFSUTIL $(GCC_FLAG) $(COMMON_CFLAGS) -I./include/fs_include -I./include $^ -o unittest
-	$(Q)./unittest
+	$(Q)gcc -g -DFSUTIL $(GCC_FLAG) $(COMMON_CFLAGS) -I./include/fs_include -I./include $^ -o $(UNIT_TEST)
 
-fsutil: $(FS_DEPEND) fs/fsutil/*.c 
+test: $(UNIT_TEST)
+	$(Q)./$(UNIT_TEST)
+
+$(FSUTIL): $(FS_DEPEND) fs/fsutil/*.c 
 ifeq ($(KBUILD_VERBOSE),0)
-	@echo "CC \t fsutil"
+	@echo "CC \t $(FSUTIL)"
 endif
-	$(Q)gcc -g -DFSUTIL $(GCC_FLAG) $(COMMON_CFLAGS) -I./include/fs_include -I./include $^ -o fsutil
-
-
+	$(Q)gcc -g -DFSUTIL $(GCC_FLAG) $(COMMON_CFLAGS) -I./include/fs_include -I./include $^ -o $(FSUTIL)
 
 buildlib:
 	$(Q)$(MAKE) $(build)=lib
@@ -101,8 +104,8 @@ include_build:
 	$(Q)$(MAKE) $(build)=include
 
 clean:
-	$(Q)rm -f fsutil
-	$(Q)rm -f unittest
+	$(Q)rm -f $(FSUTIL)
+	$(Q)rm -f $(UNIT_TEST)
 	$(Q)rm -f $(UTEST_RUNNER)
 	$(Q)rm -f $(START_TIME_FILE)
 	$(Q)rm -f $(DISK)
