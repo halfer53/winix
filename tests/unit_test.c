@@ -28,13 +28,15 @@ int file_size(struct proc* who, int fd){
     return statbuf.st_size;
 }
 
-void _reset_fs(){
+void reset_unit_test(){
     init_disk();
     init_dev();
     init_fs();
     init_tty();
     init_drivers();
     mock_init_proc();
+    memset(buffer, 0, PAGE_LEN);
+    memset(buffer2, 0, PAGE_LEN);
 }
 
 void _close_delete_file(int fd, char *name){
@@ -468,7 +470,7 @@ void test_given_access_when_folder_exists_should_return_0(){
     ret = sys_access(curr_scheduling_proc, DIR_NAME, F_OK);
     assert(ret == 0);
 
-    _reset_fs();
+    reset_unit_test();
 }
 
 void test_given_access_when_under_folder_should_return_enoent(){
@@ -479,7 +481,7 @@ void test_given_access_when_under_folder_should_return_enoent(){
     ret = sys_access(curr_scheduling_proc, DIR_FILE1, F_OK);
     assert(ret == ENOENT);
 
-    _reset_fs();
+    reset_unit_test();
 }
 
 void test_given_link_stat_when_two_files_are_linked_should_return_same(){
@@ -501,7 +503,7 @@ void test_given_link_stat_when_two_files_are_linked_should_return_same(){
     assert(statbuf.st_dev == statbuf2.st_dev);
     assert(statbuf.st_nlink == 2);
 
-    _reset_fs();
+    reset_unit_test();
 }
 
 
@@ -526,7 +528,7 @@ void test_given_link_stat_when_one_file_deleted_should_return_1_nlink(){
     assert(ret == 0);
     assert(statbuf.st_nlink == 1);
 
-    _reset_fs();
+    reset_unit_test();
 }
 
 void test_given_chdir_when_dir_not_present_should_return_eexist(){
@@ -556,7 +558,7 @@ void test_given_chdir_when_dir_is_valid_should_succeed(){
     assert(ret == 0);
     assert(curr_scheduling_proc->fp_workdir->i_num == statbuf.st_ino);
 
-    _reset_fs();
+    reset_unit_test();
 }
 
 void test_given_chmod_when_file_not_present_should_return_enonent(){
@@ -595,7 +597,7 @@ void test_given_chmod_stat_when_folder_present_should_return_0(){
     assert(ret == 0);
     assert(statbuf.st_mode == 0x777);
 
-    _reset_fs();
+    reset_unit_test();
 }
 
 void test_given_getdents_when_no_files_in_folder_should_return_default_files(){
@@ -639,14 +641,14 @@ void test_given_getdents_when_files_in_folder_should_return_files(){
     ret = sys_getdents(curr_scheduling_proc, fd2, dir, 10);
     assert(ret == 0);
 
-    _reset_fs();
+    reset_unit_test();
 }
 
 void test_given_mknod_when_path_valid_should_return_0(){
     int ret = sys_mknod(curr_scheduling_proc, TTY_PATH, O_RDWR, TTY_DEV);
     assert(ret == 0);
 
-    _reset_fs();
+    reset_unit_test();
 }
 
 void test_given_dev_open_when_file_is_driver_should_return_from_driver(){
@@ -659,7 +661,7 @@ void test_given_dev_open_when_file_is_driver_should_return_from_driver(){
     assert(fd == 0);
     assert(TTY_OPEN_CALLED == true);
 
-    _reset_fs();
+    reset_unit_test();
 }
 
 void test_given_dev_read_when_file_is_driver_should_return_from_driver(){
@@ -672,7 +674,7 @@ void test_given_dev_read_when_file_is_driver_should_return_from_driver(){
     ret = sys_read(curr_scheduling_proc, fd, buffer, 3);
     assert(ret == TTY_RETURN);
 
-    _reset_fs();
+    reset_unit_test();
 }
 
 void test_given_dev_write_when_file_is_driver_should_return_from_driver(){
@@ -685,7 +687,7 @@ void test_given_dev_write_when_file_is_driver_should_return_from_driver(){
     ret = sys_write(curr_scheduling_proc, fd, buffer, 3);
     assert(ret == TTY_RETURN);
 
-    _reset_fs();
+    reset_unit_test();
 }
 
 void test_given_dev_close_when_file_is_driver_should_return_from_driver(){
@@ -698,7 +700,7 @@ void test_given_dev_close_when_file_is_driver_should_return_from_driver(){
     ret = sys_close(curr_scheduling_proc, fd);
     assert(ret == TTY_RETURN);
 
-    _reset_fs();
+    reset_unit_test();
 }
 
 void test_given_dev_dup_when_file_is_driver_should_return_from_driver(){
@@ -729,14 +731,14 @@ void test_given_dev_dup_when_file_is_driver_should_return_from_driver(){
     ret = sys_close(curr_scheduling_proc, fd2);
     assert(ret == TTY_RETURN);
 
-    _reset_fs();
+    reset_unit_test();
 }
 
 
 int main(){
 
     init_bitmap();
-    _reset_fs();
+    reset_unit_test();
 
     test_given_open_when_flag_is_o_create_should_return_0();
     test_given_creat_when_file_not_present_should_return_0();
