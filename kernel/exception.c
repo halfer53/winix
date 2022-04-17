@@ -188,32 +188,34 @@ PRIVATE void gpf_handler() {
     trace_syscall = false;
 
 #ifdef _DEBUG
-    if(!is_vaddr_accessible(curr_scheduling_proc->ctx.m.sp, curr_scheduling_proc)){
-        kprintf("\nStack Overflow");
+    if (curr_scheduling_proc->sig_table[SIGSEGV].sa_handler == SIG_DFL){
+
+        if(!is_vaddr_accessible(curr_scheduling_proc->ctx.m.sp, curr_scheduling_proc)){
+            kprintf("\nStack Overflow");
+        }
+        kprintf("\nGeneral Protection Fault: \"%s (%d)\"\n",
+            curr_scheduling_proc->name,
+            curr_scheduling_proc->pid);
+        kprintf("Rbase=0x%x, Stack Top=0x%x, vStack Top=0x%x\n", 
+            curr_scheduling_proc->ctx.rbase,
+            curr_scheduling_proc->stack_top,
+            get_virtual_addr(curr_scheduling_proc->stack_top, curr_scheduling_proc));
+        pc = get_physical_addr(get_pc_ptr(curr_scheduling_proc),curr_scheduling_proc);
+
+        kprintf("Virtual  ");
+        PRINT_DEBUG_REG(curr_scheduling_proc->ctx.m.pc,
+                                        curr_scheduling_proc->ctx.m.sp,
+                                        curr_scheduling_proc->ctx.m.ra);
+
+        kprintf("Physical ");
+        PRINT_DEBUG_REG(pc, 
+            get_physical_addr(curr_scheduling_proc->ctx.m.sp, curr_scheduling_proc),
+            get_physical_addr(curr_scheduling_proc->ctx.m.ra, curr_scheduling_proc));
+        kprintf("Memory Table:\n");
+        kreport_ptable(curr_scheduling_proc);  
+
+        rewind_stack(curr_scheduling_proc);
     }
-    kprintf("\nGeneral Protection Fault: \"%s (%d)\"\n",
-        curr_scheduling_proc->name,
-        curr_scheduling_proc->pid);
-    kprintf("Rbase=0x%x, Stack Top=0x%x, vStack Top=0x%x\n", 
-        curr_scheduling_proc->ctx.rbase,
-        curr_scheduling_proc->stack_top,
-        get_virtual_addr(curr_scheduling_proc->stack_top, curr_scheduling_proc));
-    pc = get_physical_addr(get_pc_ptr(curr_scheduling_proc),curr_scheduling_proc);
-
-    kprintf("Virtual  ");
-    PRINT_DEBUG_REG(curr_scheduling_proc->ctx.m.pc,
-                                    curr_scheduling_proc->ctx.m.sp,
-                                    curr_scheduling_proc->ctx.m.ra);
-
-    kprintf("Physical ");
-    PRINT_DEBUG_REG(pc, 
-        get_physical_addr(curr_scheduling_proc->ctx.m.sp, curr_scheduling_proc),
-        get_physical_addr(curr_scheduling_proc->ctx.m.ra, curr_scheduling_proc));
-    kprintf("Memory Table:\n");
-    kreport_ptable(curr_scheduling_proc);  
-
-    rewind_stack(curr_scheduling_proc);
-
 #endif
 
     
