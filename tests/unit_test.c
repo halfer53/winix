@@ -16,6 +16,7 @@ const char *FILE2 = "/foo2.txt";
 const char *DIR_NAME = "/dir/";
 const char *DIR_FILE1 = "/dir/bar.txt";
 const char *DIR_FILE2 = "/dir/bar2.txt";
+const int TTY_DEV = MAKEDEV(3, 1);
 char buffer[PAGE_LEN];
 char buffer2[PAGE_LEN];
 
@@ -576,13 +577,18 @@ void test_given_getdents_when_files_in_folder_should_return_files(){
     _reset_fs();
 }
 
+void test_given_mknod_when_path_valid_should_return_0(){
+    int ret = sys_mknod(curr_scheduling_proc, "/tty", O_RDWR, TTY_DEV);
+    assert(ret == 0);
+}
+
 int unit_test_driver(){
     int ret, fd, fd2, fd3;
 
     ret = sys_mkdir(curr_scheduling_proc, "/dev", 0x755);
     assert(ret == 0);
 
-    ret = sys_mknod(curr_scheduling_proc, "/dev/tty", O_RDWR, MAKEDEV(3, 1));
+    ret = sys_mknod(curr_scheduling_proc, "/dev/tty", O_RDWR, TTY_DEV);
     assert(ret == 0);
 
     fd = sys_open(curr_scheduling_proc, "/dev/tty", O_RDWR, 0);
@@ -645,6 +651,7 @@ int main(){
     test_given_chmod_stat_when_folder_present_should_return_0();
     test_given_getdents_when_no_files_in_folder_should_return_default_files();
     test_given_getdents_when_files_in_folder_should_return_files();
+    test_given_mknod_when_path_valid_should_return_0();
     
     unit_test_driver();
     printf("filesystem unit test passed\n");
