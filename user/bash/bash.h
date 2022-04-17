@@ -9,7 +9,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <sys/debug.h>
+#include <signal.h>
+#include <stddef.h>
 #include <ucontext.h>
 #include <sys/times.h>
 #include "parse.h"

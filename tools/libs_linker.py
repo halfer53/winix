@@ -11,13 +11,14 @@ UTIL ="lib/util/"
 STDIO ="lib/stdio/"
 SYSCALL = "lib/syscall/"
 STRING = "lib/ansi/string.o"
+STRL = "lib/ansi/strl.o"
 DEBUG = "lib/util/debug.o"
 REGEX = "lib/regex/"
 IPC = "lib/ipc/"
 
 built_in = {
 	"stdlib.h": set([STDLIB, ANSI]),
-	"string.h": set([STRING]),
+	"string.h": set([STRING, STRL]),
 	"signal.h": set([SIGNAL]),
 	"ucontext.h": set([GEN]),
 	"unistd.h": set([POSIX, ANSI, STDLIB]),

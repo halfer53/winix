@@ -32,7 +32,8 @@
         "compiler.h": "c",
         "parse.h": "c",
         "assert.h": "c",
-        "mock.h": "c"
+        "mock.h": "c",
+        "type.h": "c"
     },
     "files.exclude": {
         "**/*.o": true,

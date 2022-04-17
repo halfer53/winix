@@ -41,7 +41,7 @@ export GCC_FLAG := -Wimplicit-fallthrough -Wsequence-point -Wswitch-default -Wsw
 # List of user libraries used by the kernel
 KLIB_O = lib/syscall/wramp_syscall.o lib/ipc/ipc.o \
 		lib/ansi/string.o lib/util/util.o lib/gen/ucontext.o lib/stdlib/atoi.o\
-		lib/syscall/debug.o lib/posix/_sigset.o lib/ansi/rand.o
+		lib/syscall/debug.o lib/posix/_sigset.o lib/ansi/rand.o lib/ansi/strl.o
 L_HEAD = winix/limits/limits_head.o
 L_TAIL = winix/limits/limits_tail.o
 KERNEL_O = winix/*.o kernel/system/*.o kernel/*.o fs/*.o fs/system/*.o driver/*.o include/*.o
@@ -79,6 +79,9 @@ endif
 
 test: $(UNIT_TEST)
 	$(Q)./$(UNIT_TEST)
+
+wsh: user/bash/*.c lib/ansi/strl.c
+	$(Q)gcc -g -DFSUTIL $(GCC_FLAG) $(COMMON_CFLAGS) $^ -o wsh
 
 $(FSUTIL): $(FS_DEPEND) fs/fsutil/*.c 
 ifeq ($(KBUILD_VERBOSE),0)
