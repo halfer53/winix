@@ -326,15 +326,11 @@ int help(int argc, char** argv){
 
 int do_stest(int argc, char** argv){
     static char test_str[] = "ls -lah bin | grep snake | wc | cat";
-    int limit = 10;
-    int i;
-    for(i = 0; i < limit; i++){
-        if(i == limit - 1){
-            enable_syscall_tracing();
-            wramp_syscall(WINFO, WINFO_DEBUG_SCHEDULING, NULL, 50);
-        }
-        printf("%d WINIX> ", i);
+    enable_syscall_tracing();
+    if (tfork() == 0){
         exec_cmd(test_str);
+    }else{
+        wait(NULL);
     }
     return 0;
 }
