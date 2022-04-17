@@ -10,6 +10,8 @@ static struct filp_operations fops;
 static struct device_operations dops;
 static const char* name = "tty";
 
+bool TTY_OPEN_CALLED = false;
+
 int tty_read ( struct filp *filp, char *data, size_t count, off_t offset){
     return TTY_RETURN;
 }
@@ -19,6 +21,7 @@ int tty_write ( struct filp *filp, char *data, size_t count, off_t offset){
 }
 
 int tty_open ( struct device* dev, struct filp *file){
+    TTY_OPEN_CALLED = true;
     return 0;
 }
 
