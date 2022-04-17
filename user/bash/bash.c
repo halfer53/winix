@@ -24,6 +24,7 @@ static char prev_cmd[MAX_LINE];
 static pid_t pgid;
 static pid_t last_pgid;
 static pid_t last_stopped_pgid;
+static int history_fd;
 
 // Prototypes
 CMD_PROTOTYPE(slab);
@@ -73,7 +74,7 @@ void init_shell(){
 
 int main() {
     int ret, len, newline_pos;
-    int history_fd;
+    
 
     init_shell();
     history_fd = open(history_file, O_CREAT | O_RDWR, 0x755);
@@ -149,6 +150,7 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
         setpgid(0, 0);
         last_pgid = getpgid(0);
         ioctl(STDIN_FILENO, TIOCSPGRP, last_pgid);
+        close(history_fd);
 
         if(cmd->infile){ //if redirecting input
             // saved_stdin = dup(STDIN_FILENO); //backup stdin
