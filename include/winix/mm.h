@@ -32,7 +32,7 @@ int user_get_free_pages_from(struct proc* who, ptr_t* addr, int size);
 #define is_vaddr_accessible(addr, who) is_vaddr_ok((vptr_t*)addr, who)
 #define free_page(page)         (release_pages((page),1))
 #define get_free_page(flags)    (get_free_pages(1,(flags)))
-#define user_get_free_page(who,flags)   (user_get_free_pages((who),1,(flags)))
+#define user_get_free_page(who,flags)   (user_get_free_pages((who), PAGE_LEN ,(flags)))
 #define user_free_page(who,page)        (user_release_pages((who),(page),1))
 
 int next_free_page_index();

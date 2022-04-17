@@ -105,7 +105,7 @@ ptr_t *get_free_pages(int length, int flags) {
  * corresponding the pages it got from get_free_pages(), so that the user can access these
  * allocated pages
  * @param  who    
- * @param  length 
+ * @param  length
  * @param  flags  
  * @return        
  */
@@ -119,6 +119,7 @@ ptr_t* user_get_free_pages(struct proc* who, int length, int flags){
         return NULL;
     index = PADDR_TO_PAGED(p);
     page_num = PADDR_TO_NUM_PAGES(length);
+    memset(p, 0, align_page(length));
     if(bitmap_set_nbits(who->ctx.ptable, PTABLE_LEN, index, page_num) == ERR)
         return NULL;
     return p;
