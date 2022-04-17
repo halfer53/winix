@@ -69,7 +69,7 @@ void init_shell(){
     signal(SIGINT, SIG_IGN);
     signal(SIGTSTP, SIG_IGN);
     pgid = setsid();
-    ioctl(STDIN_FILENO, TIOCSPGRP, pgid);
+    ioctl(STDIN_FILENO, TIOCSPGRP, &pgid);
     ioctl(STDIN_FILENO, TIOCSCTTY);
 #endif
 }
@@ -148,7 +148,7 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
 #ifdef __wramp__
         setpgid(0, 0);
         last_pgid = getpgid(0);
-        ioctl(STDIN_FILENO, TIOCSPGRP, last_pgid);
+        ioctl(STDIN_FILENO, TIOCSPGRP, &last_pgid);
 #endif
         close(history_fd);
 
@@ -239,7 +239,7 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
 
 #ifdef __wramp__
     ioctl(STDIN_FILENO, TIOCENABLEECHO);
-    ioctl(STDIN_FILENO, TIOCSPGRP, pgid);
+    ioctl(STDIN_FILENO, TIOCSPGRP, &pgid);
 #endif
     return 0;
 }
@@ -405,12 +405,12 @@ int do_fg(int argc, char **argv){
     int status;
     int ret;
 
-    ioctl(0, TIOCSPGRP, last_stopped_pgid);
+    ioctl(0, TIOCSPGRP, &last_stopped_pgid);
     ret =  kill(-last_stopped_pgid, SIGCONT);
     if(ret == 0){
         ret = waitpid(-last_stopped_pgid, &status, WUNTRACED);
     }
-    ioctl(STDIN_FILENO, TIOCSPGRP, pgid);
+    ioctl(STDIN_FILENO, TIOCSPGRP, &pgid);
     return ret;
 }
 

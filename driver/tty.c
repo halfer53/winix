@@ -362,9 +362,10 @@ int tty_close ( struct device* dev, struct filp *file){
     return 0;
 }
 
-int tty_ioctl(struct filp* file, int request, ptr_t* ptr){
+int tty_ioctl(struct filp* file, int request, vptr_t* vptr){
     struct proc* who = curr_syscall_caller;
     struct tty_state* tty_data;
+    ptr_t* ptr = get_physical_addr(vptr, who);
     tty_data = (struct tty_state*)file->filp_dev->private;
     switch (request)
     {
@@ -372,8 +373,8 @@ int tty_ioctl(struct filp* file, int request, ptr_t* ptr){
         *ptr = (pid_t)tty_data->foreground_group;
         break;
     case TIOCSPGRP:
-        tty_data->foreground_group = (pid_t)*ptr;
-        // KDEBUG(("set foreground to %d\n", tty_data->foreground_group));
+        tty_data->foreground_group = (pid_t)*get_physical_addr(*(ptr_t **)ptr, who);
+        KDEBUG(("set foreground to %d\n", tty_data->foreground_group));
         break;
     case TIOCSCTTY:
         tty_data->controlling_session = who->session_id;
