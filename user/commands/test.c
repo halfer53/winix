@@ -33,6 +33,7 @@ struct cmd_internal {
 CMD_PROTOTYPE(test_malloc);
 CMD_PROTOTYPE(test_so);
 CMD_PROTOTYPE(test_float);
+CMD_PROTOTYPE(test_sigsegv);
 CMD_PROTOTYPE(test_fork);
 CMD_PROTOTYPE(test_thread);
 CMD_PROTOTYPE(test_alarm);
@@ -48,6 +49,7 @@ struct cmd_internal test_commands[] = {
     { test_so, "stack"},
     { test_float, "float"},
     { test_thread, "thread"},
+    { test_sigsegv, "null" },
     { test_alarm, "alarm"},
     { test_deadlock, "deadlock"},
     { test_ipc, "ipc"},
@@ -226,6 +228,25 @@ int test_so(int argc, char **argv){
     }else{
         int status;
         wait(&status);
+    }
+    return 0;
+}
+
+int sigsegv_handler(int signum){
+    // printf("sigsegv handler\n");
+    return 0;
+}
+
+int test_sigsegv(int argc, char **argv){
+    int *p = NULL;
+    int pid;
+    if ((pid = tfork()) == 0){
+        signal(SIGSEGV, sigsegv_handler);
+        *p = 1;
+        signal(SIGSEGV, SIG_DFL);
+        printf("sigsegv test finished\n");
+    }else{
+        wait(NULL);
     }
     return 0;
 }
