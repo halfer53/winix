@@ -42,7 +42,7 @@ void emulate_fork(struct proc* p1, struct proc* p2){
     }
 }
 
-bool is_vaddr_ok(vptr_t* addr,struct proc* who){
+bool is_vaddr_ok(struct proc* who, vptr_t* addr, size_t len){
     return true;
 }
 
