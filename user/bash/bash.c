@@ -64,11 +64,13 @@ struct cmd_internal builtin_commands[] = {
 };
 
 void init_shell(){
+#ifdef __wramp__
     signal(SIGINT, SIG_IGN);
     signal(SIGTSTP, SIG_IGN);
     pgid = setsid();
-    ioctl(STDIN_FILENO, TIOCSCTTY);
     ioctl(STDIN_FILENO, TIOCSPGRP, pgid);
+    ioctl(STDIN_FILENO, TIOCSCTTY);
+#endif
 }
 
 int main() {
@@ -145,12 +147,12 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
 
         signal(SIGINT, SIG_DFL);
         signal(SIGTSTP, SIG_DFL);
+#ifdef __wramp__
         setpgid(0, 0);
         last_pgid = getpgid(0);
-        close(history_fd);
-        #ifdef __wramp__
         ioctl(STDIN_FILENO, TIOCSPGRP, last_pgid);
-        #endif
+#endif
+        close(history_fd);
 
         if(cmd->infile){ //if redirecting input
             // saved_stdin = dup(STDIN_FILENO); //backup stdin
@@ -239,8 +241,8 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
 
 #ifdef __wramp__
     ioctl(STDIN_FILENO, TIOCENABLEECHO);
-#endif
     ioctl(STDIN_FILENO, TIOCSPGRP, pgid);
+#endif
     printf("\n");
     return 0;
 }
