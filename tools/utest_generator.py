@@ -14,11 +14,15 @@ def get_prototypes(files):
     return prototypes
 
 def generate(prototypes):
+    print("#include <sys/fcntl.h>")
+    print("#include <stdio.h>")
+    print()
     for proto in prototypes:
         print(f"void {proto}();")
     print()
     print("void run_all_tests(){")
     for proto in prototypes:
+        print(f"    printf(\"%s\\n\", \"running {proto}\");")
         print(f"    {proto}();")
     print("}")
 

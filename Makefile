@@ -68,7 +68,7 @@ ifeq ($(KBUILD_VERBOSE),0)
 	@echo "LD \t winix.srec"
 endif
 
-$(UTEST_RUNNER): $(UNIT_TEST_DEPEND)
+$(UTEST_RUNNER): $(UNIT_TEST_DEPEND) tools/utest_generator.py
 	$(Q)python3 tools/utest_generator.py $(UNIT_TEST_DEPEND) > $(UTEST_RUNNER)
 
 $(UNIT_TEST): $(FS_DEPEND) $(UNIT_TEST_DEPEND) $(UTEST_RUNNER)
