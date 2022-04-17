@@ -320,7 +320,7 @@ void test_given_pipe_read_when_pipe_is_full_should_return_data(){
     _close_pipe(pipe_fd, &pcurr2);
 }
 
-void test_given_pipe_read_when_writer_write_fd_closed_should_return_success(){
+void test_given_pipe_read_when_writer_write_fd_closed_should_return_suspend(){
     struct proc pcurr2;
     int ret;
     int pipe_fd[2];
@@ -331,13 +331,17 @@ void test_given_pipe_read_when_writer_write_fd_closed_should_return_success(){
     ret = sys_close(curr_scheduling_proc, pipe_fd[1]);
     assert(ret == 0);
 
-    ret = sys_read(&pcurr2, pipe_fd[0], buffer, 2);
+    ret = sys_read(&pcurr2, pipe_fd[0], buffer, 4);
     assert(ret == SUSPEND);
+
+    ret = sys_write(&pcurr2, pipe_fd[1], "abc", 4);
+    assert(ret == 4);
+    assert(strcmp(buffer, "abc") == 0);
 
     _close_pipe(pipe_fd, &pcurr2);
 }
 
-void test_given_pipe_read_when_reader_write_fd_closed_should_return_success(){
+void test_given_pipe_read_when_reader_write_fd_closed_should_return_suspend(){
     struct proc pcurr2;
     int ret;
     int pipe_fd[2];
@@ -348,8 +352,12 @@ void test_given_pipe_read_when_reader_write_fd_closed_should_return_success(){
     ret = sys_close(&pcurr2, pipe_fd[1]);
     assert(ret == 0);
 
-    ret = sys_read(&pcurr2, pipe_fd[0], buffer, 2);
+    ret = sys_read(&pcurr2, pipe_fd[0], buffer, 4);
     assert(ret == SUSPEND);
+
+    ret = sys_write(curr_scheduling_proc, pipe_fd[1], "abc", 4);
+    assert(ret == 4);
+    assert(strcmp(buffer, "abc") == 0);
 
     _close_pipe(pipe_fd, &pcurr2);
 }
@@ -744,8 +752,8 @@ int main(){
     test_given_pipe_read_when_proc_was_suspended_should_return();
     test_given_pipe_read_when_data_is_written_should_return_data();
     test_given_pipe_read_when_pipe_is_full_should_return_data();
-    test_given_pipe_read_when_writer_write_fd_closed_should_return_success();
-    test_given_pipe_read_when_reader_write_fd_closed_should_return_success();
+    test_given_pipe_read_when_writer_write_fd_closed_should_return_suspend();
+    test_given_pipe_read_when_reader_write_fd_closed_should_return_suspend();
     test_given_pipe_read_when_all_write_fds_closed_should_return_0();
     test_given_pipe_write_when_read_fd_are_closed_should_return_sigpipe();
     test_given_pipe_write_when_one_read_fd_s_closed_should_return_success();
