@@ -74,17 +74,19 @@ Click ```Quick Load```, select ```winix.srec```
 
 #### Linux / WSL 
 
-```sudo apt-get install xutils-dev gcc```
+```shell
+sudo apt-get install xutils-dev gcc
+pip install bs4
+```
 
 ### Clone and   Compile
 
-```git clone https://github.com/halfer53/winix.git```
-
-```cd winix```
-
-```export PATH=`pwd`/tools/bin:$PATH```
-
-```make```
+```shell
+git clone https://github.com/halfer53/winix.git
+cd winix
+export PATH=`pwd`/tools/bin:$PATH```
+make
+```
 
 ## Debug tips
 
