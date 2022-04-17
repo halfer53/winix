@@ -23,10 +23,6 @@
 #define	O_RDWR		0x00000002	/* open for reading and writing */
 #define	O_ACCMODE	0x00000003	/* mask for above modes */
 
-/* File status flags for open() and fcntl().  POSIX Table 6-5. */
-#define O_APPEND       0x02000	/* set append mode */
-#define O_NONBLOCK     0x04000	/* no delay */
-#define O_REOPEN      0x010000	
 
 
 
@@ -35,6 +31,11 @@
 #define O_EXCL         0x00200	/* exclusive use flag */
 #define O_NOCTTY       0x00400	/* do not assign a controlling terminal */
 #define O_TRUNC        0x01000	/* truncate flag */
+/* File status flags for open() and fcntl().  POSIX Table 6-5. */
+#define O_APPEND       0x02000	/* set append mode */
+#define O_NONBLOCK     0x04000	/* no delay */
+#define O_REOPEN      0x010000	
+#define O_CLOEXEC     0x020000	/* close on exceve */
 
 #define	O_DSYNC		0x00010000	/* write: I/O data completion */
 #define	O_RSYNC		0x00020000	/* read: I/O completion as for write */
