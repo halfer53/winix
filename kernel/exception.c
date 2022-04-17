@@ -162,7 +162,7 @@ void rewind_stack(struct proc* proc){
         data = *p;
         if (vtext_start <= data && data <= vtext_end){
             ptr_t *instruction = get_physical_addr(data, proc);
-            kprintf("  - Virtual Addr: 0x%x, Instruction: 0x08%x\n", data, *instruction);
+            kprintf("  - Virtual Addr: 0x%x, Instruction: 0x%x\n", data, *instruction);
         }
         p++;
     }
