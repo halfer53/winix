@@ -139,7 +139,7 @@ void rewind_stack(struct proc* proc){
         return;
     }
 
-    vtext_start = (vptr_t)(get_virtual_addr(stack_end, proc) - (vptr_t*)0);
+    vtext_start = (vptr_t)(get_virtual_addr(proc->text_top, proc) - (vptr_t*)0);
     vtext_end = vtext_start + proc->text_size;
 
     kprintf("vtext start %x end %x, stack p %x end %x\n", vtext_start, vtext_end, p, stack_end);
@@ -176,10 +176,9 @@ PRIVATE void gpf_handler() {
     kprintf("\nGeneral Protection Fault: \"%s (%d)\"\n",
         curr_scheduling_proc->name,
         curr_scheduling_proc->pid);
-    kprintf("Rbase=0x%x Stack Top=0x%x\n", curr_scheduling_proc->ctx.rbase,
-        curr_scheduling_proc->stack_top);
-    kprintf("vRbase=0x%x vStack Top=0x%x\n", 
-        get_virtual_addr(curr_scheduling_proc->ctx.rbase, curr_scheduling_proc),
+    kprintf("Rbase=0x%x, Stack Top=0x%x, vStack Top=0x%x\n", 
+        curr_scheduling_proc->ctx.rbase,
+        curr_scheduling_proc->stack_top,
         get_virtual_addr(curr_scheduling_proc->stack_top, curr_scheduling_proc));
     pc = get_physical_addr(get_pc_ptr(curr_scheduling_proc),curr_scheduling_proc);
 

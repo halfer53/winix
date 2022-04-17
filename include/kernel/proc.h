@@ -133,6 +133,7 @@ typedef struct proc {
     /* Heap and Stack*/
     ptr_t* mem_start;
     ptr_t* stack_top;
+    ptr_t* text_top;
     ptr_t* heap_top;                // 
     ptr_t* heap_break;             	// Heap_break is also the physical address of the curr
     ptr_t* heap_bottom;         	// Bottom of the process image

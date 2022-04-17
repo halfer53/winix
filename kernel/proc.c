@@ -474,6 +474,7 @@ int alloc_mem_welf(struct proc* who, struct winix_elf* elf, int stack_size, int 
     // look at the first line of this file
     who->stack_top = mem_start;
     who->mem_start = mem_start;
+    who->text_top = mem_start + stack_size;
     who->ctx.m.sp = get_virtual_addr(mem_start+ stack_size - 1, who);
     *(who->stack_top) = STACK_MAGIC;
 
