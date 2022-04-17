@@ -249,10 +249,12 @@ int do_ls(char* pathname, int flag){
            strlcat(path_buffer, (char *)dir->d_name, PATH_LEN);
            print_long_format(path_buffer, flag);
        }else{
-           symbol = (dir->d_type == DT_DIR && *dir->d_name != '.')  ? slash : "";
+            symbol = (dir->d_type == DT_DIR && *dir->d_name != '.')  ? slash : "";
             printf("%s%s  ", symbol, (char *)dir->d_name);
        }
-       
+   }
+   if (flag ^ LONG_FORMAT){
+       printf("\n");
    }
    closedir(directory);
    return 0;
