@@ -404,6 +404,8 @@ struct proc *start_kernel_proc(struct boot_image* task) {
     kset_ptable(who);
     who->quantum = task->quantum;
     who->ctx.m.sp = alloc_kstack(who, task->stack_size);
+    who->text_top = who->mem_start = (ptr_t*)PAGE_LEN;
+    who->text_size = &TEXT_END - &TEXT_BEGIN;
     who->priority = task->priority;
     who->pid = 0;
     who->state = STATE_RUNNABLE;
