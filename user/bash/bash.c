@@ -241,7 +241,6 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
     ioctl(STDIN_FILENO, TIOCENABLEECHO);
     ioctl(STDIN_FILENO, TIOCSPGRP, pgid);
 #endif
-    printf("\n");
     return 0;
 }
 
