@@ -150,7 +150,7 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
         perror("fork");
     }else if(!pid){
         
-        int i, ret, cmd_start, this_pgid;
+        int i, ret, cmd_start;
         int exit_code = 0;
         int pipe_fds[10];
         int *pipe_ptr, *prev_pipe_ptr;
@@ -162,7 +162,6 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
         signal(SIGINT, SIG_DFL);
         signal(SIGTSTP, SIG_DFL);
         ret = ioctl(STDIN_FILENO, TIOCSPGRP, &last_pgid);
-        printf("pid %d pgid %d tty pgid %d ret %d\n", getpid(), last_pgid, this_pgid, ret);
 #endif
         close(history_fd);
 
