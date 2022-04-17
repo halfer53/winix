@@ -201,7 +201,8 @@ int eat_path(struct proc* who, char *path, struct inode** last_dir, struct inode
     *last_dir = NULL;
 
     ret = __eath_path(curr_dir, last_dir, ret_ino, path, string);
-    
+    if (*last_dir == NULL)
+        return ENOENT;
     return ret;
 }
 
