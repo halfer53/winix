@@ -4,7 +4,6 @@ import sys
 from subprocess import call
 from os import path
 from uuid import uuid4
-from shutil import rmtree
 
 def main():
     if len(sys.argv) < 2:
