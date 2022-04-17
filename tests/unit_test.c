@@ -638,35 +638,37 @@ void test_given_dev_close_when_file_is_driver_should_return_from_driver(){
     _reset_fs();
 }
 
-int unit_test_driver(){
-    int ret, fd, fd2, fd3;
-
-    ret = sys_mknod(curr_scheduling_proc, TTY_PATH, O_RDWR, TTY_DEV);
+void test_given_dev_dup_when_file_is_driver_should_return_from_driver(){
+    int ret = sys_mknod(curr_scheduling_proc, TTY_PATH, O_RDWR, TTY_DEV);
     assert(ret == 0);
 
-    fd = sys_open(curr_scheduling_proc, TTY_PATH, O_RDWR, 0);
+    int fd = sys_open(curr_scheduling_proc, TTY_PATH, O_EXCL, O_RDWR);
     assert(fd == 0);
 
-    ret = sys_read(curr_scheduling_proc, fd, buffer, 3);
-    assert(ret == 3);
-    assert(strcmp(buffer, "tt") == 0);
-
-    fd2 = sys_dup2(curr_scheduling_proc, fd, 1);
+    int fd2 = sys_dup2(curr_scheduling_proc, fd, 1);
     assert(1 == fd2);
 
-    ret = sys_read(curr_scheduling_proc, fd2, buffer, 4);
-    assert(ret == 4);
-    assert(strcmp(buffer, "ttt") == 0);
+    ret = sys_write(curr_scheduling_proc, fd, buffer, 3);
+    assert(ret == TTY_RETURN);
+
+    ret = sys_write(curr_scheduling_proc, fd2, buffer, 3);
+    assert(ret == TTY_RETURN);
+
+    ret = sys_read(curr_scheduling_proc, fd, buffer, 3);
+    assert(ret == TTY_RETURN);
+
+    ret = sys_read(curr_scheduling_proc, fd2, buffer, 3);
+    assert(ret == TTY_RETURN);
 
     ret = sys_close(curr_scheduling_proc, fd);
-    assert(ret == 0);
+    assert(ret == TTY_RETURN);
 
     ret = sys_close(curr_scheduling_proc, fd2);
-    assert(ret == 0);
+    assert(ret == TTY_RETURN);
 
-    ret = sys_close(curr_scheduling_proc, fd3);
-    assert(ret == EBADF);
+    _reset_fs();
 }
+
 
 int main(){
 
@@ -709,6 +711,7 @@ int main(){
     test_given_dev_read_when_file_is_driver_should_return_from_driver();
     test_given_dev_write_when_file_is_driver_should_return_from_driver();
     test_given_dev_close_when_file_is_driver_should_return_from_driver();
+    test_given_dev_dup_when_file_is_driver_should_return_from_driver();
 
     printf("filesystem unit test passed\n");
     return 0;
