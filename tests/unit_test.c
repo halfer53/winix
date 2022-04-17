@@ -612,6 +612,19 @@ void test_given_dev_write_when_file_is_driver_should_return_from_driver(){
     _reset_fs();
 }
 
+void test_given_dev_close_when_file_is_driver_should_return_from_driver(){
+    int ret = sys_mknod(curr_scheduling_proc, TTY_PATH, O_RDWR, TTY_DEV);
+    assert(ret == 0);
+
+    int fd = sys_open(curr_scheduling_proc, TTY_PATH, O_EXCL, O_RDWR);
+    assert(fd == 0);
+
+    ret = sys_close(curr_scheduling_proc, fd);
+    assert(ret == TTY_RETURN);
+
+    _reset_fs();
+}
+
 int unit_test_driver(){
     int ret, fd, fd2, fd3;
 
@@ -681,6 +694,7 @@ int main(){
     test_given_mknod_when_path_valid_should_return_0();
     test_given_dev_read_when_file_is_driver_should_return_from_driver();
     test_given_dev_write_when_file_is_driver_should_return_from_driver();
+    test_given_dev_close_when_file_is_driver_should_return_from_driver();
 
     printf("filesystem unit test passed\n");
     return 0;
