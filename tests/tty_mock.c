@@ -3,7 +3,7 @@
 //
 
 #include "../fs/fs.h"
-
+#include "unit_test.h"
 
 struct device tty_dev_static;
 static struct filp_operations fops;

@@ -2,6 +2,7 @@
 // Created by bruce on 9/05/20.
 //
 #include "../fs/fs.h"
+#include "unit_test.h"
 #include <assert.h>
 
 const char * dirent_array[] = {
@@ -16,6 +17,7 @@ const char *FILE2 = "/foo2.txt";
 const char *DIR_NAME = "/dir/";
 const char *DIR_FILE1 = "/dir/bar.txt";
 const char *DIR_FILE2 = "/dir/bar2.txt";
+const char *TTY_PATH = "/tty";
 const int TTY_DEV = MAKEDEV(3, 1);
 char buffer[PAGE_LEN];
 char buffer2[PAGE_LEN];
@@ -578,20 +580,33 @@ void test_given_getdents_when_files_in_folder_should_return_files(){
 }
 
 void test_given_mknod_when_path_valid_should_return_0(){
-    int ret = sys_mknod(curr_scheduling_proc, "/tty", O_RDWR, TTY_DEV);
+    int ret = sys_mknod(curr_scheduling_proc, TTY_PATH, O_RDWR, TTY_DEV);
     assert(ret == 0);
+
+    _reset_fs();
+}
+
+void test_given_dev_read_when_file_is_driver_should_return_from_driver(){
+    int ret = sys_mknod(curr_scheduling_proc, TTY_PATH, O_RDWR, TTY_DEV);
+    assert(ret == 0);
+
+    int fd = sys_open(curr_scheduling_proc, TTY_PATH, O_EXCL, O_RDWR);
+    assert(fd == 0);
+
+    ret = sys_read(curr_scheduling_proc, fd, buffer, 3);
+    assert(ret == 3);
+    assert(strcmp(buffer, "tt") == 0);
+
+    _reset_fs();
 }
 
 int unit_test_driver(){
     int ret, fd, fd2, fd3;
 
-    ret = sys_mkdir(curr_scheduling_proc, "/dev", 0x755);
+    ret = sys_mknod(curr_scheduling_proc, TTY_PATH, O_RDWR, TTY_DEV);
     assert(ret == 0);
 
-    ret = sys_mknod(curr_scheduling_proc, "/dev/tty", O_RDWR, TTY_DEV);
-    assert(ret == 0);
-
-    fd = sys_open(curr_scheduling_proc, "/dev/tty", O_RDWR, 0);
+    fd = sys_open(curr_scheduling_proc, TTY_PATH, O_RDWR, 0);
     assert(fd == 0);
 
     ret = sys_read(curr_scheduling_proc, fd, buffer, 3);
@@ -652,6 +667,7 @@ int main(){
     test_given_getdents_when_no_files_in_folder_should_return_default_files();
     test_given_getdents_when_files_in_folder_should_return_files();
     test_given_mknod_when_path_valid_should_return_0();
+    test_given_dev_read_when_file_is_driver_should_return_from_driver();
     
     unit_test_driver();
     printf("filesystem unit test passed\n");
