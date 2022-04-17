@@ -51,7 +51,7 @@ Winix includes full-featured kernel with process and memory management, in-memor
 
 ## Unit Test
 
-[unit_test.c](fs/unit_test.c)
+[unit_test.c](tests/unit_test.c)
 
 ## How to Run
 
