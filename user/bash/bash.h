@@ -11,7 +11,9 @@
 #include <string.h>
 #include <signal.h>
 #include <stddef.h>
+#include <errno.h>
 #include <ucontext.h>
+#include <sys/wait.h>
 #include <sys/times.h>
 #include "parse.h"
 
@@ -26,5 +28,27 @@ struct cmd_internal {
 };
 
 #define isPrintable(c)    ('!' <= c && c <= '~')
+
+#ifndef __wramp__
+
+extern const char **environ;
+static int tfork(){
+    return fork();
+}
+static int enable_syscall_tracing(){
+    return 0;
+}
+static int disable_syscall_tracing(){
+    return 0;
+}
+#define WINFO       1
+#define WINFO_MEM   1
+#define WINFO_SLAB  1
+static int wramp_syscall(int num, ...){
+    return 0;
+}
+
+#endif
+
 
 #endif

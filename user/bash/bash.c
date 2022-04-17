@@ -65,7 +65,6 @@ struct cmd_internal builtin_commands[] = {
 
 void init_shell(){
     signal(SIGINT, SIG_IGN);
-    signal(SIGTERM, SIG_IGN);
     signal(SIGTSTP, SIG_IGN);
     pgid = setsid();
     ioctl(STDIN_FILENO, TIOCSCTTY);
@@ -145,12 +144,13 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
         int *pipe_ptr, *prev_pipe_ptr;
 
         signal(SIGINT, SIG_DFL);
-        signal(SIGTERM, SIG_DFL);
         signal(SIGTSTP, SIG_DFL);
         setpgid(0, 0);
         last_pgid = getpgid(0);
-        ioctl(STDIN_FILENO, TIOCSPGRP, last_pgid);
         close(history_fd);
+        #ifdef __wramp__
+        ioctl(STDIN_FILENO, TIOCSPGRP, last_pgid);
+        #endif
 
         if(cmd->infile){ //if redirecting input
             // saved_stdin = dup(STDIN_FILENO); //backup stdin
@@ -237,7 +237,9 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
         }
     }
 
+#ifdef __wramp__
     ioctl(STDIN_FILENO, TIOCENABLEECHO);
+#endif
     ioctl(STDIN_FILENO, TIOCSPGRP, pgid);
     printf("\n");
     return 0;
@@ -393,6 +395,7 @@ int cmd_exit(int argc, char **argv){
     int status = 0;
     if(argc > 1)
         status = atoi(argv[1]);
+    close(history_fd);
     printf("Bye!\n");
     // printf("Child %d [parent %d] exits\n",getpid(),getppid());
     exit(status);
