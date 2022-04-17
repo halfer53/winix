@@ -8,9 +8,7 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v2
     - name: setunsecureenv
@@ -19,10 +17,13 @@ jobs:
       run: echo "${{github.workspace}}/tools/bin" >> "${GITHUB_PATH}"
     - name: make
       run: make N=1 -j$(nproc)
-    - name: unit test
-      run: make test
     - uses: actions/upload-artifact@v2
       with:
         name: winix.srec
         path: winix.srec
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: run unit test
+      run: make test
 
