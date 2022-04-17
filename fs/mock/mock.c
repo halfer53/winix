@@ -3,8 +3,8 @@
 
 char DISK_RAW[DISK_SIZE];
 
-#define MEM_SIZE (32 * 1024)
-int mem[MEM_SIZE];
+#define MEM_SIZE (1024 * 1024)
+char mem[MEM_SIZE];
 int curr;
 
 struct proc pcurr;
@@ -47,8 +47,11 @@ bool is_vaddr_ok(vptr_t* addr,struct proc* who){
 }
 
 void* kmalloc(unsigned int size){
+    if (curr + size >= MEM_SIZE){
+        return NULL;
+    }
     void* ret = &mem[curr];
-    curr += *(int *)&size;
+    curr += size;
     return ret;
 }
 void kfree(void *ptr){
