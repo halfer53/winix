@@ -24,12 +24,12 @@ ptr_t* get_free_pages(int length, int flags);
 int release_pages(ptr_t* page, int num);
 int user_release_pages(struct proc* who, ptr_t* page, int len);
 ptr_t* user_get_free_pages(struct proc* who, int length, int flags);
-bool is_vaddr_ok(vptr_t* addr,struct proc* who);
+bool is_vaddr_ok(struct proc* who, vptr_t* addr, size_t len);
 void add_free_mem(void* addr, size_t size);
 void kprint_slab();
 int user_get_free_pages_from(struct proc* who, ptr_t* addr, int size);
 
-#define is_vaddr_accessible(addr, who) is_vaddr_ok((vptr_t*)addr, who)
+#define is_vaddr_accessible(addr, who) is_vaddr_ok(who, (vptr_t*)addr, 1)
 #define free_page(page)         (release_pages((page),1))
 #define get_free_page(flags)    (get_free_pages(1,(flags)))
 #define user_get_free_page(who,flags)   (user_get_free_pages((who), PAGE_LEN ,(flags)))

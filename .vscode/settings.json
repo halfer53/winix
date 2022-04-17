@@ -33,7 +33,14 @@
         "parse.h": "c",
         "assert.h": "c",
         "mock.h": "c",
-        "type.h": "c"
+        "type.h": "c",
+        "array": "c",
+        "deque": "c",
+        "string": "c",
+        "unordered_map": "c",
+        "vector": "c",
+        "string_view": "c",
+        "initializer_list": "c"
     },
     "files.exclude": {
         "**/*.o": true,

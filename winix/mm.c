@@ -35,13 +35,21 @@ PRIVATE int bss_page_end;
  * @param  addr 
  * @return      
  */
-bool is_vaddr_ok( vptr_t* addr, struct proc* who){
-    int page;
-    ptr_t* paddr;
+bool is_vaddr_ok(struct proc* who, vptr_t* addr, size_t len){
+    int start_page, end_page;
+    ptr_t* paddr, *paddr_end;
+    bool ret;
 
     paddr = get_physical_addr(addr, who);
-    page = PADDR_TO_PAGED(paddr);
-    return is_bit_on(who->ctx.ptable, PTABLE_LEN, page);
+    paddr_end = get_physical_addr(addr + len, who);
+    start_page = PADDR_TO_PAGED(paddr);
+    end_page = PADDR_TO_PAGED(paddr_end);
+    for(; start_page <= end_page; start_page++){
+        ret = is_bit_on(who->ctx.ptable, PTABLE_LEN, start_page);
+        if (!ret)
+            return ret;
+    }
+    return ret;
 }
 
 /**
