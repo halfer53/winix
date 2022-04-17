@@ -1,14 +1,12 @@
 import sys
 import re
 
-from soupsieve import match
-
 def get_prototypes(files):
     prototypes = []
     for file in files:
         with open(file) as f:
             for line in f:
-                match = re.search(r"\s*void\s+test_(\w+)\s*\(\)", line)
+                match = re.search(r"\s*void\s+test_(\w+)\s*\(\s*\)", line)
                 if match:
                     prototypes.append(f"test_{match.group(1)}")
     return prototypes
