@@ -11,13 +11,11 @@ static struct device_operations dops;
 static const char* name = "tty";
 
 int tty_read ( struct filp *filp, char *data, size_t count, off_t offset){
-    memset(data, 't', count);
-    data[count - 1] = '\0';
-    return *(int *)&count;
+    return TTY_RETURN;
 }
 
 int tty_write ( struct filp *filp, char *data, size_t count, off_t offset){
-    return *(int *)&count;
+    return TTY_RETURN;
 }
 
 int tty_open ( struct device* dev, struct filp *file){
@@ -25,7 +23,7 @@ int tty_open ( struct device* dev, struct filp *file){
 }
 
 int tty_close ( struct device* dev, struct filp *file){
-    return 0;
+    return TTY_RETURN;
 }
 
 
