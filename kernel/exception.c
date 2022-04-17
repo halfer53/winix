@@ -128,28 +128,47 @@ PRIVATE void serial2_handler() {
     RexSp2->Iack = 0;
 }
 
+char *get_filename(struct proc* proc){
+    char *str = proc->name, *last_slash = NULL, *filename = NULL;
+    while (*str){
+        if (*str == '/'){
+            last_slash = str;
+        }
+        str++;
+    }
+    if (last_slash){
+        filename = last_slash + 1;
+    }
+    return filename;
+}
+
 void rewind_stack(struct proc* proc){
-    vptr_t vtext_start, vtext_end;
-    ptr_t *p = get_physical_addr(proc->ctx.m.sp, proc);
-    ptr_t *stack_end = proc->stack_top + USER_STACK_SIZE;
-    reg_t data;
+    vptr_t *vtext_start, *vtext_end;
+    ptr_t **p = (ptr_t **)get_physical_addr(proc->ctx.m.sp, proc);
+    ptr_t **stack_end = (ptr_t **)proc->stack_top + USER_STACK_SIZE;
+    reg_t *data;
+    char *filename;
 
     if (p >= stack_end){
         kprintf("stack pointer is not point to stack frame");
         return;
     }
 
-    vtext_start = (vptr_t)(get_virtual_addr(proc->text_top, proc) - (vptr_t*)0);
+    vtext_start = get_virtual_addr(proc->text_top, proc);
     vtext_end = vtext_start + proc->text_size;
 
     kprintf("Call Stack:\n");
     while (p < stack_end){
         data = *p;
         if (vtext_start <= data && data <= vtext_end){
-            kprintf("  - 0x%x\n", data);
+            ptr_t *instruction = get_physical_addr(data, proc);
+            kprintf("  - Virtual Addr: 0x%x, Instruction: 0x08%x\n", data, *instruction);
         }
         p++;
     }
+    filename = get_filename(proc);
+    kprintf("HINT: you type `python3 tools/kdbg.py <vir address> %s` to get the line number in original .c file",
+        filename);
 }
 
 #define PRINT_DEBUG_REG(pc,sp,ra)\
@@ -189,9 +208,9 @@ PRIVATE void gpf_handler() {
     kprintf("Physical ");
     PRINT_DEBUG_REG(pc, 
         get_physical_addr(curr_scheduling_proc->ctx.m.sp, curr_scheduling_proc),
-        get_physical_addr(curr_scheduling_proc->ctx.m.ra, curr_scheduling_proc));  
+        get_physical_addr(curr_scheduling_proc->ctx.m.ra, curr_scheduling_proc));
+    kprintf("Memory Table:\n");
     kreport_ptable(curr_scheduling_proc);  
-    kprintf("Current Instruction 0x%x\n", *pc);
 
     rewind_stack(curr_scheduling_proc);
 
