@@ -88,9 +88,10 @@ def main():
     with open(tmp_filename, 'r') as f:
         for idx, line in enumerate(f):
             line = line.replace("\n","")
-
+            if not line:
+                continue
             # if it's label
-            if line[-2] == ':' and "L." not in line:
+            if line[-1] == ':' and "L." not in line:
                 prev_name = line
                 prev_name_index = 0
 
