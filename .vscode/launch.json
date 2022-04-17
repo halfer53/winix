@@ -43,7 +43,7 @@
                     "ignoreFailures": true
                 }
             ],
-            "preLaunchTask": "GCC Build unittest",
+            "preLaunchTask": "Build Unit Test",
             "miDebuggerPath": "/usr/bin/gdb"
         }
     ]

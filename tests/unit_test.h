@@ -7,5 +7,7 @@
 
 extern bool TTY_OPEN_CALLED;
 
+void run_all_tests();
+
 #endif
 

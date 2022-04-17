@@ -15,6 +15,7 @@ include/srec/*.verbose
 include/srec/*.srec
 /fsutil
 /unittest
+/tests/utest_runner.c
 fs/Debug/
 a.out
 include/*.c

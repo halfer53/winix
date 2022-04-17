@@ -49,6 +49,7 @@ ALLDIR_CLEAN = winix lib init user kernel fs driver include
 FS_DEPEND = fs/*.c fs/system/*.c fs/mock/*.c winix/bitmap.c
 UNIT_TEST = tests/*.c
 DISK = include/disk.c
+UTEST_RUNNER = tests/utest_runner.c
 START_TIME_FILE = include/startup_time.c
 SREC = $(shell find $(SREC_INCLUDE) -name "*.srec")
 
@@ -64,7 +65,10 @@ ifeq ($(KBUILD_VERBOSE),0)
 	@echo "LD \t winix.srec"
 endif
 
-test: $(FS_DEPEND) $(UNIT_TEST) 
+$(UTEST_RUNNER): $(UNIT_TEST)
+	$(Q)python3 tools/utest_generator.py $(UNIT_TEST) > $(UTEST_RUNNER)
+
+test: $(FS_DEPEND) $(UNIT_TEST) $(UTEST_RUNNER)
 ifeq ($(KBUILD_VERBOSE),0)
 	@echo "CC \t unittest"
 endif
@@ -98,6 +102,10 @@ include_build:
 
 clean:
 	$(Q)rm -f fsutil
+	$(Q)rm -f unittest
+	$(Q)rm -f $(UTEST_RUNNER)
+	$(Q)rm -f $(START_TIME_FILE)
+	$(Q)rm -f $(DISK)
 	$(Q)$(MAKE) $(cleanall)='$(ALLDIR_CLEAN)'
 
 stat:
