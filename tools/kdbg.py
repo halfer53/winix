@@ -86,7 +86,7 @@ def main():
     seg_types = [".text", ".data", ".bss"]
     
     with open(tmp_filename, 'r') as f:
-        for line in f:
+        for idx, line in enumerate(f):
             line = line.replace("\n","")
 
             # if it's label
@@ -115,14 +115,6 @@ def main():
                     next_incr = 1
                 elif curr_seg == ".text":
                     next_incr = 1
-                    if(curr_seg == target_segment and \
-                            curr_count == target_line_num):
-                            print(f"Assembly: \n\t0x{instruction}\n {line}" , end="")
-                            print("Line: " + str(curr_count) + " in assembly file")
-                            print("Line: "+ loc + " in file "+filename)
-                            found = True
-                            break
-                    
                 elif curr_seg == ".bss":
                     if ".space" in line:
                         bss_len = int(line.split(".space")[1].strip())
@@ -132,7 +124,9 @@ def main():
                         
                 if(curr_count <= target_line_num\
                     and curr_count + next_incr >= target_line_num):
-                    print(f"{curr_seg}: \n" + line +"\nin file " + filename)
+                    print(f"Assembly: \n\t0x{instruction}\n {line}")
+                    print(f"Line: {idx} in assembly file")
+                    print("Line: "+ loc + " in file "+filename)
                     found = True
                     break
                 # print(str(curr_count), line )

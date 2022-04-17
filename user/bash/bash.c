@@ -116,12 +116,13 @@ int search_path(char* path, int len, char* name){
 
 #define PIPE_READ   (0)
 #define PIPE_WRITE  (1)
+#define BUFFER_LEN  (30)
 
 /**
  * Handles any unknown command.
  **/
 int _exec_cmd(char *line, struct cmdLine *cmd) {
-    char buffer[128];
+    char buffer[BUFFER_LEN];
     int status, options;
     pid_t pid;
     int sin = STDIN_FILENO, sout = STDOUT_FILENO;
@@ -158,7 +159,7 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
 
         for(i = 0; i < cmd->numCommands; i++){
             cmd_start = cmd->cmdStart[i];
-            if(search_path(buffer, 128, cmd->argv[cmd_start]) == 0){
+            if(search_path(buffer, BUFFER_LEN, cmd->argv[cmd_start]) == 0){
                 pipe_ptr = &pipe_fds[(i * 2)];
                 
                 if((i < cmd->numCommands - 1)){ // not the last command, create new pipe
