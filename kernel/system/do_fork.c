@@ -165,6 +165,14 @@ int do_vfork(struct proc* parent, struct message* m){
     return EAGAIN;
 }
 
+/**
+ * @brief tfork creates a new stack for the child process in the high memory region
+ *        it also copies and changes references from old stack to new stack
+ * 
+ * @param parent 
+ * @param m 
+ * @return int 
+ */
 int do_tfork(struct proc* parent, struct message* m){
     struct proc* child;
     ptr_t* new_stack, *sp_physical, *old_stack;
@@ -212,7 +220,18 @@ int do_tfork(struct proc* parent, struct message* m){
         }
 
         // KDEBUG(("tfork %x %x for %d tp %d\n", new_stack, *sp, child->proc_nr, child->thread_parent));
+        /*
+            if stack_top == mem_start, this means this process and its parents have not called tfork before.
+            because in the original memory layout, stack is the first page of accessible memory 
+            since we are creating new processes with stack in the high memory, thus it is no longer the first page 
+            thus mem_start skip the stack to indicate this child process is no longer using the original stack
+            we are also disabling access to parent's stack to avoid race condition.
+        */
+        if(child->stack_top == child->mem_start){
+            child->mem_start += USER_STACK_SIZE;
+        }
         proc_memctl(child, vir_old_stack, PROC_NO_ACCESS);
+
         syscall_reply2(TFORK, 0, child->proc_nr, m);
         return child->proc_nr;
     }
