@@ -76,7 +76,6 @@ Click ```Quick Load```, select ```winix.srec```
 
 ```shell
 sudo apt-get install xutils-dev gcc
-pip install bs4
 ```
 
 ### Clone and   Compile
