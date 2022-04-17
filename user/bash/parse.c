@@ -2,14 +2,10 @@
 #include <string.h>
 #include "parse.h"
 
-static int isShellSymb(char c) {
-    return (c)=='|' || (c)=='<' || (c)=='>' || (c)== '\'' || (c) == '=' || (c) == '"' || (c) == '`';
-}
+#define isShellSymb(c) ((c)=='|' || (c)=='<' || (c)=='>' || (c)== '\'' || (c) == '=' || (c) == '"' || (c) == '`')
 
+#define isSeparator(c) (isspace(c) || isShellSymb(c))
 
-static int isSeparator(char c) {
-    return isspace(c) || isShellSymb(c);
-}
 
 /*
 ** Parse: parse a simple nsh command line, and put the results into sc.
