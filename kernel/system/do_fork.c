@@ -224,11 +224,11 @@ int do_tfork(struct proc* parent, struct message* m){
             if stack_top == mem_start, this means this process and its parents have not called tfork before.
             because in the original memory layout, stack is the first page of accessible memory 
             since we are creating new processes with stack in the high memory, thus it is no longer the first page 
-            thus mem_start skip the stack to indicate this child process is no longer using the original stack
+            thus mem_start becomes text_top
             we are also disabling access to parent's stack to avoid race condition.
         */
-        if(child->stack_top == child->mem_start){
-            child->mem_start += USER_STACK_SIZE;
+        if(child->mem_start == child->stack_top){
+            child->mem_start = child->text_top;
         }
         proc_memctl(child, vir_old_stack, PROC_NO_ACCESS);
 
