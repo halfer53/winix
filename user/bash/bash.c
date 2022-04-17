@@ -17,6 +17,7 @@
 int exec_cmd(char *line);
 
 static char history_file[] = ".bash_history";
+static char PREFIX[] = "WINIX> ";
 
 // Input buffer & tokeniser
 static char buf[MAX_LINE];
@@ -85,14 +86,11 @@ int main() {
     }
 
     while(1) {
-        printf("WINIX> ");
+        write(STDOUT_FILENO, PREFIX, strlen(PREFIX));
         ret = read(0, buf, MAX_LINE);
 
         if(ret == EOF){
-            if(errno == EINTR){
-                perror("stdin: ");
-                printf("WINIX> ");
-            }
+            perror("stdin: ");
             continue;
         }
 
