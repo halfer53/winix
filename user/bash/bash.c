@@ -84,18 +84,6 @@ void init_shell(){
     
 }
 
-void debug_cmdLine(struct cmdLine *cmd){
-    int i, cmd_start;
-    char *file;
-
-    for(i = 0; i < cmd->numCommands; i++){
-        cmd_start = cmd->cmdStart[i];
-        file = cmd->argv[cmd_start];
-        printf("%x %s ", (unsigned int)(unsigned long)file, file);
-    }
-    printf("\n");
-}
-
 int main() {
     int ret, len, newline_pos;
     init_shell();
@@ -275,6 +263,7 @@ int exec_cmd(char *line){
     struct cmd_internal *handler = NULL;
 
     (void)parse(line,&cmd);
+    debug_cmdLine(&cmd);
 
     if(cmd.env && cmd.env_val){ // if a new environment variable is set
         buffer = malloc(MAX_LINE);

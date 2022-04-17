@@ -8,7 +8,7 @@ char *strlcpy(char *dest, const char *src, size_t n);
 
 #define MAX_LINE        100  /* longest accepted command line */
 #define BUF_LEN         32
-#define MAX_COMMANDS    6
+#define MAX_COMMANDS    8
 #define MAX_ARGS        10
 
 struct cmdLine
@@ -77,5 +77,6 @@ struct cmdLine
 */
 int parse(char *line, struct cmdLine *sc);
 int parse_quotes(char *input, char* buffer, int buf_len);
+void debug_cmdLine(struct cmdLine *cmd);
 
 #endif
