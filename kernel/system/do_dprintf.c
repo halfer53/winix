@@ -22,7 +22,7 @@ int do_winix_strerror(struct proc* who, struct message* msg){
     char *dst;
     int usr_errno, len;
 
-    if(!is_vaddr_ok(msg->m1_p1, who))
+    if(!is_vaddr_accessible(msg->m1_p1, who))
         return EFAULT;
     len = msg->m1_i1;
     usr_errno = msg->m1_i2;
@@ -56,7 +56,7 @@ int do_winix_dprintf(struct proc *who, struct message *m){
     fd = m->m1_i1;
     vp1 = m->m1_p1;
     vp2 = m->m1_p2;
-    if(!is_vaddr_ok(vp1, who) || !is_vaddr_ok(vp2, who))
+    if(!is_vaddr_accessible(vp1, who) || !is_vaddr_accessible(vp2, who))
         return EFAULT;
     if(!is_fd_opened_and_valid(who, fd))
         return EBADF;

@@ -46,10 +46,10 @@ int do_sigaction(struct proc *who, struct message *m){
     struct sigaction* act = m->m1_p1;
     struct sigaction* oact = m->m1_p2;
 
-    if(!is_vaddr_ok((vptr_t *)act, who))
+    if(!is_vaddr_accessible(act, who))
         return EFAULT;
 
-    if(oact && !is_vaddr_ok((vptr_t *)oact, who))
+    if(oact && !is_vaddr_accessible(oact, who))
         return EFAULT;
 
     if(!is_vaddr_accessible(m->m1_p3, who))
