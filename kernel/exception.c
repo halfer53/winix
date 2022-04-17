@@ -174,47 +174,39 @@ void rewind_stack(struct proc* proc){
 #define PRINT_DEBUG_REG(pc,sp,ra)\
     kprintf("$pc 0x%04x, $sp 0x%04x $ra 0x%04x\n",pc,sp,ra)
 
-/**
- * General Protection Fault.
- *
- * Side Effects:
- *   Current process is killed.
- *   Scheduler is called (i.e. this handler does not return).
- **/
-PRIVATE void gpf_handler() {
+
+void trigger_gpf(struct proc* who){
     ptr_t* pc;
     // is the current process a valid one?
-    ASSERT(IS_PROCN_OK(curr_scheduling_proc->proc_nr));
+    ASSERT(IS_PROCN_OK(who->proc_nr));
     trace_syscall = false;
 
 #ifdef _DEBUG
-    if (curr_scheduling_proc->sig_table[SIGSEGV].sa_handler == SIG_DFL){
+    if (who->sig_table[SIGSEGV].sa_handler == SIG_DFL){
 
-        if(!is_vaddr_accessible(curr_scheduling_proc->ctx.m.sp, curr_scheduling_proc)){
+        if(!is_vaddr_accessible(who->ctx.m.sp, who)){
             kprintf("\nStack Overflow");
         }
         kprintf("\nGeneral Protection Fault: \"%s (%d)\"\n",
-            curr_scheduling_proc->name,
-            curr_scheduling_proc->pid);
+            who->name,
+            who->pid);
         kprintf("Rbase=0x%x, Stack Top=0x%x, vStack Top=0x%x\n", 
-            curr_scheduling_proc->ctx.rbase,
-            curr_scheduling_proc->stack_top,
-            get_virtual_addr(curr_scheduling_proc->stack_top, curr_scheduling_proc));
-        pc = get_physical_addr(get_pc_ptr(curr_scheduling_proc),curr_scheduling_proc);
+            who->ctx.rbase,
+            who->stack_top,
+            get_virtual_addr(who->stack_top, who));
+        pc = get_physical_addr(get_pc_ptr(who),who);
 
         kprintf("Virtual  ");
-        PRINT_DEBUG_REG(curr_scheduling_proc->ctx.m.pc,
-                                        curr_scheduling_proc->ctx.m.sp,
-                                        curr_scheduling_proc->ctx.m.ra);
+        PRINT_DEBUG_REG(who->ctx.m.pc, who->ctx.m.sp, who->ctx.m.ra);
 
         kprintf("Physical ");
         PRINT_DEBUG_REG(pc, 
-            get_physical_addr(curr_scheduling_proc->ctx.m.sp, curr_scheduling_proc),
-            get_physical_addr(curr_scheduling_proc->ctx.m.ra, curr_scheduling_proc));
+            get_physical_addr(who->ctx.m.sp, who),
+            get_physical_addr(who->ctx.m.ra, who));
         kprintf("Memory Table:\n");
-        kreport_ptable(curr_scheduling_proc);  
+        kreport_ptable(who);  
 
-        rewind_stack(curr_scheduling_proc);
+        rewind_stack(who);
     }
 #endif
 
@@ -224,6 +216,17 @@ PRIVATE void gpf_handler() {
 
     // Kill process and call scheduler.
     send_sig(curr_scheduling_proc, SIGSEGV);
+}
+
+/**
+ * General Protection Fault.
+ *
+ * Side Effects:
+ *   Current process is killed.
+ *   Scheduler is called (i.e. this handler does not return).
+ **/
+PRIVATE void gpf_handler() {
+    trigger_gpf(curr_scheduling_proc);
     sched();
 }
 

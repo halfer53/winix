@@ -33,6 +33,7 @@ void reset_irq_count();
 #define disable_interrupt() RexTimer->Ctrl = 0
 #define EXCEPTION_STACK_SIZE    (PAGE_LEN - 1)
 void register_irq(int irq, expt_handler_t handler);
+void trigger_gpf(struct proc* who);
 
 
 #endif
