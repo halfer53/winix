@@ -15,8 +15,9 @@
 #include "bash.h"
 
 int exec_cmd(char *line);
-
+#ifdef __wramp__
 static char history_file[] = ".bash_history";
+#endif
 static char PREFIX[] = "WINIX> ";
 
 // Input buffer & tokeniser
@@ -65,33 +66,35 @@ struct cmd_internal builtin_commands[] = {
 };
 
 void init_shell(){
+#ifdef __wramp__
     int ret;
+    signal(SIGINT, SIG_IGN);
+    signal(SIGTSTP, SIG_IGN);
     ret = setsid();
     if (ret != getpid()){
         perror("setsid");
     }
-    ret = ioctl(STDIN_FILENO, TIOCSCTTY);
+    ret = ioctl(STDIN_FILENO, TIOCSCTTY, 0);
     if (ret != 0){
         perror("TIOCSCTTY");
     }
-#ifdef __wramp__
-    signal(SIGINT, SIG_IGN);
-    signal(SIGTSTP, SIG_IGN);
+    pgid = getpgid(0);
     ioctl(STDIN_FILENO, TIOCSPGRP, &pgid);
-    
 #endif
+    
 }
 
 int main() {
     int ret, len, newline_pos;
-    
-
     init_shell();
+
+#ifdef __wramp__
     history_fd = open(history_file, O_CREAT | O_RDWR, 0x755);
     if(history_fd < 0){
         perror(history_file);
         return 1;
     }
+#endif
 
     while(1) {
         write(STDOUT_FILENO, PREFIX, strlen(PREFIX));
@@ -110,8 +113,9 @@ int main() {
         }
 
         exec_cmd(buf);
-
+#ifdef __wramp__
         write(history_fd, prev_cmd, len);
+#endif
     }
     return 0;
 }
@@ -146,19 +150,19 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
         perror("fork");
     }else if(!pid){
         
-        int i, ret, cmd_start;
+        int i, ret, cmd_start, this_pgid;
         int exit_code = 0;
         int pipe_fds[10];
         int *pipe_ptr, *prev_pipe_ptr;
 
-        signal(SIGINT, SIG_DFL);
-        signal(SIGTSTP, SIG_DFL);
         ret = setpgid(0, 0);
         last_pgid = getpgid(0);
-        ret = ioctl(STDIN_FILENO, TIOCSPGRP, &last_pgid);
-        printf("pgid %d ret %d\n", last_pgid, ret);
-#ifdef __wramp__
         
+#ifdef __wramp__
+        signal(SIGINT, SIG_DFL);
+        signal(SIGTSTP, SIG_DFL);
+        ret = ioctl(STDIN_FILENO, TIOCSPGRP, &last_pgid);
+        printf("pid %d pgid %d tty pgid %d ret %d\n", getpid(), last_pgid, this_pgid, ret);
 #endif
         close(history_fd);
 
