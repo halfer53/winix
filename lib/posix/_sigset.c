@@ -23,7 +23,6 @@ sigset_t *set;
 int signo;
 {
   if (!sigisvalid(signo)) {
-      errno = EINVAL;
     return -1;
   }
   *set |= SIGBIT_0 << signo;
@@ -35,7 +34,6 @@ sigset_t *set;
 int signo;
 {
   if (!sigisvalid(signo)) {
-      errno = EINVAL;
     return -1;
   }
   *set &= ~(SIGBIT_0 << signo);
@@ -62,7 +60,6 @@ sigset_t *set;
 int signo;
 {
   if (!sigisvalid(signo)) {
-      errno = EINVAL;
     return -1;
   }
   if (*set & (SIGBIT_0 << signo))

@@ -25,14 +25,13 @@
 /* Now define _SIGN as "" or "-" depending on _SYSTEM. */
 #ifdef _SYSTEM
 #   define _SIGN         -
-#define errno  
-#define __set_errno(val)   
 #else
 #   define _SIGN 
+#endif
+
 #define ERRNO_PTR           ((unsigned int *)( (((unsigned long)get_sp()) >> 10 << 10) + 1))
 #define errno   (*ERRNO_PTR)
-#define __set_errno(val)    ((*ERRNO_PTR) = (val))        
-#endif
+#define __set_errno(val)    ((*ERRNO_PTR) = (val))     
 
 #define ESTR_SIZ    (16)
 
