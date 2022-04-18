@@ -21,7 +21,6 @@
 #endif
 
 #include <sys/ipc.h>
-#include <sys/types.h>
 #include <sys/debug.h>
 #include <sys/syscall.h>
 #include <stddef.h>
