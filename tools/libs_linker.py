@@ -22,7 +22,6 @@ built_in = {
 	"signal.h": set([SIGNAL]),
 	"ucontext.h": set([GEN]),
 	"unistd.h": set([POSIX, ANSI, STDLIB]),
-	"util.h":	set([UTIL]),
 	"stdio.h":	set([STDIO, STDLIB]),
 	"debug.h":	set([DEBUG]),
 	"dirent.h":	set([POSIX, ANSI, STDLIB]),

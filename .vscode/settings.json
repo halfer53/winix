@@ -46,7 +46,9 @@
         "limits.h": "c",
         "inode.h": "c",
         "dirent.h": "c",
-        "uchar.h": "c"
+        "uchar.h": "c",
+        "time.h": "c",
+        "util.h": "c"
     },
     "files.exclude": {
         "**/*.o": true,
