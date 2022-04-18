@@ -25,7 +25,6 @@
 #include <sys/debug.h>
 #include <sys/syscall.h>
 #include <stddef.h>
-#include <const.h>
 #include <errno.h>
 #include <stdbool.h>
 #include <curses.h>
@@ -34,6 +33,7 @@
 #include <kernel/proc.h>
 #include <kernel/system.h>
 #include <kernel/exception.h>
+#include <winix/const.h>
 #include <winix/comm.h>
 #include <winix/compiler.h>
 #include <winix/type.h>

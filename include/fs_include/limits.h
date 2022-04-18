@@ -40,4 +40,14 @@
 /* Maximum value an `unsigned int' can hold.  (Minimum is 0.)  */
 #  define UINT_MAX        4294967295U
 
+#define LONG_MIN (-2147483647L-1)/* minimum value of a long */
+
+#ifndef LONG_MAX
+#define LONG_MAX  2147483647L	/* maximum value of a long */
+#endif
+
+#ifndef ULONG_MAX
+#define ULONG_MAX 0xFFFFFFFFL	/* maximum value of an unsigned long */
+#endif
+
 #endif

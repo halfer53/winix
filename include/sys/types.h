@@ -16,7 +16,11 @@ typedef unsigned int mode_t;
 typedef unsigned int uid_t;
 typedef unsigned int gid_t;
 typedef unsigned int int32_t;
+
+#ifndef __wchar_t__
+#define __wchar_t__
 typedef unsigned int wchar_t;
+#endif
 
 # ifndef __off_t_defined
 typedef unsigned int off_t;

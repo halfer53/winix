@@ -42,7 +42,8 @@
         "string_view": "c",
         "initializer_list": "c",
         "ctype.h": "c",
-        "random": "cpp"
+        "random": "cpp",
+        "limits.h": "c"
     },
     "files.exclude": {
         "**/*.o": true,

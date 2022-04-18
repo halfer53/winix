@@ -22,10 +22,6 @@
 // Don't reply back to the sender
 #define DONTREPLY       -997
 
-#define LONG_MIN (-2147483647L-1)/* minimum value of a long */
-#define LONG_MAX  2147483647L	/* maximum value of a long */
-#define ULONG_MAX 0xFFFFFFFFL	/* maximum value of an unsigned long */
-
 #define EXIT_MAGIC      0x10293847
 
 // Major and minor version numbers for WINIX.
