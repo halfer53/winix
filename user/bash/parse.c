@@ -216,15 +216,3 @@ int parse_quotes(char *input, char* buffer, int buf_len){
     *out = '\0';
     return 0;
 }
-
-void debug_cmdLine(struct cmdLine *cmd){
-    int i, cmd_start;
-    char *file;
-
-    for(i = 0; i < cmd->numCommands; i++){
-        cmd_start = cmd->cmdStart[i];
-        file = cmd->argv[cmd_start];
-        printf("%x %s ", (unsigned int)(unsigned long)file, file);
-    }
-    printf("\n");
-}

@@ -263,7 +263,6 @@ int exec_cmd(char *line){
     struct cmd_internal *handler = NULL;
 
     (void)parse(line,&cmd);
-    debug_cmdLine(&cmd);
 
     if(cmd.env && cmd.env_val){ // if a new environment variable is set
         buffer = malloc(MAX_LINE);

@@ -77,6 +77,5 @@ struct cmdLine
 */
 int parse(char *line, struct cmdLine *sc);
 int parse_quotes(char *input, char* buffer, int buf_len);
-void debug_cmdLine(struct cmdLine *cmd);
 
 #endif
