@@ -17,7 +17,9 @@
 #include <ctype.h>
 #include <winix/dev.h>
 
-const char *errlist[_NERROR] = {
+#define ERRNO_LEN   (40)
+
+const char *errlist[ERRNO_LEN] = {
     0,			/* EGENERIC */    
     "EPERM",    /* EPERM */
     "ENOENT",    /* ENOENT */
@@ -64,7 +66,7 @@ const char* kstr_error(int err){
     if(err < 0){
         err = -err;
     }
-    if(err < 0 || err >= _NERROR)
+    if(err < 0 || err >= ERRNO_LEN)
         return (const char*)0;
     return errlist[err];
 }

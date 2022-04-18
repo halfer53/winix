@@ -17,7 +17,6 @@
 #include <fs/filp.h>
 #include <winix/rex.h>
 
-extern const char *errlist[_NERROR];
 const char* kstr_error(int err);
 
 int kputd_buf(int n, char *buf);

@@ -35,7 +35,6 @@
 #endif
 
 #define ESTR_SIZ    (16)
-extern char estr[ESTR_SIZ];
 
 /* Here are the numerical values of the error numbers. */
 #define _NERROR              40  /* number of errors */  
@@ -80,7 +79,7 @@ extern char estr[ESTR_SIZ];
 #define ENOSYS        (_SIGN 38)  /* function not implemented */
 #define ENOTEMPTY     (_SIGN 39)  /* directory not empty */
 
-
+extern const char *errlist[_NERROR];
 
 #endif /* _ERRNO_H */
 
