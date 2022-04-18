@@ -15,6 +15,8 @@
 #ifndef _STDIO_H_
 #define _STDIO_H_ 1
 
+#include <stddef.h>
+
 typedef struct __iobuf {
 	int		_count;
 	int		_fd;
@@ -63,9 +65,6 @@ typedef struct __iobuf {
 #define STDERR_FILENO	(2)
 
 #define	BUFSIZ		1024
-#ifndef NULL
-#define	NULL		((void *)0)
-#endif
 #define	EOF		(-1)
 
 
@@ -77,11 +76,6 @@ typedef struct __iobuf {
 #define __STDIO_VA_LIST__	void *
 
 typedef long int	fpos_t;
-
-#ifndef _SIZE_T
-#define	_SIZE_T
-typedef unsigned int	size_t;		/* type returned by sizeof */
-#endif /* _SIZE_T */
 
 int printf(const char *format, ...);
 int dprintf(int fd, const char *format, ...);

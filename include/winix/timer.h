@@ -14,6 +14,7 @@
 #ifndef _W_TIMER_H_
 #define _W_TIMER_H_ 1
 
+#include <sys/times.h>
 #include <kernel/proc.h>
 #include <winix/comm.h>
 

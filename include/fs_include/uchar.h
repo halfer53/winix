@@ -5,9 +5,4 @@ typedef unsigned int char32_t;
 typedef unsigned char byte;
 typedef unsigned char byte_t;
 
-#ifndef __wchar_t__
-#define __wchar_t__
-typedef unsigned int wchar_t;
-#endif
-
 #endif

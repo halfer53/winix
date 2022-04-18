@@ -15,14 +15,18 @@
 #ifndef _STDDEF_H_
 #define _STDDEF_H_ 1
 
-#include <sys/types.h>
+#ifndef _SIZE_T
+#define	_SIZE_T
+typedef unsigned int	size_t;		/* type returned by sizeof */
+#endif /* _SIZE_T */
+
+#ifndef __wchar_t__
+#define __wchar_t__
+typedef unsigned int wchar_t;
+#endif
 
 #ifndef NULL
 #define	NULL		((void *)0)
-#endif
-
-#ifndef EOF
-#define	EOF		(-1)
 #endif
 
 #define offsetof(st, m) \

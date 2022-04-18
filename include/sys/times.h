@@ -3,6 +3,8 @@
 #ifndef _TIMES_H_
 #define _TIMES_H_
 
+typedef unsigned int clock_t;
+
 #ifndef __time_t_defined
 typedef unsigned int time_t;
 #define __time_t_defined
