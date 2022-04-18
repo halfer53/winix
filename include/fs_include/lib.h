@@ -14,7 +14,7 @@
 #include <string.h>
 #include <signal.h>
 #include <sys/debug.h>
-#include <dirent.h>
+#include <sys/dirent.h>
 
 #include <winix/const.h>
 extern pid_t _pid;
