@@ -20,8 +20,9 @@ def generate(prototypes):
     print()
     print("void run_all_tests(){")
     for proto in prototypes:
+        print(f"    printf(\"%s\\n\", \"running {proto}\");")
         print(f"    {proto}();")
-        print(f"    printf(\"%s\\n\", \"{proto} passed\");")
+        print(f"    printf(\"%s\\n\\n\", \"passed: {proto}\");")
         print()
     print("}")
 
