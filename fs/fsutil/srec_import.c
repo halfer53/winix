@@ -190,14 +190,14 @@ int winix_load_srec_mem_val(char *line, struct srec_binary* result)
     int wordsLoaded = 0;
     int index = 0;
     int checksum = 0;
-    byte byteCheckSum = 0;
+    unsigned char byteCheckSum = 0;
     int recordType = 0;
     int addressLength = 0;
     int byteCount = 0;
     char buffer[128];
     int tempBufferCount = 0;
     int address = 0;
-    byte data[255];
+    unsigned char data[255];
     int readChecksum = 0;
     size_t memVal = 0;
     int i = 0;
@@ -265,7 +265,7 @@ int winix_load_srec_mem_val(char *line, struct srec_binary* result)
     for (i = 0; i < addressLength; i++)
     {
         tempBufferCount = substring(buffer, line, index + i * 2, 2);
-        // printf("temp byte value %s, value in base 10: %d,length %d\r\n",buffer,hex2int(buffer,tempBufferCount),tempBufferCount);
+        // printf("temp unsigned char value %s, value in base 10: %d,length %d\r\n",buffer,hex2int(buffer,tempBufferCount),tempBufferCount);
         checksum += hex2int(buffer, tempBufferCount);
         // string ch = line.substring(index + i * 2, 2);
         // checksum += Convert.ToInt32(ch, 16);
@@ -289,23 +289,23 @@ int winix_load_srec_mem_val(char *line, struct srec_binary* result)
     for (i = 0; i < byteCount - 1; i++)
     {
         tempBufferCount = substring(buffer, line, index, 2);
-        // printf("temp byte value %s, value in base 10: %d,length %d\r\n",buffer,hex2int(buffer,tempBufferCount),tempBufferCount);
-        data[i] = (byte)hex2int(buffer, tempBufferCount);
+        // printf("temp unsigned char value %s, value in base 10: %d,length %d\r\n",buffer,hex2int(buffer,tempBufferCount),tempBufferCount);
+        data[i] = (unsigned char)hex2int(buffer, tempBufferCount);
         // data[i] = (byte)Convert.ToInt32(line.substring(index, 2), 16);
         index += 2;
         checksum += data[i];
     }
 
-    // Checksum, two hex digits. Inverted LSB of the sum of values, including byte count, address and all data.
+    // Checksum, two hex digits. Inverted LSB of the sum of values, including unsigned char count, address and all data.
     // readChecksum = (byte)Convert.ToInt32(line.substring(index, 2), 16);
 
     tempBufferCount = substring(buffer, line, index, 2);
     // printf("read checksum value %s, value in base 10: %d,length %d\r\n",buffer,hex2int(buffer,tempBufferCount),tempBufferCount);
     readChecksum = hex2int(buffer, tempBufferCount);
     // printf("checksum %d\r\n",checksum );
-    byteCheckSum = (byte)(checksum & 0xFF);
+    byteCheckSum = (unsigned char)(checksum & 0xFF);
     // printf("checksum %d\r\n",byteCheckSum );
-    byteCheckSum = (byte)~byteCheckSum;
+    byteCheckSum = (unsigned char)~byteCheckSum;
     // printf("checksum %d\r\n",byteCheckSum );
     if (readChecksum != byteCheckSum)
     {
