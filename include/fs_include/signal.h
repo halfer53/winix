@@ -71,13 +71,6 @@ struct sigaction {
 #define SIG_UNBLOCK        1	/* for unblocking signals */
 #define SIG_SETMASK        2	/* for setting the signal mask */
 
-
-typedef struct stack{
-  void  *ss_sp;     /* address of stack */
-  int    sstate;  /* Flags */
-  size_t ss_size;   /* Number of bytes in stack */
-} stack_t;
-
 // define signal
 void (*signal(int sig, void (*func)(int)))(int);
 
