@@ -253,7 +253,7 @@ int do_ls(char* pathname, int flag){
             printf("%s%s  ", symbol, (char *)dir->d_name);
        }
    }
-   if (flag ^ LONG_FORMAT){
+   if (!(flag & LONG_FORMAT)){
        printf("\n");
    }
    closedir(directory);
