@@ -144,7 +144,7 @@ void debug_super_block(char* str){
     printf("in use %d, remaining %d after %s\n", sb->s_block_inuse, sb->s_free_blocks, str);
 }
 
-#define PATH_LEN   (256)
+#define PATH_LEN   (1024)
 
 void write_srec_list(struct list_head* lists){
     static char bin_path[] = "/bin";
@@ -183,7 +183,7 @@ int write_srec_to_disk(char* path, struct arguments* arguments){
     struct list_head srec_list;
     struct dirent *dp;
     DIR *dfd;
-    char filename_qfd[256] ;
+    char filename_qfd[PATH_LEN] ;
 
     INIT_LIST_HEAD(&srec_binary_list);
     INIT_LIST_HEAD(&srec_debug_list);
@@ -201,7 +201,7 @@ int write_srec_to_disk(char* path, struct arguments* arguments){
         {
             char *dot = strchr(dp->d_name, '.');
             char *extension_name = dot + 1;
-            snprintf(filename_qfd, 256, "%s/%s", path, dp->d_name);
+            snprintf(filename_qfd, PATH_LEN, "%s/%s", path, dp->d_name);
 
             if(strcmp(extension_name, "srec") == 0){
                 struct srec_binary *result = malloc(sizeof(struct srec_binary));
