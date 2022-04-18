@@ -1,5 +1,7 @@
 #include "../fs.h"
 #include <assert.h>
+#include <errno.h>
+#include <string.h>
 
 char DISK_RAW[DISK_SIZE];
 
@@ -100,6 +102,8 @@ int tty_write_rex(RexSp_t* rex, char* data, size_t len){
     return 0;
 }
 
-
+const char* kstr_error(int err){
+    return strerror(errno);
+}
 
 
