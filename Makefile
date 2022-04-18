@@ -83,7 +83,7 @@ test: $(UNIT_TEST)
 wsh: user/bash/*.c lib/ansi/strl.c
 	$(Q)gcc -g -DFSUTIL $(GCC_FLAG) $(COMMON_CFLAGS) $^ -o wsh
 
-$(FSUTIL): $(FS_DEPEND) fs/fsutil/*.c 
+$(FSUTIL): $(FS_DEPEND) fs/fsutil/*.c lib/ansi/strl.c
 ifeq ($(KBUILD_VERBOSE),0)
 	@echo "CC \t $(FSUTIL)"
 endif
