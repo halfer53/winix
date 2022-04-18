@@ -27,7 +27,7 @@ export SREC_INCLUDE := include/srec
 export includes := $(shell find include -name "*.h")
 export SREC = $(shell find $(SREC_INCLUDE) -name "*.srec")
 export TEXT_OFFSET := 2048
-export INCLUDE_PATH := -I./include/posix_include -I./include
+export INCLUDE_PATH := -I./include_winix -I./include
 export CURR_UNIX_TIME := $(shell date +%s)
 export WINIX_CFLAGS := -D__wramp__
 export COMMON_CFLAGS := -DTEXT_OFFSET=$(TEXT_OFFSET) -D_DEBUG 
