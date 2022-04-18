@@ -23,7 +23,7 @@
             "command": "",
             "args": [
                 "make",
-                "test",
+                "unittest",
                 "--directory=${workspaceFolder};"
             ],
             "group":  {
@@ -35,24 +35,6 @@
             },
             "problemMatcher": "$msCompile"
         },
-        {
-            "label": "python utest_runner.c",
-            "type": "shell",
-            "command": "python3",
-            "args": [
-                "tools/utest_generator.py",
-                "tests/*.c",
-                ">",
-                "tests/utest_runner.c"
-            ]
-        },
-        {
-            "label": "Build Unit Test",
-            "dependsOn":[
-                "python utest_runner.c",
-                "GCC Build unittest"
-            ]
-        }
     ],
     "version": "2.0.0"
 }
