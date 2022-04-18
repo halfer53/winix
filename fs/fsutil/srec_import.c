@@ -70,7 +70,7 @@ static char text_size[] = ".text segment size = 0x";
 static char data_size[] = ".data segment size = 0x";
 static char bss_size[] = ".bss segment size = 0x";
 
-int decode_segment_size(size_t* val, char* prefix, char* line){
+int decode_segment_size(unsigned int* val, char* prefix, char* line){
     int len = (int)strlen(prefix);
     char *strvalue = &line[len];
     if(strvalue[strlen(strvalue) - 1] == '\n'){
@@ -79,7 +79,7 @@ int decode_segment_size(size_t* val, char* prefix, char* line){
     while(*strvalue && *strvalue == '0'){
         strvalue++;
     }
-    *val = (size_t)hex2int(strvalue, (int)strlen(strvalue));
+    *val = (unsigned int)hex2int(strvalue, (int)strlen(strvalue));
 //    printf(" size %s | %d %x\n",  strvalue, *val, *val);
     return 0;
 }
