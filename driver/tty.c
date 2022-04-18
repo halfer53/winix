@@ -249,8 +249,6 @@ void tty_exception_handler( struct tty_state* state){
                     __kputc(rex, val);
                     // KDEBUG(("received %d\n", val));
                 }
-            }else{
-                __kputc(rex, BEEP);            // beep
             }
         }
 
