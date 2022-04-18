@@ -75,7 +75,7 @@ $(UNIT_TEST): $(FS_DEPEND) $(UNIT_TEST_DEPEND) $(UTEST_RUNNER) user/bash/parse.c
 ifeq ($(KBUILD_VERBOSE),0)
 	@echo "CC \t $(UNIT_TEST)"
 endif
-	$(Q)gcc -DFSUTIL $(GCC_FLAG) $(COMMON_CFLAGS) -I./include/fs_include -I./include $^ -o $(UNIT_TEST)
+	$(Q)gcc -DFSUTIL $(GCC_FLAG) $(COMMON_CFLAGS) -I./include $^ -o $(UNIT_TEST)
 
 test: $(UNIT_TEST)
 	$(Q)./$(UNIT_TEST)
@@ -87,7 +87,7 @@ $(FSUTIL): $(FS_DEPEND) fs/fsutil/*.c lib/ansi/strl.c
 ifeq ($(KBUILD_VERBOSE),0)
 	@echo "CC \t $(FSUTIL)"
 endif
-	$(Q)gcc -DFSUTIL $(GCC_FLAG) $(COMMON_CFLAGS) -I./include/fs_include -I./include $^ -o $(FSUTIL)
+	$(Q)gcc -DFSUTIL $(GCC_FLAG) $(COMMON_CFLAGS) -I./include $^ -o $(FSUTIL)
 
 buildlib:
 	$(Q)$(MAKE) $(build)=lib

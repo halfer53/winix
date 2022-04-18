@@ -3,12 +3,6 @@
 
 #include <signal.h>
 
-typedef struct stack{
-  void  *ss_sp;     /* address of stack */
-  int    sstate;  /* Flags */
-  size_t ss_size;   /* Number of bytes in stack */
-} stack_t;
-
 #define REGS_NR 13
 
 typedef struct mcontext{

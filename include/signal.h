@@ -50,6 +50,11 @@ typedef void (*sighandler_t)(int);
 #define SIG_DFL       ((sighandler_t)  0)    /* default signal handling */
 #define SIG_IGN       ((sighandler_t)  1)    /* ignore signal */
 
+typedef struct stack{
+  void  *ss_sp;     /* address of stack */
+  int    sstate;  /* Flags */
+  size_t ss_size;   /* Number of bytes in stack */
+} stack_t;
 
 struct sigaction {
   sighandler_t sa_handler;	/* SIG_DFL, SIG_IGN, or pointer to function */
