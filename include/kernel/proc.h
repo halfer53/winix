@@ -16,7 +16,7 @@
 #define _W_PROC_H_ 1
 
 #include <sys/ucontext.h>
-#include <sys/types.h>
+#include <stddef.h>
 #include <signal.h>
 #include <winix/type.h>
 #include <winix/comm.h>

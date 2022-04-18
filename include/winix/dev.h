@@ -6,7 +6,7 @@
 
 #define align_sector(x) (((((x)-1)>>9)<<9))
 
-#include <sys/types.h>
+#include <stddef.h>
 #include <winix/type.h>
 #include <fs/type.h>
 #include <fs/filp.h>

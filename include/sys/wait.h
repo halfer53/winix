@@ -18,10 +18,6 @@
 
 #include <signal.h>
 
-#ifndef _TYPES_H_
-#include <sys/types.h>
-#endif
-
 #define _LOW(v)         ( (v) & 0x7f)
 #define _HIGH(v)        ( ((v) >> 8) & 0xff)
 

@@ -6,7 +6,7 @@
 #endif
 
 #include <sys/ioctl.h>
-#include <sys/types.h>
+#include <stddef.h>
 #include <sys/ipc.h>
 #include <sys/unistd.h>
 #include <sys/dirent.h>

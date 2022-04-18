@@ -3,6 +3,7 @@
 
 #include <kernel/kernel.h>
 
+#include <stddef.h>
 #include <sys/tty.h>
 #include <sys/ioctl.h>
 #include <sys/stat.h>

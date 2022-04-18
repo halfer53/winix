@@ -2,7 +2,7 @@
 #define _LIB_H_ 1
 
 #include <errno.h>
-#include <sys/types.h>
+#include <stddef.h>
 #include <sys/syscall.h>
 #include <sys/ipc.h>
 #include <sys/stat.h>

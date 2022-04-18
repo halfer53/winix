@@ -5,7 +5,7 @@
 #ifndef FS_CMAKE_UTIL_H
 #define FS_CMAKE_UTIL_H
 
-#include <sys/types.h>
+#include <stddef.h>
 #include <sys/ipc.h>
 #include <kernel/proc.h>
 

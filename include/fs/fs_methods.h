@@ -6,7 +6,7 @@
 #define FS_FS_METHODS_H
 
 #include <kernel/proc.h>
-#include <sys/types.h>
+#include <stddef.h>
 #include <fs/type.h>
 #include <stdbool.h>
 

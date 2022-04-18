@@ -2,7 +2,7 @@
 #ifndef _LINUX_LIST_H
 #define _LINUX_LIST_H
 
-#include <sys/types.h>
+#include <stddef.h>
 #include <winix/type.h>
 
 #ifndef container_of

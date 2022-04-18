@@ -2,7 +2,7 @@
 #define _SIGNAL_H_ 1
 
 
-#include <sys/types.h>
+#include <stddef.h>
 
 /* Here are types that are closely associated with signal handling. */
 typedef int sig_atomic_t;

@@ -1,7 +1,7 @@
 #ifndef _FS_INODE_H_
 #define _FS_INODE_H_ 1
 
-#include <sys/types.h>
+#include <stddef.h>
 #include <fs/type.h>
 #include <fs/common.h>
 #include <winix/type.h>

@@ -1,7 +1,7 @@
 #ifndef _WINIX_WELF_H_
 #define _WINIX_WELF_H_
 
-#include <sys/types.h>
+#include <stddef.h>
 #include <winix/type.h>
 
 #define WINIX_ELF_MAGIC  (0x19960503) // my birthday lol

@@ -1,7 +1,7 @@
 #ifndef _FS_CONST_HEAD_
 #define _FS_CONST_HEAD_
 
-#include <sys/types.h>
+#include <stddef.h>
 #include <fs/type.h>
 #include <sys/macro.h>
 

@@ -1,7 +1,7 @@
 #ifndef _UCONTEXT_H_
 #define _UCONTEXT_H_ 1
 
-#include <sys/types.h>
+#include <stddef.h>
 #include <signal.h>
 #include <sys/ucontext.h>
 

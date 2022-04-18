@@ -2,7 +2,7 @@
 #define _STDLIB_H_ 1
 
 #include <stddef.h>
-#include <sys/types.h>
+#include <stddef.h>
 #include <sys/syscall.h>
 
 #define EXIT_SUCCESS 0

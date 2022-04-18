@@ -1,4 +1,3 @@
-#include <sys/types.h>
 #include <stddef.h>
 #include "../user/bash/parse.h"
 #include <assert.h>
