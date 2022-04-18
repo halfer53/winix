@@ -22,6 +22,7 @@ def generate(prototypes):
     for proto in prototypes:
         print(f"    printf(\"%s\\n\", \"running {proto}\");")
         print(f"    {proto}();")
+        print()
     print("}")
 
 def main():
