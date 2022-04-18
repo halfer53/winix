@@ -40,7 +40,9 @@
         "unordered_map": "c",
         "vector": "c",
         "string_view": "c",
-        "initializer_list": "c"
+        "initializer_list": "c",
+        "ctype.h": "c",
+        "random": "cpp"
     },
     "files.exclude": {
         "**/*.o": true,

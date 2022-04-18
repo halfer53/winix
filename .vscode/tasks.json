@@ -3,88 +3,37 @@
         {
             "type": "shell",
             "label": "GCC Build fsutil",
-            "command": "/usr/bin/gcc",
+            "command": "",
             "args": [
-                "-g",
-                "-Werror",
-                "-Wimplicit-fallthrough",
-                "-Wsequence-point",
-                "-Wswitch-default",
-                "-Wswitch-unreachable",
-                "-Wswitch-enum",
-                "-Wstringop-truncation",
-                "-Wbool-compare",
-                "-Wtautological-compare",
-                "-Wfloat-equal",
-                "-Wshadow=global",
-                "-Wpointer-arith",
-                "-Wpointer-compare",
-                "-Wcast-align",
-                "-Wcast-qual",
-                "-Wwrite-strings",
-                "-Wdangling-else",
-                "-Wlogical-op",
-                "-Wunused",
-                "-Wpointer-to-int-cast",
-                "-Wno-discarded-qualifiers",
-                "-DFSUTIL",
-                "-D_DEBUG",
-                "-I${workspaceFolder}/include/fs_include",
-                "-I${workspaceFolder}/include",
-                "${workspaceFolder}/fs/*.c",
-                "${workspaceFolder}/fs/system/*.c",
-                "${workspaceFolder}/fs/fsutil/*.c",
-                "${workspaceFolder}/fs/mock/*.c",
-                "${workspaceFolder}/winix/bitmap.c",
-                "-o",
-                "${workspaceFolder}/fsutil"
+                "make",
+                "--directory=${workspaceFolder};"
             ],
-            "options": {
-                "cwd": "/usr/bin"
+            "group":  {
+                "kind": "build",
+                "isDefault": true
             },
+            "presentation": {
+                "reveal":"always"
+            },
+            "problemMatcher": "$msCompile"
         },
         {
             "type": "shell",
             "label": "GCC Build unittest",
-            "command": "/usr/bin/gcc",
+            "command": "",
             "args": [
-                "-g",
-                "-Werror",
-                "-Wimplicit-fallthrough",
-                "-Wsequence-point",
-                "-Wswitch-default",
-                "-Wswitch-unreachable",
-                "-Wswitch-enum",
-                "-Wstringop-truncation",
-                "-Wbool-compare",
-                "-Wtautological-compare",
-                "-Wfloat-equal",
-                "-Wshadow=global",
-                "-Wpointer-arith",
-                "-Wpointer-compare",
-                "-Wcast-align",
-                "-Wcast-qual",
-                "-Wwrite-strings",
-                "-Wdangling-else",
-                "-Wlogical-op",
-                "-Wunused",
-                "-Wpointer-to-int-cast",
-                "-Wno-discarded-qualifiers",
-                "-DFSUTIL",
-                "-D_DEBUG",
-                "-I${workspaceFolder}/include/fs_include",
-                "-I${workspaceFolder}/include",
-                "${workspaceFolder}/fs/*.c",
-                "${workspaceFolder}/fs/system/*.c",
-                "${workspaceFolder}/fs/mock/*.c",
-                "${workspaceFolder}/winix/bitmap.c",
-                "${workspaceFolder}/tests/*.c",
-                "-o",
-                "${workspaceFolder}/unittest"
+                "make",
+                "test",
+                "--directory=${workspaceFolder};"
             ],
-            "options": {
-                "cwd": "/usr/bin"
+            "group":  {
+                "kind": "build",
+                "isDefault": true
             },
+            "presentation": {
+                "reveal":"always"
+            },
+            "problemMatcher": "$msCompile"
         },
         {
             "label": "python utest_runner.c",
