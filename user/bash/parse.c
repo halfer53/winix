@@ -1,5 +1,9 @@
-#include <stdlib.h>
+#include <sys/types.h>
+#include <stddef.h>
 #include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
 #include "parse.h"
 
 #define isShellSymb(c) ((c)=='|' || (c)=='<' || (c)=='>' || (c)== '\'' || (c) == '=' || (c) == '"' || (c) == '`')
