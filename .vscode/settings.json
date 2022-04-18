@@ -48,7 +48,8 @@
         "dirent.h": "c",
         "uchar.h": "c",
         "time.h": "c",
-        "util.h": "c"
+        "util.h": "c",
+        "stdint.h": "c"
     },
     "files.exclude": {
         "**/*.o": true,
