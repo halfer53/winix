@@ -3,7 +3,10 @@
 #ifndef _TIMES_H_
 #define _TIMES_H_
 
-#include <sys/types.h>
+#ifndef __time_t_defined
+typedef unsigned int time_t;
+#define __time_t_defined
+#endif
 
 struct tms {
   clock_t tms_utime;

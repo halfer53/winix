@@ -12,10 +12,5 @@ typedef unsigned int clock_t;
 typedef unsigned int int32_t;
 typedef int pid_t;
 
-#ifndef __time_t_defined
-typedef unsigned int time_t;
-#define __time_t_defined
-#endif
-
 
 #endif
