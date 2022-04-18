@@ -73,14 +73,5 @@ int tty_write_rex(RexSp_t* rex, char* data, size_t len){
     return 0;
 }
 
-char *strlcpy(char *dest, const char *src, size_t n){
-    char *saved = dest;
-    while (*src && n--) {
-        *dest++ = *src++;
-    }
-    *dest = 0;
-    return saved;
-}
-
 
 
