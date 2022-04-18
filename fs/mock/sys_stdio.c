@@ -71,9 +71,5 @@ const char* kstr_error(int err){
     return errlist[err];
 }
 
-int tty_write_rex(RexSp_t* rex, char* data, size_t len){
-    return 0;
-}
-
 
 

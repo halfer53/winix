@@ -96,6 +96,10 @@ void set_start_unix_time(clock_t t){
     start_unix_time = t;
 }
 
+int tty_write_rex(RexSp_t* rex, char* data, size_t len){
+    return 0;
+}
+
 
 
 
