@@ -1,6 +1,8 @@
 #ifndef _FS_INODE_H_
 #define _FS_INODE_H_ 1
 
+#include <uchar.h>
+#include <sys/stat.h>
 #include <stddef.h>
 #include <fs/type.h>
 #include <fs/common.h>

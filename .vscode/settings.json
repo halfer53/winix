@@ -43,7 +43,10 @@
         "initializer_list": "c",
         "ctype.h": "c",
         "random": "cpp",
-        "limits.h": "c"
+        "limits.h": "c",
+        "inode.h": "c",
+        "dirent.h": "c",
+        "uchar.h": "c"
     },
     "files.exclude": {
         "**/*.o": true,

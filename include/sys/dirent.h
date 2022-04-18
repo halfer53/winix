@@ -2,7 +2,8 @@
 #ifndef	_SYS_DIRENT_H
 #define _SYS_DIRENT_H 1
 
-#include <sys/types.h>
+#include <uchar.h>
+#include <sys/stat.h>
 
 #define    DIRBLKSIZ    1024    /* size of directory block */
 

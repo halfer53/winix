@@ -5,6 +5,8 @@
 #ifndef FS_FS_METHODS_H
 #define FS_FS_METHODS_H
 
+#include <uchar.h>
+#include <sys/stat.h>
 #include <kernel/proc.h>
 #include <stddef.h>
 #include <fs/type.h>
