@@ -1,7 +1,9 @@
 #ifndef _SYS_STAT_H_
 #define	_SYS_STAT_H_
 
+#include <sys/times.h>
 #include <sys/types.h>		/* XXX */
+
 typedef unsigned int mode_t;
 typedef unsigned int uid_t;
 typedef unsigned int gid_t;

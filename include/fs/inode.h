@@ -2,6 +2,7 @@
 #define _FS_INODE_H_ 1
 
 #include <uchar.h>
+#include <sys/times.h>
 #include <sys/stat.h>
 #include <stddef.h>
 #include <fs/type.h>
