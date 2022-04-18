@@ -9,7 +9,7 @@ char *strlcpy(char *dest, const char *src, size_t n);
 #define MAX_LINE        100  /* longest accepted command line */
 #define BUF_LEN         32
 #define MAX_COMMANDS    8
-#define MAX_ARGS        10
+#define MAX_ARGS        30
 
 struct cmdLine
 {
@@ -59,7 +59,7 @@ struct cmdLine
     int numCommands;
     int cmdStart[MAX_COMMANDS];
     int argc;
-    char *argv[(MAX_ARGS+1) * MAX_COMMANDS + 1];    /* +1 to hold the NULLs */
+    char *argv[MAX_ARGS+1];    /* +1 to hold the NULLs */
     char *infile, *outfile;
     char append;	/* Boolean: 1 means ">>", 0 means ">" */
     char background; //1 means backgroudn execution, otherwise 0
