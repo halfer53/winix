@@ -70,10 +70,6 @@ void init_shell(){
     int ret;
     signal(SIGINT, SIG_IGN);
     signal(SIGTSTP, SIG_IGN);
-    ret = setsid();
-    if (ret != getpid()){
-        perror("setsid");
-    }
     ret = ioctl(STDIN_FILENO, TIOCSCTTY, 0);
     if (ret != 0){
         perror("TIOCSCTTY");

@@ -61,6 +61,8 @@ void init_dev(){
 
 void init_tty(){
   int fd, ret;
+  ret = setsid();
+  CHECK_SYSCALL(ret == getpid());
   fd = open("/dev/tty1", O_RDONLY);
   CHECK_SYSCALL(fd == 0);
   ret = dup(fd);
