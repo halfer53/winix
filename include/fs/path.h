@@ -3,14 +3,6 @@
 
 #include <stdbool.h>
 
-// each direct occupies 32 bytes, with 8 bytes for d_ino, and 24 bytes for directory name
-#ifndef DIRSIZ
-#define DIRSIZ    32
-#endif
-
-#define NAME_MAX    32
-#define PATH_MAX    128
-
 char *get_name(char *old_name, char string[NAME_MAX]);
 int advance(inode_t *dirp, char string[NAME_MAX]);
 int get_parent_inode_num(inode_t *dirp);

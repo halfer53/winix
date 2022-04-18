@@ -44,4 +44,7 @@
 #define LONG_MAX  2147483647L	/* maximum value of a long */
 #define ULONG_MAX 0xFFFFFFFFL	/* maximum value of an unsigned long */
 
+#define PATH_MAX  (128)
+#define NAME_MAX  (32)
+
 #endif
