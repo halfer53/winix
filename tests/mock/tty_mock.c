@@ -2,8 +2,8 @@
 // Created by bruce on 25/04/20.
 //
 
-#include "../fs/fs.h"
-#include "unit_test.h"
+#include "../../fs/fs.h"
+#include "../unit_test.h"
 
 struct device tty_dev_static;
 static struct filp_operations fops;
