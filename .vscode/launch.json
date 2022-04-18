@@ -26,7 +26,7 @@
             "miDebuggerPath": "/usr/bin/gdb"
         },
         {
-            "name": "File System Run Unit Test",
+            "name": "Run Unit Test",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/unittest",
