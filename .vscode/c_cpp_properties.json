@@ -3,8 +3,8 @@
         {
             "name": "Linux",
             "includePath": [
-                "${workspaceFolder}/include_winix",
-                "${workspaceFolder}/include",
+                "${workspaceFolder}/include_winix/",
+                "${workspaceFolder}/include/",
                 "${workspaceFolder}/**"
             ],
             "defines": ["_DEBUG"],
