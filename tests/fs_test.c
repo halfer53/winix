@@ -1,6 +1,7 @@
 #include "../fs/fs.h"
 #include "unit_test.h"
 #include <assert.h>
+#include <signal.h>
 
 const char * dirent_array[] = {
         ".",
@@ -409,7 +410,7 @@ void test_given_pipe_write_when_read_fd_are_closed_should_return_sigpipe(){
     
     ret = sys_write(&pcurr2, pipe_fd[1], "a", 2);
     assert(ret == SUSPEND);
-    assert(pcurr2.sig_pending & (1 << SIGPIPE));
+    assert(sigismember(&pcurr2.sig_pending, SIGPIPE));
 
     reset_fs();
 }
