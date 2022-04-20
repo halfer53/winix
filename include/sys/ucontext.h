@@ -1,7 +1,11 @@
 #ifndef _SYS_UCONTEXT_T_
 #define _SYS_UCONTEXT_T_ 1
 
+#ifdef __wramp__
 #include <signal.h>
+#else
+#include <bits/types/stack_t.h>
+#endif
 
 #define REGS_NR 13
 

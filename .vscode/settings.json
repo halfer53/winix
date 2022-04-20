@@ -49,7 +49,11 @@
         "uchar.h": "c",
         "time.h": "c",
         "util.h": "c",
-        "stdint.h": "c"
+        "stdint.h": "c",
+        "signal.h": "c",
+        "stdint-intn.h": "c",
+        "stack_t.h": "c",
+        "ucontext.h": "c"
     },
     "files.exclude": {
         "**/*.o": true,

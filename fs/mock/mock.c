@@ -72,7 +72,8 @@ int syscall_reply2(int syscall_num, int reply, int dest, struct message* m){
 
 int send_sig(struct proc *who, int signum){
     KDEBUG(("signal %d sent to %d\n", signum, who->proc_nr));
-    who->sig_pending |= 1 << signum;
+    sigaddset(&who->sig_pending, signum);
+    // who->sig_pending |= 1 << signum;
     return 0;
 }
 

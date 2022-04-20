@@ -2,7 +2,7 @@
 #define _TYPE_H_ 1
 
 #include <sys/stat.h>
-#include <sys/stdint.h>
+#include <stdint.h>
 typedef int pid_t;
 
 

@@ -53,7 +53,7 @@ endif
 
 ifneq ($(NO_MAKE_DEPEND),1)
 $(srcdepend): $(source) $(includes)
-	$(Q)makedepend -o.s -f- -I./include_winix -I./include $(source) > $(srcdepend)
+	$(Q)makedepend -o.s -f- -I./include_winix -I./include -I/usr/include/x86_64-linux-gnu $(source) > $(srcdepend)
 endif
 
 $(subdir-y): FORCE
