@@ -11,22 +11,22 @@
 *.log
 Makefile.bak
 kdbg.py
-include/srec/*.verbose
-include/srec/*.srec
+include_winix/srec/*.verbose
+include_winix/srec/*.srec
 /fsutil
 /unittest
 /wsh
 /tests/utest_runner.c
 fs/Debug/
 a.out
-include/*.c
+include_winix/*.c
 cmake-build-debug
 
 RexSimulator.dll
 RexSimulatorGui.exe
 
 !tools/kdbg.py
-!include/srec/.gitkeep
+!include_winix/srec/.gitkeep
 !kernel/winix/kwramp.s
 !lib/gen/ucontext.s
 !lib/syscall/wramp_syscall.s

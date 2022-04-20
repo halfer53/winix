@@ -9,7 +9,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/fsutil",
-            "args": ["-t", "2048", "-o", "include/disk.c", "-s", "include/srec"],
+            "args": ["-t", "2048", "-o", "include_winix/disk.c", "-s", "include_winix/srec"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],

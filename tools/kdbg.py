@@ -11,7 +11,7 @@ def main():
         return 0
 
     main_path = path.dirname(path.realpath(__file__)) + "/.."
-    rpath = "include/srec"
+    rpath = "include_winix/srec"
     in_file = "winix.verbose"
     
     if len(sys.argv) == 3:
@@ -61,7 +61,7 @@ def main():
     print(f"target assembly line number {target_line_num} in segment {target_segment} in {filename}")
 
     tmp_filename = "/tmp/" + str(uuid4()) + ".s"
-    wcc_cmd = ["wcc","-N", "-g", "-S", "-I" + main_path + "/include_winix", "-I" + main_path + "/include",\
+    wcc_cmd = ["wcc","-N", "-g", "-S", "-I" + main_path + "/include", "-I" + main_path + "/include_winix",\
                     "-D__wramp__", "-D_DEBUG","-o",tmp_filename, main_path+"/"+filename, ]
 
     print(" ".join(wcc_cmd))

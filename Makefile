@@ -23,11 +23,11 @@ export NO_MAKE_DEPEND := $(N)
 export KBUILD_VERBOSE
 export Q
 export srctree \\
-export SREC_INCLUDE := include/srec
+export SREC_INCLUDE := include_winix/srec
 export includes := $(shell find include -name "*.h")
 export SREC = $(shell find $(SREC_INCLUDE) -name "*.srec")
 export TEXT_OFFSET := 2048
-export INCLUDE_PATH := -I./include_winix -I./include
+export INCLUDE_PATH := -I./include -I./include_winix
 export CURR_UNIX_TIME := $(shell date +%s)
 export WINIX_CFLAGS := -D__wramp__
 export COMMON_CFLAGS := -DTEXT_OFFSET=$(TEXT_OFFSET) -D_DEBUG 
@@ -44,15 +44,15 @@ KLIB_O = lib/syscall/wramp_syscall.o lib/ipc/ipc.o \
 		lib/syscall/debug.o lib/posix/_sigset.o lib/ansi/rand.o lib/ansi/strl.o
 L_HEAD = winix/limits/limits_head.o
 L_TAIL = winix/limits/limits_tail.o
-KERNEL_O = winix/*.o kernel/system/*.o kernel/*.o fs/*.o fs/system/*.o driver/*.o include/*.o
+KERNEL_O = winix/*.o kernel/system/*.o kernel/*.o fs/*.o fs/system/*.o driver/*.o include_winix/*.o
 ALLDIR = init user kernel fs driver winix
 ALLDIR_CLEAN = winix lib init user kernel fs driver include
 FS_DEPEND = fs/*.c fs/system/*.c fs/mock/*.c winix/bitmap.c
 UNIT_TEST_DEPEND = $(shell find tests -name "*.c" -not -name "utest_runner.c")
 
-DISK = include/disk.c
+DISK = include_winix/disk.c
 UTEST_RUNNER = tests/utest_runner.c
-START_TIME_FILE = include/startup_time.c
+START_TIME_FILE = include_winix/startup_time.c
 UNIT_TEST = unittest
 FSUTIL = fsutil
 
@@ -75,7 +75,7 @@ $(UNIT_TEST): $(FS_DEPEND) $(UNIT_TEST_DEPEND) $(UTEST_RUNNER) user/bash/parse.c
 ifeq ($(KBUILD_VERBOSE),0)
 	@echo "CC \t $(UNIT_TEST)"
 endif
-	$(Q)gcc -DFSUTIL $(GCC_FLAG) $(COMMON_CFLAGS) -I./include $^ -o $(UNIT_TEST)
+	$(Q)gcc -DFSUTIL $(GCC_FLAG) $(COMMON_CFLAGS) -I./include_winix $^ -o $(UNIT_TEST)
 
 test: $(UNIT_TEST)
 	$(Q)./$(UNIT_TEST)
@@ -87,7 +87,7 @@ $(FSUTIL): $(FS_DEPEND) fs/fsutil/*.c lib/ansi/strl.c
 ifeq ($(KBUILD_VERBOSE),0)
 	@echo "CC \t $(FSUTIL)"
 endif
-	$(Q)gcc -DFSUTIL $(GCC_FLAG) $(COMMON_CFLAGS) -I./include $^ -o $(FSUTIL)
+	$(Q)gcc -DFSUTIL $(GCC_FLAG) $(COMMON_CFLAGS) -I./include_winix $^ -o $(FSUTIL)
 
 buildlib:
 	$(Q)$(MAKE) $(build)=lib
@@ -104,7 +104,7 @@ endif
 	
 include_build:
 	$(Q)echo "unsigned int start_unix_time=$(CURR_UNIX_TIME);\n" > $(START_TIME_FILE)
-	$(Q)$(MAKE) $(build)=include
+	$(Q)$(MAKE) $(build)=include_winix
 
 clean:
 	$(Q)rm -f $(FSUTIL)
@@ -116,7 +116,7 @@ clean:
 
 stat:
 	@echo "C Lines: "
-	@find . -type d -name "include" -prune -o -name "*.c"  -exec cat {} \; | wc -l
+	@find . -type d -name "include_winix" -prune -o -name "*.c"  -exec cat {} \; | wc -l
 	@echo "Header LoC: "
 	@find . -name "*.h" -exec cat {} \; | wc -l
 	@echo "Assembly LoC: "
