@@ -2,24 +2,23 @@
 // Created by bruce on 19/04/20.
 //
 #define __STDC_WANT_LIB_EXT1__ 1
-#include <fs/common.h>
-#include <fs/cache.h>
-#include <kernel/proc.h>
-#include <fs/super.h>
-#include "../mock/mock.h"
+#include <stdlib.h>
+#include <string.h>
 #include <assert.h>
 #include <stdio.h>
-#include <string.h>
 #include <unistd.h>
 #include <argp.h>
-#include <stdlib.h>
-#include <winix/welf.h>
 #include <dirent.h>
-#include <fs/fs_methods.h>
+#include <kernel/proc.h>
+#include <winix/welf.h>
 #include <winix/list.h>
 #include <winix/dev.h>
+#include <fs/common.h>
+#include <fs/cache.h>
 #include <fs/super.h>
+#include <fs/fs_methods.h>
 #include "srec_import.h"
+#include "../mock/mock.h"
 
 void init_bitmap();
 
@@ -198,7 +197,7 @@ int write_srec_to_disk(char* path, struct arguments* arguments){
     {
         if ( dp->d_type == DT_REG )
         {
-            char *dot = strchr(dp->d_name, '.');
+            char *dot = char32_index(dp->d_name, '.');
             char *extension_name = dot + 1;
             snprintf(filename_qfd, PATH_LEN, "%s/%s", path, dp->d_name);
 
