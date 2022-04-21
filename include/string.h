@@ -31,6 +31,6 @@ char *strrchr(const char *str, int c);
 
 #define strchr(s, c)    index(s, c)
 
-#include <winix/string.h>
+#include <winix/strl.h>
 
 #endif
