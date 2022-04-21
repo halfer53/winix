@@ -45,7 +45,7 @@ int strncmp(const char *s1, const char *s2, size_t size) {
 /**
  * Calculates the length of a string.
  **/
-int strlen(const char *s) {
+size_t strlen(const char *s) {
     const char* bak = s;
     for (; *s; ++s)
                 ;

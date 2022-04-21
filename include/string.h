@@ -14,9 +14,11 @@
 #ifndef _STRING_H_
 #define _STRING_H_ 1
 
+#include <stdlib.h>
+
 void *memcpy(void *dst, const void *src, size_t n);
 int strcmp(const char *s1, const char *s2);
-int strlen(const char *s);
+size_t strlen(const char *s);
 int strncmp(const char *s1, const char *s2, size_t size);
 void *memset(void *dst, int c, size_t n);
 int substring(char* buffer,char* original,int start_index,int length);
