@@ -53,10 +53,18 @@
         "signal.h": "c",
         "stdint-intn.h": "c",
         "stack_t.h": "c",
-        "ucontext.h": "c"
+        "ucontext.h": "c",
+        "cstdlib": "c",
+        "super.h": "c",
+        "proc.h": "c",
+        "common.h": "c",
+        "argp.h": "c",
+        "libgen.h": "c",
+        "srec_import.h": "c"
     },
     "files.exclude": {
         "**/*.o": true,
+        "**/*.wo": true,
         "**/*.s": true,
         "**/*.srec": true
     }
