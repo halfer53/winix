@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
-#ifndef _LINUX_LIST_H
-#define _LINUX_LIST_H
+#ifndef _LINUX_LIST_H_
+#define _LINUX_LIST_H_
 
 #include <stddef.h>
 #include <winix/type.h>

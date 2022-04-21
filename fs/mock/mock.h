@@ -2,8 +2,8 @@
 // Created by bruce on 19/04/20.
 //
 
-#ifndef FS_CMAKE_UTIL_H
-#define FS_CMAKE_UTIL_H
+#ifndef FS_CMAKE_UTIL_H_
+#define FS_CMAKE_UTIL_H_
 
 #include <stddef.h>
 #include <sys/ipc.h>
@@ -24,4 +24,4 @@ char *strlcpy(char *dest, const char *src, size_t n);
 void set_start_unix_time(clock_t t);
 void init_disk();
 
-#endif //FS_CMAKE_UTIL_H
+#endif //FS_CMAKE_UTIL_H_

@@ -1,6 +1,6 @@
 
-#ifndef	_SYS_DIRENT_H
-#define _SYS_DIRENT_H 1
+#ifndef	_SYS_DIRENT_H_
+#define _SYS_DIRENT_H_ 1
 
 #include <uchar.h>
 #include <sys/stat.h>

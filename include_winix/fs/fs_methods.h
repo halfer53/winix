@@ -2,8 +2,8 @@
 // Created by bruce on 4/05/20.
 //
 
-#ifndef FS_FS_METHODS_H
-#define FS_FS_METHODS_H
+#ifndef FS_FS_METHODS_H_
+#define FS_FS_METHODS_H_
 
 #include <uchar.h>
 #include <sys/stat.h>
@@ -74,4 +74,4 @@ int char32_strcmp(const char32_t *s1, const char *s2);
 int char32_strlen(const char32_t *s);
 char32_t *char32_strlcpy(char32_t *dest, const char *src, size_t n);
 
-#endif //FS_FS_METHODS_H
+#endif //FS_FS_METHODS_H_
