@@ -22,5 +22,6 @@ int setenv(const char *name, const char *value, int overwrite);
 void srand(unsigned int seed);
 int rand(void);
 int atoi(char *str);
+unsigned long strtoul(const char * nptr, char ** endptr, int base);
 
 #endif
