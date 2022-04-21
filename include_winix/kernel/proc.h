@@ -15,6 +15,7 @@
 #ifndef _W_PROC_H_
 #define _W_PROC_H_ 1
 
+#include <sys/types.h>
 #include <stddef.h>
 #include <signal.h>
 #include <sys/ucontext.h>
