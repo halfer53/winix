@@ -17,8 +17,6 @@
 void *memcpy(void *dst, const void *src, size_t n);
 int strcmp(const char *s1, const char *s2);
 int strlen(const char *s);
-char *strlcpy(char *dest, const char *src, size_t n);
-char *strlcat(char *dest, const char *src, size_t n);
 int strncmp(const char *s1, const char *s2, size_t size);
 void *memset(void *dst, int c, size_t n);
 int substring(char* buffer,char* original,int start_index,int length);
@@ -29,5 +27,7 @@ size_t strspn(const char *s1, const char *s2);
 void *memmove(void *dest, const void *src, size_t n);
 
 #define strchr(s, c)    index(s, c)
+
+#include <winix/string.h>
 
 #endif
