@@ -87,9 +87,10 @@ int decode_segment_size(unsigned int* val, char* prefix, char* line){
 int decode_srec_debug(char* filepath, struct srec_debug* result){
     FILE* f = fopen(filepath, "r");
     char *filename = remove_extension(filepath);
+    char *line;
     if(!f)
         return -1;
-    char *line = malloc(1024);
+    line = malloc(1024);
     if(!line){
         fclose(f);
         return -1;
