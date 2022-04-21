@@ -114,7 +114,7 @@ void combine_srec_binary_debug(struct winix_elf_list* elf_list, struct srec_bina
     elf_list->binary_data = binary->binary_data;
 }
 
-void combine_srec_binary_and_debug_list(struct list_head* lists,
+void merge_srec_debug(struct list_head* lists,
     struct list_head *srec_binary_list, struct list_head *srec_debug_list){
     struct srec_binary *b1, *b2;
     struct srec_debug *d1, *d2;
@@ -214,7 +214,7 @@ int write_srec_to_disk(char* path, struct arguments* arguments){
             }
         }
     }
-    combine_srec_binary_and_debug_list(&srec_list, &srec_binary_list, &srec_debug_list);
+    merge_srec_debug(&srec_list, &srec_binary_list, &srec_debug_list);
     write_srec_list(&srec_list);
     return 0;
 }
