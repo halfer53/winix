@@ -171,7 +171,7 @@ void *memmove(void *dest, const void *src, size_t n)
 }
 
 
-// unsigned int
+// unsigned long
 // strtoul(nptr, endptr, base)
 // 	const char *nptr;
 // 	char **endptr;
