@@ -197,7 +197,11 @@ int write_srec_to_disk(char* path, struct arguments* arguments){
     {
         if ( dp->d_type == DT_REG )
         {
+#ifdef __wramp__
             char *dot = char32_index(dp->d_name, '.');
+#else
+            char *dot = index(dp->d_name, '.');
+#endif
             char *extension_name = dot + 1;
             snprintf(filename_qfd, PATH_LEN, "%s/%s", path, dp->d_name);
 
