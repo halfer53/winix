@@ -7,12 +7,10 @@ STDLIB = "lib/stdlib/"
 GEN = "lib/gen/"
 POSIX = "lib/posix/"
 SIGNAL = "lib/posix/_sigset.o"
-UTIL ="lib/util/"
 STDIO ="lib/stdio/"
 SYSCALL = "lib/syscall/"
 STRING = "lib/ansi/string.o"
 STRL = "lib/ansi/strl.o"
-DEBUG = "lib/util/debug.o"
 REGEX = "lib/regex/"
 IPC = "lib/ipc/"
 
@@ -23,7 +21,6 @@ built_in = {
 	"ucontext.h": set([GEN]),
 	"unistd.h": set([POSIX, ANSI, STDLIB]),
 	"stdio.h":	set([STDIO, STDLIB]),
-	"debug.h":	set([DEBUG]),
 	"dirent.h":	set([POSIX, ANSI, STDLIB]),
 	"regexp.h": set([REGEX]),
 	"sys/ipc.h": set([IPC])
