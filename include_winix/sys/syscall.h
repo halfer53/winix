@@ -21,6 +21,7 @@
 #include <sys/dirent.h>
 #include <sys/statfs.h>
 #include <sys/times.h>
+#include <sys/debug.h>
 #include <signal.h>
 #include <stdio.h>
 #include <errno.h>
