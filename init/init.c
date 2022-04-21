@@ -9,6 +9,7 @@
 #include <sys/ipc.h>
 #include <fs/common.h>
 #include <sys/ioctl.h>
+#include <stdlib.h>
 
 char shell_path[] = "/bin/bash";
 char *shell_argv[] = {
