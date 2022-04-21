@@ -31,4 +31,11 @@ int char32_strcmp(const char32_t *s1, const char *s2) {
     return (int)(*s1 - *s2);
 }
 
+char *char32_index(const char32_t *string, int c){
+    const char32_t *s = string;
+    while(*s && *s != c)
+        s++;
+    return (char *)(unsigned long)(*s ? s : NULL);
+}
+
 

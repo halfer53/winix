@@ -73,5 +73,6 @@ int run_unit_tests();
 int char32_strcmp(const char32_t *s1, const char *s2);
 int char32_strlen(const char32_t *s);
 char32_t *char32_strlcpy(char32_t *dest, const char *src, size_t n);
+char *char32_index(const char32_t *string, int c);
 
 #endif //FS_FS_METHODS_H_
