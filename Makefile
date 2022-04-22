@@ -91,7 +91,7 @@ endif
 buildlib:
 	$(Q)$(MAKE) $(build)=lib
 
-kbuild: $(ALLDIR)
+kbuild: $(ALLDIR) fsutil
 $(ALLDIR): FORCE
 	$(Q)$(MAKE) $(build)=$@
 
