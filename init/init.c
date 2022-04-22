@@ -1,15 +1,12 @@
-#include <sys/syscall.h>
 #include <stdio.h>
 #include <signal.h>
-#include <sys/debug.h>
-#include <stddef.h>
 #include <errno.h>
+#include <fcntl.h>
+#include <stdlib.h>
+#include <unistd.h>
 #include <sys/tty.h>
-#include <sys/fcntl.h>
-#include <sys/ipc.h>
 #include <fs/common.h>
 #include <sys/ioctl.h>
-#include <stdlib.h>
 
 char shell_path[] = "/bin/bash";
 char *shell_argv[] = {

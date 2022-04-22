@@ -130,8 +130,6 @@ int access(const char *pathname, int mode);
 int chdir(const char *path);
 int mkdir(const char *pathname, mode_t mode);
 int getdents( int fd, struct dirent *dirp, unsigned int count);
-int execve(const char *pathname, char *const argv[],char *const envp[]);
-int execv(const char *path, char *const argv[]);
 off_t lseek(int fd, off_t offset, int whence);
 mode_t umask(mode_t mask);
 int sync();
@@ -191,7 +189,6 @@ void sched_yield();
 #define umask(mask)                 (wramp_syscall(UMASK, mask))
 #define alarm(seconds)              (wramp_syscall(ALARM, seconds))
 #define csleep(ticks)               (wramp_syscall(CSLEEP, ticks))
-#define execve(path, argv, envp)    (wramp_syscall(EXECVE, path, argv, envp))
 #define fork()                      (wramp_syscall(FORK))
 #define getpgid(pid)                (wramp_syscall(GETPGID, pid))
 #define getpid()                    (wramp_syscall(GETPID))
@@ -223,7 +220,6 @@ void sched_yield();
 
 #endif //_SYSTEM
 
-#define execv(path, argv)       execve(path, argv, __get_env()) 
 #define perror(s)               dprintf(STDERR_FILENO, "%s: %s\n", s, strerror(errno))
 
 #endif //__wramp__

@@ -16,7 +16,18 @@
 
 #include <errno.h>
 #include <signal.h>
-#include <stddef.h>
+
+#ifdef __wramp__
+
+#define execve(path, argv, envp)    (wramp_syscall(EXECVE, path, argv, envp))
+#define execv(path, argv)       execve(path, argv, __get_env()) 
+
+#else
+
+int execve(const char *pathname, char *const argv[],char *const envp[]);
+int execv(const char *path, char *const argv[]);
+
+#endif
 
 int isatty(int fd);
 
