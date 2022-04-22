@@ -57,7 +57,6 @@ UNIT_TEST = unittest
 FSUTIL = fsutil
 
 all:
-	$(Q)$(MAKE) fsutil
 	$(Q)$(MAKE) buildlib
 	$(Q)$(MAKE) kbuild
 	$(Q)$(MAKE) $(DISK)
