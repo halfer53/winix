@@ -149,7 +149,7 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
         int i, ret, cmd_start;
         int exit_code = 0;
         int pipe_fds[10];
-        int *pipe_ptr, *prev_pipe_ptr;
+        int *pipe_ptr, *prev_pipe_ptr = NULL;
 
         ret = setpgid(0, 0);
         last_pgid = getpgid(0);
@@ -170,18 +170,14 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
 
         for(i = 0; i < cmd->numCommands; i++){
             cmd_start = cmd->cmdStart[i];
+            pipe_ptr = &pipe_fds[(i * 2)];
             if(search_path(buffer, BUFFER_LEN, cmd->argv[cmd_start]) == 0){
-                pipe_ptr = &pipe_fds[(i * 2)];
-                
                 if((i < cmd->numCommands - 1)){ // not the last command, create new pipe
                     ret = pipe(pipe_ptr);
                     if(ret){
                         perror("pipe");
                         exit(1);
                     }
-                    // fcntl(pipe_ptr[PIPE_READ], F_SETFL, O_NONBLOCK);
-                    // printf("pipeptr %x ret %d %d\n", pipe_ptr, pipe_ptr[PIPE_READ], pipe_ptr[PIPE_WRITE]);
-
                 }else if(cmd->outfile){ //if redirecting output and last command
                     int mode = O_WRONLY | O_CREAT;
                     if(cmd->append) //if append
@@ -194,10 +190,10 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
                 }
 
                 if(tfork() == 0){ // child, actual command
+                    pipe_ptr = &pipe_fds[(i * 2)];
+                    prev_pipe_ptr = &pipe_fds[((i-1) * 2)];
                     if(cmd->numCommands > 1){
-                        
                         if((i+1) < cmd->numCommands ){ // not the last command
-                            pipe_ptr = &pipe_fds[(i * 2)];
                             dup2(pipe_ptr[PIPE_WRITE], STDOUT_FILENO);
                             close(pipe_ptr[PIPE_WRITE]);
                             close(pipe_ptr[PIPE_READ]);
@@ -206,7 +202,6 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
                         // printf("cmd %d %s com %d, res %d\n", i, buffer,  cmd->numCommands, (i+1) < cmd->numCommands);
 
                         if(i > 0){ // not the first command, read previous pipe
-                            prev_pipe_ptr = &pipe_fds[((i - 1) * 2)];
                             dup2(prev_pipe_ptr[PIPE_READ], STDIN_FILENO);
                             close(prev_pipe_ptr[PIPE_READ]);
                             close(prev_pipe_ptr[PIPE_WRITE]);
@@ -214,10 +209,12 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
                         }
                     }
                     cmd_start = cmd->cmdStart[i];
-                    execv(buffer, &cmd->argv[cmd_start]);
+                    ret = execv(buffer, &cmd->argv[cmd_start]);
+                    if(ret){
+                        perror("execv");
+                    }
                     exit(1);
                 }else if( i > 0 ){
-                    prev_pipe_ptr = &pipe_fds[((i - 1) * 2)];
                     close(prev_pipe_ptr[PIPE_READ]);
                     close(prev_pipe_ptr[PIPE_WRITE]);
                 }
@@ -227,6 +224,7 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
                 exit_code = 1;
                 break;
             }
+            prev_pipe_ptr = pipe_ptr;
         }
 
         while(1){
@@ -250,7 +248,7 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
     ioctl(STDIN_FILENO, TIOCENABLEECHO);
     ioctl(STDIN_FILENO, TIOCSPGRP, &pgid);
 #endif
-    return 0;
+    return WEXITSTATUS(status);
 }
 
 int exec_cmd(char *line){
@@ -338,7 +336,12 @@ int help(int argc, char** argv){
 
 int do_stest(int argc, char** argv){
     static char test_str[] = "ls -lah bin | grep snake | wc | cat";
-    exec_cmd(test_str);
+    int i, ret;
+    for(i = 0; i < 10; i++){
+        if(ret = exec_cmd(test_str)){
+            break;
+        }
+    }
     return 0;
 }
 

@@ -436,12 +436,12 @@ int bitmap_xor(unsigned int *map1, unsigned int *map2, int map_len){
  * @param p   
  * @param len 
  */
-void kreport_bitmap(unsigned int *p, int len){
+void _kreport_bitmap(unsigned int *p, int len, int (*func) (const char *, ...)){
     int i;
     for( i = 0; i < len; i++){
-        kprintf("0x%08x ",*p++);
+        func("0x%08x ",*p++);
         if((i+1) % 8 == 0)
             kprintf("\n");
     }
-    kprintf("\n");
+    func("\n");
 }

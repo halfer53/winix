@@ -450,6 +450,12 @@ int proc_memctl(struct proc* who ,vptr_t* page_addr, int flags){
     return ERR;
 }
 
+bool peek_mem_welf(struct winix_elf* elf, int stack_size, int heap_size){
+    int td_aligned = align_page(elf->binary_size + elf->bss_size);
+    int proc_len = stack_size + td_aligned + heap_size;
+    return (bool)(peek_free_pages(proc_len, GFP_NORM) >= 0);
+}
+
 int alloc_mem_welf(struct proc* who, struct winix_elf* elf, int stack_size, int heap_size){
     int vm_offset = elf->binary_offset;
     int proc_len;
@@ -470,6 +476,9 @@ int alloc_mem_welf(struct proc* who, struct winix_elf* elf, int stack_size, int 
     mem_start = user_get_free_pages(who, proc_len, GFP_NORM);
     if(mem_start == NULL)
         return ENOMEM;
+    // klog("welf alloc ret 0x%x, len %d\n", mem_start, proc_len);
+    // _kreport_bitmap(who->ctx.ptable, MEM_MAP_LEN, kprintf2);
+    // _kreport_memtable(kprintf2);
     who->ctx.rbase = mem_start + stack_size - vm_offset;
 
     // for information on how process memory are structured, 

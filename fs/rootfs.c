@@ -139,7 +139,7 @@ static int buffered_flush_block(struct block_buffer *buf){
 }
 
 static int buffered_release_block(struct block_buffer *buf){
-    release_pages((ptr_t *)buf->block, 1);
+    release_pages((ptr_t *)buf->block, PAGE_LEN);
     return 0;
 }
 static struct block_operations bops = {buffered_init_block, buffered_retrieve_block, buffered_flush_block, buffered_release_block};
