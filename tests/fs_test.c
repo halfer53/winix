@@ -545,7 +545,7 @@ void test_given_dev_dup_when_file_is_driver_should_return_from_driver(){
     int ret = sys_mknod(current, TTY_PATH, O_RDWR, TTY_DEV);
     assert(ret == 0);
 
-    int fd = sys_current, TTY_PATH, O_EXCL | O_RDWR, 0);
+    int fd = sys_open(current, TTY_PATH, O_EXCL | O_RDWR, 0);
     assert(fd == 0);
 
     int fd2 = sys_dup2(current, fd, 1);
