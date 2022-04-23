@@ -101,7 +101,7 @@ int filp_open(struct proc* who, struct filp** _filp, char *path, int flags, mode
     if ((ret = inode->i_dev->fops->open(inode->i_dev, filp)))
         goto final;
     *_filp = filp;
-    KDEBUG(("Open: path %s Last dir %d, ret inode %d dev %u\n", path, lastdir->i_num, inode->i_num, inode->i_dev->dev_id));
+    // KDEBUG(("Open: path %s Last dir %d, ret inode %d dev %u\n", path, lastdir->i_num, inode->i_num, inode->i_dev->dev_id));
 
 final:
     put_inode(lastdir, is_new);
