@@ -56,11 +56,59 @@ void test_given_open_when_flag_is_o_create_should_return_0(){
     reset_fs();
 }
 
+
+void test_given_open_when_openned_max_exceeds_should_return_emfile(){
+    int ret;
+    int i;
+
+    for (i = 0; i < OPEN_MAX; i++){
+        ret = sys_open(curr_scheduling_proc, "/", O_RDONLY, 0);
+        assert(i >= 0);
+    }
+    ret = sys_open(curr_scheduling_proc, "/", O_RDONLY, 0);
+    assert(ret == EMFILE);
+
+    reset_fs();
+}
+
+void test_given_open_when_openned_exceeds_system_limit_should_return_enfile(){
+    int ret;
+    struct proc p2, p3;
+    int i;
+    emulate_fork(curr_scheduling_proc, &p2);
+    emulate_fork(curr_scheduling_proc, &p3);
+
+    for (i = 0; i < OPEN_MAX; i++){
+        ret = sys_open(curr_scheduling_proc, "/", O_RDONLY, 0);
+        assert(i >= 0);
+    }
+    for (i = 0; i < OPEN_MAX; i++){
+        ret = sys_open(&p2, "/", O_RDONLY, 0);
+        assert(ret >= 0);
+    }
+    ret = sys_open(&p3, "/", O_RDONLY, 0);
+    assert(ret == ENFILE);
+
+    reset_fs();
+}
+
 void test_given_creat_when_file_not_present_should_return_0(){
     int fd;
     
     fd = sys_creat(curr_scheduling_proc, FILE1 , O_RDWR);
     assert(fd == 0);
+
+    reset_fs();
+}
+
+void test_given_creat_when_file_present_should_return_eexist(){
+    int fd;
+    
+    fd = sys_creat(curr_scheduling_proc, FILE1 , O_RDWR);
+    assert(fd == 0);
+
+    fd = sys_creat(curr_scheduling_proc, FILE1 , O_RDWR);
+    assert(fd == EEXIST);
 
     reset_fs();
 }
@@ -184,40 +232,6 @@ void test_given_read_when_open_and_closing_file_should_persistted_data(){
 }
 
 
-void test_given_open_when_openned_max_exceeds_should_return_emfile(){
-    int ret;
-    int i;
-
-    for (i = 0; i < OPEN_MAX; i++){
-        ret = sys_open(curr_scheduling_proc, "/", O_RDONLY, 0);
-        assert(i >= 0);
-    }
-    ret = sys_open(curr_scheduling_proc, "/", O_RDONLY, 0);
-    assert(ret == EMFILE);
-
-    reset_fs();
-}
-
-void test_given_open_when_openned_exceeds_system_limit_should_return_enfile(){
-    int ret;
-    struct proc p2, p3;
-    int i;
-    emulate_fork(curr_scheduling_proc, &p2);
-    emulate_fork(curr_scheduling_proc, &p3);
-
-    for (i = 0; i < OPEN_MAX; i++){
-        ret = sys_open(curr_scheduling_proc, "/", O_RDONLY, 0);
-        assert(i >= 0);
-    }
-    for (i = 0; i < OPEN_MAX; i++){
-        ret = sys_open(&p2, "/", O_RDONLY, 0);
-        assert(ret >= 0);
-    }
-    ret = sys_open(&p3, "/", O_RDONLY, 0);
-    assert(ret == ENFILE);
-
-    reset_fs();
-}
 
 
 void test_given_access_when_file_not_exist_should_return_enoent(){
