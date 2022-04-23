@@ -6,12 +6,14 @@
 #include <winix/list.h>
 #include <winix/ksignal.h>
 #include <winix/mm.h>
+#include <limits.h>
 
 struct device pipe_dev;
 static const char* name = "pipe";
 static ino_t next_inum = 2;
 static dev_t pipe_devid = MAKEDEV(2, 1);
 #define PIPE_LIMIT  (PAGE_LEN)
+#define PIPE_INODE_INUM (INT_MAX)
 
 struct pipe_waiting{
     struct proc* who;
@@ -36,7 +38,7 @@ int set_filp(struct proc* who, struct filp** _file, struct inode* inode){
     ret = get_fd(who, 0, &open_slot, file);
     if(ret)
         return ret;
-        
+
     *_file = file;
     return open_slot;
 }
@@ -72,13 +74,13 @@ int sys_pipe(struct proc* who, int fd[2]){
 
     inode = get_free_inode_slot();
     if(!inode){
-        ret = EMFILE;
+        ret = ENFILE;
         goto failed_filp_slot;
     }
     inode->flags |= INODE_FLAG_PIPE;
     inode->i_count = 2;
     inode->i_nlinks = 1;
-    init_inode_non_disk(inode, get_next_ino(), &pipe_dev, NULL);
+    init_inode_non_disk(inode, PIPE_INODE_INUM, &pipe_dev, NULL);
 
     ret1 = set_filp(who, &file1, inode);
     if(ret1 < 0){
