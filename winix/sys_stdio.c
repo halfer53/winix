@@ -316,7 +316,7 @@ int kprintf_vm( struct filp* file, const char *orignal_format, void *arg, struct
 
             padding_len = pass_number(&format);
 
-            if(*format == 'l'){
+            if(*format == 'l' || *format == 'z'){
                 format++;
                 //ignore
             }
@@ -324,6 +324,7 @@ int kprintf_vm( struct filp* file, const char *orignal_format, void *arg, struct
             switch(*format) {
                 
                 case 'd':
+                case 'u':
                     format_buf_len = kputd_buf(*((int*)arg),format_ptr);
                     break;
 
