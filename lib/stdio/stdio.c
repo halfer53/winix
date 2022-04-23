@@ -1,6 +1,6 @@
 #include <lib.h>
 
-#define BUFFER_SIZ  (100)
+#define BUFFER_SIZ  (500)
 
 int putchar(const char c){
     if(printf("%c",c))
