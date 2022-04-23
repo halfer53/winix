@@ -183,6 +183,42 @@ void test_given_read_when_open_and_closing_file_should_persistted_data(){
     reset_fs();
 }
 
+
+void test_given_open_when_openned_max_exceeds_should_return_emfile(){
+    int ret;
+    int i;
+
+    for (i = 0; i < OPEN_MAX; i++){
+        ret = sys_open(curr_scheduling_proc, "/", O_RDONLY, 0);
+        assert(i >= 0);
+    }
+    ret = sys_open(curr_scheduling_proc, "/", O_RDONLY, 0);
+    assert(ret == EMFILE);
+
+    reset_fs();
+}
+
+void test_given_open_when_openned_exceeds_system_limit_should_return_enfile(){
+    int ret;
+    struct proc p2, p3;
+    int i;
+    emulate_fork(curr_scheduling_proc, &p2);
+    emulate_fork(curr_scheduling_proc, &p3);
+
+    for (i = 0; i < OPEN_MAX; i++){
+        ret = sys_open(curr_scheduling_proc, "/", O_RDONLY, 0);
+        assert(i >= 0);
+    }
+    for (i = 0; i < OPEN_MAX; i++){
+        ret = sys_open(&p2, "/", O_RDONLY, 0);
+        assert(ret >= 0);
+    }
+    ret = sys_open(&p3, "/", O_RDONLY, 0);
+    assert(ret == ENFILE);
+
+    reset_fs();
+}
+
 void _init_pipe(int pipe_fd[2], struct proc* pcurr2){
     int ret;
     pcurr2->pid = 2;
@@ -731,38 +767,4 @@ void test_given_open_when_flag_write_and_path_directory_should_return_eisdir(){
     assert(ret == EISDIR);
 }
 
-void test_given_open_when_openned_max_exceeds_should_return_emfile(){
-    int ret;
-    int i;
-
-    for (i = 0; i < OPEN_MAX; i++){
-        ret = sys_open(curr_scheduling_proc, "/", O_RDONLY, 0);
-        assert(i >= 0);
-    }
-    ret = sys_open(curr_scheduling_proc, "/", O_RDONLY, 0);
-    assert(ret == EMFILE);
-
-    reset_fs();
-}
-
-void test_given_open_when_openned_exceeds_system_limit_should_return_enfile(){
-    int ret;
-    struct proc p2, p3;
-    int i;
-    emulate_fork(curr_scheduling_proc, &p2);
-    emulate_fork(curr_scheduling_proc, &p3);
-
-    for (i = 0; i < OPEN_MAX; i++){
-        ret = sys_open(curr_scheduling_proc, "/", O_RDONLY, 0);
-        assert(i >= 0);
-    }
-    for (i = 0; i < OPEN_MAX; i++){
-        ret = sys_open(&p2, "/", O_RDONLY, 0);
-        assert(ret >= 0);
-    }
-    ret = sys_open(&p3, "/", O_RDONLY, 0);
-    assert(ret == ENFILE);
-
-    reset_fs();
-}
 
