@@ -2,7 +2,7 @@
 #define _UNIT_TEST_H_
 
 #include <stdbool.h>
-#include <winix/comm.h>
+#include <winix/page.h>
 
 #define TTY_RETURN  (1088)
 
