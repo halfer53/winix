@@ -51,7 +51,7 @@ int sys_pipe(struct proc* who, int fd[2]){
     struct filp_pipe* pipe;
     char* ptr;
 
-    ptr = (char *)get_free_pages(1, GFP_HIGH);
+    ptr = (char *)get_free_pages(PAGE_LEN, GFP_HIGH);
     if(!ptr)
         return ENOMEM;
 
@@ -111,7 +111,7 @@ int sys_pipe(struct proc* who, int fd[2]){
     kfree(pipe);
 
     failed_filp_pipe:
-    release_pages((ptr_t *)ptr, 1);
+    release_pages((ptr_t *)ptr, PAGE_LEN);
     return ret;
 }
 
@@ -315,7 +315,7 @@ int pipe_close ( struct device* dev, struct filp *file){
         }
         if(ino->i_count == 0){
             // KDEBUG(("Releasing pipe %d\n", file->filp_ino->i_num));
-            release_pages((ptr_t *)file->pipe->data, 1);
+            release_pages((ptr_t *)file->pipe->data, PAGE_LEN);
             kfree(file->pipe);
             
             // release inode
