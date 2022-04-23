@@ -178,7 +178,8 @@ int build_user_stack(struct proc* who, struct string_array* argv, struct string_
 }
 
 int exec_welf(struct proc* who, char* path, char *argv[], char *envp[], bool is_new){
-    int ret, fd;
+    int ret;
+    struct filp* filp;
     bool has_enough_ram;
     struct winix_elf elf;
     struct string_array argv_copy, envp_copy;
@@ -192,13 +193,12 @@ int exec_welf(struct proc* who, char* path, char *argv[], char *envp[], bool is_
     if (ret = copy_stirng_array(&envp_copy, envp, who, is_new))
         goto err_env;
 
-    fd = sys_open(who, path, O_RDONLY | O_DIRECT, 0);
-    if(fd < 0){
-        ret = fd;
+    ret = filp_open(who, &filp, path, O_RDONLY | O_DIRECT, 0);
+    if(ret){
         goto err_open;
     }
         
-    ret = sys_read(who, fd, &elf, sizeof(elf));
+    ret = filp_read(who, filp, &elf, sizeof(elf));
     if (ret != sizeof(elf)){
         kwarn("welf %s read fail %d\n", path, ret);
         ret = EIO;
@@ -226,7 +226,7 @@ int exec_welf(struct proc* who, char* path, char *argv[], char *envp[], bool is_
     // KDEBUG(("elf %s %x %x size: %d %d %d %d\n", path, elf.binary_offset, elf.binary_pc,
         // elf.binary_size, elf.text_size, elf.data_size, elf.bss_size));
 
-    ret = sys_read(who, fd, who->ctx.rbase + elf.binary_offset, elf.binary_size);
+    ret = filp_read(who, filp, who->ctx.rbase + elf.binary_offset, elf.binary_size);
     if(ret != elf.binary_size){
         if (ret >= 0)
             ret = EAGAIN;
@@ -240,7 +240,7 @@ int exec_welf(struct proc* who, char* path, char *argv[], char *envp[], bool is_
     goto final;
     
 final:
-    sys_close(who, fd);
+    filp_close(filp);
 err_open:
     // KDEBUG(("freeing envp\n"));
     kfree_string_array(&envp_copy);
