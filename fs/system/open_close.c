@@ -38,7 +38,7 @@ int alloc_inode_under_dir(struct proc* who, struct device* dev, inode_t** _inode
     return OK;
 }
 
-int open_filp(struct proc* who, struct filp** _filp, char *path, int flags, mode_t mode){
+int filp_open(struct proc* who, struct filp** _filp, char *path, int flags, mode_t mode){
     filp_t *filp;
     int ret;
     inode_t *inode = NULL, *lastdir = NULL;
@@ -101,7 +101,7 @@ int open_filp(struct proc* who, struct filp** _filp, char *path, int flags, mode
     if ((ret = inode->i_dev->fops->open(inode->i_dev, filp)))
         goto final;
     *_filp = filp;
-    // KDEBUG(("Open: path %s Last dir %d, ret inode %d\n", path, lastdir->i_num, inode->i_num));
+    KDEBUG(("Open: path %s Last dir %d, ret inode %d dev %u\n", path, lastdir->i_num, inode->i_num, inode->i_dev->dev_id));
 
 final:
     put_inode(lastdir, is_new);
@@ -112,7 +112,7 @@ int sys_open(struct proc *who, char *path, int flags, mode_t mode)
 {
     int open_slot, ret;
     struct filp* filp;
-    ret = open_filp(who, &filp, path, flags, mode);
+    ret = filp_open(who, &filp, path, flags, mode);
     if(ret)
         return ret;
     if ((ret = get_fd(who, 0, &open_slot, filp)))
