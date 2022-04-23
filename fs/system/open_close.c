@@ -34,7 +34,9 @@ int alloc_inode_under_dir(struct proc* who, struct device* dev, inode_t** _inode
     return OK;
 }
 
-#define IS_NEW_FILE(inode, string) (!inode && *string != '\0')
+filp_t* open_filp(struct proc* who, char *path, int flags, mode_t mode){
+
+}
 
 int sys_open(struct proc *who, char *path, int flags, mode_t mode)
 {
@@ -83,8 +85,11 @@ int sys_open(struct proc *who, char *path, int flags, mode_t mode)
             inode = lastdir;
         }
     }
-
-    if ((ret = get_fd(who, 0, &open_slot, &filp)))
+    filp = get_free_filp();
+    if (!filp)
+        return ENFILE;
+        
+    if ((ret = get_fd(who, 0, &open_slot, filp)))
         goto final;
 
     if(flags & O_TRUNC)

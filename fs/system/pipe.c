@@ -29,9 +29,15 @@ ino_t get_next_ino(){
 
 int set_filp(struct proc* who, struct filp** _file, struct inode* inode){
     int ret, open_slot;
-    ret = get_fd(who, 0, &open_slot, _file);
+    struct filp* file = get_free_filp();
+    if (!file)
+        return ENFILE;
+    
+    ret = get_fd(who, 0, &open_slot, file);
     if(ret)
         return ret;
+        
+    *_file = file;
     return open_slot;
 }
 

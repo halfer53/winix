@@ -10,7 +10,11 @@ int sys_dup(struct proc* who, int oldfd){
     if(!is_fd_opened_and_valid(who, oldfd))
         return EBADF;
 
-    ret = get_fd(who, 0, &open_slot, &file2);
+    file2 = get_free_filp();
+    if(!file2)
+        return ENFILE;
+
+    ret = get_fd(who, 0, &open_slot, file2);
     if(ret)
         return ret;
 
@@ -29,7 +33,11 @@ int sys_dup2(struct proc* who, int oldfd, int newfd){
     if(newfd < 0 || newfd >= OPEN_MAX)
         return EBADF;
     
-    ret = get_fd(who, 0, &open_slot, &file2);
+    file2 = get_free_filp();
+    if (!file2)
+        return ENFILE;
+    
+    ret = get_fd(who, 0, &open_slot, file2);
     if(ret)
         return ret;
     if(who->fp_filp[newfd]){

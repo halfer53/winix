@@ -3,10 +3,9 @@
 
 static filp_t fd_table[NR_FILPS];
 
-int get_fd(struct proc *curr, int start, int *open_slot, filp_t **fpt){
+int get_fd(struct proc *curr, int start, int *open_slot, filp_t *fpt){
     int i;
     bool found = false;
-    filp_t *f;
 
     for( i=start; i< OPEN_MAX; i++){
         if(curr->fp_filp[i] == NIL_FILP){
@@ -19,16 +18,8 @@ int get_fd(struct proc *curr, int start, int *open_slot, filp_t **fpt){
     if(!found)
         return EMFILE;
 
-    for(i = 0; i < NR_FILPS; i++ ){
-        f = &fd_table[i];
-        if (f->filp_count == 0) {
-            memset(f,0, sizeof(struct filp));
-            f->filp_table_index = i;
-            *fpt = f;
-            return(OK);
-        }
-    }
-    return ENFILE;
+    fpt->filp_table_index = i;
+    return OK;
 }
 
 int init_filp_by_inode(struct filp* filp, struct inode* inode){
@@ -59,6 +50,7 @@ filp_t *get_free_filp(){
     for(i = 0; i < NR_FILPS; i++ ){
         rep = &fd_table[i];
         if(rep->filp_count == 0){
+            memset(rep, 0, sizeof(filp_t));
             return rep;
         }
     }
