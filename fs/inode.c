@@ -12,7 +12,7 @@ struct inode* get_free_inode_slot(){
     int i;
     for(i = 0; i < NR_INODES; i++ ){
         rep = &inode_table[i];
-        if(rep->i_num <= 0){
+        if(rep->i_num == 0){
             memset(rep, 0, sizeof(struct inode));
             return rep;
         }
@@ -131,6 +131,7 @@ int init_inode_non_disk(struct inode* ino, ino_t num, struct device* dev, struct
     ino->i_sb = sb;
     ino->i_num = num;
     ino->i_total_size = get_inode_total_size_word(ino);
+    // klog("init inode %d dev %u\n", num, dev->dev_id);
     if(sb){
         bnr = ((num * sb->s_inode_size) / BLOCK_SIZE) + sb->s_inode_tablenr;
         if(bnr * BLOCK_SIZE >= sb->s_inode_tablenr * BLOCK_SIZE + sb->s_inode_table_size){
@@ -202,7 +203,7 @@ inode_t* get_inode(int num, struct device* id){
             return rep;
         }
     }
-
+    
     ret = read_inode(num, &rep, id);
     if(ret){
         kwarn("ERR: read inode %d return %d\n", num, ret);
@@ -265,6 +266,9 @@ inode_t* alloc_inode(struct proc* who, struct device* parentdev, struct device* 
     put_block_buffer_dirt(imap);
 
     inode = get_free_inode_slot();
+    if (!inode)
+        return NULL;
+    
     init_inode_non_disk(inode, inum, inodev, sb);
     inode->i_gid = who->gid;
     inode->i_uid = who->uid;
