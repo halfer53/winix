@@ -724,3 +724,8 @@ void test_given_dev_dup_when_file_is_driver_should_return_from_driver(){
 
     reset_fs();
 }
+
+void test_given_open_when_flag_write_and_path_directory_should_return_eisdir(){
+    int ret = sys_open(curr_scheduling_proc, "/", O_WRONLY, 0);
+    assert(ret == EISDIR);
+}
