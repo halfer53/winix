@@ -17,7 +17,22 @@ int sys_close(struct proc *who, int fd)
     return OK;
 }
 
-int root_fs_write(struct filp *filp, char *data, size_t count, off_t offset);
+int alloc_inode_under_dir(struct proc* who, struct device* dev, inode_t** _inode, inode_t* lastdir, char string[DIRSIZ]){
+    inode_t* inode;
+    int ret;
+    dev = lastdir->i_dev;
+    inode = alloc_inode(who, dev, dev);
+    if (!inode)
+        return ENOSPC;
+    
+    if ((ret = add_inode_to_directory(who, lastdir, inode, string)))
+    {
+        release_inode(inode);
+        return ret;
+    }
+    *_inode = inode;
+    return OK;
+}
 
 #define IS_NEW_FILE(inode, string) (!inode && *string != '\0')
 
@@ -45,49 +60,40 @@ int sys_open(struct proc *who, char *path, int flags, mode_t mode)
         ret = EISDIR;
         goto final;
     }
-    
-    if (IS_NEW_FILE(inode, string))
-    {
+    dev = lastdir->i_dev;
+    if(!inode){
+        if (*string){ // if there still components left in path
+            if (!(flags & O_CREAT))
+            {
+                ret = ENOENT;
+                goto final;
+            }
+            if (ret = alloc_inode_under_dir(who, dev, &inode, lastdir, string))
+                goto final;
+            inode->i_mode = dev->device_type | (mode & ~(who->umask));
+            is_new = true;
 
-        if (!(flags & O_CREAT))
-        {
-            ret = ENOENT;
-            goto final;
+        }else{ // if no components left, then path refers to the directory
+            // if opening a directory with write access, EISDIR is returned
+            if (flags & O_WRONLY)
+            {
+                ret = EISDIR;
+                goto final;
+            }
+            inode = lastdir;
         }
-        dev = lastdir->i_dev;
-        inode = alloc_inode(who, dev, dev);
-        if (!inode)
-        {
-            ret = ENOSPC;
-            goto final;
-        }
-
-        if ((ret = add_inode_to_directory(who, lastdir, inode, string)))
-        {
-            release_inode(inode);
-            goto final;
-        }
-        inode->i_mode = dev->device_type | (mode & ~(who->umask));
-        is_new = true;
     }
 
     if ((ret = get_fd(who, 0, &open_slot, &filp)))
         goto final;
 
-    if (!inode && *string == '\0')
-    {
-        inode = lastdir;
-    }
-
-    if(flags & O_TRUNC){
+    if(flags & O_TRUNC)
         truncate_inode(inode);
-    }
 
     init_filp_by_inode(filp, inode);
     
-    if(flags & O_APPEND){
+    if(flags & O_APPEND)
         filp->filp_pos = inode->i_size;
-    }
     
     filp->filp_mode = mode;
     filp->filp_flags = flags;
