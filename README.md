@@ -78,7 +78,7 @@ Click ```Quick Load```, select ```winix.srec```
 sudo apt-get install xutils-dev gcc
 ```
 
-### Clone and   Compile
+### Clone and Compile
 
 ```shell
 git clone https://github.com/halfer53/winix.git
@@ -93,13 +93,15 @@ make
 
 Similar to linux kbuild, **Winix** supports verbose option, you can debug Makefile by setting verbose to 1
 
-```make V=1```
+```shell
+make V=1
+```
 
 ### Debug Kernel
 
-```kprintf()``` is your friend. 
+`kprintf()`: is your friend. 
 
-```trace```: " type trace in bash to print all the syscalls in serial port 2 
+`trace`: type trace in bash to print all the syscalls in serial port 2 
 
 
 ## Supported System Call
