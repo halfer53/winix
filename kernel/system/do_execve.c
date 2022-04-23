@@ -179,11 +179,11 @@ int build_user_stack(struct proc* who, struct string_array* argv, struct string_
 
 int exec_welf(struct proc* who, char* path, char *argv[], char *envp[], bool is_new){
     int ret, fd;
+    bool has_enough_ram;
     struct winix_elf elf;
     struct string_array argv_copy, envp_copy;
     struct proc* parent = get_proc(who->parent);
     struct message m;
-    unsigned int ptable_backup[PTABLE_LEN];
 
     memset(&m, 0, sizeof(m));
     if (ret = copy_stirng_array(&argv_copy, argv, who, is_new))
@@ -191,17 +191,6 @@ int exec_welf(struct proc* who, char* path, char *argv[], char *envp[], bool is_
     // KDEBUG(("copy argv string %d\n", argv_copy.size));
     if (ret = copy_stirng_array(&envp_copy, envp, who, is_new))
         goto err_env;
-    
-    if(!is_new){
-        who->sig_pending = 0;
-        if(who->parent > 0 && !(parent->state & STATE_VFORKING)){
-            release_proc_mem(who);
-        }
-        memcpy(&ptable_backup, who->ctx.ptable, PTABLE_LEN);
-        bitmap_clear(who->ctx.ptable, PTABLE_LEN);
-    }
-
-    who->thread_parent = 0;
 
     fd = sys_open(who, path, O_RDONLY | O_DIRECT, 0);
     if(fd < 0){
@@ -210,30 +199,46 @@ int exec_welf(struct proc* who, char* path, char *argv[], char *envp[], bool is_
     }
         
     ret = sys_read(who, fd, &elf, sizeof(elf));
-    if (ret != sizeof(elf))
-        goto err_elf_read;
+    if (ret != sizeof(elf)){
+        ret = EIO;
+        goto final;
+    }
+
+    has_enough_ram = peek_mem_welf(&elf, USER_STACK_SIZE, USER_HEAP_SIZE);
+    if (!has_enough_ram){
+        ret = ENOMEM;
+        goto final;
+    }
+
+    if(!is_new){
+        who->sig_pending = 0;
+        if(who->parent > 0 && !(parent->state & STATE_VFORKING)){
+            release_proc_mem(who);
+        }
+        bitmap_clear(who->ctx.ptable, PTABLE_LEN);
+    }
     
     ret = alloc_mem_welf(who, &elf, USER_STACK_SIZE, USER_HEAP_SIZE);
     if(ret)
-        goto err_elf_read;
+        goto final;
 
     // KDEBUG(("elf %s %x %x size: %d %d %d %d\n", path, elf.binary_offset, elf.binary_pc,
         // elf.binary_size, elf.text_size, elf.data_size, elf.bss_size));
 
     ret = sys_read(who, fd, who->ctx.rbase + elf.binary_offset, elf.binary_size);
-    if(ret != elf.binary_size)
-        goto err_read;
-    
+    if(ret != elf.binary_size){
+        if (ret >= 0)
+            ret = EAGAIN;
+        goto final;
+    }
+
+    who->thread_parent = 0;
     build_user_stack(who, &argv_copy, &envp_copy);
     proc_memctl(who, (void *)0, PROC_NO_ACCESS);
     ret = OK;
     goto final;
-
-err_read:
-    release_proc_mem(who);
     
 final:
-err_elf_read:
     sys_close(who, fd);
 err_open:
     // KDEBUG(("freeing envp\n"));
@@ -241,6 +246,7 @@ err_open:
 err_env:
     // KDEBUG(("freeing argv\n"));
     kfree_string_array(&argv_copy);
+
     if (trace_syscall || ret != OK){
         klog("%s[%d] execve() %s, return %s\n", who->name, who->pid, path, kstr_error(ret));
     }
@@ -248,8 +254,6 @@ err_env:
         who->state = STATE_RUNNABLE;
         enqueue_schedule(who);
         set_proc(who, (void (*)())(unsigned long)elf.binary_pc, path);
-    }else{
-        memcpy(who->ctx.ptable, ptable_backup, PTABLE_LEN);
     }
     
     if(!is_new){
