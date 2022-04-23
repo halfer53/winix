@@ -2,6 +2,8 @@
 #include <assert.h>
 #include <errno.h>
 #include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
 
 char DISK_RAW[DISK_SIZE];
 
@@ -89,6 +91,18 @@ void _assert(int expression, int line, char* filename) {
     }
 #pragma GCC diagnostic pop
 }
+
+void _panic(const char* str, const char* file) {
+    printf("\r\nPanic! ");
+
+    if(str)
+        printf("%s", str);
+
+    if(file)
+        printf(" in %s\n", file);
+    abort();
+}
+
 
 clock_t get_uptime(){
     return 0;
