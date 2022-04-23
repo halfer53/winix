@@ -20,7 +20,7 @@
 int atoi(char *str);
 
 const char *errlist[_NERROR] = {
-    0,			/* EGENERIC */    
+    "OK",			/* OK */    
     "EPERM",    /* EPERM */
     "ENOENT",    /* ENOENT */
     "ESRCH",    /* ESRCH */
@@ -68,6 +68,10 @@ const char* kstr_error(int err){
     if(err < 0){
         err = -err;
     }
+    if (err == DONTREPLY)
+        return "DONTREPLY";
+    if (err == SUSPEND)
+        return "SUSPEND";
     if(err < 0 || err >= _NERROR)
         return (const char*)0;
     return errlist[err];
