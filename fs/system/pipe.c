@@ -50,8 +50,9 @@ int sys_pipe(struct proc* who, int fd[2]){
     struct inode* inode;
     struct filp_pipe* pipe;
     char* ptr;
+    size_t pagelen = PAGE_LEN;
 
-    ptr = (char *)get_free_pages(PAGE_LEN, GFP_HIGH);
+    ptr = (char *)get_free_pages(pagelen, GFP_HIGH);
     if(!ptr)
         return ENOMEM;
 
