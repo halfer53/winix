@@ -1,6 +1,10 @@
 #include "../fs.h"
 #include <kernel/clock.h>
 
+int filp_close(struct filp* filp){
+    return filp->filp_dev->fops->close(filp->filp_dev, filp);
+}
+
 int sys_close(struct proc *who, int fd)
 {
     filp_t *filp;
@@ -10,7 +14,7 @@ int sys_close(struct proc *who, int fd)
 
     filp = who->fp_filp[fd];
 
-    ret = filp->filp_dev->fops->close(filp->filp_dev, filp);
+    ret = filp_close(filp);
     if (ret)
         return ret;
     who->fp_filp[fd] = NULL;
@@ -34,14 +38,9 @@ int alloc_inode_under_dir(struct proc* who, struct device* dev, inode_t** _inode
     return OK;
 }
 
-filp_t* open_filp(struct proc* who, char *path, int flags, mode_t mode){
-
-}
-
-int sys_open(struct proc *who, char *path, int flags, mode_t mode)
-{
+int open_filp(struct proc* who, struct filp** _filp, char *path, int flags, mode_t mode){
     filp_t *filp;
-    int open_slot, ret;
+    int ret;
     inode_t *inode = NULL, *lastdir = NULL;
     char string[DIRSIZ];
     struct device *dev;
@@ -50,20 +49,16 @@ int sys_open(struct proc *who, char *path, int flags, mode_t mode)
 
     if ((ret = eat_path(who, path, &lastdir, &inode, string)))
         return ret;
-
-    if (inode && (flags & O_EXCL) && (flags & O_CREAT))
-    {
-        ret = EEXIST;
-        goto final;
-    }
-
-    if (inode && (inode->i_mode & S_IFDIR) && (flags & O_WRONLY))
-    {
-        ret = EISDIR;
-        goto final;
-    }
     dev = lastdir->i_dev;
-    if(!inode){
+
+    if (inode){
+        if ((flags & O_EXCL) && (flags & O_CREAT))
+        {
+            ret = EEXIST;
+            goto final;
+        }
+
+    }else{
         if (*string){ // if there still components left in path
             if (!(flags & O_CREAT))
             {
@@ -85,12 +80,10 @@ int sys_open(struct proc *who, char *path, int flags, mode_t mode)
             inode = lastdir;
         }
     }
+    
     filp = get_free_filp();
     if (!filp)
         return ENFILE;
-        
-    if ((ret = get_fd(who, 0, &open_slot, filp)))
-        goto final;
 
     if(flags & O_TRUNC)
         truncate_inode(inode);
@@ -102,18 +95,34 @@ int sys_open(struct proc *who, char *path, int flags, mode_t mode)
     
     filp->filp_mode = mode;
     filp->filp_flags = flags;
-    who->fp_filp[open_slot] = filp;
+    
     inode->i_atime = unix_time;
 
     if ((ret = inode->i_dev->fops->open(inode->i_dev, filp)))
         goto final;
-
-    ret = open_slot;
+    *_filp = filp;
     // KDEBUG(("Open: path %s Last dir %d, ret inode %d\n", path, lastdir->i_num, inode->i_num));
 
 final:
     put_inode(lastdir, is_new);
     return ret;
+}
+
+int sys_open(struct proc *who, char *path, int flags, mode_t mode)
+{
+    int open_slot, ret;
+    struct filp* filp;
+    ret = open_filp(who, &filp, path, flags, mode);
+    if(ret)
+        return ret;
+    if ((ret = get_fd(who, 0, &open_slot, filp)))
+    {
+        filp_close(filp);
+        return ret;
+    }
+
+    who->fp_filp[open_slot] = filp;
+    return open_slot;
 }
 
 int sys_creat(struct proc *who, char *path, mode_t mode)
