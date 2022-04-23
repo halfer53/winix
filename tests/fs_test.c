@@ -1,5 +1,6 @@
 #include "../fs/fs.h"
 #include "unit_test.h"
+#include "../fs/mock/mock.h"
 #include <assert.h>
 #include <signal.h>
 
@@ -717,7 +718,7 @@ void test_given_dev_dup_when_file_is_driver_should_return_from_driver(){
     assert(ret == TTY_RETURN);
 
     ret = sys_close(curr_scheduling_proc, fd);
-    assert(ret == TTY_RETURN);
+assert(ret == TTY_RETURN);
 
     ret = sys_close(curr_scheduling_proc, fd2);
     assert(ret == TTY_RETURN);
@@ -729,3 +730,23 @@ void test_given_open_when_flag_write_and_path_directory_should_return_eisdir(){
     int ret = sys_open(curr_scheduling_proc, "/", O_WRONLY, 0);
     assert(ret == EISDIR);
 }
+
+void test_given_open_when_openned_exceeds_system_limit_should_return_enfile(){
+    int ret;
+    struct proc p2, p3;
+    int i;
+    emulate_fork(curr_scheduling_proc, &p2);
+    emulate_fork(curr_scheduling_proc, &p3);
+
+    for (i = 0; i < OPEN_MAX; i++){
+        ret = sys_open(curr_scheduling_proc, "/", O_RDONLY, 0);
+        assert(i >= 0);
+    }
+    for (i = 0; i < OPEN_MAX; i++){
+        ret = sys_open(&p2, "/", O_RDONLY, 0);
+        assert(ret >= 0);
+    }
+    ret = sys_open(&p3, "/", O_RDONLY, 0);
+    assert(ret == ENFILE);
+}
+
