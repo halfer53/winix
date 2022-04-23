@@ -5,7 +5,6 @@ int fill_dirent(inode_t* ino, struct winix_dirent* curr, const char* string);
 
 #define INODE_ARC_MAP_LEN   (8)
 inode_t inode_table[NR_INODES];
-unsigned int inode_arch_map[INODE_ARC_MAP_LEN];
 
 struct inode* get_free_inode_slot(){
     inode_t* rep;
@@ -146,23 +145,18 @@ int init_inode_non_disk(struct inode* ino, ino_t num, struct device* dev, struct
 void arch_inode(struct inode* ino){
     
 #ifdef __wramp__
-    int result = is_bit_on(inode_arch_map, INODE_ARC_MAP_LEN, ino->i_num);
-    if(!result){
-        ino->i_size /= 4;
-        bitmap_set_bit(inode_arch_map, INODE_ARC_MAP_LEN, ino->i_num);
-    }
-    // if(ino->i_num > 1){
-    //     KDEBUG(("arch %d ret %d %x\n", ino->i_num, result, inode_arch_map[0]));
-    // }
+    ino->i_size /= 4;
+    // KDEBUG(("arch %d \n", ino->i_num));
 #endif
     
 }
 
 void dearch_inode(struct inode* ino){
 
-// #ifdef __wramp__
-//     ino->i_size *= 4;
-// #endif
+#ifdef __wramp__
+    ino->i_size *= 4;
+    // KDEBUG(("dearch %d \n", ino->i_num));
+#endif
 }
 
 int read_inode(int num, struct inode** ret_ino, struct device* id){
@@ -230,6 +224,7 @@ int put_inode(inode_t *inode, bool is_dirty){
     buffer = get_block_buffer(inode->i_ndblock, inode->i_dev);
     dearch_inode(inode);
     memcpy(buffer->block + inode_block_offset, inode, INODE_DISK_SIZE);
+    arch_inode(inode);
     put_block_buffer_dirt(buffer);
     // KDEBUG(("put inode %d blk %d offset %d\n", inode->i_num, inode->i_ndblock, inode_block_offset));
     return OK;
@@ -274,7 +269,6 @@ inode_t* alloc_inode(struct proc* who, struct device* parentdev, struct device* 
     inode->i_uid = who->uid;
     inode->i_count += 1;
     inode->i_ctime = get_unix_time();
-    bitmap_set_bit(inode_arch_map, INODE_ARC_MAP_LEN, inum);
     // KDEBUG(("alloc ino set bit %d\n", inum));
     inode->i_ctime = unix_time;
     inode->i_mtime = unix_time;
@@ -455,7 +449,6 @@ void init_inode(){
         rep->i_num = 0;
         rep->i_count = 0;
     }
-    bitmap_clear(inode_arch_map, INODE_ARC_MAP_LEN);
 }
 
 
