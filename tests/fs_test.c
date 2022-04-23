@@ -731,6 +731,20 @@ void test_given_open_when_flag_write_and_path_directory_should_return_eisdir(){
     assert(ret == EISDIR);
 }
 
+void test_given_open_when_openned_max_exceeds_should_return_emfile(){
+    int ret;
+    int i;
+
+    for (i = 0; i < OPEN_MAX; i++){
+        ret = sys_open(curr_scheduling_proc, "/", O_RDONLY, 0);
+        assert(i >= 0);
+    }
+    ret = sys_open(curr_scheduling_proc, "/", O_RDONLY, 0);
+    assert(ret == EMFILE);
+
+    reset_fs();
+}
+
 void test_given_open_when_openned_exceeds_system_limit_should_return_enfile(){
     int ret;
     struct proc p2, p3;
@@ -748,5 +762,7 @@ void test_given_open_when_openned_exceeds_system_limit_should_return_enfile(){
     }
     ret = sys_open(&p3, "/", O_RDONLY, 0);
     assert(ret == ENFILE);
+
+    reset_fs();
 }
 
