@@ -116,9 +116,9 @@ struct mem_block *extend_heap(struct mem_block *first , size_t s)
         s = SLAB_HEADER_SIZE + 1;
     }
 
-    round_s = ALIGN1K_HB(s);
+    round_s = align_page(s);
     
-    ptr = get_free_pages(round_s / PAGE_LEN, GFP_HIGH);
+    ptr = get_free_pages(round_s, GFP_HIGH);
     if(!ptr){
         kerror("no mem left %d %d \n", s, round_s);
         return NULL;

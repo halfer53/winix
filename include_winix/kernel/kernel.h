@@ -57,7 +57,7 @@ extern unsigned int TEXT_END, DATA_END, BSS_END;
 
 #include <stdio.h>
 #define kprintf(...) printf(__VA_ARGS__)
-#define get_free_pages(num, flag)   kmalloc(num * PAGE_LEN)
+#define get_free_pages(num, flag)   kmalloc(num)
 #define release_pages(ptr, num)     kfree(ptr)
 #define klog(...)                   printf(__VA_ARGS__)
 #define kwarn(...)                  \
