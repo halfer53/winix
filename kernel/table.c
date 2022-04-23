@@ -12,9 +12,9 @@
 */
 
 struct boot_image boot_table[NUM_TASKS] = {
-    {"IDLE",   idle_main,           IDLE,       1,  MIN_PRIORITY,   50},
-    {"PARALLEL",   parallel_main,   PARALLEL,   1,  MIN_PRIORITY,   50},
-    {"SYSTEM", system_main,         SYSTEM,     64, MAX_PRIORITY, KERNEL_STACK_SIZE},
+    {"idle",   idle_main,           IDLE,       1,  MIN_PRIORITY,   50},
+    {"parallel",   parallel_main,   PARALLEL,   1,  MIN_PRIORITY,   50},
+    {"winix", system_main,         SYSTEM,     64, MAX_PRIORITY, KERNEL_STACK_SIZE},
 };
 
 // IDLE's process number must be the lowest
