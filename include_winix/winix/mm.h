@@ -17,6 +17,7 @@
 #include <kernel/proc.h>
 #include <winix/page.h>
 #include <winix/gfp.h>
+#include <winix/bitmap.h>
 
 void init_mem_table();
 
