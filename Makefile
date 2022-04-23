@@ -31,7 +31,7 @@ export INCLUDE_PATH := -I./include -I./include_winix
 export CURR_UNIX_TIME := $(shell date +%s)
 export WINIX_CFLAGS := -D__wramp__
 export COMMON_CFLAGS := -DTEXT_OFFSET=$(TEXT_OFFSET) -D_DEBUG 
-export CFLAGS := $(WINIX_CFLAGS) $(COMMON_CFLAGS)
+export CFLAGS := $(WINIX_CFLAGS) $(COMMON_CFLAGS) $(INCLUDE_PATH)
 export GCC_FLAG := -g -Wimplicit-fallthrough -Wsequence-point -Wswitch-default -Wswitch-unreachable \
 		-Wswitch-enum -Wstringop-truncation -Wbool-compare -Wtautological-compare -Wfloat-equal \
 		-Wshadow=global -Wpointer-arith -Wpointer-compare -Wcast-align -Wwrite-strings \
