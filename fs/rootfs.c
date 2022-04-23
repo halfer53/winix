@@ -158,7 +158,7 @@ int root_fs_read (struct filp *filp, char *data, size_t count, off_t offset){
 
     curr_fp_index = offset / BLOCK_SIZE;
     off = offset % BLOCK_SIZE;
-    fp_limit = (filp->filp_pos + count ) / BLOCK_SIZE;
+    fp_limit = (filp->filp_pos + count - 1) / BLOCK_SIZE;
     ino = filp->filp_ino;
 
     for( ; curr_fp_index <= fp_limit; curr_fp_index++){
@@ -171,7 +171,7 @@ int root_fs_read (struct filp *filp, char *data, size_t count, off_t offset){
         r = 0;
         if(filp->filp_flags & O_DIRECT){
             off += bnr * BLOCK_SIZE;
-            r = filp->filp_dev->dops->dev_read(data, off, len);
+            r = blk_dev_io_read(data, off, len);
             data += r;
         }else{
             char *p;
@@ -217,10 +217,10 @@ int root_fs_write (struct filp *filp, char *data, size_t count, off_t offset){
 
     curr_fp_index = offset / BLOCK_SIZE;
     off = offset % BLOCK_SIZE;
-    fp_limit = (filp->filp_pos + count ) / BLOCK_SIZE;
+    fp_limit = (filp->filp_pos + count - 1) / BLOCK_SIZE;
     ino = filp->filp_ino;
 
-    for( ; curr_fp_index <= fp_limit; curr_fp_index++){
+    for( ; curr_fp_index <= fp_limit && count > 0; curr_fp_index++){
         bnr = ino->i_zone[curr_fp_index];
         if(bnr == 0){
             if((bnr = alloc_block(ino, ino->i_dev)) > 0){
@@ -234,7 +234,7 @@ int root_fs_write (struct filp *filp, char *data, size_t count, off_t offset){
         r = 0;
         if(filp->filp_flags & O_DIRECT){
             off += bnr * BLOCK_SIZE;
-            r = filp->filp_dev->dops->dev_write(data, off, len);
+            r = blk_dev_io_write(data, off, len);
             data += r;
         } else{
             char *p;
