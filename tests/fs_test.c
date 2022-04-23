@@ -51,7 +51,7 @@ void _close_delete_file(int fd, char *name){
 void test_given_open_when_flag_is_o_create_should_return_0(){
     int fd;
     
-    fd = sys_open(current, FILE1 ,O_CREAT, O_RDWR);
+    fd = sys_open(current, FILE1 ,O_CREAT | O_RDWR, 0x755);
     assert(fd == 0);
 
     reset_fs();
@@ -122,7 +122,7 @@ void test_given_creat_when_file_present_should_return_eexist(){
 void test_given_close_when_file_closed_should_return_ebadf(){
     int fd, ret;
     
-    fd = sys_open(current, FILE1 ,O_CREAT, O_RDWR);
+    fd = sys_open(current, FILE1 ,O_CREAT | O_RDWR, 0x755);
     assert(fd == 0);
 
     _close_delete_file(fd, FILE1);
@@ -441,7 +441,7 @@ void test_given_chmod_stat_when_folder_present_should_return_0(){
 void test_given_getdents_when_no_files_in_folder_should_return_default_files(){
     struct dirent dir[5];
     int i;
-    int fd = sys_open(current, "/", 0, O_RDONLY);
+    int fd = sys_open(current, "/", O_RDONLY, 0);
     int ret = sys_getdents(current, fd, dir, 5);
     assert(ret == sizeof(struct dirent) * 2);
     for(i = 0; i < 2; i++){
@@ -495,7 +495,7 @@ void test_given_dev_open_when_file_is_driver_should_return_from_driver(){
 
     TTY_OPEN_CALLED = false;
 
-    int fd = sys_open(current, TTY_PATH, O_EXCL, O_RDWR);
+    int fd = sys_open(current, TTY_PATH, O_EXCL | O_RDWR, 0);
     assert(fd == 0);
     assert(TTY_OPEN_CALLED == true);
 
@@ -506,7 +506,7 @@ void test_given_dev_read_when_file_is_driver_should_return_from_driver(){
     int ret = sys_mknod(current, TTY_PATH, O_RDWR, TTY_DEV);
     assert(ret == 0);
 
-    int fd = sys_open(current, TTY_PATH, O_EXCL, O_RDWR);
+    int fd = sys_open(current, TTY_PATH, O_EXCL | O_RDWR, 0);
     assert(fd == 0);
 
     ret = sys_read(current, fd, buffer, 3);
@@ -519,7 +519,7 @@ void test_given_dev_write_when_file_is_driver_should_return_from_driver(){
     int ret = sys_mknod(current, TTY_PATH, O_RDWR, TTY_DEV);
     assert(ret == 0);
 
-    int fd = sys_open(current, TTY_PATH, O_EXCL, O_RDWR);
+    int fd = sys_open(current, TTY_PATH, O_EXCL | O_RDWR, 0);
     assert(fd == 0);
 
     ret = sys_write(current, fd, buffer, 3);
@@ -532,7 +532,7 @@ void test_given_dev_close_when_file_is_driver_should_return_from_driver(){
     int ret = sys_mknod(current, TTY_PATH, O_RDWR, TTY_DEV);
     assert(ret == 0);
 
-    int fd = sys_open(current, TTY_PATH, O_EXCL, O_RDWR);
+    int fd = sys_open(current, TTY_PATH, O_EXCL | O_RDWR, 0);
     assert(fd == 0);
 
     ret = sys_close(current, fd);
@@ -545,7 +545,7 @@ void test_given_dev_dup_when_file_is_driver_should_return_from_driver(){
     int ret = sys_mknod(current, TTY_PATH, O_RDWR, TTY_DEV);
     assert(ret == 0);
 
-    int fd = sys_open(current, TTY_PATH, O_EXCL, O_RDWR);
+    int fd = sys_current, TTY_PATH, O_EXCL | O_RDWR, 0);
     assert(fd == 0);
 
     int fd2 = sys_dup2(current, fd, 1);
