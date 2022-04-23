@@ -24,6 +24,7 @@ def generate(prototypes):
         print(f"    {proto}();")
         print(f"    printf(\"%s\\n\\n\", \"passed: {proto}\");")
         print()
+    print(f"    printf(\"%d tests passed\\n\", {len(prototypes)});")
     print("}")
 
 def main():
