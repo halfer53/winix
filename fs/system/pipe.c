@@ -333,10 +333,6 @@ int pipe_close ( struct device* dev, struct filp *file){
     return 0;
 }
 
-int pipe_dev_open(){
-    return 0;
-}
-
 
 static struct filp_operations pipe_fops = {pipe_open, pipe_read, pipe_write, pipe_close};
 
