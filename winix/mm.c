@@ -87,24 +87,41 @@ bool is_pages_free_from(ptr_t* addr, int size){
 }
 
 /**
+ * @brief peek free pages in the ram
+ * 
+ * @param length 
+ * @param flags 
+ * @return int 
+ */
+int peek_free_pages(int length, int flags){
+    int nstart;
+    int num = PADDR_TO_PAGED(length);
+    if(flags & GFP_HIGH){
+        nstart =  bitmap_search_reverse(mem_map, MEM_MAP_LEN, num);
+    }else{
+        nstart =  bitmap_search_from(mem_map, MEM_MAP_LEN, bss_page_end, num);
+    }
+    return nstart;
+}
+
+/**
  * get free pages from the system
  * @param  length length in words
  * @param  flags  High mem or Normal mem
  * @return        pointer to the start of the page, or Null if failed
  */
 ptr_t *get_free_pages(int length, int flags) {
-    int nstart;
     int num = PADDR_TO_NUM_PAGES(length);
-    if(flags & GFP_HIGH){
-        nstart =  bitmap_search_reverse(mem_map, MEM_MAP_LEN, num);
-    }else{
-        nstart =  bitmap_search_from(mem_map, MEM_MAP_LEN, bss_page_end, num);
-    }
-    
+    int nstart = peek_free_pages(length, flags);
+    ptr_t *ret;
+
     if (nstart >= 0){
         bitmap_set_nbits(mem_map, MEM_MAP_LEN, nstart, num);
-        return PAGE_TO_PADDR(nstart);
+        ret = PAGE_TO_PADDR(nstart);
+        // klog("return 0x%x length %d\n", ret, length);
+        return ret;
     }
+    
     return NULL;
 }
 
@@ -122,7 +139,7 @@ ptr_t* user_get_free_pages(struct proc* who, int length, int flags){
     ptr_t* p;
     int page_num;
 
-    p = get_free_pages(length,flags);
+    p = get_free_pages(length, flags);
     if(p == NULL)
         return NULL;
     index = PADDR_TO_PAGED(p);
@@ -191,19 +208,21 @@ int peek_last_free_page(){
  * @return      
  */
 int release_pages(ptr_t* page, int len){
-    int page_index;
+    int page_index, bitmaplen;
     if((unsigned long)page % PAGE_LEN != 0)
         return ERR;
     page_index = PADDR_TO_PAGED(page);
-    return bitmap_clear_nbits(mem_map, MEM_MAP_LEN, page_index, len);
+    bitmaplen = PADDR_TO_PAGED(len);
+    return bitmap_clear_nbits(mem_map, MEM_MAP_LEN, page_index, bitmaplen);
 }
 
 int user_release_pages(struct proc* who, ptr_t* page, int len){
-    int index;
-    if(release_pages(page,len) != OK)
+    int index, bitmaplen;
+    if(release_pages(page, len) != OK)
         return ERR;
     index = PADDR_TO_PAGED(page);
-    return bitmap_clear_nbits(who->ctx.ptable, PTABLE_LEN, index, len);
+    bitmaplen = PADDR_TO_PAGED(len);
+    return bitmap_clear_nbits(who->ctx.ptable, PTABLE_LEN, index, bitmaplen);
 }
 
 /**
@@ -239,42 +258,42 @@ void* dup_vm(struct proc* parent, struct proc* child){
  * @param who 
  */
 void release_proc_mem(struct proc *who){
-    // struct proc* parent = get_proc(who->parent);
-    // if(parent->state & STATE_VFORKING){
-    //     return;
-    // }
+    struct proc* parent = get_proc(who->parent);
+    if(parent->state & STATE_VFORKING){
+        return;
+    }
     // KDEBUG(("release proc mem %d %d\n", who->proc_nr, who->thread_parent));
     if(who->thread_parent > 0){ // thread, in this case, we only release the stack
-        user_release_pages(who, who->stack_top, 1);
+        user_release_pages(who, who->stack_top, PAGE_LEN);
+        // klog("release stack 0x%x of %s %d\n", who->stack_top, who->name, who->proc_nr);
     }else{
-        int page_len = (int)(who->heap_bottom + 1 - who->mem_start) / PAGE_LEN;
-        int start_page = (unsigned long)who->mem_start / PAGE_LEN;
-        bitmap_clear_nbits(mem_map, MEM_MAP_LEN, start_page, page_len );
-        // bitmap_xor(mem_map, who->ctx.ptable, MEM_MAP_LEN);
-        bitmap_clear(who->ctx.ptable, PTABLE_LEN);
+        ptr_t* memstart = who->mem_start;
+        int page_len = (int)(who->heap_bottom + 1 - who->mem_start);
+        user_release_pages(who, memstart, page_len);
+        // klog("release proc start 0x%x len %d of %s %d\n", memstart, page_len, who->name, who->proc_nr);
     }
-    
+    // _kreport_memtable(kprintf2);
 }
 
-void kreport_ptable(struct proc* who){
-    kreport_bitmap(who->ctx.ptable, MEM_MAP_LEN);
+void _kreport_memtable(int (*func) (const char*, ...)){
+    _kreport_bitmap(mem_map, MEM_MAP_LEN, func);
 }
 
-void kreport_sysmap(){
+void _kreport_sysmap(int (*func) (const char*, ...)){
     static char free_str[] = "Free";
     static char used_str[] = "Used";
     int flags, pages, i;
     char* str;
-    kprintf("Sys Mem bitmap: \n");
-    kreport_bitmap(mem_map, MEM_MAP_LEN);
+    func("Sys Mem bitmap: \n");
+    _kreport_bitmap(mem_map, MEM_MAP_LEN, func);
 
     for(i = 0; i < 2; i++){
         flags = i == 0 ? ZERO_BITS : ONE_BITS;
         pages = count_bits(mem_map, MEM_MAP_LEN, flags);
         str = i == 0 ? free_str : used_str;
-        kprintf(" %s pages: %03d\t",str, pages, pages);
+        func(" %s pages: %03d\t",str, pages, pages);
     }
-    kprintf("\n");
+    func("\n");
 }
 
 
