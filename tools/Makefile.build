@@ -41,8 +41,8 @@ ifeq ($(KBUILD_VERBOSE),0)
 	@echo "CC \t $<"
 endif
 #gcc is only used for linting, wcc is the real compiler
-	$(Q)gcc $(CFLAGS) $(GCC_FLAG) -S -N -I./include -I./include_winix $< -o /tmp/$(notdir $@)
-	$(Q)wcc $(CFLAGS) -S -N -I./include -I./include_winix -o $@ $<
+	$(Q)gcc $(CFLAGS) $(GCC_FLAG) -S -N $< -o /tmp/$(notdir $@)
+	$(Q)wcc $(CFLAGS) -S -N -o $@ $<
 
 
 $(objects): %.o: %.s
@@ -53,7 +53,7 @@ endif
 
 ifneq ($(NO_MAKE_DEPEND),1)
 $(srcdepend): $(source) $(includes)
-	$(Q)makedepend -o.s -f- -I./include -I./include_winix -I/usr/include/x86_64-linux-gnu $(source) > $(srcdepend)
+	$(Q)makedepend -o.s -f- $(INCLUDE_PATH) -I/usr/include/x86_64-linux-gnu $(source) > $(srcdepend)
 endif
 
 $(subdir-y): FORCE
