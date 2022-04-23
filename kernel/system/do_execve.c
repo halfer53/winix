@@ -200,6 +200,7 @@ int exec_welf(struct proc* who, char* path, char *argv[], char *envp[], bool is_
         
     ret = sys_read(who, fd, &elf, sizeof(elf));
     if (ret != sizeof(elf)){
+        kwarn("welf %s read fail %d\n", path, ret);
         ret = EIO;
         goto final;
     }
