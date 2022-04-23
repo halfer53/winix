@@ -92,6 +92,11 @@ void test_given_open_when_openned_exceeds_system_limit_should_return_enfile(){
     reset_fs();
 }
 
+void test_given_open_when_flag_write_and_path_directory_should_return_eisdir(){
+    int ret = sys_open(curr_scheduling_proc, "/", O_WRONLY, 0);
+    assert(ret == EISDIR);
+}
+
 void test_given_creat_when_file_not_present_should_return_0(){
     int fd;
     
@@ -211,27 +216,69 @@ void test_given_dup_when_dupping_file_should_result_in_same_fd(){
 
 void test_given_read_when_open_and_closing_file_should_persistted_data(){
     int ret, fd;
+    memset(buffer, 0xf, PAGE_LEN);
 
     fd = sys_open(curr_scheduling_proc, FILE1 , O_CREAT | O_RDONLY, 0x0775);
     assert(fd == 0);
     
-    ret = sys_write(curr_scheduling_proc, fd, "abcdef", 7);
-    assert(ret == 7);
+    ret = sys_write(curr_scheduling_proc, fd, buffer, PAGE_LEN);
+    assert(ret == PAGE_LEN);
+
+    ret = sys_write(curr_scheduling_proc, fd, buffer, PAGE_LEN);
+    assert(ret == PAGE_LEN);
 
     ret = sys_close(curr_scheduling_proc, fd);
     assert(ret == 0);
 
     fd = sys_open(curr_scheduling_proc, FILE1 , O_RDONLY, 0x0775);
-    assert(file_size(curr_scheduling_proc, fd) == 7);
+    assert(file_size(curr_scheduling_proc, fd) == PAGE_LEN * 2);
 
-    ret = sys_read(curr_scheduling_proc, fd, buffer, 100);
-    assert(ret == 7);
-    assert(strcmp(buffer, "abcdef") == 0);
+    ret = sys_read(curr_scheduling_proc, fd, buffer2, PAGE_LEN);
+    assert(ret == PAGE_LEN);
+    assert(memcmp(buffer, buffer2, PAGE_LEN) == 0);
+
+    ret = sys_read(curr_scheduling_proc, fd, buffer2, PAGE_LEN);
+    assert(ret == PAGE_LEN);
+    assert(memcmp(buffer, buffer2, PAGE_LEN) == 0);
+
+    ret = sys_read(curr_scheduling_proc, fd, buffer2, PAGE_LEN);
+    assert(ret == 0);
 
     reset_fs();
 }
 
+void test_given_read_when_o_direct_open_and_closing_file_should_persistted_data(){
+    int ret, fd;
+    memset(buffer, 0xf, PAGE_LEN);
 
+    fd = sys_open(curr_scheduling_proc, FILE1 , O_CREAT | O_RDONLY | O_DIRECT, 0x0775);
+    assert(fd == 0);
+    
+    ret = sys_write(curr_scheduling_proc, fd, buffer, PAGE_LEN);
+    assert(ret == PAGE_LEN);
+
+    ret = sys_write(curr_scheduling_proc, fd, buffer, PAGE_LEN);
+    assert(ret == PAGE_LEN);
+
+    ret = sys_close(curr_scheduling_proc, fd);
+    assert(ret == 0);
+
+    fd = sys_open(curr_scheduling_proc, FILE1 , O_RDONLY | O_DIRECT, 0x0775);
+    assert(file_size(curr_scheduling_proc, fd) == PAGE_LEN * 2);
+
+    ret = sys_read(curr_scheduling_proc, fd, buffer2, PAGE_LEN);
+    assert(ret == PAGE_LEN);
+    assert(memcmp(buffer, buffer2, PAGE_LEN) == 0);
+
+    ret = sys_read(curr_scheduling_proc, fd, buffer2, PAGE_LEN);
+    assert(ret == PAGE_LEN);
+    assert(memcmp(buffer, buffer2, PAGE_LEN) == 0);
+
+    ret = sys_read(curr_scheduling_proc, fd, buffer2, PAGE_LEN);
+    assert(ret == 0);
+
+    reset_fs();
+}
 
 
 void test_given_access_when_file_not_exist_should_return_enoent(){
@@ -522,11 +569,6 @@ assert(ret == TTY_RETURN);
     assert(ret == TTY_RETURN);
 
     reset_fs();
-}
-
-void test_given_open_when_flag_write_and_path_directory_should_return_eisdir(){
-    int ret = sys_open(curr_scheduling_proc, "/", O_WRONLY, 0);
-    assert(ret == EISDIR);
 }
 
 
