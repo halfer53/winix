@@ -214,7 +214,10 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
                         }
                     }
                     cmd_start = cmd->cmdStart[i];
-                    execv(buffer, &cmd->argv[cmd_start]);
+                    ret = execv(buffer, &cmd->argv[cmd_start]);
+                    if(ret){
+                        perror("execv");
+                    }
                     exit(1);
                 }else if( i > 0 ){
                     prev_pipe_ptr = &pipe_fds[((i - 1) * 2)];
@@ -250,7 +253,7 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
     ioctl(STDIN_FILENO, TIOCENABLEECHO);
     ioctl(STDIN_FILENO, TIOCSPGRP, &pgid);
 #endif
-    return 0;
+    return WEXITSTATUS(status);
 }
 
 int exec_cmd(char *line){
@@ -338,7 +341,12 @@ int help(int argc, char** argv){
 
 int do_stest(int argc, char** argv){
     static char test_str[] = "ls -lah bin | grep snake | wc | cat";
-    exec_cmd(test_str);
+    int i, ret;
+    for(i = 0; i < 10; i++){
+        if(ret = exec_cmd(test_str)){
+            break;
+        }
+    }
     return 0;
 }
 
