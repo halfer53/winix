@@ -168,11 +168,13 @@ int root_fs_read (struct filp *filp, char *data, size_t count, off_t offset){
 
         len = ((BLOCK_SIZE - off) > count) ? count : BLOCK_SIZE - off;
         len = (off + len) < ino->i_size ? len : ino->i_size - off;
+        
         r = 0;
         if(filp->filp_flags & O_DIRECT){
             off += bnr * BLOCK_SIZE;
             r = blk_dev_io_read(data, off, len);
             data += r;
+            // KDEBUG(("read block %u, off %u, len %u, r %d\n", bnr, off - (bnr * BLOCK_SIZE), len, r));
         }else{
             char *p;
             size_t len2 = len;
@@ -183,16 +185,18 @@ int root_fs_read (struct filp *filp, char *data, size_t count, off_t offset){
             }
             r += (int)len;
             put_block_buffer(buffer);
+            // KDEBUG(("read block %u, off %u, len %u, r %d\n", bnr, off, len, r));
         }
-
+        
         count -= len;
         ret += r;
         filp->filp_pos += r;
-        // KDEBUG(("file read for block %d, off %d len %d remaining %d\n", bnr, off, r, count));
+        // KDEBUG(("file read for block %u, off %u len %d remaining %zu\n", bnr, off, r, count));
         if (r == 0)
             break;
         off = 0;
     }
+    // KDEBUG(("read ret %d, zone %d %d %d %d\n", ret, ino->i_zone[0], ino->i_zone[1], ino->i_zone[2], ino->i_zone[3]));
     return ret;
 }
 
