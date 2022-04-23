@@ -265,7 +265,7 @@ void kreport_sysmap(){
     static char used_str[] = "Used";
     int flags, pages, i;
     char* str;
-    kprintf("Sys Mem bitmap: ");
+    kprintf("Sys Mem bitmap: \n");
     kreport_bitmap(mem_map, MEM_MAP_LEN);
 
     for(i = 0; i < 2; i++){

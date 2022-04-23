@@ -205,7 +205,7 @@ void trigger_gpf(struct proc* who){
             get_physical_addr(who->ctx.m.ra, who));
         kprintf("Memory Table:\n");
         kreport_ptable(who);  
-
+        kreport_sysmap();
         rewind_stack(who);
     }
 #endif
