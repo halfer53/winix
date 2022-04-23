@@ -10,6 +10,7 @@ extern bool TTY_OPEN_CALLED;
 
 extern char buffer[PAGE_LEN];
 extern char buffer2[PAGE_LEN];
+extern struct proc* current;
 
 void run_all_tests();
 void reset_fs();
