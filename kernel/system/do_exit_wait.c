@@ -131,7 +131,7 @@ void clear_proc_mesg(struct proc *who){
 int check_waiting(struct proc* who){
     struct proc* parent = get_proc(who->parent);
     ptr_t *ptr;
-    struct message* mesg = curr_mesg();
+    struct message* mesg = get_ipc_mesg();
 
     // if this process if waiting for the current to be exited process
     // kreport_proc(parent);
@@ -205,7 +205,7 @@ void exit_proc(struct proc *who, int status, int signum){
         return;
     }
 
-    mesg = curr_mesg();
+    mesg = get_ipc_mesg();
     parent = get_proc(who->parent);
 
     zombify(who);

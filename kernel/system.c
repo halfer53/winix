@@ -254,7 +254,7 @@ int syscall_not_implemented(struct proc* who, struct message *m){
     return ENOSYS;
 }
 
-struct message *curr_mesg(){
+struct message *get_ipc_mesg(){
     return &_message;
 }
 

@@ -22,14 +22,14 @@
  * Entry point for the system task.
  **/
 void system_main();
-struct message *curr_mesg();
+struct message *get_ipc_mesg();
 void intr_syscall();
 struct syscall_ctx* interrupted_syscall_ctx();
 
 void syscall_region_begin();
 void syscall_region_end();
 void intr_syscall();
-struct message *curr_mesg();
+struct message *get_ipc_mesg();
 struct syscall_ctx *interrupted_syscall_ctx();
 void kreport_sysinfo();
 void init_syscall_table();
