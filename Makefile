@@ -39,7 +39,7 @@ export GCC_FLAG := -g -Wimplicit-fallthrough -Wsequence-point -Wswitch-default -
 		-Wno-builtin-declaration-mismatch -pedantic -Werror
 
 # List of user libraries used by the kernel
-KLIB_O = lib/syscall/wramp_syscall.o lib/ipc/ipc.o \
+KLIB_O = lib/syscall/wramp_syscall.o lib/ipc/ipc.o lib/posix/libgen.o\
 		lib/ansi/string.o lib/gen/ucontext.o lib/stdlib/atoi.o\
 		lib/syscall/debug.o lib/posix/_sigset.o lib/ansi/rand.o lib/ansi/strl.o
 L_HEAD = winix/limits/limits_head.o

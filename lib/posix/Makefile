@@ -1,2 +1,2 @@
 
-obj-y += _sigset.o dir.o tty.o
+obj-y += _sigset.o dir.o tty.o libgen.o

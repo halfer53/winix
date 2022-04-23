@@ -19,7 +19,7 @@
 #include <kernel/clock.h>
 #include <kernel/sched.h>
 #include <winix/ksignal.h>
-
+#include <libgen.h>
 
 PRIVATE struct message _message;
 PRIVATE int* _expt_stack_ptr;
@@ -128,20 +128,6 @@ PRIVATE void serial2_handler() {
     RexSp2->Iack = 0;
 }
 
-char *get_filename(struct proc* proc){
-    char *str = proc->name, *last_slash = NULL, *filename = NULL;
-    while (*str){
-        if (*str == '/'){
-            last_slash = str;
-        }
-        str++;
-    }
-    if (last_slash){
-        filename = last_slash + 1;
-    }
-    return filename;
-}
-
 void rewind_stack(struct proc* proc){
     vptr_t *vtext_start, *vtext_end;
     ptr_t **p = (ptr_t **)get_physical_addr(proc->ctx.m.sp, proc);
@@ -166,7 +152,7 @@ void rewind_stack(struct proc* proc){
         }
         p++;
     }
-    filename = get_filename(proc);
+    filename = basename(proc->name);
     kprintf("HINT: type `python3 tools/kdbg.py %s <vir address>` to debug\n",
         filename);
 }
