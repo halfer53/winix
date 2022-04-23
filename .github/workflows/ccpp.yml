@@ -16,7 +16,7 @@ jobs:
     - name: path
       run: echo "${{github.workspace}}/tools/bin" >> "${GITHUB_PATH}"
     - name: make
-      run: make N=1 -j$(nproc)
+      run: make N=1 -j$((`nproc`+2))
     - uses: actions/upload-artifact@v2
       with:
         name: winix.srec
