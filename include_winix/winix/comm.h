@@ -26,7 +26,7 @@
 
 // Major and minor version numbers for WINIX.
 #define MAJOR_VERSION 2
-#define MINOR_VERSION 4
+#define MINOR_VERSION 5
 
 #define HZ    (60)
 
