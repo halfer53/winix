@@ -10,7 +10,6 @@
 
 struct device pipe_dev;
 static const char* name = "pipe";
-static ino_t next_inum = 2;
 static dev_t pipe_devid = MAKEDEV(2, 1);
 #define PIPE_LIMIT  (PAGE_LEN)
 #define PIPE_INODE_INUM (INT_MAX)
