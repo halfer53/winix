@@ -20,6 +20,7 @@
 
 void init_mem_table();
 
+int peek_free_pages(int length, int flags);
 ptr_t* get_free_pages(int length, int flags);
 int release_pages(ptr_t* page, int num);
 int user_release_pages(struct proc* who, ptr_t* page, int len);
@@ -30,10 +31,10 @@ void kprint_slab();
 int user_get_free_pages_from(struct proc* who, ptr_t* addr, int size);
 
 #define is_vaddr_accessible(addr, who) is_vaddr_ok(who, (vptr_t*)addr, 1)
-#define free_page(page)         (release_pages((page),1))
-#define get_free_page(flags)    (get_free_pages(1,(flags)))
+#define free_page(page)         (release_pages((page),PAGE_LEN))
+#define get_free_page(flags)    (get_free_pages(PAGE_LEN,(flags)))
 #define user_get_free_page(who,flags)   (user_get_free_pages((who), PAGE_LEN ,(flags)))
-#define user_free_page(who,page)        (user_release_pages((who),(page),1))
+#define user_free_page(who,page)        (user_release_pages((who),(page), PAGE_LEN))
 
 int next_free_page_index();
 int peek_next_free_page();
@@ -41,6 +42,9 @@ int peek_last_free_page();
 
 void* dup_vm(struct proc* parent, struct proc* child);
 void kreport_ptable(struct proc* who);
-void kreport_sysmap();
+void _kreport_sysmap(int (*func) (const char*, ...));
+void _kreport_memtable(int (*func) (const char*, ...));
+#define kreport_sysmap()    _kreport_sysmap(kprintf)
+#define kreport_ptable(who) kreport_bitmap(who->ctx.ptable, MEM_MAP_LEN);
 
 #endif
