@@ -28,18 +28,7 @@
 #define MAJOR_VERSION 2
 #define MINOR_VERSION 4
 
-// Predefined, wramp board has 1024 pages in total,
-// which equals to 4 * 32
-#define MEM_MAP_LEN    4
-
-#ifdef __x86_64__
-#define PAGE_LEN    4096
-#else
-#define PAGE_LEN    1024
-#endif
-
 #define HZ    (60)
-
 
 #define DO_CLOCKTICK    (1)
 

@@ -19,6 +19,10 @@
 #include <winix/gfp.h>
 #include <winix/bitmap.h>
 
+// Predefined, wramp board has 1024 pages in total,
+// which equals to 4 * 32
+#define MEM_MAP_LEN    4
+
 void init_mem_table();
 
 int peek_free_pages(int length, int flags);
