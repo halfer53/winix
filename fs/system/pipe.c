@@ -25,10 +25,6 @@ struct pipe_waiting{
     struct list_head list;
 };
 
-ino_t get_next_ino(){
-    return next_inum++;
-}
-
 int set_filp(struct proc* who, struct filp** _file, struct inode* inode){
     int ret, open_slot;
     struct filp* file = get_free_filp();
