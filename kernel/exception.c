@@ -167,7 +167,7 @@ void rewind_stack(struct proc* proc){
         p++;
     }
     filename = get_filename(proc);
-    kprintf("HINT: you type `python3 tools/kdbg.py <vir address> %s` to get the line number in original .c file",
+    kprintf("HINT: type `python3 tools/kdbg.py %s <vir address>` to debug info",
         filename);
 }
 
