@@ -4,9 +4,6 @@
 #include <assert.h>
 #include <signal.h>
 
-char buffer[PAGE_LEN];
-char buffer2[PAGE_LEN];
-
 void _init_pipe(int pipe_fd[2], struct proc* pcurr2){
     int ret;
     pcurr2->pid = 2;
