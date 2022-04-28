@@ -32,8 +32,7 @@ export CURR_UNIX_TIME := $(shell date +%s)
 export WINIX_CFLAGS := -D__wramp__
 export COMMON_CFLAGS := -DTEXT_OFFSET=$(TEXT_OFFSET) -D_DEBUG 
 export CFLAGS := $(WINIX_CFLAGS) $(COMMON_CFLAGS) $(INCLUDE_PATH)
-export GCC_FLAG := -g -O -Wno-discarded-qualifiers -Wno-builtin-declaration-mismatch \
-		-Wno-comment -pedantic -Wall -Werror
+export GCC_FLAG := -g -O -Wall -Werror -pedantic -Wno-discarded-qualifiers -Wno-comment 
 
 # List of user libraries used by the kernel
 KLIB_O = lib/syscall/wramp_syscall.o lib/ipc/ipc.o lib/posix/libgen.o\
