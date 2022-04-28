@@ -102,11 +102,12 @@
 
 extern const char **_environ;
 
+int wramp_syscall(int num, ...);
+void *ptr_wramp_syscall(int num, ...);
+
 #ifndef FSUTIL
 
 // int _syscall(int syscall_num, struct message *m);
-int wramp_syscall(int num, ...);
-void *ptr_wramp_syscall(int num, ...);
 
 void exit(int status);
 pid_t getppid();
