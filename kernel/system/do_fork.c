@@ -115,7 +115,7 @@ int sys_fork(struct proc *parent) {
     struct proc *child;
     // int tdb_page_len, sp_heap_page_len, page;
 
-    if (child = get_free_proc_slot()) {
+    if ((child = get_free_proc_slot())) {
         copy_pcb(parent,child);
 
         if(copy_mm(parent,child)){
