@@ -120,7 +120,7 @@ int parse(char *input_line, struct cmdLine *sc)
         while(*line && !isSeparator(*line))  /* find the end of the argument */
             ++line;
         if(*line == '='){
-            int symbol;
+            int symbol = 0;
             *line++ = '\0';
             
             sc->env = sc->argv[argc-1];     /* env points to the previous word */   
