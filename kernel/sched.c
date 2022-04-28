@@ -55,7 +55,7 @@ struct proc *pick_proc() {
 
     // Find the highest-priority non-empty queue
     for (i = MAX_PRIORITY; i >= MIN_PRIORITY; i--){
-        if(mp = dequeue(ready_q[i])){
+        if((mp = dequeue(ready_q[i]))){
             return mp;
         }
     }
