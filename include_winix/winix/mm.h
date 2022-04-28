@@ -49,8 +49,6 @@ void* dup_vm(struct proc* parent, struct proc* child);
 void kreport_ptable(struct proc* who);
 void _kreport_sysmap(int (*func) (const char*, ...));
 void _kreport_memtable(int (*func) (const char*, ...));
-
-#define _kreport_memtable(func) _kreport_bitmap(mem_map, MEM_MAP_LEN, func)
 #define kreport_sysmap()    _kreport_sysmap(kprintf)
 #define kreport_ptable(who) kreport_bitmap(who->ctx.ptable, MEM_MAP_LEN);
 
