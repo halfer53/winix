@@ -89,8 +89,6 @@ out:
 	}else{
 		while (*argp)
 		{
-			int infd;
-
 			if (strcmp(*argp, "-") == 0)
 				match("-", exp);
 			else
@@ -105,7 +103,6 @@ out:
 				{
 					// printf("opened %s in %d\n", *argp, fd);
 					match(*argp, exp);
-					close(infd);
 				}
 			}
 			argp++;
