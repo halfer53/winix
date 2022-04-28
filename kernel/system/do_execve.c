@@ -187,10 +187,10 @@ int exec_welf(struct proc* who, char* path, char *argv[], char *envp[], bool is_
     struct message m;
 
     memset(&m, 0, sizeof(m));
-    if (ret = copy_stirng_array(&argv_copy, argv, who, is_new))
+    if ((ret = copy_stirng_array(&argv_copy, argv, who, is_new)))
         return ret;
     // KDEBUG(("copy argv string %d\n", argv_copy.size));
-    if (ret = copy_stirng_array(&envp_copy, envp, who, is_new))
+    if ((ret = copy_stirng_array(&envp_copy, envp, who, is_new)))
         goto err_env;
 
     ret = filp_open(who, &filp, path, O_RDONLY | O_DIRECT, 0);

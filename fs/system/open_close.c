@@ -65,7 +65,7 @@ int filp_open(struct proc* who, struct filp** _filp, char *path, int flags, mode
                 ret = ENOENT;
                 goto final;
             }
-            if (ret = alloc_inode_under_dir(who, dev, &inode, lastdir, string))
+            if ((ret = alloc_inode_under_dir(who, dev, &inode, lastdir, string)))
                 goto final;
             inode->i_mode = dev->device_type | (mode & ~(who->umask));
             is_new = true;

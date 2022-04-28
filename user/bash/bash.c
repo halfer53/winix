@@ -338,7 +338,7 @@ int do_stest(int argc, char** argv){
     static char test_str[] = "ls -lah bin | grep snake | wc | cat";
     int i, ret;
     for(i = 0; i < 10; i++){
-        if(ret = exec_cmd(test_str)){
+        if((ret = exec_cmd(test_str))){
             break;
         }
     }
@@ -383,7 +383,7 @@ int slab(int argc, char **argv){
 // start a new bash shell, parent shell is blocked until child shell exits
 int cmd_bash(int argc, char **argv){
     pid_t child_pid;
-    if(child_pid = fork()){
+    if((child_pid = fork())){
         if(child_pid == -1){
             perror("fork failed");
             return 1;

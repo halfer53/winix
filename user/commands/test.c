@@ -158,7 +158,7 @@ int test_ipc(int argc, char **argv){
     int ret;
     struct message m;
     wramp_syscall(WINFO, WINFO_DEBUG_IPC);
-    if(pid = tfork()){
+    if((pid = tfork())){
         m.type = 100;
         winix_sendrec(pid,&m);
         printf("received %d from child\n",m.reply_res);
@@ -179,7 +179,7 @@ int test_ipc(int argc, char **argv){
 int test_deadlock(int argc, char **argv){
     pid_t pid;
     struct message m;
-    if(pid = fork()){
+    if((pid = fork())){
         int n = 100000;
         while(n--);
         if(winix_send(pid,&m))

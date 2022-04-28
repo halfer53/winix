@@ -155,7 +155,7 @@ int do_notify(int src, int dest, struct message *m) {
     int syscall_num;
     char *msg_type = "";
     // Is the destination valid?
-    if (pDest = get_proc(dest)) {
+    if ((pDest = get_proc(dest))) {
 
         if(pDest->state & STATE_KILLED)
             return ERR;

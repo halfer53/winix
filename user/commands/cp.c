@@ -46,7 +46,6 @@ int main(int argc, char *argv[]){
             *buf++ = *p++;
         }
         *buf = '\0';
-        close(dest_fd);
 
         dest_fd = open(buffer, O_WRONLY | O_CREAT, src_buf.st_mode);
         if(dest_fd < 0){

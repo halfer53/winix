@@ -25,7 +25,7 @@ int putenv(char *name)
         init_environ();
 	if (_environ == NULL) return 1;
 	v = _environ;
-	if (r = strchr(name, '=')) {
+	if ((r = strchr(name, '='))) {
 		char *p, *q;
 
 		*r = '\0';
@@ -66,7 +66,7 @@ int putenv(char *name)
 		size = i;
 		p = _environ;
 		_environ = v;
-		while (*v++ = *p++);		/* copy the environment */
+		while ((*v++ = *p++));		/* copy the environment */
 		v = _environ;
 	} else if (!(size % ENTRY_INC)) {
 		if (!(v = realloc((void *)_environ, rounded(size) * sizeof(char **))))

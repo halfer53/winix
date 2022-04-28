@@ -83,13 +83,11 @@ static struct argp argp = { options, parse_opt, args_doc, doc };
 
 
 void write_disk(char* path){
-    char curr_dir[100];
     int i;
     char str2[] = "unsigned int DISK_RAW[] = {\n";
     char str3[] = "};\n";
     unsigned int *val = (unsigned int*)DISK_RAW;
     FILE *fp;
-    getcwd(curr_dir, 100);
 
 //    printf("opening %s\n", path);
     fp = fopen(path, "w");
@@ -231,10 +229,10 @@ int main(int argc, char** argv){
     arguments.offset = 2048;
     argp_parse (&argp, argc, argv, 0, 0, &arguments);
     if( arguments.source_path == NULL && arguments.output_path == NULL ){
-        fprintf(stderr,"Format ERROR: source file = %s\n"
-                       "output file = %s\n"
+        fprintf(stderr,"Format ERROR: source file = NULL\n"
+                       "output file = NULL\n"
                        "Offset %d\n",
-                arguments.source_path, arguments.output_path, arguments.offset);
+                arguments.offset);
         return 1;
     }
 

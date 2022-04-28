@@ -60,7 +60,8 @@
         "common.h": "c",
         "argp.h": "c",
         "libgen.h": "c",
-        "srec_import.h": "c"
+        "srec_import.h": "c",
+        "cmath": "c"
     },
     "files.exclude": {
         "**/*.o": true,
