@@ -17,7 +17,7 @@
 
 #ifndef _SIZE_T
 #define	_SIZE_T
-typedef unsigned int	size_t;		/* type returned by sizeof */
+typedef long unsigned int	size_t;		/* type returned by sizeof */
 #endif /* _SIZE_T */
 
 #ifndef __wchar_t__
