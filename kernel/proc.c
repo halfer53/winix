@@ -314,7 +314,7 @@ void proc_set_default(struct proc *p) {
     p->proc_nr = pnr_bak;
     p->state = -1;
 
-    memset(p->ctx.m.regs, -1, NUM_REGS);
+    memset(p->ctx.m.regs, -1, NUM_REGS * sizeof(reg_t));
     p->ctx.cctrl = DEFAULT_CCTRL;
 
     p->quantum = DEFAULT_USER_QUANTUM;

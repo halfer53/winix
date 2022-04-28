@@ -1,6 +1,8 @@
 #ifndef _SYS_UCONTEXT_T_
 #define _SYS_UCONTEXT_T_ 1
 
+#include <winix/type.h>
+
 #ifdef __wramp__
 #include <signal.h>
 #else
@@ -10,8 +12,8 @@
 #define REGS_NR 13
 
 typedef struct mcontext{
-    unsigned int regs[REGS_NR];    // values
-    unsigned int *sp;
+    reg_t regs[REGS_NR];    // values
+    reg_t *sp;
     void *ra;
     void (*pc)();
 }mcontext_t;
