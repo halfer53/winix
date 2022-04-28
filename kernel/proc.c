@@ -509,64 +509,6 @@ int alloc_mem_welf(struct proc* who, struct winix_elf* elf, int stack_size, int 
 }
 
 /**
- * allocate memory for the given process
- * @param  who        
- * @param  text_data_length total of text and data size
- * @param  stack_size 
- * @param  heap_size  
- * @param  flags      PROC_SET_SP or/and PROC_SET_HEAP    
- * @return            
- */
-int alloc_proc_mem(struct proc *who, int text_data_length, int stack_size, int heap_size){
-    const int vm_offset = PAGE_LEN;
-    int proc_len;
-    int td_aligned;
-    ptr_t *bss_start;
-    int bss_size;
-    ptr_t* mem_start;
-
-    // make sizes page aligned
-    // text_Data_length is the length of text plus data.
-    // Since srec file does not include the size of bss segment by
-    // default, so we have to manually set it. By default, bss segment
-    // extends from the end of the data segment. So the initial bss 
-    // size is simply aligned size minus exact size
-    td_aligned = align_page(text_data_length);
-    bss_size = td_aligned - text_data_length;
-
-    stack_size = align_page(stack_size);
-    heap_size = align_page(heap_size);
-    
-    // give bss an extra page if its not enough. not that if bss size 
-    // is not enough, it could extend to the stack segment, which could
-    // potentially corrupt the stack 
-    if(bss_size < MIN_BSS_SIZE)
-        bss_size += PAGE_LEN;
-
-    proc_len = vm_offset + stack_size + td_aligned + heap_size;
-    mem_start = user_get_free_pages(who, proc_len, GFP_NORM);
-    if(mem_start == NULL)
-        return ENOMEM;
-    who->ctx.rbase = mem_start;
-
-    // for information on how process memory are structured, 
-    // look at the first line of this file
-    who->stack_top = who->ctx.rbase + vm_offset;
-    who->ctx.m.sp = get_virtual_addr(who->stack_top + stack_size - 1,who);
-    *(who->stack_top) = STACK_MAGIC;
-
-    // set bss segment to 0
-    bss_start = who->stack_top + stack_size + text_data_length;
-    memset(bss_start, 0, bss_size);
-
-    who->heap_top = bss_start + bss_size;
-    who->heap_break = who->heap_top;
-    who->heap_bottom = who->heap_break + heap_size - 1;
-    
-    return OK;
-}
-
-/**
  * Copy values onto the user stack, this is very similar to memcpy
  * @param  who 
  * @param  src 

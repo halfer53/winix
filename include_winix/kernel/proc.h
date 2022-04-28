@@ -273,7 +273,6 @@ reg_t* alloc_stack(struct proc *who);
 void set_proc(struct proc *p, void (*entry)(), const char *name);
 struct proc *start_user_proc(size_t *lines, size_t length, size_t entry, int priority, const char *name);
 struct proc *get_free_proc_slot();
-int alloc_proc_mem(struct proc *who, int tdb_length, int stack_size, int heap_size);
 void enqueue_schedule(struct proc* p);
 reg_t* alloc_kstack(struct proc *who, int size);
 int proc_memctl(struct proc* who ,vptr_t* page_addr, int flags);
