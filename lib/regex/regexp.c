@@ -255,7 +255,7 @@ int *flagp;
 	char *ret;
 	char *br;
 	char *ender;
-	int parno;
+	int parno = 0;
 	int flags;
 
 	*flagp = HASWIDTH;	/* Tentatively. */
@@ -324,7 +324,7 @@ int *flagp;
 	char *ret;
 	char *chain;
 	char *latest;
-	int flags;
+	int flags = 0;
 	int c;
 
 	*flagp = WORST;				/* Tentatively. */
@@ -335,9 +335,9 @@ int *flagp;
 		latest = regpiece(cp, &flags);
 		if (latest == NULL)
 			return(NULL);
-		*flagp |= flags&HASWIDTH;
+		*flagp |= flags & HASWIDTH;
 		if (chain == NULL)		/* First piece. */
-			*flagp |= flags&SPSTART;
+			*flagp |= flags & SPSTART;
 		else
 			regtail(cp, chain, latest);
 		chain = latest;
