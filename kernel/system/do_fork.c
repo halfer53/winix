@@ -152,7 +152,7 @@ int do_fork(struct proc *who, struct message *m){
 
 int do_vfork(struct proc* parent, struct message* m){
     struct proc* child;
-    if(child = get_free_proc_slot()){
+    if((child = get_free_proc_slot())){
         copy_pcb(parent,child);
         child->time_used = child->sys_time_used = 0;
         child->parent = parent->proc_nr;
@@ -180,7 +180,7 @@ int do_tfork(struct proc* parent, struct message* m){
     unsigned long vstack_top, vstack_bottom, val;
     vptr_t* vsp_relative_to_stack_top, *vir_old_stack;
     reg_t** sp;
-    if(child = get_free_proc_slot()){
+    if((child = get_free_proc_slot())){
         copy_pcb(parent,child);
         child->time_used = child->sys_time_used = 0;
         child->parent = parent->proc_nr;
