@@ -274,10 +274,6 @@ void release_proc_mem(struct proc *who){
     // _kreport_memtable(kprintf2);
 }
 
-void _kreport_memtable(int (*func) (const char*, ...)){
-    _kreport_bitmap(mem_map, MEM_MAP_LEN, func);
-}
-
 void _kreport_sysmap(int (*func) (const char*, ...)){
     static char free_str[] = "Free";
     static char used_str[] = "Used";
