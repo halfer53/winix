@@ -2,7 +2,7 @@
 
 #define BUFFER_SIZ  (500)
 
-int putchar(const char c){
+int putchar(int c){
     if(printf("%c",c))
         return c;
     return EOF;

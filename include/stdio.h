@@ -80,7 +80,7 @@ typedef long int	fpos_t;
 int printf(const char *format, ...);
 int dprintf(int fd, const char *format, ...);
 int fprintf(FILE *stream, const char *format, ...);
-int putchar(const char c);
+int putchar(int c);
 
 FILE *fopen(const char *pathname, const char *mode);
 int fclose(FILE *stream);
