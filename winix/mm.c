@@ -38,7 +38,7 @@ PRIVATE int bss_page_end;
 bool is_vaddr_ok(struct proc* who, vptr_t* addr, size_t len){
     int start_page, end_page;
     ptr_t* paddr, *paddr_end;
-    bool ret;
+    bool ret = false;
 
     paddr = get_physical_addr(addr, who);
     paddr_end = get_physical_addr(addr + len, who);
