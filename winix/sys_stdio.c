@@ -335,7 +335,7 @@ int kprintf_vm( struct filp* file, const char *orignal_format, void *arg, struct
 
                 case 's':
                     vformat_str = *(vptr_t **)arg;
-                    if (!is_vaddr_accessible(vformat_str, who)){
+                    if (IS_USER_PROC(who) && !is_vaddr_accessible(vformat_str, who)){
                         format_ptr = NULL_STR;
                     }else{
                         format_ptr = (char *)get_physical_addr(vformat_str, who);
