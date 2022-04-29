@@ -148,7 +148,7 @@ void rewind_stack(struct proc* proc){
         data = *p;
         instruction = get_physical_addr(data, proc);
         if (*instruction > 0x100000 && vtext_start <= data && data <= vtext_end){
-            kprintf("  - Virtual Addr: 0x%x, Instruction: 0x%x\n", data, *instruction);
+            kprintf("  - Virtual Addr: 0x%lx, Instruction: 0x%x\n", (uintptr_t)data, *instruction);
         }
         p++;
     }
@@ -158,7 +158,7 @@ void rewind_stack(struct proc* proc){
 }
 
 #define PRINT_DEBUG_REG(pc,sp,ra)\
-    kprintf("$pc 0x%04x, $sp 0x%04x $ra 0x%04x\n",pc,sp,ra)
+    kprintf("$pc 0x%04lx, $sp 0x%04lx $ra 0x%04lx\n",pc,sp,ra)
 
 
 void trigger_gpf(struct proc* who){
@@ -176,19 +176,19 @@ void trigger_gpf(struct proc* who){
         kprintf("\nGeneral Protection Fault: \"%s (%d)\"\n",
             who->name,
             who->pid);
-        kprintf("Rbase=0x%x, Stack Top=0x%x, vStack Top=0x%x\n", 
-            who->ctx.rbase,
-            who->stack_top,
-            get_virtual_addr(who->stack_top, who));
+        kprintf("Rbase=0x%lx, Stack Top=0x%lx, vStack Top=0x%lx\n", 
+            (uintptr_t)who->ctx.rbase,
+            (uintptr_t)who->stack_top,
+            (uintptr_t)get_virtual_addr(who->stack_top, who));
         pc = get_physical_addr(get_pc_ptr(who),who);
 
         kprintf("Virtual  ");
-        PRINT_DEBUG_REG(who->ctx.m.pc, who->ctx.m.sp, who->ctx.m.ra);
+        PRINT_DEBUG_REG((uintptr_t)who->ctx.m.pc, (uintptr_t)who->ctx.m.sp, (uintptr_t)who->ctx.m.ra);
 
         kprintf("Physical ");
-        PRINT_DEBUG_REG(pc, 
-            get_physical_addr(who->ctx.m.sp, who),
-            get_physical_addr(who->ctx.m.ra, who));
+        PRINT_DEBUG_REG((uintptr_t)pc, 
+            (uintptr_t)get_physical_addr(who->ctx.m.sp, who),
+            (uintptr_t)get_physical_addr(who->ctx.m.ra, who));
         kprintf("Memory Table:\n");
         kreport_ptable(who);  
         kreport_sysmap();
@@ -296,8 +296,8 @@ PRIVATE void break_handler() {
  *   Current process is killed, and scheduler is called (i.e. this handler does not return).
  **/
 PRIVATE void arith_handler() {
-    kprintf("Arith Exception: \"%s (%d)\" PC=0x%08x.\r\n", 
-        curr_scheduling_proc->name, curr_scheduling_proc->pid, curr_scheduling_proc->ctx.m.pc);
+    kprintf("Arith Exception: \"%s (%d)\" PC=0x%08lx.\r\n", 
+        curr_scheduling_proc->name, curr_scheduling_proc->pid, (uintptr_t)curr_scheduling_proc->ctx.m.pc);
     send_sig(curr_scheduling_proc,SIGFPE);
     sched();
 }
