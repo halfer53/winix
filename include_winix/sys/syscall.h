@@ -171,6 +171,7 @@ pid_t tfork();
 int brk(void *addr);
 void init_environ();
 void sched_yield();
+void perror();
 
 #ifdef __wramp__
 #ifndef _SYSTEM
@@ -228,8 +229,6 @@ void sched_yield();
 #define sched_yield()               (wramp_syscall(SCHED_YIELD))
 
 #endif //_SYSTEM
-
-#define perror(s)               dprintf(STDERR_FILENO, "%s: %s\n", s, strerror(errno))
 
 #endif //__wramp__
 

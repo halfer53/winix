@@ -45,7 +45,6 @@ char* strerror(int usrerrno){
     return estr;
 }
 
-// void perror(const char *s){
-//     __strerror(estr, ESTR_SIZ, errno);
-//     dprintf(2, "%s: %s\n", s, estr);
-// }
+void perror(const char *s){
+    dprintf(STDERR_FILENO, "%s: %s\n", s, strerror(errno));
+}
