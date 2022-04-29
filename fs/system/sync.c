@@ -1,7 +1,7 @@
 //
 // Created by bruce on 10/05/20.
 //
-#include "../fs.h"
+#include <fs/fs.h>
 
 int do_sync(struct proc* who, struct message* msg){
 

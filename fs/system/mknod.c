@@ -2,7 +2,7 @@
 // Created by bruce on 14/05/20.
 //
 
-#include "../fs.h"
+#include <fs/fs.h>
 
 
 int sys_mknod(struct proc* who, char *path, mode_t mode, dev_t devid){

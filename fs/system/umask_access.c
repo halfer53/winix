@@ -2,7 +2,7 @@
 // Created by bruce on 30/04/20.
 //
 
-#include "../fs.h"
+#include <fs/fs.h>
 #include <sys/unistd.h>
 
 int sys_umask(struct proc* who, mode_t mask){

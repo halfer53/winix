@@ -1,4 +1,4 @@
-#include "../fs.h"
+#include <fs/fs.h>
 
 int _sys_ioctl(struct proc* who, int fd, int request, void* arg){
     struct filp* file;

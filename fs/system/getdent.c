@@ -2,7 +2,7 @@
 // Created by bruce on 3/05/20.
 //
 
-#include "../fs.h"
+#include <fs/fs.h>
 
 int sys_getdents(struct proc* who, int fd, struct dirent* dirp_dst, unsigned int count){
     int i, dirstream_nr, ret = 0;

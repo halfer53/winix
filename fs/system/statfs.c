@@ -1,5 +1,5 @@
 
-#include "../fs.h"
+#include <fs/fs.h>
 #include <sys/statfs.h>
 
 int sys_statfs(struct proc* who, char *path, struct statfs *buf){

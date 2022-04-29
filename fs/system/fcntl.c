@@ -2,7 +2,7 @@
 // Created by bruce on 27/04/20.
 //
 
-#include "../fs.h"
+#include <fs/fs.h>
 
 int sys_fcntl(struct proc* who, int fd, int cmd, void* arg){
     struct filp* file;

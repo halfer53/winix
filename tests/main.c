@@ -1,7 +1,7 @@
 //
 // Created by bruce on 9/05/20.
 //
-#include "../fs/fs.h"
+#include <fs/fs.h>
 #include "unit_test.h"
 
 int main(){

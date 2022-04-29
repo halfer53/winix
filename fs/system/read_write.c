@@ -1,4 +1,4 @@
-#include "../fs.h"
+#include <fs/fs.h>
 #include <kernel/clock.h>
 
 int filp_read(struct proc* who, struct filp* file, void *buf, size_t count){

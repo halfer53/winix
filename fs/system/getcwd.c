@@ -1,4 +1,4 @@
-#include "../fs.h"
+#include <fs/fs.h>
 #include <fs/path.h>
 
 int sys_getcwd(struct proc* who, char* pathname, int size){

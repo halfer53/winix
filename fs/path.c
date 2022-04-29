@@ -1,4 +1,4 @@
-#include "fs.h"
+#include <fs/fs.h>
 
 char* dot1 = ".";    /* used for search_dir to bypass the access */
 char* dot2 = "..";    /* permissions for . and ..            */

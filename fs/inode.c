@@ -1,4 +1,4 @@
-#include "fs.h"
+#include <fs/fs.h>
 #include <kernel/clock.h>
 
 int fill_dirent(inode_t* ino, struct winix_dirent* curr, const char* string);

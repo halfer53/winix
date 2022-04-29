@@ -2,7 +2,7 @@
 // Created by bruce on 27/04/20.
 //
 
-#include "../fs.h"
+#include <fs/fs.h>
 
 int sys_chown(struct proc* who,  char *pathname, uid_t owner, gid_t group){
     return EINVAL;
