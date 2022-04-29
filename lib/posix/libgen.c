@@ -1,7 +1,7 @@
 #include <stddef.h>
 
 char *basename(char *str){
-    char *last_slash = NULL, *filename = NULL;
+    char *last_slash = NULL, *filename = str;
     while (*str){
         if (*str == '/'){
             last_slash = str;
