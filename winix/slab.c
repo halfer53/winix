@@ -38,12 +38,12 @@ void kprintblock(struct mem_block *b) {
     char *prev, *next;
     prev = (b->prev ? b->prev->data : (char *)b->prev);
     next = (b->next ? b->next->data : (char *)b->next);
-    kprintf("0x%08x size %4d prev 0x%08x next 0x%08x ra %08x %s\n",
-        b->data,
+    kprintf("0x%08lx size %4ld prev 0x%08lx next 0x%08lx ra %08lx %s\n",
+        (uintptr_t)b->data,
         b->size, 
-        prev, 
-        next, 
-        b->ra,
+        (uintptr_t)prev, 
+        (uintptr_t)next, 
+        (uintptr_t)b->ra,
         b->free ? "is free" : "in use");
 }
 
@@ -120,7 +120,7 @@ struct mem_block *extend_heap(struct mem_block *first , size_t s)
     
     ptr = get_free_pages(round_s, GFP_HIGH);
     if(!ptr){
-        kerror("no mem left %d %d \n", s, round_s);
+        kerror("no mem left %ld %ld \n", s, round_s);
         return NULL;
     }
     
