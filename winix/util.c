@@ -28,7 +28,7 @@ void _panic(const char* str, const char* file) {
     kprintf("\r\nPanic! ");
 
     if(str)
-        kprintf(str);
+        kprintf("%s", str);
 
     if(file)
         kprintf(" in %s\n", file);

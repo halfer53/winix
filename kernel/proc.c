@@ -87,13 +87,13 @@ void kreport_all_procs(struct filp* file) {
 **/
 void kreport_proc(struct proc* curr, struct filp* file) {
     int ptable_idx = PADDR_TO_PAGED(curr->ctx.rbase)/32;
-    filp_kprint(file, "%-3d %-4d 0x%08x 0x%08x 0x%08x 0x%08x %d 0x%08x 0x%03x %s\n",
+    filp_kprint(file, "%-3d %-4d 0x%08lx 0x%08lx 0x%08lx 0x%08lx %d 0x%08x 0x%03x %s\n",
             curr->pid,
             get_proc(curr->parent)->pid,
-            curr->ctx.rbase,
-            get_physical_addr(get_pc_ptr(curr),curr),
-            get_physical_addr(curr->ctx.m.sp,curr),
-            curr->heap_break,
+            (uintptr_t)curr->ctx.rbase,
+            (uintptr_t)get_physical_addr(get_pc_ptr(curr),curr),
+            (uintptr_t)get_physical_addr(curr->ctx.m.sp,curr),
+            (uintptr_t)curr->heap_break,
             ptable_idx,
             curr->ctx.ptable[ptable_idx],
             curr->state,
