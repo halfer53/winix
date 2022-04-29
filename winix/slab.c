@@ -232,7 +232,7 @@ void _kfree(void *p, void *ra)
         // KDEBUG(("kfree %x by %x\n", p, ra));
         // kprint_slab();
     }else{
-        kwarn("invalid addr %x by %x\n", p, ra);
+        kwarn("invalid addr %p by %p\n", p, ra);
     }
     
     // putchar('\n');

@@ -105,6 +105,14 @@ extern const char **_environ;
 int wramp_syscall(int num, ...);
 void *ptr_wramp_syscall(int num, ...);
 
+#ifdef __GNUC__
+#define CHECK_PRINTF    __attribute__ ((format (printf, 1, 2)))
+#define CHECK_EPRINTF    __attribute__ ((format (printf, 2, 3)))
+#else
+#define CHECK_PRINTF 
+#define CHECK_EPRINTF   
+#endif
+
 #ifndef FSUTIL
 
 // int _syscall(int syscall_num, struct message *m);
@@ -147,9 +155,9 @@ int fcntl(int fd, int cmd, ... /* arg */ );
 pid_t setsid(void);
 int ioctl(int fd, unsigned long request, ...);
 int csleep(int ticks);
-int dprintf(int fd, const char *format, ...);
-int fprintf(FILE *stream, const char *format, ...);
-int printf(const char *format, ...);
+int dprintf(int fd, const char *format, ...) CHECK_EPRINTF;
+int fprintf(FILE *stream, const char *format, ...) CHECK_EPRINTF;
+int printf(const char *format, ...) CHECK_PRINTF;
 int enable_syscall_tracing();
 int disable_syscall_tracing();
 void* get_sigreturn_func_ptr(void);
