@@ -136,7 +136,7 @@ void rewind_stack(struct proc* proc){
     char *filename;
 
     if (p >= stack_end){
-        kprintf("stack pointer %p is not pointed to stack end %p\n", (void *)p, (void *)stack_end);
+        kwarn("sp %p past %p\n", (void *)p, (void *)stack_end);
         return;
     }
 
