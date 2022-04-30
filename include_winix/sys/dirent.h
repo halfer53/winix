@@ -28,7 +28,7 @@ struct winix_dirent {
     dev_t dev;
 };
 
-#define DIR_BUFFER_LEN  (3)
+#define DIR_BUFFER_LEN  (10)
 
 struct __dir{
     int fd;
