@@ -266,7 +266,7 @@ void release_proc_mem(struct proc *who){
     user_release_pages(who, who->stack_top, who->stack_size);
     // klog("release stack 0x%x of %s %d\n", who->stack_top, who->name, who->proc_nr);
 
-    if (who->thread_parent == 0){
+    if (!IS_THREAD(who)){
         ptr_t* memstart = who->mem_start;
         int page_len = (int)(who->heap_bottom + 1 - who->mem_start);
         user_release_pages(who, memstart, page_len);
