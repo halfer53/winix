@@ -16,6 +16,7 @@
 #include <winix/rex.h>
 #include <ctype.h>
 #include <winix/dev.h>
+#include <winix/ksignal.h>
 
 int atoi(char *str);
 
@@ -339,7 +340,7 @@ int kprintf_vm( struct filp* file, const char *orignal_format, void *arg, struct
                 case 'u':
                     format_buf_len = kputud_buf(*(unsigned int*)arg, format_ptr);
                     break;
-                    
+
                 case 'd':
                     format_buf_len = kputd_buf(*((int*)arg),format_ptr);
                     break;
@@ -355,7 +356,8 @@ int kprintf_vm( struct filp* file, const char *orignal_format, void *arg, struct
                 case 's':
                     vformat_str = *(vptr_t **)arg;
                     if (IS_USER_PROC(who) && !is_vaddr_accessible(vformat_str, who)){
-                        format_ptr = NULL_STR;
+                        (void)send_sig(who, SIGSEGV);
+                        return SUSPEND;
                     }else{
                         format_ptr = (char *)get_physical_addr(vformat_str, who);
                         if (!format_ptr)
