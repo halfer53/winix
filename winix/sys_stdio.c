@@ -114,28 +114,16 @@ int kputx_buf(int n,char *buf) {
     return offset;
 }
 
+
 /**
  * print the number in decimal string format to buf
  * @param  n   
  * @param  buf 
  * @return     
  */
-int kputd_buf(int n, char *buf) {
-    int place = 1000000000;
-    int offset = 0;
-    // zero?
-    if(n == 0) {
-        *buf++ = '0';
-        *buf = '\0';
-        return 1;
-    }
-
-    // negative?
-    if(n < 0) {
-        *buf++ = '-';
-        offset++;
-        n *= -1;
-    }
+int kputud_buf(unsigned int n, char *buf) {
+    unsigned int place = 1000000000;
+    unsigned int offset = 0;
 
     // find first digit of number
     while(place > n) {
@@ -151,6 +139,31 @@ int kputd_buf(int n, char *buf) {
     }
     *buf = '\0';
     return offset;
+}
+
+/**
+ * print the number in decimal string format to buf
+ * @param  n   
+ * @param  buf 
+ * @return     
+ */
+int kputd_buf(int n, char *buf) {
+    int offset = 0;
+    // zero?
+    if(n == 0) {
+        *buf++ = '0';
+        *buf = '\0';
+        return 1;
+    }
+
+    // negative?
+    if(n < 0) {
+        *buf++ = '-';
+        offset++;
+        n *= -1;
+    }
+
+    return kputud_buf((unsigned int)n, buf) + offset;
 }
 
 int kputs_vm_buf(char *s, void *who_rbase, char *buf) {
@@ -323,8 +336,11 @@ int kprintf_vm( struct filp* file, const char *orignal_format, void *arg, struct
 
             switch(*format) {
                 
-                case 'd':
                 case 'u':
+                    format_buf_len = kputud_buf(*(unsigned int*)arg, format_ptr);
+                    break;
+                    
+                case 'd':
                     format_buf_len = kputd_buf(*((int*)arg),format_ptr);
                     break;
 
