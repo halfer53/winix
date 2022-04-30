@@ -21,6 +21,7 @@
 #include <sys/fcntl.h>
 #include <winix/welf.h>
 #include <fs/super.h>
+#include <winix/ksignal.h>
 
 PRIVATE struct message _message;
 PRIVATE int curr_caller_proc_nr;
@@ -69,7 +70,9 @@ void system_main() {
             default:
                 syscall_reply2(curr_syscall, reply, curr_caller_proc_nr, mesg);
         }
-
+        if (is_sigpending(curr_caller)){
+            handle_pendingsig(curr_caller);
+        }
         syscall_region_end();
         
     }
