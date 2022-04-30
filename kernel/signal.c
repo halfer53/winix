@@ -52,10 +52,7 @@
  */
 PRIVATE int build_signal_ctx(struct proc *who, int signum){
     struct sigframe sframe;
-    ptr_t *sp;
     // pcb context are saved onto the user stack, and will be restored after sigreturn syscall
-
-    trace_syscall = true;
 
     copyto_user_stack(who, who, SIGNAL_CTX_LEN);
 
@@ -67,7 +64,6 @@ PRIVATE int build_signal_ctx(struct proc *who, int signum){
 
     // signum is sitting on top of the stack
     copyto_user_stack(who, &sframe, sizeof(struct sigframe));
-    sp = get_physical_addr(who->ctx.m.sp, who);
     who->ctx.m.pc = (void (*)())who->sig_table[signum].sa_handler;
 
     // skip the signum to point ra to ASM_SYSCALL
