@@ -29,14 +29,16 @@
 #define ASM_ADDUI_SP_SP_2   (0x1ee10002)
 
 struct exit_code{
-    unsigned int i_code1;
-    unsigned int i_code2;
+    unsigned long i_code1;
+    unsigned long i_code2;
 };
 
 struct initial_frame{
     int argc;
     char **argv;
-    struct syscall_frame_comm i_base;
+    int syscall_num;
+    int exit_code;
+    int signum;
     struct exit_code code;
 };
 
@@ -165,16 +167,14 @@ int build_user_stack(struct proc* who, struct string_array* argv, struct string_
 
     // setup exit if main is returned
     who->ctx.m.ra = who->ctx.m.sp - sizeof(struct exit_code);
+    
 
-    init_stack.i_base.operation = WINIX_SENDREC;
-    init_stack.i_base.dest = SYSTEM;
-    init_stack.i_base.pm = (struct message*)(who->ctx.m.sp - sizeof(struct exit_code) - sizeof(struct message));
-    init_stack.i_base.m.type = EXIT;
-    init_stack.i_base.m.m1_i1 = EXIT_MAGIC;
-    init_stack.i_base.m.m1_i2 = 0;
+    init_stack.syscall_num = EXIT;
+    init_stack.exit_code = EXIT_MAGIC;
+    init_stack.signum = 0;
     init_stack.code.i_code1 = ASM_ADDUI_SP_SP_2;
     init_stack.code.i_code2 = ASM_SYSCALL;
-    
+
     copyto_user_stack(who, &init_stack, sizeof(struct initial_frame));
 
     return OK;
