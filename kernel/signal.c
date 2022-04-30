@@ -14,11 +14,7 @@
 #include <kernel/kernel.h>
 #include <kernel/exception.h>
 #include <winix/ksignal.h>
-
-/**
-    addui $sp, $sp, 1
-    syscall
-**/
+#include <winix/kdebug.h>
 
 /**
  * How does signal works in winix
@@ -38,14 +34,11 @@
  * The sigframe mainly consists code and messages for invoking sigreturn syscall.
  * The structure of the signal context look sth like below
  *
- * signum       <- top of the stack, popped by user signal handler
- * operation   
- * destination
- * pm           <- The above three are necessary parameters for invoking syscall
- *                 operation is WINIX_SEND, destination is SYSTEM, (or kernel)
- *                 and pm points to the messages being passed to the kernel. NB
- *                 that pm is the virtual memory
- * messages     <- The actual messages, remember that pm points to this message
+ * signum           <- top of the stack, used by user signal handler
+ * syscall_num      <- 
+ * ASM: pop stack   <- ra points to this, it will pop the stack, thus pointing stack
+ *                      to syscall_num, then invoke syscall
+ * ASM: syscall
  * PCB context  <- The previous pcb context saved, will be restored after sigreturn
  */
 
@@ -59,23 +52,27 @@
  */
 PRIVATE int build_signal_ctx(struct proc *who, int signum){
     struct sigframe sframe;
-    struct sigframe* frame = &sframe;
+    ptr_t *sp;
     // pcb context are saved onto the user stack, and will be restored after sigreturn syscall
-    copyto_user_stack(who,who,SIGNAL_CTX_LEN);
 
-    frame->signum = signum;
-    frame->s_base.operation = WINIX_SENDREC;
-    frame->s_base.dest = SYSTEM;
-    frame->s_base.pm = (struct message*)(who->ctx.m.sp - sizeof(struct message));
-    frame->s_base.m.m1_i1 = signum;
-    frame->s_base.m.type = SIGRET;
+    trace_syscall = true;
+
+    copyto_user_stack(who, who, SIGNAL_CTX_LEN);
+
+    sframe.signum = signum;
+    sframe.syscall_num = SIGRET;
+    sframe.code = ASM_ADDUI_SP_SP_1;
+    sframe.code2 = ASM_SYSCALL;
+
 
     // signum is sitting on top of the stack
-    copyto_user_stack(who, frame, sizeof(struct sigframe));
-
+    copyto_user_stack(who, &sframe, sizeof(struct sigframe));
+    sp = get_physical_addr(who->ctx.m.sp, who);
     who->ctx.m.pc = (void (*)())who->sig_table[signum].sa_handler;
-    who->ctx.m.ra = (reg_t*)who->sa_restorer;
 
+    // skip the signum to point ra to ASM_SYSCALL
+    who->ctx.m.ra = (reg_t*)(who->ctx.m.sp + sizeof(signum));
+    
     // backup sig mask
     who->sig_mask2 = who->sig_mask;
     who->sig_mask = who->sig_table[signum].sa_mask;
@@ -172,7 +169,7 @@ int handle_sig(struct proc* who, int signum){
     else
         sigdelset(&act->sa_mask, signum);
 
-    build_signal_ctx(who,signum);
+    build_signal_ctx(who, signum);
 
     if(act->sa_flags & SA_RESETHAND){
         act->sa_handler = SIG_DFL;

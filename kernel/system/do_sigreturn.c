@@ -20,14 +20,16 @@ int do_sigreturn(struct proc *who, struct message *m){
     reg_t *sp;
     int signum = m->m1_i1;
 
-    sp = get_physical_addr(who->ctx.m.sp,who);
+    
 
-    sp += sizeof(struct syscall_frame_comm);
+    sp = get_physical_addr(who->ctx.m.sp, who);
+
+    sp += sizeof(struct sigframe) - sizeof(int);
 
     // Copy the previous pcb saved on the user stack back
     // to system proc struct, information includes registers
     // scheduling flags, and messages
-    memcpy(who,sp,SIGNAL_CTX_LEN);
+    memcpy(who, sp, SIGNAL_CTX_LEN);
 
     // restore mask
     who->sig_mask = who->sig_mask2;
