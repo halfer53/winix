@@ -297,6 +297,7 @@ void task_exit();
 void exit_proc(struct proc *who, int status, int signum);
 int check_waiting(struct proc* who);
 int dequeue_schedule( struct proc *h);
+int copy_from_user(struct proc* who, ptr_t *dest, vptr_t *src, size_t len);
 
 #define release_proc_slot(p)    release_zombie(p)
 
