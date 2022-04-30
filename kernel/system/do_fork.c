@@ -18,6 +18,64 @@
 #include <winix/bitmap.h>
 #include <winix/mm.h>
 #include <winix/list.h>
+
+/**
+ * @brief create a new stack in child and copy stack from to child
+ *          with virtial address referenced
+ * 
+ * @param parent 
+ * @param child 
+ * @return int 
+ */
+int copy_stack(struct proc* parent, struct proc* child){
+    ptr_t* new_stack, *sp_physical, *old_stack;
+    unsigned long *stack_ptr, *stack_bottom;
+    unsigned long vstack_top, vstack_bottom, val;
+    vptr_t* vsp_relative_to_stack_top, *vir_old_stack;
+    reg_t **child_sp;
+    int i;
+    
+    new_stack = user_get_free_page(child, GFP_HIGH);
+    if(new_stack == NULL){
+        release_proc_slot(child);
+        return ENOMEM;
+    }
+    copy_page(new_stack, parent->stack_top);
+    child_sp = &child->ctx.m.sp;
+    vsp_relative_to_stack_top = (vptr_t*)(get_physical_addr(parent->ctx.m.sp, parent) - parent->stack_top);
+    sp_physical = (ptr_t *)(new_stack + (unsigned long)vsp_relative_to_stack_top) ;
+    *child_sp = (reg_t *)get_virtual_addr(sp_physical, child);
+    child->stack_top = new_stack;
+
+    stack_ptr = (unsigned long*)child->stack_top;
+    stack_bottom = (unsigned long*)stack_ptr + child->stack_size;
+
+    old_stack = parent->stack_top;
+    vir_old_stack = get_virtual_addr(old_stack, parent);
+    vstack_top = (unsigned long)vir_old_stack;
+    vstack_bottom = (unsigned long)vir_old_stack + parent->stack_size;
+
+    // change the virtual address referencing old stack to new stack
+    while (stack_ptr < stack_bottom) {
+        val = *stack_ptr;
+        if (val >= vstack_top && val < vstack_bottom) {
+            *stack_ptr = (unsigned long)get_virtual_addr(val - vstack_top + new_stack, child);
+            // KDEBUG(("%p: old %lx new %lx\n", (void *)get_virtual_addr(stack_ptr, child), val, *stack_ptr));
+        }
+        stack_ptr++;
+    }
+    for (i = 0; i < REGS_NR; i++){
+        val = child->ctx.m.regs[i];
+        if (val >= vstack_top && val < vstack_bottom) {
+            child->ctx.m.regs[i] = (unsigned long)get_virtual_addr(val - vstack_top + new_stack, child);
+        }
+    }
+
+    // KDEBUG(("tfork %p %p for %d tp %d\n", (void *)new_stack, (void *)*sp, child->proc_nr, child->thread_parent));
+    proc_memctl(child, vir_old_stack, PROC_NO_ACCESS);
+    return OK;
+}
+
 /**
  * copy the pcb struct from parent to child
  * @param  parent 
@@ -38,6 +96,8 @@ int copy_pcb(struct proc* parent, struct proc* child){
     // ptable points to its own protection table
     child->ctx.ptable = child->protection_table;
     child->notify_pending = 0;
+    child->time_used = child->sys_time_used = 0;
+
     INIT_LIST_HEAD(&child->pipe_reading_list);
     INIT_LIST_HEAD(&child->pipe_writing_list);
 
@@ -65,15 +125,11 @@ int copy_mm(struct proc* parent, struct proc* child){
     ptr_t *src, *dest;
 
     bitmap_clear(child->ctx.ptable, PTABLE_LEN);
-    child->mem_start = dup_vm(parent,child);
+    child->mem_start = dup_vm(parent, child);
     if(child->mem_start == NULL)
-        return ERR;
+        return ENOMEM;
     child->ctx.rbase = child->mem_start - child->rbase_offset;
-    child->stack_top = child->mem_start;
 
-    // if(parent->flags & DISABLE_FIRST_PAGE){
-    //     proc_memctl(child, NULL, PROC_NO_ACCESS);
-    // }
     src = (ptr_t *)parent->mem_start;
     dest = (ptr_t *)child->mem_start;
     while(src < parent->heap_bottom){
@@ -99,7 +155,6 @@ int copy_pregs(struct proc* parent, struct proc* child){
     child->message = (struct message *)get_physical_addr((unsigned long)(*( sp + 2 )), child);
     child->heap_break = get_physical_addr(get_virtual_addr(parent->heap_break, parent), child);
     child->heap_bottom = get_physical_addr(get_virtual_addr(parent->heap_bottom, parent), child);
-    child->stack_top = get_physical_addr(get_virtual_addr(parent->stack_top, parent), child);
     return OK;
 }
 
@@ -113,14 +168,20 @@ int copy_pregs(struct proc* parent, struct proc* child){
  */
 int sys_fork(struct proc *parent) {
     struct proc *child;
+    int ret;
     // int tdb_page_len, sp_heap_page_len, page;
 
     if ((child = get_free_proc_slot())) {
         copy_pcb(parent,child);
 
-        if(copy_mm(parent,child)){
+        if((ret = copy_mm(parent, child))){
             release_proc_slot(child);
-            return ENOMEM;
+            return ret;
+        }
+
+        if((ret = copy_stack(parent, child))){
+            release_proc_slot(child);
+            return ret;
         }
 
         copy_pregs(parent,child);
@@ -154,7 +215,6 @@ int do_vfork(struct proc* parent, struct message* m){
     struct proc* child;
     if((child = get_free_proc_slot())){
         copy_pcb(parent,child);
-        child->time_used = child->sys_time_used = 0;
         child->parent = parent->proc_nr;
         child->thread_parent = 0;
         
@@ -175,15 +235,10 @@ int do_vfork(struct proc* parent, struct message* m){
  */
 int do_tfork(struct proc* parent, struct message* m){
     struct proc* child;
-    ptr_t* new_stack, *sp_physical, *old_stack;
-    unsigned long *stack_ptr, *stack_bottom;
-    unsigned long vstack_top, vstack_bottom, val;
-    vptr_t* vsp_relative_to_stack_top, *vir_old_stack;
-    reg_t** sp;
-    int i;
+    int ret;
+    
     if((child = get_free_proc_slot())){
         copy_pcb(parent,child);
-        child->time_used = child->sys_time_used = 0;
         child->parent = parent->proc_nr;
         if(parent->thread_parent > 0){
             child->thread_parent = parent->thread_parent;
@@ -191,43 +246,8 @@ int do_tfork(struct proc* parent, struct message* m){
             child->thread_parent = parent->proc_nr;
         }
         
-        new_stack = user_get_free_page(child, GFP_HIGH);
-        if(new_stack == NULL){
-            release_proc_slot(child);
-            return ENOMEM;
-        }
-        copy_page(new_stack, child->stack_top);
-        sp = &child->ctx.m.sp;
-        vsp_relative_to_stack_top = (vptr_t*)(get_physical_addr(*sp, child) - child->stack_top);
-        sp_physical = (ptr_t *)(new_stack + (unsigned long)vsp_relative_to_stack_top) ;
-        *sp = (reg_t *)get_virtual_addr(sp_physical, child);
-        old_stack = child->stack_top;
-        child->stack_top = new_stack;
-
-        stack_ptr = (unsigned long*)child->stack_top;
-        stack_bottom = (unsigned long*)stack_ptr + PAGE_LEN;
-        vir_old_stack = get_virtual_addr(old_stack, child);
-        vstack_top = (unsigned long)vir_old_stack;
-        vstack_bottom = (unsigned long)vir_old_stack + PAGE_LEN;
-
-        // change the virtual address referencing old stack to new stack
-        while (stack_ptr < stack_bottom) {
-            val = *stack_ptr;
-            if (val >= vstack_top && val < vstack_bottom) {
-                *stack_ptr = (unsigned long)get_virtual_addr(val - vstack_top + new_stack, child);
-                // KDEBUG(("%p: old %lx new %lx\n", (void *)get_virtual_addr(stack_ptr, child), val, *stack_ptr));
-            }
-            stack_ptr++;
-        }
-        for (i = 0; i < REGS_NR; i++){
-            val = child->ctx.m.regs[i];
-            if (val >= vstack_top && val < vstack_bottom) {
-                child->ctx.m.regs[i] = (unsigned long)get_virtual_addr(val - vstack_top + new_stack, child);
-            }
-        }
-
-        // KDEBUG(("tfork %p %p for %d tp %d\n", (void *)new_stack, (void *)*sp, child->proc_nr, child->thread_parent));
-        proc_memctl(child, vir_old_stack, PROC_NO_ACCESS);
+        if ((ret = copy_stack(parent, child)))
+            return ret;
 
         syscall_reply2(TFORK, 0, child->proc_nr, m);
         return child->proc_nr;
