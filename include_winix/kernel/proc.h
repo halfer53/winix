@@ -193,7 +193,6 @@ typedef struct proc {
     sigset_t sig_mask;
     sigset_t sig_mask2;
     struct sigaction sig_table[_NSIG];
-    reg_t* sa_restorer;
 
     /* Alarm */
     struct timer alarm;
