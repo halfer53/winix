@@ -233,7 +233,7 @@ int test_so(int argc, char **argv){
 }
 
 int sigsegv_handler(int signum){
-    // printf("sigsegv handler\n");
+    printf("sigsegv handler invoked\n");
     return 0;
 }
 
