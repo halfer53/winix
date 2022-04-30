@@ -34,6 +34,6 @@ void reset_irq_count();
 #define EXCEPTION_STACK_SIZE    (PAGE_LEN - 1)
 void register_irq(int irq, expt_handler_t handler);
 void trigger_gpf(struct proc* who);
-
+void kreport_proc_sigsegv(struct proc* who);
 
 #endif

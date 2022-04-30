@@ -160,13 +160,8 @@ void rewind_stack(struct proc* proc){
 #define PRINT_DEBUG_REG(pc,sp,ra)\
     kprintf("$pc 0x%04lx, $sp 0x%04lx $ra 0x%04lx\n",pc,sp,ra)
 
-
-void trigger_gpf(struct proc* who){
+void kreport_proc_sigsegv(struct proc* who){
     ptr_t* pc;
-    // is the current process a valid one?
-    ASSERT(IS_PROCN_OK(who->proc_nr));
-    trace_syscall = false;
-
 #ifdef _DEBUG
     if (who->sig_table[SIGSEGV].sa_handler == SIG_DFL){
 
@@ -195,7 +190,13 @@ void trigger_gpf(struct proc* who){
         rewind_stack(who);
     }
 #endif
+}
 
+
+void trigger_gpf(struct proc* who){
+    
+    // is the current process a valid one?
+    ASSERT(IS_PROCN_OK(who->proc_nr));
     
     if(IS_KERNEL_PROC(curr_scheduling_proc))
         _panic("kernel crashed",NULL);
