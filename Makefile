@@ -26,7 +26,7 @@ export srctree \\
 export SREC_INCLUDE := include_winix/srec
 export includes := $(shell find include -name "*.h")
 export SREC = $(shell find $(SREC_INCLUDE) -name "*.srec")
-export TEXT_OFFSET := 2048
+export TEXT_OFFSET := 1024
 export INCLUDE_PATH := -I./include -I./include_winix
 export CURR_UNIX_TIME := $(shell date +%s)
 export WINIX_CFLAGS := -D__wramp__
@@ -57,7 +57,7 @@ all:
 	$(Q)$(MAKE) kbuild
 	$(Q)$(MAKE) $(DISK)
 	$(Q)$(MAKE) include_build
-	$(Q)wlink $(LDFLAGS) -Ttext 1024 -v -o winix.srec \
+	$(Q)wlink $(LDFLAGS) -Ttext $(TEXT_OFFSET) -v -o winix.srec \
 		$(L_HEAD) $(KERNEL_O) $(KLIB_O) $(L_TAIL) > $(SREC_INCLUDE)/winix.verbose
 ifeq ($(KBUILD_VERBOSE),0)
 	@echo "LD \t winix.srec"
