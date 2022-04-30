@@ -68,6 +68,7 @@ void int2str(int value, int i, char* output){
     }
 }
 
+// byte stream for \e[000;000H
 static char draw_pos[] = {0x1b, 0x5b, 0x30, 0x30, 0x30, 0x3b, 0x30, 0x30, 0x30, 0x48, 0};
 static char coordinate_format[] = "%s ";
 
@@ -77,9 +78,7 @@ void draw_coordinate(int x, int y, char character){
     int2str(x, 100, draw_format + 6);
     coordinate_format[2] = character;
     printf(coordinate_format, draw_pos);
-    // buf[0] = character;
-    // buf[1] = '\0';
-    // fprintf(stderr, "Draw %s at x %d y %d | ", buf, pos->x, pos->y);
+    // fprintf(stderr, "Draw %c at x %d y %d | ", character, pos->x, pos->y);
 }
 
 void clear_point(struct point* p){
@@ -88,7 +87,6 @@ void clear_point(struct point* p){
 
 void clear_screen(){
     // byte stream for \e[2J
-    // static char cls[] = {0x1b, 0x5b, 0x31, 0x3b, 0x31, 0x48, 0x1b, 0x5b, 0x32, 0x4a, 0};
     static char cls[] = {0x1b, 0x5b, 0x32, 0x4a, 0};
 
     printf("%s", cls);
