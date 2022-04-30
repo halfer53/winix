@@ -28,7 +28,6 @@ int handle_sig(struct proc* who, int signum);
 int handle_pendingsig(struct proc* who);
 
 struct sigframe{
-    int signum;
     int syscall_num;
     uintptr_t code;
     uintptr_t code2; 

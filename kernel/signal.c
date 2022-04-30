@@ -56,23 +56,20 @@ PRIVATE int build_signal_ctx(struct proc *who, int signum){
 
     copyto_user_stack(who, who, SIGNAL_CTX_LEN);
 
-    sframe.signum = signum;
     sframe.syscall_num = SIGRET;
     sframe.code = ASM_ADDUI_SP_SP_1;
     sframe.code2 = ASM_SYSCALL;
-
+    copyto_user_stack(who, &sframe, sizeof(struct sigframe));
+    who->ctx.m.ra = who->ctx.m.sp;
 
     // signum is sitting on top of the stack
-    copyto_user_stack(who, &sframe, sizeof(struct sigframe));
-    who->ctx.m.pc = (void (*)())who->sig_table[signum].sa_handler;
-
-    // skip the signum to point ra to ASM_SYSCALL
-    who->ctx.m.ra = (reg_t*)(who->ctx.m.sp + sizeof(signum));
+    copyto_user_stack(who, &signum, sizeof(signum));
     
     // backup sig mask
     who->sig_mask2 = who->sig_mask;
     who->sig_mask = who->sig_table[signum].sa_mask;
 
+    who->ctx.m.pc = (void (*)())who->sig_table[signum].sa_handler;
     who->state = STATE_RUNNABLE;
     return OK;
 }

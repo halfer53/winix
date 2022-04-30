@@ -24,7 +24,7 @@ int do_sigreturn(struct proc *who, struct message *m){
 
     sp = get_physical_addr(who->ctx.m.sp, who);
 
-    sp += sizeof(struct sigframe) - sizeof(int);
+    sp += sizeof(struct sigframe);
 
     // Copy the previous pcb saved on the user stack back
     // to system proc struct, information includes registers
