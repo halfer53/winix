@@ -60,7 +60,7 @@ PRIVATE int build_signal_ctx(struct proc *who, int signum){
     sframe.code = ASM_ADDUI_SP_SP_1;
     sframe.code2 = ASM_SYSCALL;
     copyto_user_stack(who, &sframe, sizeof(struct sigframe));
-    who->ctx.m.ra = who->ctx.m.sp;
+    who->ctx.m.ra = who->ctx.m.sp + 1;
 
     // signum is sitting on top of the stack
     copyto_user_stack(who, &signum, sizeof(signum));
