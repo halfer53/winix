@@ -58,7 +58,7 @@ static error_t parse_opt (int key, char *arg, struct argp_state *state)
     switch (key)
     {
         case 't':
-            arguments->offset = arg ? atoi(arg) : 2048;
+            arguments->offset = atoi(arg);
             break;
         case 'o':
             arguments->output_path = arg;
