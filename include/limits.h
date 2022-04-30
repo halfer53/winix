@@ -34,8 +34,8 @@
 #  define USHRT_MAX        65535
 
 /* Minimum and maximum values a `signed int' can hold.  */
-#  define INT_MIN        (-INT_MAX - 1)
 #  define INT_MAX        2147483647
+#  define INT_MIN        ((-INT_MAX) - 1)
 
 /* Maximum value an `unsigned int' can hold.  (Minimum is 0.)  */
 #  define UINT_MAX        4294967295U
