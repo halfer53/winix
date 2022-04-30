@@ -27,17 +27,11 @@ int is_sigpending(struct proc* who);
 int handle_sig(struct proc* who, int signum);
 int handle_pendingsig(struct proc* who);
 
-#define SIG_FRAME_CODE_LEN  (2)
-
-struct sigframe_code{
-    unsigned int codes[SIG_FRAME_CODE_LEN];
-};
-
 struct sigframe{
     int signum;
-    struct syscall_frame_comm s_base;
+    int syscall_num;
+    uintptr_t code;
+    uintptr_t code2; 
 };
-
-
 
 #endif
