@@ -40,7 +40,6 @@ struct board_struct{
     struct list_head snake;
     struct list_head foods;
     enum direction dir;
-    int ofd;
 };
 
 struct point* new_point(int x, int y){
@@ -133,7 +132,6 @@ void board_init(struct board_struct *board){
     fd = open("/dev/tty2", O_RDWR);
     dup2(fd, STDERR_FILENO);
     fd2 = open("/dev/tty1", O_RDWR | O_NONBLOCK);
-    board->ofd = fd2;
     ioctl(fd2, TIOCDISABLEECHO);
     dup2(fd2, STDIN_FILENO);
     srand(clo);
@@ -172,7 +170,7 @@ enum direction get_direction(struct board_struct* board){
     static char input[INPUT_SIZ];
     enum direction dir = board->dir;
     //non blocking
-    int ret = read(board->ofd, input, INPUT_SIZ);
+    int ret = read(STDIN_FILENO, input, INPUT_SIZ);
     if(ret > 0){
         char c = input[ret - 1];
         // fprintf(stderr, "Direction %d \n",ret, c);
