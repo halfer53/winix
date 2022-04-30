@@ -143,6 +143,7 @@ typedef struct proc {
     size_t text_size;
     size_t data_size;
     size_t bss_size;
+    size_t stack_size;
 
     /* Protection */
     reg_t protection_table[PTABLE_LEN];
