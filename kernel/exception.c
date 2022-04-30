@@ -223,9 +223,8 @@ PRIVATE void gpf_handler() {
  *
  **/
 PRIVATE void syscall_handler() {
-    int dest, operation;
+    int dest, operation, ret;
     struct message *m;
-    int *retval;
     ptr_t *sp;
 
     if(!curr_scheduling_proc )
@@ -250,7 +249,6 @@ PRIVATE void syscall_handler() {
     }
 
     m->src = curr_scheduling_proc->proc_nr;            // Don't trust the who to specify their own source process number
-    retval = (int*)&curr_scheduling_proc->ctx.m.regs[0];        // Result is returned in $1
 
     // Decode operation
     switch(operation) {
@@ -259,22 +257,25 @@ PRIVATE void syscall_handler() {
             /* FALLTHRU */
 
         case WINIX_SEND:
-            *retval = do_send(dest, m);
-            if(*retval < 0)
+            ret = do_send(dest, m);
+            if(ret < 0)
                 curr_scheduling_proc->state &= ~STATE_RECEIVING;
             break;
 
         case WINIX_RECEIVE:
-            *retval = do_receive(m);
+            ret = do_receive(m);
             break;
 
         case WINIX_NOTIFY:
-            *retval = do_notify(m->src, dest,m);
+            ret = do_notify(m->src, dest,m);
             break;
 
         default:
-            *retval = ERR;
+            ret = ERR;
             break;
+    }
+    if (ret < 0){
+        curr_scheduling_proc->ctx.m.regs[0] = ret;
     }
 
 end:
