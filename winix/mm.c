@@ -262,10 +262,11 @@ void release_proc_mem(struct proc *who){
         return;
     }
     // KDEBUG(("release proc mem %d %d\n", who->proc_nr, who->thread_parent));
-    if(who->thread_parent > 0){ // thread, in this case, we only release the stack
-        user_release_pages(who, who->stack_top, PAGE_LEN);
-        // klog("release stack 0x%x of %s %d\n", who->stack_top, who->name, who->proc_nr);
-    }else{
+
+    user_release_pages(who, who->stack_top, who->stack_size);
+    // klog("release stack 0x%x of %s %d\n", who->stack_top, who->name, who->proc_nr);
+
+    if (who->thread_parent == 0){
         ptr_t* memstart = who->mem_start;
         int page_len = (int)(who->heap_bottom + 1 - who->mem_start);
         user_release_pages(who, memstart, page_len);
