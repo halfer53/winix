@@ -188,8 +188,6 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
                 }
 
                 if(tfork() == 0){ // child, actual command
-                    pipe_ptr = &pipe_fds[(i * 2)];
-                    prev_pipe_ptr = &pipe_fds[((i-1) * 2)];
                     if(cmd->numCommands > 1){
                         if((i+1) < cmd->numCommands ){ // not the last command
                             dup2(pipe_ptr[PIPE_WRITE], STDOUT_FILENO);
@@ -206,7 +204,6 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
                             // printf("cmd %d %s dup read %d\n", i, buffer, prev_pipe_ptr[PIPE_READ]);
                         }
                     }
-                    cmd_start = cmd->cmdStart[i];
                     ret = execv(buffer, &cmd->argv[cmd_start]);
                     if(ret){
                         perror("execv");
@@ -217,7 +214,6 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
                     close(prev_pipe_ptr[PIPE_WRITE]);
                 }
             }else{
-                cmd_start = cmd->cmdStart[i];
                 fprintf(stderr, "Unknown command '%s'\n", cmd->argv[cmd_start]);
                 exit_code = 1;
                 break;
