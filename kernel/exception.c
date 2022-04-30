@@ -131,12 +131,12 @@ PRIVATE void serial2_handler() {
 void rewind_stack(struct proc* proc){
     vptr_t *vtext_start, *vtext_end;
     ptr_t **p = (ptr_t **)get_physical_addr(proc->ctx.m.sp, proc);
-    ptr_t **stack_end = (ptr_t **)proc->stack_top + USER_STACK_SIZE;
+    ptr_t **stack_end = (ptr_t **)proc->stack_top + proc->stack_size;
     reg_t *data, *instruction;
     char *filename;
 
     if (p >= stack_end){
-        kprintf("stack pointer is not point to stack frame");
+        kprintf("stack pointer %p is not pointed to stack end %p\n", (void *)p, (void *)stack_end);
         return;
     }
 
