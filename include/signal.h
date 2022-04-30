@@ -79,8 +79,7 @@ struct sigaction {
 // define signal
 void (*signal(int sig, void (*func)(int)))(int);
 
-// currently the minisal sigframe size is 35 words, we add an extra 10 for flexibility
-#define MINSIGSTKSZ 45
+#define MINSIGSTKSZ 50
 
 int sigaddset(sigset_t *, int);
 int sigdelset(sigset_t *, int);
