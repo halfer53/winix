@@ -15,7 +15,7 @@
 */
 #include <kernel/kernel.h>
 
-int sys_sigaction(struct proc* who, int signum, struct sigaction* act, struct sigaction* oact, void *restorer){
+int sys_sigaction(struct proc* who, int signum, struct sigaction* act, struct sigaction* oact){
     if(signum < 1 || signum >= _NSIG)
         return EINVAL;
 
@@ -37,7 +37,6 @@ int sys_sigaction(struct proc* who, int signum, struct sigaction* act, struct si
     sigdelset(&act->sa_mask, SIGSTOP);
     memcpy(&who->sig_table[signum], act, sizeof(struct sigaction));
 
-    who->sa_restorer = (reg_t*)restorer;
     return OK;
 }
 
@@ -52,28 +51,24 @@ int do_sigaction(struct proc *who, struct message *m){
     if(oact && !is_vaddr_accessible(oact, who))
         return EFAULT;
 
-    if(!is_vaddr_accessible(m->m1_p3, who))
-        return EFAULT;
-
     act = (struct sigaction*)get_physical_addr(act, who);
 
     if(oact){
         oact = (struct sigaction*)get_physical_addr(oact, who);
     }
     
-    return sys_sigaction(who, signum, act, oact, m->m1_p3);
+    return sys_sigaction(who, signum, act, oact);
 }
 
 
 int do_signal(struct proc* who, struct message *m){
     struct sigaction sa, oldsa;
     int signum = m->m1_i1;
-    void *restorer = m->m1_p1;
     
-    sa.sa_handler = (sighandler_t)(unsigned long)m->m1_i2;
+    sa.sa_handler = (sighandler_t)(unsigned long)m->m1_p1;
     sa.sa_flags = SA_RESETHAND;
     sa.sa_mask = 0xffff;
-    if(sys_sigaction(who, signum, &sa, &oldsa, restorer))
+    if(sys_sigaction(who, signum, &sa, &oldsa))
         return (int)((unsigned long)SIG_ERR);
     return (int)((unsigned long)oldsa.sa_handler);
 }
