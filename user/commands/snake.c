@@ -15,14 +15,16 @@
 #define SNAKE_CHAR  ('x')
 #define FOOD_CHAR   ('o')
 #define GET_SNAKE_HEAD(board)   (list_first_entry(&board->snake, struct point, list))
+#define GET_SNAKE_TAIL(board)   (list_last_entry(&board->snake, struct point, list))
 #define draw_point(p, c)    draw_coordinate(p->x, p->y, c)
+#define clear_point(p)      draw_point(p, ' ')
 
-#define SUCCESS (0)
-#define FAIL    (-1)
-#define FAIL_LEFT   (-2)
-#define FAIL_RIGHT   (-3)
-#define FAIL_DOWN   (-4)
-#define FAIL_UP   (-5)
+#define SUCCESS         ( 0)
+#define FAIL            (-1)
+#define FAIL_LEFT       (-2)
+#define FAIL_RIGHT      (-3)
+#define FAIL_DOWN       (-4)
+#define FAIL_UP         (-5)
 #define FAIL_EAT_SELF   (-6)
 
 
@@ -81,14 +83,9 @@ void draw_coordinate(int x, int y, char character){
     // fprintf(stderr, "Draw %c at x %d y %d | ", character, pos->x, pos->y);
 }
 
-void clear_point(struct point* p){
-    draw_point(p, ' ');
-}
-
 void clear_screen(){
-    // byte stream for \e[2J
-    static char cls[] = {0x1b, 0x5b, 0x32, 0x4a, 0};
-
+    // byte stream for \e[0;0H\e[2J
+    static char cls[] = {0x1b, 0x5b, 0x30, 0x3b, 0x30, 0x48, 0x1b, 0x5b, 0x32, 0x4a, 0};
     printf("%s", cls);
 }
 
@@ -257,7 +254,7 @@ int refresh(struct board_struct* board){
             // fprintf(stderr, "eat self x %d y %d\n");
             return FAIL_EAT_SELF;
         }
-        pos = list_last_entry(&board->snake, struct point, list);
+        pos = GET_SNAKE_TAIL(board);
         clear_point(pos);
     }else{
         // if snake has eaten food, get a new random food
@@ -282,10 +279,10 @@ int refresh(struct board_struct* board){
 void draw(struct board_struct *board){
     struct point* p;
     list_for_each_entry(struct point, p, &board->snake, list){
-        draw_point(p, 'x');
+        draw_point(p, SNAKE_CHAR);
     }
     list_for_each_entry(struct point, p, &board->foods, list){
-        draw_point(p, 'o');
+        draw_point(p, FOOD_CHAR);
     }
 }
 
