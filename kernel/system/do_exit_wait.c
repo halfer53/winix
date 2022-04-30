@@ -182,7 +182,7 @@ void exit_proc_in_interrupt(struct proc* who, int exit_val,int signum){
     // is sent during exception, refer to kernel/exception.c for
     // more detail e.g. send_sig(geduling_proc, SIGSEGV)
     em.type = EXIT;
-    em.m1_i1 = 0;
+    em.m1_i1 = exit_val;
     em.m1_i2 = signum;
     em.src = who->proc_nr;
     vptr = copyto_user_heap(who, &em, sizeof(struct message));
