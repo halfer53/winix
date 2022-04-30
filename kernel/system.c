@@ -174,9 +174,6 @@ void set_syscall_mesg_exception(int operation, ptr_t* osp, struct message *m, st
         m->m1_i2 = *sp;
         break;
         
-    case SIGACTION:
-        m->m1_i1 = *(sp + 3);
-        /* FALLTHRU */
     case EXECVE:
         m->m1_p3 = (void*)*(sp + 2);
         /* FALLTHRU */
@@ -193,7 +190,8 @@ void set_syscall_mesg_exception(int operation, ptr_t* osp, struct message *m, st
     case UNLINK:
         m->m1_p1 = (void*)*sp;
         break;
-    
+
+    case SIGACTION:
     case DPRINTF:
         m->m1_i1 = *sp++;
         m->m1_p1 = (void *)*sp++;
