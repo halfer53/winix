@@ -502,6 +502,15 @@ int alloc_mem_welf(struct proc* who, struct winix_elf* elf, int stack_size, int 
     return OK;
 }
 
+int copy_from_user(struct proc* who, ptr_t *dest, vptr_t *src, size_t len){
+    ptr_t* p;
+    if (!is_vaddr_ok(who, src, len))
+        return EFAULT;
+    p = get_physical_addr(src, who);
+    memcpy(dest, p, len);
+    return OK;
+}
+
 /**
  * Copy values onto the user stack, this is very similar to memcpy
  * @param  who 
