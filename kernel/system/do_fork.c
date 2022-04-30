@@ -180,6 +180,7 @@ int do_tfork(struct proc* parent, struct message* m){
     unsigned long vstack_top, vstack_bottom, val;
     vptr_t* vsp_relative_to_stack_top, *vir_old_stack;
     reg_t** sp;
+    int i;
     if((child = get_free_proc_slot())){
         copy_pcb(parent,child);
         child->time_used = child->sys_time_used = 0;
@@ -214,12 +215,18 @@ int do_tfork(struct proc* parent, struct message* m){
             val = *stack_ptr;
             if (val >= vstack_top && val < vstack_bottom) {
                 *stack_ptr = (unsigned long)get_virtual_addr(val - vstack_top + new_stack, child);
-                // KDEBUG(("old %x new %x\n", val, *stack_ptr));
+                // KDEBUG(("%p: old %lx new %lx\n", (void *)get_virtual_addr(stack_ptr, child), val, *stack_ptr));
             }
             stack_ptr++;
         }
+        for (i = 0; i < REGS_NR; i++){
+            val = child->ctx.m.regs[i];
+            if (val >= vstack_top && val < vstack_bottom) {
+                child->ctx.m.regs[i] = (unsigned long)get_virtual_addr(val - vstack_top + new_stack, child);
+            }
+        }
 
-        // KDEBUG(("tfork %x %x for %d tp %d\n", new_stack, *sp, child->proc_nr, child->thread_parent));
+        // KDEBUG(("tfork %p %p for %d tp %d\n", (void *)new_stack, (void *)*sp, child->proc_nr, child->thread_parent));
         /*
             if stack_top == mem_start, this means this process and its parents have not called tfork before.
             because in the original memory layout, stack is the first page of accessible memory 
