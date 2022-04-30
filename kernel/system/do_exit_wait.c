@@ -205,6 +205,13 @@ void exit_proc(struct proc *who, int status, int signum){
         return;
     }
 
+    if(trace_syscall){
+        klog("%s[%d] exit status %d signal %d\n",who->name, who->pid, status, signum);
+    }
+    if(signum == SIGSEGV){
+        kreport_proc_sigsegv(who);
+    }
+
     mesg = get_ipc_mesg();
     parent = get_proc(who->parent);
 
@@ -254,12 +261,9 @@ int do_exit(struct proc *who, struct message *m){
     // if exit_magic, this means process is returned
     // from main, and exit syscall is triggered by
     // epilogue ( see system/execve.c). The return value
-    // in winix is stored in 1
+    // in winix is stored in register 1
     if(status == EXIT_MAGIC){
         status = who->ctx.m.regs[0];
-    }
-    if(trace_syscall){
-        klog("%s[%d] exit status %d signal %d\n",who->name, who->pid, status, signum);
     }
     exit_proc(who, status, signum);
     
