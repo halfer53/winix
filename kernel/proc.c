@@ -42,30 +42,27 @@ PUBLIC struct proc *curr_syscall_caller;
  *
  * Each process image is aligned as shown below
  * 
- *              <- rbase
- * Inaccessible Page (1024 words) 
- *              <- stack_top
- * Stack       (1024 words)
+ *              
+ * Inaccessible Page (1024 words)   <- rbase
  * Text segment
  * Data segment
  * Bss segment
- * Heap
- *              <- heap_bottom
+ * Heap data                        <- heap_bottom
+ *              
+ * 
+ * 
+ * 
+ * Stack                            <- stack_top
  *
  * In the struct proc, rbase points to the first page for which 
  * the process does not have access. This is because NULL points to 0, which is 
  * effectively the first page of the process image. By setting the first page
  * as inaccessible, derefercing NULL will triger page fault.
  * 
- * Stack_top points to the start of the memory where memory can be accessed
- *
  * Heap_bottom points to the end of the process image where memory can be accessed.
  * Heap can be extended by extending heap_bottom.
- *
- * Note that all those segments are continous, so whenever a fork
- * is called, we can simply compute the number of pages this process
- * is occuping by doing heap_bottom + 1 - stack_top. 
  * 
+ * Stack_top points to the start of the memory where memory can be accessed
  */
 
 /**
