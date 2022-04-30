@@ -238,11 +238,11 @@ int sigsegv_handler(int signum){
 }
 
 int test_sigsegv(int argc, char **argv){
-    int *p = NULL;
+    char *p = (char *)NULL + 1;
     int pid;
     if ((pid = tfork()) == 0){
         signal(SIGSEGV, sigsegv_handler);
-        *p = 1;
+        printf("%s", p);
         signal(SIGSEGV, SIG_DFL);
         printf("sigsegv test finished\n");
     }else{
