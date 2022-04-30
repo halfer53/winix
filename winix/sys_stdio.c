@@ -126,6 +126,13 @@ int kputud_buf(unsigned int n, char *buf) {
     unsigned int place = 1000000000;
     unsigned int offset = 0;
 
+    // zero?
+    if(n == 0) {
+        *buf++ = '0';
+        *buf = '\0';
+        return 1;
+    }
+
     // find first digit of number
     while(place > n) {
         place /= 10;
@@ -150,13 +157,7 @@ int kputud_buf(unsigned int n, char *buf) {
  */
 int kputd_buf(int n, char *buf) {
     int offset = 0;
-    // zero?
-    if(n == 0) {
-        *buf++ = '0';
-        *buf = '\0';
-        return 1;
-    }
-
+    
     // negative?
     if(n < 0) {
         *buf++ = '-';
