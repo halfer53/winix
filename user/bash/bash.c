@@ -66,18 +66,16 @@ struct cmd_internal builtin_commands[] = {
 };
 
 void init_shell(){
-#ifdef __wramp__
     int ret;
+    pgid = getpgid(0);
+    ret = ioctl(STDIN_FILENO, TIOCSPGRP, &pgid);
+    if (ret != 0){
+        perror("TIOCSPGRP");
+    }
+#ifdef __wramp__
     signal(SIGINT, SIG_IGN);
     signal(SIGTSTP, SIG_IGN);
-    ret = ioctl(STDIN_FILENO, TIOCSCTTY, 0);
-    if (ret != 0){
-        perror("TIOCSCTTY");
-    }
-    pgid = getpgid(0);
-    ioctl(STDIN_FILENO, TIOCSPGRP, &pgid);
 #endif
-    
 }
 
 int main() {
@@ -93,7 +91,7 @@ int main() {
 #endif
 
     while(1) {
-        write(STDOUT_FILENO, PREFIX, strlen(PREFIX));
+        ret = write(STDOUT_FILENO, PREFIX, strlen(PREFIX));
         ret = read(0, buf, MAX_LINE);
 
         if(ret == EOF){

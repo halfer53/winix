@@ -67,6 +67,8 @@ void init_tty(){
   CHECK_SYSCALL(ret == 1);
   ret = dup(fd);
   CHECK_SYSCALL(ret == 2);
+  ret = ioctl(STDIN_FILENO, TIOCSCTTY, 0);
+  CHECK_SYSCALL(ret == 0);
   pgid = getpgid(0);
   ret = ioctl(STDIN_FILENO, TIOCSPGRP, &pgid);
   CHECK_SYSCALL(ret == 0);
