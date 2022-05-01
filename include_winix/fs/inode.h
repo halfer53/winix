@@ -59,6 +59,7 @@ struct zone_iterator{
 struct dirent_iterator{
     struct winix_dirent* dirent;
     struct winix_dirent* dirent_end;
+    struct block_buffer* buffer;
     struct zone_iterator zone_iter;
 };
 

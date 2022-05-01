@@ -549,6 +549,7 @@ int iter_zone_close(struct zone_iterator* iter){
 int iter_dirent_init(struct dirent_iterator* iter, struct inode* inode){
     iter->dirent = NULL;
     iter->dirent_end = NULL;
+    iter->buffer = NULL;
     iter_zone_init(&iter->zone_iter, inode, 0);
     return 0;
 }
@@ -571,7 +572,9 @@ struct winix_dirent* iter_dirent_get_next(struct dirent_iterator* iter){
         buffer = get_block_buffer(zone, iter->zone_iter.i_inode->i_dev);
         iter->dirent = (struct winix_dirent*)buffer->block;
         iter->dirent_end = (struct winix_dirent* )&buffer->block[BLOCK_SIZE];
-        put_block_buffer(buffer);
+        if(iter->buffer)
+            put_block_buffer(iter->buffer);
+        iter->buffer = buffer;
     }
     return iter->dirent++;
 }
@@ -581,7 +584,11 @@ int iter_dirent_alloc(struct dirent_iterator* iter){
 }
 
 int iter_dirent_close(struct dirent_iterator* iter){
-    iter->dirent = iter->dirent_end = NULL;
+    if(iter->buffer){
+        put_block_buffer(iter->buffer);
+        iter->buffer = NULL;
+    }
+    
     return iter_zone_close(&iter->zone_iter);
 }
 
