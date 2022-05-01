@@ -209,7 +209,7 @@ void test_given_iter_dirent_has_next_when_has_data_should_return_true(){
 
 void test_given_iter_dirent_has_next_when_dirent_exhausted_should_return_false(){
     struct dirent_iterator iter;
-    int i;
+    int i, j;
     struct winix_dirent* dir;
     int ret = sys_mkdir(curr_scheduling_proc, DIR_NAME, 0x755);
     assert(ret == 0);
@@ -223,20 +223,21 @@ void test_given_iter_dirent_has_next_when_dirent_exhausted_should_return_false()
     assert(ret == 0);
 
     int dirent_per_block = BLOCK_SIZE / sizeof(struct winix_dirent);
-    for(i = 0; i < dirent_per_block; i++){
-        assert(iter_dirent_has_next(&iter) == true);
-        dir = iter_dirent_get_next(&iter);
-        assert(dir != NULL);
-    }
+    for(i = 0; i < MAX_ZONES; i++){
+        for(j = 0; j < dirent_per_block; j++){
+            assert(iter_dirent_has_next(&iter) == true);
+            dir = iter_dirent_get_next(&iter);
+            assert(dir != NULL);
+        }
 
-    assert(iter_dirent_has_next(&iter) == false);
-    assert(iter_dirent_alloc(&iter) > 0);
-    assert(iter_dirent_has_next(&iter) == true);
-
-    for(i = 0; i < dirent_per_block; i++){
-        assert(iter_dirent_has_next(&iter) == true);
-        dir = iter_dirent_get_next(&iter);
-        assert(dir != NULL);
+        assert(iter_dirent_has_next(&iter) == false);
+        if (i < MAX_ZONES - 1){
+            ret = iter_dirent_alloc(&iter);
+            assert(ret > 0);
+            assert(iter_dirent_has_next(&iter) == true);
+        }
     }
+    ret = iter_dirent_alloc(&iter);
+    assert(ret == -EFBIG);
     assert(iter_dirent_has_next(&iter) == false);
 }
