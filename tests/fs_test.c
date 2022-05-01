@@ -470,7 +470,6 @@ void test_given_pwd_when_chdir_should_return_path(){
 
     char *result = sys_getcwd(current, buffer, PAGE_LEN);
     assert(!IS_ERR(result));
-    printf("%s\n", result);
     assert(strcmp(result, DIR_NAME) == 0);
 }
 
