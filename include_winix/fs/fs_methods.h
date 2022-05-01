@@ -37,6 +37,7 @@ int sys_link(struct proc* who, char *oldpath, char *newpath);
 int sys_unlink(struct proc* who, char *path);
 int sys_mknod(struct proc* who, char *pathname, mode_t mode, dev_t devid);
 int sys_getdents(struct proc* who, int fd, struct dirent* dirp_dst, unsigned int count);
+char* sys_getcwd(struct proc* who, char* pathname, int size);
 
 void init_dev();
 void init_tty();
@@ -85,6 +86,7 @@ bool iter_has_next_zone(struct zone_iterator* iter);
 int char32_strcmp(const char32_t *s1, const char *s2);
 int char32_strlen(const char32_t *s);
 char32_t *char32_strlcpy(char32_t *dest, const char *src, size_t n);
+char *char32_strlcpy2(char *dest, char32_t *src, size_t n);
 char *char32_index(const char32_t *string, int c);
 
 #endif //FS_FS_METHODS_H_

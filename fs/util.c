@@ -12,6 +12,15 @@ char32_t *char32_strlcpy(char32_t *dest, const char *src, size_t n){
     return saved;
 }
 
+char *char32_strlcpy2(char *dest, char32_t *src, size_t n){
+    char *saved = dest;
+    while (*src && n--) {
+        *dest++ = *src++;
+    }
+    *dest = 0;
+    return saved;
+}
+
 int char32_strlen(const char32_t *s) {
     const char32_t* bak = s;
     for (; *s; ++s)
