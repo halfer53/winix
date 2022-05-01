@@ -370,22 +370,20 @@ int init_dirent(inode_t* dir, inode_t* ino){
     struct winix_dirent* curr;
     struct block_buffer* buf;
     block_t bnr;
-    int i;
+
     if(!S_ISDIR(ino->i_mode))
         return -ENOTDIR;
+    bnr = ino->i_zone[0];
+    if(bnr == 0)
+        return -EINVAL;
 
-    for (i = 0; i < NR_TZONES; ++i) {
-        if((bnr = ino->i_zone[i]) > 0){
-            buf = get_block_buffer(bnr, ino->i_dev);
-            curr = (struct winix_dirent*)buf->block;
-            fill_dirent( ino, curr, ".");
-            curr++;
-            fill_dirent(dir, curr, "..");
-            put_block_buffer_dirt(buf);
-            return OK;
-        }
-    }
-    return -ENOSPC;
+    buf = get_block_buffer(bnr, ino->i_dev);
+    curr = (struct winix_dirent*)buf->block;
+    fill_dirent( ino, curr, ".");
+    curr++;
+    fill_dirent(dir, curr, "..");
+    put_block_buffer_dirt(buf);
+    return OK;
 }
 
 
