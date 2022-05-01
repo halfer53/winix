@@ -62,5 +62,17 @@ void test_given_has_next_zone_when_zone_exhausted_should_return_false(){
 
     result = iter_has_next_zone(&iter);
     assert(result == false);
+
+    ret = iter_alloc_zone(&iter);
+    assert(ret > 0);
+
+    result = iter_has_next_zone(&iter);
+    assert(result == true);
+
+    zone = iter_get_next_zone(&iter);
+    assert(zone == ret);
+
+    result = iter_has_next_zone(&iter);
+    assert(result == false);
 }
 
