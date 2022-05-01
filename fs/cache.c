@@ -176,7 +176,7 @@ struct block_buffer *get_block_buffer(block_t blocknr, struct device* dev){
     // printf("ret blk %d %d\n", blocknr, ret);
 
     if (ret <=0 ) {
-        kwarn("dev io return %d for %d\n", ret, tbuf->b_blocknr);
+        kwarn("retrieve_block return %d for %d\n", ret, blocknr);
         dev->bops->release_block(tbuf);
         tbuf->initialised = false;
         enqueue_buf(tbuf);
