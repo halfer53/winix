@@ -546,11 +546,11 @@ int iter_zone_close(struct zone_iterator* iter){
     return 0;
 }
 
-int iter_dirent_init(struct dirent_iterator* iter, struct inode* inode){
+int iter_dirent_init(struct dirent_iterator* iter, struct inode* inode, int zone_idx, int dir_idx){
     iter->dirent = NULL;
     iter->dirent_end = NULL;
     iter->buffer = NULL;
-    iter_zone_init(&iter->zone_iter, inode, 0);
+    iter_zone_init(&iter->zone_iter, inode, zone_idx);
     return 0;
 }
 

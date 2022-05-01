@@ -187,7 +187,7 @@ void test_given_iter_dirent_has_next_when_has_data_should_return_true(){
 
     struct filp* filp = curr_scheduling_proc->fp_filp[fd];
     struct inode* inode = filp->filp_ino;
-    ret = iter_dirent_init(&iter, inode);
+    ret = iter_dirent_init(&iter, inode, 0, 0);
     assert(ret == 0);
 
     bool result = iter_dirent_has_next(&iter);
@@ -219,7 +219,7 @@ void test_given_iter_dirent_has_next_when_dirent_exhausted_should_return_false()
 
     struct filp* filp = curr_scheduling_proc->fp_filp[fd];
     struct inode* inode = filp->filp_ino;
-    ret = iter_dirent_init(&iter, inode);
+    ret = iter_dirent_init(&iter, inode, 0, 0);
     assert(ret == 0);
 
     int dirent_per_block = BLOCK_SIZE / sizeof(struct winix_dirent);
