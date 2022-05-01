@@ -575,8 +575,14 @@ struct winix_dirent* iter_dirent_get_next(struct dirent_iterator* iter){
     return iter->dirent++;
 }
 
-int iter_dirent_alloc(struct dirent_iterator* iter);
-int iter_dirent_close(struct dirent_iterator* iter);
+int iter_dirent_alloc(struct dirent_iterator* iter){
+    return iter_zone_alloc(&iter->zone_iter);
+}
+
+int iter_dirent_close(struct dirent_iterator* iter){
+    iter->dirent = iter->dirent_end = NULL;
+    return iter_zone_close(&iter->zone_iter);
+}
 
 
 
