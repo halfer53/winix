@@ -57,7 +57,6 @@ int add_inode_to_directory(struct proc* who,inode_t* dir, inode_t* ino, char* st
 // int register_device(struct device* dev, const char* name, dev_t id, mode_t type, struct device_operations*, struct filp_operations*);
 int release_filp(struct filp* file);
 int release_inode(inode_t *inode);
-filp_t *get_filp(int fd);
 filp_t *find_filp(inode_t *inode);
 filp_t *get_free_filp();
 void init_filp();

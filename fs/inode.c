@@ -554,9 +554,6 @@ int iter_dirent_init(struct dirent_iterator* iter, struct inode* inode){
 }
 
 bool iter_dirent_has_next(struct dirent_iterator* iter){
-    zone_t zone;
-    int ret;
-    struct block_buffer* buffer;
     if(iter->dirent >= iter->dirent_end)
         if(!iter_zone_has_next(&iter->zone_iter))
             return false;
@@ -566,7 +563,6 @@ bool iter_dirent_has_next(struct dirent_iterator* iter){
 
 struct winix_dirent* iter_dirent_get_next(struct dirent_iterator* iter){
     zone_t zone;
-    int ret;
     struct block_buffer* buffer;
     if(iter->dirent >= iter->dirent_end){
         if(!iter_zone_has_next(&iter->zone_iter))
@@ -575,7 +571,6 @@ struct winix_dirent* iter_dirent_get_next(struct dirent_iterator* iter){
         buffer = get_block_buffer(zone, iter->zone_iter.i_inode->i_dev);
         iter->dirent = (struct winix_dirent*)buffer->block;
         iter->dirent_end = (struct winix_dirent* )&buffer->block[BLOCK_SIZE];
-        return iter->dirent;
     }
     return iter->dirent++;
 }
