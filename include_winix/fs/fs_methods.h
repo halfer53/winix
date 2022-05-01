@@ -75,7 +75,7 @@ int truncate_inode(inode_t *inode);
 void init_inode();
 int run_unit_tests();
 
-int init_zone_iterator(struct zone_iterator* iter, struct proc* who, struct inode* inode, int zone_idx);
+int iter_zone_init(struct zone_iterator* iter, struct inode* inode, int zone_idx);
 zone_t iter_get_current_zone(struct zone_iterator* iter, zone_t** ptr, bool create_inode);
 zone_t iter_get_next_zone(struct zone_iterator* iter);
 int iter_alloc_zone(struct zone_iterator* iter);

@@ -55,7 +55,6 @@ int advance(inode_t *dirp, char string[NAME_MAX]){
 
     if(*string == '\0')
         return -EINVAL;
-
 //    KDEBUG(("advancing %s in inode %d\n", string, dirp->i_num));
     for(i = 0; i < NR_TZONES; i++){
         if(dirp->i_zone[i] > 0 ){

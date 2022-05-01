@@ -446,8 +446,7 @@ int remove_inode_from_dir(struct proc* who, struct inode* dir, struct inode* tar
     return -ENOENT;
 }
 
-int init_zone_iterator(struct zone_iterator* iter, struct proc* who, struct inode* inode, int zone_idx){
-    iter->who = who;
+int iter_zone_init(struct zone_iterator* iter, struct inode* inode, int zone_idx){
     iter->i_inode = inode;
     iter->i_zone_idx = zone_idx;
     return OK;
