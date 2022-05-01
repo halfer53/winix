@@ -573,4 +573,16 @@ void test_given_dev_dup_when_file_is_driver_should_return_from_driver(){
     reset_fs();
 }
 
+extern struct superblock root_sb;
+void test_when_disk_full_should_return_enospc(){
+    int fd = sys_open(current, FILE1, O_CREAT | O_RDWR, 0x755);
+    assert(fd == 0);
 
+    int remaining_bytes = NR_TZONES * BLOCK_SIZE;
+    char _buffer[remaining_bytes];
+    int ret = sys_write(current, fd, _buffer, remaining_bytes);
+    assert(ret == remaining_bytes);
+
+    ret = sys_write(current, fd, _buffer, 1);
+    assert(ret == -EFBIG);
+}
