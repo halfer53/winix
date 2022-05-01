@@ -52,6 +52,7 @@ struct inode_disk {
 };
 
 struct zone_iterator{
+    struct proc* who;
     struct inode* i_inode;
     block_t i_zone_idx;
 };
