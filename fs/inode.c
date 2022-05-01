@@ -452,7 +452,7 @@ int init_zone_iterator(struct zone_iterator* iter, struct inode* inode, int zone
     return OK;
 }
 
-zone_t get_current_zone(struct zone_iterator* iter){
+zone_t iter_get_current_zone(struct zone_iterator* iter){
     int ino_iter, ino_rem, indirect_idx;
     zone_t zone;
     struct inode* indirect_ino;
@@ -479,12 +479,16 @@ final:
     return zone;
 }
 
-zone_t get_next_zone(struct zone_iterator* iter){
-    zone_t zone = get_current_zone(iter);
+zone_t iter_get_next_zone(struct zone_iterator* iter){
+    zone_t zone = iter_get_current_zone(iter);
     if( zone)
         iter->i_zone_idx++;
     
     return zone;
+}
+
+int iter_alloc_zone(struct zone_iterator* iter){
+    return 0;
 }
 
 void init_inode(){

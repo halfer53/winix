@@ -19,7 +19,7 @@ void test_given_has_next_zone_when_exceed_max_should_return_false(){
     int ret = init_zone_iterator(&iter, root, MAX_ZONES);
     assert(ret == 0);
     
-    bool result = has_next_zone(&iter);
+    bool result = iter_has_next_zone(&iter);
     assert(result == false);
 }
 
@@ -30,7 +30,7 @@ void test_given_has_next_zone_when_have_zone_should_return_true(){
     int ret = init_zone_iterator(&iter, root, 0);
     assert(ret == 0);
     
-    bool result = has_next_zone(&iter);
+    bool result = iter_has_next_zone(&iter);
     assert(result == true);
 }
 
@@ -43,6 +43,6 @@ void test_given_has_next_zone_when_no_zone_should_return_false(){
     ret = init_zone_iterator(&iter, filp->filp_ino, 0);
     assert(ret == 0);
     
-    bool result = has_next_zone(&iter);
+    bool result = iter_has_next_zone(&iter);
     assert(result == false);
 }
