@@ -85,6 +85,12 @@ int iter_zone_alloc(struct zone_iterator* iter);
 int iter_zone_close(struct zone_iterator* iter);
 bool iter_zone_has_next(struct zone_iterator* iter);
 
+int iter_dirent_init(struct dirent_iterator* iter, struct inode* inode);
+bool iter_dirent_has_next(struct dirent_iterator* iter);
+struct winix_dirent* iter_dirent_get_next(struct dirent_iterator* iter);
+int iter_dirent_alloc(struct dirent_iterator* iter);
+int iter_dirent_close(struct dirent_iterator* iter);
+
 int char32_strcmp(const char32_t *s1, const char *s2);
 int char32_strlen(const char32_t *s);
 char32_t *char32_strlcpy(char32_t *dest, const char *src, size_t n);

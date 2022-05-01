@@ -553,10 +553,10 @@ int iter_dirent_init(struct dirent_iterator* iter, struct inode* inode){
     return 0;
 }
 
-bool iter_zone_has_next(struct zone_iterator* iter);
-zone_t iter_zone_get_next(struct zone_iterator* iter);
-int iter_zone_alloc(struct zone_iterator* iter);
-int iter_zone_close(struct zone_iterator* iter);
+bool iter_dirent_has_next(struct dirent_iterator* iter);
+struct winix_dirent* iter_dirent_get_next(struct dirent_iterator* iter);
+int iter_dirent_alloc(struct dirent_iterator* iter);
+int iter_dirent_close(struct dirent_iterator* iter);
 
 
 
