@@ -236,7 +236,7 @@ int dequeue_schedule( struct proc *h) {
     }
 
     if (curr == NULL)
-        return ERR;
+        return -EINVAL;
 
     if (prev == NULL) {
         q[HEAD] = curr->next;
@@ -444,7 +444,7 @@ int proc_memctl(struct proc* who ,vptr_t* page_addr, int flags){
     }else if(flags == PROC_NO_ACCESS){
         return bitmap_clear_bit(who->ctx.ptable, PTABLE_LEN, paged);
     }
-    return ERR;
+    return -EINVAL;
 }
 
 bool peek_mem_welf(struct winix_elf* elf, int stack_size, int heap_size){
@@ -461,15 +461,15 @@ int alloc_mem_welf(struct proc* who, struct winix_elf* elf, int stack_size, int 
     ptr_t* mem_start;
 
     if(elf->magic != WINIX_ELF_MAGIC)
-        return EINVAL;
+        return -EINVAL;
     if(elf->binary_size != elf->text_size + elf->data_size)
-        return EINVAL;
+        return -EINVAL;
 
     td_aligned = align_page(elf->binary_size + elf->bss_size);
     proc_len = td_aligned + heap_size;
     mem_start = user_get_free_pages(who, proc_len, GFP_NORM);
     if(mem_start == NULL)
-        return ENOMEM;
+        return -ENOMEM;
     // klog("welf alloc ret 0x%x, len %d\n", mem_start, proc_len);
     // _kreport_bitmap(who->ctx.ptable, MEM_MAP_LEN, kprintf2);
     // _kreport_memtable(kprintf2);
@@ -505,7 +505,7 @@ int alloc_mem_welf(struct proc* who, struct winix_elf* elf, int stack_size, int 
 int copy_from_user(struct proc* who, ptr_t *dest, vptr_t *src, size_t len){
     ptr_t* p;
     if (!is_vaddr_ok(who, src, len))
-        return EFAULT;
+        return -EFAULT;
     p = get_physical_addr(src, who);
     memcpy(dest, p, len);
     return OK;

@@ -61,7 +61,7 @@ int do_execve(struct proc *who, struct message *m){
             return ret;
         return exec_welf(who, buffer, argv, envp, false);
     }
-    return EFAULT;
+    return -EFAULT;
 }
 
 int copy_stirng_array(struct string_array *arr, char* from[], struct proc* who, bool is_physical_addr){
@@ -80,7 +80,7 @@ int copy_stirng_array(struct string_array *arr, char* from[], struct proc* who, 
     size++;
     arr->array = (char**)kmalloc(size);
     if(!arr->array){
-        return ENOMEM;
+        return -ENOMEM;
     }
     arr->size = size;
     pptr = from;
@@ -94,7 +94,7 @@ int copy_stirng_array(struct string_array *arr, char* from[], struct proc* who, 
         strsize = strsize < limit ? strsize : limit;
         arr->array[i] = (char*)kmalloc(strsize + 1);
         if(!arr->array[i]){
-            ret = ENOMEM;
+            ret = -ENOMEM;
             goto err_free_all;
         }
         
@@ -204,13 +204,13 @@ int exec_welf(struct proc* who, char* path, char *argv[], char *envp[], bool is_
     ret = filp_read(who, filp, &elf, sizeof(elf));
     if (ret != sizeof(elf)){
         kwarn("welf %s read fail %d\n", path, ret);
-        ret = EIO;
+        ret = -EIO;
         goto final;
     }
 
     has_enough_ram = peek_mem_welf(&elf, USER_STACK_SIZE, USER_HEAP_SIZE);
     if (!has_enough_ram){
-        ret = ENOMEM;
+        ret = -ENOMEM;
         goto final;
     }
 
@@ -232,7 +232,7 @@ int exec_welf(struct proc* who, char* path, char *argv[], char *envp[], bool is_
     ret = filp_read(who, filp, who->ctx.rbase + elf.binary_offset, elf.binary_size);
     if(ret != elf.binary_size){
         if (ret >= 0)
-            ret = EAGAIN;
+            ret = -EAGAIN;
         goto final;
     }
 

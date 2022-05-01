@@ -7,7 +7,7 @@ int do_sysconf(struct proc* who, struct message *m){
             return HZ;
 
         default:
-            return EINVAL;
+            return -EINVAL;
     }
 }
 

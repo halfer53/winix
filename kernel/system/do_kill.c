@@ -20,10 +20,10 @@ int sys_kill(struct proc* who, pid_t pid, int signum){
     struct proc* to;
     int valid_targets = 0;
     if(signum < 0 || signum >= _NSIG)
-        return EINVAL;
+        return -EINVAL;
 
     if(pid == 1 && (signum == SIGSTOP || signum == SIGKILL))
-        return EINVAL;
+        return -EINVAL;
 
     foreach_proc(to){
         if(pid < -1 && -pid != to->procgrp) continue;
@@ -49,7 +49,7 @@ int sys_kill(struct proc* who, pid_t pid, int signum){
     }
 
     if(!valid_targets)
-	    return ESRCH;
+	    return -ESRCH;
 
     return OK;
 }

@@ -16,7 +16,7 @@ int sys_link(struct proc* who, char *oldpath, char *newpath){
         goto final;
 
     if(newinode){
-        ret = EEXIST;
+        ret = -EEXIST;
         goto final;
     }
 
@@ -44,12 +44,12 @@ int sys_unlink(struct proc* who, char *path){
         goto final;
 
     if(!ino){
-        ret = ENOENT;
+        ret = -ENOENT;
         goto final;
     }
 
     if(S_ISDIR(ino->i_mode)){
-        ret = EISDIR;
+        ret = -EISDIR;
         goto inode_err;
     }
 
@@ -72,7 +72,7 @@ int sys_unlink(struct proc* who, char *path){
 int do_link(struct proc* who, struct message* msg){
     if(!is_vaddr_accessible(msg->m1_p1, who) 
         || !is_vaddr_accessible(msg->m1_p2, who)){
-            return EFAULT;
+            return -EFAULT;
         }
     return sys_link(who, (char*)get_physical_addr(msg->m1_p1, who),
         (char*)get_physical_addr(msg->m1_p2, who));
@@ -80,7 +80,7 @@ int do_link(struct proc* who, struct message* msg){
 
 int do_unlink(struct proc* who, struct message* msg){
     if(!is_vaddr_accessible(msg->m1_p1, who) ){
-            return EFAULT;
+            return -EFAULT;
         }
     return sys_unlink(who, (char*)get_physical_addr(msg->m1_p1, who));
 }

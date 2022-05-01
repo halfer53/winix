@@ -246,13 +246,13 @@ void set_reply_res_errno(struct proc* who, struct message *m){
 int no_syscall(struct proc* who, struct message* m){
     klog("Process \"%s (%d)\" performed unknown system call %d\r\n", 
         who->name, who->pid, m->type);
-    return ENOSYS;
+    return -ENOSYS;
 }
 
 int syscall_not_implemented(struct proc* who, struct message *m){
-    kprintf("ERR: %s[%d] performed syscall %d that is not linked\n", 
+    kerror("%s[%d] performed syscall %d that is not linked\n", 
             who->name, who->proc_nr, m->type);
-    return ENOSYS;
+    return -ENOSYS;
 }
 
 struct message *get_ipc_mesg(){
@@ -293,7 +293,7 @@ int syscall_reply2(int syscall_num, int reply, int dest, struct message* m){
         m->reply_res = reply;
         return do_notify(SYSTEM, dest,m);
     }
-    return ERR;
+    return -ESRCH;
 }
 
 

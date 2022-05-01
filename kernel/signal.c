@@ -79,7 +79,7 @@ PRIVATE int build_signal_ctx(struct proc *who, int signum){
  * @param  who    
  * @param  signum 
  * @return        return OK if system has handled the signal
- *                return ERR if the user needs to handle the signal
+ *                return -EINVAL if the user needs to handle the signal
  */
 PRIVATE int sys_sig_handler(struct proc *who, int signum){
     sighandler_t handler = who->sig_table[signum].sa_handler;
@@ -109,7 +109,6 @@ PRIVATE int sys_sig_handler(struct proc *who, int signum){
                 // KDEBUG(("Signal curr %x\n", curr_scheduling_proc));
                 exit_proc(who, 128, signum);
         }
-        return OK;
     }
     // if it's ignored
     else if(handler == SIG_IGN){
@@ -137,9 +136,8 @@ PRIVATE int sys_sig_handler(struct proc *who, int signum){
                                 ,signum,who->name,who->pid));
                 break;
         }
-        return OK;
     }
-    return ERR;
+    return OK;
 }
 
 /**
@@ -148,12 +146,12 @@ PRIVATE int sys_sig_handler(struct proc *who, int signum){
  */
 int handle_sig(struct proc* who, int signum){
     struct sigaction* act;
-    
+    sighandler_t handler = who->sig_table[signum].sa_handler;
     // KDEBUG(("handle %d for %d\n", signum, who->proc_nr));
     sigdelset(&who->sig_pending, signum);
     // if the system can handle the signal
-    if(sys_sig_handler(who,signum) == OK)
-        return OK;
+    if (handler == SIG_DFL || handler == SIG_IGN)
+        return sys_sig_handler(who,signum);
 
     act = &who->sig_table[signum];
 
@@ -174,7 +172,7 @@ int handle_sig(struct proc* who, int signum){
 int send_sig(struct proc *who, int signum){
 
     if(!IS_USER_PROC(who))
-        return EINVAL;
+        return -EINVAL;
     
     // if this signal is blocked
     if(sigismember(&who->sig_mask, signum)){
@@ -196,7 +194,7 @@ int send_sig(struct proc *who, int signum){
         struct message m;
         m.type = 0;
         who->state &= ~STATE_PAUSING;
-        syscall_reply2(0, EINTR, who->proc_nr, &m);
+        syscall_reply2(0, -EINTR, who->proc_nr, &m);
     }
 
     // add it the list of pending signals

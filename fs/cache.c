@@ -113,7 +113,7 @@ int flush_inode_zones(struct inode *ino){
 
 int put_block_buffer_immed(struct block_buffer* tbuf, struct device* dev){
     if(tbuf->b_dev->bops->flush_block(tbuf) == 0)
-        return EIO;
+        return -EIO;
     tbuf->b_dirt = false;
     return put_block_buffer(tbuf);
 }

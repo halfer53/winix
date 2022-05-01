@@ -67,7 +67,7 @@ void test_given_open_when_openned_max_exceeds_should_return_emfile(){
         assert(i >= 0);
     }
     ret = sys_open(current, "/", O_RDONLY, 0);
-    assert(ret == EMFILE);
+    assert(ret == -EMFILE);
 
     reset_fs();
 }
@@ -78,6 +78,7 @@ void test_given_open_when_openned_exceeds_system_limit_should_return_enfile(){
     int i;
     emulate_fork(current, &p2);
     emulate_fork(current, &p3);
+    assert(OPEN_MAX * 2 == NR_FILPS);
 
     for (i = 0; i < OPEN_MAX; i++){
         ret = sys_open(current, "/", O_RDONLY, 0);
@@ -88,14 +89,14 @@ void test_given_open_when_openned_exceeds_system_limit_should_return_enfile(){
         assert(ret >= 0);
     }
     ret = sys_open(&p3, "/", O_RDONLY, 0);
-    assert(ret == ENFILE);
+    assert(ret == -ENFILE);
 
     reset_fs();
 }
 
 void test_given_open_when_flag_write_and_path_directory_should_return_eisdir(){
     int ret = sys_open(current, "/", O_WRONLY, 0);
-    assert(ret == EISDIR);
+    assert(ret == -EISDIR);
 }
 
 void test_given_creat_when_file_not_present_should_return_0(){
@@ -114,7 +115,7 @@ void test_given_creat_when_file_present_should_return_eexist(){
     assert(fd == 0);
 
     fd = sys_creat(current, FILE1 , O_RDWR);
-    assert(fd == EEXIST);
+    assert(fd == -EEXIST);
 
     reset_fs();
 }
@@ -128,7 +129,7 @@ void test_given_close_when_file_closed_should_return_ebadf(){
     _close_delete_file(fd, FILE1);
 
     ret = sys_close(current, fd);
-    assert(ret == EBADF);
+    assert(ret == -EBADF);
 
     reset_fs();
 }
@@ -143,7 +144,7 @@ void test_given_read_when_fd_is_closed_return_ebadf(){
     assert(ret == 0);
 
     ret = sys_read(current, fd, buffer, PAGE_LEN);
-    assert(ret == EBADF);
+    assert(ret == -EBADF);
 
     reset_fs();
 }
@@ -158,7 +159,7 @@ void test_given_write_when_fd_is_closed_return_ebadf(){
     assert(ret == 0);
 
     ret = sys_write(current, fd, buffer, PAGE_LEN);
-    assert(ret == EBADF);
+    assert(ret == -EBADF);
 
     reset_fs();
 }
@@ -172,7 +173,7 @@ void test_given_open_when_deleting_file_should_return_error(){
     _close_delete_file(fd, FILE1);
 
     ret = sys_open(current, FILE1 , O_RDWR, 0775);
-    assert(ret == ENOENT);
+    assert(ret == -ENOENT);
 
     reset_fs();
 }
@@ -284,7 +285,7 @@ void test_given_read_when_o_direct_open_and_closing_file_should_persistted_data(
 
 void test_given_access_when_file_not_exist_should_return_enoent(){
     int ret = sys_access(current, FILE1, F_OK);
-    assert(ret == ENOENT);
+    assert(ret == -ENOENT);
 
     reset_fs();
 }
@@ -317,7 +318,7 @@ void test_given_access_when_under_folder_should_return_enoent(){
     assert(ret == 0);
 
     ret = sys_access(current, DIR_FILE1, F_OK);
-    assert(ret == ENOENT);
+    assert(ret == -ENOENT);
 
     reset_fs();
 }
@@ -371,7 +372,7 @@ void test_given_link_stat_when_one_file_deleted_should_return_1_nlink(){
 
 void test_given_chdir_when_dir_not_present_should_return_eexist(){
     int ret = sys_chdir(current, "/not_exist");
-    assert(ret == EEXIST);
+    assert(ret == -EEXIST);
 }
 
 void test_given_chdir_when_path_is_file_should_return_eexist(){
@@ -379,7 +380,7 @@ void test_given_chdir_when_path_is_file_should_return_eexist(){
     assert(fd == 0);
 
     int ret = sys_chdir(current, FILE1);
-    assert(ret == ENOTDIR);
+    assert(ret == -ENOTDIR);
 
     reset_fs();
 }
@@ -401,7 +402,7 @@ void test_given_chdir_when_dir_is_valid_should_succeed(){
 
 void test_given_chmod_when_file_not_present_should_return_enonent(){
     int ret = sys_chmod(current, "/notexists", O_RDONLY);
-    assert(ret == ENOENT);
+    assert(ret == -ENOENT);
 }
 
 void test_given_chmod_stat_when_file_present_should_return_0(){

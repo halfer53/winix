@@ -9,9 +9,9 @@ int sys_getcwd(struct proc* who, char* pathname, int size){
     char *p;
 
     if(!is_vaddr_accessible(pathname, who) || !is_vaddr_accessible(pathname + size, who))
-        return EFAULT;
+        return -EFAULT;
     if(size <= 1)
-        return ERANGE;
+        return -ERANGE;
 
     p = (char *)get_physical_addr(pathname+ size, who);
     *p = '\0';
@@ -24,9 +24,8 @@ int sys_getcwd(struct proc* who, char* pathname, int size){
         parent_inode = get_inode(inum, inode->i_dev);
         ret = get_child_inode_name(parent_inode, inode, string);
         // KDEBUG(("cwd: ret %d curr %d (%s), parent %d\n", ret, inode->i_num, string, inum));
-        if(ret == ERR){
+        if(ret < 0){
             // KDEBUG(("corruptted fs of %d inode\n", inum));
-            ret = EFAULT;
             goto end;
         }
         put_inode(inode, false);
@@ -34,7 +33,7 @@ int sys_getcwd(struct proc* who, char* pathname, int size){
 
         len += (ret + 1); // inclusing slash
         if(len >= size){
-            ret = ERANGE;
+            ret = -ERANGE;
             goto end;
         }
         *--p = '/';

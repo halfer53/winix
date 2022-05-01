@@ -103,7 +103,7 @@ int kgetc_blocking(struct proc* who) {
         while(!(RexSp1->Stat & 1) && --try);
         
         if(is_sigpending(who))
-            return EINTR;
+            return -EINTR;
 
     }while(try == 0);
     return RexSp1->Rx;
@@ -330,7 +330,7 @@ int tty_read ( struct filp *filp, char *data, size_t count, off_t offset){
 
     if(state->reader){
         if(IS_INUSE(state->reader)){
-            return EBUSY;
+            return -EBUSY;
         }
         state->reader = NULL;
     }
@@ -385,7 +385,7 @@ int tty_ioctl(struct filp* file, int request, vptr_t* vptr){
         break;
 
     default:
-        return EINVAL;
+        return -EINVAL;
     }
     return OK;
 }

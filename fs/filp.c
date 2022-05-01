@@ -16,7 +16,7 @@ int get_fd(struct proc *curr, int start, int *open_slot, filp_t *fpt){
     }
 
     if(!found)
-        return EMFILE;
+        return -EMFILE;
 
     fpt->filp_table_index = i;
     return OK;
@@ -64,6 +64,5 @@ void init_filp(){
         rep = &fd_table[i];
         rep->filp_count = 0;
         rep->filp_table_index = i;
-        i++;
     }
 }

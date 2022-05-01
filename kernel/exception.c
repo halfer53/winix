@@ -271,7 +271,7 @@ PRIVATE void syscall_handler() {
             break;
 
         default:
-            ret = ERR;
+            ret = -EINVAL;
             break;
     }
     if (ret < 0){

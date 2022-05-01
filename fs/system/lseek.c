@@ -30,10 +30,10 @@ int sys_lseek(struct proc* who, int fd, off_t offset, int whence){
     struct filp* file;
     int ret;
     if(!is_fd_opened_and_valid(who, fd))
-        return EBADF;
+        return -EBADF;
     file = who->fp_filp[fd];
     if(file->filp_ino->flags & INODE_FLAG_PIPE)
-        return ESPIPE;
+        return -ESPIPE;
 
     switch (whence) {
         case SEEK_SET:
@@ -49,7 +49,7 @@ int sys_lseek(struct proc* who, int fd, off_t offset, int whence){
             break;
 
         default:
-            return EINVAL;
+            return -EINVAL;
     }
     return ret;
 }

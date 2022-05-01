@@ -33,7 +33,7 @@ int do_alarm(struct proc *who, struct message *m){
     clock_t prev_timeout;
 
     if(m->m1_i1 < 0)
-        return EINVAL;
+        return -EINVAL;
 
     seconds = (clock_t )m->m1_i1; 
     alarm = &who->alarm;

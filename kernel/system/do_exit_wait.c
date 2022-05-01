@@ -48,7 +48,7 @@ int do_waitpid(struct proc *parent, struct message *mesg){
 
     // KDEBUG(("waitpid by %d, arg %d %d %x\n", parent->proc_nr, pid, options, vptr));
     if(vptr && !is_vaddr_accessible(vptr, parent))
-        return EFAULT;
+        return -EFAULT;
     
     foreach_child(child, parent){
         /**
@@ -91,7 +91,7 @@ int do_waitpid(struct proc *parent, struct message *mesg){
 
     // if this process has no valid children
     if(children == 0)
-        return ECHILD;
+        return -ECHILD;
 
     parent->wpid = pid;
     parent->woptions = options;
@@ -147,7 +147,7 @@ int check_waiting(struct proc* who){
             
             // stopped process is only reported if WUNTRACED is set
             if(who->state & STATE_STOPPED && !(parent->woptions & WUNTRACED))
-                return ERR;
+                return -EINVAL;
             
             if(parent->varg){
                 ptr = get_physical_addr(parent->varg, parent);
@@ -166,7 +166,7 @@ int check_waiting(struct proc* who){
         syscall_reply2(VFORK, who->pid, parent->proc_nr, mesg);
     }
     
-    return ERR;
+    return -ESRCH;
 }
 
 void exit_proc_in_interrupt(struct proc* who, int exit_val,int signum){

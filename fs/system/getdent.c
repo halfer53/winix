@@ -13,13 +13,13 @@ int sys_getdents(struct proc* who, int fd, struct dirent* dirp_dst, unsigned int
     block_t bnr;
 
     if(!is_fd_opened_and_valid(who, fd))
-        return EBADF;
+        return -EBADF;
 
     file = who->fp_filp[fd];
     dirp = file->filp_ino;
 
     if(!S_ISDIR(dirp->i_mode))
-        return ENOTDIR;
+        return -ENOTDIR;
 
     dirstream_nr = file->getdents_dirstream_nr;
     i = file->getdents_zone_nr;
@@ -58,7 +58,7 @@ int sys_getdents(struct proc* who, int fd, struct dirent* dirp_dst, unsigned int
 int do_getdents(struct proc* who, struct message* msg){
     struct dirent* path = (struct dirent *) get_physical_addr(msg->m1_p1, who);
     if(!is_vaddr_accessible(msg->m1_p1, who))
-        return EFAULT;
+        return -EFAULT;
     return sys_getdents(who, msg->m1_i1, path, msg->m1_i2);
 }
 

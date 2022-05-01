@@ -144,7 +144,7 @@ ptr_t* user_get_free_pages(struct proc* who, int length, int flags){
         return NULL;
     index = PADDR_TO_PAGED(p);
     page_num = PADDR_TO_NUM_PAGES(length);
-    if(bitmap_set_nbits(who->ctx.ptable, PTABLE_LEN, index, page_num) == ERR)
+    if(bitmap_set_nbits(who->ctx.ptable, PTABLE_LEN, index, page_num))
         return NULL;
     return p;
 }
@@ -161,7 +161,7 @@ int get_free_pages_from(ptr_t* addr, int size){
     // kprintf("extending from 0x%x with size %d\n", addr, size);
     // kreport_sysmap();
     if(!is_pages_free_from(addr, size))
-        return ENOMEM;
+        return -ENOMEM;
     paged = PADDR_TO_PAGED(addr);
     page_num = PADDR_TO_NUM_PAGES(size);
     return bitmap_set_nbits(mem_map, MEM_MAP_LEN, paged, page_num);
@@ -209,16 +209,16 @@ int peek_last_free_page(){
 int release_pages(ptr_t* page, int len){
     int page_index, bitmaplen;
     if((unsigned long)page % PAGE_LEN != 0)
-        return ERR;
+        return -EINVAL;
     page_index = PADDR_TO_PAGED(page);
     bitmaplen = PADDR_TO_PAGED(len);
     return bitmap_clear_nbits(mem_map, MEM_MAP_LEN, page_index, bitmaplen);
 }
 
 int user_release_pages(struct proc* who, ptr_t* page, int len){
-    int index, bitmaplen;
-    if(release_pages(page, len) != OK)
-        return ERR;
+    int index, bitmaplen, ret;
+    if((ret = release_pages(page, len)))
+        return ret;
     index = PADDR_TO_PAGED(page);
     bitmaplen = PADDR_TO_PAGED(len);
     return bitmap_clear_nbits(who->ctx.ptable, PTABLE_LEN, index, bitmaplen);
@@ -238,18 +238,6 @@ void* dup_vm(struct proc* parent, struct proc* child){
     len = parent->heap_bottom + 1 - parent->mem_start;
     
     return user_get_free_pages(child, len, GFP_NORM);
-    // int index;
-    // if(bitmap_extract_pattern(parent->ctx.ptable, MEM_MAP_LEN, (int)child->heap_break, ptn) == ERR)
-    //     return NULL;
-    
-    // index = bitmap_search_pattern(mem_map, MEM_MAP_LEN, ptn->pattern, ptn->size);
-    // if(index == ERR)
-    //     return NULL;
-
-    // bitmap_set_pattern(mem_map, MEM_MAP_LEN, index, ptn->pattern, ptn->size);
-    // bitmap_set_pattern(child->ctx.ptable, PTABLE_LEN, index, ptn->pattern, ptn->size);
-
-    // return PAGE_TO_PADDR(index);
 }
 
 /**

@@ -8,11 +8,11 @@ int sys_dup(struct proc* who, int oldfd){
     int ret, open_slot;
     struct filp* file1, *file2;
     if(!is_fd_opened_and_valid(who, oldfd))
-        return EBADF;
+        return -EBADF;
 
     file2 = get_free_filp();
     if(!file2)
-        return ENFILE;
+        return -ENFILE;
 
     ret = get_fd(who, 0, &open_slot, file2);
     if(ret)
@@ -28,14 +28,14 @@ int sys_dup2(struct proc* who, int oldfd, int newfd){
     int ret, open_slot;
     struct filp* file1, *file2;
     if(!is_fd_opened_and_valid(who, oldfd))
-        return EBADF;
+        return -EBADF;
 
     if(newfd < 0 || newfd >= OPEN_MAX)
-        return EBADF;
+        return -EBADF;
     
     file2 = get_free_filp();
     if (!file2)
-        return ENFILE;
+        return -ENFILE;
     
     ret = get_fd(who, 0, &open_slot, file2);
     if(ret)
@@ -48,7 +48,7 @@ int sys_dup2(struct proc* who, int oldfd, int newfd){
 
     file1 = who->fp_filp[oldfd];
     if(!file1)
-        return EBADF;
+        return -EBADF;
     who->fp_filp[newfd] = file1;
     file1->filp_count += 1;
     // KDEBUG(("dup2: %d %d by %s %d, filp dev %s\n", oldfd, newfd, who->name,  who->proc_nr, file1->filp_dev->init_name));

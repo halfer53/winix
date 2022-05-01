@@ -54,7 +54,7 @@ int advance(inode_t *dirp, char string[NAME_MAX]){
     struct winix_dirent* dirstream, *dirend;
 
     if(*string == '\0')
-        return ERR;
+        return -EINVAL;
 
 //    KDEBUG(("advancing %s in inode %d\n", string, dirp->i_num));
     for(i = 0; i < NR_TZONES; i++){
@@ -74,7 +74,7 @@ int advance(inode_t *dirp, char string[NAME_MAX]){
         }
 
     }
-    return ERR;
+    return -EINVAL;
 }
 
 int get_parent_inode_num(inode_t *dirp){
@@ -100,7 +100,7 @@ int get_parent_inode_num(inode_t *dirp){
         }
 
     }
-    return ERR;
+    return -EINVAL;
 }
 
 int get_child_inode_name(inode_t* parent, inode_t* child, char string[NAME_MAX]){
@@ -129,7 +129,7 @@ int get_child_inode_name(inode_t* parent, inode_t* child, char string[NAME_MAX])
         }
 
     }
-    return ERR;
+    return -EINVAL;
 }
 
  
@@ -144,37 +144,37 @@ int __eath_path(struct inode* curr_ino, struct inode** last_dir,
 
     rip = curr_ino;
 
-    /* If dir has been removed or path is empty, return ENOENT. */
+    /* If dir has been removed or path is empty, return -ENOENT. */
     if (rip->i_nlinks == 0 || *path == '\0') {
-        return ENOENT;
+        return -ENOENT;
     }
     dev = rip->i_dev;
 
     while(1){
         if((component_name = get_name(path,string)) == (char *)0){
-            return ENOENT; // bad parsing
+            return -ENOENT; // bad parsing
         }
 
         if(*component_name == '\0') {
             if (rip->i_mode & S_IFDIR){
                 *last_dir = rip;
                 inum = advance(rip, string);
-                if(inum == ERR){
+                if(inum == -EINVAL){
                     return OK;
                 }
                 new_rip = get_inode(inum, rip->i_dev);
                 *ret_ino = new_rip;
                 return OK;
             }else{
-                return ENOTDIR;
+                return -ENOTDIR;
             }
         }
 
         if(!(rip->i_mode & S_IFDIR))
-            return ENOTDIR; //if one of the pathname in the path is not directory
+            return -ENOTDIR; //if one of the pathname in the path is not directory
 //        KDEBUG(("path advance %d %s\n", rip->i_num, string));
         inum = advance(rip,string);
-        if(inum == ERR) {
+        if(inum == -EINVAL) {
             return OK;
         }
 
@@ -184,7 +184,7 @@ int __eath_path(struct inode* curr_ino, struct inode** last_dir,
         rip = new_rip;
         path = component_name;
     }
-    return ENOENT;
+    return -ENOENT;
 }
 
 int eat_path(struct proc* who, char *path, struct inode** last_dir, struct inode** ret_ino, char string[DIRSIZ]){
@@ -202,7 +202,7 @@ int eat_path(struct proc* who, char *path, struct inode** last_dir, struct inode
 
     ret = __eath_path(curr_dir, last_dir, ret_ino, path, string);
     if (*last_dir == NULL)
-        return ENOENT;
+        return -ENOENT;
     return ret;
 }
 

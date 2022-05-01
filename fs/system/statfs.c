@@ -11,13 +11,13 @@ int sys_statfs(struct proc* who, char *path, struct statfs *buf){
     if((ret = eat_path(who, path, &last_dir, &inode, string)))
         return ret;
     if(!last_dir){
-        ret = ENOENT;
+        ret = -ENOENT;
         goto final;
     }
         
     sb = get_sb(last_dir->i_dev);
     if(!sb){
-        ret = ENOSYS;
+        ret = -ENOSYS;
         goto final;
     }
 
@@ -44,7 +44,7 @@ int do_statfs(struct proc* who, struct message *msg){
     vptr_t *vir_ptr = msg->m1_p1;
     vptr_t *vir_msg = msg->m1_p2;
     if(!is_vaddr_accessible(vir_ptr, who) || !is_vaddr_accessible(vir_msg, who))
-        return EFAULT;
+        return -EFAULT;
     return sys_statfs(who, (char *)get_physical_addr(vir_ptr, who) ,(struct statfs*) get_physical_addr(vir_msg, who) );
 }
 

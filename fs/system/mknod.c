@@ -13,19 +13,19 @@ int sys_mknod(struct proc* who, char *path, mode_t mode, dev_t devid){
 
     dev = get_dev(devid);
     if(!dev)
-        return ENXIO;
+        return -ENXIO;
 
     if((ret = eat_path(who, path, &lastdir, &inode, string)))
         return ret;
 
     if(inode || *string == '\0'){
-        ret = EEXIST;
+        ret = -EEXIST;
         goto final;
     }
 
     inode = alloc_inode(who, lastdir->i_dev, dev);
     if(!inode){
-        ret = ENOSPC;
+        ret = -ENOSPC;
         goto final;
     }
 
@@ -43,7 +43,7 @@ int sys_mknod(struct proc* who, char *path, mode_t mode, dev_t devid){
 
 int do_mknod(struct proc* who, struct message* msg){
     if(!is_vaddr_accessible(msg->m1_p1, who))
-        return EFAULT;
+        return -EFAULT;
     return sys_mknod(who, (char*)get_physical_addr(msg->m1_p1, who),
         msg->m1_i1, msg->m1_i2);
 }

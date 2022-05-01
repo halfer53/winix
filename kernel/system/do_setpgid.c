@@ -7,7 +7,7 @@ int do_setpgid(struct proc* who, struct message* m){
 
 
     if(pid< 0 || pgid < 0)
-        return EINVAL;
+        return -EINVAL;
 
     if(pid == 0)
         mp = who;
@@ -15,7 +15,7 @@ int do_setpgid(struct proc* who, struct message* m){
         mp = get_proc_by_pid(pid);
 
     if(!mp)
-        return ESRCH;
+        return -ESRCH;
 
     if(pgid == 0)
         pgid = mp->pid;

@@ -216,7 +216,7 @@ struct argp
      messages.  KEY is either a key from an option, in which case TEXT is
      that option's help text, or a special key from the ARGP_KEY_HELP_
      defines, below, describing which other help text TEXT is.  The function
-     should return either TEXT, if it should be used as-is, a replacement
+     should return -Either TEXT, if it should be used as-is, a replacement
      string, which should be malloced, and will be freed by argp, or NULL,
      meaning `print nothing'.  The value for TEXT is *after* any translation
      has been done, so if any of the replacement text also needs translation,

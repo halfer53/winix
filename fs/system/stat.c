@@ -25,7 +25,7 @@ void set_statbuf(struct inode* inode, struct stat* statbuf){
 int sys_fstat(struct proc* who, int fd, struct stat* statbuf){
     struct filp* file;
     if(!is_fd_opened_and_valid(who, fd))
-        return EBADF;
+        return -EBADF;
     file = who->fp_filp[fd];
     set_statbuf(file->filp_ino, statbuf);
     return OK;
@@ -39,7 +39,7 @@ int sys_stat(struct proc* who, char *pathname, struct stat *statbuf){
         return ret;
 
     if(!inode)
-        return ENOENT;
+        return -ENOENT;
 
     set_statbuf(inode, statbuf);
     put_inode(inode, false);
@@ -49,7 +49,7 @@ int sys_stat(struct proc* who, char *pathname, struct stat *statbuf){
 int do_stat(struct proc* who, struct message* msg){
     if(!is_vaddr_accessible(msg->m1_p1, who) 
         || !is_vaddr_accessible(msg->m1_p2, who)){
-            return EFAULT;
+            return -EFAULT;
         }
     return sys_stat(who, (char*)get_physical_addr(msg->m1_p1, who),
         (struct stat*)get_physical_addr(msg->m1_p2, who));
@@ -57,7 +57,7 @@ int do_stat(struct proc* who, struct message* msg){
 
 int do_fstat(struct proc* who, struct message* msg){
     if(!is_vaddr_accessible(msg->m1_p1, who) ){
-            return EFAULT;
+            return -EFAULT;
         }
     return sys_fstat(who, msg->m1_i1,
         (struct stat*)get_physical_addr(msg->m1_p1, who));

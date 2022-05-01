@@ -28,7 +28,7 @@ int set_filp(struct proc* who, struct filp** _file, struct inode* inode){
     int ret, open_slot;
     struct filp* file = get_free_filp();
     if (!file)
-        return ENFILE;
+        return -ENFILE;
     
     ret = get_fd(who, 0, &open_slot, file);
     if(ret)
@@ -42,7 +42,7 @@ int do_pipe(struct proc* who, struct message* msg){
     int* fds;
     vptr_t* vp = msg->m1_p1;
     if(!is_vaddr_accessible(vp, who))
-        return EFAULT;
+        return -EFAULT;
     fds = (int*)get_physical_addr(vp, who);
     return sys_pipe(who, fds);
 }
@@ -57,11 +57,11 @@ int sys_pipe(struct proc* who, int fd[2]){
 
     ptr = (char *)get_free_pages(pagelen, GFP_HIGH);
     if(!ptr)
-        return ENOMEM;
+        return -ENOMEM;
 
     pipe = kmalloc(sizeof(struct filp_pipe));
     if(!pipe){
-        ret = ENOMEM;
+        ret = -ENOMEM;
         goto failed_filp_pipe;
     }
     pipe->data = ptr;
@@ -69,7 +69,7 @@ int sys_pipe(struct proc* who, int fd[2]){
 
     inode = get_free_inode_slot();
     if(!inode){
-        ret = ENFILE;
+        ret = -ENFILE;
         goto failed_filp_slot;
     }
     inode->flags |= INODE_FLAG_PIPE;
@@ -190,7 +190,7 @@ int pipe_read ( struct filp *filp, char *data, size_t count, off_t offset){
 
         next = (struct pipe_waiting*)kmalloc(sizeof(struct pipe_waiting));
         if(!next)
-            return ENOMEM;
+            return -ENOMEM;
         curr_syscall_caller->flags |= STATE_WAITING;
         next->who = curr_syscall_caller;
         next->filp = filp;
@@ -232,14 +232,14 @@ int pipe_write ( struct filp *filp, char *data, size_t count, off_t offset){
     if(filp->filp_ino->i_count == 1) {
         int signum = SIGPIPE;
         if(curr_syscall_caller->sig_table[signum].sa_handler == SIG_IGN){
-            return EPIPE;
+            return -EPIPE;
         }
         send_sig(curr_syscall_caller, signum);
         return SUSPEND;
     }
 
     if(count > PIPE_LIMIT)
-        return ENOSPC;
+        return -ENOSPC;
 
     if(count > (PIPE_LIMIT - filp->pipe->pos)){
         char *p, *p2;
@@ -249,11 +249,11 @@ int pipe_write ( struct filp *filp, char *data, size_t count, off_t offset){
         
         next = (struct pipe_waiting*)kmalloc(sizeof(struct pipe_waiting));
         if(!next)
-            return ENOMEM;
+            return -ENOMEM;
         p = (char *)kmalloc(count);
         if(!next){
             kfree(next);
-            return ENOMEM;
+            return -ENOMEM;
         }
         p2 = p;
         while(len--){

@@ -10,7 +10,7 @@ int sys_close(struct proc *who, int fd)
     filp_t *filp;
     int ret;
     if (!is_fd_opened_and_valid(who, fd))
-        return EBADF;
+        return -EBADF;
 
     filp = who->fp_filp[fd];
 
@@ -27,7 +27,7 @@ int alloc_inode_under_dir(struct proc* who, struct device* dev, inode_t** _inode
     dev = lastdir->i_dev;
     inode = alloc_inode(who, dev, dev);
     if (!inode)
-        return ENOSPC;
+        return -ENOSPC;
     
     if ((ret = add_inode_to_directory(who, lastdir, inode, string)))
     {
@@ -54,7 +54,7 @@ int filp_open(struct proc* who, struct filp** _filp, char *path, int flags, mode
     if (inode){
         if ((flags & O_EXCL) && (flags & O_CREAT))
         {
-            ret = EEXIST;
+            ret = -EEXIST;
             goto final;
         }
 
@@ -62,7 +62,7 @@ int filp_open(struct proc* who, struct filp** _filp, char *path, int flags, mode
         if (*string){ // if there still components left in path
             if (!(flags & O_CREAT))
             {
-                ret = ENOENT;
+                ret = -ENOENT;
                 goto final;
             }
             if ((ret = alloc_inode_under_dir(who, dev, &inode, lastdir, string)))
@@ -74,7 +74,7 @@ int filp_open(struct proc* who, struct filp** _filp, char *path, int flags, mode
             // if opening a directory with write access, EISDIR is returned
             if (flags & O_WRONLY)
             {
-                ret = EISDIR;
+                ret = -EISDIR;
                 goto final;
             }
             inode = lastdir;
@@ -83,7 +83,7 @@ int filp_open(struct proc* who, struct filp** _filp, char *path, int flags, mode
     
     filp = get_free_filp();
     if (!filp)
-        return ENFILE;
+        return -ENFILE;
 
     if(flags & O_TRUNC)
         truncate_inode(inode);
@@ -134,7 +134,7 @@ int do_open(struct proc *who, struct message *msg)
 {
     char *path;
     if(!is_vaddr_accessible(msg->m1_p1, who))
-        return EFAULT;
+        return -EFAULT;
     path = (char *)get_physical_addr(msg->m1_p1, who);
     return sys_open(who, path, msg->m1_i1, msg->m1_i2);
 }
@@ -143,7 +143,7 @@ int do_creat(struct proc *who, struct message *msg)
 {
     char *path;
     if(!is_vaddr_accessible(msg->m1_p1, who))
-        return EFAULT;
+        return -EFAULT;
     path = (char *)get_physical_addr(msg->m1_p1, who);
     return sys_creat(who, path, msg->m1_i1);
 }

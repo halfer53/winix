@@ -17,14 +17,14 @@
 
 int sys_sigaction(struct proc* who, int signum, struct sigaction* act, struct sigaction* oact){
     if(signum < 1 || signum >= _NSIG)
-        return EINVAL;
+        return -EINVAL;
 
     if(signum == SIGKILL || signum == SIGSTOP)
-        return EINVAL;
+        return -EINVAL;
 
     if(act->sa_handler == SIG_IGN){
         if(signum == SIGSEGV)
-            return EINVAL;
+            return -EINVAL;
 
         sigdelset(&who->sig_pending, signum);
     }
@@ -46,10 +46,10 @@ int do_sigaction(struct proc *who, struct message *m){
     struct sigaction* oact = m->m1_p2;
 
     if(!is_vaddr_accessible(act, who))
-        return EFAULT;
+        return -EFAULT;
 
     if(oact && !is_vaddr_accessible(oact, who))
-        return EFAULT;
+        return -EFAULT;
 
     act = (struct sigaction*)get_physical_addr(act, who);
 

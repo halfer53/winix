@@ -7,7 +7,7 @@
 int sys_fcntl(struct proc* who, int fd, int cmd, void* arg){
     struct filp* file;
     if(!is_fd_opened_and_valid(who, fd))
-        return EBADF;
+        return -EBADF;
     file = who->fp_filp[fd];
     switch (cmd)
     {
@@ -18,14 +18,14 @@ int sys_fcntl(struct proc* who, int fd, int cmd, void* arg){
         break;
 
     default:
-        return EINVAL;
+        return -EINVAL;
     }
     return OK;
 }
 
 int do_fcntl(struct proc* who, struct message* msg){
     if(!is_vaddr_accessible(msg->m1_p1, who))
-        return EFAULT;
+        return -EFAULT;
     return sys_fcntl(who, msg->m1_i1, msg->m1_i2, get_physical_addr(msg->m1_p1, who));
 }
 

@@ -85,7 +85,7 @@ int alloc_block(inode_t *ino, struct device* id){
     }
     kwarn("no free block id found for dev %d", id->dev_id);
     put_block_buffer(bmap);
-    return ENOSPC;
+    return -ENOSPC;
 }
 
 int release_block(block_t bnr, struct device* id){
@@ -135,7 +135,7 @@ int init_inode_non_disk(struct inode* ino, ino_t num, struct device* dev, struct
         bnr = ((num * sb->s_inode_size) / BLOCK_SIZE) + sb->s_inode_tablenr;
         if(bnr * BLOCK_SIZE >= sb->s_inode_tablenr * BLOCK_SIZE + sb->s_inode_table_size){
             kwarn("ino %d exceeding\n", num);
-            return ERR;
+            return -EINVAL;
         }
         ino->i_ndblock = bnr;
     }
@@ -168,11 +168,11 @@ int read_inode(int num, struct inode** ret_ino, struct device* id){
     struct inode* inode = get_free_inode_slot();
 
     if(!inode)
-        return ENOSPC;
+        return -ENOSPC;
     if(!is_inode_in_use(num, id))
-        return EINVAL;
+        return -EINVAL;
     if(num == 0)
-        return EINVAL;
+        return -EINVAL;
 
     buffer = get_block_buffer(blocknr, id);
     memcpy(inode, &buffer->block[offset], INODE_DISK_SIZE);
@@ -200,7 +200,7 @@ inode_t* get_inode(int num, struct device* id){
     
     ret = read_inode(num, &rep, id);
     if(ret){
-        kwarn("ERR: read inode %d return %d\n", num, ret);
+        kwarn("read inode %d return %d\n", num, ret);
         return NULL;
     }
 
@@ -214,7 +214,7 @@ int put_inode(inode_t *inode, bool is_dirty){
     unsigned int inode_block_offset;
     struct block_buffer *buffer;
     if(!inode)
-        return EINVAL;
+        return -EINVAL;
     inode->i_count -= 1;
     if(!is_dirty)
         return OK;
@@ -304,7 +304,7 @@ int release_inode(inode_t *inode){
     int i = 0;
     if(inode->i_count != 0){
         kwarn("%d is in use before releasing\n", inum);
-        return EINVAL;
+        return -EINVAL;
     }
     // KDEBUG(("releasing inode %d\n", inode->i_num));
 
@@ -352,7 +352,7 @@ int init_dirent(inode_t* dir, inode_t* ino){
     block_t bnr;
     int i;
     if(!S_ISDIR(ino->i_mode))
-        return ENOTDIR;
+        return -ENOTDIR;
 
     for (i = 0; i < NR_TZONES; ++i) {
         if((bnr = ino->i_zone[i]) > 0){
@@ -365,7 +365,7 @@ int init_dirent(inode_t* dir, inode_t* ino){
             return OK;
         }
     }
-    return ENOSPC;
+    return -ENOSPC;
 }
 
 
@@ -377,11 +377,11 @@ int add_inode_to_directory(struct proc* who, struct inode* dir, struct inode* in
     struct block_buffer* buf;
 
     if(!(S_ISDIR(dir->i_mode)))
-        return EINVAL;
+        return -EINVAL;
     if(!has_file_access(who, dir, W_OK))
-        return EACCES;
+        return -EACCES;
     if(strlen(string) >= DIRNAME_LEN)
-        return ENAMETOOLONG;
+        return -ENAMETOOLONG;
 
     for(i = 0; i < NR_TZONES; i++){
         bnr = dir->i_zone[i];
@@ -405,7 +405,7 @@ int add_inode_to_directory(struct proc* who, struct inode* dir, struct inode* in
         }
         put_block_buffer(buf);
     }
-    return ENOSPC;
+    return -ENOSPC;
 }
 
 int remove_inode_from_dir(struct proc* who, struct inode* dir, struct inode* target, char* name){
@@ -415,7 +415,7 @@ int remove_inode_from_dir(struct proc* who, struct inode* dir, struct inode* tar
     struct winix_dirent *curr, *end;
 
     if(!has_file_access(who, dir, W_OK))
-        return EACCES;
+        return -EACCES;
 
     for(i = 0; i < NR_TZONES; i++){
         bnr = dir->i_zone[i];
@@ -436,7 +436,7 @@ int remove_inode_from_dir(struct proc* who, struct inode* dir, struct inode* tar
         }
         put_block_buffer(buf);
     }
-    return ENOENT;
+    return -ENOENT;
 }
 
 

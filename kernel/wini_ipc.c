@@ -44,7 +44,7 @@ int do_send(int dest, struct message *m) {
             struct proc* xp = curr_scheduling_proc->sender_q;
             while(xp){
                 if(xp == pDest){
-                    return EDEADLK;
+                    return -EDEADLK;
                 }
                 xp = xp->next_sender;
             }
@@ -74,7 +74,7 @@ int do_send(int dest, struct message *m) {
 
         return OK;
     }
-    return ESRCH;
+    return -ESRCH;
 }
 
 /**
@@ -158,7 +158,7 @@ int do_notify(int src, int dest, struct message *m) {
     if ((pDest = get_proc(dest))) {
 
         if(pDest->state & STATE_KILLED)
-            return ERR;
+            return -EINVAL;
 
 
         // KDEBUG(("\nNOTIFY %d from %d type %d| ",dest, src ,m->type));
@@ -196,7 +196,7 @@ int do_notify(int src, int dest, struct message *m) {
         // do nothing if it's not waiting
         return OK;
     }
-    return ESRCH;
+    return -ESRCH;
 }
 
 /**

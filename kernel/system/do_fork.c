@@ -38,7 +38,7 @@ int copy_stack(struct proc* parent, struct proc* child){
     new_stack = user_get_free_page(child, GFP_HIGH);
     if(new_stack == NULL){
         release_proc_slot(child);
-        return ENOMEM;
+        return -ENOMEM;
     }
     copy_page(new_stack, parent->stack_top);
     child_sp = &child->ctx.m.sp;
@@ -127,7 +127,7 @@ int copy_mm(struct proc* parent, struct proc* child){
     bitmap_clear(child->ctx.ptable, PTABLE_LEN);
     child->mem_start = dup_vm(parent, child);
     if(child->mem_start == NULL)
-        return ENOMEM;
+        return -ENOMEM;
     child->ctx.rbase = child->mem_start - child->rbase_offset;
 
     src = (ptr_t *)parent->mem_start;
@@ -193,7 +193,7 @@ int sys_fork(struct proc *parent) {
 
         return child->proc_nr;
     }
-    return EAGAIN;
+    return -EAGAIN;
 }
 
 int do_fork(struct proc *who, struct message *m){
@@ -222,7 +222,7 @@ int do_vfork(struct proc* parent, struct message* m){
         parent->state |= STATE_VFORKING;
         return SUSPEND;
     }
-    return EAGAIN;
+    return -EAGAIN;
 }
 
 /**
@@ -252,7 +252,7 @@ int do_tfork(struct proc* parent, struct message* m){
         syscall_reply2(TFORK, 0, child->proc_nr, m);
         return child->proc_nr;
     }
-    return EAGAIN;
+    return -EAGAIN;
 }
 
 

@@ -22,7 +22,7 @@ int do_csleep(struct proc* who, struct message* m){
 
     alarm = &who->alarm;
     if(alarm->flags & TIMER_INUSE){
-        return EINVAL;
+        return -EINVAL;
     }
     
     new_timer(who->proc_nr, alarm, ticks, wakeup_process);

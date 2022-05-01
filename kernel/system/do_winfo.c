@@ -20,7 +20,7 @@ int do_winfo(struct proc *who, struct message *m){
     struct filp* file = who->fp_filp[STDOUT_FILENO];
 
     if(!file)
-        return EINVAL;
+        return -EINVAL;
 
     switch(m->m1_i1){
         case WINFO_PS:
@@ -52,7 +52,7 @@ int do_winfo(struct proc *who, struct message *m){
             break;
 
         default:
-            return EINVAL;
+            return -EINVAL;
     }
     return OK;
 }

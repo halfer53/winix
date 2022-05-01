@@ -54,21 +54,21 @@ end:
      * is invoked while the process is blocked e.g. by wait(2),
      * the state of the blocked process would be
      *  (STATE_RECEIVING | STATE_WAITING).
-     * if we would simply do syscall_reply(EINTR, pnr, m), then
+     * if we would simply do syscall_reply(-EINTR, pnr, m), then
      * only STATE_RECEIVING is cleared, STATE_WAITING is not. Since
      * a process is only runnable if state == 0, the user space still
      * wouldn't get the response.
      * 
-     * since we want to return EINTR to the user, thus state has to be
+     * since we want to return -EINTR to the user, thus state has to be
      * cleared, or equal to STATE_RUNNABLE, thus both RECEIVING AND WAITING
      * need to be cleared. 
      * 
-     * by making who->state = STATE_RECEIVING, we are ensuring that EINTR
+     * by making who->state = STATE_RECEIVING, we are ensuring that -EINTR
      * is returned to the user space, and no other state info is blocking our way
      */
     if(who->state & STATE_RECEIVING){
         who->state = STATE_RECEIVING;
-        return EINTR;
+        return -EINTR;
     }
         
     return DONTREPLY;

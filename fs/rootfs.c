@@ -109,7 +109,7 @@ static int retrieve_block(struct block_buffer *buf, struct device *dev, block_t 
     off_t off = bnr * BLOCK_SIZE;
     int ret;
     if (off >= rootfs_disk_size){
-        ret = ENOSPC;
+        ret = -ENOSPC;
         return ret;
     }
     buf->block = rootfs_disk + off;
@@ -235,7 +235,7 @@ int root_fs_write (struct filp *filp, char *data, size_t count, off_t offset){
             if((bnr = alloc_block(ino, ino->i_dev)) > 0){
                 ino->i_zone[curr_fp_index] = bnr;
             }else{
-                return ENOSPC;
+                return -ENOSPC;
             }
         }
 

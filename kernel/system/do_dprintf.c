@@ -23,12 +23,12 @@ int do_winix_strerror(struct proc* who, struct message* msg){
     int usr_errno, len;
 
     if(!is_vaddr_accessible(msg->m1_p1, who))
-        return EFAULT;
+        return -EFAULT;
     len = msg->m1_i1;
     usr_errno = msg->m1_i2;
     
     if(usr_errno <= 0 || usr_errno >= _NERROR)
-        return EINVAL;
+        return -EINVAL;
     dst = (char*)get_physical_addr(msg->m1_p1, who);
     // KDEBUG(("errno %d from %s\n", usr_errno, who->name));
     strlcpy(dst, kstr_error(usr_errno), len);
@@ -57,9 +57,9 @@ int do_winix_dprintf(struct proc *who, struct message *m){
     vp1 = m->m1_p1;
     vp2 = m->m1_p2;
     if(!is_vaddr_accessible(vp1, who) || !is_vaddr_accessible(vp2, who))
-        return EFAULT;
+        return -EFAULT;
     if(!is_fd_opened_and_valid(who, fd))
-        return EBADF;
+        return -EBADF;
     file = who->fp_filp[fd];
     ptr = get_physical_addr(vp1,who);
     ptr2 = get_physical_addr(vp2,who);

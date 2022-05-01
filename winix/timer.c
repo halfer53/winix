@@ -34,7 +34,7 @@ void kreport_timers(){
 int new_timer(int procnr_from, struct timer* curr, clock_t timeout, timerhandler_t watchdog){
 
     if(timeout <= 0)
-        return ERR;
+        return -EINVAL;
 
     if( !(curr->flags & TIMER_INUSE) ){
         curr->flags |= TIMER_INUSE;
@@ -47,7 +47,7 @@ int new_timer(int procnr_from, struct timer* curr, clock_t timeout, timerhandler
     }
     
     // PANIC("No timer left");
-    return ERR;
+    return -EINVAL;
 }
 
 

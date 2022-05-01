@@ -252,7 +252,7 @@ void test_given_pipe_write_when_read_fd_closed_and_sigpipe_ignored_should_return
     
     pcurr2.sig_table[SIGPIPE].sa_handler = SIG_IGN;
     ret = sys_write(&pcurr2, pipe_fd[1], "a", 2);
-    assert(ret == EPIPE);
+    assert(ret == -EPIPE);
 
     reset_fs();
 }
