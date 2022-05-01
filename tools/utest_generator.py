@@ -2,18 +2,22 @@ import sys
 import re
 
 def get_prototypes(files):
-    prototypes = []
+    prototypes = set([])
     for file in files:
         with open(file) as f:
             for line in f:
                 match = re.search(r"\s*void\s+test_(\w+)\s*\(\s*\)", line)
                 if match:
-                    prototypes.append(f"test_{match.group(1)}")
+                    proto = f"test_{match.group(1)}"
+                    if proto in prototypes:
+                        raise ValueError(f"{proto} is duplciated")
+                    prototypes.add(proto)
     return prototypes
 
 def generate(prototypes):
     print("#include <sys/fcntl.h>")
     print("#include <stdio.h>")
+    print("#include \"unit_test.h\"")
     print()
     for proto in prototypes:
         print(f"void {proto}();")
@@ -21,6 +25,7 @@ def generate(prototypes):
     print("void run_all_tests(){")
     for proto in prototypes:
         print(f"    printf(\"%s\\n\", \"running {proto}\");")
+        print(f"    reset_fs();")
         print(f"    {proto}();")
         print(f"    printf(\"%s\\n\\n\", \"passed: {proto}\");")
         print()
