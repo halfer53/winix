@@ -456,7 +456,7 @@ int iter_zone_init(struct zone_iterator* iter, struct inode* inode, int zone_idx
     return OK;
 }
 
-zone_t iter_get_current_zone(struct zone_iterator* iter, zone_t** ptr, bool create_inode){
+zone_t _iter_get_current_zone(struct zone_iterator* iter, zone_t** ptr, bool create_inode){
     int ino_iter, ino_rem, indirect_idx;
     zone_t ret = 0;
     zone_t *pos;
@@ -504,12 +504,12 @@ final:
 }
 
 bool iter_has_next_zone(struct zone_iterator* iter){
-    return (bool)iter_get_current_zone(iter, NULL, false);
+    return (bool)_iter_get_current_zone(iter, NULL, false);
 }
 
 zone_t iter_get_next_zone(struct zone_iterator* iter){
     zone_t *zonepos;
-    zone_t zone = iter_get_current_zone(iter, &zonepos, false);
+    zone_t zone = _iter_get_current_zone(iter, &zonepos, false);
     if( zone)
         iter->i_zone_idx++;
     
@@ -522,7 +522,7 @@ int iter_alloc_zone(struct zone_iterator* iter){
     int ret;
     if (iter->i_zone_idx >= MAX_ZONES )
         return -EFBIG;
-    if ((zone = iter_get_current_zone(iter, &pos, true)))
+    if ((zone = _iter_get_current_zone(iter, &pos, true)))
         return -EINVAL;
     ret = alloc_block(iter->i_inode, iter->i_inode->i_dev);
     if(ret < 0)
