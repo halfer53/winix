@@ -26,6 +26,7 @@ void _close_pipe(int pipe_fd[2], struct proc* pcurr2){
 }
 
 void test_given_pipe_read_when_no_data_in_pipe_should_return_suspend(){
+
     struct proc pcurr2;
     int ret;
     int pipe_fd[2];
@@ -35,10 +36,10 @@ void test_given_pipe_read_when_no_data_in_pipe_should_return_suspend(){
     ret = sys_read(current, pipe_fd[0], buffer, 100);
     assert(ret == SUSPEND);
 
-    reset_fs();
 }
 
 void test_given_pipe_write_when_no_data_in_pipe_should_return_succeed(){
+
     struct proc pcurr2;
     int ret;
     int pipe_fd[2];
@@ -48,10 +49,10 @@ void test_given_pipe_write_when_no_data_in_pipe_should_return_succeed(){
     ret = sys_write(current, pipe_fd[1], "a", 1);
     assert(ret == 1);
 
-    reset_fs();
 }
 
 void test_given_pipe_write_when_pipe_is_full_should_return_suspend(){
+
     struct proc pcurr2;
     int ret;
     int pipe_fd[2];
@@ -64,10 +65,10 @@ void test_given_pipe_write_when_pipe_is_full_should_return_suspend(){
     ret = sys_write(current, pipe_fd[1], buffer, PAGE_LEN);
     assert(ret == SUSPEND);
 
-    reset_fs();
 }
 
 void test_given_pipe_read_when_proc_was_suspended_should_return(){
+
     struct proc pcurr2;
     int ret;
     int pipe_fd[2];
@@ -86,10 +87,10 @@ void test_given_pipe_read_when_proc_was_suspended_should_return(){
     ret = sys_write(&pcurr2, pipe_fd[1], "5678", 5);
     assert(ret == 5);
 
-    reset_fs();
 }
 
 void test_given_pipe_read_when_data_is_written_should_return_data(){
+
     struct proc pcurr2;
     int ret;
     int pipe_fd[2];
@@ -103,10 +104,10 @@ void test_given_pipe_read_when_data_is_written_should_return_data(){
     assert(ret == 5);
     assert(strcmp(buffer, "5678") == 0);
 
-    reset_fs();
 }
 
 void test_given_pipe_read_when_pipe_is_full_should_return_data(){
+
     struct proc pcurr2;
     int ret;
     int pipe_fd[2];
@@ -130,10 +131,10 @@ void test_given_pipe_read_when_pipe_is_full_should_return_data(){
     assert(ret == 4);
     assert(strcmp(buffer2, "abc") == 0);
 
-    reset_fs();
 }
 
 void test_given_pipe_read_when_writer_write_fd_closed_should_return_suspend(){
+
     struct proc pcurr2;
     int ret;
     int pipe_fd[2];
@@ -151,10 +152,10 @@ void test_given_pipe_read_when_writer_write_fd_closed_should_return_suspend(){
     assert(ret == 4);
     assert(strcmp(buffer, "abc") == 0);
 
-    reset_fs();
 }
 
 void test_given_pipe_read_when_reader_write_fd_closed_should_return_suspend(){
+
     struct proc pcurr2;
     int ret;
     int pipe_fd[2];
@@ -172,11 +173,11 @@ void test_given_pipe_read_when_reader_write_fd_closed_should_return_suspend(){
     assert(ret == 4);
     assert(strcmp(buffer, "abc") == 0);
 
-    reset_fs();
 }
 
 
 void test_given_pipe_read_when_all_write_fds_closed_should_return_0(){
+
     struct proc pcurr2;
     int ret;
     int pipe_fd[2];
@@ -193,10 +194,10 @@ void test_given_pipe_read_when_all_write_fds_closed_should_return_0(){
     ret = sys_read(&pcurr2, pipe_fd[0], buffer, 2);
     assert(ret == 0);
 
-    reset_fs();
 }
 
 void test_given_pipe_write_when_one_read_fd_s_closed_should_return_success(){
+
     struct proc pcurr2;
     int ret;
     int pipe_fd[2];
@@ -214,10 +215,10 @@ void test_given_pipe_write_when_one_read_fd_s_closed_should_return_success(){
     assert(ret == 2);
     assert(strcmp("a", buffer) == 0);
 
-    reset_fs();
 }
 
 void test_given_pipe_write_when_read_fd_are_closed_should_return_sigpipe(){
+
     struct proc pcurr2;
     int ret;
     int pipe_fd[2];
@@ -234,10 +235,10 @@ void test_given_pipe_write_when_read_fd_are_closed_should_return_sigpipe(){
     assert(ret == SUSPEND);
     assert(sigismember(&pcurr2.sig_pending, SIGPIPE));
 
-    reset_fs();
 }
 
 void test_given_pipe_write_when_read_fd_closed_and_sigpipe_ignored_should_return_epipe(){
+
     struct proc pcurr2;
     int ret;
     int pipe_fd[2];
@@ -254,5 +255,4 @@ void test_given_pipe_write_when_read_fd_closed_and_sigpipe_ignored_should_return
     ret = sys_write(&pcurr2, pipe_fd[1], "a", 2);
     assert(ret == -EPIPE);
 
-    reset_fs();
 }

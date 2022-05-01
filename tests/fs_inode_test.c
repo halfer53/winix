@@ -3,7 +3,6 @@
 #include "unit_test.h"
 
 void test_given_zone_iterator_should_return(){
-    reset_fs();
     struct zone_iterator iter;
     struct device* dev = get_dev(ROOT_DEV);
     struct inode* root = get_inode(ROOT_INODE_NUM, dev);
@@ -14,7 +13,6 @@ void test_given_zone_iterator_should_return(){
 }
 
 void test_given_has_next_zone_when_exceed_max_should_return_false(){
-    reset_fs();
     struct zone_iterator iter;
     struct device* dev = get_dev(ROOT_DEV);
     struct inode* root = get_inode(ROOT_INODE_NUM, dev);
@@ -26,7 +24,6 @@ void test_given_has_next_zone_when_exceed_max_should_return_false(){
 }
 
 void test_given_has_next_zone_when_have_zone_should_return_true(){
-    reset_fs();
     struct zone_iterator iter;
     struct device* dev = get_dev(ROOT_DEV);
     struct inode* root = get_inode(ROOT_INODE_NUM, dev);
@@ -38,7 +35,6 @@ void test_given_has_next_zone_when_have_zone_should_return_true(){
 }
 
 void test_given_has_next_zone_when_no_zone_should_return_false(){
-    reset_fs();
     struct zone_iterator iter;
 
     struct filp* filp;
