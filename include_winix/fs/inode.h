@@ -59,7 +59,7 @@ struct zone_iterator{
 struct dirent_iterator{
     struct winix_dirent* dirent;
     struct winix_dirent* dirent_end;
-    struct zone_iterator iter;
+    struct zone_iterator zone_iter;
 };
 
 #define INODE_DISK_SIZE (sizeof(struct inode_disk))
