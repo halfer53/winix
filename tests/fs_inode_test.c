@@ -22,7 +22,7 @@ void test_given_has_next_zone_when_exceed_max_should_return_false(){
     int ret = iter_zone_init(&iter, root, MAX_ZONES);
     assert(ret == 0);
     
-    bool result = iter_has_next_zone(&iter);
+    bool result = iter_zone_has_next(&iter);
     assert(result == false);
 
     ret = iter_zone_close(&iter);
@@ -38,7 +38,7 @@ void test_given_has_next_zone_when_no_zone_should_return_false(){
     ret = iter_zone_init(&iter, filp->filp_ino, 0);
     assert(ret == 0);
     
-    bool result = iter_has_next_zone(&iter);
+    bool result = iter_zone_has_next(&iter);
     assert(result == false);
 
     ret = iter_zone_close(&iter);
@@ -52,7 +52,7 @@ void test_given_has_next_zone_when_have_zone_should_return_true(){
     int ret = iter_zone_init(&iter, root, 0);
     assert(ret == 0);
     
-    bool result = iter_has_next_zone(&iter);
+    bool result = iter_zone_has_next(&iter);
     assert(result == true);
 
     ret = iter_zone_close(&iter);
@@ -66,25 +66,25 @@ void test_given_has_next_zone_when_zone_exhausted_should_return_false(){
     int ret = iter_zone_init(&iter, root, 0);
     assert(ret == 0);
     
-    bool result = iter_has_next_zone(&iter);
+    bool result = iter_zone_has_next(&iter);
     assert(result == true);
 
-    zone_t zone = iter_get_next_zone(&iter);
+    zone_t zone = iter_zone_get_next(&iter);
     assert(zone > 0);
 
-    result = iter_has_next_zone(&iter);
+    result = iter_zone_has_next(&iter);
     assert(result == false);
 
-    ret = iter_alloc_zone(&iter);
+    ret = iter_zone_alloc(&iter);
     assert(ret > 0);
 
-    result = iter_has_next_zone(&iter);
+    result = iter_zone_has_next(&iter);
     assert(result == true);
 
-    zone = iter_get_next_zone(&iter);
+    zone = iter_zone_get_next(&iter);
     assert(zone == ret);
 
-    result = iter_has_next_zone(&iter);
+    result = iter_zone_has_next(&iter);
     assert(result == false);
 
     ret = iter_zone_close(&iter);
@@ -112,23 +112,23 @@ void test_given_has_next_zone_when_alloc_zone_should_continue(){
     assert(inode->i_count == 2);
 
     for(i = 0; i < MAX_ZONES; i++){
-        result = iter_has_next_zone(&iter);
+        result = iter_zone_has_next(&iter);
         assert(result == false);
 
-        ret = iter_alloc_zone(&iter);
+        ret = iter_zone_alloc(&iter);
         assert(ret > 0);
 
-        result = iter_has_next_zone(&iter);
+        result = iter_zone_has_next(&iter);
         assert(result == true);
 
-        zone = iter_get_next_zone(&iter);
+        zone = iter_zone_get_next(&iter);
         assert(zone == ret);
     }
 
-    result = iter_has_next_zone(&iter);
+    result = iter_zone_has_next(&iter);
     assert(result == false);
 
-    ret = iter_alloc_zone(&iter);
+    ret = iter_zone_alloc(&iter);
     assert(ret == -EFBIG);
 
     ret = iter_zone_close(&iter);
@@ -158,7 +158,7 @@ void test_given_has_next_zone_when_alloc_zone_should_continue(){
     }
 
     release_inode(inode);
-    
+
     assert(inode->i_count == 0);
     assert(!is_inode_in_use(inode->i_num, dev));
     for(i = 0; i < NR_TZONES; i++){

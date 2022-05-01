@@ -58,8 +58,8 @@ int advance(inode_t *dirp, char string[NAME_MAX]){
         return -EINVAL;
     iter_zone_init(&iter, dirp, 0);
 //    KDEBUG(("advancing %s in inode %d\n", string, dirp->i_num));
-    while(iter_has_next_zone(&iter)){
-        zone_t zone = iter_get_next_zone(&iter);
+    while(iter_zone_has_next(&iter)){
+        zone_t zone = iter_zone_get_next(&iter);
         if((buffer = get_block_buffer(zone, dirp->i_dev))){
             dirstream = (struct winix_dirent*)buffer->block;
             dirend = (struct winix_dirent* )&buffer->block[BLOCK_SIZE];
@@ -84,8 +84,8 @@ int get_parent_inode_num(inode_t *dirp){
     struct zone_iterator iter;
 
     iter_zone_init(&iter, dirp, 0);
-    while(iter_has_next_zone(&iter)){
-        zone_t zone = iter_get_next_zone(&iter);
+    while(iter_zone_has_next(&iter)){
+        zone_t zone = iter_zone_get_next(&iter);
         if((buffer = get_block_buffer(zone, dirp->i_dev)) != NULL){
             dirstream = (struct winix_dirent*)buffer->block;
             dirend = (struct winix_dirent* )&buffer->block[BLOCK_SIZE];
@@ -111,8 +111,8 @@ int get_child_inode_name(inode_t* parent, inode_t* child, char string[NAME_MAX])
     struct zone_iterator iter;
 
     iter_zone_init(&iter, parent, 0);
-    while(iter_has_next_zone(&iter)){
-        zone_t zone = iter_get_next_zone(&iter);
+    while(iter_zone_has_next(&iter)){
+        zone_t zone = iter_zone_get_next(&iter);
         if((buffer = get_block_buffer(zone, parent->i_dev)) != NULL){
             dirstream = (struct winix_dirent*)buffer->block;
             dirend = (struct winix_dirent* )&buffer->block[BLOCK_SIZE];

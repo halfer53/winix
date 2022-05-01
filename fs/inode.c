@@ -512,11 +512,11 @@ final:
     return ret;
 }
 
-bool iter_has_next_zone(struct zone_iterator* iter){
+bool iter_zone_has_next(struct zone_iterator* iter){
     return (bool)_iter_get_current_zone(iter, NULL, false);
 }
 
-zone_t iter_get_next_zone(struct zone_iterator* iter){
+zone_t iter_zone_get_next(struct zone_iterator* iter){
     zone_t *zonepos;
     zone_t zone = _iter_get_current_zone(iter, &zonepos, false);
     if( zone)
@@ -525,7 +525,7 @@ zone_t iter_get_next_zone(struct zone_iterator* iter){
     return zone;
 }
 
-int iter_alloc_zone(struct zone_iterator* iter){
+int iter_zone_alloc(struct zone_iterator* iter){
     zone_t *pos;
     zone_t zone;
     int ret;
@@ -553,9 +553,9 @@ int iter_dirent_init(struct dirent_iterator* iter, struct inode* inode){
     return 0;
 }
 
-bool iter_has_next_zone(struct zone_iterator* iter);
-zone_t iter_get_next_zone(struct zone_iterator* iter);
-int iter_alloc_zone(struct zone_iterator* iter);
+bool iter_zone_has_next(struct zone_iterator* iter);
+zone_t iter_zone_get_next(struct zone_iterator* iter);
+int iter_zone_alloc(struct zone_iterator* iter);
 int iter_zone_close(struct zone_iterator* iter);
 
 

@@ -80,10 +80,10 @@ bool is_inode_in_use(int num, struct device* id);
 int run_unit_tests();
 
 int iter_zone_init(struct zone_iterator* iter, struct inode* inode, int zone_idx);
-zone_t iter_get_next_zone(struct zone_iterator* iter);
-int iter_alloc_zone(struct zone_iterator* iter);
+zone_t iter_zone_get_next(struct zone_iterator* iter);
+int iter_zone_alloc(struct zone_iterator* iter);
 int iter_zone_close(struct zone_iterator* iter);
-bool iter_has_next_zone(struct zone_iterator* iter);
+bool iter_zone_has_next(struct zone_iterator* iter);
 
 int char32_strcmp(const char32_t *s1, const char *s2);
 int char32_strlen(const char32_t *s);
