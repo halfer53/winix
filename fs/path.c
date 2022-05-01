@@ -49,32 +49,23 @@ char *get_name(char *old_name, char string[NAME_MAX]){
 // given a directory and a name component, lookup in the directory
 // and find the corresponding inode
 int advance(inode_t *dirp, char string[NAME_MAX]){
-    int inum  = 0;
-    struct block_buffer *buffer;
-    struct winix_dirent* dirstream, *dirend;
-    struct zone_iterator iter;
+    struct winix_dirent* dirstream;
+    struct dirent_iterator iter;
+    int ret = -EINVAL;
 
     if(*string == '\0')
-        return -EINVAL;
-    iter_zone_init(&iter, dirp, 0);
+        return ret;
+    iter_dirent_init(&iter, dirp);
 //    KDEBUG(("advancing %s in inode %d\n", string, dirp->i_num));
-    while(iter_zone_has_next(&iter)){
-        zone_t zone = iter_zone_get_next(&iter);
-        if((buffer = get_block_buffer(zone, dirp->i_dev))){
-            dirstream = (struct winix_dirent*)buffer->block;
-            dirend = (struct winix_dirent* )&buffer->block[BLOCK_SIZE];
-            for(; dirstream < dirend; dirstream++ ){
-                if(char32_strcmp(dirstream->dirent.d_name, string) == 0){
-                    inum = dirstream->dirent.d_ino;
-                    put_block_buffer(buffer);
-                    return inum;
-                }
-            }
-            put_block_buffer(buffer);
+    while(iter_dirent_has_next(&iter)){
+        dirstream = iter_dirent_get_next(&iter);
+        if(char32_strcmp(dirstream->dirent.d_name, string) == 0){
+            ret = dirstream->dirent.d_ino;
+            break;
         }
     }
-    iter_zone_close(&iter);
-    return -EINVAL;
+    iter_dirent_close(&iter);
+    return ret;
 }
 
 int get_parent_inode_num(inode_t *dirp){
