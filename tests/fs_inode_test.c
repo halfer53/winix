@@ -106,6 +106,11 @@ void test_given_has_next_zone_when_alloc_zone_should_continue(){
     ret = iter_zone_init(&iter, filp->filp_ino, 0);
     assert(ret == 0);
 
+    struct inode* inode = iter.i_inode;
+    struct device *dev = inode->i_dev;
+    assert(is_inode_in_use(inode->i_num, dev));
+    assert(inode->i_count == 2);
+
     for(i = 0; i < MAX_ZONES; i++){
         result = iter_has_next_zone(&iter);
         assert(result == false);
@@ -128,6 +133,46 @@ void test_given_has_next_zone_when_alloc_zone_should_continue(){
 
     ret = iter_zone_close(&iter);
     assert(ret == 0);
+    assert(inode->i_count == 1);
+
+    ret = filp_close(filp);
+    assert(ret == 0);
+    assert(inode->i_count == 0);
+
+    struct inode* i1 = get_inode(inode->i_zone[NR_DIRECT_ZONE], dev);
+    put_inode(i1, false);
+    assert(i1);
+    assert(is_inode_in_use(i1->i_num, dev));
+    assert(i1->flags & INODE_FLAG_ZONE);
+    for(i = 0; i < NR_TZONES; i++){
+        assert(i1->i_zone[i] > 0);
+    }
+
+    struct inode* i2 = get_inode(inode->i_zone[NR_DIRECT_ZONE + 1], dev);
+    put_inode(i2, false);
+    assert(i2);
+    assert(is_inode_in_use(i2->i_num, dev));
+    assert(i2->flags & INODE_FLAG_ZONE);
+    for(i = 0; i < NR_TZONES; i++){
+        assert(i2->i_zone[i] > 0);
+    }
+
+    release_inode(inode);
+    
+    assert(inode->i_count == 0);
+    assert(!is_inode_in_use(inode->i_num, dev));
+    for(i = 0; i < NR_TZONES; i++){
+        assert(inode->i_zone[i] == 0);
+    }
+    assert(i1->i_count == 0);
+    assert(i2->i_count == 0);
+    assert(!is_inode_in_use(i1->i_num, dev));
+    assert(!is_inode_in_use(i2->i_num, dev));
+    for(i = 0; i < NR_TZONES; i++){
+        assert(i1->i_zone[i] == 0);
+    }for(i = 0; i < NR_TZONES; i++){
+        assert(i2->i_zone[i] == 0);
+    }
     
 }
 

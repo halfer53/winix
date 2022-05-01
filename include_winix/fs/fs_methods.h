@@ -75,6 +75,8 @@ inode_t* alloc_inode(struct device*, struct device*);
 void init_inode_proc_field(struct inode* ino, struct proc* who, mode_t devtype, mode_t mode);
 int truncate_inode(inode_t *inode);
 void init_inode();
+bool is_inode_in_use(int num, struct device* id);
+
 int run_unit_tests();
 
 int iter_zone_init(struct zone_iterator* iter, struct inode* inode, int zone_idx);
