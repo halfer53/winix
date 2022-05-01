@@ -87,32 +87,26 @@ int get_parent_inode_num(inode_t *dirp){
 }
 
 int get_child_inode_name(inode_t* parent, inode_t* child, char string[NAME_MAX]){
-    int len;
+    struct winix_dirent* dirstream;
+    struct dirent_iterator iter;
+    int ret = -EINVAL;
     char32_t *p;
-    struct block_buffer *buffer;
-    struct winix_dirent* dirstream, *dirend;
-    struct zone_iterator iter;
+    int len = -EINVAL;
 
-    iter_zone_init(&iter, parent, 0);
-    while(iter_zone_has_next(&iter)){
-        zone_t zone = iter_zone_get_next(&iter);
-        if((buffer = get_block_buffer(zone, parent->i_dev)) != NULL){
-            dirstream = (struct winix_dirent*)buffer->block;
-            dirend = (struct winix_dirent* )&buffer->block[BLOCK_SIZE];
-            for(; dirstream < dirend; dirstream++ ){
-                if(dirstream->dirent.d_ino == child->i_num){
-                    p = dirstream->dirent.d_name;
-                    len = char32_strlen(p);
-                    char32_strlcpy2(string, p, len + 1);
-                    put_block_buffer(buffer);
-                    return len;
-                }
-            }
-            put_block_buffer(buffer);
+    iter_dirent_init(&iter, parent);
+//    KDEBUG(("advancing %s in inode %d\n", string, dirp->i_num));
+    while(iter_dirent_has_next(&iter)){
+        dirstream = iter_dirent_get_next(&iter);
+        if(dirstream->dirent.d_ino == child->i_num){
+            p = dirstream->dirent.d_name;
+            len = char32_strlen(p);
+            char32_strlcpy2(string, p, len + 1);
+            ret = len;
+            break;
         }
     }
-    iter_zone_close(&iter);
-    return -EINVAL;
+    iter_dirent_close(&iter);
+    return ret;
 }
 
  
