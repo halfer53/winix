@@ -322,9 +322,18 @@ int release_inode(inode_t *inode){
     for(i = 0; i < NR_TZONES; i++){
         zone_id = inode->i_zone[i];
         if(zone_id > 0){
-            // KDEBUG(("releasing block %d for %d\n", zone_id, inode->i_num));
-            release_block(zone_id, id);
-            inode->i_zone[i] = 0;
+            if(inode->flags & INODE_FLAG_ZONE || i < NR_DIRECT_ZONE){
+                // KDEBUG(("releasing block %d for %d\n", zone_id, inode->i_num));
+                release_block(zone_id, id);
+                inode->i_zone[i] = 0;
+            }else{
+                struct inode* indirect_zone = get_inode(zone_id, id);
+                if(indirect_zone){
+                    if (!(indirect_zone->flags & INODE_FLAG_ZONE))
+                        PANIC("indirect inode");
+                    release_inode(inode);
+                }
+            }
         }
     }
     
@@ -482,7 +491,7 @@ zone_t _iter_get_current_zone(struct zone_iterator* iter, zone_t** ptr, bool cre
         indirect_ino = alloc_inode(dev, dev);
         if(!indirect_ino)
             goto final;
-        
+        indirect_ino->flags |= INODE_FLAG_ZONE;
         *pos = (zone_t)indirect_ino->i_num;
         pos = &indirect_ino->i_zone[ino_rem];
     }else{

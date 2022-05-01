@@ -72,11 +72,12 @@ extern inode_t inode_table[NR_INODES];
 #define NR_DIRECT_ZONE          (NR_TZONES - MAX_INDIRECT_NR_ZONE)
 
 #define NIL_INODE (inode_t *) 0    /* indicates absence of inode slot */
-#define INODE_FLAG_DIR     1
-#define INODE_FLAG_PIPE    2
-#define INODE_FLAG_MOUNT   4
-#define INODE_FLAG_SEEK    8
-#define INODE_FLAG_MEM_DIR    16    // temp dir like /dev
+#define INODE_FLAG_DIR          0x00000001
+#define INODE_FLAG_PIPE         0x00000002
+#define INODE_FLAG_MOUNT        0x00000004
+#define INODE_FLAG_SEEK         0x00000008
+#define INODE_FLAG_MEM_DIR      0x00000010      // temp dir like /dev
+#define INODE_FLAG_ZONE         0x00000020      // inode for indirect zone
 
 #endif
 
