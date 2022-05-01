@@ -452,35 +452,43 @@ int init_zone_iterator(struct zone_iterator* iter, struct inode* inode, int zone
     return OK;
 }
 
-zone_t iter_get_current_zone(struct zone_iterator* iter){
+zone_t iter_get_current_zone(struct zone_iterator* iter, zone_t** ptr){
     int ino_iter, ino_rem, indirect_idx;
-    zone_t zone;
-    struct inode* indirect_ino;
+    zone_t zone = 0;
+    zone_t *pos;
+    struct inode* indirect_ino = NULL;
     if (iter->i_zone_idx >= MAX_ZONES )
         return 0;
     if (iter->i_zone_idx < NR_DIRECT_ZONE){
-        return iter->i_inode->i_zone[iter->i_zone_idx];
+        pos = &iter->i_inode->i_zone[iter->i_zone_idx];
+        goto assign;
     }
     indirect_idx = iter->i_zone_idx - NR_DIRECT_ZONE;
     ino_iter = indirect_idx / NR_TZONES;
     ino_rem = indirect_idx % NR_TZONES;
-    zone = iter->i_inode->i_zone[NR_DIRECT_ZONE - 1 + ino_iter];
-    if (zone == 0)
-        return zone;
-    indirect_ino = get_inode(zone, iter->i_inode->i_dev);
-    if (!indirect_idx){
+    pos = &iter->i_inode->i_zone[NR_DIRECT_ZONE - 1 + ino_iter];
+    if (*pos == 0)
+        goto assign;
+    indirect_ino = get_inode(*pos, iter->i_inode->i_dev);
+    if (!indirect_ino){
         zone = 0;
         goto final;
     }
-    zone = indirect_ino->i_zone[ino_rem];
-    
+    pos = &indirect_ino->i_zone[ino_rem];
+
+assign:
+    zone = *pos;
 final:
-    put_inode(indirect_ino, false);
+    if (ptr)
+        *ptr = pos;
+    if (indirect_ino)
+        put_inode(indirect_ino, false);
     return zone;
 }
 
 zone_t iter_get_next_zone(struct zone_iterator* iter){
-    zone_t zone = iter_get_current_zone(iter);
+    zone_t *zonepos;
+    zone_t zone = iter_get_current_zone(iter, &zonepos);
     if( zone)
         iter->i_zone_idx++;
     
@@ -488,7 +496,16 @@ zone_t iter_get_next_zone(struct zone_iterator* iter){
 }
 
 int iter_alloc_zone(struct zone_iterator* iter){
-    return 0;
+    zone_t *pos;
+    zone_t zone = iter_get_current_zone(iter, &pos);
+    int ret;
+    if (zone)
+        return -EINVAL;
+    ret = alloc_block(iter->i_inode, iter->i_inode->i_dev);
+    if(ret < 0)
+        return ret;
+    *pos = (zone_t)ret;
+    return ret;
 }
 
 void init_inode(){
