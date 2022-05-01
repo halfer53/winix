@@ -107,6 +107,11 @@ static int init_block(struct block_buffer *buf){
 
 static int retrieve_block(struct block_buffer *buf, struct device *dev, block_t bnr){
     off_t off = bnr * BLOCK_SIZE;
+    int ret;
+    if (off >= rootfs_disk_size){
+        ret = ENOSPC;
+        return ret;
+    }
     buf->block = rootfs_disk + off;
     return BLOCK_SIZE;
 }
