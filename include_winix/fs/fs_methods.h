@@ -76,7 +76,9 @@ void init_inode();
 int run_unit_tests();
 
 int init_zone_iterator(struct zone_iterator* iter, struct inode* inode, int zone_idx);
-bool has_next_zone(struct zone_iterator* iter);
+zone_t get_current_zone(struct zone_iterator* iter);
+zone_t get_next_zone(struct zone_iterator* iter);
+#define has_next_zone(iter)     (get_current_zone(iter))
 
 int char32_strcmp(const char32_t *s1, const char *s2);
 int char32_strlen(const char32_t *s);
