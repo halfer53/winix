@@ -1,7 +1,7 @@
 #include <fs/fs.h>
 #include <fs/path.h>
 
-int sys_getcwd(struct proc* who, char* pathname, int size){
+char* sys_getcwd(struct proc* who, char* pathname, int size){
     int ret = OK, len;
     inode_t *inode, *parent_inode;
     int inum;
@@ -9,9 +9,9 @@ int sys_getcwd(struct proc* who, char* pathname, int size){
     char *p;
 
     if(!is_vaddr_accessible(pathname, who) || !is_vaddr_accessible(pathname + size, who))
-        return -EFAULT;
+        return ERR_PTR(EFAULT);
     if(size <= 1)
-        return -ERANGE;
+        return ERR_PTR(ERANGE);
 
     p = (char *)get_physical_addr(pathname+ size, who);
     *p = '\0';
@@ -26,6 +26,7 @@ int sys_getcwd(struct proc* who, char* pathname, int size){
         // KDEBUG(("cwd: ret %d curr %d (%s), parent %d\n", ret, inode->i_num, string, inum));
         if(ret < 0){
             // KDEBUG(("corruptted fs of %d inode\n", inum));
+            p = ERR_PTR(-ret);
             goto end;
         }
         put_inode(inode, false);
@@ -33,7 +34,7 @@ int sys_getcwd(struct proc* who, char* pathname, int size){
 
         len += (ret + 1); // inclusing slash
         if(len >= size){
-            ret = -ERANGE;
+            p = ERR_PTR(ERANGE);
             goto end;
         }
         *--p = '/';
@@ -42,13 +43,15 @@ int sys_getcwd(struct proc* who, char* pathname, int size){
 
     }
     *--p = '/';
-    ret = (int)(get_virtual_addr(p, who) - (ptr_t*)0);
 end:
     put_inode(inode, false);
-    return ret;
+    return p;
 }
 
 
 int do_getcwd(struct proc* who, struct message* m){
-    return sys_getcwd(who, m->m1_p1, m->m1_i1);
+    char *p = sys_getcwd(who, m->m1_p1, m->m1_i1);
+    if (IS_ERR(p))
+        return -PTR_ERR(p);
+    return (int)(get_virtual_addr(p, who) - (ptr_t*)0);
 }
