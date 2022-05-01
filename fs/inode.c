@@ -452,6 +452,34 @@ int init_zone_iterator(struct zone_iterator* iter, struct inode* inode, int zone
     return OK;
 }
 
+bool has_next_zone(struct zone_iterator* iter){
+    int ino_iter, ino_rem, indirect_idx;
+    zone_t zone;
+    struct inode* indirect_ino;
+    bool ret = false;
+    if (iter->i_zone_idx >= MAX_ZONES )
+        return false;
+    if (iter->i_zone_idx < NR_DIRECT_ZONE){
+        return (bool)iter->i_inode->i_zone[iter->i_zone_idx] > 0;
+    }
+    indirect_idx = iter->i_zone_idx - NR_DIRECT_ZONE;
+    ino_iter = indirect_idx / NR_TZONES;
+    ino_rem = indirect_idx % NR_TZONES;
+    zone = iter->i_inode->i_zone[NR_DIRECT_ZONE - 1 + ino_iter];
+    if (zone == 0)
+        return false;
+    indirect_ino = get_inode(zone, iter->i_inode->i_dev);
+    if (!indirect_idx)
+        goto final;
+    if (indirect_ino->i_zone[ino_rem] == 0)
+        goto final;
+    ret = true;
+    
+final:
+    put_inode(indirect_ino, false);
+    return ret;
+}
+
 void init_inode(){
     inode_t* rep;
     int i;
