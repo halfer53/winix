@@ -100,7 +100,7 @@ int release_block(block_t bnr, struct device* id){
     block_t bmap_nr = sb->s_blockmapnr + (bnr / BLOCK_SIZE);
     struct block_buffer *bmap, *block;
     if(is_valid_block_num(bnr, id)){
-        kwarn("Invalid block id %d", bnr);
+        kwarn("Invalid block id %d\n", bnr);
         return -EINVAL;
     }
     block = get_block_buffer(bnr, id);
@@ -571,6 +571,7 @@ struct winix_dirent* iter_dirent_get_next(struct dirent_iterator* iter){
         buffer = get_block_buffer(zone, iter->zone_iter.i_inode->i_dev);
         iter->dirent = (struct winix_dirent*)buffer->block;
         iter->dirent_end = (struct winix_dirent* )&buffer->block[BLOCK_SIZE];
+        put_block_buffer(buffer);
     }
     return iter->dirent++;
 }
