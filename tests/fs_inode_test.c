@@ -93,39 +93,41 @@ void test_given_has_next_zone_when_zone_exhausted_should_return_false(){
 
 
 
-// void test_given_has_next_zone_when_alloc_zone_should_continue(){
+void test_given_has_next_zone_when_alloc_zone_should_continue(){
+    struct zone_iterator iter;
+    struct filp* filp;
+    int i;
+    bool result;
+    zone_t zone;
 
-//     struct zone_iterator iter;
-//     struct filp* filp;
-//     int i;
-//     bool result;
-//     zone_t zone;
+    int ret = filp_open(curr_scheduling_proc, &filp, FILE1, O_CREAT | O_RDWR, 0x755);
+    assert(ret == 0);
 
-//     int ret = filp_open(curr_scheduling_proc, &filp, FILE1, O_CREAT | O_RDWR, 0x755);
-//     assert(ret == 0);
+    ret = init_zone_iterator(&iter, curr_scheduling_proc, filp->filp_ino, 0);
+    assert(ret == 0);
 
-//     ret = init_zone_iterator(&iter, curr_scheduling_proc, filp->filp_ino, 0);
-//     assert(ret == 0);
+    for(i = 0; i < MAX_ZONES; i++){
+        result = iter_has_next_zone(&iter);
+        assert(result == false);
 
-//     for(i = 0; i < MAX_ZONES; i++){
-//         if(i == 6){
-//             printf("a");
-//         }
-//         result = iter_has_next_zone(&iter);
-//         assert(result == false);
+        ret = iter_alloc_zone(&iter);
+        assert(ret > 0);
 
-//         ret = iter_alloc_zone(&iter);
-//         assert(ret > 0);
+        result = iter_has_next_zone(&iter);
+        assert(result == true);
 
-//         result = iter_has_next_zone(&iter);
-//         assert(result == true);
+        zone = iter_get_next_zone(&iter);
+        assert(zone == ret);
+    }
 
-//         zone = iter_get_next_zone(&iter);
-//         assert(zone == ret);
-//     }
+    result = iter_has_next_zone(&iter);
+    assert(result == false);
 
-//     ret = iter_close(&iter);
-//     assert(ret == 0);
+    ret = iter_alloc_zone(&iter);
+    assert(ret == -EFBIG);
+
+    ret = iter_close(&iter);
+    assert(ret == 0);
     
-// }
+}
 
