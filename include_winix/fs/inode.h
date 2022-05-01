@@ -20,7 +20,7 @@ typedef struct inode {
     time_t i_atime;        /* time of last access (V2 only) */ //8
     time_t i_mtime;        /* when was file data last changed */ //8
     time_t i_ctime;        /* when was inode itself changed (V2 only)*/ //8
-    block_t i_zone[NR_TZONES]; /* zone numbers for data blocks */
+    zone_t i_zone[NR_TZONES]; /* zone numbers for data blocks */
 
     struct device* i_dev;            /* which device is the inode on */
     ino_t i_num;            /* inode number on its (minor) device */
@@ -47,8 +47,8 @@ struct inode_disk {
     off_t i_size;            /* current file size in bytes */ //8 bytes
     time_t i_atime;        /* time of last access (V2 only) */ //8
     time_t i_mtime;        /* when was file data last changed */ //8
-    time_t i_ctime;        /* when was inode itself changed (V2 only)*/ //8
-    block_t i_zone[NR_TZONES]; /* zone numbers for data blocks */
+    time_t i_ctime;         /* when was inode itself changed (V2 only)*/ //8
+    zone_t i_zone[NR_TZONES]; /* zone numbers for data blocks */
 };
 
 struct zone_iterator{
@@ -60,6 +60,10 @@ struct zone_iterator{
 
 
 extern inode_t inode_table[NR_INODES];
+
+#define MAX_INDIRECT_NR_ZONE    2
+#define MAX_ZONES               (NR_TZONES * MAX_INDIRECT_NR_ZONE + NR_TZONES - MAX_INDIRECT_NR_ZONE)
+#define NR_DIRECT_ZONE          (NR_TZONES - MAX_INDIRECT_NR_ZONE)
 
 #define NIL_INODE (inode_t *) 0    /* indicates absence of inode slot */
 #define INODE_FLAG_DIR     1
