@@ -79,6 +79,7 @@ int init_zone_iterator(struct zone_iterator* iter, struct inode* inode, int zone
 zone_t iter_get_current_zone(struct zone_iterator* iter, zone_t** ptr);
 zone_t iter_get_next_zone(struct zone_iterator* iter);
 int iter_alloc_zone(struct zone_iterator* iter);
+int iter_close(struct zone_iterator* iter);
 #define iter_has_next_zone(iter)     (iter_get_current_zone(iter, NULL))
 
 int char32_strcmp(const char32_t *s1, const char *s2);

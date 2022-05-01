@@ -10,6 +10,9 @@ void test_given_zone_iterator_should_return(){
     assert(ret == 0);
     assert(iter.i_inode == root);
     assert(iter.i_zone_idx == 0);
+
+    ret = iter_close(&iter);
+    assert(ret == 0);
 }
 
 void test_given_has_next_zone_when_exceed_max_should_return_false(){
@@ -21,6 +24,9 @@ void test_given_has_next_zone_when_exceed_max_should_return_false(){
     
     bool result = iter_has_next_zone(&iter);
     assert(result == false);
+
+    ret = iter_close(&iter);
+    assert(ret == 0);
 }
 
 void test_given_has_next_zone_when_no_zone_should_return_false(){
@@ -34,6 +40,9 @@ void test_given_has_next_zone_when_no_zone_should_return_false(){
     
     bool result = iter_has_next_zone(&iter);
     assert(result == false);
+
+    ret = iter_close(&iter);
+    assert(ret == 0);
 }
 
 void test_given_has_next_zone_when_have_zone_should_return_true(){
@@ -45,6 +54,9 @@ void test_given_has_next_zone_when_have_zone_should_return_true(){
     
     bool result = iter_has_next_zone(&iter);
     assert(result == true);
+
+    ret = iter_close(&iter);
+    assert(ret == 0);
 }
 
 void test_given_has_next_zone_when_zone_exhausted_should_return_false(){
@@ -74,5 +86,8 @@ void test_given_has_next_zone_when_zone_exhausted_should_return_false(){
 
     result = iter_has_next_zone(&iter);
     assert(result == false);
+
+    ret = iter_close(&iter);
+    assert(ret == 0);
 }
 
