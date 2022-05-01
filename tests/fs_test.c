@@ -460,6 +460,20 @@ void test_given_getdents_when_files_in_folder_should_return_files(){
 
 }
 
+void test_given_pwd_when_chdir_should_return_path(){
+    int ret;
+    ret = sys_mkdir(current, DIR_NAME, 0x755);
+    assert(ret == 0);
+
+    ret = sys_chdir(current, DIR_NAME);
+    assert(ret == 0);
+
+    char *result = sys_getcwd(current, buffer, PAGE_LEN);
+    assert(!IS_ERR(result));
+    printf("%s\n", result);
+    assert(strcmp(result, DIR_NAME) == 0);
+}
+
 void test_given_mknod_when_path_valid_should_return_0(){
     int ret = sys_mknod(current, TTY_PATH, O_RDWR, TTY_DEV);
     assert(ret == 0);
