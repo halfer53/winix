@@ -531,10 +531,12 @@ int iter_alloc_zone(struct zone_iterator* iter){
     return ret;
 }
 
-int iter_close(struct zone_iterator* iter){
+int iter_zone_close(struct zone_iterator* iter){
     iter->i_zone_idx = 0;
     return 0;
 }
+
+
 
 void init_inode(){
     inode_t* rep;

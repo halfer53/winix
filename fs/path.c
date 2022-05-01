@@ -73,7 +73,7 @@ int advance(inode_t *dirp, char string[NAME_MAX]){
             put_block_buffer(buffer);
         }
     }
-    iter_close(&iter);
+    iter_zone_close(&iter);
     return -EINVAL;
 }
 
@@ -99,7 +99,7 @@ int get_parent_inode_num(inode_t *dirp){
             put_block_buffer(buffer);
         }
     }
-    iter_close(&iter);
+    iter_zone_close(&iter);
     return -EINVAL;
 }
 
@@ -128,7 +128,7 @@ int get_child_inode_name(inode_t* parent, inode_t* child, char string[NAME_MAX])
             put_block_buffer(buffer);
         }
     }
-    iter_close(&iter);
+    iter_zone_close(&iter);
     return -EINVAL;
 }
 

@@ -80,7 +80,7 @@ int run_unit_tests();
 int iter_zone_init(struct zone_iterator* iter, struct inode* inode, int zone_idx);
 zone_t iter_get_next_zone(struct zone_iterator* iter);
 int iter_alloc_zone(struct zone_iterator* iter);
-int iter_close(struct zone_iterator* iter);
+int iter_zone_close(struct zone_iterator* iter);
 bool iter_has_next_zone(struct zone_iterator* iter);
 
 int char32_strcmp(const char32_t *s1, const char *s2);

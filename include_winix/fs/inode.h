@@ -52,9 +52,13 @@ struct inode_disk {
 };
 
 struct zone_iterator{
-    struct proc* who;
     struct inode* i_inode;
     block_t i_zone_idx;
+};
+
+struct dirent_iterator{
+    struct winix_dirent* dirent;
+    struct zone_iterator iter;
 };
 
 #define INODE_DISK_SIZE (sizeof(struct inode_disk))

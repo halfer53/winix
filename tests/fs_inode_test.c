@@ -11,7 +11,7 @@ void test_given_zone_iterator_should_return(){
     assert(iter.i_inode == root);
     assert(iter.i_zone_idx == 0);
 
-    ret = iter_close(&iter);
+    ret = iter_zone_close(&iter);
     assert(ret == 0);
 }
 
@@ -25,7 +25,7 @@ void test_given_has_next_zone_when_exceed_max_should_return_false(){
     bool result = iter_has_next_zone(&iter);
     assert(result == false);
 
-    ret = iter_close(&iter);
+    ret = iter_zone_close(&iter);
     assert(ret == 0);
 }
 
@@ -41,7 +41,7 @@ void test_given_has_next_zone_when_no_zone_should_return_false(){
     bool result = iter_has_next_zone(&iter);
     assert(result == false);
 
-    ret = iter_close(&iter);
+    ret = iter_zone_close(&iter);
     assert(ret == 0);
 }
 
@@ -55,7 +55,7 @@ void test_given_has_next_zone_when_have_zone_should_return_true(){
     bool result = iter_has_next_zone(&iter);
     assert(result == true);
 
-    ret = iter_close(&iter);
+    ret = iter_zone_close(&iter);
     assert(ret == 0);
 }
 
@@ -87,7 +87,7 @@ void test_given_has_next_zone_when_zone_exhausted_should_return_false(){
     result = iter_has_next_zone(&iter);
     assert(result == false);
 
-    ret = iter_close(&iter);
+    ret = iter_zone_close(&iter);
     assert(ret == 0);
 }
 
@@ -126,7 +126,7 @@ void test_given_has_next_zone_when_alloc_zone_should_continue(){
     ret = iter_alloc_zone(&iter);
     assert(ret == -EFBIG);
 
-    ret = iter_close(&iter);
+    ret = iter_zone_close(&iter);
     assert(ret == 0);
     
 }
