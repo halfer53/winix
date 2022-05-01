@@ -49,30 +49,31 @@ char *get_name(char *old_name, char string[NAME_MAX]){
 // given a directory and a name component, lookup in the directory
 // and find the corresponding inode
 int advance(inode_t *dirp, char string[NAME_MAX]){
-    int i,inum  = 0;
+    int inum  = 0;
     struct block_buffer *buffer;
     struct winix_dirent* dirstream, *dirend;
+    struct zone_iterator iter;
 
     if(*string == '\0')
         return -EINVAL;
+    iter_zone_init(&iter, dirp, 0);
 //    KDEBUG(("advancing %s in inode %d\n", string, dirp->i_num));
-    for(i = 0; i < NR_TZONES; i++){
-        if(dirp->i_zone[i] > 0 ){
-            if((buffer = get_block_buffer(dirp->i_zone[i], dirp->i_dev)) != NULL){
-                dirstream = (struct winix_dirent*)buffer->block;
-                dirend = (struct winix_dirent* )&buffer->block[BLOCK_SIZE];
-                for(; dirstream < dirend; dirstream++ ){
-                    if(char32_strcmp(dirstream->dirent.d_name, string) == 0){
-                        inum = dirstream->dirent.d_ino;
-                        put_block_buffer(buffer);
-                        return inum;
-                    }
+    while(iter_has_next_zone(&iter)){
+        zone_t zone = iter_get_next_zone(&iter);
+        if((buffer = get_block_buffer(zone, dirp->i_dev))){
+            dirstream = (struct winix_dirent*)buffer->block;
+            dirend = (struct winix_dirent* )&buffer->block[BLOCK_SIZE];
+            for(; dirstream < dirend; dirstream++ ){
+                if(char32_strcmp(dirstream->dirent.d_name, string) == 0){
+                    inum = dirstream->dirent.d_ino;
+                    put_block_buffer(buffer);
+                    return inum;
                 }
-                put_block_buffer(buffer);
             }
+            put_block_buffer(buffer);
         }
-
     }
+    iter_close(&iter);
     return -EINVAL;
 }
 
