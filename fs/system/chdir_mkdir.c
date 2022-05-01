@@ -54,7 +54,10 @@ int sys_mkdir(struct proc* who, char* pathname, mode_t mode){
     }
     ino->i_zone[0] = bnr;
     ino->i_size = BLOCK_SIZE;
-    init_dirent(lastdir, ino);
+    ret = init_dirent(lastdir, ino);
+    if(ret){
+        goto final;
+    }
     ret = add_inode_to_directory(who, lastdir, ino, string);
     if(ret){
         release_inode(ino);
