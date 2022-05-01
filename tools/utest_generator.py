@@ -6,7 +6,7 @@ def get_prototypes(files):
     for file in files:
         with open(file) as f:
             for line in f:
-                match = re.search(r"\s*void\s+test_(\w+)\s*\(\s*\)", line)
+                match = re.search(r"^\s*void\s+test_(\w+)\s*\(\s*\)", line)
                 if match:
                     proto = f"test_{match.group(1)}"
                     if proto in prototypes:
