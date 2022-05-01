@@ -232,10 +232,12 @@ int root_fs_write (struct filp *filp, char *data, size_t count, off_t offset){
     for( ; curr_fp_index <= fp_limit && count > 0; curr_fp_index++){
         bnr = ino->i_zone[curr_fp_index];
         if(bnr == 0){
-            if((bnr = alloc_block(ino, ino->i_dev)) > 0){
+            int result;
+            if((result = alloc_block(ino, ino->i_dev)) > 0){
+                bnr = result;
                 ino->i_zone[curr_fp_index] = bnr;
             }else{
-                return -ENOSPC;
+                return result;
             }
         }
 
@@ -260,7 +262,6 @@ int root_fs_write (struct filp *filp, char *data, size_t count, off_t offset){
         /* Read or write 'chunk' bytes. */
         if (r == 0)
             break;
-
         count -= len;
         ret += r;
         filp->filp_pos += r;
