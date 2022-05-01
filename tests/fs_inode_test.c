@@ -205,3 +205,30 @@ void test_given_iter_dirent_has_next_when_has_data_should_return_true(){
     dir = iter_dirent_get_next(&iter);
     assert(char32_strcmp(dir->dirent.d_name, filename) == 0);
 }
+
+
+void test_given_iter_dirent_has_next_when_dirent_exhausted_should_return_false(){
+    struct dirent_iterator iter;
+    int i;
+    struct winix_dirent* dir;
+    int ret = sys_mkdir(curr_scheduling_proc, DIR_NAME, 0x755);
+    assert(ret == 0);
+
+    int fd = sys_open(curr_scheduling_proc, DIR_NAME, O_RDONLY, 0);
+    assert(fd == 0);
+
+    struct filp* filp = curr_scheduling_proc->fp_filp[fd];
+    struct inode* inode = filp->filp_ino;
+    ret = iter_dirent_init(&iter, inode);
+    assert(ret == 0);
+
+    int dirent_per_block = BLOCK_SIZE / sizeof(struct winix_dirent);
+    for(i = 0; i < dirent_per_block; i++){
+        assert(iter_dirent_has_next(&iter) == true);
+        dir = iter_dirent_get_next(&iter);
+        assert(dir != NULL);
+    }
+
+    assert(iter_dirent_has_next(&iter) == false);
+
+}
