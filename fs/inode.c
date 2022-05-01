@@ -452,7 +452,7 @@ int init_zone_iterator(struct zone_iterator* iter, struct inode* inode, int zone
     return OK;
 }
 
-bool has_next_zone(struct zone_iterator* iter){
+bool has_next_block(struct zone_iterator* iter){
     int ino_iter, ino_rem, indirect_idx;
     zone_t zone;
     struct inode* indirect_ino;
