@@ -51,6 +51,11 @@ struct inode_disk {
     block_t i_zone[NR_TZONES]; /* zone numbers for data blocks */
 };
 
+struct zone_iterator{
+    struct inode* i_inode;
+    block_t i_zone_idx;
+};
+
 #define INODE_DISK_SIZE (sizeof(struct inode_disk))
 
 
