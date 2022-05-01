@@ -230,5 +230,13 @@ void test_given_iter_dirent_has_next_when_dirent_exhausted_should_return_false()
     }
 
     assert(iter_dirent_has_next(&iter) == false);
+    assert(iter_dirent_alloc(&iter) > 0);
+    assert(iter_dirent_has_next(&iter) == true);
 
+    for(i = 0; i < dirent_per_block; i++){
+        assert(iter_dirent_has_next(&iter) == true);
+        dir = iter_dirent_get_next(&iter);
+        assert(dir != NULL);
+    }
+    assert(iter_dirent_has_next(&iter) == false);
 }
