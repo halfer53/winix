@@ -23,17 +23,17 @@ int sys_mknod(struct proc* who, char *path, mode_t mode, dev_t devid){
         goto final;
     }
 
-    inode = alloc_inode(who, lastdir->i_dev, dev);
+    inode = alloc_inode(lastdir->i_dev, dev);
     if(!inode){
         ret = -ENOSPC;
         goto final;
     }
-
+    
     if((ret = add_inode_to_directory(who, lastdir, inode, string))){
         release_inode(inode);
         goto final;
     }
-    inode->i_mode = dev->device_type | ( mode & ~who->umask);
+    init_inode_proc_field(inode, who, dev->device_type, mode);
 
     final:
     put_inode(inode, false);

@@ -41,12 +41,12 @@ int sys_mkdir(struct proc* who, char* pathname, mode_t mode){
         ret = -EEXIST;
         goto final;
     }
-    ino = alloc_inode(who, lastdir->i_dev, lastdir->i_dev);
+    ino = alloc_inode(lastdir->i_dev, lastdir->i_dev);
     if(!ino){
         ret = -ENOSPC;
         goto final;
     }
-    ino->i_mode = S_IFDIR | (mode & ~(who->umask));
+    init_inode_proc_field(ino, who, S_IFDIR, mode);
     bnr = alloc_block(ino, lastdir->i_dev);
     if ( bnr <= 0){
         ret = bnr;

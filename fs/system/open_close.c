@@ -25,7 +25,7 @@ int alloc_inode_under_dir(struct proc* who, struct device* dev, inode_t** _inode
     inode_t* inode;
     int ret;
     dev = lastdir->i_dev;
-    inode = alloc_inode(who, dev, dev);
+    inode = alloc_inode(dev, dev);
     if (!inode)
         return -ENOSPC;
     
@@ -67,7 +67,7 @@ int filp_open(struct proc* who, struct filp** _filp, char *path, int flags, mode
             }
             if ((ret = alloc_inode_under_dir(who, dev, &inode, lastdir, string)))
                 goto final;
-            inode->i_mode = dev->device_type | (mode & ~(who->umask));
+            init_inode_proc_field(inode, who, dev->device_type, mode);
             is_new = true;
 
         }else{ // if no components left, then path refers to the directory

@@ -47,7 +47,7 @@ bool is_valid_inode_num(int num, struct device* id){
 bool is_valid_block_num(block_t bnr, struct device* id){
     struct superblock* sb = get_sb(id);
     unsigned int total_block = sb->s_block_inuse + sb->s_free_blocks;
-    return 0 <= bnr && bnr < total_block;
+    return (0 <= bnr) && (bnr < total_block);
 }
 
 bool is_inode_in_use(int num, struct device* id){
@@ -238,7 +238,7 @@ int put_inode(inode_t *inode, bool is_dirty){
 }
 
 
-inode_t* alloc_inode(struct proc* who, struct device* parentdev, struct device* inodev){
+inode_t* alloc_inode(struct device* parentdev, struct device* inodev){
     struct superblock* sb;
     int inum = 0;
     block_t imap_end = 0, bnr = 0;
@@ -272,8 +272,6 @@ inode_t* alloc_inode(struct proc* who, struct device* parentdev, struct device* 
         return NULL;
     
     init_inode_non_disk(inode, inum, inodev, sb);
-    inode->i_gid = who->gid;
-    inode->i_uid = who->uid;
     inode->i_count += 1;
     inode->i_ctime = get_unix_time();
     // KDEBUG(("alloc ino set bit %d\n", inum));
@@ -284,6 +282,12 @@ inode_t* alloc_inode(struct proc* who, struct device* parentdev, struct device* 
     sb->s_free_inodes -= 1;
     sb->s_inode_inuse += 1;
     return inode;
+}
+
+void init_inode_proc_field(struct inode* ino, struct proc* who, mode_t devtype, mode_t mode){
+    ino->i_gid = who->gid;
+    ino->i_uid = who->uid;
+    ino->i_mode = devtype | (mode & ~(who->umask));
 }
 
 int truncate_inode(inode_t *inode){
@@ -475,7 +479,7 @@ zone_t iter_get_current_zone(struct zone_iterator* iter, zone_t** ptr, bool crea
         if(!create_inode)
             goto final;
         
-        indirect_ino = alloc_inode(iter->who, dev, dev);
+        indirect_ino = alloc_inode(dev, dev);
         if(!indirect_ino)
             goto final;
         
