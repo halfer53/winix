@@ -8,6 +8,11 @@
 
 extern bool TTY_OPEN_CALLED;
 
+extern const char *FILE1;
+extern const char *FILE2;
+extern const char *DIR_NAME;
+extern const char *DIR_FILE1;
+extern const char *DIR_FILE2;
 extern char buffer[PAGE_LEN];
 extern char buffer2[PAGE_LEN];
 extern struct proc* current;

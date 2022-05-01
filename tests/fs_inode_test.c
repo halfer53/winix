@@ -1,7 +1,9 @@
 #include <fs/fs.h>
 #include <assert.h>
+#include "unit_test.h"
 
 void test_given_zone_iterator_should_return(){
+    reset_fs();
     struct zone_iterator iter;
     struct device* dev = get_dev(ROOT_DEV);
     struct inode* root = get_inode(ROOT_INODE_NUM, dev);
@@ -12,6 +14,7 @@ void test_given_zone_iterator_should_return(){
 }
 
 void test_given_has_next_zone_when_have_zone_should_return_true(){
+    reset_fs();
     struct zone_iterator iter;
     struct device* dev = get_dev(ROOT_DEV);
     struct inode* root = get_inode(ROOT_INODE_NUM, dev);
@@ -20,4 +23,18 @@ void test_given_has_next_zone_when_have_zone_should_return_true(){
     
     bool result = has_next_zone(&iter);
     assert(result == true);
+}
+
+void test_given_has_next_zone_when_no_zone_should_return_false(){
+    reset_fs();
+    struct zone_iterator iter;
+
+    struct filp* filp;
+    int ret = filp_open(curr_scheduling_proc, &filp, FILE1, O_CREAT | O_RDWR, 0x755);
+
+    ret = init_zone_iterator(&iter, filp->filp_ino, 0);
+    assert(ret == 0);
+    
+    bool result = has_next_zone(&iter);
+    assert(result == false);
 }

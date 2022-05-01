@@ -49,16 +49,17 @@ void _close_delete_file(int fd, char *name){
 }
 
 void test_given_open_when_flag_is_o_create_should_return_0(){
+    reset_fs();
     int fd;
     
     fd = sys_open(current, FILE1 ,O_CREAT | O_RDWR, 0x755);
     assert(fd == 0);
 
-    reset_fs();
 }
 
 
 void test_given_open_when_openned_max_exceeds_should_return_emfile(){
+    reset_fs();
     int ret;
     int i;
 
@@ -69,10 +70,10 @@ void test_given_open_when_openned_max_exceeds_should_return_emfile(){
     ret = sys_open(current, "/", O_RDONLY, 0);
     assert(ret == -EMFILE);
 
-    reset_fs();
 }
 
 void test_given_open_when_openned_exceeds_system_limit_should_return_enfile(){
+    reset_fs();
     int ret;
     struct proc p2, p3;
     int i;
@@ -91,24 +92,25 @@ void test_given_open_when_openned_exceeds_system_limit_should_return_enfile(){
     ret = sys_open(&p3, "/", O_RDONLY, 0);
     assert(ret == -ENFILE);
 
-    reset_fs();
 }
 
 void test_given_open_when_flag_write_and_path_directory_should_return_eisdir(){
+    reset_fs();
     int ret = sys_open(current, "/", O_WRONLY, 0);
     assert(ret == -EISDIR);
 }
 
 void test_given_creat_when_file_not_present_should_return_0(){
+    reset_fs();
     int fd;
     
     fd = sys_creat(current, FILE1 , O_RDWR);
     assert(fd == 0);
 
-    reset_fs();
 }
 
 void test_given_creat_when_file_present_should_return_eexist(){
+    reset_fs();
     int fd;
     
     fd = sys_creat(current, FILE1 , O_RDWR);
@@ -117,10 +119,10 @@ void test_given_creat_when_file_present_should_return_eexist(){
     fd = sys_creat(current, FILE1 , O_RDWR);
     assert(fd == -EEXIST);
 
-    reset_fs();
 }
 
 void test_given_close_when_file_closed_should_return_ebadf(){
+    reset_fs();
     int fd, ret;
     
     fd = sys_open(current, FILE1 ,O_CREAT | O_RDWR, 0x755);
@@ -131,10 +133,10 @@ void test_given_close_when_file_closed_should_return_ebadf(){
     ret = sys_close(current, fd);
     assert(ret == -EBADF);
 
-    reset_fs();
 }
 
 void test_given_read_when_fd_is_closed_return_ebadf(){
+    reset_fs();
     int ret, fd;
     
     fd = sys_creat(current, FILE1 , O_RDWR);
@@ -146,10 +148,10 @@ void test_given_read_when_fd_is_closed_return_ebadf(){
     ret = sys_read(current, fd, buffer, PAGE_LEN);
     assert(ret == -EBADF);
 
-    reset_fs();
 }
 
 void test_given_write_when_fd_is_closed_return_ebadf(){
+    reset_fs();
     int ret, fd;
     
     fd = sys_creat(current, FILE1 , O_RDWR);
@@ -161,10 +163,10 @@ void test_given_write_when_fd_is_closed_return_ebadf(){
     ret = sys_write(current, fd, buffer, PAGE_LEN);
     assert(ret == -EBADF);
 
-    reset_fs();
 }
 
 void test_given_open_when_deleting_file_should_return_error(){
+    reset_fs();
     int ret, fd;
     
     fd = sys_creat(current, FILE1 , O_RDWR);
@@ -175,10 +177,10 @@ void test_given_open_when_deleting_file_should_return_error(){
     ret = sys_open(current, FILE1 , O_RDWR, 0775);
     assert(ret == -ENOENT);
 
-    reset_fs();
 }
 
 void test_given_dup_when_dupping_file_should_result_in_same_fd(){
+    reset_fs();
     int ret, fd, fd2;
     
     fd = sys_open(current, FILE1 ,O_CREAT | O_RDWR, 0775);
@@ -213,10 +215,10 @@ void test_given_dup_when_dupping_file_should_result_in_same_fd(){
     assert(ret == 7);
     assert(strcmp(buffer, "abcdef") == 0);
 
-    reset_fs();
 }
 
 void test_given_read_when_open_and_closing_file_should_persistted_data(){
+    reset_fs();
     int ret, fd;
     memset(buffer, 0xf, PAGE_LEN);
 
@@ -246,10 +248,10 @@ void test_given_read_when_open_and_closing_file_should_persistted_data(){
     ret = sys_read(current, fd, buffer2, PAGE_LEN);
     assert(ret == 0);
 
-    reset_fs();
 }
 
 void test_given_read_when_o_direct_open_and_closing_file_should_persistted_data(){
+    reset_fs();
     int ret, fd;
     memset(buffer, 0xf, PAGE_LEN);
 
@@ -279,18 +281,18 @@ void test_given_read_when_o_direct_open_and_closing_file_should_persistted_data(
     ret = sys_read(current, fd, buffer2, PAGE_LEN);
     assert(ret == 0);
 
-    reset_fs();
 }
 
 
 void test_given_access_when_file_not_exist_should_return_enoent(){
+    reset_fs();
     int ret = sys_access(current, FILE1, F_OK);
     assert(ret == -ENOENT);
 
-    reset_fs();
 }
 
 void test_given_access_when_file_exists_should_return_0(){
+    reset_fs();
     int ret;
     ret = sys_creat(current, FILE1, 0x755);
     assert(ret == 0);
@@ -298,10 +300,10 @@ void test_given_access_when_file_exists_should_return_0(){
     ret = sys_access(current, FILE1, F_OK);
     assert(ret == 0);
 
-    reset_fs();
 }
 
 void test_given_access_when_folder_exists_should_return_0(){
+    reset_fs();
     int ret;
     ret = sys_mkdir(current, DIR_NAME, 0x755);
     assert(ret == 0);
@@ -309,10 +311,10 @@ void test_given_access_when_folder_exists_should_return_0(){
     ret = sys_access(current, DIR_NAME, F_OK);
     assert(ret == 0);
 
-    reset_fs();
 }
 
 void test_given_access_when_under_folder_should_return_enoent(){
+    reset_fs();
     int ret;
     ret = sys_mkdir(current, DIR_NAME, 0x755);
     assert(ret == 0);
@@ -320,10 +322,10 @@ void test_given_access_when_under_folder_should_return_enoent(){
     ret = sys_access(current, DIR_FILE1, F_OK);
     assert(ret == -ENOENT);
 
-    reset_fs();
 }
 
 void test_given_link_stat_when_two_files_are_linked_should_return_same(){
+    reset_fs();
     int fd, ret;
     struct stat statbuf, statbuf2;
 
@@ -342,11 +344,11 @@ void test_given_link_stat_when_two_files_are_linked_should_return_same(){
     assert(statbuf.st_dev == statbuf2.st_dev);
     assert(statbuf.st_nlink == 2);
 
-    reset_fs();
 }
 
 
 void test_given_link_stat_when_one_file_deleted_should_return_1_nlink(){
+    reset_fs();
     int fd, ret;
     struct stat statbuf;
 
@@ -367,25 +369,26 @@ void test_given_link_stat_when_one_file_deleted_should_return_1_nlink(){
     assert(ret == 0);
     assert(statbuf.st_nlink == 1);
 
-    reset_fs();
 }
 
 void test_given_chdir_when_dir_not_present_should_return_eexist(){
+    reset_fs();
     int ret = sys_chdir(current, "/not_exist");
     assert(ret == -EEXIST);
 }
 
 void test_given_chdir_when_path_is_file_should_return_eexist(){
+    reset_fs();
     int fd = sys_creat(current, FILE1, O_RDWR);
     assert(fd == 0);
 
     int ret = sys_chdir(current, FILE1);
     assert(ret == -ENOTDIR);
 
-    reset_fs();
 }
 
 void test_given_chdir_when_dir_is_valid_should_succeed(){
+    reset_fs();
     struct stat statbuf;
     int ret = sys_mkdir(current, DIR_NAME, O_RDWR);
     assert(ret == 0);
@@ -397,15 +400,16 @@ void test_given_chdir_when_dir_is_valid_should_succeed(){
     assert(ret == 0);
     assert(current->fp_workdir->i_num == statbuf.st_ino);
 
-    reset_fs();
 }
 
 void test_given_chmod_when_file_not_present_should_return_enonent(){
+    reset_fs();
     int ret = sys_chmod(current, "/notexists", O_RDONLY);
     assert(ret == -ENOENT);
 }
 
 void test_given_chmod_stat_when_file_present_should_return_0(){
+    reset_fs();
     int fd, ret;
     struct stat statbuf;
 
@@ -419,10 +423,10 @@ void test_given_chmod_stat_when_file_present_should_return_0(){
     assert(ret == 0);
     assert(statbuf.st_mode == 0x777);
 
-    reset_fs();
 }
 
 void test_given_chmod_stat_when_folder_present_should_return_0(){
+    reset_fs();
     int fd, ret;
     struct stat statbuf;
 
@@ -436,10 +440,10 @@ void test_given_chmod_stat_when_folder_present_should_return_0(){
     assert(ret == 0);
     assert(statbuf.st_mode == 0x777);
 
-    reset_fs();
 }
 
 void test_given_getdents_when_no_files_in_folder_should_return_default_files(){
+    reset_fs();
     struct dirent dir[5];
     int i;
     int fd = sys_open(current, "/", O_RDONLY, 0);
@@ -454,6 +458,7 @@ void test_given_getdents_when_no_files_in_folder_should_return_default_files(){
 }
 
 void test_given_getdents_when_files_in_folder_should_return_files(){
+    reset_fs();
     int ret, fd, fd2, i;
     struct dirent dir[5];
 
@@ -480,17 +485,17 @@ void test_given_getdents_when_files_in_folder_should_return_files(){
     ret = sys_getdents(current, fd2, dir, 10);
     assert(ret == 0);
 
-    reset_fs();
 }
 
 void test_given_mknod_when_path_valid_should_return_0(){
+    reset_fs();
     int ret = sys_mknod(current, TTY_PATH, O_RDWR, TTY_DEV);
     assert(ret == 0);
 
-    reset_fs();
 }
 
 void test_given_dev_open_when_file_is_driver_should_return_from_driver(){
+    reset_fs();
     int ret = sys_mknod(current, TTY_PATH, O_RDWR, TTY_DEV);
     assert(ret == 0);
 
@@ -500,10 +505,10 @@ void test_given_dev_open_when_file_is_driver_should_return_from_driver(){
     assert(fd == 0);
     assert(TTY_OPEN_CALLED == true);
 
-    reset_fs();
 }
 
 void test_given_dev_read_when_file_is_driver_should_return_from_driver(){
+    reset_fs();
     int ret = sys_mknod(current, TTY_PATH, O_RDWR, TTY_DEV);
     assert(ret == 0);
 
@@ -513,10 +518,10 @@ void test_given_dev_read_when_file_is_driver_should_return_from_driver(){
     ret = sys_read(current, fd, buffer, 3);
     assert(ret == TTY_RETURN);
 
-    reset_fs();
 }
 
 void test_given_dev_write_when_file_is_driver_should_return_from_driver(){
+    reset_fs();
     int ret = sys_mknod(current, TTY_PATH, O_RDWR, TTY_DEV);
     assert(ret == 0);
 
@@ -526,10 +531,10 @@ void test_given_dev_write_when_file_is_driver_should_return_from_driver(){
     ret = sys_write(current, fd, buffer, 3);
     assert(ret == TTY_RETURN);
 
-    reset_fs();
 }
 
 void test_given_dev_close_when_file_is_driver_should_return_from_driver(){
+    reset_fs();
     int ret = sys_mknod(current, TTY_PATH, O_RDWR, TTY_DEV);
     assert(ret == 0);
 
@@ -539,10 +544,10 @@ void test_given_dev_close_when_file_is_driver_should_return_from_driver(){
     ret = sys_close(current, fd);
     assert(ret == TTY_RETURN);
 
-    reset_fs();
 }
 
 void test_given_dev_dup_when_file_is_driver_should_return_from_driver(){
+    reset_fs();
     int ret = sys_mknod(current, TTY_PATH, O_RDWR, TTY_DEV);
     assert(ret == 0);
 
@@ -569,11 +574,10 @@ void test_given_dev_dup_when_file_is_driver_should_return_from_driver(){
 
     ret = sys_close(current, fd2);
     assert(ret == TTY_RETURN);
-
-    reset_fs();
 }
 
 void test_when_zone_full_should_return_enospc(){
+    reset_fs();
     int fd = sys_open(current, FILE1, O_CREAT | O_RDWR, 0x755);
     assert(fd == 0);
 
