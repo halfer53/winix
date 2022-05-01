@@ -496,7 +496,7 @@ final:
     if (ptr)
         *ptr = pos;
     if (indirect_ino)
-        put_inode(indirect_ino, false);
+        put_inode(indirect_ino, create_inode);
     return ret;
 }
 
@@ -515,9 +515,11 @@ zone_t iter_get_next_zone(struct zone_iterator* iter){
 
 int iter_alloc_zone(struct zone_iterator* iter){
     zone_t *pos;
-    zone_t zone = iter_get_current_zone(iter, &pos, true);
+    zone_t zone;
     int ret;
-    if (zone)
+    if (iter->i_zone_idx >= MAX_ZONES )
+        return -EFBIG;
+    if ((zone = iter_get_current_zone(iter, &pos, true)))
         return -EINVAL;
     ret = alloc_block(iter->i_inode, iter->i_inode->i_dev);
     if(ret < 0)
