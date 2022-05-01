@@ -178,6 +178,7 @@ void test_given_has_next_zone_when_alloc_zone_should_continue(){
 
 void test_given_iter_dirent_has_next_when_has_data_should_return_true(){
     struct dirent_iterator iter;
+    char filename[] = "abc";
     int ret = sys_mkdir(curr_scheduling_proc, DIR_NAME, 0x755);
     assert(ret == 0);
 
@@ -198,4 +199,9 @@ void test_given_iter_dirent_has_next_when_has_data_should_return_true(){
     dir = iter_dirent_get_next(&iter);
     assert(char32_strcmp(dir->dirent.d_name, "..") == 0);
 
+    struct inode* newinode = alloc_inode(inode->i_dev, inode->i_dev);
+    ret = add_inode_to_directory(curr_scheduling_proc, inode, newinode, filename);
+
+    dir = iter_dirent_get_next(&iter);
+    assert(char32_strcmp(dir->dirent.d_name, filename) == 0);
 }
