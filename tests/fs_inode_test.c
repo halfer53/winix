@@ -13,6 +13,18 @@ void test_given_zone_iterator_should_return(){
     assert(iter.i_zone_idx == 0);
 }
 
+void test_given_has_next_zone_when_exceed_max_should_return_false(){
+    reset_fs();
+    struct zone_iterator iter;
+    struct device* dev = get_dev(ROOT_DEV);
+    struct inode* root = get_inode(ROOT_INODE_NUM, dev);
+    int ret = init_zone_iterator(&iter, root, MAX_ZONES);
+    assert(ret == 0);
+    
+    bool result = has_next_zone(&iter);
+    assert(result == false);
+}
+
 void test_given_has_next_zone_when_have_zone_should_return_true(){
     reset_fs();
     struct zone_iterator iter;
