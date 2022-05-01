@@ -42,9 +42,9 @@
 
 #define SUPER_BLOCK_MAGIC   (0xabcdefff)
 
-#define DISK_PAGE_NR    (50)
-#define DISK_SIZE   (DISK_PAGE_NR * BLOCK_SIZE)
-#define DISK_SIZE_WORD   (DISK_PAGE_NR * BLOCK_SIZE_WORD)
+#define DISK_PAGE_NR        (50)
+#define DISK_SIZE           (DISK_PAGE_NR * BLOCK_SIZE)
+#define DISK_SIZE_WORD      (DISK_PAGE_NR * BLOCK_SIZE_WORD)
 
 
 extern unsigned int start_unix_time;
