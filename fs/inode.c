@@ -99,7 +99,7 @@ int release_block(block_t bnr, struct device* id){
     struct superblock* sb = get_sb(id);
     block_t bmap_nr = sb->s_blockmapnr + (bnr / BLOCK_SIZE);
     struct block_buffer *bmap, *block;
-    if(is_valid_block_num(bnr, id)){
+    if(!is_valid_block_num(bnr, id)){
         kwarn("Invalid block id %d\n", bnr);
         return -EINVAL;
     }
