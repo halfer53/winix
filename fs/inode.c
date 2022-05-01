@@ -557,23 +557,29 @@ bool iter_dirent_has_next(struct dirent_iterator* iter){
     zone_t zone;
     int ret;
     struct block_buffer* buffer;
-    if(iter->dirent >= iter->dirent_end){
-        if(!iter_zone_has_next(&iter->zone_iter)){
-            if((ret = iter_zone_alloc(&iter->zone_iter)) < 0)
-                return false;
-            zone = ret;
-        }else{
-            zone = iter_zone_get_next(&iter->zone_iter);
-        }
+    if(iter->dirent >= iter->dirent_end)
+        if(!iter_zone_has_next(&iter->zone_iter))
+            return false;
+    
+    return true;
+}
 
+struct winix_dirent* iter_dirent_get_next(struct dirent_iterator* iter){
+    zone_t zone;
+    int ret;
+    struct block_buffer* buffer;
+    if(iter->dirent >= iter->dirent_end){
+        if(!iter_zone_has_next(&iter->zone_iter))
+            return NULL;
+        zone = iter_zone_get_next(&iter->zone_iter);
         buffer = get_block_buffer(zone, iter->zone_iter.i_inode->i_dev);
         iter->dirent = (struct winix_dirent*)buffer->block;
         iter->dirent_end = (struct winix_dirent* )&buffer->block[BLOCK_SIZE];
-        return true;
+        return iter->dirent;
     }
     return iter->dirent++;
 }
-struct winix_dirent* iter_dirent_get_next(struct dirent_iterator* iter);
+
 int iter_dirent_alloc(struct dirent_iterator* iter);
 int iter_dirent_close(struct dirent_iterator* iter);
 
