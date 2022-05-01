@@ -38,12 +38,16 @@ bool has_file_access(struct proc* who, struct inode* ino, mode_t mode){
 bool is_valid_inode_num(int num, struct device* id){
     struct superblock* sb = get_sb(id);
     unsigned int inodes_nr;
-    if(num <= 0 || num >= NR_INODES)
-        return false;
 
     inodes_nr = sb->s_inode_per_block * (sb->s_inode_table_size / BLOCK_SIZE);
 //    KDEBUG(("is valid inode num: %d, inode per block %d, inodes_nr %d\n", num, sb->s_inode_per_block, inodes_nr));
-    return num <= inodes_nr;
+    return 1 <= num && num <= inodes_nr;
+}
+
+bool is_valid_block_num(block_t bnr, struct device* id){
+    struct superblock* sb = get_sb(id);
+    unsigned int total_block = sb->s_block_inuse + sb->s_free_blocks;
+    return 0 <= bnr && bnr < total_block;
 }
 
 bool is_inode_in_use(int num, struct device* id){
@@ -71,6 +75,9 @@ int alloc_block(inode_t *ino, struct device* id){
     while(bmap->b_blocknr < bmap_end){
         free_bit = bitmap_search_from((unsigned int*) bmap->block, BLOCK_SIZE_WORD, 0, 1);
         if(free_bit > 0){
+            if (!is_valid_block_num(free_bit, id)){
+                return -ENOSPC;
+            }
             bitmap_set_bit((unsigned int*)bmap->block, BLOCK_SIZE_WORD, free_bit);
             sb->s_block_inuse += 1;
             sb->s_free_blocks -= 1;
@@ -92,9 +99,9 @@ int release_block(block_t bnr, struct device* id){
     struct superblock* sb = get_sb(id);
     block_t bmap_nr = sb->s_blockmapnr + (bnr / BLOCK_SIZE);
     struct block_buffer *bmap, *block;
-    if(bnr > sb->s_blockmap_size){
+    if(is_valid_block_num(bnr, id)){
         kwarn("Invalid block id %d", bnr);
-        return -1;
+        return -EINVAL;
     }
     block = get_block_buffer(bnr, id);
     memset(block->block, 0, BLOCK_SIZE);
