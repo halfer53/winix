@@ -331,7 +331,8 @@ int release_inode(inode_t *inode){
                 if(indirect_zone){
                     if (!(indirect_zone->flags & INODE_FLAG_ZONE))
                         PANIC("indirect inode");
-                    release_inode(inode);
+                    put_inode(indirect_zone, false);
+                    release_inode(indirect_zone);
                 }
             }
         }
@@ -459,6 +460,7 @@ int remove_inode_from_dir(struct proc* who, struct inode* dir, struct inode* tar
 
 int iter_zone_init(struct zone_iterator* iter, struct inode* inode, int zone_idx){
     iter->i_inode = inode;
+    inode->i_count++;
     iter->i_zone_idx = zone_idx;
     return OK;
 }
@@ -540,6 +542,7 @@ int iter_alloc_zone(struct zone_iterator* iter){
 
 int iter_zone_close(struct zone_iterator* iter){
     iter->i_zone_idx = 0;
+    iter->i_inode->i_count--;
     return 0;
 }
 
