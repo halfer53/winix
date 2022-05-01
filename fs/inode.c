@@ -546,23 +546,7 @@ int iter_zone_close(struct zone_iterator* iter){
     return 0;
 }
 
-int iter_dirent_init(struct dirent_iterator* iter, struct inode* inode, int zone_idx, int dir_idx){
-    iter->dirent = NULL;
-    iter->dirent_end = NULL;
-    iter->buffer = NULL;
-    iter_zone_init(&iter->zone_iter, inode, zone_idx);
-    return 0;
-}
-
-bool iter_dirent_has_next(struct dirent_iterator* iter){
-    if(iter->dirent + 1 >= iter->dirent_end)
-        if(!iter_zone_has_next(&iter->zone_iter))
-            return false;
-    
-    return true;
-}
-
-struct winix_dirent* iter_dirent_get_next(struct dirent_iterator* iter){
+struct winix_dirent* _iter_dirent_get_current(struct dirent_iterator* iter){
     zone_t zone;
     struct block_buffer* buffer;
     if(iter->dirent + 1 >= iter->dirent_end){
@@ -576,6 +560,29 @@ struct winix_dirent* iter_dirent_get_next(struct dirent_iterator* iter){
             put_block_buffer(iter->buffer);
         iter->buffer = buffer;
     }
+    return iter->dirent;
+}
+
+int iter_dirent_init(struct dirent_iterator* iter, struct inode* inode, int zone_idx, int dir_idx){
+    iter->dirent = NULL;
+    iter->dirent_end = NULL;
+    iter->buffer = NULL;
+    iter_zone_init(&iter->zone_iter, inode, zone_idx);
+    iter->dirent = _iter_dirent_get_current(iter);
+    iter->dirent += dir_idx;
+    return 0;
+}
+
+bool iter_dirent_has_next(struct dirent_iterator* iter){
+    if(iter->dirent + 1 >= iter->dirent_end)
+        if(!iter_zone_has_next(&iter->zone_iter))
+            return false;
+    
+    return true;
+}
+
+struct winix_dirent* iter_dirent_get_next(struct dirent_iterator* iter){
+    iter->dirent = _iter_dirent_get_current(iter);
     return iter->dirent++;
 }
 
