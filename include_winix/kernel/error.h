@@ -6,7 +6,7 @@
 #define MAX_ERR (PAGE_LEN)
 
 #define IS_ERR(p)   ((unsigned long)(void *)(p) >= (unsigned long)-MAX_ERR)
-#define ERR_PTR(p)  ((void *)p)
+#define ERR_PTR(p)  ((void *)(unsigned long)p)
 #define PTR_ERR(e)  ((unsigned long)e) 
 
 #endif
