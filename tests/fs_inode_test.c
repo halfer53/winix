@@ -240,4 +240,6 @@ void test_given_iter_dirent_has_next_when_dirent_exhausted_should_return_false()
     ret = iter_dirent_alloc(&iter);
     assert(ret == -EFBIG);
     assert(iter_dirent_has_next(&iter) == false);
+
+    assert(iter_dirent_close(&iter) == 0);
 }
