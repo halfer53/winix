@@ -536,6 +536,19 @@ int iter_zone_close(struct zone_iterator* iter){
     return 0;
 }
 
+int iter_dirent_init(struct dirent_iterator* iter, struct inode* inode){
+    iter->dirent = NULL;
+    iter->dirent_end = NULL;
+    iter_zone_init(&iter->iter, inode, 0);
+    return 0;
+}
+
+bool iter_has_next_zone(struct zone_iterator* iter);
+zone_t iter_get_next_zone(struct zone_iterator* iter);
+int iter_alloc_zone(struct zone_iterator* iter);
+int iter_zone_close(struct zone_iterator* iter);
+
+
 
 
 void init_inode(){
