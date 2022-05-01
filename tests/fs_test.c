@@ -573,8 +573,7 @@ void test_given_dev_dup_when_file_is_driver_should_return_from_driver(){
     reset_fs();
 }
 
-extern struct superblock root_sb;
-void test_when_disk_full_should_return_enospc(){
+void test_when_zone_full_should_return_enospc(){
     int fd = sys_open(current, FILE1, O_CREAT | O_RDWR, 0x755);
     assert(fd == 0);
 
