@@ -23,17 +23,6 @@ void test_given_has_next_zone_when_exceed_max_should_return_false(){
     assert(result == false);
 }
 
-void test_given_has_next_zone_when_have_zone_should_return_true(){
-    struct zone_iterator iter;
-    struct device* dev = get_dev(ROOT_DEV);
-    struct inode* root = get_inode(ROOT_INODE_NUM, dev);
-    int ret = init_zone_iterator(&iter, root, 0);
-    assert(ret == 0);
-    
-    bool result = iter_has_next_zone(&iter);
-    assert(result == true);
-}
-
 void test_given_has_next_zone_when_no_zone_should_return_false(){
     struct zone_iterator iter;
 
@@ -46,3 +35,32 @@ void test_given_has_next_zone_when_no_zone_should_return_false(){
     bool result = iter_has_next_zone(&iter);
     assert(result == false);
 }
+
+void test_given_has_next_zone_when_have_zone_should_return_true(){
+    struct zone_iterator iter;
+    struct device* dev = get_dev(ROOT_DEV);
+    struct inode* root = get_inode(ROOT_INODE_NUM, dev);
+    int ret = init_zone_iterator(&iter, root, 0);
+    assert(ret == 0);
+    
+    bool result = iter_has_next_zone(&iter);
+    assert(result == true);
+}
+
+void test_given_has_next_zone_when_zone_exhausted_should_return_false(){
+    struct zone_iterator iter;
+    struct device* dev = get_dev(ROOT_DEV);
+    struct inode* root = get_inode(ROOT_INODE_NUM, dev);
+    int ret = init_zone_iterator(&iter, root, 0);
+    assert(ret == 0);
+    
+    bool result = iter_has_next_zone(&iter);
+    assert(result == true);
+
+    zone_t zone = iter_get_next_zone(&iter);
+    assert(zone > 0);
+
+    result = iter_has_next_zone(&iter);
+    assert(result == false);
+}
+
