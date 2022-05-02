@@ -2,16 +2,14 @@ import sys
 import re
 
 def get_prototypes(files):
-    prototypes = set([])
+    prototypes = []
     for file in files:
         with open(file) as f:
             for line in f:
                 match = re.search(r"^\s*void\s+test_(\w+)\s*\(\s*\)\s*{", line)
                 if match:
                     proto = f"test_{match.group(1)}"
-                    if proto in prototypes:
-                        raise ValueError(f"{proto} is duplciated")
-                    prototypes.add(proto)
+                    prototypes.append(proto)
     return prototypes
 
 def generate(prototypes):
