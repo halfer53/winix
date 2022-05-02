@@ -156,24 +156,22 @@ int root_fs_read (struct filp *filp, char *data, size_t count, off_t offset){
     int ret = 0, r;
     unsigned int len;
     off_t off;
-    unsigned int curr_fp_index, fp_limit;
-    block_t bnr;
+    unsigned int curr_fp_index;
     inode_t *ino = NULL;
+    struct zone_iterator iter;
+    block_t bnr;
     struct block_buffer* buffer = NULL;
 
     curr_fp_index = offset / BLOCK_SIZE;
     off = offset % BLOCK_SIZE;
-    fp_limit = (filp->filp_pos + count - 1) / BLOCK_SIZE;
     ino = filp->filp_ino;
 
-    for( ; curr_fp_index <= fp_limit && curr_fp_index < NR_TZONES; curr_fp_index++){
-        bnr = ino->i_zone[curr_fp_index];
-        if(bnr == 0)
-            continue;
-
+    iter_zone_init(&iter, ino, curr_fp_index);
+    while(iter_zone_has_next(&iter)){
+        bnr = iter_zone_get_next(&iter);
         len = ((BLOCK_SIZE - off) > count) ? count : BLOCK_SIZE - off;
         len = (off + len) < ino->i_size ? len : ino->i_size - off;
-        
+
         r = 0;
         if(filp->filp_flags & O_DIRECT){
             off += bnr * BLOCK_SIZE;
@@ -201,6 +199,7 @@ int root_fs_read (struct filp *filp, char *data, size_t count, off_t offset){
             break;
         off = 0;
     }
+    iter_zone_close(&iter);
     // KDEBUG(("read ret %d, zone %d %d %d %d\n", ret, ino->i_zone[0], ino->i_zone[1], ino->i_zone[2], ino->i_zone[3]));
     return ret;
 }
