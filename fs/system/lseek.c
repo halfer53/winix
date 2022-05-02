@@ -5,23 +5,23 @@
 
 int extend_file(struct filp* file, off_t count){
     off_t user_increment, allocated = 0;
-    int i;
-    block_t bnr;
+    int ret;
+    struct zone_iterator iter;
     struct inode* ino = file->filp_ino;
 
-    if( count < file->filp_ino->i_total_size){
+    if( count < ino->i_total_size){
         file->filp_pos = count;
         return count;
     }
+    iter_zone_init(&iter, ino, 0);
     user_increment = ALIGN1K( count - ino->i_total_size);
-    for(i = 0; i < NR_TZONES; i++){
-        bnr = ino->i_zone[i];
-        if(bnr == 0 && user_increment > 0){
-            bnr = alloc_block(ino, ino->i_dev);
-            ino->i_zone[i] = bnr;
-            allocated += BLOCK_SIZE;
-            user_increment -= BLOCK_SIZE;
-        }
+    while(iter_zone_has_next(&iter));
+    while(user_increment > 0){
+        ret = iter_zone_alloc(&iter);
+        if (ret < 0)
+            return ret;
+        allocated += BLOCK_SIZE;
+        user_increment -= BLOCK_SIZE;
     }
     return allocated;
 }
