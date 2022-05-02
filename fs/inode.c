@@ -47,7 +47,7 @@ bool is_valid_inode_num(int num, struct device* id){
 bool is_valid_block_num(block_t bnr, struct device* id){
     struct superblock* sb = get_sb(id);
     unsigned int total_block = sb->s_block_inuse + sb->s_free_blocks;
-    return (0 <= bnr) && (bnr < total_block);
+    return bnr < total_block;
 }
 
 bool is_inode_in_use(int num, struct device* id){
