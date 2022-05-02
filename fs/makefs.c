@@ -24,7 +24,7 @@ int makefs( char* disk_raw, size_t disk_size)
     block_t blockmap_block_nr = 1;
     block_t inodemap_block_nr = 2;
     block_t inode_table_block_nr = 3;
-    unsigned int inode_tablesize = (int)(blocks_nr * 0.02) * BLOCK_SIZE;
+    unsigned int inode_tablesize = (int)(blocks_nr * 0.02 * (PAGE_LEN / BLOCK_SIZE)) * BLOCK_SIZE;
     block_t root_node_block_nr = inode_table_block_nr + (inode_tablesize / BLOCK_SIZE);
     block_t block_in_use = root_node_block_nr + 1;
     block_t remaining_blocks = blocks_nr - block_in_use;
