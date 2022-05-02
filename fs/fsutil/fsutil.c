@@ -166,6 +166,7 @@ void write_srec_list(struct list_head* lists){
         assert(ret == 0);
         list_del(&pos->list);
         // debug_super_block(pos->name);
+        free(pos->binary_data);
         free(pos);
     }
     flush_all_buffer();
