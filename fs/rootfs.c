@@ -204,43 +204,31 @@ int root_fs_read (struct filp *filp, char *data, size_t count, off_t offset){
     return ret;
 }
 
-// char* get_buffer_data(char* data, size_t count){
-//     static char __buffer[50];
-//     char* p = __buffer;
-//     while(count--){
-//         *p++ = *data++;
-//     }
-//     *p = '\0';
-//     return __buffer;
-// }
-
 int root_fs_write (struct filp *filp, char *data, size_t count, off_t offset){
     int r, ret = 0, result;
     unsigned int len;
     off_t off;
-    unsigned int curr_fp_index, fp_limit;
+    unsigned int curr_fp_index;
     block_t bnr;
     inode_t *ino = NULL;
     struct block_buffer* buffer = NULL;
+    struct zone_iterator iter;
 
     curr_fp_index = offset / BLOCK_SIZE;
     off = offset % BLOCK_SIZE;
-    fp_limit = (filp->filp_pos + count - 1) / BLOCK_SIZE;
     ino = filp->filp_ino;
 
-    if(curr_fp_index >= NR_TZONES)
-        return -EFBIG;
-
-    for( ; curr_fp_index <= fp_limit && count > 0 && curr_fp_index < NR_TZONES; curr_fp_index++){
-        bnr = ino->i_zone[curr_fp_index];
-        if(bnr == 0){
-            if((result = alloc_block(ino, ino->i_dev)) > 0){
-                bnr = (block_t)result;
-                ino->i_zone[curr_fp_index] = bnr;
-            }else{
-                return result;
+    iter_zone_init(&iter, ino, curr_fp_index);
+    while(count > 0){
+        if(!iter_zone_has_next(&iter)){
+            result = iter_zone_alloc(&iter);
+            if(result < 0){
+                if(ret == 0)
+                    ret = result;
+                break;
             }
         }
+        bnr = iter_zone_get_next(&iter);
 
         len = ((BLOCK_SIZE - off) > count) ? count : BLOCK_SIZE - off;
         r = 0;
