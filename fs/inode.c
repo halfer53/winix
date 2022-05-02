@@ -453,7 +453,7 @@ int iter_zone_init(struct zone_iterator* iter, struct inode* inode, int zone_idx
     return OK;
 }
 
-zone_t _iter_get_current_zone(struct zone_iterator* iter, zone_t** ptr, bool create_inode){
+zone_t _iter_get_current_zone(struct zone_iterator* iter, bool create_inode, zone_t **ptr, ino_t* inum){
     int ino_iter, ino_rem, indirect_idx;
     zone_t ret = 0;
     zone_t *pos;
@@ -463,6 +463,8 @@ zone_t _iter_get_current_zone(struct zone_iterator* iter, zone_t** ptr, bool cre
         return 0;
     if (iter->i_zone_idx < NR_DIRECT_ZONE){
         pos = &iter->i_inode->i_zone[iter->i_zone_idx];
+        if (inum)
+            *inum = iter->i_inode->i_num;
         goto assign;
     }
     // if we are in indirect zone
@@ -481,14 +483,14 @@ zone_t _iter_get_current_zone(struct zone_iterator* iter, zone_t** ptr, bool cre
             goto final;
         indirect_ino->flags |= INODE_FLAG_ZONE;
         *pos = (zone_t)indirect_ino->i_num;
-        pos = &indirect_ino->i_zone[ino_rem];
     }else{
         indirect_ino = get_inode(*pos, iter->i_inode->i_dev);
         if (!indirect_ino)
             goto final;
-        
-        pos = &indirect_ino->i_zone[ino_rem];
     }
+    if (inum)
+        *inum = indirect_ino->i_num;
+    pos = &indirect_ino->i_zone[ino_rem];
 
 assign:
     ret = *pos;
@@ -501,12 +503,11 @@ final:
 }
 
 bool iter_zone_has_next(struct zone_iterator* iter){
-    return (bool)_iter_get_current_zone(iter, NULL, false);
+    return (bool)_iter_get_current_zone(iter, false, NULL, NULL);
 }
 
 zone_t iter_zone_get_next(struct zone_iterator* iter){
-    zone_t *zonepos;
-    zone_t zone = _iter_get_current_zone(iter, &zonepos, false);
+    zone_t zone = _iter_get_current_zone(iter, false, NULL, NULL);
     if( zone)
         iter->i_zone_idx++;
     
@@ -514,17 +515,23 @@ zone_t iter_zone_get_next(struct zone_iterator* iter){
 }
 
 int iter_zone_alloc(struct zone_iterator* iter){
-    zone_t *pos;
+    zone_t *pos = NULL;
+    ino_t inum = 0;
     zone_t zone;
     int ret;
     if (iter->i_zone_idx >= MAX_ZONES )
         return -EFBIG;
-    if ((zone = _iter_get_current_zone(iter, &pos, true)))
+    if ((zone = _iter_get_current_zone(iter, true, &pos, &inum)))
         return -EINVAL;
     ret = alloc_block(iter->i_inode, iter->i_inode->i_dev);
     if(ret < 0)
         return ret;
-    *pos = (zone_t)ret;
+    if (pos && inum){
+        struct inode* ino = get_inode(inum, iter->i_inode->i_dev);
+        *pos = (zone_t)ret;
+        put_inode(ino, true);
+    }
+    
     return ret;
 }
 
