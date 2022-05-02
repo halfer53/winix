@@ -306,7 +306,7 @@ int truncate_inode(inode_t *inode){
 }
 
 
-int release_inode(inode_t *inode){
+int _release_inode(inode_t *inode, bool is_indirect_zone){
     struct device* id = inode->i_dev;
     int inum = inode->i_num;
     struct superblock* sb = get_sb(id);
@@ -322,17 +322,15 @@ int release_inode(inode_t *inode){
     for(i = 0; i < NR_TZONES; i++){
         zone_id = inode->i_zone[i];
         if(zone_id > 0){
-            if(inode->flags & INODE_FLAG_ZONE || i < NR_DIRECT_ZONE){
+            if(is_indirect_zone || i < NR_DIRECT_ZONE){
                 // KDEBUG(("releasing block %d for %d\n", zone_id, inode->i_num));
                 release_block(zone_id, id);
                 inode->i_zone[i] = 0;
             }else{
                 struct inode* indirect_zone = get_inode(zone_id, id);
                 if(indirect_zone){
-                    if (!(indirect_zone->flags & INODE_FLAG_ZONE))
-                        PANIC("indirect inode");
                     put_inode(indirect_zone, false);
-                    release_inode(indirect_zone);
+                    _release_inode(indirect_zone, true);
                 }
             }
         }

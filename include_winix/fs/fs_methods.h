@@ -56,7 +56,8 @@ int get_fd(struct proc *curr, int start, int *open_slot, filp_t *fpt);
 int add_inode_to_directory(struct proc* who,inode_t* dir, inode_t* ino, char* string);
 // int register_device(struct device* dev, const char* name, dev_t id, mode_t type, struct device_operations*, struct filp_operations*);
 int release_filp(struct filp* file);
-int release_inode(inode_t *inode);
+int _release_inode(inode_t *inode, bool is_indirect_zone);
+#define release_inode(ino)  _release_inode(ino, false)
 filp_t *find_filp(inode_t *inode);
 filp_t *get_free_filp();
 void init_filp();
