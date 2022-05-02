@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <signal.h>
 #include <libgen.h>
+#include <stdlib.h>
 
 const char * dirent_array[] = {
         ".",
@@ -603,11 +604,13 @@ void test_when_zone_full_should_return_enospc(){
     int fd = sys_open(current, FILE1, O_CREAT | O_RDWR, 0x755);
     assert(fd == 0);
 
-    int remaining_bytes = NR_TZONES * BLOCK_SIZE;
-    char _buffer[remaining_bytes];
+    int remaining_bytes = MAX_ZONES * BLOCK_SIZE;
+    char *_buffer = malloc(remaining_bytes);
     int ret = sys_write(current, fd, _buffer, remaining_bytes);
     assert(ret == remaining_bytes);
 
     ret = sys_write(current, fd, _buffer, 1);
     assert(ret == -EFBIG);
+
+    free(_buffer);
 }
