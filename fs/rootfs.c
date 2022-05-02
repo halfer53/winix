@@ -54,16 +54,17 @@ int blk_dev_io_write(char *buf, off_t off, size_t len){
     return blk_dev_io_read_write(buf, off, len, true);
 }
 
-int blk_dev_init(){
-    rootfs_disk_size = DISK_SIZE;
-    rootfs_disk = DISK_RAW;
-#ifdef __wramp__
-    ASSERT(DISK_RAW[0] == SUPER_BLOCK_MAGIC);
-#endif
+void __blk_dev_init(char *disk, size_t size){
+    rootfs_disk_size = size;
+    rootfs_disk = disk;
     memcpy(&root_sb, rootfs_disk, sizeof(struct superblock));
     arch_superblock(&root_sb);
     ASSERT(root_sb.magic == SUPER_BLOCK_MAGIC);
     // KDEBUG(("sb block in use %d inode table size %d\n", sb->s_block_inuse, sb->s_inode_table_size));
+}
+
+int blk_dev_init(){
+    __blk_dev_init(DISK_RAW, DISK_SIZE);
     return 0;
 }
 
