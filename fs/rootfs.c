@@ -23,26 +23,7 @@ struct superblock* get_sb(struct device* id){
     return NULL;
 }
 
-int blk_dev_io_read(char *buf, off_t off, size_t len){
-    char *ptr;
-    int count = len;
-    if(off >= rootfs_disk_size)
-        return 0;
-
-    if(off + len > rootfs_disk_size){
-        count = rootfs_disk_size - off;
-        len = count;
-    }
-
-//    KDEBUG(("dev read blk %d %d\n", off / BLOCK_SIZE, len));
-    ptr = rootfs_disk + off;
-    while(count-- > 0){
-        *buf++ = *ptr++;
-    }
-    return len;
-}
-
-int blk_dev_io_write(char *buf, off_t off, size_t len){
+int blk_dev_io_read_write(char *buf, off_t off, size_t len, bool write_mode){
     char *ptr;
     int count = len;
     if(off >= rootfs_disk_size)
@@ -55,9 +36,22 @@ int blk_dev_io_write(char *buf, off_t off, size_t len){
 //    KDEBUG(("dev write blk %d %d\n", off / BLOCK_SIZE, len));
     ptr = rootfs_disk + off;
     while(count-- > 0){
-        *ptr++ = *buf++;
+        if(write_mode){
+            *ptr++ = *buf++;
+        }else{
+            *buf++ = *ptr++;
+        }
+        
     }
     return len;
+}
+
+int blk_dev_io_read(char *buf, off_t off, size_t len){
+    return blk_dev_io_read_write(buf, off, len, false);
+}
+
+int blk_dev_io_write(char *buf, off_t off, size_t len){
+    return blk_dev_io_read_write(buf, off, len, true);
 }
 
 int blk_dev_init(){
@@ -161,12 +155,10 @@ int root_fs_read_write(struct filp *filp, char *data, size_t count, off_t offset
     inode_t *ino = NULL;
     struct block_buffer* buffer = NULL;
     struct zone_iterator iter;
-    int (*dirent_io)(char *, off_t, size_t);
 
     curr_fp_index = offset / BLOCK_SIZE;
     off = offset % BLOCK_SIZE;
     ino = filp->filp_ino;
-    dirent_io = write_mode ? blk_dev_io_write : blk_dev_io_read;
 
     if (!write_mode){
         off_t remaining = ino->i_size - offset;
@@ -193,7 +185,7 @@ int root_fs_read_write(struct filp *filp, char *data, size_t count, off_t offset
 
         if(filp->filp_flags & O_DIRECT){
             off += bnr * BLOCK_SIZE;
-            r = dirent_io(data, off, len);
+            r = blk_dev_io_read_write(data, off, len, write_mode);
             data += r;
         } else{
             char *p;
