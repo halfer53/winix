@@ -18,11 +18,14 @@ int extend_file(struct filp* file, off_t count){
     while(iter_zone_has_next(&iter));
     while(user_increment > 0){
         ret = iter_zone_alloc(&iter);
-        if (ret < 0)
+        if (ret < 0){
+            iter_zone_close(&iter);
             return ret;
+        }
         allocated += BLOCK_SIZE;
         user_increment -= BLOCK_SIZE;
     }
+    iter_zone_close(&iter);
     return allocated;
 }
 
