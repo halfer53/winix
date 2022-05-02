@@ -424,34 +424,28 @@ int add_inode_to_directory(struct proc* who, struct inode* dir, struct inode* in
 }
 
 int remove_inode_from_dir(struct proc* who, struct inode* dir, struct inode* target, char* name){
-    int i;
-    block_t bnr;
-    struct block_buffer* buf;
-    struct winix_dirent *curr, *end;
+    struct winix_dirent* curr;
+    struct dirent_iterator iter;
+    int ret = -ENOENT;
 
     if(!has_file_access(who, dir, W_OK))
         return -EACCES;
 
-    for(i = 0; i < NR_TZONES; i++){
-        bnr = dir->i_zone[i];
-        if(bnr == 0)
-            continue;
-        buf = get_block_buffer(bnr, dir->i_dev);
-        end = (struct winix_dirent*)&buf->block[BLOCK_SIZE];
-        curr = (struct winix_dirent*)buf->block;
-        while(curr < end){
-            if(curr->dirent.d_ino == target->i_num && char32_strcmp(curr->dirent.d_name, name) == 0){
-                curr->dirent.d_name[0] = '\0';
-                curr->dirent.d_ino = 0;
-                put_block_buffer_dirt(buf);
-                target->i_nlinks -= 1;
-                return OK;
-            }
-            curr++;
+    iter_dirent_init(&iter, dir, 0, 0);
+    while(iter_dirent_has_next(&iter)){
+        curr = iter_dirent_get_next(&iter);
+        if(curr->dirent.d_ino == target->i_num && char32_strcmp(curr->dirent.d_name, name) == 0){
+            curr->dirent.d_name[0] = '\0';
+            curr->dirent.d_ino = 0;
+            iter.buffer->b_dirt = true;
+            target->i_nlinks -= 1;
+            ret = 0;
+            break;
         }
-        put_block_buffer(buf);
     }
-    return -ENOENT;
+
+    iter_dirent_close(&iter);
+    return ret;
 }
 
 int iter_zone_init(struct zone_iterator* iter, struct inode* inode, int zone_idx){
