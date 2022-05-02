@@ -3,6 +3,7 @@
 #include "../fs/mock/mock.h"
 #include <assert.h>
 #include <signal.h>
+#include <libgen.h>
 
 const char * dirent_array[] = {
         ".",
@@ -458,6 +459,48 @@ void test_given_getdents_when_files_in_folder_should_return_files(){
     ret = sys_getdents(current, fd2, dir, 10);
     assert(ret == 0);
 
+    assert(sys_close(current, fd) == 0);
+    assert(sys_close(current, fd2) == 0);
+}
+
+
+void test_given_getdents_when_successive_call_should_return_files(){
+    int ret, fd, fd2;
+    struct dirent dir[5];
+
+    ret = sys_mkdir(current, DIR_NAME, O_RDWR);
+    assert(ret == 0);
+
+    fd = sys_creat(current, DIR_FILE1, O_RDWR);
+    assert(fd == 0);
+
+    ret = sys_link(current, DIR_FILE1, DIR_FILE2);
+    assert(ret == 0);
+
+    fd2 = sys_open(current, DIR_NAME, O_RDONLY, 0);
+    assert(fd2 == 1);
+
+    ret = sys_getdents(current, fd2, dir, 1);
+    assert(ret == sizeof(struct dirent));
+    assert(char32_strcmp(dir[0].d_name, ".") == 0);
+
+    ret = sys_getdents(current, fd2, dir, 1);
+    assert(ret == sizeof(struct dirent));
+    assert(char32_strcmp(dir[0].d_name, "..") == 0);
+
+    ret = sys_getdents(current, fd2, dir, 1);
+    assert(ret == sizeof(struct dirent));
+    assert(char32_strcmp(dir[0].d_name, basename(DIR_FILE1)) == 0);
+
+    ret = sys_getdents(current, fd2, dir, 1);
+    assert(ret == sizeof(struct dirent));
+    assert(char32_strcmp(dir[0].d_name, basename(DIR_FILE2)) == 0);
+
+    ret = sys_getdents(current, fd2, dir, 5);
+    assert(ret == 0);
+
+    assert(sys_close(current, fd) == 0);
+    assert(sys_close(current, fd2) == 0);
 }
 
 void test_given_pwd_when_chdir_should_return_path(){
