@@ -155,7 +155,6 @@ void write_srec_list(struct list_head* lists){
     list_for_each_entry_safe(struct winix_elf_list, pos, tmp, lists, list){
         snprintf(path, PATH_LEN, "%s%s%s", bin_path, "/", pos->name);
 //        printf("writing %s %x %x\n", pos->name, pos->binary_data[0], pos->binary_data[1]);
-
         fd = sys_creat(curr_scheduling_proc, path, 0x755);
         assert(fd >= 0);
         ret = sys_write(curr_scheduling_proc, fd, &pos->elf, elf_size);
@@ -173,17 +172,16 @@ void write_srec_list(struct list_head* lists){
     flush_super_block(get_dev(ROOT_DEV));
 }
 
-int write_srec_to_disk(char* path, struct arguments* arguments){
+int get_srec_list(struct list_head *srec_list, char* path, int offset){
     struct list_head srec_binary_list;
     struct list_head srec_debug_list;
-    struct list_head srec_list;
     struct dirent *dp;
     DIR *dfd;
     char filename_qfd[PATH_LEN] ;
 
     INIT_LIST_HEAD(&srec_binary_list);
     INIT_LIST_HEAD(&srec_debug_list);
-    INIT_LIST_HEAD(&srec_list);
+    INIT_LIST_HEAD(srec_list);
 
     if ((dfd = opendir(path)) == NULL)
     {
@@ -205,7 +203,7 @@ int write_srec_to_disk(char* path, struct arguments* arguments){
 
             if(strcmp(extension_name, "srec") == 0){
                 struct srec_binary *result = malloc(sizeof(struct srec_binary));
-                decode_srec(filename_qfd, arguments->offset, result);
+                decode_srec(filename_qfd, offset, result);
                 list_add(&result->list, &srec_binary_list);
 //                printf("srec %s %d %d pc %x\n", result->name, result->binary_offset, result->binary_idx, result->binary_pc);
             }else if(strcmp(extension_name, "verbose") == 0){
@@ -216,7 +214,16 @@ int write_srec_to_disk(char* path, struct arguments* arguments){
             }
         }
     }
-    merge_srec_debug(&srec_list, &srec_binary_list, &srec_debug_list);
+    merge_srec_debug(srec_list, &srec_binary_list, &srec_debug_list);
+    return 0;
+}
+
+int write_srec_to_disk(char* path, struct arguments* arguments){
+    struct list_head srec_list;
+    int ret;
+
+    if((ret = get_srec_list(&srec_list, path, arguments->offset)))
+        return ret;
     write_srec_list(&srec_list);
     return 0;
 }
