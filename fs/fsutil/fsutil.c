@@ -157,15 +157,28 @@ void write_srec_list(struct list_head* lists){
 //        printf("writing %s %x %x\n", pos->name, pos->binary_data[0], pos->binary_data[1]);
         fd = sys_creat(curr_scheduling_proc, path, 0x755);
         assert(fd >= 0);
+
         ret = sys_write(curr_scheduling_proc, fd, &pos->elf, elf_size);
         assert(ret == elf_size);
+
         binary_size = TO_CHAR_SIZE(pos->elf.binary_size);
         ret = sys_write(curr_scheduling_proc, fd, pos->binary_data,  binary_size);
         assert(ret == binary_size);
+
+        ret = sys_lseek(curr_scheduling_proc, fd, elf_size, SEEK_SET);
+        assert(ret == elf_size);
+
+        unsigned int *read_buffer = malloc(pos->elf.binary_size * sizeof(unsigned int));
+        ret = sys_read(curr_scheduling_proc, fd, read_buffer, binary_size);
+        assert(ret == binary_size);
+        assert(memcmp(pos->binary_data, read_buffer, binary_size) == 0);
+        
         ret = sys_close(curr_scheduling_proc, fd);
         assert(ret == 0);
+
         list_del(&pos->list);
         // debug_super_block(pos->name);
+        free(read_buffer);
         free(pos->binary_data);
         free(pos);
     }
