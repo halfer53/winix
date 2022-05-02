@@ -42,7 +42,7 @@ L_HEAD = winix/limits/limits_head.o
 L_TAIL = winix/limits/limits_tail.o
 KERNEL_O = winix/*.o kernel/system/*.o kernel/*.o fs/*.o fs/system/*.o driver/*.o include_winix/*.o
 ALLDIR = init user kernel fs driver winix
-ALLDIR_CLEAN = winix lib init user kernel fs driver include
+ALLDIR_CLEAN = winix lib init user kernel fs driver include_winix
 FS_DEPEND = fs/*.c fs/system/*.c fs/mock/*.c winix/bitmap.c
 UNIT_TEST_DEPEND = $(shell find tests -name "*.c" -not -name "utest_runner.c")
 
