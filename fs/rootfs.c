@@ -161,14 +161,24 @@ int root_fs_read_write(struct filp *filp, char *data, size_t count, off_t offset
     inode_t *ino = NULL;
     struct block_buffer* buffer = NULL;
     struct zone_iterator iter;
+    int (*dirent_io)(char *, off_t, size_t);
 
     curr_fp_index = offset / BLOCK_SIZE;
     off = offset % BLOCK_SIZE;
     ino = filp->filp_ino;
+    dirent_io = write_mode ? blk_dev_io_write : blk_dev_io_read;
+
+    if (!write_mode){
+        off_t remaining = ino->i_size - offset;
+        count = count < remaining ? count : remaining;
+    }
 
     iter_zone_init(&iter, ino, curr_fp_index);
     while(count > 0){
         if(!iter_zone_has_next(&iter)){
+            if(!write_mode)
+                break;
+            
             result = iter_zone_alloc(&iter);
             if(result < 0){
                 if(ret == 0)
@@ -176,13 +186,14 @@ int root_fs_read_write(struct filp *filp, char *data, size_t count, off_t offset
                 break;
             }
         }
-        bnr = iter_zone_get_next(&iter);
 
+        bnr = iter_zone_get_next(&iter);
         len = ((BLOCK_SIZE - off) > count) ? count : BLOCK_SIZE - off;
         r = 0;
+
         if(filp->filp_flags & O_DIRECT){
             off += bnr * BLOCK_SIZE;
-            r = blk_dev_io_write(data, off, len);
+            r = dirent_io(data, off, len);
             data += r;
         } else{
             char *p;
@@ -190,10 +201,16 @@ int root_fs_read_write(struct filp *filp, char *data, size_t count, off_t offset
             buffer = get_block_buffer(bnr, filp->filp_dev);
             p = &buffer->block[off];
             while(len2-- > 0){
-                *p++ = *data++;
+                if(write_mode){
+                    *p++ = *data++;
+                }else{
+                    *data++ = *p++;
+                }
             }
             r += (int)len;
-            put_block_buffer_dirt(buffer);
+            if(write_mode)
+                buffer->b_dirt = true;
+            put_block_buffer(buffer);
         }
         // KDEBUG(("file write for block %d, off %d len %d, size %d\n", curr_fp_index, off, r, filp->filp_ino->i_size + r));
         /* Read or write 'chunk' bytes. */
@@ -202,63 +219,17 @@ int root_fs_read_write(struct filp *filp, char *data, size_t count, off_t offset
         count -= len;
         ret += r;
         filp->filp_pos += r;
-        filp->filp_ino->i_size += r;
+        if(write_mode)
+            filp->filp_ino->i_size += r;
         off = 0;
     }
     // KDEBUG(("Rootfs %d write count %d, offset %d ret %d data %s\n",filp->filp_ino->i_num, count, offset, ret, get_buffer_data(data, count)));
+    iter_zone_close(&iter);
     return ret;
 }
 
 int root_fs_read (struct filp *filp, char *data, size_t count, off_t offset){
-    int ret = 0, r;
-    unsigned int len;
-    off_t off;
-    unsigned int curr_fp_index;
-    inode_t *ino = NULL;
-    struct zone_iterator iter;
-    block_t bnr;
-    struct block_buffer* buffer = NULL;
-
-    curr_fp_index = offset / BLOCK_SIZE;
-    off = offset % BLOCK_SIZE;
-    ino = filp->filp_ino;
-
-    iter_zone_init(&iter, ino, curr_fp_index);
-    while(iter_zone_has_next(&iter)){
-        bnr = iter_zone_get_next(&iter);
-        len = ((BLOCK_SIZE - off) > count) ? count : BLOCK_SIZE - off;
-        len = (off + len) < ino->i_size ? len : ino->i_size - off;
-
-        r = 0;
-        if(filp->filp_flags & O_DIRECT){
-            off += bnr * BLOCK_SIZE;
-            r = blk_dev_io_read(data, off, len);
-            data += r;
-            // KDEBUG(("read block %u, off %u, len %u, r %d\n", bnr, off - (bnr * BLOCK_SIZE), len, r));
-        }else{
-            char *p;
-            size_t len2 = len;
-            buffer = get_block_buffer(bnr, filp->filp_dev);
-            p = &buffer->block[off];
-            while(len2-- > 0){
-                *data++ = *p++;
-            }
-            r += (int)len;
-            put_block_buffer(buffer);
-            // KDEBUG(("read block %u, off %u, len %u, r %d\n", bnr, off, len, r));
-        }
-        
-        count -= len;
-        ret += r;
-        filp->filp_pos += r;
-        // KDEBUG(("file read for block %u, off %u len %d remaining %zu\n", bnr, off, r, count));
-        if (r == 0)
-            break;
-        off = 0;
-    }
-    iter_zone_close(&iter);
-    // KDEBUG(("read ret %d, zone %d %d %d %d\n", ret, ino->i_zone[0], ino->i_zone[1], ino->i_zone[2], ino->i_zone[3]));
-    return ret;
+    return root_fs_read_write(filp, data, count, offset, false);
 }
 
 int root_fs_write (struct filp *filp, char *data, size_t count, off_t offset){
