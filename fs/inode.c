@@ -390,10 +390,9 @@ int init_dirent(inode_t* dir, inode_t* ino){
 
 
 int add_inode_to_directory(struct proc* who, struct inode* dir, struct inode* ino, char* string){
-    int i;
-    block_t bnr;
-    struct winix_dirent* curr, *end;
-    struct block_buffer* buf;
+    struct winix_dirent* curr;
+    struct dirent_iterator iter;
+    int ret = 0;
 
     if(!(S_ISDIR(dir->i_mode)))
         return -EINVAL;
@@ -402,29 +401,26 @@ int add_inode_to_directory(struct proc* who, struct inode* dir, struct inode* in
     if(strlen(string) >= DIRNAME_LEN)
         return -ENAMETOOLONG;
 
-    for(i = 0; i < NR_TZONES; i++){
-        bnr = dir->i_zone[i];
-        if(bnr == 0){
-            bnr = alloc_block(dir, dir->i_dev);
-            dir->i_zone[i] = bnr;
+    iter_dirent_init(&iter, dir, 0, 0);
+    while(true){
+        if(!iter_dirent_has_next(&iter)){
+            ret = iter_dirent_alloc(&iter);
+            if(ret < 0)
+                break;
         }
-
-        buf = get_block_buffer(bnr, dir->i_dev);
-        end = (struct winix_dirent*)&buf->block[BLOCK_SIZE];
-        curr = (struct winix_dirent*)buf->block;
-        while(curr < end){
-            if(curr->dirent.d_name[0] == '\0'){
-                fill_dirent(ino, curr, string);
-                curr->dev = ino->i_dev->dev_id;
-                ino->i_nlinks += 1;
-                put_block_buffer_dirt(buf);
-                return OK;
-            }
-            curr++;
+        curr = iter_dirent_get_next(&iter);
+        if(curr->dirent.d_name[0] == '\0'){
+            fill_dirent(ino, curr, string);
+            curr->dev = ino->i_dev->dev_id;
+            ino->i_nlinks += 1;
+            iter.buffer->b_dirt = true;
+            ret = 0;
+            break;
         }
-        put_block_buffer(buf);
     }
-    return -ENOSPC;
+
+    iter_dirent_close(&iter);
+    return ret;
 }
 
 int remove_inode_from_dir(struct proc* who, struct inode* dir, struct inode* target, char* name){
@@ -587,7 +583,10 @@ struct winix_dirent* iter_dirent_get_next(struct dirent_iterator* iter){
 }
 
 int iter_dirent_alloc(struct dirent_iterator* iter){
-    return iter_zone_alloc(&iter->zone_iter);
+    int ret = iter_zone_alloc(&iter->zone_iter);
+    if (ret >= 0)
+        return 0;
+    return ret;
 }
 
 int iter_dirent_close(struct dirent_iterator* iter){
