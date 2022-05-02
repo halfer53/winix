@@ -23,6 +23,10 @@
 #define TO_CHAR_SIZE(x)     (x)
 #endif
 
+#define DISK_PAGE_NR        (50)
+#define DISK_SIZE           (DISK_PAGE_NR * BLOCK_SIZE)
+#define DISK_SIZE_WORD      (DISK_PAGE_NR * BLOCK_SIZE_WORD)
+
 #define INODE_NUM   496
 #define NR_TZONES   8
 
@@ -43,11 +47,6 @@
 #define ROOT_DEV    (0x0101)    /* MAKEDEV(1,1) */
 
 #define SUPER_BLOCK_MAGIC   (0xabcdefff)
-
-#define DISK_PAGE_NR        (100)
-#define DISK_SIZE           (DISK_PAGE_NR * BLOCK_SIZE)
-#define DISK_SIZE_WORD      (DISK_PAGE_NR * BLOCK_SIZE_WORD)
-
 
 extern unsigned int start_unix_time;
 #define get_unix_time()         (start_unix_time + (get_uptime() / HZ))
