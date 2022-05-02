@@ -231,8 +231,11 @@ int exec_welf(struct proc* who, char* path, char *argv[], char *envp[], bool is_
 
     ret = filp_read(who, filp, who->ctx.rbase + elf.binary_offset, elf.binary_size);
     if(ret != elf.binary_size){
-        if (ret >= 0)
+        if (ret >= 0){
+            kwarn("exp %d read %d\n", elf.binary_size, ret);
             ret = -EAGAIN;
+        }
+            
         goto final;
     }
 
