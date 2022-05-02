@@ -142,49 +142,6 @@ void debug_super_block(char* str){
 
 #define PATH_LEN   (1024)
 
-void write_srec_list(struct list_head* lists){
-    static char bin_path[] = "/bin";
-    struct winix_elf_list *pos, *tmp;
-    char path[PATH_LEN];
-    int ret, fd;
-    int elf_size = sizeof(struct winix_elf);
-    int binary_size;
-    ret = sys_mkdir(curr_scheduling_proc, bin_path, 0x755);
-    // printf("ret %d\n", ret);
-    assert(ret == 0);
-    list_for_each_entry_safe(struct winix_elf_list, pos, tmp, lists, list){
-        snprintf(path, PATH_LEN, "%s%s%s", bin_path, "/", pos->name);
-//        printf("writing %s %x %x\n", pos->name, pos->binary_data[0], pos->binary_data[1]);
-        fd = sys_creat(curr_scheduling_proc, path, 0x755);
-        assert(fd >= 0);
-
-        ret = sys_write(curr_scheduling_proc, fd, &pos->elf, elf_size);
-        assert(ret == elf_size);
-
-        binary_size = TO_CHAR_SIZE(pos->elf.binary_size);
-        ret = sys_write(curr_scheduling_proc, fd, pos->binary_data,  binary_size);
-        assert(ret == binary_size);
-
-        ret = sys_lseek(curr_scheduling_proc, fd, elf_size, SEEK_SET);
-        assert(ret == elf_size);
-
-        unsigned int *read_buffer = malloc(pos->elf.binary_size * sizeof(unsigned int));
-        ret = sys_read(curr_scheduling_proc, fd, read_buffer, binary_size);
-        assert(ret == binary_size);
-        assert(memcmp(pos->binary_data, read_buffer, binary_size) == 0);
-        
-        ret = sys_close(curr_scheduling_proc, fd);
-        assert(ret == 0);
-
-        list_del(&pos->list);
-        // debug_super_block(pos->name);
-        free(read_buffer);
-        free(pos->binary_data);
-        free(pos);
-    }
-    flush_all_buffer();
-    flush_super_block(get_dev(ROOT_DEV));
-}
 
 int get_srec_list(struct list_head *srec_list, char* path, int offset){
     struct list_head srec_binary_list;
@@ -232,6 +189,81 @@ int get_srec_list(struct list_head *srec_list, char* path, int offset){
     return 0;
 }
 
+void write_srec_list(struct list_head* lists){
+    static char bin_path[] = "/bin";
+    struct winix_elf_list *pos, *tmp;
+    char path[PATH_LEN];
+    int ret, fd;
+    int elf_size = sizeof(struct winix_elf);
+    int binary_size;
+    ret = sys_mkdir(curr_scheduling_proc, bin_path, 0x755);
+    // printf("ret %d\n", ret);
+    assert(ret == 0);
+    list_for_each_entry_safe(struct winix_elf_list, pos, tmp, lists, list){
+        snprintf(path, PATH_LEN, "%s%s%s", bin_path, "/", pos->name);
+//        printf("writing %s %x %x\n", pos->name, pos->binary_data[0], pos->binary_data[1]);
+        fd = sys_creat(curr_scheduling_proc, path, 0x755);
+        assert(fd >= 0);
+
+        ret = sys_write(curr_scheduling_proc, fd, &pos->elf, elf_size);
+        assert(ret == elf_size);
+
+        binary_size = TO_CHAR_SIZE(pos->elf.binary_size);
+        ret = sys_write(curr_scheduling_proc, fd, pos->binary_data,  binary_size);
+        assert(ret == binary_size);
+
+        ret = sys_lseek(curr_scheduling_proc, fd, elf_size, SEEK_SET);
+        assert(ret == elf_size);
+
+        unsigned int *read_buffer = malloc(pos->elf.binary_size * sizeof(unsigned int));
+        ret = sys_read(curr_scheduling_proc, fd, read_buffer, binary_size);
+        assert(ret == binary_size);
+        assert(memcmp(pos->binary_data, read_buffer, binary_size) == 0);
+        
+        ret = sys_close(curr_scheduling_proc, fd);
+        assert(ret == 0);
+
+        // debug_super_block(pos->name);
+        free(read_buffer);
+    }
+    flush_all_buffer();
+    flush_super_block(get_dev(ROOT_DEV));
+}
+
+void verify_srec_with_disk(struct list_head* lists){
+    static char bin_path[] = "/bin";
+    struct winix_elf_list *pos, *tmp;
+    char path[PATH_LEN];
+    int ret, fd;
+    int elf_size = sizeof(struct winix_elf);
+    int binary_size;
+
+    list_for_each_entry_safe(struct winix_elf_list, pos, tmp, lists, list){
+        snprintf(path, PATH_LEN, "%s%s%s", bin_path, "/", pos->name);
+        binary_size = TO_CHAR_SIZE(pos->elf.binary_size);
+        struct winix_elf elf;
+
+        fd = sys_open(curr_scheduling_proc, path, 0, 0);
+        assert(fd >= 0);
+
+        ret = sys_read(curr_scheduling_proc, fd, &elf, elf_size);
+        assert(ret == elf_size);
+        assert(memcmp(&elf, &pos->elf, elf_size) == 0);
+
+        unsigned int read_buffer[pos->elf.binary_size];
+        ret = sys_read(curr_scheduling_proc, fd, read_buffer,  binary_size);
+        assert(ret == binary_size);
+        assert(memcmp(read_buffer, pos->binary_data, binary_size) == 0);
+
+        ret = sys_close(curr_scheduling_proc, fd);
+        assert(ret == 0);
+
+        // debug_super_block(pos->name);
+        free(pos->binary_data);
+        free(pos);
+    }
+}
+
 int write_srec_to_disk(char* path, struct arguments* arguments){
     struct list_head srec_list;
     int ret;
@@ -239,6 +271,7 @@ int write_srec_to_disk(char* path, struct arguments* arguments){
     if((ret = get_srec_list(&srec_list, path, arguments->offset)))
         return ret;
     write_srec_list(&srec_list);
+    verify_srec_with_disk(&srec_list);
     return 0;
 }
 
