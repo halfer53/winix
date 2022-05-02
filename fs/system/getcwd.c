@@ -52,6 +52,6 @@ end:
 int do_getcwd(struct proc* who, struct message* m){
     char *p = sys_getcwd(who, m->m1_p1, m->m1_i1);
     if (IS_ERR(p))
-        return -PTR_ERR(p);
+        return -(int)PTR_ERR(p);
     return (int)(get_virtual_addr(p, who) - (ptr_t*)0);
 }
