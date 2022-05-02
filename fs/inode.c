@@ -306,7 +306,7 @@ int truncate_inode(inode_t *inode){
 }
 
 
-int release_inode(inode_t *inode){
+int _release_inode(inode_t *inode, bool is_indirect_zone){
     struct device* id = inode->i_dev;
     int inum = inode->i_num;
     struct superblock* sb = get_sb(id);
@@ -322,17 +322,15 @@ int release_inode(inode_t *inode){
     for(i = 0; i < NR_TZONES; i++){
         zone_id = inode->i_zone[i];
         if(zone_id > 0){
-            if(inode->flags & INODE_FLAG_ZONE || i < NR_DIRECT_ZONE){
+            if(is_indirect_zone || i < NR_DIRECT_ZONE){
                 // KDEBUG(("releasing block %d for %d\n", zone_id, inode->i_num));
                 release_block(zone_id, id);
                 inode->i_zone[i] = 0;
             }else{
                 struct inode* indirect_zone = get_inode(zone_id, id);
                 if(indirect_zone){
-                    if (!(indirect_zone->flags & INODE_FLAG_ZONE))
-                        PANIC("indirect inode");
                     put_inode(indirect_zone, false);
-                    release_inode(indirect_zone);
+                    _release_inode(indirect_zone, true);
                 }
             }
         }
@@ -390,10 +388,9 @@ int init_dirent(inode_t* dir, inode_t* ino){
 
 
 int add_inode_to_directory(struct proc* who, struct inode* dir, struct inode* ino, char* string){
-    int i;
-    block_t bnr;
-    struct winix_dirent* curr, *end;
-    struct block_buffer* buf;
+    struct winix_dirent* curr;
+    struct dirent_iterator iter;
+    int ret = 0;
 
     if(!(S_ISDIR(dir->i_mode)))
         return -EINVAL;
@@ -402,60 +399,51 @@ int add_inode_to_directory(struct proc* who, struct inode* dir, struct inode* in
     if(strlen(string) >= DIRNAME_LEN)
         return -ENAMETOOLONG;
 
-    for(i = 0; i < NR_TZONES; i++){
-        bnr = dir->i_zone[i];
-        if(bnr == 0){
-            bnr = alloc_block(dir, dir->i_dev);
-            dir->i_zone[i] = bnr;
+    iter_dirent_init(&iter, dir, 0, 0);
+    while(true){
+        if(!iter_dirent_has_next(&iter)){
+            ret = iter_dirent_alloc(&iter);
+            if(ret < 0)
+                break;
         }
-
-        buf = get_block_buffer(bnr, dir->i_dev);
-        end = (struct winix_dirent*)&buf->block[BLOCK_SIZE];
-        curr = (struct winix_dirent*)buf->block;
-        while(curr < end){
-            if(curr->dirent.d_name[0] == '\0'){
-                fill_dirent(ino, curr, string);
-                curr->dev = ino->i_dev->dev_id;
-                ino->i_nlinks += 1;
-                put_block_buffer_dirt(buf);
-                return OK;
-            }
-            curr++;
+        curr = iter_dirent_get_next(&iter);
+        if(curr->dirent.d_name[0] == '\0'){
+            fill_dirent(ino, curr, string);
+            curr->dev = ino->i_dev->dev_id;
+            ino->i_nlinks += 1;
+            iter.buffer->b_dirt = true;
+            ret = 0;
+            break;
         }
-        put_block_buffer(buf);
     }
-    return -ENOSPC;
+
+    iter_dirent_close(&iter);
+    return ret;
 }
 
 int remove_inode_from_dir(struct proc* who, struct inode* dir, struct inode* target, char* name){
-    int i;
-    block_t bnr;
-    struct block_buffer* buf;
-    struct winix_dirent *curr, *end;
+    struct winix_dirent* curr;
+    struct dirent_iterator iter;
+    int ret = -ENOENT;
 
     if(!has_file_access(who, dir, W_OK))
         return -EACCES;
 
-    for(i = 0; i < NR_TZONES; i++){
-        bnr = dir->i_zone[i];
-        if(bnr == 0)
-            continue;
-        buf = get_block_buffer(bnr, dir->i_dev);
-        end = (struct winix_dirent*)&buf->block[BLOCK_SIZE];
-        curr = (struct winix_dirent*)buf->block;
-        while(curr < end){
-            if(curr->dirent.d_ino == target->i_num && char32_strcmp(curr->dirent.d_name, name) == 0){
-                curr->dirent.d_name[0] = '\0';
-                curr->dirent.d_ino = 0;
-                put_block_buffer_dirt(buf);
-                target->i_nlinks -= 1;
-                return OK;
-            }
-            curr++;
+    iter_dirent_init(&iter, dir, 0, 0);
+    while(iter_dirent_has_next(&iter)){
+        curr = iter_dirent_get_next(&iter);
+        if(curr->dirent.d_ino == target->i_num && char32_strcmp(curr->dirent.d_name, name) == 0){
+            curr->dirent.d_name[0] = '\0';
+            curr->dirent.d_ino = 0;
+            iter.buffer->b_dirt = true;
+            target->i_nlinks -= 1;
+            ret = 0;
+            break;
         }
-        put_block_buffer(buf);
     }
-    return -ENOENT;
+
+    iter_dirent_close(&iter);
+    return ret;
 }
 
 int iter_zone_init(struct zone_iterator* iter, struct inode* inode, int zone_idx){
@@ -465,7 +453,7 @@ int iter_zone_init(struct zone_iterator* iter, struct inode* inode, int zone_idx
     return OK;
 }
 
-zone_t _iter_get_current_zone(struct zone_iterator* iter, zone_t** ptr, bool create_inode){
+zone_t _iter_get_current_zone(struct zone_iterator* iter, bool create_inode, zone_t **ptr, ino_t* inum){
     int ino_iter, ino_rem, indirect_idx;
     zone_t ret = 0;
     zone_t *pos;
@@ -475,6 +463,8 @@ zone_t _iter_get_current_zone(struct zone_iterator* iter, zone_t** ptr, bool cre
         return 0;
     if (iter->i_zone_idx < NR_DIRECT_ZONE){
         pos = &iter->i_inode->i_zone[iter->i_zone_idx];
+        if (inum)
+            *inum = iter->i_inode->i_num;
         goto assign;
     }
     // if we are in indirect zone
@@ -493,14 +483,14 @@ zone_t _iter_get_current_zone(struct zone_iterator* iter, zone_t** ptr, bool cre
             goto final;
         indirect_ino->flags |= INODE_FLAG_ZONE;
         *pos = (zone_t)indirect_ino->i_num;
-        pos = &indirect_ino->i_zone[ino_rem];
     }else{
         indirect_ino = get_inode(*pos, iter->i_inode->i_dev);
         if (!indirect_ino)
             goto final;
-        
-        pos = &indirect_ino->i_zone[ino_rem];
     }
+    if (inum)
+        *inum = indirect_ino->i_num;
+    pos = &indirect_ino->i_zone[ino_rem];
 
 assign:
     ret = *pos;
@@ -513,12 +503,11 @@ final:
 }
 
 bool iter_zone_has_next(struct zone_iterator* iter){
-    return (bool)_iter_get_current_zone(iter, NULL, false);
+    return (bool)_iter_get_current_zone(iter, false, NULL, NULL);
 }
 
 zone_t iter_zone_get_next(struct zone_iterator* iter){
-    zone_t *zonepos;
-    zone_t zone = _iter_get_current_zone(iter, &zonepos, false);
+    zone_t zone = _iter_get_current_zone(iter, false, NULL, NULL);
     if( zone)
         iter->i_zone_idx++;
     
@@ -526,17 +515,23 @@ zone_t iter_zone_get_next(struct zone_iterator* iter){
 }
 
 int iter_zone_alloc(struct zone_iterator* iter){
-    zone_t *pos;
+    zone_t *pos = NULL;
+    ino_t inum = 0;
     zone_t zone;
     int ret;
     if (iter->i_zone_idx >= MAX_ZONES )
         return -EFBIG;
-    if ((zone = _iter_get_current_zone(iter, &pos, true)))
+    if ((zone = _iter_get_current_zone(iter, true, &pos, &inum)))
         return -EINVAL;
     ret = alloc_block(iter->i_inode, iter->i_inode->i_dev);
     if(ret < 0)
         return ret;
-    *pos = (zone_t)ret;
+    if (pos && inum){
+        struct inode* ino = get_inode(inum, iter->i_inode->i_dev);
+        *pos = (zone_t)ret;
+        put_inode(ino, true);
+    }
+    
     return ret;
 }
 
@@ -587,7 +582,10 @@ struct winix_dirent* iter_dirent_get_next(struct dirent_iterator* iter){
 }
 
 int iter_dirent_alloc(struct dirent_iterator* iter){
-    return iter_zone_alloc(&iter->zone_iter);
+    int ret = iter_zone_alloc(&iter->zone_iter);
+    if (ret >= 0)
+        return 0;
+    return ret;
 }
 
 int iter_dirent_close(struct dirent_iterator* iter){

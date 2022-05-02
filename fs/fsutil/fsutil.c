@@ -215,7 +215,7 @@ void write_srec_list(struct list_head* lists){
         ret = sys_lseek(curr_scheduling_proc, fd, elf_size, SEEK_SET);
         assert(ret == elf_size);
 
-        unsigned int *read_buffer = malloc(pos->elf.binary_size * sizeof(unsigned int));
+        unsigned int read_buffer[pos->elf.binary_size];
         ret = sys_read(curr_scheduling_proc, fd, read_buffer, binary_size);
         assert(ret == binary_size);
         assert(memcmp(pos->binary_data, read_buffer, binary_size) == 0);
@@ -223,8 +223,6 @@ void write_srec_list(struct list_head* lists){
         ret = sys_close(curr_scheduling_proc, fd);
         assert(ret == 0);
 
-        // debug_super_block(pos->name);
-        free(read_buffer);
     }
     flush_all_buffer();
     flush_super_block(get_dev(ROOT_DEV));

@@ -233,7 +233,7 @@ void test_given_iter_dirent_has_next_when_dirent_exhausted_should_return_false()
         assert(iter_dirent_has_next(&iter) == false);
         if (i < MAX_ZONES - 1){
             ret = iter_dirent_alloc(&iter);
-            assert(ret > 0);
+            assert(ret >= 0);
             assert(iter_dirent_has_next(&iter) == true);
         }
     }
