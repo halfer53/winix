@@ -198,8 +198,10 @@ void trigger_gpf(struct proc* who){
     // is the current process a valid one?
     ASSERT(IS_PROCN_OK(who->proc_nr));
     
-    if(IS_KERNEL_PROC(curr_scheduling_proc))
-        _panic("kernel crashed",NULL);
+    if(IS_KERNEL_PROC(curr_scheduling_proc)){
+        kreport_proc_sigsegv(curr_scheduling_proc);
+        PANIC("kernel crashed");
+    }
 
     // Kill process and call scheduler.
     send_sig(curr_scheduling_proc, SIGSEGV);
