@@ -7,18 +7,20 @@
 
 #define ROOT_INODE_NUM  1
 
-#define BLOCK_SIZE_WORD  (512)
+
 
 #ifdef __x86_64__
-#define SECTOR_SIZE 512
-#define BLOCK_SIZE  2048
-#define TO_WORD_SIZE(x) (x / 4)
-#define TO_CHAR_SIZE(x) (x * 4)
+#define SECTOR_SIZE         512
+#define BLOCK_SIZE          4096
+#define BLOCK_SIZE_WORD     1024
+#define TO_WORD_SIZE(x)     (x / 4)
+#define TO_CHAR_SIZE(x)     (x * 4)
 #else
-#define SECTOR_SIZE 128
-#define BLOCK_SIZE  512
-#define TO_WORD_SIZE(x) (x)
-#define TO_CHAR_SIZE(x) (x)
+#define SECTOR_SIZE         128
+#define BLOCK_SIZE          1024
+#define BLOCK_SIZE_WORD     1024
+#define TO_WORD_SIZE(x)     (x)
+#define TO_CHAR_SIZE(x)     (x)
 #endif
 
 #define INODE_NUM   496
