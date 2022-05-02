@@ -24,10 +24,4 @@ int rand(void);
 int atoi(char *str);
 unsigned long strtoul(const char * nptr, char ** endptr, int base);
 
-#define __ALIGN1K(x) 	    (((((x))>>10)<<10)+1023)
-#define __get_env_address() (__ALIGN1K((unsigned long)get_sp()))
-#define __get_env_ptr()     (*((const char ***) (unsigned long)__get_env_address()))
-#define __get_env()         (_environ ? _environ : __get_env_ptr()) 
-#define init_environ()      (_environ = __get_env())
-
 #endif

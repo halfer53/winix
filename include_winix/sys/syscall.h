@@ -26,6 +26,11 @@
 #include <stdio.h>
 #include <errno.h>
 
+#define __ALIGN1K(x) 	    (((((x))>>10)<<10)+1023)
+#define __get_env_address() (__ALIGN1K((unsigned long)get_sp()))
+#define __get_env_ptr()     (*((const char ***) (unsigned long)__get_env_address()))
+#define __get_env()         (_environ ? _environ : __get_env_ptr()) 
+#define init_environ()      (_environ = __get_env())
 
 #ifndef NULL
 #define	NULL		((void *)0)
@@ -40,7 +45,7 @@
 #define EXIT            2
 #define FORK            3
 #define VFORK           4
-#define EXECVE          5
+#define EXECVE          (5)
 #define BRK             6
 #define ALARM           7
 #define SIGACTION       8
@@ -169,9 +174,10 @@ clock_t times(struct tms *buf);
 pid_t waitpid(pid_t pid, int *status, int options);
 pid_t tfork();
 int brk(void *addr);
-void init_environ();
 void sched_yield();
 void perror();
+int execve(const char *pathname, char *const argv[],char *const envp[]);
+int execv(const char *path, char *const argv[]);
 
 #ifdef __wramp__
 #ifndef _SYSTEM
@@ -227,6 +233,8 @@ void perror();
 #define getcwd(buf, size)           (ptr_wramp_syscall(GETCWD, size, buf))
 #define tfork()                     (wramp_syscall(TFORK))
 #define sched_yield()               (wramp_syscall(SCHED_YIELD))
+#define execve(path, argv, envp)    (wramp_syscall(EXECVE, path, argv, envp))
+#define execv(path, argv)           execve(path, argv, __get_env()) 
 
 #endif //_SYSTEM
 
