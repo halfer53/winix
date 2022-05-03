@@ -152,7 +152,7 @@ int init_inode_non_disk(struct inode* ino, ino_t num, struct device* dev, struct
 void arch_inode(struct inode* ino){
     
 #ifdef __wramp__
-    ino->i_size /= 4;
+    ARCH_CHAR_SIZE_WRAMP(ino->i_size);
     // KDEBUG(("arch %d \n", ino->i_num));
 #endif
     
@@ -161,7 +161,7 @@ void arch_inode(struct inode* ino){
 void dearch_inode(struct inode* ino){
 
 #ifdef __wramp__
-    ino->i_size *= 4;
+    DEARCH_CHAR_SIZE_WRAMP(ino->i_size);
     // KDEBUG(("dearch %d \n", ino->i_num));
 #endif
 }
