@@ -93,7 +93,7 @@ void system_main() {
     kprintf("BSS Segment:  0x%08lx - 0x%08lx\n", (uintptr_t)&BSS_BEGIN, (uintptr_t)&BSS_END);
     kprintf("Unallocated:  0x%08x - 0x%08x\n", free_mem_begin, mem_end);
     kprintf("Root Disk %d Blocks Used, %d Remaining\n", sb->s_block_inuse, sb->s_free_blocks);
-    kprintf("%d Pages Free\n", 
+    kprintf("%ld Pages Free\n", 
     ((unsigned int)(mem_end - free_mem_begin + PAGE_LEN)) / PAGE_LEN); // inclusive
 }
 

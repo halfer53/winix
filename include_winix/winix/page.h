@@ -14,11 +14,9 @@
 #ifndef _W_PAGE_H_
 #define _W_PAGE_H_ 1
 
-#ifdef __x86_64__
-#define PAGE_LEN    4096
-#else
-#define PAGE_LEN    1024
-#endif
+#include <sys/arch.h>
+
+#define PAGE_LEN    (1024 * WORD_SIZE)
 
 int align_page(int len);
 

@@ -63,7 +63,8 @@
         "srec_import.h": "c",
         "cmath": "c",
         "*.tcc": "c",
-        "bash.h": "c"
+        "bash.h": "c",
+        "macro.h": "c"
     },
     "files.exclude": {
         "**/*.o": true,
