@@ -505,7 +505,7 @@ int alloc_mem_welf(struct proc* who, struct winix_elf* elf, int stack_size, int 
 
 int copy_from_user(struct proc* who, ptr_t *dest, vptr_t *src, size_t len){
     ptr_t* p;
-    if (!is_vaddr_ok(who, src, len))
+    if (!is_vaddr_ok(src, len, who))
         return -EFAULT;
     p = get_physical_addr(src, who);
     memcpy(dest, p, len);

@@ -41,7 +41,7 @@ int sys_getdents(struct proc* who, int fd, struct dirent* dirp_dst, unsigned int
 int do_getdents(struct proc* who, struct message* msg){
     struct dirent* path = (struct dirent *) get_physical_addr(msg->m1_p1, who);
     int count = msg->m1_i2;
-    if(!is_vaddr_ok(who, msg->m1_p1, sizeof(struct dirent) * count))
+    if(!is_vaddr_ok(msg->m1_p1, sizeof(struct dirent) * count, who))
         return -EFAULT;
     return sys_getdents(who, msg->m1_i1, path, count);
 }

@@ -8,8 +8,7 @@ char* sys_getcwd(struct proc* who, char* pathname, int size){
     char string[NAME_MAX];
     char *p;
 
-    if(!is_vaddr_accessible(pathname, who) || !is_vaddr_accessible(pathname + size, who))
-        return ERR_PTR(EFAULT);
+    
     if(size <= 1)
         return ERR_PTR(ERANGE);
 
@@ -44,13 +43,18 @@ char* sys_getcwd(struct proc* who, char* pathname, int size){
     }
     *--p = '/';
 end:
-    put_inode(inode, false);
+    put_inode(inode, false); 
     return p;
 }
 
 
 int do_getcwd(struct proc* who, struct message* m){
-    char *p = sys_getcwd(who, m->m1_p1, m->m1_i1);
+    char *p, *path;
+    int size = m->m1_i1;
+    if(!is_vaddr_ok(m->m1_p1, size, who) )
+        return -EFAULT;
+    path = (char *)get_physical_addr(m->m1_p1, who);
+    p = sys_getcwd(who, path, size);
     if (IS_ERR(p))
         return -(int)PTR_ERR(p);
     return (int)(get_virtual_addr(p, who) - (ptr_t*)0);

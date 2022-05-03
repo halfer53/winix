@@ -35,7 +35,7 @@ PRIVATE int bss_page_end;
  * @param  addr 
  * @return      
  */
-bool is_vaddr_ok(struct proc* who, vptr_t* addr, size_t len){
+bool is_vaddr_ok(vptr_t* addr, size_t len, struct proc* who){
     int start_page, end_page;
     ptr_t* paddr, *paddr_end;
     bool ret = false;
