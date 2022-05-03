@@ -10,7 +10,7 @@ char* sys_getcwd(struct proc* who, char* pathname, int size){
 
     
     if(size <= 1)
-        return ERR_PTR(ERANGE);
+        return ERR_PTR(-ERANGE);
 
     p = (char *)get_physical_addr(pathname+ size, who);
     *p = '\0';
@@ -25,7 +25,7 @@ char* sys_getcwd(struct proc* who, char* pathname, int size){
         // KDEBUG(("cwd: ret %d curr %d (%s), parent %d\n", ret, inode->i_num, string, inum));
         if(ret < 0){
             // KDEBUG(("corruptted fs of %d inode\n", inum));
-            p = ERR_PTR(-ret);
+            p = ERR_PTR(ret);
             goto end;
         }
         put_inode(inode, false);
@@ -33,7 +33,7 @@ char* sys_getcwd(struct proc* who, char* pathname, int size){
 
         len += (ret + 1); // inclusing slash
         if(len >= size){
-            p = ERR_PTR(ERANGE);
+            p = ERR_PTR(-ERANGE);
             goto end;
         }
         *--p = '/';

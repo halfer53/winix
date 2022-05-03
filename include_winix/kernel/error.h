@@ -5,9 +5,10 @@
 
 #define MAX_ERR (PAGE_LEN)
 
-#define IS_ERR(p)   ((unsigned long)(void *)(p) <= (unsigned long)MAX_ERR)
-#define ERR_PTR(p)  ((void *)(unsigned long)p)
-#define PTR_ERR(e)  ((unsigned long)e) 
+#define IS_ERR(p)           ((unsigned long)(void *)(p) >= (unsigned long)-MAX_ERR)
+#define IS_ERR_OR_NULL(p)   ((!p) || IS_ERR(p))
+#define ERR_PTR(p)          ((void *)(unsigned long)p)
+#define PTR_ERR(e)          ((unsigned long)e) 
 
 #endif
 
