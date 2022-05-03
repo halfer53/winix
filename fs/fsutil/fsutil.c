@@ -208,7 +208,7 @@ void write_srec_list(struct list_head* lists){
         ret = sys_write(curr_scheduling_proc, fd, &pos->elf, elf_size);
         assert(ret == elf_size);
 
-        binary_size = TO_CHAR_SIZE(pos->elf.binary_size);
+        binary_size = TO_CHAR_SIZE_FROM_WRAMP(pos->elf.binary_size);
         ret = sys_write(curr_scheduling_proc, fd, pos->binary_data,  binary_size);
         assert(ret == binary_size);
 
@@ -238,7 +238,7 @@ void verify_srec_with_disk(struct list_head* lists){
 
     list_for_each_entry_safe(struct winix_elf_list, pos, tmp, lists, list){
         snprintf(path, PATH_LEN, "%s%s%s", bin_path, "/", pos->name);
-        binary_size = TO_CHAR_SIZE(pos->elf.binary_size);
+        binary_size = TO_CHAR_SIZE_FROM_WRAMP(pos->elf.binary_size);
         struct winix_elf elf;
 
         fd = sys_open(curr_scheduling_proc, path, 0, 0);
