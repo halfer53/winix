@@ -504,7 +504,7 @@ void test_given_getdents_when_successive_call_should_return_files(){
     assert(sys_close(current, fd2) == 0);
 }
 
-void test_given_pwd_when_chdir_should_return_path(){
+void test_given_cwd_when_chdir_should_return_path(){
     int ret;
     ret = sys_mkdir(current, DIR_NAME, 0x755);
     assert(ret == 0);
@@ -516,6 +516,13 @@ void test_given_pwd_when_chdir_should_return_path(){
     assert(!IS_ERR(result));
     assert(strcmp(result, DIR_NAME) == 0);
 }
+
+void test_given_cwd_when_path_is_1_should_return_einvalid(){
+    char *result = sys_getcwd(current, buffer, 1);
+    assert(IS_ERR(result));
+    assert(PTR_ERR(result) == -ERANGE);
+}
+
 
 void test_given_mknod_when_path_valid_should_return_0(){
     int ret = sys_mknod(current, TTY_PATH, O_RDWR, TTY_DEV);
