@@ -143,28 +143,36 @@ char *get_user_name(uid_t uid){
 }
 
 
-void int2str(int value, int i, char* output){
+void int2str(int value, int limit, char* output){
     int j;
-    while(i){
-        j = (value / i) % 10;
+    int place = 1000000000;
+    while(place > value) {
+        place /= 10;
+    }
+    if(place == 0 || place == 1){
+        place = 10;
+    }
+    while(place && limit--){
+        j = (value / place) % 10;
         *output++ = '0' + j;
-        i /= 10;
+        place /= 10;
     }
     *output = '\0';
 }
 
 void set_num_str(int value, char *buf){
     int size, mod;
+    int limit = 2;
     size = value / 1024;
     mod = value % 1024;
-    int2str(size, 10, buf);
+    int2str(size, limit, buf);
     if(*buf == '0'){
         *buf = ' ';
     }
-    buf += 2;
+    buf += limit;
     *buf++ = '.';
-    int2str(mod, 10, buf);
-    buf += 2;
+    int2str(mod, limit, buf);
+    buf += limit;
     *buf = '\0';
 }
 
@@ -207,7 +215,7 @@ void print_long_format(char *pathname, int flag){
         unit_s = "KB";
     }else{
         char *bufptr = size_buf;
-        int2str(statbuf.st_size, 10000, size_buf);
+        int2str(statbuf.st_size, 5, size_buf);
         while(*bufptr){
             if(*bufptr == '0'){
                 *bufptr = ' ';
