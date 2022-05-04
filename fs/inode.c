@@ -123,6 +123,7 @@ blkcnt_t get_inode_blocks(struct inode* ino){
         ret++;
         (void)iter_zone_get_next(&iter);
     }
+    iter_zone_close(&iter);
     return ret;
 }
 
@@ -292,16 +293,14 @@ void init_inode_proc_field(struct inode* ino, struct proc* who, mode_t devtype, 
 
 int truncate_inode(inode_t *inode){
     block_t zone_id;
-    int i = 0;
+    struct zone_iterator iter;
+    iter_zone_init(&iter, inode, 0);
 
-    for(i = 0; i < NR_TZONES; i++){
-        zone_id = inode->i_zone[i];
-        if(zone_id > 0){
-            // KDEBUG(("releasing block %d for %d\n", zone_id, inode->i_num));
-            release_block(zone_id, inode->i_dev);
-            inode->i_zone[i] = 0;
-        }
+    while(iter_zone_has_next(&iter)){
+        zone_t zone = iter_zone_get_next(&iter);
+        release_block((block_t)zone, inode->i_dev);
     }
+    iter_zone_close(&iter);
     return OK;
 }
 
