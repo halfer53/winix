@@ -299,6 +299,7 @@ int kprintf_vm( struct filp* file, const char *orignal_format, void *arg, struct
     int (*filp_write)(struct filp *, char *, size_t, off_t );
     const char* format = (const char*)orignal_format;
     char token;
+    int left_limit;
     vptr_t* vformat_str;
     
     memset(this_buffer, 0, sizeof(struct printf_buffer));
@@ -315,6 +316,7 @@ int kprintf_vm( struct filp* file, const char *orignal_format, void *arg, struct
             format_ptr = format_buffer;
             token = SPACE;
             format_buf_len = 0;
+            left_limit = 0;
 
             // decode padding options
             if(*format == '-'){
@@ -327,6 +329,11 @@ int kprintf_vm( struct filp* file, const char *orignal_format, void *arg, struct
             }
 
             padding_len = pass_number(&format);
+
+            if (*format == '.'){
+                format++;
+                left_limit = pass_number(&format);
+            }
 
             if(*format == 'l' || *format == 'z'){
                 format++;
@@ -376,6 +383,14 @@ int kprintf_vm( struct filp* file, const char *orignal_format, void *arg, struct
             format++;
 
             padding_len -= format_buf_len;
+            if (left_limit > 0){
+                if (left_limit > format_buf_len){
+                    token = ZERO;
+                    padding_len = left_limit - format_buf_len;
+                }else{
+                    format_buf_len = left_limit;
+                }
+            }
             // offset += this_buffer->pos;
 
 
