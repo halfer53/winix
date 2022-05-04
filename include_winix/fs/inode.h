@@ -28,7 +28,7 @@ typedef struct inode {
     block_t i_ndblock;        /* # direct block, where the inode info is stored in the inode table */
     size_t i_total_size;    
     struct superblock *i_sb;    /* pointer to super block for inode's device */
-    unsigned int flags;
+    unsigned int i_flags;
     struct list_head pipe_reading_list;
     struct list_head pipe_writing_list;
 
@@ -79,6 +79,7 @@ extern inode_t inode_table[NR_INODES];
 #define INODE_FLAG_SEEK         0x00000008
 #define INODE_FLAG_MEM_DIR      0x00000010      // temp dir like /dev
 #define INODE_FLAG_ZONE         0x00000020      // inode for indirect zone
+#define INODE_FLAG_DIRTY        0x00000040      
 
 #endif
 

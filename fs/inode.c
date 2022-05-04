@@ -462,42 +462,42 @@ zone_t _iter_get_current_zone(struct zone_iterator* iter, bool create_inode, boo
 
     if (iter->i_zone_idx >= MAX_ZONES )
         return 0;
-    if (iter->i_zone_idx < NR_DIRECT_ZONE){
+    if (iter->i_zone_idx < NR_DIRECT_ZONE)
+    {
         pos = &iter->i_inode->i_zone[iter->i_zone_idx];
-        goto check_alloc;
     }
-    // if we are in indirect zone
-    indirect_idx = iter->i_zone_idx - NR_DIRECT_ZONE;
-    ino_iter = indirect_idx / NR_TZONES;
-    ino_rem = indirect_idx % NR_TZONES;
-    pos = &iter->i_inode->i_zone[NR_DIRECT_ZONE + ino_iter];
-    // if the zone number in indirect zone is 0,
-    // create inode if create_inode is set
-    if (*pos == 0){
-        if(!create_inode)
-            goto final;
-        
-        indirect_ino = alloc_inode(dev, dev);
-        if(!indirect_ino){
-            ret = -ENOSPC;
-            goto final;
-        }
+    else
+    {
+        // if we are in indirect zone
+        indirect_idx = iter->i_zone_idx - NR_DIRECT_ZONE;
+        ino_iter = indirect_idx / NR_TZONES;
+        ino_rem = indirect_idx % NR_TZONES;
+        pos = &iter->i_inode->i_zone[NR_DIRECT_ZONE + ino_iter];
+        // if the zone number in indirect zone is 0,
+        // create inode if create_inode is set
+        if (*pos == 0){
+            if(!create_inode)
+                goto final;
             
-        indirect_ino->flags |= INODE_FLAG_ZONE;
-        *pos = (zone_t)indirect_ino->i_num;
-    }else{
-        indirect_ino = get_inode(*pos, inode->i_dev);
-        if (!indirect_ino){
-            kwarn("ino %d not found\n", *pos);
-            ret = -EINVAL;
-            goto final;
+            indirect_ino = alloc_inode(dev, dev);
+            if(!indirect_ino){
+                ret = -ENOSPC;
+                goto final;
+            }
+            indirect_ino->i_flags |= INODE_FLAG_ZONE | INODE_FLAG_DIRTY;
+            *pos = (zone_t)indirect_ino->i_num;
+        }else{
+            indirect_ino = get_inode(*pos, inode->i_dev);
+            if (!indirect_ino){
+                kwarn("inode %d indirect ino %d not found\n", iter->i_inode->i_num, *pos);
+                ret = -EINVAL;
+                goto final;
+            }
         }
-            
+        pos = &indirect_ino->i_zone[ino_rem];
+        inode = indirect_ino;
     }
-    pos = &indirect_ino->i_zone[ino_rem];
-    inode = indirect_ino;
-
-check_alloc:
+    
     if(create_block){
         if (*pos){ // if creating block but this zone already has block
             ret = -EINVAL;
@@ -512,7 +512,7 @@ check_alloc:
 
 final:
     if (indirect_ino)
-        put_inode(indirect_ino, create_inode);
+        put_inode(indirect_ino, create_inode || create_block);
     return ret;
 }
 

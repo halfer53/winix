@@ -72,7 +72,7 @@ int sys_pipe(struct proc* who, int fd[2]){
         ret = -ENFILE;
         goto failed_filp_slot;
     }
-    inode->flags |= INODE_FLAG_PIPE;
+    inode->i_flags |= INODE_FLAG_PIPE;
     inode->i_count = 2;
     inode->i_nlinks = 1;
     init_inode_non_disk(inode, PIPE_INODE_INUM, &pipe_dev, NULL);

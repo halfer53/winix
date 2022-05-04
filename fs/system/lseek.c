@@ -35,7 +35,7 @@ int sys_lseek(struct proc* who, int fd, off_t offset, int whence){
     if(!is_fd_opened_and_valid(who, fd))
         return -EBADF;
     file = who->fp_filp[fd];
-    if(file->filp_ino->flags & INODE_FLAG_PIPE)
+    if(file->filp_ino->i_flags & INODE_FLAG_PIPE)
         return -ESPIPE;
 
     switch (whence) {

@@ -149,7 +149,7 @@ void test_given_has_next_zone_when_alloc_zone_should_continue(){
     put_inode(i1, false);
     assert(i1);
     assert(is_inode_in_use(i1->i_num, dev));
-    assert(i1->flags & INODE_FLAG_ZONE);
+    assert(i1->i_flags & INODE_FLAG_ZONE);
     for(i = 0; i < NR_TZONES; i++){
         assert(i1->i_zone[i] > 0);
     }
@@ -158,7 +158,7 @@ void test_given_has_next_zone_when_alloc_zone_should_continue(){
     put_inode(i2, false);
     assert(i2);
     assert(is_inode_in_use(i2->i_num, dev));
-    assert(i2->flags & INODE_FLAG_ZONE);
+    assert(i2->i_flags & INODE_FLAG_ZONE);
     for(i = 0; i < NR_TZONES; i++){
         assert(i2->i_zone[i] > 0);
     }
