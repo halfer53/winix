@@ -3,18 +3,22 @@
 //
 #include <fs/fs.h>
 
-int extend_file(struct filp* file, off_t count){
+int extend_file(struct filp* file, off_t count, int whence){
     off_t user_increment, allocated = 0;
     int ret;
     struct zone_iterator iter;
     struct inode* ino = file->filp_ino;
+    int total_size = get_inode_total_size_word(ino);
 
-    if( count < ino->i_total_size){
+    if (whence == SEEK_END)
+        count += total_size;
+
+    if( count < total_size){
         file->filp_pos = count;
         return count;
     }
     iter_zone_init(&iter, ino, 0);
-    user_increment = ALIGN1K( count - ino->i_total_size);
+    user_increment = ALIGN1K( count - total_size);
     while(iter_zone_has_next(&iter));
     while(user_increment > 0){
         ret = iter_zone_alloc(&iter);
@@ -40,15 +44,15 @@ int sys_lseek(struct proc* who, int fd, off_t offset, int whence){
 
     switch (whence) {
         case SEEK_SET:
-            ret = extend_file(file, offset);
+            ret = extend_file(file, offset, whence);
             break;
 
         case SEEK_CUR:
-            ret = extend_file(file, file->filp_pos + offset);
+            ret = extend_file(file, file->filp_pos + offset, whence);
             break;
 
         case SEEK_END:
-            ret = extend_file(file, file->filp_ino->i_total_size + offset);
+            ret = extend_file(file, offset, whence);
             break;
 
         default:

@@ -81,7 +81,6 @@ int alloc_block(inode_t *ino, struct device* id){
             bitmap_set_bit((unsigned int*)bmap->block, BLOCK_SIZE_DWORD, free_bit);
             sb->s_block_inuse += 1;
             sb->s_free_blocks -= 1;
-            ino->i_total_size += BLOCK_SIZE;
             put_block_buffer_dirt(bmap);
             // KDEBUG(("alloc_block %d for inode %d\n", free_bit, ino->i_num));
             return free_bit;
@@ -137,7 +136,6 @@ int init_inode_non_disk(struct inode* ino, ino_t num, struct device* dev, struct
     ino->i_dev = dev;
     ino->i_sb = sb;
     ino->i_num = num;
-    ino->i_total_size = get_inode_total_size_word(ino);
     // klog("init inode %d dev %u\n", num, dev->dev_id);
     if(sb){
         bnr = ((num * sb->s_inode_size) / BLOCK_SIZE) + sb->s_inode_tablenr;

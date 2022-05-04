@@ -28,7 +28,7 @@ int alloc_inode_under_dir(struct proc* who, struct device* dev, inode_t** _inode
     inode = alloc_inode(dev, dev);
     if (!inode)
         return -ENOSPC;
-    kprintf("creating %s with ino %d\n", string, inode->i_num);
+    // kprintf("creating %s with ino %d\n", string, inode->i_num);
     if ((ret = add_inode_to_directory(who, lastdir, inode, string)))
     {
         release_inode(inode);
