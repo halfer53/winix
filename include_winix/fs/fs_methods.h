@@ -76,6 +76,7 @@ void init_inode_proc_field(struct inode* ino, struct proc* who, mode_t devtype, 
 int truncate_inode(inode_t *inode);
 void init_inode();
 bool is_inode_in_use(int num, struct device* id);
+void flush_inodes();
 
 int run_unit_tests();
 

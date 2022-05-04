@@ -225,6 +225,7 @@ void write_srec_list(struct list_head* lists){
 
     }
     flush_all_buffer();
+    flush_inodes();
     flush_super_block(get_dev(ROOT_DEV));
 }
 

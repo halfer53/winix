@@ -595,7 +595,15 @@ int iter_dirent_close(struct dirent_iterator* iter){
     return iter_zone_close(&iter->zone_iter);
 }
 
-
+void flush_inodes(){
+    inode_t* rep;
+    int i;
+    for(i = 0; i < NR_INODES; i++){
+        rep = &inode_table[i];
+        if(rep->i_flags & INODE_FLAG_DIRTY)
+            put_inode(rep, true);
+    }
+}
 
 
 void init_inode(){
