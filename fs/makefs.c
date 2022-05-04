@@ -1,6 +1,7 @@
 #include <fs/fs.h>
 #include <stdio.h>
 #include <string.h>
+#include <assert.h>
 
 int fill_dirent(inode_t* ino, struct winix_dirent* curr, char* string);
 char rootfs_name[] = "WINIX_ROOTFS";
@@ -24,7 +25,7 @@ int makefs( char* disk_raw, size_t disk_size)
     block_t blockmap_block_nr = 1;
     block_t inodemap_block_nr = 2;
     block_t inode_table_block_nr = 3;
-    unsigned int inode_tablesize = (int)(blocks_nr * 0.02) * BLOCK_SIZE;
+    unsigned int inode_tablesize = (int)((blocks_nr * 0.02) * BLOCK_SIZE);
     block_t root_node_block_nr = inode_table_block_nr + (inode_tablesize / BLOCK_SIZE);
     block_t block_in_use = root_node_block_nr + 1;
     block_t remaining_blocks = blocks_nr - block_in_use;
@@ -54,16 +55,10 @@ int makefs( char* disk_raw, size_t disk_size)
         inode_per_block, // inode per block
     };
     char32_strlcpy(superblock.s_name, rootfs_name, SUPERBLOCK_NAME_LEN);
-    // printf("block nr %d %d %d\n", blocks_nr, block_in_use, remaining_blocks);
-    if(blocks_nr < 8){
-        KDEBUG(("block nr %d\n", blocks_nr));
-        return -1;
-    }
-
-    if(block_in_use >= 32){
-        KDEBUG(("block in use %d\n", block_in_use));
-        return -1;
-    }
+    // printf("block nr %d %d %d inode table size %ld\n", blocks_nr, block_in_use, remaining_blocks, inode_tablesize / BLOCK_SIZE);
+    assert(BLOCK_SIZE > sizeof(struct superblock));
+    assert(BLOCK_SIZE_WORD * 32 >= blocks_nr);
+    assert(BLOCK_SIZE_WORD * 32 >= free_inodes);
 
 
     memset(&root_node, 0, sizeof(inode_t));
@@ -82,9 +77,8 @@ int makefs( char* disk_raw, size_t disk_size)
     memcpy(pdisk, &s2, sizeof(superblock));
     pdisk += superblock.s_superblock_size;
 
-    bitval = setBits(block_in_use);
-//    KDEBUG(("block in use %d block map  %08x\n",block_in_use, bitval));
-    memcpy(pdisk, &bitval, sizeof(unsigned int));
+    // KDEBUG(("block in use %d\n", block_in_use));
+    bitmap_set_nbits((unsigned int *)pdisk, BLOCK_SIZE_WORD, 0, block_in_use);
     pdisk += superblock.s_blockmap_size;
 
     //inode map, first bit is set for root inode
