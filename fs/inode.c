@@ -117,11 +117,11 @@ int release_block(block_t bnr, struct device* id){
 
 blkcnt_t get_inode_blocks(struct inode* ino){
     blkcnt_t ret = 0;
-    int i;
-    for(i = 0; i < NR_TZONES; i++){
-        if(ino->i_zone[i] > 0){
-            ret++;
-        }
+    struct zone_iterator iter;
+    iter_zone_init(&iter, ino, 0);
+    while(iter_zone_has_next(&iter)){
+        ret++;
+        (void)iter_zone_get_next(&iter);
     }
     return ret;
 }
