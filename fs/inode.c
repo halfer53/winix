@@ -403,6 +403,7 @@ int add_inode_to_directory(struct proc* who, struct inode* dir, struct inode* in
             ret = iter_dirent_alloc(&iter);
             if(ret < 0)
                 break;
+            dir->i_size += BLOCK_SIZE;
         }
         curr = iter_dirent_get_next(&iter);
         if(curr->dirent.d_name[0] == '\0'){
