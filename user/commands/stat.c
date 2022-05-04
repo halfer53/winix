@@ -1,34 +1,10 @@
 #include <sys/syscall.h>
 
-void int2str(int value, int i, char* output){
-    int j;
-    while(i){
-        j = (value / i) % 10;
-        *output++ = '0' + j;
-        i /= 10;
-    }
-}
-
-void set_num_str(int value, char *buf){
-    int size, mod;
-    size = value / 1024;
-    mod = value % 1024;
-    int2str(size, 10, buf);
-    if(*buf == '0'){
-        *buf = ' ';
-    }
-    buf += 2;
-    *buf++ = '.';
-    int2str(mod, 10, buf);
-    buf += 2;
-    *buf = '\0';
-}
-
 int main(int argc, char* argv[]){
     int ret;
     struct stat statbuf;
-    char buffer[10];
     char* path = argv[1];
+    int div, rem, size;
     if(argc != 2)
         return 1;
     ret = stat(path, &statbuf);
@@ -36,10 +12,12 @@ int main(int argc, char* argv[]){
         perror("stat");
         return 1;
     }
-    set_num_str(statbuf.st_size, buffer);
+    size = statbuf.st_size;
+    div = size / 1024;
+    rem = size % 1024;
 
-    printf("File: %s\nNum: %d\nSize: %sKB\nBlocks: %d\nAccess: 0x%x\n", 
-        path, statbuf.st_ino, buffer, statbuf.st_blocks, statbuf.st_mode & 0x777);
+    printf("File: %s\nNum: %d\nSize: %d.%.2dKB\nBlocks: %d\nAccess: 0x%x\n", 
+        path, statbuf.st_ino, div, rem, statbuf.st_blocks, statbuf.st_mode & 0x777);
     return 0;
 }
 
