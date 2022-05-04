@@ -214,22 +214,13 @@ void print_long_format(char *pathname, int flag){
         set_num_str(statbuf.st_size, size_buf);
         unit_s = "KB";
     }else{
-        char *bufptr = size_buf;
         int2str(statbuf.st_size, 5, size_buf);
-        while(*bufptr){
-            if(*bufptr == '0'){
-                *bufptr = ' ';
-            }else{
-                break;
-            }
-            bufptr++;
-        }
         unit_s = "";
     }
     username = get_user_name(statbuf.st_uid);
     groupname = get_group_name(statbuf.st_gid);
     parse_unix_time(statbuf.st_atime, &time);
-    printf("%s %2d %s %s %s%s %02d/%02d/%04d %02d:%02d:%02d %s\n", buffer, statbuf.st_nlink, username, groupname,
+    printf("%s %2d %s %s %5s%s %02d/%02d/%04d %02d:%02d:%02d %s\n", buffer, statbuf.st_nlink, username, groupname,
      size_buf, unit_s, time.date, time.month, time.currYear, time.hours, time.minutes, time.seconds, pathname);
 }
 
