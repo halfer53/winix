@@ -42,7 +42,7 @@ ifeq ($(KBUILD_VERBOSE),0)
 endif
 #gcc is only used for linting, wcc is the real compiler
 	$(Q)gcc $(CFLAGS) $(GCC_FLAG) -S -N $< -o /tmp/$(notdir $@)
-	$(Q)wcc $(CFLAGS) -S -N -o $@ $<
+	$(Q)wcc $(CFLAGS) -S -N -w -o $@ $<
 
 
 $(objects): %.o: %.s
