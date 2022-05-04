@@ -57,8 +57,8 @@ int makefs( char* disk_raw, size_t disk_size)
     char32_strlcpy(superblock.s_name, rootfs_name, SUPERBLOCK_NAME_LEN);
     // printf("block nr %d %d %d inode table size %ld\n", blocks_nr, block_in_use, remaining_blocks, inode_tablesize / BLOCK_SIZE);
     assert(BLOCK_SIZE > sizeof(struct superblock));
-    assert(BLOCK_SIZE_WORD * 32 >= blocks_nr);
-    assert(BLOCK_SIZE_WORD * 32 >= free_inodes);
+    assert(BLOCK_SIZE_DWORD * 32 >= blocks_nr);
+    assert(BLOCK_SIZE_DWORD * 32 >= free_inodes);
 
 
     memset(&root_node, 0, sizeof(inode_t));
@@ -78,7 +78,7 @@ int makefs( char* disk_raw, size_t disk_size)
     pdisk += superblock.s_superblock_size;
 
     // KDEBUG(("block in use %d\n", block_in_use));
-    bitmap_set_nbits((unsigned int *)pdisk, BLOCK_SIZE_WORD, 0, block_in_use);
+    bitmap_set_nbits((unsigned int *)pdisk, BLOCK_SIZE_DWORD, 0, block_in_use);
     pdisk += superblock.s_blockmap_size;
 
     //inode map, first bit is set for root inode

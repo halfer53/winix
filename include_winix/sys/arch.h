@@ -18,7 +18,7 @@
 #endif
 
 #define DWORD_SIZE                       (sizeof(unsigned int))
-#define TO_WORD_SIZE(x)                 (x / DWORD_SIZE)
+#define TO_DWORD_SIZE(x)                 (x / DWORD_SIZE)
 #define TO_CHAR_SIZE_FROM_WRAMP(x)      (x * DWORD_SIZE)
 #define ARCH_CHAR_SIZE(x)         (x /= CHAR_SIZE)
 #define DEARCH_CHAR_SIZE(x)       (x *= CHAR_SIZE)

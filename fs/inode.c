@@ -60,7 +60,7 @@ bool is_inode_in_use(int num, struct device* id){
     }
     buf = get_block_buffer(sb->s_inodemapnr, id);
     // KDEBUG(("inode map %08x for inode %d\n", *map_ptr, num));
-    ret = is_bit_on((unsigned int*)buf->block, (int)TO_WORD_SIZE(sb->s_inodemap_size), num);
+    ret = is_bit_on((unsigned int*)buf->block, (int)TO_DWORD_SIZE(sb->s_inodemap_size), num);
     put_block_buffer(buf);
     return ret;
 }
@@ -73,12 +73,12 @@ int alloc_block(inode_t *ino, struct device* id){
     int free_bit = -1;
 
     while(bmap->b_blocknr < bmap_end){
-        free_bit = bitmap_search_from((unsigned int*) bmap->block, BLOCK_SIZE_WORD, 0, 1);
+        free_bit = bitmap_search_from((unsigned int*) bmap->block, BLOCK_SIZE_DWORD, 0, 1);
         if(free_bit > 0){
             if (!is_valid_block_num(free_bit, id)){
                 return -ENOSPC;
             }
-            bitmap_set_bit((unsigned int*)bmap->block, BLOCK_SIZE_WORD, free_bit);
+            bitmap_set_bit((unsigned int*)bmap->block, BLOCK_SIZE_DWORD, free_bit);
             sb->s_block_inuse += 1;
             sb->s_free_blocks -= 1;
             ino->i_total_size += BLOCK_SIZE;
@@ -109,7 +109,7 @@ int release_block(block_t bnr, struct device* id){
 
     bmap = get_block_buffer(bmap_nr, id);
 
-    bitmap_clear_bit((unsigned int*)bmap->block, BLOCK_SIZE_WORD, bnr);
+    bitmap_clear_bit((unsigned int*)bmap->block, BLOCK_SIZE_DWORD, bnr);
     sb->s_block_inuse -= 1;
     sb->s_free_blocks += 1;
     return put_block_buffer(bmap);
@@ -252,7 +252,7 @@ inode_t* alloc_inode(struct device* parentdev, struct device* inodev){
     imap = get_imap(parentdev);
     imap_end = imap->b_blocknr + (sb->s_blockmap_size / BLOCK_SIZE);
     while(imap->b_blocknr < imap_end){
-        inum = bitmap_search_from((unsigned int*)imap->block, BLOCK_SIZE_WORD, 0, 1);
+        inum = bitmap_search_from((unsigned int*)imap->block, BLOCK_SIZE_DWORD, 0, 1);
         if(inum > 0){
             found = true;
             break;
@@ -265,7 +265,7 @@ inode_t* alloc_inode(struct device* parentdev, struct device* inodev){
         put_block_buffer(imap);
         return NULL;
     }
-    bitmap_set_bit((unsigned int*)imap->block, BLOCK_SIZE_WORD, inum);
+    bitmap_set_bit((unsigned int*)imap->block, BLOCK_SIZE_DWORD, inum);
     put_block_buffer_dirt(imap);
 
     inode = get_free_inode_slot();
@@ -336,7 +336,7 @@ int _release_inode(inode_t *inode, bool is_indirect_zone){
     
     // assumping inum is smaller than 1024 for simplicity
     imap = get_block_buffer(sb->s_inode_tablenr, id);
-    bitmap_clear_bit((unsigned int*)imap->block, BLOCK_SIZE_WORD, inum);
+    bitmap_clear_bit((unsigned int*)imap->block, BLOCK_SIZE_DWORD, inum);
     sb->s_inode_inuse -= 1;
     sb->s_free_inodes += 1;
     put_block_buffer_dirt(imap);

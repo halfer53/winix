@@ -93,7 +93,7 @@ void write_disk(char* path){
     fp = fopen(path, "w");
     fprintf(fp, "%s", str2);
 
-    for(i = 0; i < DISK_SIZE_WORD; i++){
+    for(i = 0; i < DISK_SIZE_DWORD; i++){
         fprintf(fp, "\t0x%08x,\n", *val++);
     }
     fprintf(fp, "%s\n\n", str3);
