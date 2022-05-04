@@ -221,7 +221,8 @@ int put_inode(inode_t *inode, bool is_dirty){
     struct block_buffer *buffer;
     if(!inode)
         return -EINVAL;
-    inode->i_count -= 1;
+    if (inode->i_count > 0)
+        inode->i_count -= 1;
     if(!is_dirty)
         return OK;
     sb = get_sb(inode->i_dev);
