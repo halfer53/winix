@@ -155,8 +155,8 @@ void int2str(int value, int i, char* output){
 
 void set_num_str(int value, char *buf){
     int size, mod;
-    size = value / 4096;
-    mod = value % 4096;
+    size = value / 1024;
+    mod = value % 1024;
     int2str(size, 10, buf);
     if(*buf == '0'){
         *buf = ' ';
