@@ -292,7 +292,6 @@ void init_inode_proc_field(struct inode* ino, struct proc* who, mode_t devtype, 
 }
 
 int truncate_inode(inode_t *inode){
-    block_t zone_id;
     struct zone_iterator iter;
     iter_zone_init(&iter, inode, 0);
 
