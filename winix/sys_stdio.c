@@ -205,10 +205,6 @@ int tty_non_init_write(struct filp *file, char *data, size_t len, off_t offset){
 
 #define BUFFER_SIZ  (101)   // Column size in WRAMP is 100
 #define FORMAT_BUF_SIZ  (11)
-#define PADDING_BUFFER_SIZ (20)
-#define PADDING_NUM_BUF_SIZ (8)
-// static char buffer[BUFFER_SIZ];
-
 
 struct printf_buffer{
     char buffer[BUFFER_SIZ];
@@ -266,19 +262,20 @@ static void fill_padding(struct printf_buffer* tbuf, char token, int len){
     }
 }
 
+#define PASS_NUMBER_BUF_SIZ (20)
 static int pass_number(const char **s_format){
     const char *format = *s_format;
     int ret = 0;
-    char padding_num_buffer[PADDING_NUM_BUF_SIZ];
-    int padding_num_buffer_count = 0;
+    char _buffer[PASS_NUMBER_BUF_SIZ];
+    int count = 0;
 
-    while(isdigit(*format) && (padding_num_buffer_count < (PADDING_NUM_BUF_SIZ - 1))){
-        padding_num_buffer[padding_num_buffer_count++] = *format++;
+    while(isdigit(*format) && (count < (PASS_NUMBER_BUF_SIZ - 1))){
+        _buffer[count++] = *format++;
     }
 
-    if(padding_num_buffer_count > 0 ){
-        padding_num_buffer[padding_num_buffer_count] = '\0';
-        ret = atoi(padding_num_buffer);
+    if(count > 0 ){
+        _buffer[count] = '\0';
+        ret = atoi(_buffer);
     }
     *s_format = format;
     return ret;
