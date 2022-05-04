@@ -484,7 +484,8 @@ zone_t _iter_get_current_zone(struct zone_iterator* iter, bool create_inode, boo
                 ret = -ENOSPC;
                 goto final;
             }
-            indirect_ino->i_flags |= INODE_FLAG_ZONE | INODE_FLAG_DIRTY;
+            inode->i_flags |= INODE_FLAG_DIRTY;
+            indirect_ino->i_flags |= INODE_FLAG_ZONE;
             *pos = (zone_t)indirect_ino->i_num;
         }else{
             indirect_ino = get_inode(*pos, inode->i_dev);
