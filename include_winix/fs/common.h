@@ -8,7 +8,7 @@
 #include <winix/page.h>
 
 #define ROOT_INODE_NUM      1
-#define BLOCK_SIZE_WORD     512
+#define BLOCK_SIZE_WORD     256
 #define BLOCK_SIZE          (BLOCK_SIZE_WORD * WORD_SIZE)
 
 #define DISK_PAGE_NR        (PAGE_LEN / BLOCK_SIZE * 50)
