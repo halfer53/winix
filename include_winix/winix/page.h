@@ -16,7 +16,7 @@
 
 #include <sys/arch.h>
 
-#define PAGE_LEN    (1024 * WORD_SIZE)
+#define PAGE_LEN    (1024 * DWORD_SIZE)
 
 int align_page(int len);
 

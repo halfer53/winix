@@ -11,10 +11,16 @@
  * 
  */
 
-#define WORD_SIZE                       (sizeof(unsigned int))
-#define TO_WORD_SIZE(x)                 (x / WORD_SIZE)
-#define TO_CHAR_SIZE_FROM_WRAMP(x)      (x * WORD_SIZE)
-#define ARCH_CHAR_SIZE_WRAMP(x)         (x /= 4)
-#define DEARCH_CHAR_SIZE_WRAMP(x)       (x *= 4)
+#ifdef __wramp__
+#define CHAR_SIZE   4
+#else
+#define CHAR_SIZE   1
+#endif
+
+#define DWORD_SIZE                       (sizeof(unsigned int))
+#define TO_WORD_SIZE(x)                 (x / DWORD_SIZE)
+#define TO_CHAR_SIZE_FROM_WRAMP(x)      (x * DWORD_SIZE)
+#define ARCH_CHAR_SIZE(x)         (x /= CHAR_SIZE)
+#define DEARCH_CHAR_SIZE(x)       (x *= CHAR_SIZE)
 
 #endif

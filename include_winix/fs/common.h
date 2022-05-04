@@ -9,7 +9,7 @@
 
 #define ROOT_INODE_NUM      1
 #define BLOCK_SIZE_WORD     256
-#define BLOCK_SIZE          (BLOCK_SIZE_WORD * WORD_SIZE)
+#define BLOCK_SIZE          (BLOCK_SIZE_WORD * DWORD_SIZE)
 
 #define DISK_PAGE_NR        (PAGE_LEN / BLOCK_SIZE * 50)
 #define DISK_SIZE           (DISK_PAGE_NR * BLOCK_SIZE)

@@ -70,23 +70,23 @@ int blk_dev_init(){
 
 void arch_superblock(struct superblock* sb){
 #ifdef __wramp__
-    ARCH_CHAR_SIZE_WRAMP(sb->s_inode_size);
-    ARCH_CHAR_SIZE_WRAMP(sb->s_block_size);
-    ARCH_CHAR_SIZE_WRAMP(sb->s_superblock_size);
-    ARCH_CHAR_SIZE_WRAMP(sb->s_blockmap_size);
-    ARCH_CHAR_SIZE_WRAMP(sb->s_inodemap_size);
-    ARCH_CHAR_SIZE_WRAMP(sb->s_inode_table_size);
+    ARCH_CHAR_SIZE(sb->s_inode_size);
+    ARCH_CHAR_SIZE(sb->s_block_size);
+    ARCH_CHAR_SIZE(sb->s_superblock_size);
+    ARCH_CHAR_SIZE(sb->s_blockmap_size);
+    ARCH_CHAR_SIZE(sb->s_inodemap_size);
+    ARCH_CHAR_SIZE(sb->s_inode_table_size);
 #endif
 }
 
 void dearch_superblock(struct superblock* sb){
 #ifdef __wramp__
-    DEARCH_CHAR_SIZE_WRAMP(sb->s_inode_size);
-    DEARCH_CHAR_SIZE_WRAMP(sb->s_block_size);
-    DEARCH_CHAR_SIZE_WRAMP(sb->s_superblock_size);
-    DEARCH_CHAR_SIZE_WRAMP(sb->s_blockmap_size);
-    DEARCH_CHAR_SIZE_WRAMP(sb->s_inodemap_size);
-    DEARCH_CHAR_SIZE_WRAMP(sb->s_inode_table_size);
+    DEARCH_CHAR_SIZE(sb->s_inode_size);
+    DEARCH_CHAR_SIZE(sb->s_block_size);
+    DEARCH_CHAR_SIZE(sb->s_superblock_size);
+    DEARCH_CHAR_SIZE(sb->s_blockmap_size);
+    DEARCH_CHAR_SIZE(sb->s_inodemap_size);
+    DEARCH_CHAR_SIZE(sb->s_inode_table_size);
 #endif
 }
 
