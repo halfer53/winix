@@ -12,7 +12,7 @@ char* sys_getcwd(struct proc* who, char* pathname, int size){
     if(size <= 1)
         return ERR_PTR(-ERANGE);
 
-    p = (char *)get_physical_addr(pathname+ size, who);
+    p = pathname + size - 1;
     *p = '\0';
     len = 1;
     inode = who->fp_workdir;
@@ -56,6 +56,6 @@ int do_getcwd(struct proc* who, struct message* m){
     path = (char *)get_physical_addr(m->m1_p1, who);
     p = sys_getcwd(who, path, size);
     if (IS_ERR(p))
-        return -(int)PTR_ERR(p);
-    return (int)(get_virtual_addr(p, who) - (ptr_t*)0);
+        return (int)PTR_ERR(p);
+    return (int)(get_virtual_addr(p, who) - (vptr_t*)0);
 }
