@@ -4,10 +4,9 @@
 #include <fs/fs.h>
 
 int do_sync(struct proc* who, struct message* msg){
-
-    KDEBUG(("sync msg %d\n", msg->m1_i1));
-    // flush_all_buffer();
-    // flush_super_block(get_dev(ROOT_DEV));
+    flush_all_buffer();
+    flush_inodes();
+    flush_super_block(get_dev(ROOT_DEV));
     return OK;
 }
 
