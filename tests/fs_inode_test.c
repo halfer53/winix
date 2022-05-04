@@ -41,6 +41,12 @@ void test_given_has_next_zone_when_no_zone_should_return_false(){
     bool result = iter_zone_has_next(&iter);
     assert(result == false);
 
+    ret = iter_zone_get_next(&iter);
+    assert(ret == 0);
+
+    ret = iter_zone_get_next(&iter);
+    assert(ret == 0);
+
     ret = iter_zone_close(&iter);
     assert(ret == 0);
 }
