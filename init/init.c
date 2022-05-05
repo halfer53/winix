@@ -21,7 +21,7 @@ int pgid;
 
 void failed_init(int line)
 {
-  printf("init %d failed at %d, err %s\n", getpid(), line, strerror(line));
+  printf("init %d failed at %d, err %s\n", getpid(), line, strerror(errno));
   exit(1);
 }
 
@@ -125,8 +125,6 @@ int main(int argc, char **argv)
   }
 
   // delete bash after execving it
-  unlink("/bin/init");
-  unlink(shell_path);
   write_dummy_file();
   
   start_init_routine();
