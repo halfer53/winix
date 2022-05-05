@@ -262,8 +262,9 @@ int do_ls(char* pathname, int flag){
    return 0;
 }
 
+#define eprintf(...) fprintf (stderr, __VA_ARGS__)
 void usage(){
-    fprintf(stderr, "ls [-l] [-a] [-h] FOLDER\n");
+    eprintf("ls [-l] [-a] [-h] FOLDER %d\n", 1);
     exit(1);
 }
 

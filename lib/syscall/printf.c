@@ -6,7 +6,6 @@
 FILE _stdin =  {0, 0, _IODEFAULT, 0 , 0, 0};
 FILE _stdout = {0, 1, _IODEFAULT, 0 , 0, 0};
 FILE _stderr = {0, 2, _IODEFAULT, 0 , 0, 0};
-FILE *stdin = &_stdin, *stdout = &_stdout, *stderr = &_stderr;
 
 char estr[ESTR_SIZ];
 

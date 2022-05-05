@@ -53,12 +53,12 @@ typedef struct __iobuf {
 #endif
 
 
-#define	FOPEN_MAX	20
+#define	FOPEN_MAX	8
 
-// C89/C99 requires them to be macros, so satisfy them
-#define	stdin		stdin
-#define	stdout		stdout
-#define	stderr		stderr
+extern FILE	_stdin, _stdout, _stderr;
+#define	stdin		(&_stdin)
+#define	stdout		(&_stdout)
+#define	stderr		(&_stderr)
 
 #define STDIN_FILENO	(0)
 #define STDOUT_FILENO	(1)
@@ -94,7 +94,6 @@ int getc(FILE* stream);
 
 
 extern FILE	*__iotab[FOPEN_MAX];
-extern FILE	*stdin, *stdout, *stderr;
 
 #include <sys/syscall.h>
 
