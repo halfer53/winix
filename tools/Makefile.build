@@ -41,7 +41,7 @@ ifeq ($(KBUILD_VERBOSE),0)
 	@echo "CC \t $<"
 endif
 #gcc is only used for linting, wcc is the real compiler
-	$(Q)gcc $(CFLAGS) $(GCC_FLAG) -S -N $< -o /tmp/$(notdir $@)
+	$(Q)gcc $(CFLAGS) $(GCC_FLAG) -nostdinc -S -N $< -o /tmp/$(notdir $@)
 	$(Q)wcc $(CFLAGS) -S -N -w -o $@ $<
 
 
