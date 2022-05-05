@@ -5,21 +5,20 @@
 *.class
 *.o
 *.s
+*.gcc
 *.srec
 *.sublime-workspace
 *.obj
 *.log
-Makefile.bak
-kdbg.py
 include_winix/srec/*.verbose
 include_winix/srec/*.srec
+include_winix/*.c
 /fsutil
 /unittest
 /wsh
-/tests/utest_runner.c
+
 fs/Debug/
 a.out
-include_winix/*.c
 cmake-build-debug
 
 RexSimulator.dll
@@ -32,7 +31,6 @@ RexSimulatorGui.exe
 !lib/syscall/wramp_syscall.s
 !lib/syscall/debug.s
 !lib/syscall/variadic_syscall.s
-!lib/syscall/__sigreturn.s
 !winix/kwramp.s
 !winix/limits/limits_head.s
 !winix/limits/limits_tail.s
