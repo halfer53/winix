@@ -154,7 +154,6 @@ static char permission_char[] = "-xwr";
 void print_long_format(char *pathname, int flag){
     struct stat statbuf;
     struct time_struct time;
-    char size_buf[10];
     char *unit_s;
     char *p = buffer;
     int i, j, k;
