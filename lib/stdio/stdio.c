@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#define BUFFER_SIZ  (500)
+
 
 int putchar(int c){
     if(printf("%c",c))
@@ -18,10 +18,10 @@ FILE *fopen(const char *pathname, const char *mode){
     f->_fd = open(pathname, O_RDWR | O_CREAT);
     if(f->_fd == -1)
         goto err;
-    f->_buf = malloc(BUFFER_SIZ);
+    f->_buf = malloc(FILE_BUFFER_SIZ);
     if(!f->_buf)
         goto err_buffer;
-    f->_bufsiz = BUFFER_SIZ;
+    f->_bufsiz = FILE_BUFFER_SIZ;
     return f;
     
 err_buffer:
@@ -55,31 +55,6 @@ int fclose(FILE *stream){
 //     printf("FILE fd %d count %d flag %x bufsiz %d\n", stream->_fd, stream->_count, stream->_flags, stream->_bufsiz);
 // }
 
-int getc(FILE* stream){
-    int ret;
-    unsigned char* buf_end;
-    if(stream->_flags & _IOEOF)
-        return EOF;
-
-    if(!stream->_buf){
-        stream->_buf = malloc(BUFFER_SIZ);
-        stream->_bufsiz = BUFFER_SIZ;
-    }
-
-    buf_end = stream->_buf + stream->_count;
-    if(!(stream->_ptr) || stream->_ptr >= buf_end){
-
-        ret = read(stream->_fd, stream->_buf, stream->_bufsiz);
-        if(ret <= 0){
-            stream->_flags |= _IOEOF;
-            return EOF;
-        }
-        stream->_count = ret;
-        stream->_ptr = stream->_buf;
-    }
-
-    return *stream->_ptr++;
-}
 
 
 

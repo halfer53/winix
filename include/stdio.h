@@ -42,6 +42,7 @@ typedef struct __iobuf {
 #define _IOFIFO		0x400   // not used
 #define _IODEFAULT	0x800	// defualt stdin, stdout and stderr
 
+#define FILE_BUFFER_SIZ  (500)
 
 #ifndef SEEK_SET
 #define	SEEK_SET	0
