@@ -14,14 +14,6 @@ int dprintf(int fd, const char *format, ...){
     return __dprintf(fd, format, (int*)&format + 1);
 }
 
-int fprintf(FILE *stream, const char *format, ...){
-    return __dprintf(stream->_fd, format, (int*)&format + 1);
-}
-
-int printf(const char *format, ...) {
-    return __dprintf(1, format, (int*)&format + 1);
-}
-
 char* strerror(int usrerrno){
     __strerror(estr, ESTR_SIZ, usrerrno);
     return estr;

@@ -238,6 +238,8 @@ int execv(const char *path, char *const argv[]);
 #define open(path, flags, ...)              (wramp_syscall(OPEN, flags, path, ##__VA_ARGS__))
 #define ioctl(fd, request, ...)             (wramp_syscall(IOCTL, fd, request, ##__VA_ARGS__))
 #define fcntl(fd, cmd, ...)                 (wramp_syscall(FCNTL, fd, cmd, ##__VA_ARGS__))
+#define fprintf(stream, format, ...)        (dprintf(stream->_fd, format, ##__VA_ARGS__))
+#define printf(format, ...)                 (dprintf(STDOUT_FILENO, format, ##__VA_ARGS__))
 
 #endif //_SYSTEM
 
