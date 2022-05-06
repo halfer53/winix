@@ -40,7 +40,8 @@ $(assembly): %.s: %.c
 ifeq ($(KBUILD_VERBOSE),0)
 	@echo "CC \t $<"
 endif
-	$(Q)gcc $(INCLUDE_PATH) $(CFLAGS) $(WRAMP) -nostdinc -E -N $< -o /dev/stdout | sed -E "s/__attribute__\s*\(.+\)//" | rcc -target=wramp > $@
+	$(Q)gcc $(INCLUDE_PATH) $(CFLAGS) $(WRAMP) -nostdinc -c $< -o /dev/null
+	$(Q)gcc $(INCLUDE_PATH) $(CFLAGS) $(WRAMP) -nostdinc -E $< -o /dev/stdout | sed -E "s/__attribute__\s*\(.+\)//" | rcc -target=wramp > $@
 
 $(objects): %.o: %.s
 ifeq ($(KBUILD_VERBOSE),0)
