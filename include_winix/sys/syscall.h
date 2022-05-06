@@ -25,7 +25,7 @@
 #define EXIT            2
 #define FORK            3
 #define VFORK           4
-#define EXECVE          (5)
+#define EXECVE          5
 #define BRK             6
 #define ALARM           7
 #define SIGACTION       8
