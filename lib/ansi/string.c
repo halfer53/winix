@@ -1,28 +1,7 @@
 #include <lib.h>
 #include <limits.h>
 #include <ctype.h>
-
-
-
-
-
-
-
-/**
- * return the length of substring of the original string, starting at start_index, and has specified length
- **/
-int substring(char* buffer, char* original, int start_index, int length) {
-    int i = 0;
-    int count = 0;
-    for (i = start_index; i < length + start_index; i++)
-    {
-        buffer[count] = original[i];
-        count++;
-    }
-    buffer[count] = '\0';
-    return count;
-}
-
+#include <stdio.h>
 
 char *index(const char *string, int c){
     const char *s = string;
@@ -31,7 +10,7 @@ char *index(const char *string, int c){
     return (char *)(unsigned long)(*s ? s : NULL);
 }
 
-#include <stdio.h>
+
 
 // returns true if X and Y are same
 int compare(const char *X, const char *Y)
