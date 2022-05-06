@@ -7,13 +7,13 @@
 #include <sys/arch.h>
 #include <winix/page.h>
 
-#define ROOT_INODE_NUM      1
-#define BLOCK_SIZE_DWORD     256
-#define BLOCK_SIZE          (BLOCK_SIZE_DWORD * DWORD_SIZE)
+#define ROOT_INODE_NUM          1
+#define BLOCK_SIZE_DWORD        256
+#define BLOCK_SIZE              (BLOCK_SIZE_DWORD * DWORD_SIZE)
 
-#define DISK_PAGE_NR        (PAGE_LEN / BLOCK_SIZE * 50)
-#define DISK_SIZE           (DISK_PAGE_NR * BLOCK_SIZE)
-#define DISK_SIZE_DWORD      (DISK_PAGE_NR * BLOCK_SIZE_DWORD)
+#define DISK_PAGE_NR            (PAGE_LEN / BLOCK_SIZE * 40)
+#define DISK_SIZE               (DISK_PAGE_NR * BLOCK_SIZE)
+#define DISK_SIZE_DWORD         (DISK_PAGE_NR * BLOCK_SIZE_DWORD)
 
 #define INODE_NUM   496
 #define NR_TZONES   8
