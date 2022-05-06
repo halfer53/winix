@@ -57,7 +57,6 @@ FSUTIL = fsutil
 all:
 	$(Q)$(MAKE) buildlib
 	$(Q)$(MAKE) kbuild
-	$(Q)$(MAKE) $(DISK)
 	$(Q)$(MAKE) include_build
 	$(Q)wlink $(LDFLAGS) -Ttext $(TEXT_OFFSET) -v -o winix.srec \
 		$(L_HEAD) $(KERNEL_O) $(KLIB_O) $(L_TAIL) > $(SREC_INCLUDE)/winix.verbose
@@ -89,17 +88,17 @@ endif
 buildlib:
 	$(Q)$(MAKE) $(build)=lib
 
-kbuild: $(ALLDIR) fsutil
+kbuild: $(ALLDIR) $(FSUTIL)
 $(ALLDIR): FORCE
 	$(Q)$(MAKE) $(build)=$@
 
-$(DISK): $(SREC) fsutil
+$(DISK): $(SREC) $(FSUTIL)
 ifeq ($(KBUILD_VERBOSE),0)
-	@echo "LD \t disk.c"
+	@echo "LD \t $(DISK)"
 endif
 	$(Q)./fsutil -t $(TEXT_OFFSET) -o $(DISK) -s $(SREC_INCLUDE) -u $(CURR_UNIX_TIME)
 	
-include_build:
+include_build: $(DISK)
 	$(Q)echo "unsigned int start_unix_time=$(CURR_UNIX_TIME);\n" > $(START_TIME_FILE)
 	$(Q)$(MAKE) $(build)=include_winix
 

@@ -58,16 +58,16 @@ $(srcdepend): $(source) $(includes)
 	$(Q)makedepend -o.s -f- $(INCLUDE_PATH) $(WINIX_INCLUDE_PATH) -I/usr/include/x86_64-linux-gnu $(source) > $(srcdepend)
 endif
 
-$(subdir-y): FORCE
-	$(Q)$(MAKE) $(build)=$@
-
 .SECONDEXPANSION:
 %.srec : $$(%.srec)
 ifeq ($(KBUILD_VERBOSE),0)
 	@echo "LD \t $@"
 endif
-	$(Q)wlink -Ttext $(TEXT_OFFSET) -v -o $(SREC_INCLUDE)/$(notdir $@) $^ `$(get_libs) $^` > $(SREC_INCLUDE)/$(notdir $(@:.srec=)).verbose
+	$(Q)wlink -Ttext $(TEXT_OFFSET) -v -o $@ $^ `$(get_libs) $^` > $(SREC_INCLUDE)/$(notdir $(@:.srec=.verbose))
+	$(Q)cp $@ $(SREC_INCLUDE)/$(notdir $@)
 
+$(subdir-y): FORCE
+	$(Q)$(MAKE) $(build)=$@
 
 FORCE:
 
