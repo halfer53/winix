@@ -142,40 +142,6 @@ char *get_user_name(uid_t uid){
     return NULL;
 }
 
-
-void int2str(int value, int limit, char* output){
-    int j;
-    int place = 1000000000;
-    while(place > value) {
-        place /= 10;
-    }
-    if(place == 0 || place == 1){
-        place = 10;
-    }
-    while(place && limit--){
-        j = (value / place) % 10;
-        *output++ = '0' + j;
-        place /= 10;
-    }
-    *output = '\0';
-}
-
-void set_num_str(int value, char *buf){
-    int size, mod;
-    int limit = 2;
-    size = value / 1024;
-    mod = value % 1024;
-    int2str(size, limit, buf);
-    if(*buf == '0'){
-        *buf = ' ';
-    }
-    buf += limit;
-    *buf++ = '.';
-    int2str(mod, limit, buf);
-    buf += limit;
-    *buf = '\0';
-}
-
 #define get_group_name(id)  (get_user_name(id))
 
 #define SHOW_HIDDEN     1
@@ -193,6 +159,7 @@ void print_long_format(char *pathname, int flag){
     char *p = buffer;
     int i, j, k;
     int ret;
+    off_t size;
     mode_t mode;
     char *username, *groupname;
     ret = stat(pathname, &statbuf);
@@ -210,18 +177,23 @@ void print_long_format(char *pathname, int flag){
         k = k >> 1;
     }
     *p = '\0';
-    if(flag & HUMAN_FORMAT){
-        set_num_str(statbuf.st_size, size_buf);
-        unit_s = "KB";
-    }else{
-        int2str(statbuf.st_size, 5, size_buf);
-        unit_s = "";
-    }
+
     username = get_user_name(statbuf.st_uid);
     groupname = get_group_name(statbuf.st_gid);
+    printf("%s %2d %s %s ", buffer, statbuf.st_nlink, username, groupname);
+
+    size = statbuf.st_size;
+    if(flag & HUMAN_FORMAT){
+        printf("%2d.%.2d ", size / 1024, size % 1024);
+        unit_s = "KB";
+    }else{
+        printf("%5d ", size);
+        unit_s = "";
+    }
+    
     parse_unix_time(statbuf.st_atime, &time);
-    printf("%s %2d %s %s %5s%s %02d/%02d/%04d %02d:%02d:%02d %s\n", buffer, statbuf.st_nlink, username, groupname,
-     size_buf, unit_s, time.date, time.month, time.currYear, time.hours, time.minutes, time.seconds, pathname);
+    printf("%s %02d/%02d/%04d %02d:%02d:%02d %s\n", unit_s, time.date, time.month, time.currYear,
+         time.hours, time.minutes, time.seconds, pathname);
 }
 
 #define PATH_LEN    (50)
