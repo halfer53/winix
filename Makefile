@@ -63,21 +63,6 @@ ifeq ($(KBUILD_VERBOSE),0)
 	@echo "LD \t winix.srec"
 endif
 
-$(UTEST_RUNNER): $(UNIT_TEST_DEPEND) tools/utest_generator.py
-	$(Q)python3 tools/utest_generator.py $(UNIT_TEST_DEPEND) > $(UTEST_RUNNER)
-
-$(UNIT_TEST): $(FS_DEPEND) $(UNIT_TEST_DEPEND) $(UTEST_RUNNER) user/bash/parse.c lib/ansi/strl.c
-ifeq ($(KBUILD_VERBOSE),0)
-	@echo "CC \t $(UNIT_TEST)"
-endif
-	$(Q)gcc -DFSUTIL $(CFLAGS) $^ -o $(UNIT_TEST)
-
-test: $(UNIT_TEST)
-	$(Q)./$(UNIT_TEST)
-
-wsh: user/bash/*.c lib/ansi/strl.c
-	$(Q)gcc -DFSUTIL $(COMMON_CFLAGS) $(GCC_FLAG) $^ -o wsh
-
 $(FSUTIL): $(FS_DEPEND) fs/fsutil/*.c lib/ansi/strl.c
 ifeq ($(KBUILD_VERBOSE),0)
 	@echo "CC \t $(FSUTIL)"
@@ -101,6 +86,22 @@ include_build: $(DISK)
 	$(Q)echo "unsigned int start_unix_time=$(CURR_UNIX_TIME);\n" > $(START_TIME_FILE)
 	$(Q)$(MAKE) $(build)=include_winix
 
+
+$(UTEST_RUNNER): $(UNIT_TEST_DEPEND) tools/utest_generator.py
+	$(Q)python3 tools/utest_generator.py $(UNIT_TEST_DEPEND) > $(UTEST_RUNNER)
+
+$(UNIT_TEST): $(FS_DEPEND) $(UNIT_TEST_DEPEND) $(UTEST_RUNNER) user/bash/parse.c lib/ansi/strl.c
+ifeq ($(KBUILD_VERBOSE),0)
+	@echo "CC \t $(UNIT_TEST)"
+endif
+	$(Q)gcc -DFSUTIL $(CFLAGS) $^ -o $(UNIT_TEST)
+
+test: $(UNIT_TEST)
+	$(Q)./$(UNIT_TEST)
+
+wsh: user/bash/*.c lib/ansi/strl.c
+	$(Q)gcc -DFSUTIL $(COMMON_CFLAGS) $(GCC_FLAG) $^ -o wsh
+	
 clean:
 	$(Q)rm -f $(FSUTIL)
 	$(Q)rm -f $(UNIT_TEST)
