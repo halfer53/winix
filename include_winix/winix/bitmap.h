@@ -39,12 +39,6 @@ int bitmap_set_nbits(unsigned int *map, int map_len,int start, int len);
 int bitmap_clear_bit(unsigned int *map, int map_len,int start);
 int bitmap_clear_nbits(unsigned int *map, int map_len,int start, int len);
 int bitmap_xor(unsigned int *map1, unsigned int *map2, int size_len);
-
-
-int bitmap_search_pattern(unsigned int *map, int map_len, unsigned int pattern, int pattern_len);
-int bitmap_set_pattern(unsigned int *map, int map_len, int index, unsigned int pattern, int pattern_len);
-int bitmap_extract_pattern(unsigned int *map, int map_len, int heap_break, struct bit_pattern* ptn);
-
 int count_bits(unsigned int *map, int map_len, int flags);
 void _kreport_bitmap(unsigned int *p, int len, int (*func) (const char *, ...));
 #define kreport_bitmap(p, len) _kreport_bitmap(p, len, kprintf)
