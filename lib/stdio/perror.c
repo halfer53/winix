@@ -1,7 +1,5 @@
-#include <sys/syscall.h>
-#include <errno.h>
-#include <stddef.h>
 #include <stdio.h>
+#include <errno.h>
 #include <string.h>
 
 void perror(const char *s){
