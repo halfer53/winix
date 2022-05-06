@@ -1,4 +1,5 @@
-#include <sys/syscall.h>
+#include <stdio.h>
+#include <sys/statfs.h>
 
 int main(int argc, char **argv){
     struct statfs buf;

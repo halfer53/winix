@@ -1,5 +1,5 @@
-#include <sys/syscall.h>
-#include <sys/fcntl.h>
+#include <stdio.h>
+#include <fcntl.h>
 
 static char buffer[128];
 
