@@ -20,9 +20,13 @@
 int isatty(int fd);
 void sync();
 int getdents( int fd, struct dirent *dirp, unsigned int count);
+size_t read(int fd, void *buf, size_t count);
+size_t write(int fd, const void *buf, size_t count);
 
 #if defined(__wramp__) & !defined(_SYSTEM)
 #define sync()                              wramp_syscall(SYNC)
+#define read(fd, buf, count)                wramp_syscall(READ,fd, buf, count)
+#define write(fd, buf, count)               wramp_syscall(WRITE,fd, buf, count)
 #endif
 
 #endif

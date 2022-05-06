@@ -1,6 +1,7 @@
-#include <sys/syscall.h>
 #include <fcntl.h>
 #include <sys/stat.h>
+#include <unistd.h>
+#include <stdio.h>
 
 int main(int argc, char *argv[]){
     int fd, ret;

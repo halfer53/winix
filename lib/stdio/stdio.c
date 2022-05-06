@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <fcntl.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #define BUFFER_SIZ  (500)
 

@@ -1,6 +1,6 @@
-#include <sys/syscall.h>
-#include <sys/fcntl.h>
-#include <sys/unistd.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <stdio.h>
 
 #define BUFFER_SIZ  256
 
