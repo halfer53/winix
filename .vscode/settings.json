@@ -71,6 +71,7 @@
         "**/*.wo": true,
         "**/*.s": true,
         "**/*.srec": true,
-        "**/*.c~": true
+        "**/*.c~": true,
+        "**/.depend": true
     }
 }
