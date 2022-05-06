@@ -452,9 +452,9 @@ int iter_zone_init(struct zone_iterator* iter, struct inode* inode, int zone_idx
     return OK;
 }
 
-zone_t _iter_get_current_zone(struct zone_iterator* iter, bool create_inode, bool create_block){
+int _iter_get_current_zone(struct zone_iterator* iter, bool create_inode, bool create_block){
     int ino_iter, ino_rem, indirect_idx;
-    zone_t ret = 0;
+    int ret = 0;
     zone_t *pos;
     struct inode* indirect_ino = NULL, *inode;
     struct device* dev = iter->i_inode->i_dev;
@@ -522,10 +522,10 @@ bool iter_zone_has_next(struct zone_iterator* iter){
 }
 
 zone_t iter_zone_get_next(struct zone_iterator* iter){
-    zone_t zone = _iter_get_current_zone(iter, false, false);
+    int zone = _iter_get_current_zone(iter, false, false);
     if( zone)
         iter->i_zone_idx++;
-    return zone;
+    return (zone_t)zone;
 }
 
 int iter_zone_alloc(struct zone_iterator* iter){
