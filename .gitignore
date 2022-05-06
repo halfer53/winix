@@ -13,6 +13,7 @@
 include_winix/srec/*.verbose
 include_winix/srec/*.srec
 include_winix/*.c
+tests/utest_runner.c
 /fsutil
 /unittest
 /wsh
