@@ -337,7 +337,7 @@ int do_stest(int argc, char** argv){
     return 0;
 }
 
-// byte stream for \e[1;1H\e[2J
+// byte stream for \e[0;0H\e[2J
 char cls[] = {0x1b, 0x5b, 0x30, 0x3b, 0x30, 0x48, 0x1b, 0x5b, 0x32, 0x4a, 0};
 
 int do_cls(int argc, char** argv){
