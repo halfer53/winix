@@ -5,11 +5,7 @@
 
 
 
-int putchar(int c){
-    if(printf("%c",c))
-        return c;
-    return EOF;
-}
+
 
 FILE *fopen(const char *pathname, const char *mode){
     FILE* f = (FILE*)malloc(sizeof(FILE));
