@@ -132,7 +132,6 @@ pid_t getpgid(pid_t pid);
 // int open(const char *pathname,int flags, mode_t mode);
 
 
-int pipe(int pipefd[2]);
 int access(const char *pathname, int mode);
 int chdir(const char *path);
 int mkdir(const char *pathname, mode_t mode);
@@ -173,7 +172,7 @@ int execv(const char *path, char *const argv[]);
 
 #if defined(__wramp__) & !defined(_SYSTEM)
 
-#define pipe(pipefd)                        wramp_syscall(PIPE, pipefd)
+
 #define mknod(pathname, mode, dev)          wramp_syscall(MKNOD, mode, pathname, dev)
 #define chdir(path)                         wramp_syscall(CHDIR, path)
 #define chown(pathname, owner, group)       wramp_syscall(CHOWN, owner, pathname, group)
