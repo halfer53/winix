@@ -77,12 +77,12 @@
 #define SCHED_YIELD     54
 
 
-#define WINFO_PS            1
-#define WINFO_MEM           2
-#define WINFO_SLAB          3
-#define WINFO_TRACE_SYSCALL (4)
-#define WINFO_DISABLE_TRACE (5)
-#define WINFO_DEBUG_IPC     6
+#define WINFO_PS                1
+#define WINFO_MEM               2
+#define WINFO_SLAB              3
+#define WINFO_TRACE_SYSCALL     4
+#define WINFO_DISABLE_TRACE     5
+#define WINFO_DEBUG_IPC         6
 #define WINFO_DEBUG_SCHEDULING  7
 
 #define CHECK_PRINTF    __attribute__ ((format (printf, 1, 2)))
