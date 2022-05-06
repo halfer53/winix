@@ -102,6 +102,7 @@ int sigpending(sigset_t *set);
 #define sigsuspend(mask)                    wramp_syscall(SIGSUSPEND, *mask)
 #define sigpending(set)                     wramp_syscall(SIGPENDING, set)
 #define signal(signum, handler)             wramp_syscall(SIGNAL, signum, handler)
+#define sigprocmask(how, set, oldset)       wramp_syscall(SIGPROCMASK,how, oldset, *set)
 
 #endif
 

@@ -152,7 +152,7 @@ int execv(const char *path, char *const argv[]);
 
 
 #define sysconf(name)                       wramp_syscall(SYSCONF, name)
-#define sigprocmask(how, set, oldset)       wramp_syscall(SIGPROCMASK,how, oldset, *set)
+
 
 #define times(buf)                          wramp_syscall(TIMES, buf)
 #define waitpid(pid, wstatus, option)       wramp_syscall(WAITPID, pid, wstatus, option)
