@@ -27,12 +27,14 @@ export SREC_INCLUDE := include_winix/srec
 export includes := $(shell find include -name "*.h")
 export SREC = $(shell find $(SREC_INCLUDE) -name "*.srec")
 export TEXT_OFFSET := 1024
-export INCLUDE_PATH := -I./include -I./include_winix
 export CURR_UNIX_TIME := $(shell date +%s)
-export WINIX_CFLAGS := -D__wramp__
+
+export WINIX_INCLUDE_PATH := -Iinclude_winix
+export INCLUDE_PATH := -Iinclude
+export WRAMP := -D__wramp__
 export COMMON_CFLAGS := -DTEXT_OFFSET=$(TEXT_OFFSET) -D_DEBUG 
-export CFLAGS := $(WINIX_CFLAGS) $(COMMON_CFLAGS) $(INCLUDE_PATH)
 export GCC_FLAG := -g -Wall -Werror -pedantic -Wno-discarded-qualifiers -Wno-comment 
+export CFLAGS := $(COMMON_CFLAGS) $(WINIX_INCLUDE_PATH) $(GCC_FLAG)
 
 # List of user libraries used by the kernel
 KLIB_O = lib/syscall/wramp_syscall.o lib/ipc/ipc.o lib/posix/libgen.o\
@@ -70,19 +72,19 @@ $(UNIT_TEST): $(FS_DEPEND) $(UNIT_TEST_DEPEND) $(UTEST_RUNNER) user/bash/parse.c
 ifeq ($(KBUILD_VERBOSE),0)
 	@echo "CC \t $(UNIT_TEST)"
 endif
-	$(Q)gcc -DFSUTIL $(GCC_FLAG) $(COMMON_CFLAGS) -I./include_winix $^ -o $(UNIT_TEST)
+	$(Q)gcc -DFSUTIL $(CFLAGS) $^ -o $(UNIT_TEST)
 
 test: $(UNIT_TEST)
 	$(Q)./$(UNIT_TEST)
 
 wsh: user/bash/*.c lib/ansi/strl.c
-	$(Q)gcc -DFSUTIL $(GCC_FLAG) $(COMMON_CFLAGS) $^ -o wsh
+	$(Q)gcc -DFSUTIL $(COMMON_CFLAGS) $(GCC_FLAG) $^ -o wsh
 
 $(FSUTIL): $(FS_DEPEND) fs/fsutil/*.c lib/ansi/strl.c
 ifeq ($(KBUILD_VERBOSE),0)
 	@echo "CC \t $(FSUTIL)"
 endif
-	$(Q)gcc -DFSUTIL $(GCC_FLAG) $(COMMON_CFLAGS) -I./include_winix $^ -o $(FSUTIL)
+	$(Q)gcc -DFSUTIL $(CFLAGS)  $^ -o $(FSUTIL)
 
 buildlib:
 	$(Q)$(MAKE) $(build)=lib

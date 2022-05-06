@@ -42,7 +42,7 @@ $(tmpsource): %.c~: %.c
 ifeq ($(KBUILD_VERBOSE),0)
 	@echo "CC \t $<"
 endif
-	$(Q)gcc $(CFLAGS) $(GCC_FLAG) -nostdinc -E -N $< -o $@
+	$(Q)gcc $(INCLUDE_PATH) $(CFLAGS) $(WRAMP) -nostdinc -E -N $< -o $@
 
 $(assembly): %.s: %.c~
 	$(Q)cat $< | sed -E "s/__attribute__\s*\(.+\)//" | rcc -target=wramp > $@
@@ -55,7 +55,7 @@ endif
 
 ifneq ($(NO_MAKE_DEPEND),1)
 $(srcdepend): $(source) $(includes)
-	$(Q)makedepend -o.s -f- $(INCLUDE_PATH) -I/usr/include/x86_64-linux-gnu $(source) > $(srcdepend)
+	$(Q)makedepend -o.s -f- $(INCLUDE_PATH) $(WINIX_INCLUDE_PATH) -I/usr/include/x86_64-linux-gnu $(source) > $(srcdepend)
 endif
 
 $(subdir-y): FORCE
@@ -66,8 +66,7 @@ $(subdir-y): FORCE
 ifeq ($(KBUILD_VERBOSE),0)
 	@echo "LD \t $@"
 endif
-	$(Q)wlink -Ttext $(TEXT_OFFSET) -v -o $@ $^ `$(get_libs) $^` > $(SREC_INCLUDE)/$(notdir $(@:.srec=)).verbose
-	$(Q)cp $@ $(SREC_INCLUDE)/$(notdir $@)
+	$(Q)wlink -Ttext $(TEXT_OFFSET) -v -o $(SREC_INCLUDE)/$(notdir $@) $^ `$(get_libs) $^` > $(SREC_INCLUDE)/$(notdir $(@:.srec=)).verbose
 
 
 FORCE:
