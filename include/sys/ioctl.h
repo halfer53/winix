@@ -28,4 +28,11 @@
 #define TIOCDISABLEECHO 20
 #define TIOCENABLEECHO  21
 
+int ioctl(int fd, unsigned long request, ...);
+
+#if defined(__wramp__) & !defined(_SYSTEM)
+
+#define ioctl(fd, request, ...)             wramp_syscall(IOCTL, fd, request, ##__VA_ARGS__)
+#endif
+
 #endif
