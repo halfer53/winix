@@ -29,7 +29,6 @@
 #include <curses.h>
 #include <string.h>
 
-#include <kernel/error.h>
 #include <kernel/proc.h>
 #include <kernel/system.h>
 #include <kernel/exception.h>
