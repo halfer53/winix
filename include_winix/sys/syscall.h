@@ -26,16 +26,6 @@
 #include <stdio.h>
 #include <errno.h>
 
-#define __ALIGN1K(x) 	    (((((x))>>10)<<10)+1023)
-#define __get_env_address() (__ALIGN1K((unsigned long)get_sp()))
-#define __get_env_ptr()     (*((const char ***) (unsigned long)__get_env_address()))
-#define __get_env()         (_environ ? _environ : __get_env_ptr()) 
-#define init_environ()      (_environ = __get_env())
-
-#ifndef NULL
-#define	NULL		((void *)0)
-#endif
-
 #define _NSYSCALL               55
 /**
  * System Call Numbers
@@ -105,7 +95,7 @@
 #define WINFO_DEBUG_IPC     6
 #define WINFO_DEBUG_SCHEDULING  7
 
-extern const char **_environ;
+
 
 int wramp_syscall(int num, ...);
 void *ptr_wramp_syscall(int num, ...);
