@@ -146,7 +146,6 @@ int mkdir(const char *pathname, mode_t mode);
 int getdents( int fd, struct dirent *dirp, unsigned int count);
 off_t lseek(int fd, off_t offset, int whence);
 mode_t umask(mode_t mask);
-int sync();
 int unlink(const char *pathname);
 int link(const char *oldpath, const char *newpath);
 int dup2(int oldfd, int newfd);
@@ -182,7 +181,7 @@ int execv(const char *path, char *const argv[]);
 #ifdef __wramp__
 #ifndef _SYSTEM
 
-#define sync()                              (wramp_syscall(SYNC))
+
 #define getdents(fd, dirp, count)           (wramp_syscall(GETDENT, fd, dirp, count))
 #define creat(pathname, mode)               (wramp_syscall(CREAT, mode, pathname))
 #define close(fd)                           (wramp_syscall(CLOSE, fd))

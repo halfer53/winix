@@ -18,5 +18,10 @@
 #include <signal.h>
 
 int isatty(int fd);
+void sync();
+
+#if defined(__wramp__) & !defined(_SYSTEM)
+#define sync()                              (wramp_syscall(SYNC))
+#endif
 
 #endif
