@@ -121,12 +121,6 @@ void exit(int status);
 pid_t getppid();
 
 long sysconf(int name);
-int sigaction(int signum, const struct sigaction *act,
-                         struct sigaction *oldact);
-int sigprocmask(int how, const sigset_t *set, sigset_t *oldset);
-int sigsuspend(const sigset_t *mask);
-int sigpending(sigset_t *set);
-
 
 
 int fcntl(int fd, int cmd, ... /* arg */ );
@@ -156,11 +150,10 @@ int execv(const char *path, char *const argv[]);
 #define __dprintf(fd, format, arg)          wramp_syscall(DPRINTF, fd, format, arg)
 #define __strerror(buffer, len,usrerr)      wramp_syscall(STRERROR, len, buffer, usrerr)
 
-#define sigaction(signum, act, oact)        wramp_syscall(SIGACTION, signum, act, oact)
-#define sigsuspend(mask)                    wramp_syscall(SIGSUSPEND, *mask)
+
 #define sysconf(name)                       wramp_syscall(SYSCONF, name)
 #define sigprocmask(how, set, oldset)       wramp_syscall(SIGPROCMASK,how, oldset, *set)
-#define sigpending(set)                     wramp_syscall(SIGPENDING, set)
+
 #define times(buf)                          wramp_syscall(TIMES, buf)
 #define waitpid(pid, wstatus, option)       wramp_syscall(WAITPID, pid, wstatus, option)
 #define wait(wstatus)                       waitpid(-1, wstatus, 0)
@@ -169,7 +162,7 @@ int execv(const char *path, char *const argv[]);
 
 #define exit(status)                        wramp_syscall(EXIT, status, 0)
 #define getppid()                           wramp_syscall(GETPPID)
-#define signal(signum, handler)             wramp_syscall(SIGNAL, signum, handler)
+
 #define sbrk(increment)                     ptr_wramp_syscall(SBRK, increment)
 #define brk(ptr)                            wramp_syscall(BRK, ptr)
 #define statfs(path, buf)                   wramp_syscall(STATFS, path, buf)

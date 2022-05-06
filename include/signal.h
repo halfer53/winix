@@ -89,10 +89,19 @@ int sigfillset(sigset_t *);
 int sigismember(sigset_t *, int);
 int raise(int signum);
 int kill (pid_t pid, int sig);
+int sigaction(int signum, const struct sigaction *act,
+                         struct sigaction *oldact);
+int sigprocmask(int how, const sigset_t *set, sigset_t *oldset);
+int sigsuspend(const sigset_t *mask);
+int sigpending(sigset_t *set);
 
 #if defined(__wramp__) & !defined(_SYSTEM)
 
 #define kill(pid, sig)                      wramp_syscall(KILL, pid, sig)
+#define sigaction(signum, act, oact)        wramp_syscall(SIGACTION, signum, act, oact)
+#define sigsuspend(mask)                    wramp_syscall(SIGSUSPEND, *mask)
+#define sigpending(set)                     wramp_syscall(SIGPENDING, set)
+#define signal(signum, handler)             wramp_syscall(SIGNAL, signum, handler)
 
 #endif
 
