@@ -1,98 +1,68 @@
 import sys
-from os import path, listdir
+from pathlib import Path
+from typing import Dict
+import re
 
-ENVIRON = "lib/ansi/env.o"
-ANSI = "lib/ansi/"
-STDLIB = "lib/stdlib/"
-GEN = "lib/gen/"
-POSIX = "lib/posix/"
-SIGNAL = "lib/posix/_sigset.o"
-STDIO ="lib/stdio/"
-SYSCALL = "lib/syscall/"
-STRING = "lib/ansi/string.o"
-STRL = "lib/ansi/strl.o"
-REGEX = "lib/regex/"
-IPC = "lib/ipc/"
+def get_all_assemblies(path) -> list[Path]:
+	result = list(Path(path).rglob("*.s"))
+	return result
 
-built_in = {
-	"stdlib.h": set([STDLIB, ANSI]),
-	"string.h": set([STRING, STRL]),
-	"signal.h": set([SIGNAL]),
-	"ucontext.h": set([GEN]),
-	"unistd.h": set([POSIX, ANSI, STDLIB]),
-	"stdio.h":	set([STDIO, STDLIB]),
-	"dirent.h":	set([POSIX, ANSI, STDLIB]),
-	"regexp.h": set([REGEX]),
-	"sys/ipc.h": set([IPC])
-}
-
-def get_all_files(libs):
-	ret = set()
-	for lib in libs:
-		if lib.endswith("/"):
-			for file in listdir(lib):
-				if file.endswith(".o"):
-					ret.add(lib + file)
-		else:
-			ret.add(lib)
-	return ' '.join(ret)
-
-def include_iterate(start, end,line):
-	i = 0
-	j = 0
-	# get header name
-	while(line[i] != start):
-		i += 1
-	i += 1
-	j = i
-	while(line[j] != end):
-		j += 1
-	# print(line, i, j, line[i:j])
-	return i,j
-
-def get_sys_include(line):
-	i,j = include_iterate('<', '>',line)
-	if(j > i + 1):
-		filename = line[i:j]
-		if(filename in built_in):
-			# print(built_in[filename])
-			return built_in[filename]
-	return set()
-
-def get_local_include(line, dir_path):
-	i,j = include_iterate('"', '"',line)
-	if(j > i + 1):
-		filename = line[i:j]
-		return do_include_search(dir_path + filename)
-	return set()
-
-def do_include_search(filename : str):
-	libs = set()
-	dir_path = path.dirname(path.realpath(filename)) + '/'
-	# print(dir_path)
-	if filename.endswith('.o'):
-		filename = filename.replace('.o', '.c')
-	with open(filename) as f:
+def get_assembly_dependencies(filepath):
+	export = set()
+	required = set()
+	with open(filepath) as f:
+		PREFIX = '.global'
+		JAL = 'jal'
 		for line in f:
-			if "#include" in line:
-				tlib = set()
-				if "<" in line:
-					tlib = get_sys_include(line)
-				else:
-					tlib = get_local_include(line, dir_path)
-				if(len(tlib) > 0):
-					libs.update(tlib)
-	return libs	
+			if PREFIX in line:
+				label = line[:-1].replace(PREFIX, '').strip()
+				export.add(label)
+		f.seek(0)
+		for line in f:
+			if JAL in line:
+				label = line[:-1].replace(JAL, '').strip()
+				if label not in export:
+					required.add(label)
+			match = re.match(r"\s+lw\s+\$\d+,\s+([^\d]+)\(\$\d+\)", line)
+			if match:
+				label = match.group(1)
+				if label not in export:
+					required.add(label)
+	return export, required
+		
+def get_dependencies(files: list[str]) -> str:
+	assemblies = get_all_assemblies('./lib')
+	export_dict : Dict[str, str] = dict()
+	dependency_dict : Dict[str, set] = dict()
+	reuqired_files = set()
+	for posixpath in assemblies:
+		filepath = str(posixpath)
+		export, required = get_assembly_dependencies(posixpath.resolve())
+		for exp in export:
+			export_dict[exp] = filepath
+		dependency_dict[filepath] = required
+		# print(filepath, export, required, file=sys.stderr)
+	for file in files:
+		export, required = get_assembly_dependencies(file.replace('.o', '.s'))
+		# print(str(file), export, required)
+		while required:
+			filelist = []
+			tmp = set()
+			for req in required:
+				if req in export_dict:
+					dependent_file = export_dict[req]
+					reuqired_files.add(dependent_file)
+					filelist.append(dependent_file)
+			for nextfile in filelist:
+				if nextfile in dependency_dict:
+					tmp.update(dependency_dict[nextfile])
+			required = tmp
+	return ' '.join(map(lambda x: x.replace('.s', '.o'), reuqired_files))
 
 def main():
 	if(len(sys.argv) < 2):
-		return -1
-	libs = {ENVIRON, SYSCALL}
-	for i in range(1,len(sys.argv)):
-		tlib = do_include_search(sys.argv[i])
-		libs.update(tlib)
-		
-	print(get_all_files(libs), end='')
+		return 1
+	print(get_dependencies(sys.argv[1:]), end='')
 
 if __name__ == '__main__':
 	main()
