@@ -132,21 +132,11 @@ pid_t getpgid(pid_t pid);
 // int open(const char *pathname,int flags, mode_t mode);
 
 
-int access(const char *pathname, int mode);
-int chdir(const char *path);
-int mkdir(const char *pathname, mode_t mode);
 
-off_t lseek(int fd, off_t offset, int whence);
-mode_t umask(mode_t mask);
 int unlink(const char *pathname);
 int link(const char *oldpath, const char *newpath);
 int dup2(int oldfd, int newfd);
 int dup(int oldfd);
-int fstat(int fd, struct stat *statbuf);
-int stat(const char *pathname, struct stat *statbuf);
-int chmod(const char *pathname, mode_t mode);
-int chown(const char *pathname, uid_t owner, gid_t group);
-int mknod(const char *pathname, mode_t mode, dev_t dev);
 int fcntl(int fd, int cmd, ... /* arg */ );
 pid_t setsid(void);
 int ioctl(int fd, unsigned long request, ...);
@@ -173,20 +163,10 @@ int execv(const char *path, char *const argv[]);
 #if defined(__wramp__) & !defined(_SYSTEM)
 
 
-#define mknod(pathname, mode, dev)          wramp_syscall(MKNOD, mode, pathname, dev)
-#define chdir(path)                         wramp_syscall(CHDIR, path)
-#define chown(pathname, owner, group)       wramp_syscall(CHOWN, owner, pathname, group)
-#define chmod(pathname, mode)               wramp_syscall(CHMOD, mode, pathname)
-#define stat(pathname, statbuf)             wramp_syscall(STAT, pathname, statbuf)
-#define fstat(fd, statbuf)                  wramp_syscall(FSTAT, fd, statbuf)
 #define dup(oldfd)                          wramp_syscall(DUP, oldfd)
 #define dup2(oldfd, newfd)                  wramp_syscall(DUP2, oldfd, newfd)
 #define link(oldpath, newpath)              wramp_syscall(LINK, oldpath, newpath)
 #define unlink(pathname)                    wramp_syscall(UNLINK, pathname)
-#define access(pathname, mode)              wramp_syscall(ACCESS, mode, pathname)
-#define mkdir(pathname, mode)               wramp_syscall(MKDIR, mode, pathname)
-#define lseek(fd, offset, whence)           wramp_syscall(LSEEK, fd, offset, whence)
-#define umask(mask)                         wramp_syscall(UMASK, mask)
 #define alarm(seconds)                      wramp_syscall(ALARM, seconds)
 #define csleep(ticks)                       wramp_syscall(CSLEEP, ticks)
 #define fork()                              wramp_syscall(FORK)

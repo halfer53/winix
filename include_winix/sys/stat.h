@@ -76,15 +76,33 @@ struct stat {
 #define	S_ISLNK(m)	(((m) & S_IFMT) == S_IFLNK)	/* symbolic link */
 #define	S_ISSOCK(m)	(((m) & S_IFMT) == S_IFSOCK)	/* socket */
 
-// int	chmod(const char *, mode_t);
-// int	mkdir(const char *, mode_t);
-// int	mkfifo(const char *, mode_t);
-// int	stat(const char *, struct stat *);
-// int	fstat(int, struct stat *);
-// mode_t	umask(mode_t);
-// int	fchmod(int, mode_t);
+int	chmod(const char *, mode_t);
+int	mkdir(const char *, mode_t);
+int	mkfifo(const char *, mode_t);
+int	stat(const char *, struct stat *);
+int	fstat(int, struct stat *);
+mode_t	umask(mode_t);
+int	fchmod(int, mode_t);
+int chdir(const char *path);
+int	lstat(const char *, struct stat *);
+int	mknod(const char *, mode_t, dev_t);
+int chown(const char *pathname, uid_t owner, gid_t group);
+int access(const char *pathname, int mode);
 
-// int	lstat(const char *, struct stat *);
-// int	mknod(const char *, mode_t, dev_t);
+
+#if defined(__wramp__) & !defined(_SYSTEM)
+
+
+#define mknod(pathname, mode, dev)          wramp_syscall(MKNOD, mode, pathname, dev)
+#define chdir(path)                         wramp_syscall(CHDIR, path)
+#define chown(pathname, owner, group)       wramp_syscall(CHOWN, owner, pathname, group)
+#define chmod(pathname, mode)               wramp_syscall(CHMOD, mode, pathname)
+#define stat(pathname, statbuf)             wramp_syscall(STAT, pathname, statbuf)
+#define fstat(fd, statbuf)                  wramp_syscall(FSTAT, fd, statbuf)
+#define access(pathname, mode)              wramp_syscall(ACCESS, mode, pathname)
+#define mkdir(pathname, mode)               wramp_syscall(MKDIR, mode, pathname)
+#define umask(mask)                         wramp_syscall(UMASK, mask)
+
+#endif
 
 #endif /* !_SYS_STAT_H_ */
