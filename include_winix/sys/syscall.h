@@ -136,11 +136,16 @@ void* get_sigreturn_func_ptr(void);
 char *strerror(int err);
 
 
-void sched_yield();
+
 void perror();
 
 
 #if defined(__wramp__) & !defined(_SYSTEM)
+
+#define ioctl(fd, request, ...)             wramp_syscall(IOCTL, fd, request, ##__VA_ARGS__)
+#define fcntl(fd, cmd, ...)                 wramp_syscall(FCNTL, fd, cmd, ##__VA_ARGS__)
+#define fprintf(stream, format, ...)        dprintf(stream->_fd, format, ##__VA_ARGS__)
+#define printf(format, ...)                 dprintf(STDOUT_FILENO, format, ##__VA_ARGS__)
 
 #define __dprintf(fd, format, arg)          wramp_syscall(DPRINTF, fd, format, arg)
 #define __strerror(buffer, len,usrerr)      wramp_syscall(STRERROR, len, buffer, usrerr)
@@ -152,12 +157,7 @@ void perror();
 #define disable_syscall_tracing()           wramp_syscall(WINFO, WINFO_DISABLE_TRACE)
 
 
-#define sched_yield()                       wramp_syscall(SCHED_YIELD)
 
-#define ioctl(fd, request, ...)             wramp_syscall(IOCTL, fd, request, ##__VA_ARGS__)
-#define fcntl(fd, cmd, ...)                 wramp_syscall(FCNTL, fd, cmd, ##__VA_ARGS__)
-#define fprintf(stream, format, ...)        dprintf(stream->_fd, format, ##__VA_ARGS__)
-#define printf(format, ...)                 dprintf(STDOUT_FILENO, format, ##__VA_ARGS__)
 
 #endif //__wramp__
 
