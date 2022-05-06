@@ -1,4 +1,5 @@
-#include <lib.h>
+#include <stdlib.h>
+#include <unistd.h>
 
 struct mem_control_block {
   int is_available;

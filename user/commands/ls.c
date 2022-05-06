@@ -2,6 +2,7 @@
 #include <dirent.h>
 #include <stdbool.h>
 #include <string.h>
+#include <stdlib.h>
 
 struct time_struct{
     int date;

@@ -1,6 +1,8 @@
-#include <sys/syscall.h>
 #include <sys/times.h>
-#include <sys/unistd.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <stdio.h>
+
 /**
  * Prints the system uptime
  **/

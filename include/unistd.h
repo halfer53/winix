@@ -37,6 +37,14 @@ pid_t getpgid(pid_t pid);
 pid_t getpid();
 int setpgid(pid_t pid, pid_t pgid);
 pid_t setsid(void);
+long sysconf(int name);
+void _exit(int status);
+pid_t getppid();
+void *sbrk(int increment);
+int brk(void *addr);
+char *getcwd(char *buf, size_t size);
+int execve(const char *pathname, char *const argv[],char *const envp[]);
+int execv(const char *path, char *const argv[]);
 
 #if defined(__wramp__) & !defined(_SYSTEM)
 
@@ -58,6 +66,15 @@ pid_t setsid(void);
 #define getpid()                            wramp_syscall(GETPID)
 #define setpgid(pid, pgid)                  wramp_syscall(SETPGID, pid, pgid)
 #define setsid()                            wramp_syscall(SETSID)
+#define sysconf(name)                       wramp_syscall(SYSCONF, name)
+#define getppid()                           wramp_syscall(GETPPID)
+#define sbrk(increment)                     ptr_wramp_syscall(SBRK, increment)
+#define brk(ptr)                            wramp_syscall(BRK, ptr)
+#define getcwd(buf, size)                   ptr_wramp_syscall(GETCWD, size, buf)
+#define execve(path, argv, envp)            wramp_syscall(EXECVE, path, argv, envp)
+#define execv(path, argv)                   execve(path, argv, __get_env())
+
+#define _exit(status)                       __exit(status)
 
 #endif
 

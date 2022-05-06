@@ -4,6 +4,7 @@
 
 #include <stddef.h>
 #include <sys/types.h>
+#include <sys/syscall.h>
 
 /* Here are types that are closely associated with signal handling. */
 typedef int sig_atomic_t;

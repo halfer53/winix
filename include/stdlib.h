@@ -24,4 +24,8 @@ int rand(void);
 int atoi(char *str);
 unsigned long strtoul(const char * nptr, char ** endptr, int base);
 
+
+
+#define exit(code)      __exit(code)
+
 #endif

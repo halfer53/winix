@@ -117,10 +117,9 @@ void *ptr_wramp_syscall(int num, ...);
 
 // int _syscall(int syscall_num, struct message *m);
 
-void exit(int status);
-pid_t getppid();
 
-long sysconf(int name);
+
+
 
 
 int fcntl(int fd, int cmd, ... /* arg */ );
@@ -133,25 +132,23 @@ int printf(const char *format, ...) CHECK_PRINTF;
 int enable_syscall_tracing();
 int disable_syscall_tracing();
 void* get_sigreturn_func_ptr(void);
-void *sbrk(int increment);
+
 char *strerror(int err);
 int statfs(const char *path, struct statfs *buf);
-char *getcwd(char *buf, size_t size);
+
 clock_t times(struct tms *buf);
 pid_t waitpid(pid_t pid, int *status, int options);
-int brk(void *addr);
+
 void sched_yield();
 void perror();
-int execve(const char *pathname, char *const argv[],char *const envp[]);
-int execv(const char *path, char *const argv[]);
+
 
 #if defined(__wramp__) & !defined(_SYSTEM)
 
 #define __dprintf(fd, format, arg)          wramp_syscall(DPRINTF, fd, format, arg)
 #define __strerror(buffer, len,usrerr)      wramp_syscall(STRERROR, len, buffer, usrerr)
+#define __exit(status)                      wramp_syscall(EXIT, status, 0)
 
-
-#define sysconf(name)                       wramp_syscall(SYSCONF, name)
 
 
 #define times(buf)                          wramp_syscall(TIMES, buf)
@@ -160,17 +157,15 @@ int execv(const char *path, char *const argv[]);
 #define enable_syscall_tracing()            wramp_syscall(WINFO, WINFO_TRACE_SYSCALL)
 #define disable_syscall_tracing()           wramp_syscall(WINFO, WINFO_DISABLE_TRACE)
 
-#define exit(status)                        wramp_syscall(EXIT, status, 0)
-#define getppid()                           wramp_syscall(GETPPID)
 
-#define sbrk(increment)                     ptr_wramp_syscall(SBRK, increment)
-#define brk(ptr)                            wramp_syscall(BRK, ptr)
+
+
+
 #define statfs(path, buf)                   wramp_syscall(STATFS, path, buf)
-#define getcwd(buf, size)                   ptr_wramp_syscall(GETCWD, size, buf)
+
 
 #define sched_yield()                       wramp_syscall(SCHED_YIELD)
-#define execve(path, argv, envp)            wramp_syscall(EXECVE, path, argv, envp)
-#define execv(path, argv)                   execve(path, argv, __get_env())
+
 #define ioctl(fd, request, ...)             wramp_syscall(IOCTL, fd, request, ##__VA_ARGS__)
 #define fcntl(fd, cmd, ...)                 wramp_syscall(FCNTL, fd, cmd, ##__VA_ARGS__)
 #define fprintf(stream, format, ...)        dprintf(stream->_fd, format, ##__VA_ARGS__)
