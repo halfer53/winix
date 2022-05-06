@@ -136,7 +136,7 @@ void* get_sigreturn_func_ptr(void);
 char *strerror(int err);
 int statfs(const char *path, struct statfs *buf);
 
-clock_t times(struct tms *buf);
+
 pid_t waitpid(pid_t pid, int *status, int options);
 
 void sched_yield();
@@ -151,7 +151,7 @@ void perror();
 
 
 
-#define times(buf)                          wramp_syscall(TIMES, buf)
+
 #define waitpid(pid, wstatus, option)       wramp_syscall(WAITPID, pid, wstatus, option)
 #define wait(wstatus)                       waitpid(-1, wstatus, 0)
 #define enable_syscall_tracing()            wramp_syscall(WINFO, WINFO_TRACE_SYSCALL)

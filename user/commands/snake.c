@@ -1,12 +1,12 @@
 #include <stdio.h>
 #include <winix/list.h>
 #include <unistd.h>
-#include <sys/times.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
+#include <time.h>
 
 #define NUM_COLS  (100)
 #define NUM_ROWS  (31)
