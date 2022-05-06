@@ -29,6 +29,7 @@ size_t strspn(const char *s1, const char *s2);
 void *memmove(void *dest, const void *src, size_t n);
 char *strrchr(const char *str, int c);
 int memcmp(const void *str1, const void *str2, size_t n);
+char *strerror(int err);
 
 #define strchr(s, c)    index(s, c)
 

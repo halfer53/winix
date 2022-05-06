@@ -94,8 +94,6 @@ void *ptr_wramp_syscall(int num, ...);
 int enable_syscall_tracing();
 int disable_syscall_tracing();
 
-char *strerror(int err);
-
 
 #if defined(__wramp__) & !defined(_SYSTEM)
 
