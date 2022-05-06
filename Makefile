@@ -34,12 +34,6 @@ export WRAMP := -D__wramp__
 export COMMON_CFLAGS := -DTEXT_OFFSET=$(TEXT_OFFSET) -D_DEBUG 
 export GCC_FLAG := -g -Wall -Werror -pedantic -Wno-discarded-qualifiers -Wno-comment 
 export CFLAGS := $(COMMON_CFLAGS) $(WINIX_INCLUDE_PATH) $(GCC_FLAG)
-
-# List of user libraries used by the kernel
-KLIB_O = lib/syscall/wramp_syscall.o lib/ipc/ipc.o lib/posix/libgen.o\
-		lib/gen/ucontext.o lib/stdlib/atoi.o lib/ansi/index.o \
-		lib/syscall/debug.o lib/posix/_sigset.o lib/ansi/rand.o lib/ansi/strl.o\
-		lib/ansi/memcpy.o lib/ansi/strcmp.o lib/ansi/strlen.o lib/ansi/memset.o \
 		
 L_HEAD = winix/limits/limits_head.o
 L_TAIL = winix/limits/limits_tail.o
@@ -59,8 +53,7 @@ all:
 	$(Q)$(MAKE) buildlib
 	$(Q)$(MAKE) kbuild
 	$(Q)$(MAKE) include_build
-	$(Q)wlink $(LDFLAGS) -Ttext $(TEXT_OFFSET) -v -o winix.srec \
-		$(L_HEAD) $(KERNEL_O) $(KLIB_O) $(L_TAIL) > $(SREC_INCLUDE)/winix.verbose
+	$(Q)wlink $(LDFLAGS) -Ttext $(TEXT_OFFSET) -v -o winix.srec $(L_HEAD) $(KERNEL_O) `$(get_libs) $(KERNEL_O)` $(L_TAIL) > $(SREC_INCLUDE)/winix.verbose
 ifeq ($(KBUILD_VERBOSE),0)
 	@echo "LD \t winix.srec"
 endif
