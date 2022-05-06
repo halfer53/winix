@@ -506,21 +506,22 @@ void test_given_getdents_when_successive_call_should_return_files(){
 
 void test_given_cwd_when_chdir_should_return_path(){
     int ret;
+    char *result;
     ret = sys_mkdir(current, DIR_NAME, 0x755);
     assert(ret == 0);
 
     ret = sys_chdir(current, DIR_NAME);
     assert(ret == 0);
 
-    char *result = sys_getcwd(current, buffer, PAGE_LEN);
-    assert(!IS_ERR(result));
+    ret = sys_getcwd(current, buffer, PAGE_LEN, &result);
+    assert(ret == 0);
     assert(strcmp(result, DIR_NAME) == 0);
 }
 
 void test_given_cwd_when_path_is_1_should_return_einvalid(){
-    char *result = sys_getcwd(current, buffer, 1);
-    assert(IS_ERR(result));
-    assert(PTR_ERR(result) == -ERANGE);
+    char *result;
+    int ret = sys_getcwd(current, buffer, 1, &result);
+    assert(ret == -ERANGE);
 }
 
 

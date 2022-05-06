@@ -37,7 +37,7 @@ int sys_link(struct proc* who, char *oldpath, char *newpath);
 int sys_unlink(struct proc* who, char *path);
 int sys_mknod(struct proc* who, char *pathname, mode_t mode, dev_t devid);
 int sys_getdents(struct proc* who, int fd, struct dirent* dirp_dst, unsigned int count);
-char* sys_getcwd(struct proc* who, char* pathname, int size);
+int sys_getcwd(struct proc* who, char* pathname, int size, char** result);
 
 void init_dev();
 void init_tty();
