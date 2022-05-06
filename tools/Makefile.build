@@ -31,19 +31,21 @@ obj-y := $(filter-out %/,$(obj-y))
 objects := $(addprefix $(src)/, $(obj-y) $(asm-y:%.s=%.o))
 assembly := $(addprefix $(src)/, $(obj-y:%.o=%.s))
 source := $(addprefix $(src)/, $(obj-y:%.o=%.c))
+tmpsource := $(addprefix $(src)/, $(obj-y:%.o=%.c~))
 srecobj := $(addprefix $(src)/, $(srec-y))
 
 PHONY := __build
 
-__build: $(assembly) $(objects) $(subdir-y) $(srecobj)
-$(assembly): %.s: %.c
+__build: $(assembly) $(objects) $(subdir-y) $(srecobj) $(tmpsource)
+
+$(tmpsource): %.c~: %.c
 ifeq ($(KBUILD_VERBOSE),0)
 	@echo "CC \t $<"
 endif
-#gcc is only used for linting, wcc is the real compiler
-	$(Q)gcc $(CFLAGS) $(GCC_FLAG) -nostdinc -S -N $< -o /tmp/$(notdir $@)
-	$(Q)wcc $(CFLAGS) -S -N -w -o $@ $<
+	$(Q)gcc $(CFLAGS) $(GCC_FLAG) -nostdinc -E -N $< -o $@
 
+$(assembly): %.s: %.c~
+	$(Q)cat $< | sed -E "s/__attribute__\s*\(.+\)//" | rcc -target=wramp > $@
 
 $(objects): %.o: %.s
 ifeq ($(KBUILD_VERBOSE),0)

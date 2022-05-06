@@ -5,7 +5,7 @@
 *.class
 *.o
 *.s
-*.gcc
+*.c~
 *.srec
 *.sublime-workspace
 *.obj
