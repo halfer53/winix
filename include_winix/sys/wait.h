@@ -16,6 +16,7 @@
 #ifndef _WAIT_H_
 #define _WAIT_H_ 1
 
+#include <sys/types.h>
 #include <signal.h>
 
 #define _LOW(v)         ( (v) & 0x7f)
@@ -31,8 +32,15 @@
 #define WIFSTOPPED(s)       (_LOW(s) == SIGSTOP || _LOW(s) == SIGTSTP )            /* stopped */
 #define WSTOPSIG(s)         (_HIGH(s))                    /* stop signal */
 
-// pid_t wait(int *wstatus);
-// pid_t waitpid(pid_t pid, int *wstatus, int options);
+pid_t wait(int *wstatus);
+pid_t waitpid(pid_t pid, int *wstatus, int options);
+
+#if defined(__wramp__) & !defined(_SYSTEM)
+
+#define waitpid(pid, wstatus, option)       wramp_syscall(WAITPID, pid, wstatus, option)
+#define wait(wstatus)                       waitpid(-1, wstatus, 0)
+
+#endif
 
 #endif /* _WAIT_H */
 
