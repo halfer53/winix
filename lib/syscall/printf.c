@@ -3,16 +3,8 @@
 #include <stddef.h>
 #include <stdio.h>
 
-FILE _stdin =  {0, 0, _IODEFAULT, 0 , 0, 0};
-FILE _stdout = {0, 1, _IODEFAULT, 0 , 0, 0};
-FILE _stderr = {0, 2, _IODEFAULT, 0 , 0, 0};
 
 char estr[ESTR_SIZ];
-
-int dprintf(int fd, const char *format, ...){
-    
-    return __dprintf(fd, format, (int*)&format + 1);
-}
 
 char* strerror(int usrerrno){
     __strerror(estr, ESTR_SIZ, usrerrno);

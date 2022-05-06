@@ -1,2 +1,2 @@
 
-obj-y += stdio.o 
+obj-y += stdio.o dprintf.o
