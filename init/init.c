@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <string.h>
 
 char shell_path[] = "/bin/bash";
 char *shell_argv[] = {
