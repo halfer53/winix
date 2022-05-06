@@ -36,7 +36,6 @@ obj-y := $(filter-out %/,$(obj-y))
 objects := $(addprefix $(src)/, $(obj-y) $(asm-y:%.s=%.o))
 assembly := $(addprefix $(src)/, $(obj-y:%.o=%.s))
 srecobj := $(addprefix $(src)/, $(srec-y))
-tmpsource := $(addprefix $(src)/, $(obj-y:%.o=%.c~))
 
 PHONY := all __clean
 
@@ -45,7 +44,7 @@ all: __clean
 
 __clean: $(subdir-y)
 	$(Q)echo -n "" > $(srcdepend)
-	$(Q)rm -f $(objects) $(assembly) $(srecobj) $(tmpsource) $(addprefix $(src)/, .depend) 
+	$(Q)rm -f $(objects) $(assembly) $(srecobj) $(addprefix $(src)/, .depend) 
 ifeq ($(KBUILD_VERBOSE),0)
 	@echo "RM \t $(obj)"
 endif
