@@ -27,7 +27,7 @@ typedef struct inode {
     int i_count;            /* # times inode used; 0 means slot is free */
     block_t i_ndblock;        /* # direct block, where the inode info is stored in the inode table */
     struct superblock *i_sb;    /* pointer to super block for inode's device */
-    unsigned int i_flags;
+    int i_flags;
     struct list_head pipe_reading_list;
     struct list_head pipe_writing_list;
 
