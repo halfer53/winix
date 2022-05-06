@@ -22,8 +22,6 @@
 #define errno               (*ERRNO_PTR)
 #define __set_errno(val)    ((*ERRNO_PTR) = (val))     
 
-#define ESTR_SIZ    (16)
-
 /* Here are the numerical values of the error numbers. */
 #define _NERROR              40  /* number of errors */  
 
