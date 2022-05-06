@@ -1,5 +1,5 @@
 #include <sys/syscall.h>
-#include <sys/fcntl.h>
+#include <fcntl.h>
 #include <errno.h>
 
 #define BUFFER_SIZ  (256)

@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <dirent.h>
-#include <sys/fcntl.h>
+#include <fcntl.h>
 #include <stdlib.h>
 
 DIR *opendir(const char *pathname){

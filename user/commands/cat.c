@@ -1,5 +1,5 @@
 #include <sys/syscall.h>
-#include <sys/fcntl.h>
+#include <fcntl.h>
 #include <sys/stat.h>
 
 int main(int argc, char *argv[]){

@@ -2,7 +2,7 @@
 #include <winix/list.h>
 #include <unistd.h>
 #include <sys/times.h>
-#include <sys/fcntl.h>
+#include <fcntl.h>
 #include <sys/ioctl.h>
 #include <stdlib.h>
 #include <stdbool.h>

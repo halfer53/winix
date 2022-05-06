@@ -22,7 +22,7 @@ void sync();
 int getdents( int fd, struct dirent *dirp, unsigned int count);
 
 #if defined(__wramp__) & !defined(_SYSTEM)
-#define sync()                              (wramp_syscall(SYNC))
+#define sync()                              wramp_syscall(SYNC)
 #endif
 
 #endif

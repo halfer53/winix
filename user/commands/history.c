@@ -1,5 +1,5 @@
 #include <sys/syscall.h>
-#include <sys/fcntl.h>
+#include <fcntl.h>
 
 static char filename[] = "/.bash_history";
 #define SIZE    128

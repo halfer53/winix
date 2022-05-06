@@ -110,13 +110,8 @@ extern const char **_environ;
 int wramp_syscall(int num, ...);
 void *ptr_wramp_syscall(int num, ...);
 
-#ifdef __GNUC__
 #define CHECK_PRINTF    __attribute__ ((format (printf, 1, 2)))
 #define CHECK_EPRINTF    __attribute__ ((format (printf, 2, 3)))
-#else
-#define CHECK_PRINTF 
-#define CHECK_EPRINTF   
-#endif
 
 #ifndef FSUTIL
 
@@ -133,10 +128,9 @@ int sigsuspend(const sigset_t *mask);
 int sigpending(sigset_t *set);
 int setpgid(pid_t pid, pid_t pgid);
 pid_t getpgid(pid_t pid);
-int open(const char *pathname,int flags, ...);
+
 // int open(const char *pathname,int flags, mode_t mode);
-int creat(const char *pathname, mode_t mode);
-int close(int fd);
+
 size_t read(int fd, void *buf, size_t count);
 size_t write(int fd, const void *buf, size_t count);
 int pipe(int pipefd[2]);
@@ -180,8 +174,6 @@ int execv(const char *path, char *const argv[]);
 
 #if defined(__wramp__) & !defined(_SYSTEM)
 
-#define creat(pathname, mode)               (wramp_syscall(CREAT, mode, pathname))
-#define close(fd)                           (wramp_syscall(CLOSE, fd))
 #define read(fd, buf, count)                (wramp_syscall(READ,fd, buf, count))
 #define write(fd, buf, count)               (wramp_syscall(WRITE,fd, buf, count))
 #define pipe(pipefd)                        (wramp_syscall(PIPE, pipefd))
@@ -231,7 +223,6 @@ int execv(const char *path, char *const argv[]);
 #define sched_yield()                       (wramp_syscall(SCHED_YIELD))
 #define execve(path, argv, envp)            (wramp_syscall(EXECVE, path, argv, envp))
 #define execv(path, argv)                   (execve(path, argv, __get_env()))
-#define open(path, flags, ...)              (wramp_syscall(OPEN, flags, path, ##__VA_ARGS__))
 #define ioctl(fd, request, ...)             (wramp_syscall(IOCTL, fd, request, ##__VA_ARGS__))
 #define fcntl(fd, cmd, ...)                 (wramp_syscall(FCNTL, fd, cmd, ##__VA_ARGS__))
 #define fprintf(stream, format, ...)        (dprintf(stream->_fd, format, ##__VA_ARGS__))

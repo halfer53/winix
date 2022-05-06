@@ -22,7 +22,7 @@
 #include <regexp.h>
 #include <stdio.h>
 #include <unistd.h>
-#include <sys/fcntl.h>
+#include <fcntl.h>
 #include <string.h>
 
 void match(char *name, regexp *exp);
