@@ -38,7 +38,6 @@ CMD_PROTOTYPE(do_untrace_syscall);
 CMD_PROTOTYPE(help);
 CMD_PROTOTYPE(cmd_exit);
 CMD_PROTOTYPE(printenv);
-CMD_PROTOTYPE(cmd_bash);
 CMD_PROTOTYPE(do_cd);
 CMD_PROTOTYPE(do_cls);
 CMD_PROTOTYPE(do_fg);
@@ -50,7 +49,6 @@ struct cmd_internal builtin_commands[] = {
     { printenv, "env" },
     { do_trace_syscall, "trace"},
     { do_untrace_syscall, "untrace"},
-    { cmd_bash, "bash"},
     { slab, "slab"},
     { cmd_kill, "kill"},
     { print_pid, "pid"},
@@ -340,7 +338,7 @@ int do_stest(int argc, char** argv){
 }
 
 // byte stream for \e[1;1H\e[2J
-char cls[] = {0x1b, 0x5b, 0x31, 0x3b, 0x31, 0x48, 0x1b, 0x5b, 0x32, 0x4a, 0};
+char cls[] = {0x1b, 0x5b, 0x30, 0x3b, 0x30, 0x48, 0x1b, 0x5b, 0x32, 0x4a, 0};
 
 int do_cls(int argc, char** argv){
     printf("%s", cls);
@@ -372,23 +370,6 @@ int print_pid(int argc, char **argv){
 // list all the processes in the system
 int slab(int argc, char **argv){
     return wramp_syscall(WINFO, WINFO_SLAB);
-}
-
-// start a new bash shell, parent shell is blocked until child shell exits
-int cmd_bash(int argc, char **argv){
-    pid_t child_pid;
-    if((child_pid = fork())){
-        if(child_pid == -1){
-            perror("fork failed");
-            return 1;
-        }
-        // printf("parent shell %d waiting for child shell %d\n",getpid(),child_pid);
-        child_pid = wait(NULL);
-        // printf("parent shell %d awakened by child shell %d\n",getpid(),child_pid);
-    }else{
-        printf("Child shell %d [parent %d] start:\n",getpid(),getppid());
-    }
-    return 0;
 }
 
 int cmd_exit(int argc, char **argv){
