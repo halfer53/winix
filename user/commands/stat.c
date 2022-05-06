@@ -15,6 +15,7 @@ int main(int argc, char* argv[]){
     size = statbuf.st_size;
     div = size / 1024;
     rem = size % 1024;
+    rem = rem > 1000 ? 999 : rem;
 
     printf("File: %s\nNum: %d\nSize: %d.%.2dKB\nBlocks: %d\nAccess: 0x%x\n", 
         path, statbuf.st_ino, div, rem, statbuf.st_blocks, statbuf.st_mode & 0x777);
