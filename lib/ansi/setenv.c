@@ -1,4 +1,5 @@
-#include <lib.h>
+#include <string.h>
+#include <stdlib.h>
 
 int setenv(const char *name, const char *value, int overwrite) {
 	char *buf;
