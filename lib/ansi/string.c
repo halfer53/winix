@@ -3,33 +3,6 @@
 #include <ctype.h>
 
 
-
-/**
- * Compares two strings.
- **/
-int strcmp(const char *s1, const char *s2) {
-    while (*s1 && *s2) {
-        if (*s1 != *s2) {
-            break;
-        }
-        s1++;
-        s2++;
-    }
-
-    return *s1 - *s2;
-}
-
-int strncmp(const char *s1, const char *s2, size_t size) {
-    while (*s1 && *s2 && size--) {
-        if (*s1 != *s2) {
-            break;
-        }
-        s1++;
-        s2++;
-    }
-    return *s1 - *s2;
-}
-
 /**
  * Calculates the length of a string.
  **/
