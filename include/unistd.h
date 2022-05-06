@@ -35,6 +35,8 @@ pid_t vfork();
 pid_t tfork();
 pid_t getpgid(pid_t pid);
 pid_t getpid();
+int setpgid(pid_t pid, pid_t pgid);
+pid_t setsid(void);
 
 #if defined(__wramp__) & !defined(_SYSTEM)
 
@@ -54,6 +56,8 @@ pid_t getpid();
 #define tfork()                             wramp_syscall(TFORK)
 #define getpgid(pid)                        wramp_syscall(GETPGID, pid)
 #define getpid()                            wramp_syscall(GETPID)
+#define setpgid(pid, pgid)                  wramp_syscall(SETPGID, pid, pgid)
+#define setsid()                            wramp_syscall(SETSID)
 
 #endif
 

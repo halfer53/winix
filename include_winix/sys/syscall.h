@@ -126,16 +126,11 @@ int sigaction(int signum, const struct sigaction *act,
 int sigprocmask(int how, const sigset_t *set, sigset_t *oldset);
 int sigsuspend(const sigset_t *mask);
 int sigpending(sigset_t *set);
-int setpgid(pid_t pid, pid_t pgid);
-
-
-// int open(const char *pathname,int flags, mode_t mode);
-
 
 
 
 int fcntl(int fd, int cmd, ... /* arg */ );
-pid_t setsid(void);
+
 int ioctl(int fd, unsigned long request, ...);
 
 int dprintf(int fd, const char *format, ...) CHECK_EPRINTF;
@@ -160,8 +155,7 @@ int execv(const char *path, char *const argv[]);
 
 #define __dprintf(fd, format, arg)          wramp_syscall(DPRINTF, fd, format, arg)
 #define __strerror(buffer, len,usrerr)      wramp_syscall(STRERROR, len, buffer, usrerr)
-#define setpgid(pid, pgid)                  wramp_syscall(SETPGID, pid, pgid)
-#define setsid()                            wramp_syscall(SETSID)
+
 #define sigaction(signum, act, oact)        wramp_syscall(SIGACTION, signum, act, oact)
 #define sigsuspend(mask)                    wramp_syscall(SIGSUSPEND, *mask)
 #define sysconf(name)                       wramp_syscall(SYSCONF, name)
