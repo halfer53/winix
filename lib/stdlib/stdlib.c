@@ -1,10 +1,6 @@
 #include <stdlib.h>
 #include <unistd.h>
-
-struct mem_control_block {
-  int is_available;
-  int size;
-};
+#include "memblock.h"
 
 int has_initialized = 0;
 char *managed_memory_start;
@@ -97,41 +93,6 @@ void *malloc(long numbytes) {
 }
 
 
-// void free(void *p) {
-//     char *ptr = p;
-//     struct mem_control_block *mcb;
-//     mcb = (struct mem_control_block*)(ptr - sizeof(struct mem_control_block));
-//     mcb->is_available = 1;
-// }
-
-// void *malloc(long numbytes){
-//     char *p;
-//     struct mem_control_block* mem = sbrk(sizeof(struct mem_control_block) + numbytes);
-//     mem->is_available = 0;
-//     mem->size = numbytes;
-//     p = (char *)mem;
-//     return p + sizeof(struct mem_control_block);
-// }
-
-void* realloc(void *p, long size){
-    char* ret, *dst;
-    char *ptr = p;
-    int len;
-    struct mem_control_block *mcb;
-    mcb = (struct mem_control_block*)(ptr - sizeof(struct mem_control_block));
-    ret = malloc(size);
-    len = mcb->size;
-    dst = ret;
-    while(len--){
-        *dst++ = *ptr++;
-    }
-    free(p);
-    return ret;
-}
-
-void print_heap(){
-    
-}
 
 
 
