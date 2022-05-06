@@ -332,6 +332,7 @@ int kprintf_vm( struct filp* file, const char *orignal_format, void *arg, struct
 
             if (*format == '.'){
                 format++;
+                token = ZERO;
                 left_limit = pass_number(&format);
             }
 
