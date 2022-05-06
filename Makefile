@@ -24,7 +24,6 @@ export KBUILD_VERBOSE
 export Q
 export srctree \\
 export SREC_INCLUDE := include_winix/srec
-export includes := $(shell find include -name "*.h")
 export SREC = $(shell find $(SREC_INCLUDE) -name "*.srec")
 export TEXT_OFFSET := 1024
 export CURR_UNIX_TIME := $(shell date +%s)
