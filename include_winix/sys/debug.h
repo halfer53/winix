@@ -5,7 +5,6 @@
 
 void* get_pc();
 void* get_sp();
-void* get_ra();
 void* fcn_to_ptr(void(*)());
 
 #ifdef _SYSTEM
