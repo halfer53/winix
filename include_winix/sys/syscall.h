@@ -127,20 +127,17 @@ int sigprocmask(int how, const sigset_t *set, sigset_t *oldset);
 int sigsuspend(const sigset_t *mask);
 int sigpending(sigset_t *set);
 int setpgid(pid_t pid, pid_t pgid);
-pid_t getpgid(pid_t pid);
+
 
 // int open(const char *pathname,int flags, mode_t mode);
 
 
 
-int unlink(const char *pathname);
-int link(const char *oldpath, const char *newpath);
-int dup2(int oldfd, int newfd);
-int dup(int oldfd);
+
 int fcntl(int fd, int cmd, ... /* arg */ );
 pid_t setsid(void);
 int ioctl(int fd, unsigned long request, ...);
-int csleep(int ticks);
+
 int dprintf(int fd, const char *format, ...) CHECK_EPRINTF;
 int fprintf(FILE *stream, const char *format, ...) CHECK_EPRINTF;
 int printf(const char *format, ...) CHECK_PRINTF;
@@ -153,7 +150,6 @@ int statfs(const char *path, struct statfs *buf);
 char *getcwd(char *buf, size_t size);
 clock_t times(struct tms *buf);
 pid_t waitpid(pid_t pid, int *status, int options);
-pid_t tfork();
 int brk(void *addr);
 void sched_yield();
 void perror();
@@ -163,15 +159,7 @@ int execv(const char *path, char *const argv[]);
 #if defined(__wramp__) & !defined(_SYSTEM)
 
 
-#define dup(oldfd)                          wramp_syscall(DUP, oldfd)
-#define dup2(oldfd, newfd)                  wramp_syscall(DUP2, oldfd, newfd)
-#define link(oldpath, newpath)              wramp_syscall(LINK, oldpath, newpath)
-#define unlink(pathname)                    wramp_syscall(UNLINK, pathname)
-#define alarm(seconds)                      wramp_syscall(ALARM, seconds)
-#define csleep(ticks)                       wramp_syscall(CSLEEP, ticks)
-#define fork()                              wramp_syscall(FORK)
-#define getpgid(pid)                        wramp_syscall(GETPGID, pid)
-#define getpid()                            wramp_syscall(GETPID)
+
 #define kill(pid, sig)                      wramp_syscall(KILL, pid, sig)
 #define __dprintf(fd, format, arg)          wramp_syscall(DPRINTF, fd, format, arg)
 #define __strerror(buffer, len,usrerr)      wramp_syscall(STRERROR, len, buffer, usrerr)
@@ -187,7 +175,7 @@ int execv(const char *path, char *const argv[]);
 #define wait(wstatus)                       waitpid(-1, wstatus, 0)
 #define enable_syscall_tracing()            wramp_syscall(WINFO, WINFO_TRACE_SYSCALL)
 #define disable_syscall_tracing()           wramp_syscall(WINFO, WINFO_DISABLE_TRACE)
-#define vfork()                             wramp_syscall(VFORK)
+
 #define exit(status)                        wramp_syscall(EXIT, status, 0)
 #define getppid()                           wramp_syscall(GETPPID)
 #define signal(signum, handler)             wramp_syscall(SIGNAL, signum, handler)
@@ -195,7 +183,7 @@ int execv(const char *path, char *const argv[]);
 #define brk(ptr)                            wramp_syscall(BRK, ptr)
 #define statfs(path, buf)                   wramp_syscall(STATFS, path, buf)
 #define getcwd(buf, size)                   ptr_wramp_syscall(GETCWD, size, buf)
-#define tfork()                             wramp_syscall(TFORK)
+
 #define sched_yield()                       wramp_syscall(SCHED_YIELD)
 #define execve(path, argv, envp)            wramp_syscall(EXECVE, path, argv, envp)
 #define execv(path, argv)                   execve(path, argv, __get_env())

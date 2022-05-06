@@ -5,6 +5,7 @@
 #include <sys/ioctl.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 char shell_path[] = "/bin/bash";
 char *shell_argv[] = {

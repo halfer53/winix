@@ -1,4 +1,4 @@
- #include <lib.h>
+ #include <unistd.h>
 
 void abort(){
     kill(getpid(),SIGABRT);
