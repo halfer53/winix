@@ -3,6 +3,7 @@
 
 
 #include <stddef.h>
+#include <sys/types.h>
 
 /* Here are types that are closely associated with signal handling. */
 typedef int sig_atomic_t;
@@ -87,5 +88,12 @@ int sigemptyset(sigset_t *);
 int sigfillset(sigset_t *);
 int sigismember(sigset_t *, int);
 int raise(int signum);
+int kill (pid_t pid, int sig);
+
+#if defined(__wramp__) & !defined(_SYSTEM)
+
+#define kill(pid, sig)                      wramp_syscall(KILL, pid, sig)
+
+#endif
 
 #endif

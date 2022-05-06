@@ -119,7 +119,7 @@ void *ptr_wramp_syscall(int num, ...);
 
 void exit(int status);
 pid_t getppid();
-int kill (pid_t pid, int sig);
+
 long sysconf(int name);
 int sigaction(int signum, const struct sigaction *act,
                          struct sigaction *oldact);
@@ -158,9 +158,6 @@ int execv(const char *path, char *const argv[]);
 
 #if defined(__wramp__) & !defined(_SYSTEM)
 
-
-
-#define kill(pid, sig)                      wramp_syscall(KILL, pid, sig)
 #define __dprintf(fd, format, arg)          wramp_syscall(DPRINTF, fd, format, arg)
 #define __strerror(buffer, len,usrerr)      wramp_syscall(STRERROR, len, buffer, usrerr)
 #define setpgid(pid, pgid)                  wramp_syscall(SETPGID, pid, pgid)
