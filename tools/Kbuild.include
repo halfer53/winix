@@ -6,7 +6,7 @@
 # Shorthand for python3 tools/libs_linker.py 
 # Usage:
 # $(shell $(get_libs) source) 
-get_libs := python3 -S tools/libs_linker.py 
+get_libs := python3 -S tools/libs_linker.py $(srctree)/lib
 
 # Convenient variables
 comma   := ,

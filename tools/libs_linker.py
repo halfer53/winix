@@ -30,8 +30,8 @@ def get_assembly_dependencies(filepath):
 					required.add(label)
 	return export, required
 		
-def get_dependencies(files: list[str]) -> str:
-	assemblies = get_all_assemblies('./lib')
+def get_dependencies(libpath: str, files: list[str]) -> str:
+	assemblies = get_all_assemblies(libpath)
 	export_dict : Dict[str, str] = dict()
 	dependency_dict : Dict[str, set] = dict()
 	reuqired_files = set()
@@ -60,9 +60,10 @@ def get_dependencies(files: list[str]) -> str:
 	return ' '.join(map(lambda x: x.replace('.s', '.o'), reuqired_files))
 
 def main():
-	if(len(sys.argv) < 2):
+	if(len(sys.argv) < 3):
 		return 1
-	print(get_dependencies(sys.argv[1:]), end='')
+	libpath = sys.argv[1]
+	print(get_dependencies(libpath, sys.argv[2:]), end='')
 
 if __name__ == '__main__':
 	main()
