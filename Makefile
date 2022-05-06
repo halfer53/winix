@@ -39,7 +39,7 @@ export CFLAGS := $(COMMON_CFLAGS) $(WINIX_INCLUDE_PATH) $(GCC_FLAG)
 KLIB_O = lib/syscall/wramp_syscall.o lib/ipc/ipc.o lib/posix/libgen.o\
 		lib/ansi/string.o lib/gen/ucontext.o lib/stdlib/atoi.o\
 		lib/syscall/debug.o lib/posix/_sigset.o lib/ansi/rand.o lib/ansi/strl.o\
-		lib/ansi/memcpy.o lib/ansi/strcmp.o
+		lib/ansi/memcpy.o lib/ansi/strcmp.o lib/ansi/strlen.o
 L_HEAD = winix/limits/limits_head.o
 L_TAIL = winix/limits/limits_tail.o
 KERNEL_O = winix/*.o kernel/system/*.o kernel/*.o fs/*.o fs/system/*.o driver/*.o include_winix/*.o
