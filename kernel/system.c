@@ -212,7 +212,6 @@ void set_syscall_mesg_exception(int operation, ptr_t* osp, struct message *m, st
     
     case FCNTL:
     case IOCTL:
-        who->ctx.m.sp++;
         m->m1_i1 = *sp++;
         m->m1_i2 = *sp++;
         m->m1_p1 = (void *)get_virtual_addr(sp, who);

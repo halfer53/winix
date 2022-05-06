@@ -236,6 +236,7 @@ int execv(const char *path, char *const argv[]);
 #define execve(path, argv, envp)    (wramp_syscall(EXECVE, path, argv, envp))
 #define execv(path, argv)           (execve(path, argv, __get_env()))
 #define open(path, flags, ...)      (wramp_syscall(OPEN, flags, path, ##__VA_ARGS__))
+#define ioctl(fd, request, ...)     (wramp_syscall(IOCTL, fd, request, ##__VA_ARGS__))
 
 #endif //_SYSTEM
 
