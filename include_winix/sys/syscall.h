@@ -134,7 +134,7 @@ int disable_syscall_tracing();
 void* get_sigreturn_func_ptr(void);
 
 char *strerror(int err);
-int statfs(const char *path, struct statfs *buf);
+
 
 void sched_yield();
 void perror();
@@ -150,10 +150,6 @@ void perror();
 
 #define enable_syscall_tracing()            wramp_syscall(WINFO, WINFO_TRACE_SYSCALL)
 #define disable_syscall_tracing()           wramp_syscall(WINFO, WINFO_DISABLE_TRACE)
-
-
-
-#define statfs(path, buf)                   wramp_syscall(STATFS, path, buf)
 
 
 #define sched_yield()                       wramp_syscall(SCHED_YIELD)

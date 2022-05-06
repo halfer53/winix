@@ -13,7 +13,12 @@ struct statfs {
     int f_namelen; /* Maximum length of filenames */
 };
 
+int statfs(const char *path, struct statfs *buf);
 
+#if defined(__wramp__) & !defined(_SYSTEM)
+
+#define statfs(path, buf)                   wramp_syscall(STATFS, path, buf)
+#endif
 
 #endif
 
