@@ -17,6 +17,7 @@
 
 #include <stddef.h>
 #include <sys/syscall.h>
+#include <sys/compiler.h>
 
 typedef struct __iobuf {
 	int		_count;

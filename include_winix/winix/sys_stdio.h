@@ -16,6 +16,7 @@
 
 #include <fs/filp.h>
 #include <winix/rex.h>
+#include <sys/compiler.h>
 
 const char* kstr_error(int err);
 

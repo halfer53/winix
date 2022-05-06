@@ -85,9 +85,6 @@
 #define WINFO_DEBUG_IPC         6
 #define WINFO_DEBUG_SCHEDULING  7
 
-#define CHECK_PRINTF    __attribute__ ((format (printf, 1, 2)))
-#define CHECK_EPRINTF    __attribute__ ((format (printf, 2, 3)))
-
 int wramp_syscall(int num, ...);
 void *ptr_wramp_syscall(int num, ...);
 
