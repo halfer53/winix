@@ -234,7 +234,8 @@ int execv(const char *path, char *const argv[]);
 #define tfork()                     (wramp_syscall(TFORK))
 #define sched_yield()               (wramp_syscall(SCHED_YIELD))
 #define execve(path, argv, envp)    (wramp_syscall(EXECVE, path, argv, envp))
-#define execv(path, argv)           execve(path, argv, __get_env()) 
+#define execv(path, argv)           (execve(path, argv, __get_env()))
+#define open(path, flags, ...)      (wramp_syscall(OPEN, flags, path, ##__VA_ARGS__))
 
 #endif //_SYSTEM
 
