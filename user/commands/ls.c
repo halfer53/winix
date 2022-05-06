@@ -185,7 +185,7 @@ void print_long_format(char *pathname, int flag){
     size = statbuf.st_size;
     if(flag & HUMAN_FORMAT){
         off_t rem = size % 1024;
-        rem = rem > 1000 ? 999 : rem;
+        rem = rem >= 1000 ? 999 : rem;
         printf("%2d.%.2d ", size / 1024, rem);
         unit_s = "KB";
     }else{
