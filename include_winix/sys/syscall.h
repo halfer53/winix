@@ -143,7 +143,7 @@ int pipe(int pipefd[2]);
 int access(const char *pathname, int mode);
 int chdir(const char *path);
 int mkdir(const char *pathname, mode_t mode);
-int getdents( int fd, struct dirent *dirp, unsigned int count);
+
 off_t lseek(int fd, off_t offset, int whence);
 mode_t umask(mode_t mask);
 int unlink(const char *pathname);
@@ -178,11 +178,8 @@ void perror();
 int execve(const char *pathname, char *const argv[],char *const envp[]);
 int execv(const char *path, char *const argv[]);
 
-#ifdef __wramp__
-#ifndef _SYSTEM
+#if defined(__wramp__) & !defined(_SYSTEM)
 
-
-#define getdents(fd, dirp, count)           (wramp_syscall(GETDENT, fd, dirp, count))
 #define creat(pathname, mode)               (wramp_syscall(CREAT, mode, pathname))
 #define close(fd)                           (wramp_syscall(CLOSE, fd))
 #define read(fd, buf, count)                (wramp_syscall(READ,fd, buf, count))
@@ -239,8 +236,6 @@ int execv(const char *path, char *const argv[]);
 #define fcntl(fd, cmd, ...)                 (wramp_syscall(FCNTL, fd, cmd, ##__VA_ARGS__))
 #define fprintf(stream, format, ...)        (dprintf(stream->_fd, format, ##__VA_ARGS__))
 #define printf(format, ...)                 (dprintf(STDOUT_FILENO, format, ##__VA_ARGS__))
-
-#endif //_SYSTEM
 
 #endif //__wramp__
 

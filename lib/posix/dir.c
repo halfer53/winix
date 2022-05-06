@@ -1,7 +1,11 @@
 //
 // Created by bruce on 3/05/20.
 //
-#include <lib.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <dirent.h>
+#include <sys/fcntl.h>
+#include <stdlib.h>
 
 DIR *opendir(const char *pathname){
    DIR *dir_ptr;
