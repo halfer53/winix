@@ -16,16 +16,6 @@
 #ifndef _SYSCALL_H_
 #define _SYSCALL_H_ 1
 
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <sys/dirent.h>
-#include <sys/statfs.h>
-#include <sys/times.h>
-#include <sys/debug.h>
-#include <signal.h>
-#include <stdio.h>
-#include <errno.h>
-
 #define _NSYSCALL               55
 /**
  * System Call Numbers
@@ -95,59 +85,27 @@
 #define WINFO_DEBUG_IPC     6
 #define WINFO_DEBUG_SCHEDULING  7
 
-
+#define CHECK_PRINTF    __attribute__ ((format (printf, 1, 2)))
+#define CHECK_EPRINTF    __attribute__ ((format (printf, 2, 3)))
 
 int wramp_syscall(int num, ...);
 void *ptr_wramp_syscall(int num, ...);
 
-#define CHECK_PRINTF    __attribute__ ((format (printf, 1, 2)))
-#define CHECK_EPRINTF    __attribute__ ((format (printf, 2, 3)))
-
-#ifndef FSUTIL
-
-// int _syscall(int syscall_num, struct message *m);
-
-
-
-
-
-
-
-int dprintf(int fd, const char *format, ...) CHECK_EPRINTF;
-int fprintf(FILE *stream, const char *format, ...) CHECK_EPRINTF;
-int printf(const char *format, ...) CHECK_PRINTF;
 int enable_syscall_tracing();
 int disable_syscall_tracing();
-void* get_sigreturn_func_ptr(void);
 
 char *strerror(int err);
 
 
-
-void perror();
-
-
 #if defined(__wramp__) & !defined(_SYSTEM)
-
-
-
-#define fprintf(stream, format, ...)        dprintf(stream->_fd, format, ##__VA_ARGS__)
-#define printf(format, ...)                 dprintf(STDOUT_FILENO, format, ##__VA_ARGS__)
 
 #define __dprintf(fd, format, arg)          wramp_syscall(DPRINTF, fd, format, arg)
 #define __strerror(buffer, len,usrerr)      wramp_syscall(STRERROR, len, buffer, usrerr)
 #define __exit(status)                      wramp_syscall(EXIT, status, 0)
-
-
-
 #define enable_syscall_tracing()            wramp_syscall(WINFO, WINFO_TRACE_SYSCALL)
 #define disable_syscall_tracing()           wramp_syscall(WINFO, WINFO_DISABLE_TRACE)
 
+#endif
 
-
-
-#endif //__wramp__
-
-#endif //FSUTIL
 
 #endif

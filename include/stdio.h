@@ -16,6 +16,7 @@
 #define _STDIO_H_ 1
 
 #include <stddef.h>
+#include <sys/syscall.h>
 
 typedef struct __iobuf {
 	int		_count;
@@ -85,6 +86,10 @@ size_t fread(void *ptr, size_t size, size_t nmemb, FILE *stream);
 size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream);
 int getline(char *buf, int size);
 char *fgets(char *str, int n, FILE *stream);
+int dprintf(int fd, const char *format, ...) CHECK_EPRINTF;
+int fprintf(FILE *stream, const char *format, ...) CHECK_EPRINTF;
+int printf(const char *format, ...) CHECK_PRINTF;
+void perror();
 
 int getc(FILE* stream);
 #define getchar()	(getc(stdin))
@@ -92,6 +97,10 @@ int getc(FILE* stream);
 
 extern FILE	*__iotab[FOPEN_MAX];
 
-#include <sys/syscall.h>
+#if defined(__wramp__) & !defined(_SYSTEM)
+
+#define fprintf(stream, format, ...)        dprintf(stream->_fd, format, ##__VA_ARGS__)
+#define printf(format, ...)                 dprintf(STDOUT_FILENO, format, ##__VA_ARGS__)
+#endif
 
 #endif
