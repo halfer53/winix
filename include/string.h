@@ -14,7 +14,8 @@
 #ifndef _STRING_H_
 #define _STRING_H_ 1
 
-#include <stdlib.h>
+#include <stddef.h>
+#include <winix/strl.h>
 
 void *memcpy(void *dst, const void *src, size_t n);
 int strcmp(const char *s1, const char *s2);
@@ -32,6 +33,6 @@ char *strerror(int err);
 
 #define strchr(s, c)    index(s, c)
 
-#include <winix/strl.h>
+
 
 #endif
