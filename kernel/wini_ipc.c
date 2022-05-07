@@ -164,7 +164,7 @@ int do_notify(int src, int dest, struct message *m) {
         // KDEBUG(("\nNOTIFY %d from %d type %d| ",dest, src ,m->type));
             
         // If destination is waiting, deliver message immediately.
-        if (pDest->state == STATE_RECEIVING || pDest->state & STATE_STOPPED) {
+        if (pDest->state == STATE_RECEIVING) {
 
             if(pDest->flags & DIRECT_SYSCALL){
                 set_reply_res_errno(pDest, m);
