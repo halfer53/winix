@@ -164,6 +164,7 @@ struct proc *get_runnable_proc(int proc_nr){
  *   proc    The proc struct to add to the list.
  **/
 void enqueue_tail(struct proc **q, struct proc *proc) {
+    ASSERT(!proc->next && q[TAIL] != proc);
     if (q[HEAD] == NULL) {
         q[HEAD] = q[TAIL] = proc;
     }
@@ -182,6 +183,8 @@ void enqueue_tail(struct proc **q, struct proc *proc) {
  *   proc    The proc struct to add to the list.
  **/
 void enqueue_head(struct proc **q, struct proc *proc) {
+    ASSERT(!proc->next && q[HEAD] != proc);
+
     if (q[HEAD] == NULL) {
         proc->next = NULL;
         q[HEAD] = q[TAIL] = proc;
@@ -255,8 +258,6 @@ int dequeue_schedule( struct proc *h) {
  * @param p 
  */
 void enqueue_schedule(struct proc* p) {
-    if (ready_q[p->priority][TAIL] == p)
-        PANIC("double enqueue");
     enqueue_tail(ready_q[p->priority], p);
 }
 
