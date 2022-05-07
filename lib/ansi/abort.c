@@ -1,6 +1,7 @@
- #include <unistd.h>
+#include <unistd.h>
+#include <signal.h>
 
 void abort(){
-    kill(getpid(),SIGABRT);
+    kill(getpid(), SIGABRT);
 }
 
