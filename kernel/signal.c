@@ -230,7 +230,7 @@ int handle_pendingsig(struct proc* who){
     // KDEBUG(("handle pending %x\n", curr_scheduling_proc));
     if(signum){
         handle_sig(who, signum);
-        if(who->state == STATE_RUNNABLE)
+        if(who->state == STATE_RUNNABLE && who != curr_syscall_caller)
             enqueue_schedule(who);
     }
     return signum;
