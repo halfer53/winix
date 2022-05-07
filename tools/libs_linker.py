@@ -76,13 +76,23 @@ def get_dependencies(libpath: str, files: List[str]) -> str:
                 if nextfile in dependency_dict:
                     tmp.update(dependency_dict[nextfile])
             required = tmp
-    return ' '.join(map(lambda x: x.replace('.s', '.o'), reuqired_files))
+    return reuqired_files
 
 def main():
-    if(len(sys.argv) < 3):
+    if(len(sys.argv) < 4):
         return 1
-    libpath = sys.argv[1]
-    print(get_dependencies(libpath, sys.argv[2:]), end='')
+    mode = sys.argv[1]
+    libpath = sys.argv[2]
+    if mode == 'linker':
+        dependencies = get_dependencies(libpath, sys.argv[3:])
+        output = ' '.join(map(lambda x: x.replace('.s', '.o'), dependencies))
+        print(output, end='')
+    elif mode == 'getdependency':
+        for file in sys.argv[3:]:
+            dependencies = get_dependencies(libpath, [file])
+            for dep in dependencies:
+                print(f"{file.replace('.o', '.s')}: {dep}")
+
 
 if __name__ == '__main__':
     main()
