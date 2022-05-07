@@ -164,7 +164,7 @@ void move_cursor(RexSp_t* rex, int num, int direction){
 
 void tty_exception_handler( struct tty_state* state){
     int val, stat, is_new_line;
-    struct message* msg;
+    struct message* msg = get_exception_m();
     RexSp_t *rex = state->rex;
     
     stat = rex->Stat;
@@ -252,9 +252,13 @@ void tty_exception_handler( struct tty_state* state){
             }
         }
 
-        if((is_new_line || state->bptr >= state->buffer_end ) && state->reader){
+        if (is_sigpending(state->reader))
+        {
+            syscall_reply2(READ, -EINTR, state->reader->proc_nr, msg);
+        }
+        else if((is_new_line || state->bptr >= state->buffer_end ) && state->reader)
+        {
             *state->bptr = '\0';
-            msg = get_exception_m();
             strlcpy(state->read_data, state->read_ptr, state->read_count);
             syscall_reply2(READ, state->bptr - state->buffer, state->reader->proc_nr, msg);
             state->bptr = state->buffer;
