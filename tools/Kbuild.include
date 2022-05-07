@@ -32,11 +32,18 @@ cleanall := -f $(srctree)/tools/Makefile.cleanall obj
 # Shorthand for python3 tools/libs_linker.py 
 # Usage:
 # $(shell $(get_libs) source) 
-get_libs := python3 -S tools/libs_linker.py linker $(srctree)/lib
+get_libs := python3 -S tools/libs_linker.py linker $(srctree)/lib $(depcache)
 
 # Get all lib dependencies
 ###
 # Shorthand for python3 tools/libs_linker.py 
 # Usage:
-# $(shell $(get_libs) source) 
-get_deps := python3 -S tools/libs_linker.py getdependency $(srctree)/lib
+# $(shell $(get_deps) source) 
+get_deps := python3 -S tools/libs_linker.py getdependency $(srctree)/lib $(depcache)
+
+# Build dependency cache
+###
+# Shorthand for python3 tools/libs_linker.py 
+# Usage:
+# $(shell $(build_depcache))
+build_depcache := python3 -S tools/libs_linker.py buildcache $(srctree)/lib $(depcache)

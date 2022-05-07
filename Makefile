@@ -23,6 +23,8 @@ export NO_MAKE_DEPEND := $(N)
 export KBUILD_VERBOSE
 export Q
 export srctree \\
+export depcache := .depcache
+
 export SREC_INCLUDE := include_winix/srec
 export SREC = $(shell find $(SREC_INCLUDE) -name "*.srec")
 export TEXT_OFFSET := 1024
@@ -66,6 +68,7 @@ endif
 
 buildlib:
 	$(Q)$(MAKE) $(build)=lib
+	$(Q)$(build_depcache)
 
 kbuild: $(ALLDIR) $(FSUTIL)
 $(ALLDIR): FORCE
@@ -98,6 +101,7 @@ wsh: user/bash/*.c lib/ansi/strl.c
 	$(Q)gcc -DFSUTIL $(COMMON_CFLAGS) $(GCC_FLAG) $^ -o wsh
 	
 clean:
+	$(Q)rm -f $(depcache)
 	$(Q)rm -f $(FSUTIL)
 	$(Q)rm -f $(UNIT_TEST)
 	$(Q)rm -f $(UTEST_RUNNER)

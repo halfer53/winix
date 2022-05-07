@@ -1,7 +1,8 @@
 import sys
-from typing import Dict, List
+from typing import Dict, List, Tuple
 import re
 import os
+import json
 
 def run_fast_scandir(dir, ext):    # dir: str, ext: list
     dirname = os.getcwd() + '/'
@@ -25,7 +26,7 @@ def get_all_assemblies(path) -> List[str]:
     _, files = run_fast_scandir(path, ['.s'])
     return files
 
-def get_assembly_dependencies(filepath):
+def get_assembly_dependencies(filepath) -> Tuple[set, set]:
     export = set()
     required = set()
     with open(filepath) as f:
@@ -47,12 +48,11 @@ def get_assembly_dependencies(filepath):
                 if label not in export:
                     required.add(label)
     return export, required
-        
-def get_dependencies(libpath: str, files: List[str]) -> str:
+
+def build_dependency_dict(libpath: str) -> Tuple[Dict[str, str], Dict[str, str]]:
     assemblies = get_all_assemblies(libpath)
-    export_dict : Dict[str, str] = dict()
     dependency_dict : Dict[str, set] = dict()
-    reuqired_files = set()
+    export_dict : Dict[str, str] = dict()
     for posixpath in assemblies:
         filepath = str(posixpath)
         export, required = get_assembly_dependencies(posixpath)
@@ -60,6 +60,26 @@ def get_dependencies(libpath: str, files: List[str]) -> str:
             export_dict[exp] = filepath
         dependency_dict[filepath] = required
         # print(filepath, export, required, file=sys.stderr)
+    return export_dict, dependency_dict
+
+def build_dependency_cache(path: str):
+    export_dict, dependency_dict = build_dependency_dict(path)
+    obj = {
+        'export': export_dict,
+        'dependency': dependency_dict
+    }
+    return obj
+
+def get_dependency_from_cache(libpath: str, cachepath: str) -> Tuple[Dict[str, str], Dict[str, str]]:
+    try:
+        with open(cachepath) as f:
+            obj = json.load(f)
+            return obj['export'], obj['dependency']
+    except:
+        return build_dependency_dict(libpath)
+        
+def get_dependencies(export_dict : Dict[str, str], dependency_dict : Dict[str, set], files: List[str]) -> str:
+    reuqired_files = set()
     for file in files:
         export, required = get_assembly_dependencies(file.replace('.o', '.s'))
         # print(str(file), export, required)
@@ -77,18 +97,30 @@ def get_dependencies(libpath: str, files: List[str]) -> str:
             required = tmp
     return reuqired_files
 
+def serialize_sets(obj):
+    if isinstance(obj, set):
+        return list(obj)
+    return obj
+
 def main():
     if(len(sys.argv) < 4):
         return 1
     mode = sys.argv[1]
     libpath = sys.argv[2]
+    cachepath = sys.argv[3]
+    if mode == 'buildcache':
+        obj = build_dependency_cache(libpath)
+        with open(cachepath, 'w') as f:
+            json.dump(obj, f, default=serialize_sets)
+        return
+    export_dict, dependency_dict = get_dependency_from_cache(libpath, cachepath)
     if mode == 'linker':
-        dependencies = get_dependencies(libpath, sys.argv[3:])
+        dependencies = get_dependencies(export_dict, dependency_dict, sys.argv[4:])
         output = ' '.join(map(lambda x: x.replace('.s', '.o'), dependencies))
         print(output, end='')
     elif mode == 'getdependency':
-        for file in sys.argv[3:]:
-            dependencies = get_dependencies(libpath, [file])
+        for file in sys.argv[4:]:
+            dependencies = get_dependencies(export_dict, dependency_dict, [file])
             for dep in dependencies:
                 print(f"{file}: {dep}")
 
