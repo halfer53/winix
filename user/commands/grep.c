@@ -24,6 +24,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <string.h>
+#include <stdlib.h>
 
 void match(char *name, regexp *exp);
 void pline(char *name, int lineno, char buf[]);
