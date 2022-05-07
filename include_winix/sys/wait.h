@@ -17,7 +17,6 @@
 #define _WAIT_H_ 1
 
 #include <sys/types.h>
-#include <signal.h>
 
 #define _LOW(v)         ( (v) & 0x7f)
 #define _HIGH(v)        ( ((v) >> 8) & 0xff)
