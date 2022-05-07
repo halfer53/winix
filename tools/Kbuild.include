@@ -1,13 +1,6 @@
 ####
 # kbuild: Generic definitions
 
-# Winix build tools
-###
-# Shorthand for python3 tools/libs_linker.py 
-# Usage:
-# $(shell $(get_libs) source) 
-get_libs := python3 -S tools/libs_linker.py $(srctree)/lib
-
 # Convenient variables
 comma   := ,
 quote   := "
@@ -34,3 +27,16 @@ clean := -f $(srctree)/tools/Makefile.clean obj
 # $(Q)$(MAKE) $(cleanall)=dirs
 cleanall := -f $(srctree)/tools/Makefile.cleanall obj
 
+# Get all lib linker
+###
+# Shorthand for python3 tools/libs_linker.py 
+# Usage:
+# $(shell $(get_libs) source) 
+get_libs := python3 -S tools/libs_linker.py linker $(srctree)/lib
+
+# Get all lib dependencies
+###
+# Shorthand for python3 tools/libs_linker.py 
+# Usage:
+# $(shell $(get_libs) source) 
+get_deps := python3 -S tools/libs_linker.py getdependency $(srctree)/lib
