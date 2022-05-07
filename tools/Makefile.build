@@ -50,9 +50,9 @@ endif
 	$(Q)wasm $< -o $@
 
 ifneq ($(NO_MAKE_DEPEND),1)
-$(srcdepend): $(source)
+$(srcdepend): $(source) $(assembly)
 	$(Q)makedepend -o.s -f- $(INCLUDE_PATH) $(WINIX_INCLUDE_PATH) -I/usr/include/x86_64-linux-gnu $(source) > $(srcdepend)
-	$(Q)$(get_deps) $(source) >> $(srcdepend)
+	$(Q)$(get_deps) $(assembly) >> $(srcdepend)
 endif
 
 $(subdir-y): FORCE

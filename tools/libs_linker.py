@@ -89,9 +89,9 @@ def main():
         print(output, end='')
     elif mode == 'getdependency':
         for file in sys.argv[3:]:
-            dependencies = get_dependencies(libpath, [file.replace(".c", ".s")])
+            dependencies = get_dependencies(libpath, [file])
             for dep in dependencies:
-                print(f"{file.replace('.c', '.s')}: {dep}")
+                print(f"{file}: {dep}")
 
 
 if __name__ == '__main__':
