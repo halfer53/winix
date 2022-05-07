@@ -35,7 +35,7 @@ CMD_PROTOTYPE(test_so);
 CMD_PROTOTYPE(test_float);
 CMD_PROTOTYPE(test_sigsegv);
 CMD_PROTOTYPE(test_fork);
-CMD_PROTOTYPE(test_thread);
+CMD_PROTOTYPE(test_coroutine);
 CMD_PROTOTYPE(test_alarm);
 CMD_PROTOTYPE(test_eintr);
 CMD_PROTOTYPE(test_nohandler);
@@ -48,7 +48,7 @@ CMD_PROTOTYPE(test_while);
 struct cmd_internal test_commands[] = {
     { test_so, "stack"},
     { test_float, "float"},
-    { test_thread, "thread"},
+    { test_coroutine, "coroutine"},
     { test_sigsegv, "null" },
     { test_alarm, "alarm"},
     { test_deadlock, "deadlock"},
@@ -283,41 +283,41 @@ int test_alarm(int argc, char **argv){
 }
 
 ucontext_t mcontext;
-#define THREAD_STACK_SIZE    56
+#define COROUTINE_STACK_SIZE    56
 
 void func(int arg) {
-      printf("Hello World! I'm thread %d\n",arg);
+      printf("Hello World! I'm coroutine %d\n",arg);
 }
 
-int test_thread(int argc, char **argv){
+int test_coroutine(int argc, char **argv){
     int i,j,num = 2;
     int count = 1;
     void **thread_stack_op;
-    ucontext_t *threads; 
-    ucontext_t *cthread;
+    ucontext_t *coroutines_list; 
+    ucontext_t *coroutine;
 
     if(argc > 1)
         num = atoi(argv[1]);
     // ucontext represents the context for each thread
-    threads = malloc(sizeof(ucontext_t) * num);
-    if(threads == NULL)
+    coroutines_list = malloc(sizeof(ucontext_t) * num);
+    if(coroutines_list == NULL)
         goto err;
     
     // thread_stack_op saves the original pointer returned by malloc
     // so later we can use it to free the malloced memory
     thread_stack_op = malloc(sizeof(int) * num);
     if(thread_stack_op == NULL)
-        goto err_free_threads;
+        goto err_free_coroutines;
         
-    cthread = threads;
+    coroutine = coroutines_list;
     // Allocate stack for each thread
     for( i = 0; i < num; i++){
-        if ((thread_stack_op[i] =  malloc(THREAD_STACK_SIZE)) != NULL) {
-            cthread->uc_stack.ss_sp = thread_stack_op[i];
-            cthread->uc_stack.ss_size = THREAD_STACK_SIZE;
-            cthread->uc_link = &mcontext;
-            makecontext(cthread,func,1,count++);
-            cthread++;
+        if ((thread_stack_op[i] =  malloc(COROUTINE_STACK_SIZE)) != NULL) {
+            coroutine->uc_stack.ss_sp = thread_stack_op[i];
+            coroutine->uc_stack.ss_size = COROUTINE_STACK_SIZE;
+            coroutine->uc_link = &mcontext;
+            makecontext(coroutine,func,1,count++);
+            coroutine++;
 
             if(i%50 == 0)
                 putchar('!');
@@ -327,13 +327,13 @@ int test_thread(int argc, char **argv){
     }
     putchar('\n');
     
-    cthread = threads;
-    // scheduling the threads
+    coroutine = coroutines_list;
+    // scheduling the coroutines
     // note that we are using user thread library, 
-    // so we have to manually schedule all the threads.
+    // so we have to manually schedule all the coroutines.
     // Currently the scheduling algorithm is just simple a round robin
     for( i = 0; i < num; i++){
-        swapcontext(&mcontext,cthread++);
+        swapcontext(&mcontext,coroutine++);
     }
     
     err_free_all:
@@ -341,8 +341,8 @@ int test_thread(int argc, char **argv){
             free(thread_stack_op[j]);
         }
         free(thread_stack_op);
-    err_free_threads:
-        free(threads);
+    err_free_coroutines:
+        free(coroutines_list);
     err:
         if(errno == ENOMEM)
             perror("malloc");
