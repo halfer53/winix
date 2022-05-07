@@ -101,6 +101,7 @@
 #define IN_USE                    	0x0001      /* process slot is in use */
 #define BILLABLE                	0x0002      /* Set when user is invoking a system call */
 #define DIRECT_SYSCALL              0x0004      /* Direct Syscall mode */
+#define PROC_SIGAL_HANDLER          0x0008      /* process is in signal handler */
 
 // proc_memctll flags
 #define PROC_ACCESS                	1
