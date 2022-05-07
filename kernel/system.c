@@ -61,7 +61,9 @@ void system_main() {
             handler = syscall_not_implemented;
         
         reply = handler(curr_caller, mesg);
-        
+        if (is_sigpending(curr_caller)){
+            handle_pendingsig(curr_caller);
+        }
 
         switch(reply){
             case SUSPEND:
@@ -70,9 +72,7 @@ void system_main() {
             default:
                 syscall_reply2(curr_syscall, reply, curr_caller_proc_nr, mesg);
         }
-        if (is_sigpending(curr_caller)){
-            handle_pendingsig(curr_caller);
-        }
+        
         syscall_region_end();
         
     }
