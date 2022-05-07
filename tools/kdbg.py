@@ -62,11 +62,10 @@ def main():
     print(f"target assembly line number {target_line_num} in segment {target_segment} in {filename}")
 
     tmp_filename = "/tmp/" + filename.replace("/", "_") + ".s"
-    wcc_cmd = ["wcc","-N", "-g", "-S", "-I" + main_path + "/include", "-I" + main_path + "/include_winix",\
-                    "-D__wramp__", "-D_DEBUG","-o",tmp_filename, main_path+"/"+filename, ]
+    cc_cmd = f"gcc -Iinclude -DTEXT_OFFSET=1024 -D_DEBUG -Iinclude_winix -g -Wall -Werror -pedantic -Wno-discarded-qualifiers -Wno-comment  -D__wramp__ -nostdinc -E {filename} -o /dev/stdout | sed -E \"s/__attribute__\s*\(.+\)//\" | rcc -g -target=wramp > {tmp_filename}"
 
-    print(" ".join(wcc_cmd))
-    result = call(wcc_cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    print(cc_cmd)
+    result = call(cc_cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, shell=True)
     if result != 0:
         tmpfilename = filename.replace(".c",".s")
         if path.isfile(main_path+"/" +  tmpfilename):
