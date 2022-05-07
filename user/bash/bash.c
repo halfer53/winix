@@ -327,7 +327,7 @@ int help(int argc, char** argv){
 }
 
 int do_stest(int argc, char** argv){
-    static char test_str[] = "ls -lah bin | grep snake | wc | cat";
+    static char test_str[] = "ls -lah /bin | grep snake | wc | cat";
     // static char test_str[] = "test deadlock";
 
     int i, ret;
