@@ -24,7 +24,6 @@ typedef unsigned int sigset_t;
 #define SIGILL             4    /* illegal instruction */
 #define SIGTRAP            5    /* trace trap (not reset when caught) */
 #define SIGABRT            6    /* IOT instruction */
-#define SIGIOT             6    /* SIGABRT for people who speak PDP-11 */
 #define SIGUNUSED          7    /* spare code */
 #define SIGFPE             8    /* floating point exception */
 #define SIGKILL            9    /* kill (cannot be caught or ignored) */
