@@ -27,22 +27,6 @@ PUBLIC clock_t next_timeout = 0;
 
 PRIVATE struct proc* bill_ptr;
 
-void do_ticks();
-
-// void clock_main(){
-//     struct message m;
-//     while(1){
-//         winix_receive(&m);
-//         switch(m.type){
-//             case DO_CLOCKTICK:
-//                 do_ticks();
-//                 break;
-//             default:
-//                 kerror("CLOCK received %d from %d\n",m.type,m.src);
-//         }
-//     }
-// }
-
 void do_ticks(){
     while(next_timeout <= system_uptime){
         struct timer* next_timer = dequeue_alarm();
