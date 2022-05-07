@@ -20,7 +20,10 @@
 void deliver_alarm(int proc_nr, clock_t time){
     struct proc* who = get_proc(proc_nr);
     if(who){
-        send_sig(who,SIGALRM);
+        send_sig(who, SIGALRM);
+        if(who->state){
+            handle_pendingsig(who, true);
+        }
     }
 }
 
