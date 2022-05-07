@@ -52,6 +52,7 @@ endif
 ifneq ($(NO_MAKE_DEPEND),1)
 $(srcdepend): $(source)
 	$(Q)makedepend -o.s -f- $(INCLUDE_PATH) $(WINIX_INCLUDE_PATH) -I/usr/include/x86_64-linux-gnu $(source) > $(srcdepend)
+	$(Q)$(get_deps) $(source) >> $(srcdepend)
 endif
 
 $(subdir-y): FORCE
@@ -64,9 +65,6 @@ ifeq ($(KBUILD_VERBOSE),0)
 endif
 	$(Q)wlink -Ttext $(TEXT_OFFSET) -v -o $@ $^ `$(get_libs) $^` > $(SREC_INCLUDE)/$(notdir $(@:.srec=.verbose))
 	$(Q)cp $@ $(SREC_INCLUDE)/$(notdir $@)
-ifneq ($(NO_MAKE_DEPEND),1)
-	$(Q)$(get_deps) $^ >> $(srcdepend)
-endif
 
 FORCE:
 
