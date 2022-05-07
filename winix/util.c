@@ -33,8 +33,6 @@ void _panic(const char* str, const char* file) {
     if(file)
         kprintf(" in %s\n", file);
 
-    // if (!in_interrupt())
-    //     wramp_syscall(WINIX_STACK_TRACE);
         
     while(1) {
         RexParallel->Ctrl = 0;
@@ -51,6 +49,8 @@ void _panic(const char* str, const char* file) {
 void _assert(int expression, int line, char* filename) {
     if(!expression) {
         kprintf("\nAssert Failed at line %d in %s",line,filename);
+        if (!in_interrupt())
+            wramp_syscall(WINIX_STACK_TRACE);
         _panic(NULL, NULL);
     }
 }
