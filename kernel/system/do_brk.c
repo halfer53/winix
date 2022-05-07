@@ -83,6 +83,8 @@ ret_result:
 
 int do_sbrk(struct proc* who, struct message *m){
     ptr_t* ret = sys_sbrk(who, m->m1_i1);
+    if (!ret)
+        return -ENOMEM;
     return (int)(get_virtual_addr(ret, who) - (vptr_t*)0);
 }
 
