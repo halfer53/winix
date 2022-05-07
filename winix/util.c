@@ -33,7 +33,8 @@ void _panic(const char* str, const char* file) {
     if(file)
         kprintf(" in %s\n", file);
 
-    wramp_syscall(WINIX_STACK_TRACE);
+    // if (!in_interrupt())
+    //     wramp_syscall(WINIX_STACK_TRACE);
         
     while(1) {
         RexParallel->Ctrl = 0;
