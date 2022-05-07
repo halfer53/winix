@@ -271,6 +271,10 @@ PRIVATE void syscall_handler() {
         case WINIX_NOTIFY:
             ret = do_notify(m->src, dest,m);
             break;
+        
+        case WINIX_STACK_TRACE:
+            rewind_stack(curr_scheduling_proc);
+            break;
 
         default:
             ret = -EINVAL;
