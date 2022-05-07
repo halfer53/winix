@@ -255,6 +255,8 @@ int dequeue_schedule( struct proc *h) {
  * @param p 
  */
 void enqueue_schedule(struct proc* p) {
+    if (ready_q[p->priority][TAIL] == p)
+        PANIC("double enqueue");
     enqueue_tail(ready_q[p->priority], p);
 }
 
