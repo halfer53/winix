@@ -16,6 +16,7 @@
 
 #include <winix/syscall_ctx.h>
 #include <signal.h>
+#include <stdbool.h>
 
 // By POSIX convention, if a process is killed by a signal, its exit status code is 128 + signum
 #define SIG_STATUS(s)   (128 + (s))
@@ -25,7 +26,8 @@ int send_sig(struct proc *who, int signum);
 int cause_sig(struct proc *who, int signum);
 int is_sigpending(struct proc* who);
 int handle_sig(struct proc* who, int signum);
-int handle_pendingsig(struct proc* who);
+int handle_pendingsig(struct proc* who, bool check_enqueue);
+#define handle_pendingsig_syscall(who, reply)   handle_pendingsig(who, (reply == DONTREPLY || reply == SUSPEND))
 
 struct sigframe{
     int syscall_num;
