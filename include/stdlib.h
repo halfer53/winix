@@ -35,7 +35,7 @@ void srand(unsigned int seed);
 int rand(void);
 int atoi(char *str);
 unsigned long strtoul(const char * nptr, char ** endptr, int base);
-
+void abort();
 
 
 #define exit(code)      __exit(code)
