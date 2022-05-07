@@ -30,7 +30,8 @@ int do_sigreturn(struct proc *who, struct message *m){
     // to system proc struct, information includes registers
     // scheduling flags, and messages
     memcpy(who, sp, SIGNAL_CTX_LEN);
-
+    who->flags &= ~PROC_SIGAL_HANDLER;
+    
     // restore mask
     who->sig_mask = who->sig_mask2;
 
