@@ -20,6 +20,7 @@
 #include <sys/times.h>
 #include <sys/fcntl.h>
 #include <stdlib.h>
+#include <assert.h>
 
 #define CMD_PROTOTYPE(name)    int name(int argc, char**argv)
 
@@ -51,6 +52,7 @@ struct cmd_internal test_commands[] = {
     { test_coroutine, "coroutine"},
     { test_sigsegv, "null" },
     { test_alarm, "alarm"},
+    { test_eintr, "eintr"},
     { test_deadlock, "deadlock"},
     { test_ipc, "ipc"},
     { test_signal, "signal"},
@@ -255,13 +257,20 @@ int test_sigsegv(int argc, char **argv){
 int seconds = 1;
 int cont;
 
-void signal_handler(int signum){
-    printf("\n%d seconds elapsed\n",seconds);
-}
-
 void alarm_handler(int signum){
     printf("\n%d seconds elapsed\n",seconds);
     cont = 0;
+}
+
+int test_eintr(int argc, char **argv){
+    char __buffer[10];
+    int ret;
+    signal(SIGALRM, alarm_handler);
+    alarm(1);
+    ret = read(STDIN_FILENO, __buffer, 10);
+    assert(ret == -1);
+    assert(errno == EINTR);
+    return 0;
 }
 
 int test_alarm(int argc, char **argv){
