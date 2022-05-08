@@ -201,7 +201,7 @@ int test_deadlock(int argc, char **argv){
     pid_t pid;
     struct message m;
     int ret, result;
-    if((pid = fork())){
+    if((pid = tfork())){
         sched_yield();
         ret = winix_send(pid,&m);
         assert(ret == -1);
