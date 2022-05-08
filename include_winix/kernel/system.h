@@ -22,7 +22,6 @@
  * Entry point for the system task.
  **/
 void system_main();
-struct message *get_ipc_mesg();
 void intr_syscall();
 struct syscall_ctx* interrupted_syscall_ctx();
 
@@ -37,7 +36,7 @@ bool is_in_syscall(struct proc* who);
 ptr_t* sys_sbrk(struct proc *who, int size);
 void set_syscall_mesg_exception(int operation, ptr_t* sp, struct message *m, struct proc* who);
 void set_reply_res_errno(struct proc* who, struct message *m);
-
+int curr_syscall_num();
 int sys_kill(struct proc* who, pid_t pid, int signum);
 
 #ifdef _DEBUG
