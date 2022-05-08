@@ -33,19 +33,16 @@ struct cmd_internal {
     char *name;
 };
 
-CMD_PROTOTYPE(test_malloc);
 CMD_PROTOTYPE(test_so);
 CMD_PROTOTYPE(test_float);
 CMD_PROTOTYPE(test_sigsegv);
-CMD_PROTOTYPE(test_fork);
 CMD_PROTOTYPE(test_coroutine);
 CMD_PROTOTYPE(test_eintr);
 CMD_PROTOTYPE(test_nohandler);
-CMD_PROTOTYPE(test_vfork);
 CMD_PROTOTYPE(test_deadlock);
 CMD_PROTOTYPE(test_ipc);
 CMD_PROTOTYPE(test_signal);
-CMD_PROTOTYPE(test_while);
+CMD_PROTOTYPE(run_all);
 
 struct cmd_internal test_commands[] = {
     { test_so, "stack"},
@@ -56,7 +53,7 @@ struct cmd_internal test_commands[] = {
     { test_deadlock, "deadlock"},
     { test_ipc, "ipc"},
     { test_signal, "signal"},
-    { test_while, "while"},
+    { run_all, "run"},
     { test_nohandler, NULL},
     {0}
 };
@@ -85,8 +82,21 @@ int test_nohandler(int argc, char** argv){
     return 0;
 }
 
-int test_while(int argc, char** argv){
-    while(1);
+int run_all(int argc, char** argv){
+    struct cmd_internal* handler;
+    char *handler_argv[2];
+    int ret;
+    handler = test_commands;
+    handler_argv[1] = NULL;
+    while(handler->name){
+        if (strcmp(handler->name, argv[0]) == 0)
+            break;
+        handler_argv[0] = handler->name;
+        ret = handler->handle(1, handler_argv);
+        printf("%s return %d\n", handler->name, ret);
+        assert(ret == 0);
+        handler++;
+    }
     return 0;
 }
 
@@ -338,7 +348,7 @@ int test_coroutine(int argc, char **argv){
             makecontext(coroutine,func,1,count++);
             coroutine++;
 
-            if(i%50 == 0)
+            if(i && i % 50 == 0)
                 putchar('!');
         }else{
             goto err_free_all;
