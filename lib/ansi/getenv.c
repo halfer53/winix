@@ -11,12 +11,10 @@ char *getenv(const char *name)
     const char **v;
     const char *p, *q;
     
-    if(_environ == NULL)
-        init_environ();
-    if (name == NULL || _environ == NULL)
+    if (name == NULL)
         return (char *)NULL;
 
-    v = _environ;
+    v = environ;
     while ((p = *v++) != NULL) {
         q = name;
         while (*q && (*q == *p++))

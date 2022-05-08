@@ -21,10 +21,7 @@ int putenv(char *name)
 	 */
 
     if (!name) return 0;
-    if(_environ == NULL)
-        init_environ();
-	if (_environ == NULL) return 1;
-	v = _environ;
+	v = environ;
 	if ((r = strchr(name, '='))) {
 		char *p, *q;
 
