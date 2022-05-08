@@ -27,7 +27,7 @@
 #define WIFEXITED(s)        (_LOW(s) == 0)                /* normal exit */
 #define WEXITSTATUS(s)      (_HIGH(s))                /* exit status */
 #define WTERMSIG(s)         (_LOW(s))            /* sig value */
-#define WIFSIGNALED(s)      (((unsigned int)(s)-1 & 0xFFFF) < 0xFF) /* signaled */
+#define WIFSIGNALED(s)      (_LOW(s) > 0) /* signaled */
 #define WIFSTOPPED(s)       (_LOW(s) == SIGSTOP || _LOW(s) == SIGTSTP )            /* stopped */
 #define WSTOPSIG(s)         (_HIGH(s))                    /* stop signal */
 
