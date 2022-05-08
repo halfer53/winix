@@ -2,6 +2,7 @@
 #include <dirent.h>
 #include <stdlib.h>
 #include <string.h>
+#include <bsd/string.h>
 
 #define PATH_LEN    (64)
 char slash[] = "/";

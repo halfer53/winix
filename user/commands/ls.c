@@ -4,6 +4,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <sys/stat.h>
+#include <bsd/string.h>
 
 struct time_struct{
     int date;

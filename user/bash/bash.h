@@ -15,6 +15,7 @@
 #include <ucontext.h>
 #include <sys/wait.h>
 #include <sys/times.h>
+#include <bsd/string.h>
 #include "parse.h"
 
 

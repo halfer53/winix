@@ -14,6 +14,7 @@
 #include <winix/rex.h>
 #include <winix/list.h>
 #include <string.h>
+#include <bsd/string.h>
 #include <ctype.h>
 #include <winix/ksignal.h>
 

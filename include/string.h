@@ -15,7 +15,6 @@
 #define _STRING_H_ 1
 
 #include <stddef.h>
-#include <winix/strl.h>
 
 void *memcpy(void *dst, const void *src, size_t n);
 int strcmp(const char *s1, const char *s2);

@@ -6,6 +6,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <regexp.h>
+#include <bsd/string.h>
 #include "regmagic.h"
 
 /*

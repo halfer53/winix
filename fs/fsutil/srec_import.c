@@ -7,6 +7,7 @@
 #include <libgen.h>
 #include <argp.h>
 #include <winix/welf.h>
+#include <bsd/string.h>
 #include "srec_import.h"
 #include "../mock/mock.h"
 

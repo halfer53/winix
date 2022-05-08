@@ -1,5 +1,6 @@
 #include <string.h>
 #include <stdlib.h>
+#include <bsd/string.h>
 
 int setenv(const char *name, const char *value, int overwrite) {
 	char *buf;

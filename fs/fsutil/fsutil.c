@@ -17,6 +17,7 @@
 #include <fs/cache.h>
 #include <fs/super.h>
 #include <fs/fs_methods.h>
+#include <bsd/string.h>
 #include "srec_import.h"
 #include "../mock/mock.h"
 

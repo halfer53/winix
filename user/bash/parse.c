@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <bsd/string.h>
 #include "parse.h"
 
 #define isShellSymb(c) ((c)=='|' || (c)=='<' || (c)=='>' || (c)== '\'' || (c) == '=' || (c) == '"' || (c) == '`')

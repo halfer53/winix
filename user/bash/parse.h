@@ -3,9 +3,6 @@
 
 #include <ctype.h>
 
-char *strlcat(char *dest, const char *src, size_t n);
-char *strlcpy(char *dest, const char *src, size_t n);
-
 #define MAX_LINE        100  /* longest accepted command line */
 #define BUF_LEN         32
 #define MAX_COMMANDS    8
