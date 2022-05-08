@@ -90,25 +90,31 @@ int test_while(int argc, char** argv){
     return 0;
 }
 
+int sig_sum;
+
 void usr_handler(int signum){
+    sig_sum += signum;
     printf("SIGUR1 start\n");
     raise(SIGUSR2);
     printf("SIGUR1 end\n");
 }
 
 void usr2_handler(int signum){
+    sig_sum += signum;
     printf("SIGUR2 start\n");
     raise(SIGINT);
     printf("SIGUR2 end\n");
 }
 
 void int_handler(int signum){
+    sig_sum += signum;
     printf("SIGINT start\n");
     raise(SIGTERM);
     printf("SIGINT end\n");
 }
 
 void term_handler(int signum){
+    sig_sum += signum;
     printf("SIGTERM start\n");
     printf("SIGTERM end\n");
 }
@@ -116,6 +122,7 @@ void term_handler(int signum){
 int test_signal(int argc, char **argv){
     struct sigaction sa;
     sigset_t set, prevset;
+    sig_sum = 0;
 
     // Check out what would happen after changing
     // the following sigemptyset to sigfillset
@@ -141,17 +148,17 @@ int test_signal(int argc, char **argv){
     // since SIGUSR1 is currently blocked by sigprocmask
     // SIGUSR1 will be pended until sigsuspend
     raise(SIGUSR1);
+    assert(sig_sum == 0);
 
     // check pending signals
     sigpending(&set);
-    printf("pending sigs %x\n",set);
-
-    if(sigismember(&set, SIGUSR1))
-        printf("SIGUSR1 is pending\n");
+    assert(sigismember(&set, SIGUSR1));
+    assert(sig_sum == 0);
 
     // unblock all pending signals
     printf("signal handler usr1 should be called after this\n");
     sigsuspend(&prevset);
+    assert(sig_sum == SIGUSR1 + SIGUSR2 + SIGTERM + SIGINT);
     return 0;
 }
 
