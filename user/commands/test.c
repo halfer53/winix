@@ -165,15 +165,15 @@ int test_ipc(int argc, char **argv){
         m.type = 100;
         winix_sendrec(pid,&m);
         printf("received %d from child\n",m.reply_res);
+        assert(m.reply_res == 200);
         wait(NULL);
     }else{
         winix_receive(&m);
         printf("received %d from parent\n",m.type);
+        assert(m.type == 100);
         m.reply_res = 200;
         ret = winix_send(getppid(), &m);
-        if(ret){
-            perror("send");
-        }
+        assert(ret == 0);
         exit(0);
     }
     return 0;
