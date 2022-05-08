@@ -39,7 +39,6 @@ CMD_PROTOTYPE(test_float);
 CMD_PROTOTYPE(test_sigsegv);
 CMD_PROTOTYPE(test_fork);
 CMD_PROTOTYPE(test_coroutine);
-CMD_PROTOTYPE(test_alarm);
 CMD_PROTOTYPE(test_eintr);
 CMD_PROTOTYPE(test_nohandler);
 CMD_PROTOTYPE(test_vfork);
@@ -53,7 +52,6 @@ struct cmd_internal test_commands[] = {
     { test_float, "float"},
     { test_coroutine, "coroutine"},
     { test_sigsegv, "null" },
-    { test_alarm, "alarm"},
     { test_eintr, "eintr"},
     { test_deadlock, "deadlock"},
     { test_ipc, "ipc"},
@@ -288,24 +286,6 @@ int test_eintr(int argc, char **argv){
     ret = read(STDIN_FILENO, __buffer, 10);
     assert(ret == -1);
     assert(errno == EINTR);
-    return 0;
-}
-
-int test_alarm(int argc, char **argv){
-    int i;
-    seconds = (argc > 1) ? atoi(argv[1]) : 1;
-    if(seconds < 0)
-        seconds = 0;
-    signal(SIGALRM,alarm_handler);
-    alarm(seconds);
-    cont = 1;
-    i = 10000;
-    while(cont){
-        putchar('!');
-        while(i--);
-        i = 10000;
-    }
-        
     return 0;
 }
 
