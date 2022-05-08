@@ -169,7 +169,7 @@ int test_signal(int argc, char **argv){
     // unblock all pending signals
     printf("signal handler usr1 should be called after this\n");
     sigsuspend(&prevset);
-    assert(sig_sum = SIGUSR1 + SIGUSR2 + SIGTERM + SIGINT);
+    assert(sig_sum == SIGUSR1 + SIGUSR2 + SIGTERM + SIGINT);
     return 0;
 }
 
