@@ -320,7 +320,6 @@ void proc_set_default(struct proc *p) {
     p->quantum = DEFAULT_USER_QUANTUM;
     p->ctx.ptable = p->protection_table;
     p->alarm.proc_nr = p->proc_nr;
-    p->sig_table[SIGCHLD].sa_handler = SIG_IGN;
     p->priority = DEFAULT_PRIORITY;
     p->umask = 0x22;
 }
