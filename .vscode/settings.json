@@ -64,7 +64,9 @@
         "cmath": "c",
         "*.tcc": "c",
         "bash.h": "c",
-        "macro.h": "c"
+        "macro.h": "c",
+        "wait.h": "c",
+        "ipc.h": "c"
     },
     "files.exclude": {
         "**/*.o": true,

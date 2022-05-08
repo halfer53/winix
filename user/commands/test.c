@@ -21,6 +21,7 @@
 #include <sys/fcntl.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <sys/wait.h>
 
 #define CMD_PROTOTYPE(name)    int name(int argc, char**argv)
 
@@ -242,13 +243,16 @@ int sigsegv_handler(int signum){
 int test_sigsegv(int argc, char **argv){
     char *p = (char *)NULL + 1;
     int pid;
+    int result;
     if ((pid = tfork()) == 0){
         signal(SIGSEGV, sigsegv_handler);
         printf("%s", p);
         signal(SIGSEGV, SIG_DFL);
-        printf("sigsegv test finished\n");
+        exit(0);
     }else{
-        wait(NULL);
+        wait(&result);
+        assert(WEXITSTATUS(result) == 0);
+        assert(!WIFSIGNALED(result));
     }
     return 0;
 }
@@ -265,6 +269,9 @@ void alarm_handler(int signum){
 int test_eintr(int argc, char **argv){
     char __buffer[10];
     int ret;
+    seconds = (argc > 1) ? atoi(argv[1]) : 1;
+    if(seconds < 0)
+        seconds = 0;
     signal(SIGALRM, alarm_handler);
     alarm(1);
     ret = read(STDIN_FILENO, __buffer, 10);
