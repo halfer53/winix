@@ -228,6 +228,7 @@ PRIVATE void syscall_handler() {
     int dest, operation, ret;
     struct message *m;
     ptr_t *sp;
+    bool direct_syscall = false;
 
     if(!curr_scheduling_proc )
         goto end;
@@ -244,6 +245,7 @@ PRIVATE void syscall_handler() {
         sp++;
         set_syscall_mesg_exception(operation, sp, m, curr_scheduling_proc);
         operation = WINIX_SENDREC;
+        direct_syscall = true;
         
     }else{ // traditional IPC mode
         dest = *(sp+1);                // Destination is second parameter on the stack
@@ -280,7 +282,7 @@ PRIVATE void syscall_handler() {
             ret = -EINVAL;
             break;
     }
-    if (ret < 0){
+    if (!direct_syscall || ret < 0){
         curr_scheduling_proc->ctx.m.regs[0] = ret;
     }
 
