@@ -63,13 +63,19 @@ struct cmd_internal builtin_commands[] = {
     { 0, NULL}
 };
 
+void init_pgid(){
+    pgid = getpgid(0);
+}
+
 void init_shell(){
     int ret;
-    pgid = getpgid(0);
     ret = ioctl(STDIN_FILENO, TIOCSPGRP, &pgid);
     if (ret != 0){
         perror("TIOCSPGRP");
     }
+}
+
+void init_signal(){
 #ifdef __wramp__
     signal(SIGINT, SIG_IGN);
     signal(SIGTSTP, SIG_IGN);
@@ -79,6 +85,7 @@ void init_shell(){
 int main(int argc, char *argv[]) {
     int ret, len, newline_pos;
 
+    init_pgid();
     if(argc > 2 && strcmp(argv[1], "-c") == 0){
         int i;
         buf[0] = '\0';
@@ -90,7 +97,7 @@ int main(int argc, char *argv[]) {
     }
 
     init_shell();
-
+    init_signal();
 #ifdef __wramp__
     history_fd = open(history_file, O_CREAT | O_RDWR, 0x755);
     if(history_fd < 0){
