@@ -50,7 +50,7 @@ struct cmd_internal test_commands[] = {
     { test_float, "float", true },
     { test_coroutine, "coroutine", true },
     { test_sigsegv, "null", true },
-    { test_eintr, "eintr", true},
+    { test_eintr, "eintr", false},
     { test_deadlock, "deadlock", true },
     { test_ipc, "ipc", true },
     { test_signal, "signal", true },
