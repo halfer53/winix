@@ -97,11 +97,16 @@ void start_init_routine()
 
 void run_unit_test()
 {
+    pid_t pid;
+    int status;
     char *argv[] = {shell_path, "-c", "test", "run", ">", "test.log", NULL};
-    if (!vfork()){
+    pid = vfork();
+    if (!pid){
         execv(shell_path, argv);
         _exit(1);
     }
+    wait(&status);
+    CHECK_SYSCALL(WIFEXITED(status));
 }
 
 void run_shell(){
@@ -117,7 +122,6 @@ int main(int argc, char **argv)
     init_dev();
     init_tty();
 
-    
     run_unit_test();
     run_shell();
     start_init_routine();
