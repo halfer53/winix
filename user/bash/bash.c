@@ -76,8 +76,19 @@ void init_shell(){
 #endif
 }
 
-int main() {
+int main(int argc, char *argv[]) {
     int ret, len, newline_pos;
+
+    if(argc > 2 && strcmp(argv[1], "-c") == 0){
+        int i;
+        buf[0] = '\0';
+        for(i = 2; i < argc; i++){
+            strlcat(buf, argv[i], MAX_LINE);
+            strlcat(buf, " ", MAX_LINE);
+        }
+        return exec_cmd(buf);
+    }
+
     init_shell();
 
 #ifdef __wramp__
