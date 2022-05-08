@@ -31,7 +31,9 @@
 #include <winix/ksignal.h>
 
 int get_wstats(struct proc* child){
-    return (child->exit_status << 8) | (child->sig_status & 0x7f);
+    int ret = (child->exit_status << 8) | (child->sig_status & 0x7f);
+    // klog("return wstatus %d for %d\n", ret, child->proc_nr);
+    return ret;
 }
 
 int do_waitpid(struct proc *parent, struct message *mesg){
@@ -251,7 +253,9 @@ void exit_proc(struct proc *who, int status, int signum){
     
     // if No process is waiting for this process, send SIGCHLD to parent
     check_waiting(who);
-    send_sig(parent, SIGCHLD);
+    if (parent->sig_table[SIGCHLD].sa_handler != SIG_DFL){
+        send_sig(parent, SIGCHLD);
+    }
 }
 
 int do_exit(struct proc *who, struct message *m){
