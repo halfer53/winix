@@ -166,7 +166,8 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
         signal(SIGTSTP, SIG_DFL);
         ret = ioctl(STDIN_FILENO, TIOCSPGRP, &last_pgid);
 #endif
-        close(history_fd);
+        if (history_fd)
+            close(history_fd);
 
         if(cmd->infile){ //if redirecting input
             // saved_stdin = dup(STDIN_FILENO); //backup stdin
