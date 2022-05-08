@@ -68,7 +68,8 @@ endif
 
 buildlib:
 	$(Q)$(MAKE) $(build)=lib
-	$(Q)$(build_depcache)
+	# building cache currently takes more time than necessary, disable it
+	# $(Q)$(build_depcache)
 
 kbuild: $(ALLDIR) $(FSUTIL)
 $(ALLDIR): FORCE
