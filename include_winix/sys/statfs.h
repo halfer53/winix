@@ -15,7 +15,7 @@ struct statfs {
 
 int statfs(const char *path, struct statfs *buf);
 
-#if defined(__wramp__) & !defined(_SYSTEM)
+#if defined(__wramp__) & !defined(LINTING) && !defined(_SYSTEM)
 
 #define statfs(path, buf)                   wramp_syscall(STATFS, path, buf)
 #endif

@@ -34,7 +34,7 @@
 pid_t wait(int *wstatus);
 pid_t waitpid(pid_t pid, int *wstatus, int options);
 
-#if defined(__wramp__) & !defined(_SYSTEM)
+#if defined(__wramp__) & !defined(LINTING) && !defined(_SYSTEM)
 
 #define waitpid(pid, wstatus, option)       wramp_syscall(WAITPID, pid, wstatus, option)
 #define wait(wstatus)                       waitpid(-1, wstatus, 0)

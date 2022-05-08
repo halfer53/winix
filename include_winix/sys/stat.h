@@ -73,7 +73,7 @@ int chown(const char *pathname, uid_t owner, gid_t group);
 int access(const char *pathname, int mode);
 
 
-#if defined(__wramp__) & !defined(_SYSTEM)
+#if defined(__wramp__) & !defined(LINTING) && !defined(_SYSTEM)
 
 
 #define mknod(pathname, mode, dev)          wramp_syscall(MKNOD, mode, pathname, dev)

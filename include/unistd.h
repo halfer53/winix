@@ -38,7 +38,7 @@ char *getcwd(char *buf, size_t size);
 int execve(const char *pathname, char *const argv[],char *const envp[]);
 int execv(const char *path, char *const argv[]);
 
-#if defined(__wramp__) & !defined(_SYSTEM)
+#if defined(__wramp__) & !defined(LINTING) && !defined(_SYSTEM)
 
 #define sync()                              wramp_syscall(SYNC)
 #define read(fd, buf, count)                wramp_syscall(READ,fd, buf, count)

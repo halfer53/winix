@@ -3,7 +3,7 @@
 
 void sched_yield();
 
-#if defined(__wramp__) & !defined(_SYSTEM)
+#if defined(__wramp__) & !defined(LINTING) && !defined(_SYSTEM)
 
 #define sched_yield()                       wramp_syscall(SCHED_YIELD)
 #endif

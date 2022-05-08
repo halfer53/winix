@@ -9,7 +9,7 @@ int close(int fd);
 int open(const char *pathname,int flags, ...);
 int fcntl(int fd, int cmd, ... /* arg */ );
 
-#if defined(__wramp__) & !defined(_SYSTEM)
+#if defined(__wramp__) & !defined(LINTING) && !defined(_SYSTEM)
 
 #define creat(pathname, mode)               wramp_syscall(CREAT, mode, pathname)
 #define close(fd)                           wramp_syscall(CLOSE, fd)

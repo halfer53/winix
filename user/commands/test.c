@@ -250,9 +250,8 @@ int test_so(int argc, char **argv){
     return 0;
 }
 
-int sigsegv_handler(int signum){
+void sigsegv_handler(int signum){
     printf("sigsegv handler invoked %d\n", signum);
-    return 0;
 }
 
 int test_sigsegv(int argc, char **argv){

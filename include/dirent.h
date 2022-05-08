@@ -6,7 +6,7 @@
 
 int getdents( int fd, struct dirent *dirp, unsigned int count);
 
-#if defined(__wramp__) & !defined(_SYSTEM)
+#if defined(__wramp__) & !defined(LINTING) && !defined(_SYSTEM)
 #define getdents(fd, dirp, count)           wramp_syscall(GETDENT, fd, dirp, count)
 #endif
 

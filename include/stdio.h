@@ -99,7 +99,7 @@ int getc(FILE* stream);
 
 extern FILE	*__iotab[FOPEN_MAX];
 
-#if defined(__wramp__) & !defined(_SYSTEM)
+#if defined(__wramp__) & !defined(LINTING) && !defined(_SYSTEM)
 
 #define fprintf(stream, format, ...)        dprintf(stream->_fd, format, ##__VA_ARGS__)
 #define printf(format, ...)                 dprintf(STDOUT_FILENO, format, ##__VA_ARGS__)

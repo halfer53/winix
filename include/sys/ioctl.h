@@ -30,7 +30,7 @@
 
 int ioctl(int fd, unsigned long request, ...);
 
-#if defined(__wramp__) & !defined(_SYSTEM)
+#if defined(__wramp__) & !defined(LINTING) && !defined(_SYSTEM)
 
 #define ioctl(fd, request, ...)             wramp_syscall(IOCTL, fd, request, ##__VA_ARGS__)
 #endif

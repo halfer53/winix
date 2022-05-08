@@ -92,7 +92,7 @@ int enable_syscall_tracing();
 int disable_syscall_tracing();
 
 
-#if defined(__wramp__) & !defined(_SYSTEM)
+#if defined(__wramp__)
 
 #define __dprintf(fd, format, arg)          wramp_syscall(DPRINTF, fd, format, arg)
 #define __strerror(buffer, len,usrerr)      wramp_syscall(STRERROR, len, buffer, usrerr)

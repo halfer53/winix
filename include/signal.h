@@ -95,7 +95,7 @@ int sigprocmask(int how, const sigset_t *set, sigset_t *oldset);
 int sigsuspend(const sigset_t *mask);
 int sigpending(sigset_t *set);
 
-#if defined(__wramp__) & !defined(_SYSTEM)
+#if defined(__wramp__) & !defined(LINTING) && !defined(_SYSTEM)
 
 #define kill(pid, sig)                      wramp_syscall(KILL, pid, sig)
 #define sigaction(signum, act, oact)        wramp_syscall(SIGACTION, signum, act, oact)
