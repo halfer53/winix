@@ -68,6 +68,7 @@ int copy_stack(struct proc* parent, struct proc* child){
         val = child->ctx.m.regs[i];
         if (val >= vstack_top && val < vstack_bottom) {
             child->ctx.m.regs[i] = (unsigned long)get_virtual_addr(val - vstack_top + new_stack, child);
+            // KDEBUG(("reg %d: old %lx new %x\n", i+1, val, child->ctx.m.regs[i]));
         }
     }
 
@@ -149,13 +150,10 @@ int copy_mm(struct proc* parent, struct proc* child){
  * @param  child  
  * @return        
  */
-int copy_pregs(struct proc* parent, struct proc* child){
-    ptr_t *sp;
-    sp = get_physical_addr(parent->ctx.m.sp,parent);
-    child->message = (struct message *)get_physical_addr((unsigned long)(*( sp + 2 )), child);
+void copy_pregs(struct proc* parent, struct proc* child){
+    child->message = (struct message *)get_physical_addr(get_virtual_addr(parent->message, parent), child);
     child->heap_break = get_physical_addr(get_virtual_addr(parent->heap_break, parent), child);
     child->heap_bottom = get_physical_addr(get_virtual_addr(parent->heap_bottom, parent), child);
-    return OK;
 }
 
 
@@ -173,7 +171,7 @@ int sys_fork(struct proc *parent) {
 
     if ((child = get_free_proc_slot())) {
         copy_pcb(parent,child);
-
+        
         if((ret = copy_mm(parent, child))){
             release_proc_slot(child);
             return ret;
@@ -203,7 +201,7 @@ int do_fork(struct proc *who, struct message *m){
     // if an error is encounted
     if(child_pr < 0)
         return child_pr;
-    
+
     // send 0 to child
     syscall_reply2(FORK, 0, child_pr, m);
 
