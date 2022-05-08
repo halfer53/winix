@@ -22,7 +22,7 @@
 #define _HIGH(v)        ( ((v) >> 8) & 0xff)
 
 #define WNOHANG         1    /* do not wait for child to exit */
-#define WUNTRACED       2    /* for job control; not implemented */
+#define WUNTRACED       2    /* return if a child has stopped */
 
 #define WIFEXITED(s)        (_LOW(s) == 0)                                          /* normal exit */
 #define WEXITSTATUS(s)      (_HIGH(s))                                              /* exit status */
