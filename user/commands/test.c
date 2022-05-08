@@ -22,6 +22,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <sys/wait.h>
+#include <sched.h>
 
 #define CMD_PROTOTYPE(name)    int name(int argc, char**argv)
 
@@ -158,21 +159,23 @@ int test_signal(int argc, char **argv){
 
 int test_ipc(int argc, char **argv){
     pid_t pid;
-    int ret;
+    int ret, result;
     struct message m;
-    wramp_syscall(WINFO, WINFO_DEBUG_IPC);
     if((pid = tfork())){
         m.type = 100;
         winix_sendrec(pid,&m);
         printf("received %d from child\n",m.reply_res);
         assert(m.reply_res == 200);
-        wait(NULL);
+        ret = wait(&result);
+        assert(ret == 0);
+        assert(WIFEXITED(ret));
     }else{
         winix_receive(&m);
         printf("received %d from parent\n",m.type);
         assert(m.type == 100);
         m.reply_res = 200;
         ret = winix_send(getppid(), &m);
+        printf("%d \n", ret);
         assert(ret == 0);
         exit(0);
     }
@@ -182,15 +185,20 @@ int test_ipc(int argc, char **argv){
 int test_deadlock(int argc, char **argv){
     pid_t pid;
     struct message m;
+    int ret, result;
     if((pid = fork())){
-        int n = 100000;
-        while(n--);
-        if(winix_send(pid,&m))
-            perror("send to child");
-        kill(pid,SIGKILL);
-        wait(NULL);
+        sched_yield();
+        ret = winix_send(pid,&m);
+        assert(ret == -1);
+        assert(errno == EDEADLK);
+        ret = kill(pid,SIGKILL);
+        assert(ret == 0);
+        ret = wait(&result);
+        assert(ret == 0);
+        assert(WIFSIGNALED(result));
+        assert(WTERMSIG(result) == SIGKILL);
     }else{
-        (void)winix_send(getppid(),&m);
+        (void)winix_send(getppid(), &m);
         while(1);
     }
     return 0;
@@ -251,6 +259,7 @@ int test_sigsegv(int argc, char **argv){
         exit(0);
     }else{
         wait(&result);
+        // printf("%d %d %d\n", result, WEXITSTATUS(result), WIFSIGNALED(result));
         assert(WEXITSTATUS(result) == 0);
         assert(!WIFSIGNALED(result));
     }
@@ -262,7 +271,7 @@ int seconds = 1;
 int cont;
 
 void alarm_handler(int signum){
-    printf("\n%d seconds elapsed\n",seconds);
+    printf("%d seconds elapsed\n",seconds);
     cont = 0;
 }
 
