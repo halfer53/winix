@@ -64,7 +64,7 @@ int execv(const char *path, char *const argv[]);
 #define brk(ptr)                            wramp_syscall(BRK, ptr)
 #define getcwd(buf, size)                   ptr_wramp_syscall(GETCWD, size, buf)
 #define execve(path, argv, envp)            wramp_syscall(EXECVE, path, argv, envp)
-#define execv(path, argv)                   execve(path, argv, __get_env())
+#define execv(path, argv)                   execve(path, argv, environ)
 
 #define _exit(status)                       __exit(status)
 
