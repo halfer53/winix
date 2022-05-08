@@ -159,6 +159,8 @@ int build_user_stack(struct proc* who, struct string_array* argv, struct string_
         env_ptr = (ptr_t*)kmalloc(env->size);
         if(env_ptr){
             copy_sarray_to_heap(who, env, env_ptr);
+            // store the pointer to environment variable at the bottom of stack
+            // this can be retrieved by get_environ() in lib/ansi/env.c
             *sp_btm = (unsigned long)copyto_user_heap(who, env_ptr, env->size);
             // KDEBUG(("build stack env %p physical %p\n", *sp_btm , get_physical_addr(*sp_btm, who)));
             kfree(env_ptr);
