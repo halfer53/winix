@@ -239,6 +239,8 @@ int test_so(int argc, char **argv){
     }else{
         int status;
         wait(&status);
+        assert(WIFSIGNALED(status));
+        assert(WTERMSIG(status) == SIGSEGV);
     }
     return 0;
 }
@@ -260,8 +262,8 @@ int test_sigsegv(int argc, char **argv){
     }else{
         wait(&result);
         // printf("%d %d %d\n", result, WEXITSTATUS(result), WIFSIGNALED(result));
+        assert(WIFEXITED(result));
         assert(WEXITSTATUS(result) == 0);
-        assert(!WIFSIGNALED(result));
     }
     return 0;
 }
@@ -309,17 +311,21 @@ int test_alarm(int argc, char **argv){
 
 ucontext_t mcontext;
 #define COROUTINE_STACK_SIZE    56
+int sum;
 
 void func(int arg) {
       printf("Hello World! I'm coroutine %d\n",arg);
+      sum += arg;
 }
 
 int test_coroutine(int argc, char **argv){
     int i,j,num = 2;
     int count = 1;
+    int cumulative = 0;
     void **thread_stack_op;
     ucontext_t *coroutines_list; 
     ucontext_t *coroutine;
+    sum = 0;
 
     if(argc > 1)
         num = atoi(argv[1]);
@@ -341,6 +347,7 @@ int test_coroutine(int argc, char **argv){
             coroutine->uc_stack.ss_sp = thread_stack_op[i];
             coroutine->uc_stack.ss_size = COROUTINE_STACK_SIZE;
             coroutine->uc_link = &mcontext;
+            cumulative += count;
             makecontext(coroutine,func,1,count++);
             coroutine++;
 
@@ -360,6 +367,7 @@ int test_coroutine(int argc, char **argv){
     for( i = 0; i < num; i++){
         swapcontext(&mcontext,coroutine++);
     }
+    assert(sum == cumulative);
     
     err_free_all:
         for( j = 0; j < i; j++){
