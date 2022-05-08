@@ -23,14 +23,15 @@
 #include <assert.h>
 #include <sys/wait.h>
 #include <sched.h>
+#include <stdbool.h>
 
 #define CMD_PROTOTYPE(name)    int name(int argc, char**argv)
-
 
 // Maps strings to function pointers
 struct cmd_internal {
     int (*handle)(int argc, char **argv);
     char *name;
+    bool unittest;
 };
 
 CMD_PROTOTYPE(test_so);
@@ -45,16 +46,16 @@ CMD_PROTOTYPE(test_signal);
 CMD_PROTOTYPE(run_all);
 
 struct cmd_internal test_commands[] = {
-    { test_so, "stack"},
-    { test_float, "float"},
-    { test_coroutine, "coroutine"},
-    { test_sigsegv, "null" },
-    { test_eintr, "eintr"},
-    { test_deadlock, "deadlock"},
-    { test_ipc, "ipc"},
-    { test_signal, "signal"},
-    { run_all, "run"},
-    { test_nohandler, NULL},
+    { test_so, "stack", false },
+    { test_float, "float", true },
+    { test_coroutine, "coroutine", true },
+    { test_sigsegv, "null", true },
+    { test_eintr, "eintr", true},
+    { test_deadlock, "deadlock", true },
+    { test_ipc, "ipc", true },
+    { test_signal, "signal", true },
+    { run_all, "run", false },
+    { test_nohandler, NULL, false},
     {0}
 };
 
@@ -89,12 +90,12 @@ int run_all(int argc, char** argv){
     handler = test_commands;
     handler_argv[1] = NULL;
     while(handler->name){
-        if (strcmp(handler->name, argv[0]) == 0)
-            break;
-        handler_argv[0] = handler->name;
-        ret = handler->handle(1, handler_argv);
-        printf("%s return %d\n", handler->name, ret);
-        assert(ret == 0);
+        if (handler->unittest){
+            handler_argv[0] = handler->name;
+            ret = handler->handle(1, handler_argv);
+            printf("---\n%s return %d\n", handler->name, ret);
+            assert(ret == 0);
+        }
         handler++;
     }
     return 0;
@@ -168,7 +169,7 @@ int test_signal(int argc, char **argv){
     // unblock all pending signals
     printf("signal handler usr1 should be called after this\n");
     sigsuspend(&prevset);
-    assert(sig_sum == SIGUSR1 + SIGUSR2 + SIGTERM + SIGINT);
+    assert(sig_sum = SIGUSR1 + SIGUSR2 + SIGTERM + SIGINT);
     return 0;
 }
 
@@ -190,7 +191,6 @@ int test_ipc(int argc, char **argv){
         assert(m.type == 100);
         m.reply_res = 200;
         ret = winix_send(getppid(), &m);
-        printf("%d \n", ret);
         assert(ret == 0);
         exit(0);
     }
@@ -217,16 +217,6 @@ int test_deadlock(int argc, char **argv){
         while(1);
     }
     return 0;
-}
-
-
-
-void usr1h(int sig){
-    printf("usr1h\n");
-}
-
-void usr2h(int sig){
-    printf("usr2h\n");
 }
 
 int test_float(int argc, char **argv){
