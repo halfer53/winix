@@ -43,7 +43,7 @@ int new_timer(int procnr_from, struct timer* curr, clock_t timeout, timerhandler
         curr->proc_nr = procnr_from;
         curr->next = NULL;
         insert_timer(curr);
-        return OK;
+        return 0;
     }
     
     // PANIC("No timer left");

@@ -18,7 +18,7 @@ int sys_close(struct proc *who, int fd)
     if (ret)
         return ret;
     who->fp_filp[fd] = NULL;
-    return OK;
+    return 0;
 }
 
 int alloc_inode_under_dir(struct proc* who, struct device* dev, inode_t** _inode, inode_t* lastdir, char string[DIRSIZ]){
@@ -35,7 +35,7 @@ int alloc_inode_under_dir(struct proc* who, struct device* dev, inode_t** _inode
         return ret;
     }
     *_inode = inode;
-    return OK;
+    return 0;
 }
 
 int filp_open(struct proc* who, struct filp** _filp, char *path, int flags, mode_t mode){

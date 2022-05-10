@@ -28,7 +28,7 @@ int sys_access(struct proc* who, char* pathname, int mode){
     }
 
     has_access = has_file_access(who, ino, mode);
-    ret = has_access ? OK : EACCES;
+    ret = has_access ? 0 : EACCES;
 
     final:
     put_inode(ino, false);

@@ -5,7 +5,7 @@
 #include <fs/fs.h>
 
 int sys_chdir(struct proc* who, char* pathname){
-    int ret = OK;
+    int ret = 0;
     inode_t *inode = NULL, *curr_working;
 
     if((ret = get_inode_by_path(who, pathname, &inode)))
@@ -22,7 +22,7 @@ int sys_chdir(struct proc* who, char* pathname){
     curr_working = who->fp_workdir;
     who->fp_workdir = inode;
     put_inode(curr_working, false);
-    return OK;
+    return 0;
     error:
     put_inode(inode, false);
     return ret;
@@ -31,7 +31,7 @@ int sys_chdir(struct proc* who, char* pathname){
 int sys_mkdir(struct proc* who, char* pathname, mode_t mode){
     char string[DIRSIZ];
     struct inode *lastdir = NULL, *ino = NULL;
-    int ret = OK, bnr;
+    int ret = 0, bnr;
     bool is_dirty = false;
 
     ret = eat_path(who, pathname, &lastdir, &ino, string);

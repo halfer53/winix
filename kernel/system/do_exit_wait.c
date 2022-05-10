@@ -89,7 +89,7 @@ int do_waitpid(struct proc *parent, struct message *mesg){
     }
     
     if(options & WNOHANG)
-        return OK;
+        return 0;
 
     // if this process has no valid children
     if(children == 0)
@@ -161,7 +161,7 @@ int check_waiting(struct proc* who){
 
             if(who->state & STATE_ZOMBIE)
                 release_zombie(who);
-            return OK;
+            return 0;
         }
     }else if(parent->state & STATE_VFORKING){
         parent->state &= ~STATE_VFORKING;

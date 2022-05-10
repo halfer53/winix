@@ -51,7 +51,7 @@ int bitmap_clear(unsigned int *map, int map_len){
     {
         map[i] = 0;
     }
-    return OK;
+    return 0;
 }
 
 /**
@@ -66,7 +66,7 @@ int bitmap_fill(unsigned int *map, int map_len){
     {
         map[i] = 0xffffffff;
     }
-    return OK;
+    return 0;
 }
 /**
  * search the number of 0 bits from the position specified
@@ -148,7 +148,7 @@ int bitmap_set_bit(unsigned int *map, int map_len,int start){
     if(start >= map_len * 32)    
         return -EINVAL;
     map[ibit] = map[ibit] | mask[start%32];
-    return OK;
+    return 0;
 }
 
 /**
@@ -169,7 +169,7 @@ int bitmap_set_nbits(unsigned int *map, int map_len,int start, int len){
         inum = start + i;
         map[inum/32] = map[inum/32] | mask[inum%32];
     }
-    return OK;
+    return 0;
 }
 
 /**kprintf
@@ -184,7 +184,7 @@ int bitmap_clear_nbits(unsigned int *map, int map_len,int start, int len){
         inum = start + i;
         map[inum/32] = map[inum/32] & (~mask[inum%32]);
     }
-    return OK;
+    return 0;
 }
 
 /**
@@ -199,7 +199,7 @@ int bitmap_clear_bit(unsigned int *map, int map_len,int start){
     if(start >= map_len * 32)    
         return -EINVAL;
     map[ibit] = map[ibit] & (~mask[start%32]);
-    return OK;
+    return 0;
 }
 
 /**
@@ -263,7 +263,7 @@ int bitmap_xor(unsigned int *map1, unsigned int *map2, int map_len){
     for(i = 0; i< map_len; i++){
         map1[i] ^= map2[i];
     }
-    return OK;
+    return 0;
 }
 
 /**

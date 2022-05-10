@@ -89,7 +89,7 @@ int flush_all_buffer(){
             tbuf->b_dirt = false;
         }
     }
-    return OK;
+    return 0;
 }
 
 int flush_inode_zones(struct inode *ino){
@@ -108,7 +108,7 @@ int flush_inode_zones(struct inode *ino){
             }
         }
     }
-    return OK;
+    return 0;
 }
 
 int put_block_buffer_immed(struct block_buffer* tbuf, struct device* dev){
@@ -132,7 +132,7 @@ int put_block_buffer(struct block_buffer *tbuf) {
         tbuf->b_count = 0;
     }
 //    visualise_lru();
-    return OK;
+    return 0;
 }
 
 struct block_buffer *get_block_buffer(block_t blocknr, struct device* dev){

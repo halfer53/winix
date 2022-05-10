@@ -20,7 +20,7 @@ int sys_fcntl(struct proc* who, int fd, int cmd, void* arg){
     default:
         return -EINVAL;
     }
-    return OK;
+    return 0;
 }
 
 int do_fcntl(struct proc* who, struct message* msg){

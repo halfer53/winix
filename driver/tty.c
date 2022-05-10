@@ -392,7 +392,7 @@ int tty_ioctl(struct filp* file, int request, vptr_t* vptr){
     default:
         return -EINVAL;
     }
-    return OK;
+    return 0;
 }
 
 int tty_dev_init(){

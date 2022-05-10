@@ -249,7 +249,7 @@ int dequeue_schedule( struct proc *h) {
     } else {
         prev->next = curr->next;
     }
-    return OK;
+    return 0;
 }
 
 /**
@@ -426,7 +426,7 @@ struct proc *start_kernel_proc(struct boot_image* task) {
 // struct proc *start_user_proc(size_t *lines, size_t length, size_t entry, int options, const char *name){
 //     struct proc *p;
 //     if(p = get_free_proc_slot()){
-//         if(exec_proc(p,lines,length,entry,options,name) == OK)
+//         if(exec_proc(p,lines,length,entry,options,name) == 0)
 //             return p;
 //     }
 //     return NULL;
@@ -502,7 +502,7 @@ int alloc_mem_welf(struct proc* who, struct winix_elf* elf, int stack_size, int 
     who->stack_size = stack_size;
 
     // KDEBUG(("%d alloc from %p to %p\n", who->pid, mem_start, who->heap_bottom));
-    return OK;
+    return 0;
 }
 
 int copy_from_user(struct proc* who, ptr_t *dest, vptr_t *src, size_t len){
@@ -511,7 +511,7 @@ int copy_from_user(struct proc* who, ptr_t *dest, vptr_t *src, size_t len){
         return -EFAULT;
     p = get_physical_addr(src, who);
     memcpy(dest, p, len);
-    return OK;
+    return 0;
 }
 
 /**
@@ -526,7 +526,7 @@ int copyto_user_stack(struct proc *who, void *src, size_t len){
     sp -= len;
     memcpy(sp,src,len);
     who->ctx.m.sp = get_virtual_addr(sp,who);
-    return OK;
+    return 0;
 }
 
 vptr_t* copyto_user_heap(struct proc* who, void *src, size_t len){

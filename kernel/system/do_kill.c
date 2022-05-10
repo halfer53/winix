@@ -32,7 +32,7 @@ int sys_kill(struct proc* who, pid_t pid, int signum){
         if(pid == -1 && to->pid == 1)   continue;
 
         if(signum == 0)
-            return OK;
+            return 0;
 
         /*
          * if the process to which we are sending 
@@ -51,7 +51,7 @@ int sys_kill(struct proc* who, pid_t pid, int signum){
     if(!valid_targets)
 	    return -ESRCH;
 
-    return OK;
+    return 0;
 }
 
 int do_kill(struct proc *who, struct message *m){

@@ -102,7 +102,7 @@ int sys_pipe(struct proc* who, int fd[2]){
     INIT_LIST_HEAD(&inode->pipe_writing_list);
     INIT_LIST_HEAD(&inode->pipe_reading_list);
     // KDEBUG(("new pipe ret %d %d with inode %d for proc %d\n", ret1, ret2, inode->i_num, who->proc_nr));
-    return OK;
+    return 0;
 
     failed_filp2:
     who->fp_filp[ret1] = NULL;

@@ -74,7 +74,7 @@ int copy_stack(struct proc* parent, struct proc* child){
 
     // KDEBUG(("tfork %p %p for %d tp %d\n", (void *)new_stack, (void *)*sp, child->proc_nr, child->thread_parent));
     proc_memctl(child, vir_old_stack, PROC_NO_ACCESS);
-    return OK;
+    return 0;
 }
 
 /**
@@ -112,7 +112,7 @@ int copy_pcb(struct proc* parent, struct proc* child){
     if(parent->priority > MIN_PRIORITY) // let child run first
         parent->priority--;
     parent->ticks_left = 0;
-    return OK;
+    return 0;
 }
 
 /**
@@ -138,7 +138,7 @@ int copy_mm(struct proc* parent, struct proc* child){
         src += PAGE_LEN;
         dest += PAGE_LEN;
     }
-    return OK;
+    return 0;
 }
 
 

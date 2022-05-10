@@ -66,6 +66,6 @@ int do_sigprocmask(struct proc* who, struct message* m){
             return -EINVAL;
     }
 
-    return OK;
+    return 0;
 }
 

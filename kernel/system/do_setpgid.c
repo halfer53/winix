@@ -21,6 +21,6 @@ int do_setpgid(struct proc* who, struct message* m){
         pgid = mp->pid;
 
     mp->procgrp = pgid;
-    return OK;
+    return 0;
 }
 

@@ -24,7 +24,7 @@ int register_device(struct device* dev, const char* name, dev_t id, mode_t type,
     dev->dops = dops;
     dev->fops = fops;
     list_add(&dev->list,&devices_list);
-    return OK;
+    return 0;
 }
 
 struct device* get_dev(dev_t dev){

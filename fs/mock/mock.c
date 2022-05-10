@@ -119,8 +119,8 @@ int tty_write_rex(RexSp_t* rex, char* data, size_t len){
 }
 
 const char* kstr_error(int err){
-    if (err == OK)
-        return "OK";
+    if (err == 0)
+        return "0";
     if (err == DONTREPLY)
         return "DONTREPLY";
     if (err == SUSPEND)

@@ -242,11 +242,11 @@ int root_fs_close (struct device* dev, struct filp *filp){
             release_inode(filp->filp_ino);
         }
     }
-    return OK;
+    return 0;
 }
 
 int root_fs_ioctl(struct filp* file, int request_type, ptr_t* arg){
-    return OK;
+    return 0;
 }
 
 static struct device_operations dops = {blk_dev_init, blk_dev_io_read, blk_dev_io_write, blk_dev_release};

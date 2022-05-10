@@ -37,7 +37,7 @@ int sys_sigaction(struct proc* who, int signum, struct sigaction* act, struct si
     sigdelset(&act->sa_mask, SIGSTOP);
     memcpy(&who->sig_table[signum], act, sizeof(struct sigaction));
 
-    return OK;
+    return 0;
 }
 
 int do_sigaction(struct proc *who, struct message *m){

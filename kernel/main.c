@@ -71,7 +71,7 @@ void start_init(){
     init->flags = IN_USE;
     init->pid = INIT;
     ret = exec_welf(init, INIT_PATH, init_argv, initial_env, true);
-    if(ret != OK && ret != DONTREPLY){
+    if(ret != 0 && ret != DONTREPLY){
         kerror("%d\n", ret);
         PANIC("init");
     }

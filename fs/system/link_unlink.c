@@ -26,7 +26,7 @@ int sys_link(struct proc* who, char *oldpath, char *newpath){
     if(newinode)
         put_inode(newinode, false);
     if(lastdir)
-        put_inode(lastdir, ret == OK);
+        put_inode(lastdir, ret == 0);
 
     failed_1:
     if(oldinode)

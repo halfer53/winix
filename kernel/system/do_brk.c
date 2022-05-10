@@ -108,7 +108,7 @@ int do_brk(struct proc *who, struct message *m){
         
         who->heap_break = addr;
         m->m1_p1 = vaddr;
-        return OK;
+        return 0;
     }
 
     size = (int)((unsigned long)addr - (unsigned long)who->heap_break);
@@ -117,5 +117,5 @@ int do_brk(struct proc *who, struct message *m){
         return -ENOMEM;
     new_brk = get_virtual_addr(new_brk, who);
     m->m1_p1 = new_brk;
-    return OK;
+    return 0;
 }

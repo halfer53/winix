@@ -27,7 +27,7 @@ int sys_chmod(struct proc* who, char *pathname, mode_t mode){
 
     inode->i_mode = mode;
     put_inode(inode, true);
-    return OK;
+    return 0;
 }
 
 int do_chmod(struct proc* who, struct message* msg){

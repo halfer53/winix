@@ -73,7 +73,7 @@ int copy_stirng_array(struct string_array *arr, char* from[], struct proc* who, 
 
     arr->size = 0;
     if(!from)
-        return OK;
+        return 0;
     while(*pptr++ && count-- > 0){
         size++;
     }
@@ -101,7 +101,7 @@ int copy_stirng_array(struct string_array *arr, char* from[], struct proc* who, 
         strlcpy(arr->array[i], physical, limit);
     }
     arr->array[i] = NULL;
-    ret = OK;
+    ret = 0;
     
     goto final;
 
@@ -179,7 +179,7 @@ int build_user_stack(struct proc* who, struct string_array* argv, struct string_
 
     copyto_user_stack(who, &init_stack, sizeof(struct initial_frame));
 
-    return OK;
+    return 0;
 }
 
 int exec_welf(struct proc* who, char* path, char *argv[], char *envp[], bool is_new){
@@ -244,7 +244,7 @@ int exec_welf(struct proc* who, char* path, char *argv[], char *envp[], bool is_
     who->thread_parent = 0;
     build_user_stack(who, &argv_copy, &envp_copy);
     proc_memctl(who, (void *)0, PROC_NO_ACCESS);
-    ret = OK;
+    ret = 0;
     goto final;
     
 final:
@@ -256,10 +256,10 @@ err_env:
     // KDEBUG(("freeing argv\n"));
     kfree_string_array(&argv_copy);
 
-    if (trace_syscall || ret != OK){
+    if (trace_syscall || ret != 0){
         klog("%s[%d] execve() %s, return %s\n", who->name, who->pid, path, kstr_error(ret));
     }
-    if (ret == OK){
+    if (ret == 0){
         who->state = STATE_RUNNABLE;
         enqueue_schedule(who);
         set_proc(who, (void (*)())(unsigned long)elf.binary_pc, path);
@@ -273,7 +273,7 @@ err_env:
         }
     }
 
-    if (ret == OK)
+    if (ret == 0)
         return DONTREPLY;
     return ret;
 }

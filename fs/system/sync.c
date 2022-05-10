@@ -7,7 +7,7 @@ int do_sync(struct proc* who, struct message* msg){
     flush_all_buffer();
     flush_inodes();
     flush_super_block(get_dev(ROOT_DEV));
-    return OK;
+    return 0;
 }
 
 

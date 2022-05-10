@@ -145,7 +145,7 @@ int init_inode_non_disk(struct inode* ino, ino_t num, struct device* dev, struct
         }
         ino->i_ndblock = bnr;
     }
-    return OK;
+    return 0;
 }
 
 void arch_inode(struct inode* ino){
@@ -189,7 +189,7 @@ int read_inode(int num, struct inode** ret_ino, struct device* id){
     put_block_buffer(buffer);
     *ret_ino = inode;
     // KDEBUG(("read inode %d blk %d off %d zone %d\n", num, blocknr, offset, inode->i_zone[0]));
-    return OK;
+    return 0;
 }
 
 inode_t* get_inode(int num, struct device* id){
@@ -224,7 +224,7 @@ int put_inode(inode_t *inode, bool is_dirty){
     if (inode->i_count > 0)
         inode->i_count -= 1;
     if(!is_dirty)
-        return OK;
+        return 0;
     sb = get_sb(inode->i_dev);
     inum = inode->i_num;
     inode_block_offset = (inum * sb->s_inode_size) % BLOCK_SIZE;;
@@ -235,7 +235,7 @@ int put_inode(inode_t *inode, bool is_dirty){
     put_block_buffer_dirt(buffer);
     inode->i_flags &= ~INODE_FLAG_DIRTY;
     // KDEBUG(("put inode %d blk %d offset %d\n", inode->i_num, inode->i_ndblock, inode_block_offset));
-    return OK;
+    return 0;
 }
 
 
@@ -300,7 +300,7 @@ int truncate_inode(inode_t *inode){
         release_block((block_t)zone, inode->i_dev);
     }
     iter_zone_close(&iter);
-    return OK;
+    return 0;
 }
 
 
@@ -342,7 +342,7 @@ int _release_inode(inode_t *inode, bool is_indirect_zone){
     put_block_buffer_dirt(imap);
 
     memset(inode, 0, sizeof(struct inode));
-    return OK;
+    return 0;
 }
 
 
@@ -360,7 +360,7 @@ int fill_dirent(inode_t* ino, struct winix_dirent* curr, const char* string){
     }else if(mode & S_IFBLK){
         curr->dirent.d_type = DT_BLK;
     }
-    return OK;
+    return 0;
 }
 
 int init_dirent(inode_t* dir, inode_t* ino){
@@ -380,7 +380,7 @@ int init_dirent(inode_t* dir, inode_t* ino){
     curr++;
     fill_dirent(dir, curr, "..");
     put_block_buffer_dirt(buf);
-    return OK;
+    return 0;
 }
 
 
@@ -449,7 +449,7 @@ int iter_zone_init(struct zone_iterator* iter, struct inode* inode, int zone_idx
     iter->i_inode = inode;
     inode->i_count++;
     iter->i_zone_idx = zone_idx;
-    return OK;
+    return 0;
 }
 
 int _iter_get_current_zone(struct zone_iterator* iter, bool create_inode, bool create_block){

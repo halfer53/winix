@@ -137,11 +137,11 @@ int __eath_path(struct inode* curr_ino, struct inode** last_dir,
                 *last_dir = rip;
                 inum = advance(rip, string);
                 if(inum == -EINVAL){
-                    return OK;
+                    return 0;
                 }
                 new_rip = get_inode(inum, rip->i_dev);
                 *ret_ino = new_rip;
-                return OK;
+                return 0;
             }else{
                 return -ENOTDIR;
             }
@@ -152,7 +152,7 @@ int __eath_path(struct inode* curr_ino, struct inode** last_dir,
 //        KDEBUG(("path advance %d %s\n", rip->i_num, string));
         inum = advance(rip,string);
         if(inum == -EINVAL) {
-            return OK;
+            return 0;
         }
 
         put_inode(rip, false);

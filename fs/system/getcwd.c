@@ -2,7 +2,7 @@
 #include <fs/path.h>
 
 int sys_getcwd(struct proc* who, char* pathname, int size, char** result){
-    int ret = OK, len, ret2;
+    int ret = 0, len, ret2;
     inode_t *inode, *parent_inode;
     int inum;
     char string[NAME_MAX];

@@ -19,14 +19,14 @@ int get_fd(struct proc *curr, int start, int *open_slot, filp_t *fpt){
         return -EMFILE;
 
     fpt->filp_table_index = i;
-    return OK;
+    return 0;
 }
 
 int init_filp_by_inode(struct filp* filp, struct inode* inode){
     filp->filp_ino = inode;
     filp->filp_count += 1;
     filp->filp_dev = inode->i_dev;
-    return OK;
+    return 0;
 }
 
 int release_filp(struct filp* file){

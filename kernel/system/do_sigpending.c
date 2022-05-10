@@ -22,6 +22,6 @@ int do_sigpending(struct proc* who, struct message* m){
     p = get_physical_addr(vp, who);
     *p = who->sig_pending;
     // m->m1_i1 = who->sig_pending;
-    return OK;
+    return 0;
 }
 

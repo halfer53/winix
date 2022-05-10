@@ -48,7 +48,7 @@
  * the process runs, it will run the next process
  * @param  who    
  * @param  signum 
- * @return        OK if building is successful
+ * @return        0 if building is successful
  */
 PRIVATE int build_signal_ctx(struct proc *who, int signum){
     struct sigframe sframe;
@@ -72,14 +72,14 @@ PRIVATE int build_signal_ctx(struct proc *who, int signum){
     who->ctx.m.pc = (void (*)())who->sig_table[signum].sa_handler;
     who->state = STATE_RUNNABLE;
     who->flags |= PROC_SIGAL_HANDLER;
-    return OK;
+    return 0;
 }
 
 /**
  * Check if the system can handle the signal (default, or ignore)
  * @param  who    
  * @param  signum 
- * @return        return OK if system has handled the signal
+ * @return        return 0 if system has handled the signal
  *                return -EINVAL if the user needs to handle the signal
  */
 PRIVATE int sys_sig_handler(struct proc *who, int signum){
@@ -138,7 +138,7 @@ PRIVATE int sys_sig_handler(struct proc *who, int signum){
                 break;
         }
     }
-    return OK;
+    return 0;
 }
 
 /**
@@ -167,7 +167,7 @@ int handle_sig(struct proc* who, int signum){
         act->sa_handler = SIG_DFL;
     }
 
-    return OK;
+    return 0;
 }
 
 int send_sig(struct proc *who, int signum){
@@ -205,7 +205,7 @@ int send_sig(struct proc *who, int signum){
     sigaddset(&who->sig_pending, signum);
     
     
-    return OK;
+    return 0;
 }
 
 

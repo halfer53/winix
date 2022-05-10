@@ -3,7 +3,7 @@
  * NB this is a winix specific system call
  * Input:   m1_i1: type of information to be displayed
  *
- * Return:  reply_res: OK
+ * Return:  reply_res: 0
  * 
  * @author Bruce Tan
  * @email brucetansh@gmail.com
@@ -54,6 +54,6 @@ int do_winfo(struct proc *who, struct message *m){
         default:
             return -EINVAL;
     }
-    return OK;
+    return 0;
 }
 

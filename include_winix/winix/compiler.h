@@ -13,7 +13,7 @@ void _assert(int expression, int line, char* filename);
 #define ASSERT_NULL(exp)        ASSERT(exp == NULL)
 #define ASSERT_TRUE(exp)        ASSERT(exp == true)
 #define ASSERT_FALSE(exp)       ASSERT(exp == false)
-#define ASSERT_OK(exp)          ASSERT(exp == OK)
+#define ASSERT_OK(exp)          ASSERT(exp == 0)
 #define PANIC(expression)     _panic(expression, __FILE__)
 
 #define READ_ONCE(v)    (v)

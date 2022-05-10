@@ -72,7 +72,7 @@ int do_send(int dest, struct message *m) {
             pDest->sender_q = curr_scheduling_proc;
         }
 
-        return OK;
+        return 0;
     }
     return -ESRCH;
 }
@@ -97,7 +97,7 @@ int do_receive(struct message *m) {
     //         // if(is_debugging_ipc()){
     //         //     KDEBUG(("%d notify queue %d type %d\n", curr_scheduling_proc->proc_nr, p->proc_nr, m->type));
     //         // }
-    //         return OK;
+    //         return 0;
     //     }
     // }
     if(curr_scheduling_proc->notify_pending){
@@ -109,7 +109,7 @@ int do_receive(struct message *m) {
                 if(is_debugging_ipc()){
                     klog("%d notify queue %d type %d\n", curr_scheduling_proc->proc_nr, p->proc_nr, m->type);
                 }
-                return OK;
+                return 0;
             }
         }
     }
@@ -133,12 +133,12 @@ int do_receive(struct message *m) {
         // if(is_debugging_ipc())
         //     KDEBUG(("IPC: %d REC from %d type %d\n",curr_scheduling_proc->proc_nr, m->src ,m->type));
         
-        return OK;
+        return 0;
     }
 
     curr_scheduling_proc->message = m;
     curr_scheduling_proc->state |= STATE_RECEIVING;
-    return OK;
+    return 0;
 }
 /**
  * non-block send
@@ -194,7 +194,7 @@ int do_notify(int src, int dest, struct message *m) {
             // list_add(&pSrc->notify_queue, &pDest->notify_queue);
         }
         // do nothing if it's not waiting
-        return OK;
+        return 0;
     }
     return -ESRCH;
 }

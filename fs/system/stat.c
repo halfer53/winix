@@ -28,7 +28,7 @@ int sys_fstat(struct proc* who, int fd, struct stat* statbuf){
         return -EBADF;
     file = who->fp_filp[fd];
     set_statbuf(file->filp_ino, statbuf);
-    return OK;
+    return 0;
 }
 
 int sys_stat(struct proc* who, char *pathname, struct stat *statbuf){
@@ -43,7 +43,7 @@ int sys_stat(struct proc* who, char *pathname, struct stat *statbuf){
 
     set_statbuf(inode, statbuf);
     put_inode(inode, false);
-    return OK;
+    return 0;
 }
 
 int do_stat(struct proc* who, struct message* msg){
