@@ -26,7 +26,6 @@
 #include <stddef.h>
 #include <errno.h>
 #include <stdbool.h>
-#include <curses.h>
 #include <string.h>
 #include <bsd/string.h>
 
