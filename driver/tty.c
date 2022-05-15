@@ -254,7 +254,8 @@ void tty_exception_handler( struct tty_state* state){
         }
 
         if (is_sigpending(state->reader))
-        {
+        {   
+            state->reader = NULL;
             syscall_reply2(READ, -EINTR, state->reader->proc_nr, msg);
         }
         else if((is_new_line || state->bptr >= state->buffer_end ) && state->reader)
