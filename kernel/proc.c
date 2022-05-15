@@ -511,8 +511,18 @@ int copy_from_user(struct proc* who, ptr_t *dest, vptr_t *src, size_t len){
         return -EFAULT;
     p = get_physical_addr(src, who);
     memcpy(dest, p, len);
-    return 0;
+    return len;
 }
+
+int copy_to_user(struct proc* who, vptr_t *dest, ptr_t *src, size_t len){
+    ptr_t* p;
+    if (!is_vaddr_ok(src, len, who))
+        return -EFAULT;
+    p = get_physical_addr(src, who);
+    memcpy(dest, p, len);
+    return len;
+}
+
 
 /**
  * Copy values onto the user stack, this is very similar to memcpy
