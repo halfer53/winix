@@ -6,6 +6,6 @@
 #define isupper(c)	((unsigned) ((c)-'A') < 26)
 #define isprint(c)	((unsigned) ((c)-' ') < 95)
 #define isascii(c)	((unsigned) (c) < 128)
-#define isspace(c)    (c==' ')
+#define isspace(c)  ((unsigned) (((c)-9) < 5 || c == ' '))
 #define isalpha(c)  (isupper(c) || islower(c))
 #endif
