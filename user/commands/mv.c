@@ -12,7 +12,7 @@ int main(int argc, char *argv[]){
     char *path, *dest;
 
     if(argc < 3){
-        fprintf(stderr, "mv SRC DEST");
+        fprintf(stderr, "usage: mv [SRC] [DEST]\n");
         goto fail;
     }
     path = *++argv;
