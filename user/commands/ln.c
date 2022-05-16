@@ -4,7 +4,7 @@
 int main(int argc, char *argv[]){
     int ret;
     if(argc < 3){
-        fprintf(stderr, "ln path/to/file path/to/hardlink");
+        fprintf(stderr, "ln [path/to/file] [path/to/hardlink]\n");
         return 1;
     }
     ret = link(argv[1], argv[2]);
