@@ -260,9 +260,9 @@ void tty_exception_handler( struct tty_state* state){
         }
         else if((is_new_line || state->bptr >= state->buffer_end ) && state->reader)
         {
-            *state->bptr = '\0';
-            strlcpy(state->read_data, state->read_ptr, state->read_count);
-            syscall_reply2(READ, state->bptr - state->buffer, state->reader->proc_nr, msg);
+            int len = state->bptr - state->read_ptr;
+            memcpy(state->read_data, state->read_ptr, len);
+            syscall_reply2(READ, len, state->reader->proc_nr, msg);
             state->bptr = state->buffer;
             state->read_ptr = state->buffer;
             state->reader = NULL;
