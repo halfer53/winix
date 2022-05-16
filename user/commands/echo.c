@@ -39,6 +39,7 @@ int main(int argc, char *argv[]){
         i++;
     }
     *dest++ = '\n';
+    *dest++ = '\0';
     printf("%s", buffer);
     return 0;
 }
