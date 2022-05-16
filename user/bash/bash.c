@@ -15,9 +15,7 @@
 #include "bash.h"
 
 int exec_cmd(char *line);
-#ifdef __wramp__
 static char history_file[] = ".bash_history";
-#endif
 static char PREFIX[] = "WINIX> ";
 
 // Input buffer & tokeniser
@@ -98,13 +96,11 @@ int main(int argc, char *argv[]) {
 
     init_shell();
     init_signal();
-#ifdef __wramp__
-    history_fd = open(history_file, O_CREAT | O_RDWR, 0x755);
+    history_fd = open(history_file, O_CREAT | O_RDWR | O_APPEND, S_IRWXU | S_IRGRP | S_IROTH);
     if(history_fd < 0){
         perror(history_file);
         return 1;
     }
-#endif
 
     while(1) {
         int line_pos;
@@ -123,9 +119,8 @@ int main(int argc, char *argv[]) {
         line_pos = ret - 1;
         buf[line_pos] = '\0';
         exec_cmd(buf);
-#ifdef __wramp__
+
         write(history_fd, prev_cmd, ret);
-#endif
     }
     return 0;
 }
