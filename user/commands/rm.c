@@ -7,7 +7,7 @@ int main(int argc, char *argv[]){
     struct stat statbuf;
     char *path = *++argv;
     if(argc < 2){
-        fprintf(stderr, "rm FILE");
+        fprintf(stderr, "usage: rm [FILE]\n");
         return 1;
     }
     ret = stat(path, &statbuf);
