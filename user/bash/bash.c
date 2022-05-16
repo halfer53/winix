@@ -83,7 +83,7 @@ void init_signal(){
 }
 
 int main(int argc, char *argv[]) {
-    int ret, len, newline_pos;
+    int ret;
 
     init_pgid();
     if(argc > 2 && strcmp(argv[1], "-c") == 0){
@@ -107,6 +107,7 @@ int main(int argc, char *argv[]) {
 #endif
 
     while(1) {
+        int line_pos;
         ret = write(STDOUT_FILENO, PREFIX, strlen(PREFIX));
         ret = read(0, buf, MAX_LINE);
 
@@ -115,16 +116,15 @@ int main(int argc, char *argv[]) {
             continue;
         }
 
-        len = strlen(buf);
-        newline_pos = len - 1;
+        buf[ret] = '\0';
         strlcpy(prev_cmd, buf, MAX_LINE);
-        if(buf[newline_pos] == '\n'){
-            buf[newline_pos] = '\0';
-        }
 
+        // delete new line
+        line_pos = ret - 1;
+        buf[line_pos] = '\0';
         exec_cmd(buf);
 #ifdef __wramp__
-        write(history_fd, prev_cmd, len);
+        write(history_fd, prev_cmd, ret);
 #endif
     }
     return 0;
