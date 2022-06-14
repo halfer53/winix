@@ -22,7 +22,6 @@ const char *TTY_PATH = "/tty";
 const int TTY_DEV = MAKEDEV(3, 1);
 char buffer[PAGE_LEN];
 char buffer2[PAGE_LEN];
-struct proc* curr_scheduling_proc;
 
 int file_size(struct proc* who, int fd){
     struct stat statbuf;

@@ -15,7 +15,6 @@ extern const char *DIR_FILE1;
 extern const char *DIR_FILE2;
 extern char buffer[PAGE_LEN];
 extern char buffer2[PAGE_LEN];
-extern struct proc* current;
 
 void run_all_tests();
 void reset_fs();
