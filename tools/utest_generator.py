@@ -20,7 +20,7 @@ def generate(prototypes):
     for proto in prototypes:
         print(f"void {proto}();")
     print()
-    print("void run_all_tests(){")
+    print("int main(){")
     for proto in prototypes:
         print(f"    printf(\"%s\\n\", \"running {proto}\");")
         print(f"    reset_fs();")
@@ -28,6 +28,7 @@ def generate(prototypes):
         print(f"    printf(\"%s\\n\\n\", \"passed: {proto}\");")
         print()
     print(f"    printf(\"%d tests passed\\n\", {len(prototypes)});")
+    print("    return 0;")
     print("}")
 
 def main():

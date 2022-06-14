@@ -16,7 +16,6 @@ extern const char *DIR_FILE2;
 extern char buffer[PAGE_LEN];
 extern char buffer2[PAGE_LEN];
 
-void run_all_tests();
 void reset_fs();
 
 #endif
