@@ -21,8 +21,6 @@
 #include "srec_import.h"
 #include "../mock/mock.h"
 
-void init_bitmap();
-
 /* Program documentation. */
 static char doc[] = "Generate FS Disk";
 
@@ -320,7 +318,6 @@ int main(int argc, char** argv){
 
 
     mock_init_proc();
-    init_bitmap();
     init_disk();
     init_dev();
     init_fs();

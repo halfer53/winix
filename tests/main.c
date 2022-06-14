@@ -5,7 +5,6 @@
 #include "unit_test.h"
 
 int main(){
-    init_bitmap();
     reset_fs();
     current = curr_scheduling_proc;
 

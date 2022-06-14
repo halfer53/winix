@@ -30,7 +30,6 @@ int main() {
     int bss_len = &BSS_END - &BSS_BEGIN;
     memset(&BSS_BEGIN, 0, bss_len);
     
-    init_bitmap();
     init_dev();
     init_fs();
     init_tty();
