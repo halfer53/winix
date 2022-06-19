@@ -176,7 +176,8 @@ void test_given_has_next_zone_when_alloc_zone_should_continue(){
     assert(!is_inode_in_use(i2->i_num, dev));
     for(i = 0; i < NR_TZONES; i++){
         assert(i1->i_zone[i] == 0);
-    }for(i = 0; i < NR_TZONES; i++){
+    }
+    for(i = 0; i < NR_TZONES; i++){
         assert(i2->i_zone[i] == 0);
     }
     
@@ -206,7 +207,9 @@ void test_given_iter_dirent_has_next_when_has_data_should_return_true(){
     assert(char32_strcmp(dir->dirent.d_name, "..") == 0);
 
     struct inode* newinode = alloc_inode(inode->i_dev, inode->i_dev);
+    assert(newinode);
     ret = add_inode_to_directory(curr_scheduling_proc, inode, newinode, filename);
+    assert(ret == 0);
 
     dir = iter_dirent_get_next(&iter);
     assert(char32_strcmp(dir->dirent.d_name, filename) == 0);
