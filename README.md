@@ -83,7 +83,6 @@ sudo apt-get install xutils-dev gcc
 ```shell
 git clone https://github.com/halfer53/winix.git
 cd winix
-export PATH=`pwd`/tools/bin:$PATH
 make
 ```
 

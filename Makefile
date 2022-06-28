@@ -55,7 +55,7 @@ all:
 	$(Q)$(MAKE) buildlib
 	$(Q)$(MAKE) kbuild
 	$(Q)$(MAKE) include_build
-	$(Q)wlink $(LDFLAGS) -Ttext $(TEXT_OFFSET) -v -o winix.srec $(L_HEAD) $(KERNEL_O) `$(get_libs) $(KERNEL_O)` $(L_TAIL) > $(SREC_INCLUDE)/winix.verbose
+	$(Q)tools/bin/wlink $(LDFLAGS) -Ttext $(TEXT_OFFSET) -v -o winix.srec $(L_HEAD) $(KERNEL_O) `$(get_libs) $(KERNEL_O)` $(L_TAIL) > $(SREC_INCLUDE)/winix.verbose
 ifeq ($(KBUILD_VERBOSE),0)
 	@echo "LD \t winix.srec"
 endif

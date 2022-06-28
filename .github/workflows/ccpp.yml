@@ -11,10 +11,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: setunsecureenv
-      run: echo "ACTIONS_ALLOW_UNSECURE_COMMANDS=true" >> "${GITHUB_ENV}"
-    - name: path
-      run: echo "${{github.workspace}}/tools/bin" >> "${GITHUB_PATH}"
     - name: make
       run: make N=1 -j$((`nproc`+2))
     - uses: actions/upload-artifact@v2

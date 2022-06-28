@@ -41,13 +41,13 @@ ifeq ($(KBUILD_VERBOSE),0)
 	@echo "CC \t $<"
 endif
 	$(Q)gcc -DLINTING $(INCLUDE_PATH) $(CFLAGS) $(WRAMP) -nostdinc -S $< -o /dev/null
-	$(Q)gcc $(INCLUDE_PATH) $(CFLAGS) $(WRAMP) -nostdinc -E $< -o /dev/stdout | sed -E "s/__attribute__\s*\(.+\)//" | rcc -target=wramp > $@
+	$(Q)gcc $(INCLUDE_PATH) $(CFLAGS) $(WRAMP) -nostdinc -E $< -o /dev/stdout | sed -E "s/__attribute__\s*\(.+\)//" | tools/bin/rcc -target=wramp > $@
 
 $(objects): %.o: %.s
 ifeq ($(KBUILD_VERBOSE),0)
 	@echo "AS \t $<"
 endif
-	$(Q)wasm $< -o $@
+	$(Q)tools/bin/wasm $< -o $@
 
 ifneq ($(NO_MAKE_DEPEND),1)
 $(srcdepend): $(source) $(assembly)
@@ -63,7 +63,7 @@ $(subdir-y): FORCE
 ifeq ($(KBUILD_VERBOSE),0)
 	@echo "LD \t $@"
 endif
-	$(Q)wlink -Ttext $(TEXT_OFFSET) -v -o $@ $^ `$(get_libs) $^` > $(SREC_INCLUDE)/$(notdir $(@:.srec=.verbose))
+	$(Q)tools/bin/wlink -Ttext $(TEXT_OFFSET) -v -o $@ $^ `$(get_libs) $^` > $(SREC_INCLUDE)/$(notdir $(@:.srec=.verbose))
 	$(Q)cp $@ $(SREC_INCLUDE)/$(notdir $@)
 
 FORCE:
