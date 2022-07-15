@@ -83,7 +83,7 @@ sudo apt-get install xutils-dev gcc
 ```shell
 git clone https://github.com/halfer53/winix.git
 cd winix
-make
+make -j$((`nproc`+2))
 ```
 
 ## Debug tips
