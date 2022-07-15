@@ -8,8 +8,8 @@
 #include <string.h>
 #include <time.h>
 
-#define NUM_COLS  (100)
-#define NUM_ROWS  (31)
+#define NUM_COLS  (50)
+#define NUM_ROWS  (15)
 #define INITIAL_SNAKE_LEN   (3)
 #define INITAL_FOOD_NUM (10)
 #define SNAKE_CHAR  ('x')
