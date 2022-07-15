@@ -12,8 +12,8 @@
 
 int isatty(int fd);
 void sync();
-size_t read(int fd, void *buf, size_t count);
-size_t write(int fd, const void *buf, size_t count);
+ssize_t read(int fd, void *buf, size_t count);
+ssize_t write(int fd, const void *buf, size_t count);
 int pipe(int pipefd[2]);
 off_t lseek(int fd, off_t offset, int whence);
 int unlink(const char *pathname);

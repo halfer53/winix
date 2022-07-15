@@ -20,6 +20,11 @@
 typedef long unsigned int	size_t;		/* type returned by sizeof */
 #endif /* _SIZE_T */
 
+#ifndef _SSIZE_T
+#define	_SSIZE_T
+typedef long int	ssize_t;		    /* type returned by sizeof */
+#endif /* _SIZE_T */
+
 #ifndef __wchar_t__
 #define __wchar_t__
 typedef unsigned int wchar_t;
