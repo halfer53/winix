@@ -157,14 +157,15 @@ int do_notify(int src, int dest, struct message *m) {
     // Is the destination valid?
     if ((pDest = get_proc(dest))) {
 
-        if(pDest->state & STATE_KILLED)
+        if(pDest->state & STATE_KILLED || pDest->state & STATE_ZOMBIE)
             return -EINVAL;
-
-
         // KDEBUG(("\nNOTIFY %d from %d type %d| ",dest, src ,m->type));
-            
+
+        // Unblock receiver
+        pDest->state &= ~STATE_RECEIVING;
+
         // If destination is waiting, deliver message immediately.
-        if (pDest->state == STATE_RECEIVING) {
+        if (pDest->state == STATE_RUNNABLE) {
 
             if(pDest->flags & DIRECT_SYSCALL){
                 set_reply_res_errno(pDest, m);
@@ -173,13 +174,9 @@ int do_notify(int src, int dest, struct message *m) {
             // Copy message to destination
             *(pDest->message) = *m;
             
-
-            // Unblock receiver
-            pDest->state &= ~STATE_RECEIVING;
             pDest->ctx.m.regs[0] = m->reply_res;
-            if(pDest->state == STATE_RUNNABLE){
-                enqueue_head(ready_q[pDest->priority], pDest);
-            }
+            enqueue_head(ready_q[pDest->priority], pDest);
+            
         }else{
             pSrc = get_proc(src);
             syscall_num = m->type;
@@ -189,9 +186,6 @@ int do_notify(int src, int dest, struct message *m) {
             if(IS_KERNEL_PROC(pSrc)){
                 kwarn("notify: dest %s[%d] state %x cant receive %s from %d\n", pDest->name, pDest->proc_nr, pDest->state, msg_type, src);
             }
-            pSrc->message = m;
-            bitmap_set_bit(&pDest->notify_pending, 1, pSrc->proc_nr);
-            // list_add(&pSrc->notify_queue, &pDest->notify_queue);
         }
         // do nothing if it's not waiting
         return 0;
