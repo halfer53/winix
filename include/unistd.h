@@ -39,6 +39,7 @@ int execve(const char *pathname, char *const argv[],char *const envp[]);
 int execv(const char *path, char *const argv[]);
 
 pid_t tcgetpgrp(int fd);
+int tcsetpgrp(int fd, pid_t pgrp);
 
 #if defined(__wramp__) & !defined(LINTING) && !defined(_SYSTEM)
 
