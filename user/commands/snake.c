@@ -170,7 +170,7 @@ enum direction get_direction(struct board_struct* board){
     static char input[INPUT_SIZ];
     enum direction dir = board->dir;
     //non blocking
-    int ret = read(STDIN_FILENO, input, INPUT_SIZ);
+    int ret = read(STDIN_FILENO, input, INPUT_SIZ * sizeof(char));
     if(ret > 0){
         char c = input[ret - 1];
         // fprintf(stderr, "Direction %d \n",ret, c);
@@ -286,7 +286,7 @@ void draw(struct board_struct *board){
 
 char get_chr(){
     char c;
-    int ret = read(STDIN_FILENO, &c, 1);
+    int ret = read(STDIN_FILENO, &c, 1 * sizeof(char));
     if(ret > 0)
         return c;
     return 0;

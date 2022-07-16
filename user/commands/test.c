@@ -289,7 +289,7 @@ int test_eintr(int argc, char **argv){
         seconds = 0;
     signal(SIGALRM, alarm_handler);
     alarm(1);
-    ret = read(STDIN_FILENO, __buffer, 10);
+    ret = read(STDIN_FILENO, __buffer, 10 * sizeof(char));
     assert(ret == -1);
     assert(errno == EINTR);
     return 0;

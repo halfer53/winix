@@ -105,7 +105,7 @@ int main(int argc, char *argv[]) {
     while(1) {
         int line_pos;
         ret = write(STDOUT_FILENO, PREFIX, strlen(PREFIX));
-        ret = read(0, buf, MAX_LINE);
+        ret = read(0, buf, MAX_LINE * sizeof(char));
 
         if(ret == EOF){
             perror("stdin: ");

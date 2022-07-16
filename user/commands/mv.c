@@ -31,7 +31,7 @@ int main(int argc, char *argv[]){
         }
         while(1){
             printf("overwrite %s (y/n)? ", dest);
-            ret = read(STDIN_FILENO, buffer, BUFFER_SIZ);
+            ret = read(STDIN_FILENO, buffer, BUFFER_SIZ * sizeof(char));
             if(buffer[0] == 'n'){
                 return 0;
             }else if(buffer[0] == 'y'){

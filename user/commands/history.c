@@ -12,7 +12,7 @@ int main(int argc, char *argv[]){
         perror(filename);
         return 1;
     }
-    while((ret = read(fd, buffer, SIZE)) > 0){
+    while((ret = read(fd, buffer, SIZE * sizeof(char))) > 0){
         write(STDOUT_FILENO, buffer, ret);
     }
     close(fd);

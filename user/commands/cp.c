@@ -61,7 +61,7 @@ int main(int argc, char *argv[]){
         }
     }
     
-    while((ret = read(src_fd, buffer, BUFFER_SIZ)) > 0){
+    while((ret = read(src_fd, buffer, BUFFER_SIZ * sizeof(char))) > 0){
         ret = write(dest_fd, buffer, ret);
         if(ret <= 0){
             perror("write");

@@ -29,7 +29,7 @@ int main(int argc, char *argv[]){
         }
     }
     
-    while((ret = read(fd, buf, 256)) > 0){
+    while((ret = read(fd, buf, 256 * sizeof(char))) > 0){
         write(STDOUT_FILENO, buf, ret);
     }
     if(ret < 0){
