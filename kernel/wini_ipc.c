@@ -87,7 +87,6 @@ int do_send(int dest, struct message *m) {
  **/
 int do_receive(struct message *m) {
     struct proc *p;
-    int i;
     
     p = curr_scheduling_proc->sender_q;
     // If a process is waiting to send to this process, deliver it immediately.
