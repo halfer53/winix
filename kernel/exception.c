@@ -128,12 +128,14 @@ PRIVATE void serial2_handler() {
     RexSp2->Iack = 0;
 }
 
+#define LIMIT 10
 void rewind_stack(struct proc* proc){
     vptr_t *vtext_start, *vtext_end;
     ptr_t **p = (ptr_t **)get_physical_addr(proc->ctx.m.sp, proc);
     ptr_t **stack_end = (ptr_t **)proc->stack_top + proc->stack_size;
     reg_t *data, *instruction;
     char *filename;
+    int i = 0;
 
     if (p >= stack_end){
         kwarn("sp %p past %p\n", (void *)p, (void *)stack_end);
@@ -144,11 +146,12 @@ void rewind_stack(struct proc* proc){
     vtext_end = vtext_start + proc->text_size;
 
     kprintf("Call Stack:\n");
-    while (p < stack_end){
+    while (p < stack_end && i < LIMIT){
         data = *p;
         instruction = get_physical_addr(data, proc);
         if (*instruction > 0x100000 && vtext_start <= data && data <= vtext_end){
             kprintf("  - Virtual Addr: 0x%lx, Instruction: 0x%x\n", (uintptr_t)data, *instruction);
+            i++;
         }
         p++;
     }
