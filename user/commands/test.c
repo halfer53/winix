@@ -43,6 +43,7 @@ CMD_PROTOTYPE(test_nohandler);
 CMD_PROTOTYPE(test_deadlock);
 CMD_PROTOTYPE(test_ipc);
 CMD_PROTOTYPE(test_signal);
+CMD_PROTOTYPE(test_while);
 CMD_PROTOTYPE(run_all);
 
 struct cmd_internal test_commands[] = {
@@ -54,6 +55,7 @@ struct cmd_internal test_commands[] = {
     { test_deadlock, "deadlock", true },
     { test_ipc, "ipc", true },
     { test_signal, "signal", true },
+    { test_while, "while", false },
     { run_all, "run", false },
     { test_nohandler, NULL, false},
     {0}
@@ -368,5 +370,13 @@ int test_coroutine(int argc, char **argv){
     return 0;
 }
 
+int test_while(int argc, char **argv){
+    int tick_rate = sysconf(_SC_CLK_TCK);
+    while(1){
+        printf("a");
+        csleep(tick_rate);
+    }
+    return 0;
+}
 
 
