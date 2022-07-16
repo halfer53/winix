@@ -244,8 +244,9 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
         exit(exit_code);
     }else{
         options =  WUNTRACED;
-        pid = waitpid(-1, &status, options);
+        pid = waitpid(pid, &status, options);
         if(WIFSTOPPED(status)){
+            // printf("[%d] Stopped pg %d\n", pid, last_pgid);
             last_stopped_pgid = last_pgid;
         }
     }
