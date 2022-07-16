@@ -72,7 +72,7 @@ PUBLIC struct proc *curr_syscall_caller;
 **/
 void kreport_all_procs(struct filp* file) {
     struct proc *curr;
-    filp_kprint(file, "PID PPID RBASE      PC         STACK      HEAP       PROTECTION    FLAG NAME    \n");
+    filp_kprint(file, "PID PPID PG RBASE      PC         STACK      HEAP       PROTECTION    FLAG NAME    \n");
 
     foreach_proc(curr){
         kreport_proc(curr, file);
@@ -84,9 +84,10 @@ void kreport_all_procs(struct filp* file) {
 **/
 void kreport_proc(struct proc* curr, struct filp* file) {
     int ptable_idx = PADDR_TO_PAGED(curr->ctx.rbase)/32;
-    filp_kprint(file, "%-3d %-4d 0x%08lx 0x%08lx 0x%08lx 0x%08lx %d 0x%08x 0x%03x %s\n",
+    filp_kprint(file, "%-3d %-4d %-2d 0x%08lx 0x%08lx 0x%08lx 0x%08lx %d 0x%08x 0x%03x %s\n",
             curr->pid,
             get_proc(curr->parent)->pid,
+            curr->procgrp,
             (uintptr_t)curr->ctx.rbase,
             (uintptr_t)get_physical_addr(get_pc_ptr(curr),curr),
             (uintptr_t)get_physical_addr(curr->ctx.m.sp,curr),
