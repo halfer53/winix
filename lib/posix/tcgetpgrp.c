@@ -3,6 +3,6 @@
 
 pid_t tcgetpgrp(int fd){
     pid_t pid;
-    int ret = ioctl(fd, TIOCGPGRP, &pid);
+    ioctl(fd, TIOCGPGRP, &pid);
     return pid;
 }
