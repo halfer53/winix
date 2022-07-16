@@ -8,9 +8,11 @@ void wakeup_process(int proc_nr, clock_t time){
     struct proc* p;
     p = get_proc(proc_nr);
     if(p){
-        if(p->state & STATE_ZOMBIE)
-            return;
-        syscall_reply2(CSLEEP, 0, proc_nr, &_message);
+        if(p->state == STATE_RECEIVING){
+            syscall_reply2(CSLEEP, 0, proc_nr, &_message);
+        }else{
+            p->state &= ~STATE_RECEIVING;
+        }
     }
 }
 
