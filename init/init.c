@@ -62,7 +62,7 @@ void init_tty()
     ret = ioctl(STDIN_FILENO, TIOCSCTTY, 0);
     assert(ret == 0);
     pgid = getpgid(0);
-    ret = ioctl(STDIN_FILENO, TIOCSPGRP, &pgid);
+    ret = tcsetpgrp(STDIN_FILENO, pgid);
     assert(ret == 0);
 }
 
