@@ -88,31 +88,6 @@ int do_send(int dest, struct message *m) {
 int do_receive(struct message *m) {
     struct proc *p;
     int i;
-
-    // if(!list_empty(&curr_scheduling_proc->notify_queue)){
-    //     // KDEBUG(("not empty"));
-    //     list_for_each_entry_safe(struct proc, p, bak, &curr_scheduling_proc->notify_queue, notify_queue){
-    //         list_del(&p->notify_queue);
-    //         *m = *(p->message);
-    //         // if(is_debugging_ipc()){
-    //         //     KDEBUG(("%d notify queue %d type %d\n", curr_scheduling_proc->proc_nr, p->proc_nr, m->type));
-    //         // }
-    //         return 0;
-    //     }
-    // }
-    if(curr_scheduling_proc->notify_pending){
-        for(i = 0; i < 32; i++){
-            if(is_bit_on(&curr_scheduling_proc->notify_pending, 1, i)){
-                bitmap_clear_bit(&curr_scheduling_proc->notify_pending, 1, i);
-                p = get_proc(i);
-                *m = *(p->message);
-                if(is_debugging_ipc()){
-                    klog("%d notify queue %d type %d\n", curr_scheduling_proc->proc_nr, p->proc_nr, m->type);
-                }
-                return 0;
-            }
-        }
-    }
     
     p = curr_scheduling_proc->sender_q;
     // If a process is waiting to send to this process, deliver it immediately.

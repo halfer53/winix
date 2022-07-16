@@ -96,7 +96,6 @@ int copy_pcb(struct proc* parent, struct proc* child){
     child->sig_pending = 0;
     // ptable points to its own protection table
     child->ctx.ptable = child->protection_table;
-    child->notify_pending = 0;
     child->time_used = child->sys_time_used = 0;
 
     INIT_LIST_HEAD(&child->pipe_reading_list);
