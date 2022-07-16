@@ -66,10 +66,9 @@ void init_pgid(){
 }
 
 void init_shell(){
-    int ret;
-    ret = ioctl(STDIN_FILENO, TIOCSPGRP, &pgid);
+    int ret = tcsetpgrp(STDIN_FILENO, pgid);
     if (ret != 0){
-        perror("TIOCSPGRP");
+        perror("tcsetpgrp");
     }
 }
 
@@ -166,8 +165,9 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
 #ifdef __wramp__
         signal(SIGINT, SIG_DFL);
         signal(SIGTSTP, SIG_DFL);
-        ret = ioctl(STDIN_FILENO, TIOCSPGRP, &last_pgid);
+        ret = tcsetpgrp(STDIN_FILENO, last_pgid);
 #endif
+        
         if (history_fd)
             close(history_fd);
 
@@ -252,8 +252,9 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
 
 #ifdef __wramp__
     ioctl(STDIN_FILENO, TIOCENABLEECHO);
-    ioctl(STDIN_FILENO, TIOCSPGRP, &pgid);
+    tcsetpgrp(STDIN_FILENO, pgid);
 #endif
+    
     return WEXITSTATUS(status);
 }
 
@@ -403,12 +404,12 @@ int do_fg(int argc, char **argv){
     int status;
     int ret;
 
-    ioctl(0, TIOCSPGRP, &last_stopped_pgid);
+    tcsetpgrp(STDIN_FILENO, last_stopped_pgid);
     ret =  kill(-last_stopped_pgid, SIGCONT);
     if(ret == 0){
         ret = waitpid(-last_stopped_pgid, &status, WUNTRACED);
     }
-    ioctl(STDIN_FILENO, TIOCSPGRP, &pgid);
+    tcsetpgrp(STDIN_FILENO, pgid);
     return ret;
 }
 
