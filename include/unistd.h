@@ -38,6 +38,8 @@ char *getcwd(char *buf, size_t size);
 int execve(const char *pathname, char *const argv[],char *const envp[]);
 int execv(const char *path, char *const argv[]);
 
+pid_t tcgetpgrp(int fd);
+
 #if defined(__wramp__) & !defined(LINTING) && !defined(_SYSTEM)
 
 #define sync()                              wramp_syscall(SYNC)
