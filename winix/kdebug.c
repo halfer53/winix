@@ -59,7 +59,7 @@ void debug_ipc(int val){
 }
 
 void debug_syscall(int val){
-    _debug_syscall = val * 2;
+    trace_syscall = true;
 }
 
 void debug_timer(int val){
@@ -75,7 +75,7 @@ void stop_debug_ipc(){
 }
 
 void stop_debug_syscall(){
-    _debug_syscall = 0;
+    trace_syscall = false;
 }
 
 void kreport_readyqueue(){
