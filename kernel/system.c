@@ -214,16 +214,7 @@ void set_syscall_mesg_exception(int operation, ptr_t* osp, struct message *m, st
 int set_syscall_reply(struct proc* who, int reply, int syscall_num){
     if(reply < 0){
         *(USER_ERRNO(who)) = -reply;
-        switch (syscall_num)
-        {
-        case GETCWD:
-            reply = 0;
-            break;
-        
-        default:
-            reply = -1;
-            break;
-        }
+        reply = syscall_num == GETCWD ? 0 : -1;
     }
     who->ctx.m.regs[0] = reply;
     return reply;
