@@ -25,7 +25,6 @@ void stop_debug_ipc();
 void stop_debug_syscall();
 void kprintf_syscall_reply(int reply);
 void kprintf_syscall_request(int,pid_t);
-void rewind_stack(struct proc* proc);
 
 #ifdef _DEBUG
     #define KDEBUG(token)   klog token

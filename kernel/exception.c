@@ -129,10 +129,9 @@ PRIVATE void serial2_handler() {
 }
 
 #define LIMIT 10
-void rewind_stack(struct proc* proc){
+void _traceback_stack(struct proc* proc, ptr_t **stack_start, ptr_t** stack_end){
     vptr_t *vtext_start, *vtext_end;
-    ptr_t **p = (ptr_t **)get_physical_addr(proc->ctx.m.sp, proc);
-    ptr_t **stack_end = (ptr_t **)proc->stack_top + proc->stack_size;
+    ptr_t **p = stack_start;
     reg_t *data, *instruction;
     char *filename;
     int i = 0;
@@ -158,6 +157,33 @@ void rewind_stack(struct proc* proc){
     filename = basename(proc->name);
     kprintf("HINT: type `python3 tools/kdbg.py %s <vir address>` to debug\n",
         filename);
+}
+
+void traceback_stack(struct proc* proc){
+    ptr_t **stack_start, **stack_end;
+
+    if (proc == curr_scheduling_proc && !in_interrupt()){
+        wramp_syscall(WINIX_STACK_TRACE);
+        return;
+    }
+    stack_start = (ptr_t **)get_physical_addr(proc->ctx.m.sp, proc);
+    stack_end = (ptr_t **)proc->stack_top + proc->stack_size;
+
+    _traceback_stack(proc, stack_start, stack_end);
+}
+
+void traceback_exception_stack(){
+    if(!in_interrupt())
+        return;
+    kprintf("traceback_exception_stack\n");
+    _traceback_stack(SYSTEM_TASK, get_sp(), (ptr_t **)get_exception_stack_bottom());
+}
+
+void traceback_current_stack(){
+    if(in_interrupt())
+        traceback_exception_stack();
+    else
+        traceback_stack(curr_scheduling_proc);
 }
 
 #define PRINT_DEBUG_REG(pc,sp,ra)\
@@ -190,7 +216,7 @@ void kreport_proc_sigsegv(struct proc* who){
         kprintf("Memory Table:\n");
         kreport_ptable(who);  
         kreport_sysmap();
-        rewind_stack(who);
+        traceback_stack(who);
     }
 #endif
 }
@@ -278,7 +304,7 @@ PRIVATE void syscall_handler() {
             break;
         
         case WINIX_STACK_TRACE:
-            rewind_stack(curr_scheduling_proc);
+            traceback_stack(curr_scheduling_proc);
             break;
 
         default:

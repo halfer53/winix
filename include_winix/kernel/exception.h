@@ -35,5 +35,8 @@ void reset_irq_count();
 void register_irq(int irq, expt_handler_t handler);
 void trigger_gpf(struct proc* who);
 void kreport_proc_sigsegv(struct proc* who);
+void traceback_stack(struct proc* proc);
+void traceback_exception_stack();
+void traceback_current_stack();
 
 #endif
