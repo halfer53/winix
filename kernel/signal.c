@@ -90,7 +90,12 @@ PRIVATE int sys_sig_handler(struct proc *who, int signum){
             case SIGCONT:
                 if(who->state & STATE_STOPPED){
                     who->state &= ~STATE_STOPPED;
-                    if(!who->state){
+                    if (who->state & STATE_RECEIVING){
+                        who->state &= ~STATE_RECEIVING;
+                        who->ctx.m.regs[0] = 0xFFFFFFFF;
+                        *(USER_ERRNO(who)) = EINTR;
+                    }
+                    if(who->state == STATE_RUNNABLE){
                         enqueue_schedule(who);
                     }
                 }
