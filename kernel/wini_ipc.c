@@ -87,6 +87,21 @@ int do_send(int dest, struct message *m) {
  **/
 int do_receive(struct message *m) {
     struct proc *p;
+    int i;
+
+    if(curr_scheduling_proc->notify_pending){
+        for(i = 0; i < 32; i++){
+            if(is_bit_on(&curr_scheduling_proc->notify_pending, 1, i)){
+                bitmap_clear_bit(&curr_scheduling_proc->notify_pending, 1, i);
+                p = get_proc(i);
+                *m = *(p->message);
+                if(is_debugging_ipc()){
+                    klog("%d notify queue %d type %d\n", curr_scheduling_proc->proc_nr, p->proc_nr, m->type);
+                }
+                return 0;
+            }
+        }
+    }
     
     p = curr_scheduling_proc->sender_q;
     // If a process is waiting to send to this process, deliver it immediately.
@@ -133,13 +148,11 @@ int do_notify(int src, int dest, struct message *m) {
 
         if(pDest->state & STATE_KILLED || pDest->state & STATE_ZOMBIE)
             return -EINVAL;
+
         // KDEBUG(("\nNOTIFY %d from %d type %d| ",dest, src ,m->type));
-
-        // Unblock receiver
-        pDest->state &= ~STATE_RECEIVING;
-
+            
         // If destination is waiting, deliver message immediately.
-        if (pDest->state == STATE_RUNNABLE) {
+        if (pDest->state == STATE_RECEIVING) {
 
             if(pDest->flags & DIRECT_SYSCALL){
                 set_reply_res_errno(pDest, m);
@@ -148,16 +161,22 @@ int do_notify(int src, int dest, struct message *m) {
             // Copy message to destination
             *(pDest->message) = *m;
             
+
+            // Unblock receiver
+            pDest->state &= ~STATE_RECEIVING;
             pDest->ctx.m.regs[0] = m->reply_res;
-            enqueue_head(ready_q[pDest->priority], pDest);
-            
+            if(pDest->state == STATE_RUNNABLE){
+                enqueue_head(ready_q[pDest->priority], pDest);
+            }
         }else{
             pSrc = get_proc(src);
-            syscall_num = m->type;
-            if(syscall_num > 0 && syscall_num < _NSYSCALL){
-                msg_type = syscall_str[syscall_num];
-            }
-            if(IS_KERNEL_PROC(pSrc)){
+            if(IS_USER_PROC(pSrc)){
+                pSrc->message = m;
+            }else{
+                syscall_num = m->type;
+                if(syscall_num > 0 && syscall_num < _NSYSCALL){
+                    msg_type = syscall_str[syscall_num];
+                }
                 kwarn("notify: dest %s[%d] state %x cant receive %s from %d\n", pDest->name, pDest->proc_nr, pDest->state, msg_type, src);
             }
         }

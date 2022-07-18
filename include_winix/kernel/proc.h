@@ -153,6 +153,9 @@ typedef struct proc {
     struct proc *sender_q;        	// Head of process queue waiting to send to this process
     struct proc *next_sender;     	// Link to next sender in the queue
 
+    /* Pending messages, used by winix_notify */
+    unsigned int notify_pending;	// bitmap for masking list of pending messages by system proc
+
     /* Scheduling */
     struct proc *next;            	// Next pointer
     int priority;                	// Priority
