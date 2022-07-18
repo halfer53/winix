@@ -23,5 +23,5 @@ int do_getpid(struct proc *who, struct message *m){
 }
 
 int do_getppid(struct proc* who, struct message *m){
-    return who->parent;
+    return get_proc(who->parent)->pid;
 }
