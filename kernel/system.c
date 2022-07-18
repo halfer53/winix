@@ -211,22 +211,22 @@ void set_syscall_mesg_exception(int operation, ptr_t* osp, struct message *m, st
     }
 }
 
-void set_reply_res_errno(struct proc* who, struct message *m){
-    int reply;
-    if(m->reply_res < 0){
-        reply = -(m->reply_res);
-        *(USER_ERRNO(who)) = reply;
-        switch (m->type)
+int set_syscall_reply(struct proc* who, int reply, int syscall_num){
+    if(reply < 0){
+        *(USER_ERRNO(who)) = -reply;
+        switch (syscall_num)
         {
         case GETCWD:
-            m->reply_res = 0;
+            reply = 0;
             break;
         
         default:
-            m->reply_res = -1;
+            reply = -1;
             break;
-        }        
+        }
     }
+    who->ctx.m.regs[0] = reply;
+    return reply;
 }
 
 int no_syscall(struct proc* who, struct message* m){

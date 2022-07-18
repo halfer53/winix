@@ -92,8 +92,7 @@ PRIVATE int sys_sig_handler(struct proc *who, int signum){
                     who->state &= ~STATE_STOPPED;
                     if (who->state & STATE_RECEIVING){
                         who->state &= ~STATE_RECEIVING;
-                        who->ctx.m.regs[0] = 0xFFFFFFFF;
-                        *(USER_ERRNO(who)) = EINTR;
+                        (void)set_syscall_reply(who, -EINTR, 0);
                     }
                     if(who->state == STATE_RUNNABLE){
                         enqueue_schedule(who);

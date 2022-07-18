@@ -155,16 +155,18 @@ int do_notify(int src, int dest, struct message *m) {
         if (pDest->state == STATE_RECEIVING) {
 
             if(pDest->flags & DIRECT_SYSCALL){
-                set_reply_res_errno(pDest, m);
                 pDest->flags &= ~DIRECT_SYSCALL;
             }
+
+            // Set syscall reply
+            (void)set_syscall_reply(pDest, m->reply_res, m->type);
+
             // Copy message to destination
             *(pDest->message) = *m;
-            
 
             // Unblock receiver
             pDest->state &= ~STATE_RECEIVING;
-            pDest->ctx.m.regs[0] = m->reply_res;
+            
             if(pDest->state == STATE_RUNNABLE){
                 enqueue_head(ready_q[pDest->priority], pDest);
             }
