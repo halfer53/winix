@@ -238,6 +238,7 @@ void stack_overflow(int a){
 
 int test_so(int argc, char **argv){
     if(!fork()){// child
+        wramp_syscall(WINFO, WINFO_NO_GPF);
         printf("Generating stack overflow ....\n");
         stack_overflow(1);
     }else{
