@@ -47,7 +47,7 @@ CMD_PROTOTYPE(test_while);
 CMD_PROTOTYPE(run_all);
 
 struct cmd_internal test_commands[] = {
-    { test_so, "stack", false },
+    { test_so, "stack", true },
     { test_float, "float", true },
     { test_coroutine, "coroutine", true },
     { test_sigsegv, "null", true },
@@ -244,15 +244,12 @@ pid_t do_tfork(){
     return tfork();
 }
 
-pid_t do_vfork(){
-    return vfork();
-}
-
+#define FORK_LEN    2
 int test_so(int argc, char **argv){
-    pid_t (*fork_function_array[4])() = {do_fork, do_tfork, do_vfork, NULL};
+    pid_t (*fork_function_array[FORK_LEN])() = {do_fork, do_tfork};
     int i = 0;
 
-    while(fork_function_array[i]){
+    for(i = 0; i < FORK_LEN; i++){
         pid_t pid = fork_function_array[i]();
         if(!pid){// child
             wramp_syscall(WINFO, WINFO_NO_GPF);
@@ -264,7 +261,6 @@ int test_so(int argc, char **argv){
             assert(WIFSIGNALED(status));
             assert(WTERMSIG(status) == SIGSEGV);
         }
-        i++;
     }
     
     return 0;
