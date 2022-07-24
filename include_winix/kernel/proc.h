@@ -102,6 +102,7 @@
 #define BILLABLE                	0x0002      /* Set when user is invoking a system call */
 #define DIRECT_SYSCALL              0x0004      /* Direct Syscall mode */
 #define PROC_SIGAL_HANDLER          0x0008      /* process is in signal handler */
+#define PROC_NO_GPF                 0x0010      /* Do not generate GPF info for this process */
 
 // proc_memctll flags
 #define PROC_ACCESS                	1

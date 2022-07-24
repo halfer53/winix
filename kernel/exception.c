@@ -195,31 +195,34 @@ void traceback_current_stack(){
 void kreport_proc_sigsegv(struct proc* who){
     ptr_t* pc;
 #ifdef _DEBUG
-    if (who->sig_table[SIGSEGV].sa_handler == SIG_DFL){
+    if (who->sig_table[SIGSEGV].sa_handler != SIG_DFL)
+        return;
+    if (who->flags & PROC_NO_GPF)
+        return;
 
-        if(!is_vaddr_accessible(who->ctx.m.sp, who)){
-            kprintf("\nStack Overflow");
-        }
-        kprintf("\nGeneral Protection Fault: \"%s (%d)\"\n",
-            who->name,
-            who->pid);
-        kprintf("Rbase=0x%lx, Stack Top=0x%lx, vStack Top=0x%lx\n", 
-            (uintptr_t)who->ctx.rbase,
-            (uintptr_t)who->stack_top,
-            (uintptr_t)get_virtual_addr(who->stack_top, who));
-        pc = get_physical_addr(get_pc_ptr(who),who);
-
-        kprintf("Virtual  ");
-        PRINT_DEBUG_REG((uintptr_t)who->ctx.m.pc, (uintptr_t)who->ctx.m.sp, (uintptr_t)who->ctx.m.ra);
-
-        kprintf("Physical ");
-        PRINT_DEBUG_REG((uintptr_t)pc, 
-            (uintptr_t)get_physical_addr(who->ctx.m.sp, who),
-            (uintptr_t)get_physical_addr(who->ctx.m.ra, who));
-        kprintf("Memory: ");
-        kreport_ptable(who);  
-        traceback_stack(who);
+    if(!is_vaddr_accessible(who->ctx.m.sp, who)){
+        kprintf("\nStack Overflow");
     }
+    kprintf("\nGeneral Protection Fault: \"%s (%d)\"\n",
+        who->name,
+        who->pid);
+    kprintf("Rbase=0x%lx, Stack Top=0x%lx, vStack Top=0x%lx\n", 
+        (uintptr_t)who->ctx.rbase,
+        (uintptr_t)who->stack_top,
+        (uintptr_t)get_virtual_addr(who->stack_top, who));
+    pc = get_physical_addr(get_pc_ptr(who),who);
+
+    kprintf("Virtual  ");
+    PRINT_DEBUG_REG((uintptr_t)who->ctx.m.pc, (uintptr_t)who->ctx.m.sp, (uintptr_t)who->ctx.m.ra);
+
+    kprintf("Physical ");
+    PRINT_DEBUG_REG((uintptr_t)pc, 
+        (uintptr_t)get_physical_addr(who->ctx.m.sp, who),
+        (uintptr_t)get_physical_addr(who->ctx.m.ra, who));
+    kprintf("Memory: ");
+    kreport_ptable(who);  
+    traceback_stack(who);
+    
 #endif
 }
 
