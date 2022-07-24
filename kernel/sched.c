@@ -79,9 +79,7 @@ struct proc *pick_proc() {
  **/
 void sched() {
     int signum;
-    // irq count is increased for each exception being called, and cleared on exiting
-    // exception
-    reset_irq_count();
+    
 
     if (curr_scheduling_proc && !curr_scheduling_proc->state) {
 
@@ -118,6 +116,10 @@ void sched() {
         curr_scheduling_proc->ticks_left = curr_scheduling_proc->quantum;
     }
 
+    // irq count is increased for each exception being called, and cleared on exiting
+    // exception
+    reset_irq_count();
+    
     // Load context and run
     wramp_load_context();
 }
