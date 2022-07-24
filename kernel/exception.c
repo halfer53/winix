@@ -290,7 +290,7 @@ PRIVATE void syscall_handler() {
             /* FALLTHRU */
 
         case WINIX_SEND:
-            ret = do_send(dest, m);
+            ret = do_send(curr_scheduling_proc, dest, m);
             if(ret < 0)
                 curr_scheduling_proc->state &= ~STATE_RECEIVING;
             break;

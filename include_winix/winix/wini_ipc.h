@@ -25,7 +25,7 @@
  *   0 on success
  *   -1 if destination is invalid
  **/
-int do_send(int dest, struct message *m);
+int do_send(struct proc* source, int dest, struct message *m);
 
 /**
  * non-blocking send
