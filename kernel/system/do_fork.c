@@ -128,6 +128,7 @@ int copy_mm(struct proc* parent, struct proc* child){
     child->mem_start = dup_vm(parent, child);
     if(child->mem_start == NULL)
         return -ENOMEM;
+    child->text_top = child->mem_start;
     child->ctx.rbase = child->mem_start - child->rbase_offset;
 
     src = (ptr_t *)parent->mem_start;
