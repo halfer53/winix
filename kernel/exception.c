@@ -213,9 +213,8 @@ void kreport_proc_sigsegv(struct proc* who){
         PRINT_DEBUG_REG((uintptr_t)pc, 
             (uintptr_t)get_physical_addr(who->ctx.m.sp, who),
             (uintptr_t)get_physical_addr(who->ctx.m.ra, who));
-        kprintf("Memory Table:\n");
+        kprintf("Memory: ");
         kreport_ptable(who);  
-        kreport_sysmap();
         traceback_stack(who);
     }
 #endif
