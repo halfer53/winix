@@ -159,8 +159,9 @@ int check_waiting(struct proc* who){
             parent->wpid = 0;
             syscall_reply2(WAITPID ,who->pid, parent->proc_nr, mesg);
 
-            if(who->state & STATE_ZOMBIE)
+            if(who->state & STATE_ZOMBIE){
                 release_zombie(who);
+            }
             return 0;
         }
     }else if(parent->state & STATE_VFORKING){
@@ -244,7 +245,7 @@ void exit_proc(struct proc *who, int status, int signum){
     for(i = 0; i < OPEN_MAX; i++){
         file = who->fp_filp[i];
         if(file){
-            file->filp_dev->fops->close(file->filp_dev, file);
+            filp_close(file);
             who->fp_filp[i] = NULL;
         }
     }
