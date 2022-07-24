@@ -84,6 +84,7 @@
 #define WINFO_DISABLE_TRACE     5
 #define WINFO_DEBUG_IPC         6
 #define WINFO_DEBUG_SCHEDULING  7
+#define WINFO_NO_GPF            8
 
 int wramp_syscall(int num, ...);
 void *ptr_wramp_syscall(int num, ...);

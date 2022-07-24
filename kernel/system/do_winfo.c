@@ -51,6 +51,10 @@ int do_winfo(struct proc *who, struct message *m){
             debug_scheduling(m->m1_i2);
             break;
 
+        case WINFO_NO_GPF:
+            who->flags |= PROC_NO_GPF;
+            break;
+
         default:
             return -EINVAL;
     }
