@@ -236,17 +236,37 @@ void stack_overflow(int a){
     stack_overflow(a);
 }
 
+pid_t do_fork(){
+    return fork();
+}
+
+pid_t do_tfork(){
+    return tfork();
+}
+
+pid_t do_vfork(){
+    return vfork();
+}
+
 int test_so(int argc, char **argv){
-    if(!fork()){// child
-        wramp_syscall(WINFO, WINFO_NO_GPF);
-        printf("Generating stack overflow ....\n");
-        stack_overflow(1);
-    }else{
-        int status;
-        wait(&status);
-        assert(WIFSIGNALED(status));
-        assert(WTERMSIG(status) == SIGSEGV);
+    pid_t (*fork_function_array[4])() = {do_fork, do_tfork, do_vfork, NULL};
+    int i = 0;
+
+    while(fork_function_array[i]){
+        pid_t pid = fork_function_array[i]();
+        if(!pid){// child
+            wramp_syscall(WINFO, WINFO_NO_GPF);
+            printf("Generating stack overflow for %d ....\n", i);
+            stack_overflow(1);
+        }else{
+            int status;
+            wait(&status);
+            assert(WIFSIGNALED(status));
+            assert(WTERMSIG(status) == SIGSEGV);
+        }
+        i++;
     }
+    
     return 0;
 }
 
