@@ -10,7 +10,8 @@ def main():
         print("python tools/kdby.py <file> <vir_address>")
         return 1
 
-    main_path = path.dirname(path.realpath(__file__)) + "/.."
+    curr_path = path.dirname(path.realpath(__file__))
+    main_path = curr_path + "/.."
     rpath = "include_winix/srec"
 
     in_file = sys.argv[1] + ".verbose"
@@ -62,15 +63,14 @@ def main():
     print(f"target assembly line number {target_line_num} in segment {target_segment} in {filename}")
 
     tmp_filename = "/tmp/" + filename.replace("/", "_") + ".s"
-    cc_cmd = f"gcc -Iinclude -DTEXT_OFFSET=1024 -D_DEBUG -Iinclude_winix -g -Wall -Werror -pedantic -Wno-discarded-qualifiers -Wno-comment  -D__wramp__ -nostdinc -E {filename} -o /dev/stdout | sed -E \"s/__attribute__\s*\(.+\)//\" | rcc -g -target=wramp > {tmp_filename}"
+    cc_cmd = f"gcc -Iinclude -DTEXT_OFFSET=1024 -D_DEBUG -Iinclude_winix -g -Wall -Werror -pedantic -Wno-discarded-qualifiers -Wno-comment  -D__wramp__ -nostdinc -E {filename} -o /dev/stdout | sed -E \"s/__attribute__\s*\(.+\)//\" | {curr_path}/bin/rcc -g -target=wramp > {tmp_filename}"
 
     print(cc_cmd)
     result = call(cc_cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, shell=True)
     if result != 0:
         tmpfilename = filename.replace(".c",".s")
         if path.isfile(main_path+"/" +  tmpfilename):
-            print("Line " + str(target_line_num) + \
-                        " in file "+tmpfilename)
+            print(f"Line: {target_line_num} in {tmpfilename}:{target_line_num}")
             return 0
         else:
             print('Err')
