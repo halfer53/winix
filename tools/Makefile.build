@@ -41,7 +41,7 @@ ifeq ($(KBUILD_VERBOSE),0)
 	@echo "CC \t $<"
 endif
 	$(Q)gcc -DLINTING $(INCLUDE_PATH) $(CFLAGS) $(WRAMP) -nostdinc -S $< -o /dev/null
-	$(Q)gcc $(INCLUDE_PATH) $(CFLAGS) $(WRAMP) -nostdinc -E $< -o /dev/stdout | sed -E "s/__attribute__\s*\(.+\)//" | tools/bin/rcc -target=wramp > $@
+	$(Q)gcc $(INCLUDE_PATH) $(CFLAGS) $(WRAMP) -nostdinc -E $< -o /dev/stdout | sed -E "s/__attribute__\s*\(.+\)//" | tools/bin/rcc -w -target=wramp > $@
 
 $(objects): %.o: %.s
 ifeq ($(KBUILD_VERBOSE),0)
