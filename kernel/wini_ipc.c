@@ -29,10 +29,10 @@
  *   -1 if destination is invalid
  **/
 
-int do_send(int dest, struct message *m) {
+int do_send(struct proc* src, int dest, struct message *m) {
     struct proc *pDest;
 
-    curr_scheduling_proc->message = m; // save for later
+    src->message = m; // save for later
     pDest = get_proc(dest);
     
     // Is the destination valid?
@@ -41,7 +41,7 @@ int do_send(int dest, struct message *m) {
         // if the destination is waiting for the curr proc
         // avoid deadlock
         if(pDest->state & STATE_SENDING){
-            struct proc* xp = curr_scheduling_proc->sender_q;
+            struct proc* xp = src->sender_q;
             while(xp){
                 if(xp == pDest){
                     return -EDEADLK;
@@ -57,19 +57,19 @@ int do_send(int dest, struct message *m) {
             pDest->state &= ~STATE_RECEIVING;
             pDest->ctx.m.regs[0] = m->reply_res;
             enqueue_head(ready_q[pDest->priority], pDest);
-            // if(is_debugging_ipc()){
-            //     KDEBUG(("IPC: msg delivered to %d from %d\n", dest, curr_scheduling_proc->proc_nr));
-            // }
+            if(is_debugging_ipc()){
+                KDEBUG(("IPC: msg delivered to %d from %d\n", dest, src->proc_nr));
+            }
         }else {
-            // if(is_debugging_ipc()){
-            //     KDEBUG(("IPC: SEND to %d from %d blocked\n",
-            //                 dest, curr_scheduling_proc->proc_nr,m->type));
-            // }
+            if(is_debugging_ipc()){
+                KDEBUG(("IPC: SEND to %d from %d blocked\n",
+                            dest, src->proc_nr));
+            }
             // Otherwise, block current process and add it to
             // head of sending queue of the destination.
-            curr_scheduling_proc->state |= STATE_SENDING;
-            curr_scheduling_proc->next_sender = pDest->sender_q;
-            pDest->sender_q = curr_scheduling_proc;
+            src->state |= STATE_SENDING;
+            src->next_sender = pDest->sender_q;
+            pDest->sender_q = src;
         }
 
         return 0;
