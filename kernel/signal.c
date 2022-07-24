@@ -112,7 +112,7 @@ PRIVATE int sys_sig_handler(struct proc *who, int signum){
                 klog("Signal %d: terminate process \"%s [%d]\"\n"
                                         ,signum,who->name,who->pid);
                 // KDEBUG(("Signal curr %x\n", curr_scheduling_proc));
-                exit_proc(who, 128, signum);
+                exit_signal(who, signum);
         }
     }
     // if it's ignored
@@ -120,7 +120,7 @@ PRIVATE int sys_sig_handler(struct proc *who, int signum){
         struct proc* mp;
         switch(signum){
             case SIGABRT:
-                exit_proc(who, 0, signum);
+                exit_signal(who, signum);
                 break;
             
             // case SIGSEGV:

@@ -301,7 +301,8 @@ int dequeue_schedule( struct proc *h);
 int copy_from_user(struct proc* who, ptr_t *dest, vptr_t *src, size_t len);
 int copy_to_user(struct proc* who, vptr_t *dest, ptr_t *src, size_t len);
 
-#define release_proc_slot(p)    release_zombie(p)
+#define release_proc_slot(p)        release_zombie(p)
+#define exit_signal(who, signum)    exit_proc(who, 128, signum)
 
 #endif
 
