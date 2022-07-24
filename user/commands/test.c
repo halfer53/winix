@@ -222,17 +222,14 @@ int test_deadlock(int argc, char **argv){
 }
 
 int test_float(int argc, char **argv){
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
-    int foo, zero = 0;
-
+    int foo = 0, zero = 0;
     signal(SIGFPE, SIG_IGN);
-    printf("dividing by 0\n");
+    
     foo = 1 / zero;
-    signal(SIGFPE, SIG_DFL);
+    printf("dividing foo %d by 0\n", foo);
 
+    signal(SIGFPE, SIG_DFL);
     return 0;
-#pragma GCC diagnostic pop
 }
 
 void stack_overflow(int a){
