@@ -54,13 +54,16 @@ int do_alarm(struct proc *who, struct message *m){
     return prev_timeout;
 }
 
-int sys_setitimer(int which, const struct itimerval* new_value, struct itimerval* old_value){
+int sys_setitimer(struct proc* who, int which, const struct itimerval* new_value, struct itimerval* old_value){
+    struct timer *alarm;
+    clock_t prev_timeout;
     // int micro_seconds_period = (1000 * 1000) / HZ;
 
     if (which != ITIMER_REAL)
         return -EINVAL;
 
-    
+    alarm = &who->alarm;
+    prev_timeout = alarm->time_out; // return previous alarm
 
     return 0;
 }
@@ -79,5 +82,5 @@ int do_setitimer(struct proc *who, struct message *m){
     if (oact){
         oact = (struct itimerval*)get_physical_addr(oact, who);
     }
-    return sys_setitimer(m->m1_i1, act, oact);
+    return sys_setitimer(who, m->m1_i1, act, oact);
 }
