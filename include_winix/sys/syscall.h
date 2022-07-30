@@ -16,7 +16,7 @@
 #ifndef _SYSCALL_H_
 #define _SYSCALL_H_ 1
 
-#define _NSYSCALL               55
+#define _NSYSCALL               56
 /**
  * System Call Numbers
  **/
@@ -75,7 +75,7 @@
 #define GETCWD          52
 #define TFORK           53
 #define SCHED_YIELD     54
-#define SETITIMER        55
+#define SETITIMER       55
 
 
 #define WINFO_PS                1
