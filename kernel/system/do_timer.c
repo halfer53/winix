@@ -55,11 +55,11 @@ int do_alarm(struct proc *who, struct message *m){
 }
 
 int sys_setitimer(int which, const struct itimerval* new_value, struct itimerval* old_value){
-    int micro_seconds_period = (1000 * 1000) / HZ;
+    // int micro_seconds_period = (1000 * 1000) / HZ;
 
     if (which != ITIMER_REAL)
         return -EINVAL;
-    
+
     
 
     return 0;
