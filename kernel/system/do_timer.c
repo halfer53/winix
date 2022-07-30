@@ -31,11 +31,20 @@ void deliver_alarm(int proc_nr, clock_t time){
 // input     m.m1_i1    seconds
 // output    m.reply_res    previous timeout
 
+clock_t convert_to_hz(const struct timeval *tv){
+    clock_t hz, micro_hz;
+    hz = tv->tv_sec * HZ;
+    micro_hz = tv->tv_usec / (1000000 / HZ);
+    if (tv->tv_usec && micro_hz == 0)
+        micro_hz = 1;
+    return hz + micro_hz;
+}
+
 
 int sys_setitimer(struct proc* who, int which, const struct itimerval* new_value, struct itimerval* old_value){
     struct timer *alarm;
     clock_t prev_timeout;
-    clock_t new_timeout, micro_timeout;
+    clock_t new_timeout;
     int microseconds = (1000 * 1000);
     int micro_seconds_period = microseconds / HZ;
 
@@ -49,11 +58,7 @@ int sys_setitimer(struct proc* who, int which, const struct itimerval* new_value
         remove_timer(alarm);
     }
 
-    new_timeout = new_value->it_value.tv_sec * HZ;
-    micro_timeout = new_value->it_value.tv_usec / micro_seconds_period;
-    if (micro_timeout == 0 && new_value->it_value.tv_usec != 0)
-        micro_timeout = 1;
-    new_timeout += micro_timeout;
+    new_timeout = convert_to_hz(&new_value->it_value);
 
     if(new_timeout > 0){
         new_timer(who->proc_nr, alarm, new_timeout, deliver_alarm);
