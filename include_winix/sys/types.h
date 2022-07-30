@@ -22,4 +22,14 @@ typedef unsigned int off_t;
 # define __off_t_defined
 #endif
 
+#ifndef __time_t_defined
+typedef unsigned int time_t;
+#define __time_t_defined
+#endif
+
+#ifndef __suseconds_t_defined
+typedef unsigned int suseconds_t;
+#define __suseconds_t_defined
+#endif
+
 #endif

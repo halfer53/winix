@@ -15,6 +15,7 @@
 #include <kernel/kernel.h>
 #include <kernel/clock.h>
 #include <winix/ksignal.h>
+#include <sys/time.h>
 
 void deliver_alarm(int proc_nr, clock_t time){
     struct proc* who = get_proc(proc_nr);
@@ -51,4 +52,8 @@ int do_alarm(struct proc *who, struct message *m){
     }
 
     return prev_timeout;
+}
+
+int setitimer(int which, const struct itimerval* new_value, struct itimerval* old_value){
+    return 0;
 }
