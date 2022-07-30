@@ -54,6 +54,30 @@ int do_alarm(struct proc *who, struct message *m){
     return prev_timeout;
 }
 
-int setitimer(int which, const struct itimerval* new_value, struct itimerval* old_value){
+int sys_setitimer(int which, const struct itimerval* new_value, struct itimerval* old_value){
+    int micro_seconds_period = (1000 * 1000) / HZ;
+
+    if (which != ITIMER_REAL)
+        return -EINVAL;
+    
+    
+
     return 0;
+}
+
+int do_setitimer(struct proc *who, struct message *m){
+    struct itimerval* act = m->m1_p1;
+    struct itimerval* oact = m->m1_p2;
+
+    if(!is_vaddr_accessible(act, who))
+        return -EFAULT;
+
+    if(oact && !is_vaddr_accessible(oact, who))
+        return -EFAULT;
+
+    act = (struct itimerval*)get_physical_addr(act, who);
+    if (oact){
+        oact = (struct itimerval*)get_physical_addr(oact, who);
+    }
+    return sys_setitimer(m->m1_i1, act, oact);
 }
