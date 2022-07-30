@@ -2,7 +2,6 @@
  * Syscall in this file: alarm
  * Input:   m1_i1: seconds
  *
- * Return:  m1_i1: previous timer seconds
  *
  * @author Bruce Tan
  * @email brucetansh@gmail.com
