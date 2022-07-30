@@ -27,10 +27,6 @@ void deliver_alarm(int proc_nr, clock_t time){
     }
 }
 
-// alarm syscall
-// input     m.m1_i1    seconds
-// output    m.reply_res    previous timeout
-
 clock_t convert_to_hz(const struct timeval *tv){
     clock_t hz, micro_hz;
     hz = tv->tv_sec * HZ;
