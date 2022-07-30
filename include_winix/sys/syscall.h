@@ -75,6 +75,7 @@
 #define GETCWD          52
 #define TFORK           53
 #define SCHED_YIELD     54
+#define SETTIMER        55
 
 
 #define WINFO_PS                1
