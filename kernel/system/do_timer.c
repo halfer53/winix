@@ -30,29 +30,7 @@ void deliver_alarm(int proc_nr, clock_t time){
 // alarm syscall
 // input     m.m1_i1    seconds
 // output    m.reply_res    previous timeout
-int do_alarm(struct proc *who, struct message *m){
-    clock_t seconds;
-    struct timer *alarm;
-    clock_t prev_timeout;
 
-    if(m->m1_i1 < 0)
-        return -EINVAL;
-
-    seconds = (clock_t )m->m1_i1; 
-    alarm = &who->alarm;
-    prev_timeout = alarm->time_out; // return previous alarm
-
-    if(alarm->flags & TIMER_INUSE){
-        remove_timer(alarm);
-    }
-    
-    // if seconds is 0, any pending alarm is canceled
-    if(seconds > 0){
-        new_timer(who->proc_nr, alarm, seconds * HZ, deliver_alarm);
-    }
-
-    return prev_timeout;
-}
 
 int sys_setitimer(struct proc* who, int which, const struct itimerval* new_value, struct itimerval* old_value){
     struct timer *alarm;
@@ -108,3 +86,16 @@ int do_setitimer(struct proc *who, struct message *m){
     }
     return sys_setitimer(who, m->m1_i1, act, oact);
 }
+
+
+int do_alarm(struct proc *who, struct message *m){
+    int ret;
+    struct itimerval act, oact;
+    memset(&act, 0, sizeof(struct itimerval));
+    act.it_value.tv_sec = m->m1_i1;
+    ret = sys_setitimer(who, ITIMER_REAL, &act, &oact);
+    if (ret)
+        return ret;
+    return oact.it_value.tv_sec;
+}
+
