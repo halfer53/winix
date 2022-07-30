@@ -57,13 +57,37 @@ int do_alarm(struct proc *who, struct message *m){
 int sys_setitimer(struct proc* who, int which, const struct itimerval* new_value, struct itimerval* old_value){
     struct timer *alarm;
     clock_t prev_timeout;
-    // int micro_seconds_period = (1000 * 1000) / HZ;
+    clock_t new_timeout, micro_timeout;
+    int microseconds = (1000 * 1000);
+    int micro_seconds_period = microseconds / HZ;
 
     if (which != ITIMER_REAL)
         return -EINVAL;
 
     alarm = &who->alarm;
     prev_timeout = alarm->time_out; // return previous alarm
+
+    if(alarm->flags & TIMER_INUSE){
+        remove_timer(alarm);
+    }
+
+    new_timeout = new_value->it_value.tv_sec * HZ;
+    micro_timeout = new_value->it_value.tv_usec / micro_seconds_period;
+    if (micro_timeout == 0 && new_value->it_value.tv_usec != 0)
+        micro_timeout = 1;
+    new_timeout += micro_timeout;
+
+    if(new_timeout > 0){
+        new_timer(who->proc_nr, alarm, new_timeout, deliver_alarm);
+    }
+
+    if (old_value){
+        int seconds = prev_timeout / HZ;
+        int remainder = prev_timeout % HZ;
+        int microseconds = remainder * micro_seconds_period;
+        old_value->it_value.tv_sec = seconds;
+        old_value->it_value.tv_usec = microseconds;
+    }
 
     return 0;
 }

@@ -18,6 +18,7 @@
 #include <sys/debug.h>
 #include <ucontext.h>
 #include <sys/times.h>
+#include <sys/time.h>
 #include <sys/fcntl.h>
 #include <stdlib.h>
 #include <assert.h>
@@ -289,22 +290,25 @@ int test_sigsegv(int argc, char **argv){
 }
 
 
-int seconds = 1;
-int cont;
-
 void alarm_handler(int signum){
-    printf("%d seconds elapsed\n",seconds);
-    cont = 0;
+    printf("alarm handler triggered\n");
 }
 
 int test_eintr(int argc, char **argv){
     char __buffer[10];
     int ret;
-    seconds = (argc > 1) ? atoi(argv[1]) : 1;
-    if(seconds < 0)
-        seconds = 0;
+    clock_t seconds;
+    suseconds_t microseconds = 1000;
+    struct itimerval itv;
+    memset(&itv, 0, sizeof(itv));
+
+    seconds = (argc > 1) ? atoi(argv[1]) : 0;
+    itv.it_value.tv_sec = seconds;
+    itv.it_value.tv_usec = microseconds;
+
     signal(SIGALRM, alarm_handler);
-    alarm(1);
+    setitimer(ITIMER_REAL, &itv, NULL);
+
     ret = read(STDIN_FILENO, __buffer, 10 * sizeof(char));
     assert(ret == -1);
     assert(errno == EINTR);
