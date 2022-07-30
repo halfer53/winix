@@ -331,6 +331,7 @@ void init_syscall_table(){
     SYSCALL_MAP(GETCWD, do_getcwd);
     SYSCALL_MAP(TFORK, do_tfork);
     SYSCALL_MAP(SCHED_YIELD, do_sched_yield);
+    SYSCALL_MAP(SETITIMER, do_setitimer);
 }
 
 
