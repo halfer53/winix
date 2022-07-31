@@ -54,7 +54,7 @@ struct cmd_internal test_commands[] = {
     { test_coroutine, "coroutine", true },
     { test_sigsegv, "null", true },
     { test_eintr, "eintr", false },
-    { test_timer, "timer", false },
+    { test_timer, "timer", true },
     { test_deadlock, "deadlock", true },
     { test_ipc, "ipc", true },
     { test_signal, "signal", true },
