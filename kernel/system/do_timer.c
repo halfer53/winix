@@ -24,6 +24,9 @@ void deliver_alarm(int proc_nr, clock_t time){
         if(who->state){
             handle_pendingsig(who, true);
         }
+        if(who->state == STATE_RUNNABLE && who->timer_interval){
+            new_timer(proc_nr, &who->timer, who->timer_interval, deliver_alarm);
+        }
     }
 }
 
@@ -38,26 +41,29 @@ clock_t convert_to_hz(const struct timeval *tv){
 
 
 int sys_setitimer(struct proc* who, int which, const struct itimerval* new_value, struct itimerval* old_value){
-    struct timer *alarm;
+    struct timer *timer;
     clock_t prev_timeout;
-    clock_t new_timeout;
+    clock_t new_timeout, interval;
     int microseconds = (1000 * 1000);
     int micro_seconds_period = microseconds / HZ;
 
     if (which != ITIMER_REAL)
         return -EINVAL;
 
-    alarm = &who->alarm;
-    prev_timeout = alarm->time_out; // return previous alarm
+    timer = &who->timer;
+    prev_timeout = timer->time_out; 
 
-    if(alarm->flags & TIMER_INUSE){
-        remove_timer(alarm);
+    if(timer->flags & TIMER_INUSE){
+        remove_timer(timer);
+        who->timer_interval = 0;
     }
 
     new_timeout = convert_to_hz(&new_value->it_value);
+    interval = convert_to_hz(&new_value->it_interval);
+    who->timer_interval = interval;
 
     if(new_timeout > 0){
-        new_timer(who->proc_nr, alarm, new_timeout, deliver_alarm);
+        new_timer(who->proc_nr, timer, new_timeout, deliver_alarm);
     }
 
     if (old_value){
