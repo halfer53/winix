@@ -18,7 +18,7 @@ int do_csleep(struct proc* who, struct message* m){
 
     ticks = m->m1_i1;
 
-    alarm = &who->alarm;
+    alarm = &who->timer;
     if(alarm->flags & TIMER_INUSE){
         return -EINVAL;
     }
