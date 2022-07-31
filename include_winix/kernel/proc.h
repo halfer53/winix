@@ -94,7 +94,6 @@
 #define STATE_PAUSING               0x00000008    /* process blocked by sigsuspend(2) or pause(2) */
 #define STATE_VFORKING              0x00000010    /* parent is blocked by vfork(2) */
 #define STATE_STOPPED               0x00000020    /* Stopped by SIGSTOP or SIGTSTP */
-#define STATE_KILLED                0x00000040    /* Process killed by signal */  
 #define STATE_ZOMBIE                0x80000000    /* Zombie process */
 
 // Process Information flags
