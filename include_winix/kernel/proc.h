@@ -196,7 +196,8 @@ typedef struct proc {
     struct sigaction sig_table[_NSIG];
 
     /* Alarm */
-    struct timer alarm;
+    struct timer timer;
+    clock_t timer_interval;
 
     /* File System */
     mode_t umask;
