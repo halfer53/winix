@@ -46,13 +46,15 @@ CMD_PROTOTYPE(test_ipc);
 CMD_PROTOTYPE(test_signal);
 CMD_PROTOTYPE(test_while);
 CMD_PROTOTYPE(run_all);
+CMD_PROTOTYPE(test_timer);
 
 struct cmd_internal test_commands[] = {
     { test_so, "stack", true },
     { test_float, "float", true },
     { test_coroutine, "coroutine", true },
     { test_sigsegv, "null", true },
-    { test_eintr, "eintr", false},
+    { test_eintr, "eintr", false },
+    { test_timer, "timer", false },
     { test_deadlock, "deadlock", true },
     { test_ipc, "ipc", true },
     { test_signal, "signal", true },
@@ -316,6 +318,35 @@ int test_eintr(int argc, char **argv){
     assert(ret == -1);
     assert(errno == EINTR);
     assert(alarm_handler_called == true);
+    return 0;
+}
+
+int test_timer(int argc, char ** argv){
+    suseconds_t microseconds = 5000;
+    struct itimerval itv;
+    struct sigaction act;
+    memset(&itv, 0, sizeof(itv)); 
+    memset(&act, 0, sizeof(act));
+    alarm_handler_called = false;
+
+    if(!tfork()){
+        itv.it_value.tv_usec = microseconds;
+        itv.it_interval = itv.it_value;
+
+        act.sa_handler = alarm_handler;
+        act.sa_flags = SA_RESETHAND;
+
+        sigaction(SIGALRM, &act, NULL);
+        setitimer(ITIMER_REAL, &itv, NULL);
+        while(1);
+    }else{
+        int status;
+        wait(&status);
+        assert(alarm_handler_called == true);
+        assert(WIFSIGNALED(status));
+        assert(WTERMSIG(status) == SIGALRM);
+
+    }
     return 0;
 }
 
