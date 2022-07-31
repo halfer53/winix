@@ -146,7 +146,7 @@ int do_notify(int src, int dest, struct message *m) {
     // Is the destination valid?
     if ((pDest = get_proc(dest))) {
 
-        if(pDest->state & STATE_KILLED || pDest->state & STATE_ZOMBIE)
+        if(pDest->state & STATE_ZOMBIE)
             return -EINVAL;
 
         // KDEBUG(("\nNOTIFY %d from %d type %d| ",dest, src ,m->type));
