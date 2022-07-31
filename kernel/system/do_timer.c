@@ -18,7 +18,7 @@
 #include <sys/time.h>
 
 void deliver_alarm(int proc_nr, clock_t time){
-    struct proc* who = get_proc(proc_nr);
+    struct proc* who = get_non_zombie_proc(proc_nr);
     if(who){
         send_sig(who, SIGALRM);
         if(who->state){
