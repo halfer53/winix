@@ -190,7 +190,7 @@ void exit_proc_in_interrupt(struct proc* who, int exit_val,int signum){
     em.src = who->proc_nr;
     vptr = copyto_user_heap(who, &em, sizeof(struct message));
     ptr = get_physical_addr(vptr, who);
-    who->state |= STATE_KILLED;
+    zombify(who);
     // KDEBUG(("exit interrupt who %d, curr %d\n", who->proc_nr, curr_scheduling_proc->proc_nr));
     do_send(who, SYSTEM, (struct message*) ptr);
 }
