@@ -150,9 +150,9 @@ struct proc *get_proc(int proc_nr) {
  * @param  proc_nr 
  * @return         
  */
-struct proc *get_runnable_proc(int proc_nr){
+struct proc *get_non_zombie_proc(int proc_nr){
     struct proc *p = get_proc(proc_nr);
-    if(p && IS_RUNNABLE(p))
+    if(p && !(p->state & STATE_ZOMBIE))
         return p;
     return NULL;
 }

@@ -281,7 +281,7 @@ int proc_memctl(struct proc* who ,vptr_t* page_addr, int flags);
 pid_t get_next_pid();
 struct proc* get_proc_by_pid(pid_t pid);
 struct proc *get_proc(int proc_nr);
-struct proc *get_runnable_proc(int proc_nr);
+struct proc *get_non_zombie_proc(int proc_nr);
 void kreport_all_procs(struct filp*);
 void kreport_proc(struct proc* curr, struct filp* );
 struct proc *pick_proc();
