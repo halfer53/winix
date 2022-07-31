@@ -232,12 +232,14 @@ int is_sigpending(struct proc* who){
 
 int handle_pendingsig(struct proc* who, bool check_enqueue){
     int signum = is_sigpending(who);
-    if(signum){
+    disable_interrupt();
+    if(signum ){
         handle_sig(who, signum);
         // (syscall_return == DONTREPLY || syscall_return == SUSPEND)
         if(check_enqueue && who->state == STATE_RUNNABLE && who->flags & PROC_SIGAL_HANDLER){
             enqueue_schedule(who);
         }
     }
+    enable_interrupt();
     return signum;
 }
