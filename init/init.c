@@ -53,7 +53,7 @@ void init_tty()
     int fd, ret;
     ret = setsid();
     assert(ret == getpid());
-    fd = open("/dev/tty1", O_RDONLY);
+    fd = open("/dev/tty1", O_RDWR);
     assert(fd == 0);
     ret = dup(fd);
     assert(ret == 1);
