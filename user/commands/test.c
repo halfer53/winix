@@ -289,9 +289,11 @@ int test_sigsegv(int argc, char **argv){
     return 0;
 }
 
+bool alarm_handler_called = false;
 
 void alarm_handler(int signum){
     printf("alarm handler triggered\n");
+    alarm_handler_called = true;
 }
 
 int test_eintr(int argc, char **argv){
@@ -301,6 +303,7 @@ int test_eintr(int argc, char **argv){
     suseconds_t microseconds = 1000;
     struct itimerval itv;
     memset(&itv, 0, sizeof(itv));
+    alarm_handler_called = false;
 
     seconds = (argc > 1) ? atoi(argv[1]) : 0;
     itv.it_value.tv_sec = seconds;
@@ -312,6 +315,7 @@ int test_eintr(int argc, char **argv){
     ret = read(STDIN_FILENO, __buffer, 10 * sizeof(char));
     assert(ret == -1);
     assert(errno == EINTR);
+    assert(alarm_handler_called == true);
     return 0;
 }
 
