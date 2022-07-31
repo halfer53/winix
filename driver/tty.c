@@ -186,7 +186,7 @@ void tty_exception_handler( struct tty_state* state){
             else if(val == CTRL_Z)
                 signal =SIGTSTP;
             
-            if(state->controlling_session > 0 && state->foreground_group > 0){
+            if(state->foreground_group > 0){
                 // KDEBUG(("Send sig to foreground %d\n", state->foreground_group));
                 (void)sys_kill(SYSTEM_TASK, -(state->foreground_group), signal);
             }
@@ -329,7 +329,7 @@ int tty_write_rex(RexSp_t* rex, char* data, size_t len){
 
 int tty_read ( struct filp *filp, char *data, size_t count, off_t offset){
     struct tty_state* state = (struct tty_state*)filp->private;
-    if(curr_syscall_caller->procgrp != state->foreground_group){
+    if(curr_syscall_caller->session_id != state->controlling_session){
         send_sig(curr_syscall_caller, SIGINT);
         return DONTREPLY;
     }
