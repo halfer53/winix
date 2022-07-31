@@ -231,8 +231,9 @@ int is_sigpending(struct proc* who){
 }
 
 int handle_pendingsig(struct proc* who, bool check_enqueue){
-    int signum = is_sigpending(who);
+    int signum;
     disable_interrupt();
+    signum = is_sigpending(who);
     if(signum ){
         handle_sig(who, signum);
         // (syscall_return == DONTREPLY || syscall_return == SUSPEND)
