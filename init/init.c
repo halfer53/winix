@@ -84,18 +84,35 @@ void start_init_routine()
     printf("Shutting down...\n");
 }
 
-void run_unit_test()
+pid_t run_unit_test()
 {
     pid_t pid;
-    int status;
-    char *argv[] = {shell_path, "-c", "test", "run", ">", "test.log", NULL};
+    int ret;
+    char *argv[] = {shell_path, "-c", "test", "eintr", ">", "test.log", NULL};
     pid = vfork();
     if (!pid){
         execv(shell_path, argv);
         _exit(1);
     }
-    wait(&status);
-    assert(WEXITSTATUS(status) == 0);
+    return pid;
+}
+
+void wait_for_unit_test(pid_t pid){
+    int status, exit_status, fd, ret;
+
+    ret = waitpid(pid, &status, 0);
+    assert(ret == 0);
+    exit_status = WEXITSTATUS(status);
+    if (exit_status){
+        char buf[64];
+        printf("Unit test failed, exit status %d\n", exit_status);
+        fd = open("test.log", O_RDONLY);
+        while((ret = read(fd, buf, 64 * sizeof(char))) > 0){
+            write(STDOUT_FILENO, buf, ret);
+        }
+        close(fd);
+    }
+    assert(exit_status == 0);
 }
 
 void run_shell(){
@@ -108,11 +125,14 @@ void run_shell(){
 
 int main(int argc, char **argv)
 {
+    pid_t pid;
     init_dev();
     init_tty();
 
-    run_unit_test();
+    pid = run_unit_test();
     run_shell();
+
+    wait_for_unit_test(pid);
     start_init_routine();
     return 0;
 }
