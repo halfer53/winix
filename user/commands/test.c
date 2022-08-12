@@ -114,7 +114,7 @@ int run_all(int argc, char** argv){
         if (handler->unittest){
             handler_argv[0] = handler->name;
             ret = handler->handle(1, handler_argv);
-            printf("---\n%s return %d\n", handler->name, ret);
+            printf("%s return %d\n---\n\n", handler->name, ret);
             assert(ret == 0);
         }
         handler++;
