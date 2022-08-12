@@ -381,6 +381,9 @@ int tty_ioctl(struct filp* file, int request, vptr_t* vptr){
         // KDEBUG(("set foreground to %d\n", tty_data->foreground_group));
         break;
     case TIOCSCTTY:
+        if(!IS_SESSION_LEADER(who)){
+            return -EPERM;
+        }
         tty_data->controlling_session = who->session_id;
         break;
     case TIOCDISABLEECHO:
