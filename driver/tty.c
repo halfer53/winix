@@ -375,31 +375,46 @@ int tty_ioctl(struct filp* file, int request, vptr_t* vptr){
     tty_data = (struct tty_state*)file->filp_dev->private;
     switch (request)
     {
+
     case TIOCGPGRP:
         *ptr = (pid_t)tty_data->foreground_group;
         break;
+
     case TIOCSPGRP:
         tty_data->foreground_group = (pid_t)*get_physical_addr(*(ptr_t **)ptr, who);
         // KDEBUG(("set foreground to %d\n", tty_data->foreground_group));
         break;
+
     case TIOCSCTTY:
         if(!IS_SESSION_LEADER(who)){
             return -EPERM;
         }
-        if(tty_data->controlling_session && !IS_ROOT(curr_syscall_caller)){
+        if(tty_data->controlling_session && !IS_ROOT(who)){
             return -EPERM;
         }
         tty_data->controlling_session = who->session_id;
         break;
+
+    case TIOCNOTTY:
+        if (!IS_SESSION_LEADER(who)){
+            return -EPERM;
+        }
+        if(tty_data->foreground_group){
+            send_sig(-tty_data->foreground_group, SIGHUP);
+        }
+        break;
+
     case TIOCDISABLEECHO:
         tty_data->is_echoing = false;
         break;
+
     case TIOCENABLEECHO:
         tty_data->is_echoing = true;
         break;
 
     default:
         return -EINVAL;
+
     }
     return 0;
 }
