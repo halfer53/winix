@@ -100,7 +100,6 @@ void wait_for_unit_test(pid_t pid){
     int status, exit_status, fd, ret;
 
     ret = waitpid(pid, &status, 0);
-    assert(ret == 0);
     exit_status = WEXITSTATUS(status);
     if (exit_status){
         char buf[64];
