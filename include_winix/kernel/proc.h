@@ -90,10 +90,9 @@
 #define STATE_RUNNABLE              0x00000000    /* Process is running or in the ready queue */
 #define STATE_SENDING               0x00000001    /* process blocked trying to SEND */
 #define STATE_RECEIVING             0x00000002    /* process blocked trying to RECEIVE */
-#define STATE_WAITING               0x00000004    /* process blocked wait(2) */
-#define STATE_PAUSING               0x00000008    /* process blocked by sigsuspend(2) or pause(2) */
-#define STATE_VFORKING              0x00000010    /* parent is blocked by vfork(2) */
-#define STATE_STOPPED               0x00000020    /* Stopped by SIGSTOP or SIGTSTP */
+#define STATE_WAITING               0x00000004    /* process blocked waitpid(2) or sigsuspend(2)  */
+#define STATE_VFORKING              0x00000008    /* parent is blocked by vfork(2) */
+#define STATE_STOPPED               0x00000010    /* Stopped by SIGSTOP or SIGTSTP */
 #define STATE_ZOMBIE                0x80000000    /* Zombie process */
 
 // Process Information flags

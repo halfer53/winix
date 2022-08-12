@@ -195,10 +195,10 @@ int send_sig(struct proc *who, int signum){
 
     // Unpause the process if it was blocked by pause(2)
     // or sigsuspend(2)
-    if(who->state & STATE_PAUSING ){
+    if(who->state & STATE_WAITING ){
         struct message m;
         m.type = 0;
-        who->state &= ~STATE_PAUSING;
+        who->state &= ~STATE_WAITING;
         syscall_reply2(0, -EINTR, who->proc_nr, &m);
     }
 
