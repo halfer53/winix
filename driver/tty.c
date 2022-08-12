@@ -402,6 +402,8 @@ int tty_ioctl(struct filp* file, int request, vptr_t* vptr){
         if(tty_data->foreground_group){
             sys_kill(SYSTEM_TASK, -(tty_data->foreground_group), SIGHUP);
         }
+        tty_data->foreground_group = 0;
+        tty_data->controlling_session = 0;
         break;
 
     case TIOCDISABLEECHO:
