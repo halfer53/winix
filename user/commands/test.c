@@ -19,7 +19,7 @@
 #include <ucontext.h>
 #include <sys/times.h>
 #include <sys/time.h>
-#include <sys/fcntl.h>
+#include <fcntl.h>
 #include <stdlib.h>
 #include <assert.h>
 #include <sys/wait.h>
@@ -92,8 +92,23 @@ int run_all(int argc, char** argv){
     struct cmd_internal* handler;
     char *handler_argv[2];
     int ret;
+    // int ret, fd, stdin_backup;
+    // pid_t pgid;
     handler = test_commands;
     handler_argv[1] = NULL;
+
+    // stdin_backup = dup(STDIN_FILENO);
+    // assert(stdin_backup);
+    // fd = open("/dev/tty2", O_RDWR);
+    // assert(fd);
+    // pgid = getpgid(0);
+    // ret = tcsetpgrp(fd, pgid);
+    // assert(ret == 0);
+    // ret = dup2(fd, STDIN_FILENO);
+    // assert(ret == 0);
+    // ret = close(fd);
+    // assert(ret == 0);
+
     while(handler->name){
         if (handler->unittest){
             handler_argv[0] = handler->name;
@@ -103,6 +118,12 @@ int run_all(int argc, char** argv){
         }
         handler++;
     }
+
+    // ret = dup2(stdin_backup, STDIN_FILENO);
+    // assert(ret == 0);
+    // ret = close(stdin_backup);
+    // assert(ret == 0);
+
     return 0;
 }
 
@@ -304,6 +325,23 @@ int test_eintr(int argc, char **argv){
     clock_t seconds;
     suseconds_t microseconds = 1000;
     struct itimerval itv;
+
+    // int fd, stdin_backup;
+    // pid_t pgid;
+
+    // stdin_backup = dup(STDIN_FILENO);
+    // assert(stdin_backup);
+    // fd = open("/dev/tty2", O_RDWR);
+    // assert(fd);
+    // pgid = getpgid(0);
+    // ret = tcsetpgrp(fd, pgid);
+    // assert(ret == 0);
+    // ret = dup2(fd, STDIN_FILENO);
+    // assert(ret == 0);
+    // ret = close(fd);
+    // assert(ret == 0);
+
+    enable_syscall_tracing();
     memset(&itv, 0, sizeof(itv));
     alarm_handler_called = false;
 
@@ -318,6 +356,12 @@ int test_eintr(int argc, char **argv){
     assert(ret == -1);
     assert(errno == EINTR);
     assert(alarm_handler_called == true);
+
+    // ret = dup2(stdin_backup, STDIN_FILENO);
+    // assert(ret == 0);
+    // ret = close(stdin_backup);
+    // assert(ret == 0);
+
     return 0;
 }
 
