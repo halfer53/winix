@@ -42,7 +42,6 @@ CMD_PROTOTYPE(test_sigsegv);
 CMD_PROTOTYPE(test_coroutine);
 CMD_PROTOTYPE(test_eintr);
 CMD_PROTOTYPE(test_nohandler);
-CMD_PROTOTYPE(test_deadlock);
 CMD_PROTOTYPE(test_ipc);
 CMD_PROTOTYPE(test_signal);
 CMD_PROTOTYPE(test_while);
@@ -56,7 +55,6 @@ struct cmd_internal test_commands[] = {
     { test_sigsegv, "null", true },
     { test_eintr, "eintr", true },
     { test_timer, "timer", true },
-    { test_deadlock, "deadlock", true },
     { test_ipc, "ipc", true },
     { test_signal, "signal", true },
     { test_while, "while", false },
@@ -201,28 +199,6 @@ int test_ipc(int argc, char **argv){
         ret = winix_send(getppid(), &m);
         assert(ret == 0);
         exit(0);
-    }
-    return 0;
-}
-
-int test_deadlock(int argc, char **argv){
-    pid_t pid;
-    struct message m;
-    int ret, result;
-    if((pid = tfork())){
-        sched_yield();
-        ret = winix_send(pid,&m);
-        assert(ret == -1);
-        assert(errno == EDEADLK);
-        ret = kill(pid,SIGKILL);
-        assert(ret == 0);
-        ret = wait(&result);
-        assert(ret == 0);
-        assert(WIFSIGNALED(result));
-        assert(WTERMSIG(result) == SIGKILL);
-    }else{
-        (void)winix_send(getppid(), &m);
-        while(1);
     }
     return 0;
 }
