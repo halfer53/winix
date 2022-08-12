@@ -103,6 +103,7 @@ void wait_for_unit_test(pid_t pid){
     exit_status = WEXITSTATUS(status);
     if (exit_status){
         char buf[64];
+        disable_syscall_tracing();
         printf("Unit test failed, exit status %d\n", exit_status);
         fd = open("test.log", O_RDONLY);
         while((ret = read(fd, buf, 64 * sizeof(char))) > 0){
