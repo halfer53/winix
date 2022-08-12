@@ -312,7 +312,11 @@ void open_tty_as_stdin(char *str){
     fd = open(str, O_RDWR);
     assert(fd);
     ret = dup2(fd, STDIN_FILENO);
-    assert(ret == 0);
+    assert(ret == STDIN_FILENO);
+    ret = dup2(fd, STDOUT_FILENO);
+    assert(ret == STDOUT_FILENO);
+    ret = dup2(fd, STDERR_FILENO);
+    assert(ret == STDERR_FILENO);
 
     ret = ioctl(STDIN_FILENO, TIOCSCTTY, 0);
     assert(ret == 0);
@@ -324,35 +328,34 @@ void open_tty_as_stdin(char *str){
 }
 
 int test_eintr(int argc, char **argv){
-    char __buffer[10];
-    int ret, stdin_backup;
-    clock_t seconds;
-    suseconds_t microseconds = 1000;
-    struct itimerval itv;
+    if(!tfork()){
+        char __buffer[10];
+        int ret;
+        clock_t seconds;
+        suseconds_t microseconds = 1000;
+        struct itimerval itv;
 
-    stdin_backup = dup(STDIN_FILENO);
-    assert(stdin_backup);
-    open_tty_as_stdin("/dev/tty2");
+        open_tty_as_stdin("/dev/tty2");
 
-    memset(&itv, 0, sizeof(itv));
-    alarm_handler_called = false;
+        memset(&itv, 0, sizeof(itv));
+        alarm_handler_called = false;
 
-    seconds = (argc > 1) ? atoi(argv[1]) : 0;
-    itv.it_value.tv_sec = seconds;
-    itv.it_value.tv_usec = microseconds;
+        seconds = (argc > 1) ? atoi(argv[1]) : 0;
+        itv.it_value.tv_sec = seconds;
+        itv.it_value.tv_usec = microseconds;
 
-    signal(SIGALRM, alarm_handler);
-    setitimer(ITIMER_REAL, &itv, NULL);
+        signal(SIGALRM, alarm_handler);
+        setitimer(ITIMER_REAL, &itv, NULL);
 
-    ret = read(STDIN_FILENO, __buffer, 10 * sizeof(char));
-    assert(ret == -1);
-    assert(errno == EINTR);
-    assert(alarm_handler_called == true);
+        ret = read(STDIN_FILENO, __buffer, 10 * sizeof(char));
+        assert(ret == -1);
+        assert(errno == EINTR);
+        assert(alarm_handler_called == true);
 
-    assert(close(STDIN_FILENO) == 0);
-    ret = dup2(stdin_backup, STDIN_FILENO);
-    assert(ret == 0);
-    assert(close(stdin_backup) == 0);
+        ret = ioctl(STDIN_FILENO, TIOCNOTTY, 0);
+        assert(ret == 0);
+    }
+    wait(NULL);
 
     return 0;
 }
