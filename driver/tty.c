@@ -368,11 +368,35 @@ int tty_close ( struct device* dev, struct filp *file){
     return 0;
 }
 
+int _tty_tiocspgrp ( struct tty_state* tty_data, struct proc* who, ptr_t* ptr){
+    pid_t pgrp;
+    struct proc* p;
+    bool found = false;
+
+    if(tty_data->controlling_session != who->session_id){
+        return -ENOTTY;
+    }
+    pgrp = (pid_t)*get_physical_addr(*(ptr_t **)ptr, who);
+    foreach_proc(p){
+        if(p->procgrp == pgrp && p->session_id == who->session_id){
+            found = true;
+        }
+    }
+    
+    if (!found){
+        return -EINVAL;
+    }
+    tty_data->foreground_group = pgrp;
+    // KDEBUG(("set foreground to %d\n", tty_data->foreground_group));
+    return 0;
+}
+
 int tty_ioctl(struct filp* file, int request, vptr_t* vptr){
     struct proc* who = curr_syscall_caller;
     struct tty_state* tty_data;
     ptr_t* ptr = get_physical_addr(vptr, who);
     tty_data = (struct tty_state*)file->filp_dev->private;
+    
     switch (request)
     {
 
@@ -381,9 +405,7 @@ int tty_ioctl(struct filp* file, int request, vptr_t* vptr){
         break;
 
     case TIOCSPGRP:
-        tty_data->foreground_group = (pid_t)*get_physical_addr(*(ptr_t **)ptr, who);
-        // KDEBUG(("set foreground to %d\n", tty_data->foreground_group));
-        break;
+        return _tty_tiocspgrp(tty_data, who, ptr);
 
     case TIOCSCTTY:
         if(!IS_SESSION_LEADER(who)){
