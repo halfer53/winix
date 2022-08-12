@@ -107,10 +107,6 @@ int copy_pcb(struct proc* parent, struct proc* child){
             file->filp_count += 1;
         }
     }
-
-    if(parent->priority > MIN_PRIORITY) // let child run first
-        parent->priority--;
-    parent->ticks_left = 0;
     return 0;
 }
 
