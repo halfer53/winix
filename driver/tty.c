@@ -400,7 +400,7 @@ int tty_ioctl(struct filp* file, int request, vptr_t* vptr){
             return -EPERM;
         }
         if(tty_data->foreground_group){
-            send_sig(-tty_data->foreground_group, SIGHUP);
+            sys_kill(SYSTEM_TASK, -(tty_data->foreground_group), SIGHUP);
         }
         break;
 
