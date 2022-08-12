@@ -226,6 +226,7 @@ extern struct proc *block_q[2];
 #define IS_KERNELN(n)                   ((n)<= 0 && (n)> -NUM_TASKS)
 #define IS_USER_PROC(p)                 ((p)->ctx.rbase != NULL)
 #define IS_THREAD(p)                    ((p)->thread_parent > 0)
+#define IS_SESSION_LEADER(p)            ((p)->session_id == (p)->pid)
 
 #define IS_IDLE(p)                      ((p)->proc_nr == IDLE)
 #define IS_SYSTEM(p)                    ((p)->proc_nr == SYSTEM)
