@@ -25,6 +25,7 @@
 #include <sys/wait.h>
 #include <sched.h>
 #include <stdbool.h>
+#include <sys/ioctl.h>
 
 #define CMD_PROTOTYPE(name)    int name(int argc, char**argv)
 
@@ -319,29 +320,39 @@ void alarm_handler(int signum){
     alarm_handler_called = true;
 }
 
+
+void open_tty_as_stdin(char *str){
+    int fd, ret, session_id;
+    pid_t pgid;
+
+    session_id = setsid();
+    assert(session_id == getpid());
+
+    fd = open(str, O_RDWR);
+    assert(fd);
+    ret = dup2(fd, STDIN_FILENO);
+    assert(ret == 0);
+
+    ret = ioctl(STDIN_FILENO, TIOCSCTTY, 0);
+    assert(ret == 0);
+    pgid = getpgid(0);
+    ret = tcsetpgrp(fd, pgid);
+    assert(ret == 0);
+    ret = close(fd);
+    assert(ret == 0);
+}
+
 int test_eintr(int argc, char **argv){
     char __buffer[10];
-    int ret;
+    int ret, stdin_backup;
     clock_t seconds;
     suseconds_t microseconds = 1000;
     struct itimerval itv;
 
-    // int fd, stdin_backup;
-    // pid_t pgid;
+    stdin_backup = dup(STDIN_FILENO);
+    assert(stdin_backup);
+    open_tty_as_stdin("/dev/tty2");
 
-    // stdin_backup = dup(STDIN_FILENO);
-    // assert(stdin_backup);
-    // fd = open("/dev/tty2", O_RDWR);
-    // assert(fd);
-    // pgid = getpgid(0);
-    // ret = tcsetpgrp(fd, pgid);
-    // assert(ret == 0);
-    // ret = dup2(fd, STDIN_FILENO);
-    // assert(ret == 0);
-    // ret = close(fd);
-    // assert(ret == 0);
-
-    enable_syscall_tracing();
     memset(&itv, 0, sizeof(itv));
     alarm_handler_called = false;
 
@@ -357,10 +368,10 @@ int test_eintr(int argc, char **argv){
     assert(errno == EINTR);
     assert(alarm_handler_called == true);
 
-    // ret = dup2(stdin_backup, STDIN_FILENO);
-    // assert(ret == 0);
-    // ret = close(stdin_backup);
-    // assert(ret == 0);
+    assert(close(STDIN_FILENO) == 0);
+    ret = dup2(stdin_backup, STDIN_FILENO);
+    assert(ret == 0);
+    assert(close(stdin_backup) == 0);
 
     return 0;
 }
