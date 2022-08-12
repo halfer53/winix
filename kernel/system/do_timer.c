@@ -52,10 +52,10 @@ int sys_setitimer(struct proc* who, int which, const struct itimerval* new_value
 
     timer = &who->timer;
     prev_timeout = timer->time_out; 
+    who->timer_interval = 0;
 
     if(timer->flags & TIMER_INUSE){
         remove_timer(timer);
-        who->timer_interval = 0;
     }
 
     new_timeout = convert_to_hz(&new_value->it_value);
