@@ -87,7 +87,7 @@ void start_init_routine()
 pid_t run_unit_test()
 {
     pid_t pid;
-    char *argv[] = {shell_path, "-c", "test", "eintr", ">", "test.log", NULL};
+    char *argv[] = {shell_path, "-c", "test", "run", ">", "test.log", NULL};
     pid = vfork();
     if (!pid){
         execv(shell_path, argv);
