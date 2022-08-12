@@ -50,7 +50,7 @@ int do_send(struct proc* src, int dest, struct message *m) {
             }
         }
         
-        if (pDest->state & STATE_RECEIVING) {
+        if (pDest->state == STATE_RECEIVING) {
             *(pDest->message) = *m;
 
             // Unblock receiver
