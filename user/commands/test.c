@@ -328,6 +328,7 @@ void open_tty_as_stdin(char *str){
 }
 
 int test_eintr(int argc, char **argv){
+    int status;
     if(!tfork()){
         char __buffer[10];
         int ret;
@@ -352,11 +353,16 @@ int test_eintr(int argc, char **argv){
         assert(errno == EINTR);
         assert(alarm_handler_called == true);
 
+        // ignore SIGHUP triggered when tty is closed
+        signal(SIGHUP, SIG_IGN);
         ret = ioctl(STDIN_FILENO, TIOCNOTTY, 0);
         assert(ret == 0);
+        exit(0);
+    }else{
+        wait(&status);
+        assert(WIFEXITED(status));
+        assert(WEXITSTATUS(status) == 0);
     }
-    wait(NULL);
-
     return 0;
 }
 
