@@ -93,22 +93,8 @@ int run_all(int argc, char** argv){
     struct cmd_internal* handler;
     char *handler_argv[2];
     int ret;
-    // int ret, fd, stdin_backup;
-    // pid_t pgid;
     handler = test_commands;
     handler_argv[1] = NULL;
-
-    // stdin_backup = dup(STDIN_FILENO);
-    // assert(stdin_backup);
-    // fd = open("/dev/tty2", O_RDWR);
-    // assert(fd);
-    // pgid = getpgid(0);
-    // ret = tcsetpgrp(fd, pgid);
-    // assert(ret == 0);
-    // ret = dup2(fd, STDIN_FILENO);
-    // assert(ret == 0);
-    // ret = close(fd);
-    // assert(ret == 0);
 
     while(handler->name){
         if (handler->unittest){
@@ -119,11 +105,6 @@ int run_all(int argc, char** argv){
         }
         handler++;
     }
-
-    // ret = dup2(stdin_backup, STDIN_FILENO);
-    // assert(ret == 0);
-    // ret = close(stdin_backup);
-    // assert(ret == 0);
 
     return 0;
 }
