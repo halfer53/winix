@@ -330,6 +330,8 @@ int tty_write_rex(RexSp_t* rex, char* data, size_t len){
 int tty_read ( struct filp *filp, char *data, size_t count, off_t offset){
     struct tty_state* state = (struct tty_state*)filp->private;
     if(curr_syscall_caller->session_id != state->controlling_session){
+        kwarn("tty_read: invalid reader %d session %d tty %x session %d\n", 
+            curr_syscall_caller->pid, curr_syscall_caller->session_id, filp->filp_dev->dev_id, state->controlling_session);
         send_sig(curr_syscall_caller, SIGINT);
         return DONTREPLY;
     }
@@ -382,6 +384,9 @@ int tty_ioctl(struct filp* file, int request, vptr_t* vptr){
         break;
     case TIOCSCTTY:
         if(!IS_SESSION_LEADER(who)){
+            return -EPERM;
+        }
+        if(tty_data->controlling_session && !IS_ROOT(curr_syscall_caller)){
             return -EPERM;
         }
         tty_data->controlling_session = who->session_id;
