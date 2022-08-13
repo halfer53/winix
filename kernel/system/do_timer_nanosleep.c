@@ -121,14 +121,14 @@ void _wakeup_process(int proc_nr, clock_t time){
     struct message _message;
     p = get_proc(proc_nr);
     if(p){
-        syscall_reply2(CSLEEP, 0, proc_nr, &_message);
+        syscall_reply2(NANOSLEEP, 0, proc_nr, &_message);
     }
 }
 
 int do_nanosleep(struct proc* who, struct message* m){
     clock_t ticks;
     struct timer *alarm;
-    struct timespec* req, *rem;
+    struct timespec* req;
 
     if(!is_vaddr_accessible(m->m1_p1, who))
         return -EFAULT;
