@@ -16,6 +16,7 @@
 #include <kernel/clock.h>
 #include <winix/ksignal.h>
 #include <sys/time.h>
+#include <time.h>
 
 void deliver_alarm(int proc_nr, clock_t time){
     struct proc* who = get_non_zombie_proc(proc_nr);
@@ -30,13 +31,22 @@ void deliver_alarm(int proc_nr, clock_t time){
     }
 }
 
-clock_t convert_to_hz(const struct timeval *tv){
+clock_t convert_timeval_to_hz(const struct timeval *tv){
     clock_t hz, micro_hz;
     hz = tv->tv_sec * HZ;
     micro_hz = tv->tv_usec / (1000000 / HZ);
     if (tv->tv_usec && micro_hz == 0)
         micro_hz = 1;
     return hz + micro_hz;
+}
+
+clock_t convert_timespec_to_hz(const struct timespec *tv){
+    clock_t hz, nano_hz;
+    hz = tv->tv_sec * HZ;
+    nano_hz = tv->tv_nsec / (1000000000 / HZ);
+    if (tv->tv_nsec && nano_hz == 0)
+        nano_hz = 1;
+    return hz + nano_hz;
 }
 
 
@@ -58,8 +68,8 @@ int sys_setitimer(struct proc* who, int which, const struct itimerval* new_value
         remove_timer(timer);
     }
 
-    new_timeout = convert_to_hz(&new_value->it_value);
-    interval = convert_to_hz(&new_value->it_interval);
+    new_timeout = convert_timeval_to_hz(&new_value->it_value);
+    interval = convert_timeval_to_hz(&new_value->it_interval);
     who->timer_interval = interval;
 
     if(new_timeout > 0){
@@ -116,5 +126,6 @@ void _wakeup_process(int proc_nr, clock_t time){
 }
 
 int do_nanosleep(struct proc* who, struct message* m){
+
     return SUSPEND;
 }

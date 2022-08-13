@@ -67,7 +67,8 @@
         "macro.h": "c",
         "wait.h": "c",
         "ipc.h": "c",
-        "dev.h": "c"
+        "dev.h": "c",
+        "times.h": "c"
     },
     "files.exclude": {
         "**/*.o": true,
