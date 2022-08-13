@@ -125,15 +125,19 @@ void print_border(struct board_struct* board){
 }
 
 void board_init(struct board_struct *board){
-    int fd, fd2;
+    int fd;
     clock_t clo = times(NULL);
     INIT_LIST_HEAD(&board->foods);
     INIT_LIST_HEAD(&board->snake);
-    fd = open("/dev/tty2", O_RDWR);
+    fd = open("/snake.log", O_RDWR | O_CREAT | O_TRUNC, 0x644);
     dup2(fd, STDERR_FILENO);
-    fd2 = open("/dev/tty1", O_RDWR | O_NONBLOCK);
-    ioctl(fd2, TIOCDISABLEECHO);
-    dup2(fd2, STDIN_FILENO);
+    close(fd);
+
+    fd = open("/dev/tty1", O_RDWR | O_NONBLOCK);
+    dup2(fd, STDIN_FILENO);
+    close(fd);
+
+    ioctl(STDIN_FILENO, TIOCDISABLEECHO);
     srand(clo);
     disable_cursor();
 }
