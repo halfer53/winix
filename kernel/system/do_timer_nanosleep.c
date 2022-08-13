@@ -90,10 +90,10 @@ int do_setitimer(struct proc *who, struct message *m){
     struct itimerval* act = m->m1_p1;
     struct itimerval* oact = m->m1_p2;
 
-    if(!is_vaddr_accessible(act, who))
+    if(!is_vaddr_ok((vptr_t *)act, sizeof(struct itimerval), who))
         return -EFAULT;
 
-    if(oact && !is_vaddr_accessible(oact, who))
+    if(oact && !is_vaddr_ok((vptr_t *)oact, sizeof(struct itimerval), who))
         return -EFAULT;
 
     act = (struct itimerval*)get_physical_addr(act, who);
@@ -130,7 +130,7 @@ int do_nanosleep(struct proc* who, struct message* m){
     struct timer *alarm;
     struct timespec* req;
 
-    if(!is_vaddr_accessible(m->m1_p1, who))
+    if(!is_vaddr_ok(m->m1_p1, sizeof(struct timespec), who))
         return -EFAULT;
 
     req = (struct timespec*)get_physical_addr(m->m1_p1, who);
