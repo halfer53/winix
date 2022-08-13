@@ -67,7 +67,7 @@
 #define FCNTL           44
 #define IOCTL           45
 #define SETSID          46
-#define CSLEEP          47
+#define NANOSLEEP       47
 #define GETPPID         48
 #define SIGNAL          49
 #define SBRK            50
