@@ -133,11 +133,11 @@ int main(int argc, char **argv)
     pid_t pid;
     init_dev();
     init_tty();
-
-    pid = run_unit_test();
     run_shell();
 
+    pid = run_unit_test();
     wait_for_unit_test(pid);
+    
     start_init_routine();
     return 0;
 }
