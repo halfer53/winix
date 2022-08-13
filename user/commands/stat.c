@@ -19,7 +19,7 @@ int main(int argc, char* argv[]){
     rem = size % 1024;
     rem = rem >= 1000 ? 999 : rem;
 
-    printf("File: %s\nNum: %d\nSize: %d.%.3dKB\nBlocks: %d\nAccess: 0x%x\n", 
+    printf("File: %s\nNum: %d\nSize: %d.%.3dKB\nBlocks: %d\nAccess: 0%o\n", 
         path, statbuf.st_ino, div, rem, statbuf.st_blocks, statbuf.st_mode & 0777);
     return 0;
 }
