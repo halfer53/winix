@@ -270,36 +270,6 @@ int write_srec_to_disk(char* path, struct arguments* arguments){
     return 0;
 }
 
-/**
- * @brief write dummy text, e.g. abcd\nefgh\n
- * since wramp architecture sizeof(char) == sizeof(int)
- * we have to use int size in buffer when working with characters
- */
-void write_dummy_file()
-{
-    
-    int fd, ret, i, j, len;
-    char c = 'a';
-    int buffer[128];
-    int *p = buffer;
-
-    fd = sys_creat(curr_scheduling_proc, "/dummy.txt", 0x755);
-    for (i = 0; i < 6; i++)
-    {
-        for (j = 0; j < 4; j++)
-        {
-            *p++ = (int)c++;
-        }
-        *p++ = '\n';
-    }
-    *p = '\0';
-    // we need to do this convert int size to char size
-    len = (p - buffer + 1) * sizeof(int);
-    ret = sys_write(curr_scheduling_proc, fd, buffer, len);
-    assert(ret == len);
-    ret = sys_close(curr_scheduling_proc, fd);
-    assert(ret == 0);
-}
 
 int main(int argc, char** argv){
     struct arguments arguments;
@@ -325,7 +295,6 @@ int main(int argc, char** argv){
 
     if(arguments.source_path && arguments.output_path){
         write_srec_to_disk(arguments.source_path, &arguments);
-        write_dummy_file();
         flush_all_buffer();
         flush_inodes();
         flush_super_block(get_dev(ROOT_DEV));
