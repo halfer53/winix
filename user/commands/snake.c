@@ -129,7 +129,7 @@ void board_init(struct board_struct *board){
     clock_t clo = times(NULL);
     INIT_LIST_HEAD(&board->foods);
     INIT_LIST_HEAD(&board->snake);
-    fd = open("/var/log/snake.log", O_RDWR | O_CREAT | O_TRUNC, 0x644);
+    fd = open("/var/log/snake.log", O_RDWR | O_CREAT | O_TRUNC, 0644);
     dup2(fd, STDERR_FILENO);
     close(fd);
 

@@ -35,22 +35,22 @@ void init_dev()
 {
     int ret;
 
-    ret = mkdir("/dev", 0x755);
+    ret = mkdir("/dev", 0755);
     assert(ret == 0);
 
-    ret = mkdir("/var", 0x755);
+    ret = mkdir("/var", 0755);
     assert(ret == 0);
 
-    ret = mkdir("/var/log/", 0x755);
+    ret = mkdir("/var/log/", 0755);
     assert(ret == 0);
 
-    ret = mknod("/dev/tty1", 0x755, TTY1_DEV_NUM);
+    ret = mknod("/dev/tty1", 0755, TTY1_DEV_NUM);
     assert(ret == 0);
 
-    ret = mknod("/dev/tty2", 0x755, TTY2_DEV_NUM);
+    ret = mknod("/dev/tty2", 0755, TTY2_DEV_NUM);
     assert(ret == 0);
 
-    ret = mknod("/dev/sda", 0x755, ROOT_DEV);
+    ret = mknod("/dev/sda", 0755, ROOT_DEV);
     assert(ret == 0);
 }
 

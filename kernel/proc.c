@@ -322,7 +322,7 @@ void proc_set_default(struct proc *p) {
     p->ctx.ptable = p->protection_table;
     p->timer.proc_nr = p->proc_nr;
     p->priority = DEFAULT_PRIORITY;
-    p->umask = 0x22;
+    p->umask = 022;
 }
 
 /**

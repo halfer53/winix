@@ -7,7 +7,7 @@
 
 int sys_umask(struct proc* who, mode_t mask){
     mode_t prev = who->umask;
-    who->umask = mask & 0x777;
+    who->umask = mask & 0777;
     return prev;
 }
 

@@ -33,7 +33,7 @@ void test_given_has_next_zone_when_no_zone_should_return_false(){
     struct zone_iterator iter;
 
     struct filp* filp;
-    int ret = filp_open(curr_scheduling_proc, &filp, FILE1, O_CREAT | O_RDWR, 0x755);
+    int ret = filp_open(curr_scheduling_proc, &filp, FILE1, O_CREAT | O_RDWR, 0755);
 
     ret = iter_zone_init(&iter, filp->filp_ino, 0);
     assert(ret == 0);
@@ -106,7 +106,7 @@ void test_given_has_next_zone_when_alloc_zone_should_continue(){
     bool result;
     zone_t zone;
 
-    int ret = filp_open(curr_scheduling_proc, &filp, FILE1, O_CREAT | O_RDWR, 0x755);
+    int ret = filp_open(curr_scheduling_proc, &filp, FILE1, O_CREAT | O_RDWR, 0755);
     assert(ret == 0);
 
     ret = iter_zone_init(&iter, filp->filp_ino, 0);
@@ -186,7 +186,7 @@ void test_given_has_next_zone_when_alloc_zone_should_continue(){
 void test_given_iter_dirent_has_next_when_has_data_should_return_true(){
     struct dirent_iterator iter;
     char filename[] = "abc";
-    int ret = sys_mkdir(curr_scheduling_proc, DIR_NAME, 0x755);
+    int ret = sys_mkdir(curr_scheduling_proc, DIR_NAME, 0755);
     assert(ret == 0);
 
     int fd = sys_open(curr_scheduling_proc, DIR_NAME, O_RDONLY, 0);
@@ -220,7 +220,7 @@ void test_given_iter_dirent_has_next_when_dirent_exhausted_should_return_false()
     struct dirent_iterator iter;
     int i, j;
     struct winix_dirent* dir;
-    int ret = sys_mkdir(curr_scheduling_proc, DIR_NAME, 0x755);
+    int ret = sys_mkdir(curr_scheduling_proc, DIR_NAME, 0755);
     assert(ret == 0);
 
     int fd = sys_open(curr_scheduling_proc, DIR_NAME, O_RDONLY, 0);

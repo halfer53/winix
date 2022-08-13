@@ -169,14 +169,13 @@ void print_long_format(char *pathname, int flag){
         return;
     mode = statbuf.st_mode;
     *p++ = S_ISDIR(statbuf.st_mode) ? 'd' : '-';
-    k = 0x400;
+    k = 0400;
     for(i = 3; i > 0; i--){ 
         for(j = 3; j > 0; j--){
             *p++ = k & mode ? permission_char[j] : '-';
             // printf("k %x mode %x\n", k, mode);
             k = k >> 1;
         }
-        k = k >> 1;
     }
     *p = '\0';
 

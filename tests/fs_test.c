@@ -52,7 +52,7 @@ void _close_delete_file(int fd, char *name){
 void test_given_open_when_flag_is_o_create_should_return_0(){
     int fd;
     
-    fd = sys_open(curr_scheduling_proc, FILE1 ,O_CREAT | O_RDWR, 0x755);
+    fd = sys_open(curr_scheduling_proc, FILE1 ,O_CREAT | O_RDWR, 0755);
     assert(fd == 0);
 
 }
@@ -119,7 +119,7 @@ void test_given_creat_when_file_present_should_return_eexist(){
 void test_given_close_when_file_closed_should_return_ebadf(){
     int fd, ret;
     
-    fd = sys_open(curr_scheduling_proc, FILE1 ,O_CREAT | O_RDWR, 0x755);
+    fd = sys_open(curr_scheduling_proc, FILE1 ,O_CREAT | O_RDWR, 0755);
     assert(fd == 0);
 
     _close_delete_file(fd, FILE1);
@@ -280,7 +280,7 @@ void test_given_access_when_file_not_exist_should_return_enoent(){
 
 void test_given_access_when_file_exists_should_return_0(){
     int ret;
-    ret = sys_creat(curr_scheduling_proc, FILE1, 0x755);
+    ret = sys_creat(curr_scheduling_proc, FILE1, 0755);
     assert(ret == 0);
 
     ret = sys_access(curr_scheduling_proc, FILE1, F_OK);
@@ -290,7 +290,7 @@ void test_given_access_when_file_exists_should_return_0(){
 
 void test_given_access_when_folder_exists_should_return_0(){
     int ret;
-    ret = sys_mkdir(curr_scheduling_proc, DIR_NAME, 0x755);
+    ret = sys_mkdir(curr_scheduling_proc, DIR_NAME, 0755);
     assert(ret == 0);
 
     ret = sys_access(curr_scheduling_proc, DIR_NAME, F_OK);
@@ -300,7 +300,7 @@ void test_given_access_when_folder_exists_should_return_0(){
 
 void test_given_access_when_under_folder_should_return_enoent(){
     int ret;
-    ret = sys_mkdir(curr_scheduling_proc, DIR_NAME, 0x755);
+    ret = sys_mkdir(curr_scheduling_proc, DIR_NAME, 0755);
     assert(ret == 0);
 
     ret = sys_access(curr_scheduling_proc, DIR_FILE1, F_OK);
@@ -393,12 +393,12 @@ void test_given_chmod_stat_when_file_present_should_return_0(){
     fd = sys_creat(curr_scheduling_proc, FILE1, O_RDWR);
     assert(fd == 0);
 
-    ret = sys_chmod(curr_scheduling_proc, FILE1, 0x777);
+    ret = sys_chmod(curr_scheduling_proc, FILE1, 0777);
     assert(ret == 0);
 
     ret = sys_stat(curr_scheduling_proc, FILE1, &statbuf);
     assert(ret == 0);
-    assert(statbuf.st_mode == 0x777);
+    assert(statbuf.st_mode == 0777);
 
 }
 
@@ -409,12 +409,12 @@ void test_given_chmod_stat_when_folder_present_should_return_0(){
     fd = sys_mkdir(curr_scheduling_proc, DIR_NAME, O_RDWR);
     assert(fd == 0);
 
-    ret = sys_chmod(curr_scheduling_proc, DIR_NAME, 0x777);
+    ret = sys_chmod(curr_scheduling_proc, DIR_NAME, 0777);
     assert(ret == 0);
 
     ret = sys_stat(curr_scheduling_proc, DIR_NAME, &statbuf);
     assert(ret == 0);
-    assert(statbuf.st_mode == 0x777);
+    assert(statbuf.st_mode == 0777);
 
 }
 
@@ -506,7 +506,7 @@ void test_given_getdents_when_successive_call_should_return_files(){
 void test_given_cwd_when_chdir_should_return_path(){
     int ret;
     char *result;
-    ret = sys_mkdir(curr_scheduling_proc, DIR_NAME, 0x755);
+    ret = sys_mkdir(curr_scheduling_proc, DIR_NAME, 0755);
     assert(ret == 0);
 
     ret = sys_chdir(curr_scheduling_proc, DIR_NAME);
@@ -608,7 +608,7 @@ void test_given_dev_dup_when_file_is_driver_should_return_from_driver(){
 }
 
 void test_when_zone_full_should_return_enospc(){
-    int fd = sys_open(curr_scheduling_proc, FILE1, O_CREAT | O_RDWR, 0x755);
+    int fd = sys_open(curr_scheduling_proc, FILE1, O_CREAT | O_RDWR, 0755);
     assert(fd == 0);
 
     int remaining_bytes = MAX_ZONES * BLOCK_SIZE;

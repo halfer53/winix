@@ -62,7 +62,7 @@ int makefs( char* disk_raw, size_t disk_size)
 
 
     memset(&root_node, 0, sizeof(inode_t));
-    root_node.i_mode = S_IFDIR | 0x755;
+    root_node.i_mode = S_IFDIR | 0755;
     root_node.i_nlinks = 1;
     root_node.i_mtime = now;
     root_node.i_atime = now;

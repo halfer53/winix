@@ -195,13 +195,13 @@ void write_srec_list(struct list_head* lists){
     int ret, fd;
     int elf_size = sizeof(struct winix_elf);
     int binary_size;
-    ret = sys_mkdir(curr_scheduling_proc, bin_path, 0x755);
+    ret = sys_mkdir(curr_scheduling_proc, bin_path, 0755);
     // printf("ret %d\n", ret);
     assert(ret == 0);
     list_for_each_entry_safe(struct winix_elf_list, pos, tmp, lists, list){
         snprintf(path, PATH_LEN, "%s%s%s", bin_path, "/", pos->name);
 //        printf("writing %s %x %x\n", pos->name, pos->binary_data[0], pos->binary_data[1]);
-        fd = sys_creat(curr_scheduling_proc, path, 0x755);
+        fd = sys_creat(curr_scheduling_proc, path, 0755);
         assert(fd >= 0);
 
         ret = sys_write(curr_scheduling_proc, fd, &pos->elf, elf_size);
