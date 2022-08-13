@@ -21,7 +21,6 @@ int link(const char *oldpath, const char *newpath);
 int dup2(int oldfd, int newfd);
 int dup(int oldfd);
 unsigned int alarm(unsigned int seconds);
-int csleep(int ticks);
 pid_t fork();
 pid_t vfork();
 pid_t tfork();
@@ -53,7 +52,6 @@ int tcsetpgrp(int fd, pid_t pgrp);
 #define link(oldpath, newpath)              wramp_syscall(LINK, oldpath, newpath)
 #define unlink(pathname)                    wramp_syscall(UNLINK, pathname)
 #define alarm(seconds)                      wramp_syscall(ALARM, seconds)
-#define csleep(ticks)                       wramp_syscall(CSLEEP, ticks)
 #define fork()                              wramp_syscall(FORK)
 #define vfork()                             wramp_syscall(VFORK)
 #define tfork()                             wramp_syscall(TFORK)
