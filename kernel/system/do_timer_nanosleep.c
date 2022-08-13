@@ -1,6 +1,5 @@
 /**
- * Syscall in this file: alarm
- * Input:   m1_i1: seconds
+ * Syscall in this file: alarm, setitimer, nanosleep
  *
  *
  * @author Bruce Tan
