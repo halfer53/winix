@@ -106,3 +106,15 @@ int do_alarm(struct proc *who, struct message *m){
     return oact.it_value.tv_sec;
 }
 
+void _wakeup_process(int proc_nr, clock_t time){
+    struct proc* p;
+    struct message _message;
+    p = get_proc(proc_nr);
+    if(p){
+        syscall_reply2(CSLEEP, 0, proc_nr, &_message);
+    }
+}
+
+int do_nanosleep(struct proc* who, struct message* m){
+    return SUSPEND;
+}
