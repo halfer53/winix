@@ -85,7 +85,7 @@ const char* kstr_error(int err){
  * @param  buf 
  * @return     OK
  */
-int kputx_buf(int n,char *buf, int start, int decrease, int mask) {
+int _kputnum_buf(int n,char *buf, int start, int decrease, int mask) {
     int i;
     int v = 0, offset = 0;
 
@@ -352,7 +352,7 @@ int kprintf_vm( struct filp* file, const char *orignal_format, void *arg, struct
                     break;
 
                 case 'o':
-                    format_buf_len += kputx_buf(*((int*)arg), format_ptr, 30, 3, 07);
+                    format_buf_len += _kputnum_buf(*((int*)arg), format_ptr, 30, 3, 07);
                     format_ptr = format_buffer;
                     break;
 
@@ -360,7 +360,7 @@ int kprintf_vm( struct filp* file, const char *orignal_format, void *arg, struct
                     format_buf_len = kputs_vm_buf("0x", NULL, format_ptr);
                     format_ptr += format_buf_len;
                 case 'x':
-                    format_buf_len += kputx_buf(*((int*)arg), format_ptr, 28, 4, 0xf);
+                    format_buf_len += _kputnum_buf(*((int*)arg), format_ptr, 28, 4, 0xf);
                     format_ptr = format_buffer;
                     break;
 
