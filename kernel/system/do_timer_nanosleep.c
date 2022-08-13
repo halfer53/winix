@@ -126,6 +126,23 @@ void _wakeup_process(int proc_nr, clock_t time){
 }
 
 int do_nanosleep(struct proc* who, struct message* m){
+    clock_t ticks;
+    struct timer *alarm;
+    struct timespec* req, *rem;
+
+    if(!is_vaddr_accessible(m->m1_p1, who))
+        return -EFAULT;
+
+    req = (struct timespec*)get_physical_addr(m->m1_p1, who);
+
+    alarm = &who->timer;
+    if(alarm->flags & TIMER_INUSE){
+        return -EINVAL;
+    }
+
+    ticks = convert_timespec_to_hz(req);
+    
+    new_timer(who->proc_nr, alarm, ticks, _wakeup_process);
 
     return SUSPEND;
 }
