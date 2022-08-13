@@ -145,7 +145,6 @@ void set_syscall_mesg_exception(int operation, ptr_t* osp, struct message *m, st
     case CLOSE:
     case DUP:
     case UMASK:
-    case CSLEEP:
     case SBRK:
         m->m1_i1 = *sp;
         break;
@@ -177,6 +176,7 @@ void set_syscall_mesg_exception(int operation, ptr_t* osp, struct message *m, st
         /* FALLTHRU */
     case STAT:
     case LINK:
+    case NANOSLEEP:
     case STATFS:
         m->m1_p2 = (void *)*(sp + 1);
         /* FALLTHRU */
@@ -323,7 +323,7 @@ void init_syscall_table(){
     SYSCALL_MAP(FCNTL, do_fcntl);
     SYSCALL_MAP(IOCTL, do_ioctl);
     SYSCALL_MAP(SETSID, do_setsid);
-    SYSCALL_MAP(CSLEEP, do_csleep);
+    SYSCALL_MAP(NANOSLEEP, do_nanosleep);
     SYSCALL_MAP(GETPPID, do_getppid);
     SYSCALL_MAP(SIGNAL, do_signal);
     SYSCALL_MAP(SBRK, do_sbrk);  
