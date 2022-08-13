@@ -26,6 +26,7 @@
 #include <sched.h>
 #include <stdbool.h>
 #include <sys/ioctl.h>
+#include <time.h>
 
 #define CMD_PROTOTYPE(name)    int name(int argc, char**argv)
 
@@ -445,10 +446,12 @@ int test_coroutine(int argc, char **argv){
 }
 
 int test_while(int argc, char **argv){
-    int tick_rate = sysconf(_SC_CLK_TCK);
+    struct timespec ts;
+    memset(&ts, 0, sizeof(struct timespec));
+    ts.tv_sec = 1;
     while(1){
         printf("a");
-        csleep(tick_rate);
+        nanosleep(&ts, NULL);
     }
     return 0;
 }
