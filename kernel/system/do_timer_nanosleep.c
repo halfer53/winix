@@ -126,6 +126,7 @@ void _wakeup_process(int proc_nr, clock_t time){
 
 int do_nanosleep(struct proc* who, struct message* m){
     clock_t ticks;
+    int ret;
     struct timer *alarm;
     struct timespec* req;
 
@@ -141,7 +142,9 @@ int do_nanosleep(struct proc* who, struct message* m){
 
     ticks = convert_timespec_to_hz(req);
     
-    new_timer(who->proc_nr, alarm, ticks, _wakeup_process);
+    ret = new_timer(who->proc_nr, alarm, ticks, _wakeup_process);
+    if (ret)    
+        return ret;
 
     return SUSPEND;
 }
