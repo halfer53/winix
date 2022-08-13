@@ -38,6 +38,12 @@ void init_dev()
     ret = mkdir("/dev", 0x755);
     assert(ret == 0);
 
+    ret = mkdir("/var", 0x755);
+    assert(ret == 0);
+
+    ret = mkdir("/var/log/", 0x755);
+    assert(ret == 0);
+
     ret = mknod("/dev/tty1", 0x755, TTY1_DEV_NUM);
     assert(ret == 0);
 
