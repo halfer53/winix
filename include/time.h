@@ -9,10 +9,14 @@ struct timespec {
 };
 
 clock_t times(struct tms *buf);
+int nanosleep(const struct timespec *req, struct timespec *rem);
 
 
 #if defined(__wramp__) & !defined(LINTING) && !defined(_SYSTEM)
+
 #define times(buf)                          wramp_syscall(TIMES, buf)
+#define nanosleep(req, rem)                 wramp_syscall(NANOSLEEP, req, rem)
+
 #endif
 
 #endif
