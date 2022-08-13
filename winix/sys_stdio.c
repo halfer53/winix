@@ -351,6 +351,11 @@ int kprintf_vm( struct filp* file, const char *orignal_format, void *arg, struct
                     format_buf_len = kputd_buf(*((int*)arg),format_ptr);
                     break;
 
+                case 'o':
+                    format_buf_len += kputx_buf(*((int*)arg), format_ptr, 30, 3, 07);
+                    format_ptr = format_buffer;
+                    break;
+
                 case 'p':
                     format_buf_len = kputs_vm_buf("0x", NULL, format_ptr);
                     format_ptr += format_buf_len;
