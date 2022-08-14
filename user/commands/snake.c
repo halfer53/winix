@@ -212,7 +212,7 @@ struct point* get_point_at_coordinate(struct list_head* head, int x, int y){
     return NULL;
 }
 
-int refresh(struct board_struct* board){
+int _refresh(struct board_struct* board){
     enum direction dir = board->dir;
     struct point* head = GET_SNAKE_HEAD(board), *newpos, *pos;
     int x = head->x, y = head->y;
@@ -269,9 +269,14 @@ int refresh(struct board_struct* board){
     return SUCCESS;
 }
 
-
-// \e[1;1H
-
+int refresh(struct board_struct* board){
+    int ret = _refresh(board);
+    if(ret){
+        print_to_central_screen(NUM_ROWS / 2 - 1, "You lost :(");
+        // printf("%d", ret);
+    }
+    return ret;
+}
 
 void draw(struct board_struct *board){
     struct point* p;
@@ -300,7 +305,7 @@ void reset_board(struct board_struct* board){
 int main(int argc, char** argv){
     static char input[INPUT_SIZ];
     static struct board_struct board;
-    int ret;
+    int ret, i;
     struct board_struct* bp = &board;
     struct timespec ts;
     bool is_snake_alive = true, is_game_running = true, waiting_for_command = true;
@@ -309,12 +314,12 @@ int main(int argc, char** argv){
     board_init(bp);
     clear_screen();
     print_border(bp);
-    print_instruction();
 
     ts.tv_nsec = 125000000;
 
     while(is_game_running){
-        
+
+        print_instruction();
         while(waiting_for_command){
             char c = get_chr();
             if(c == 32){
@@ -332,18 +337,27 @@ int main(int argc, char** argv){
         is_snake_alive = true;
 
         while(is_snake_alive){
-            ret = read(STDIN_FILENO, input, INPUT_SIZ * sizeof(char));
-            if(ret > 0){
-                bp->dir = get_direction(bp, input[ret - 1]);
-            }
-            ret = refresh(bp);
-            if(ret){
-                print_to_central_screen(NUM_ROWS / 2 - 1, "You lost :(");
-                // printf("%d", ret);
-                print_instruction();
-                is_snake_alive = false;
-            }
+            char prev;
+
             nanosleep(&ts, NULL);
+            ret = read(STDIN_FILENO, input, INPUT_SIZ * sizeof(char));
+            if (ret == 0){
+                if((refresh(bp))){
+                    is_snake_alive = false;
+                    break;
+                }
+            }
+            for(i = 0; i < ret; i++){
+                if (i && input[i] == prev)
+                    continue;
+                prev = input[i];
+                bp->dir = get_direction(bp, input[i]);
+                ret = refresh(bp);
+                if(ret){
+                    is_snake_alive = false;
+                    break;
+                }
+            }
         }
     }
     
