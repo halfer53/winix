@@ -194,7 +194,7 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
                         mode |= O_APPEND;
                     else //else replace the original document
                         mode |= O_TRUNC;
-                    sout = open(cmd->outfile, mode, 0755);
+                    sout = open(cmd->outfile, mode, 0664);
                     dup2(sout,STDOUT_FILENO);
                     close(sout);
                 }
