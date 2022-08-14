@@ -8,16 +8,16 @@
 #include <time.h>
 #include "../../include_winix/winix/list.h"
 
-#define NUM_COLS  (50)
-#define NUM_ROWS  (15)
-#define INITIAL_SNAKE_LEN   (3)
-#define INITAL_FOOD_NUM (10)
-#define SNAKE_CHAR  ('x')
-#define FOOD_CHAR   ('o')
+#define NUM_COLS                (50)
+#define NUM_ROWS                (15)
+#define INITIAL_SNAKE_LEN       (3)
+#define INITAL_FOOD_NUM         (10)
+#define SNAKE_CHAR              ('x')
+#define FOOD_CHAR               ('o')
 #define GET_SNAKE_HEAD(board)   (list_first_entry(&board->snake, struct point, list))
 #define GET_SNAKE_TAIL(board)   (list_last_entry(&board->snake, struct point, list))
-#define draw_point(p, c)    draw_coordinate(p->x, p->y, c)
-#define clear_point(p)      draw_point(p, ' ')
+#define draw_point(p, c)        draw_coordinate(p->x, p->y, c)
+#define clear_point(p)          draw_point(p, ' ')
 
 #define SUCCESS         ( 0)
 #define FAIL            (-1)
