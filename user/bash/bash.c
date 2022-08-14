@@ -95,7 +95,7 @@ int main(int argc, char *argv[]) {
 
     init_shell();
     init_signal();
-    history_fd = open(history_file, O_CREAT | O_RDWR | O_APPEND, S_IRWXU | S_IRGRP | S_IROTH);
+    history_fd = open(history_file, O_CREAT | O_RDWR | O_APPEND, 0664);
     if(history_fd < 0){
         perror(history_file);
         return 1;
