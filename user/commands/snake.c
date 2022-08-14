@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include "../../include_winix/winix/list.h"
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>
@@ -7,6 +6,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <time.h>
+#include "../../include_winix/winix/list.h"
 
 #define NUM_COLS  (50)
 #define NUM_ROWS  (15)
