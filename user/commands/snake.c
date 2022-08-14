@@ -170,40 +170,35 @@ void debug_board(struct board_struct* board){
 
 #define INPUT_SIZ   (12)
 
-enum direction get_direction(struct board_struct* board){
-    static char input[INPUT_SIZ];
+enum direction get_direction(struct board_struct* board, char c){
     enum direction dir = board->dir;
     //non blocking
-    int ret = read(STDIN_FILENO, input, INPUT_SIZ * sizeof(char));
-    if(ret > 0){
-        char c = input[ret - 1];
-        // fprintf(stderr, "Direction %d \n",ret, c);
-        switch (c)
-        {
-        case 'w':
-            if(dir == down)
-                return down;
-            return up;
-        case 'a':
-            if(dir == right)
-                return right;
-            return left; 
-        case 's':
-            if(dir == up)
-                return up;
+    switch (c)
+    {
+    case 'w':
+        if(dir == down)
             return down;
-        case 'd':
-            if(dir == left)
-                return left;
+        return up;
+    case 'a':
+        if(dir == right)
             return right;
-        case 'q':
-            clear_screen();
-            exit(0);
+        return left; 
+    case 's':
+        if(dir == up)
+            return up;
+        return down;
+    case 'd':
+        if(dir == left)
+            return left;
+        return right;
+    case 'q':
+        clear_screen();
+        exit(0);
 
-        default:
-            break;
-        }
+    default:
+        break;
     }
+    
     return dir;
 }
 
@@ -303,6 +298,7 @@ void reset_board(struct board_struct* board){
 }
 
 int main(int argc, char** argv){
+    static char input[INPUT_SIZ];
     static struct board_struct board;
     int ret;
     struct board_struct* bp = &board;
@@ -336,8 +332,10 @@ int main(int argc, char** argv){
         is_snake_alive = true;
 
         while(is_snake_alive){
-            nanosleep(&ts, NULL);
-            bp->dir = get_direction(bp);
+            ret = read(STDIN_FILENO, input, INPUT_SIZ * sizeof(char));
+            if(ret > 0){
+                bp->dir = get_direction(bp, input[ret - 1]);
+            }
             ret = refresh(bp);
             if(ret){
                 print_to_central_screen(NUM_ROWS / 2 - 1, "You lost :(");
@@ -345,6 +343,7 @@ int main(int argc, char** argv){
                 print_instruction();
                 is_snake_alive = false;
             }
+            nanosleep(&ts, NULL);
         }
     }
     
