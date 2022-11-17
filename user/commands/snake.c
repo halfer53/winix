@@ -337,7 +337,7 @@ int main(int argc, char** argv){
         is_snake_alive = true;
 
         while(is_snake_alive){
-            char prev;
+            char prev = '\0';
 
             nanosleep(&ts, NULL);
             ret = read(STDIN_FILENO, input, INPUT_SIZ * sizeof(char));
