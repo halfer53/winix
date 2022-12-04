@@ -3,6 +3,8 @@
 #include <bsd/string.h>
 #include <string.h>
 #include <errno.h>
+#include <stdbool.h>
+#include <time.h>
 
 void print_last_n_lines(FILE* stream, int n){
     char* line = NULL;
@@ -25,30 +27,30 @@ void print_last_n_lines(FILE* stream, int n){
     if (line_count < n){
         for (j = 0; j < line_count; j++){
             printf("%s", lines[j]);
+            free(lines[j]);
         }
     } else {
         for (j = 0; j < n; j++){
-            printf("%s", lines[(i + j) % n]);
+            char *_line = lines[(i + j) % n];
+            printf("%s", _line);
+            free(_line);
         }
-    }
-    free(line);
-    for (j = 0; j < n; j++){
-        free(lines[j]);
     }
     free(lines);
 }
 
 int main(int argc, char *argv[]){
-    FILE* stream;
+    FILE* stream = stdin;
     int i = 0, n = 10;
-    if (argc < 2){
-        printf("Usage: tail [-n <num>] <file>");
-        return 1;
-    }
+    bool follow = false;
+    struct timespec ts;
+
     for (i = 1; i < argc; i++){
         if(strcmp(argv[i], "-n") == 0){
             n = atoi(argv[i + 1]);
             i++;
+        } else if( strcmp(argv[i], "-f") == 0){
+            follow = true;
         } else {
             stream = fopen(argv[i], "r");
             if (stream == NULL){
@@ -57,5 +59,19 @@ int main(int argc, char *argv[]){
             }
         }
     }
+    
     print_last_n_lines(stream, n);
+
+    if (follow){
+        int ret;
+        char buffer[64];
+        memset(&ts, 0, sizeof(struct timespec));
+        ts.tv_nsec = 125000000;
+        while (true){
+            nanosleep(&ts, NULL);
+            while((ret = fread(buffer, 1, sizeof(buffer), stream)) > 0){
+                fwrite(buffer, 1, ret, stdout);
+            }
+        }
+    }
 }
