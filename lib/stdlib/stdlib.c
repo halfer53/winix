@@ -1,8 +1,9 @@
 #include <stdlib.h>
 #include <unistd.h>
+#include <stdbool.h>
 #include "memblock.h"
 
-int has_initialized = 0;
+bool has_initialized = false;
 char *managed_memory_start;
 char *last_valid_address;
 
@@ -13,15 +14,28 @@ void malloc_init()
      *just set the beginning to be last_valid_address */
     managed_memory_start = last_valid_address;
     /* Okay, we're initialized and ready to go */
-    has_initialized = 1;
+    has_initialized = true;
 }
 
 void free(void *firstbyte)
 {
     char *p = firstbyte;
-    struct mem_control_block *mcb;
+    struct mem_control_block *mcb, *next, *prev;
     mcb = (struct mem_control_block *)(p - sizeof(struct mem_control_block));
     mcb->is_available = 1;
+
+    next = (struct mem_control_block *)((char *)mcb + mcb->size);
+    if (((char *)next < last_valid_address) && next->is_available)
+    {
+        next->is_available = false;
+        mcb->size += next->size;
+    }
+
+    prev = mcb->prev;
+    if(prev && prev->is_available){
+        mcb->is_available = false;
+        prev->size += mcb->size;
+    }
     return;
 }
 
@@ -32,7 +46,7 @@ void *malloc(long numbytes)
     char *current_location;
     /* This is the same as current_location, but cast to a * memory_control_block
      */
-    struct mem_control_block *current_location_mcb;
+    struct mem_control_block *current_location_mcb, *prev = NULL;
     /* This is the memory location we will return.
        It will * be set to 0 until we find something suitable */
     char *memory_location;
@@ -65,7 +79,7 @@ void *malloc(long numbytes)
             {
                 /* Woohoo!  We've found an open, * appropriately-size location.  */
                 /* It is no longer available */
-                current_location_mcb->is_available = 0;
+                current_location_mcb->is_available = false;
                 /* We own it */
                 memory_location = current_location;
                 /* Leave the loop */
@@ -74,6 +88,7 @@ void *malloc(long numbytes)
         }
         /* If we made it here, it's because the Current memory
          * block not suitable, move to the next one */
+        prev = current_location_mcb;
         current_location = current_location + current_location_mcb->size;
     }
     /* If we still don't have a valid location, we'll
@@ -91,8 +106,9 @@ void *malloc(long numbytes)
         last_valid_address = last_valid_address + numbytes;
         /* We need to initialize the mem_control_block */
         current_location_mcb = (struct mem_control_block *)memory_location;
-        current_location_mcb->is_available = 0;
+        current_location_mcb->is_available = false;
         current_location_mcb->size = numbytes;
+        current_location_mcb->prev = prev;
     }
     /* Now, no matter what (well, except for error conditions),
      * memory_location has the address of the memory, including
