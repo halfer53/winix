@@ -93,8 +93,13 @@ int fprintf(FILE *stream, const char *format, ...) CHECK_EPRINTF;
 int printf(const char *format, ...) CHECK_PRINTF;
 void perror();
 
-int getc(FILE* stream);
-#define getchar()	(getc(stdin))
+
+ssize_t getdelim(char **lineptr, size_t *n, int delimiter, FILE *stream);
+#define getline(lineptr, n, stream)		getdelim(lineptr, n, '\n', stream)
+
+int fgetc(FILE* stream);
+#define getc(stream)	fgetc(stream)
+#define getchar()		fgetc(stdin)
 
 
 extern FILE	*__iotab[FOPEN_MAX];
