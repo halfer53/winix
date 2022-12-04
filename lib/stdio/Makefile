@@ -1,2 +1,2 @@
 
-obj-y += stdio.o dprintf.o perror.o getc.o putchar.o
+obj-y += stdio.o dprintf.o perror.o getc.o putchar.o getdelim.o
