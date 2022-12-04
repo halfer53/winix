@@ -60,16 +60,15 @@ struct cmd_internal builtin_commands[] = {
     { do_stest, "stest"},
     { 0, NULL}
 };
-
 void init_pgid(){
     pgid = getpgid(0);
 }
 
 void init_shell(){
-    int ret = tcsetpgrp(STDIN_FILENO, pgid);
-    if (ret != 0){
-        perror("tcsetpgrp");
-    }
+    int ret = setpgid(0, 0);
+    init_pgid();
+    ret = tcsetpgrp(STDIN_FILENO, pgid);
+    assert(ret == 0);
 }
 
 void init_signal(){
@@ -81,8 +80,8 @@ void init_signal(){
 
 int main(int argc, char *argv[]) {
     int ret;
-
     init_pgid();
+
     if(argc > 2 && strcmp(argv[1], "-c") == 0){
         int i;
         buf[0] = '\0';

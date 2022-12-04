@@ -17,6 +17,7 @@
 #include <sys/times.h>
 #include <bsd/string.h>
 #include "parse.h"
+#include <assert.h>
 
 
 #define CMD_PROTOTYPE(name)    int name(int argc, char**argv)
