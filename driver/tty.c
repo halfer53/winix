@@ -49,6 +49,7 @@ struct tty_state{
     RexSp_t* rex;
     char *bptr, *buffer_end, *read_ptr;
     struct proc* reader;
+    struct filp* reader_filp;
     char *read_data;
     size_t read_count;
     char buffer[TTY_BUFFER_SIZ];
@@ -161,7 +162,12 @@ void move_cursor(RexSp_t* rex, int num, int direction){
     cmd_cursor[5] = '0' + num;
     cmd_cursor[6] = direction;
     __kputs(rex, cmd_cursor);
-}   
+}
+
+void clear_reader(struct tty_state* state){
+    state->reader = NULL;
+    state->reader_filp = NULL;
+}
 
 void tty_exception_handler( struct tty_state* state){
     int val, stat, is_new_line;
@@ -255,17 +261,17 @@ void tty_exception_handler( struct tty_state* state){
 
         if (is_sigpending(state->reader))
         {   
-            state->reader = NULL;
             syscall_reply2(READ, -EINTR, state->reader->proc_nr, msg);
+            clear_reader(state);
         }
-        else if((is_new_line || state->bptr >= state->buffer_end ) && state->reader)
+        else if (state->reader && (is_new_line || state->bptr >= state->buffer_end || state->reader_filp->filp_flags & O_NONBLOCK))
         {
             int len = state->bptr - state->read_ptr;
             memcpy(state->read_data, state->read_ptr, len);
             syscall_reply2(READ, len, state->reader->proc_nr, msg);
             state->bptr = state->buffer;
             state->read_ptr = state->buffer;
-            state->reader = NULL;
+            clear_reader(state);
         }
     }
     end:
@@ -340,7 +346,7 @@ int tty_read ( struct filp *filp, char *data, size_t count, off_t offset){
         if(IS_INUSE(state->reader)){
             return -EBUSY;
         }
-        state->reader = NULL;
+        clear_reader(state);
     }
     if(filp->filp_flags & O_NONBLOCK){
         return __tty_read(state, data, count);
@@ -348,6 +354,7 @@ int tty_read ( struct filp *filp, char *data, size_t count, off_t offset){
     state->read_data = data;
     state->read_count = count;
     state->reader = curr_syscall_caller;
+    state->reader_filp = filp;
     return SUSPEND;
 }
 
