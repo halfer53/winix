@@ -491,7 +491,7 @@ int alloc_mem_welf(struct proc* who, struct winix_elf* elf, int stack_size, int 
     bss_start = mem_start + elf->binary_size;
     memset(bss_start, 0, elf->bss_size);
 
-    who->heap_top = mem_start + td_aligned;
+    who->heap_top = bss_start + elf->bss_size;
     who->heap_break = who->heap_top;
     who->heap_bottom = who->heap_break + heap_size - 1;
     memset(who->heap_top, 0, heap_size);
