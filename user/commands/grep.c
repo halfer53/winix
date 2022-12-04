@@ -28,7 +28,7 @@
 
 void match(char *name, regexp *exp);
 void pline(char *name, int lineno, char buf[]);
-int getline(char *buf, int size);
+int _getline(char *buf, int size);
 void usage();
 
 void regdump(regexp *s);
@@ -122,7 +122,7 @@ void match(char *name, regexp *exp)
 
 	// printf("match %s\n", name);
 	// enable_syscall_tracing();
-	while ((lineret = getline(buf, MAXLINE)) != -1)
+	while ((lineret = _getline(buf, MAXLINE)) != -1)
 	{
 		char *cr = index(buf, '\n');
 		lineno++;
@@ -165,7 +165,7 @@ void usage()
 	exit(2);
 }
 
-int getline(char *buf, int size)
+int _getline(char *buf, int size)
 {
 	char *initbuf = buf, c;
 
