@@ -488,6 +488,7 @@ void init_tty_filp(struct filp** _file, struct device* dev, struct tty_state* st
     file = get_free_filp();
     file->filp_count = 100;
     file->filp_dev = dev;
+    state->dev = dev;
     file->private = (void*)state;
     *_file = file;
 }
