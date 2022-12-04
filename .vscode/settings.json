@@ -68,7 +68,8 @@
         "wait.h": "c",
         "ipc.h": "c",
         "dev.h": "c",
-        "times.h": "c"
+        "times.h": "c",
+        "memblock.h": "c"
     },
     "files.exclude": {
         "**/*.o": true,
