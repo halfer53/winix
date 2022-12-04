@@ -234,6 +234,8 @@ int do_tfork(struct proc* parent, struct message* m){
     if((child = get_free_proc_slot())){
         copy_pcb(parent,child);
         child->parent = parent->proc_nr;
+        child->pid = child->proc_nr;
+        
         if(parent->thread_parent > 0){
             child->thread_parent = parent->thread_parent;
         }else{
