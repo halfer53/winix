@@ -128,6 +128,35 @@ void run_shell(){
     }
 }
 
+void start_tty2_shell(){
+    int ret;
+    int fd = open("/dev/tty2", O_RDWR);
+    assert(fd > 0);
+    
+    ret = ioctl(fd, TIOCSCTTY, 0);
+    assert(ret == 0);
+    pgid = getpgid(0);
+    ret = tcsetpgrp(fd, pgid);
+    assert(ret == 0);
+
+    if(!tfork()){
+        
+        ret = dup2(fd, STDIN_FILENO);
+        assert(ret == 0);
+        ret = dup2(fd, STDOUT_FILENO);
+        assert(ret == 1);
+        ret = dup2(fd, STDERR_FILENO);
+        assert(ret == 2);
+        ret = close(fd);
+        assert(ret == 0);
+
+        run_shell();
+        exit(0);
+    }else{
+        wait(NULL);
+    }
+}
+
 int main(int argc, char **argv)
 {
     pid_t pid;
@@ -137,6 +166,7 @@ int main(int argc, char **argv)
 
     pid = run_unit_test();
     wait_for_unit_test(pid);
+    start_tty2_shell();
     
     start_init_routine();
     return 0;
