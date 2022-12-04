@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <bsd/string.h>
+#include <string.h>
+#include <errno.h>
 
 void print_last_n_lines(FILE* stream, int n){
     char* line = NULL;
@@ -38,10 +40,22 @@ void print_last_n_lines(FILE* stream, int n){
 
 int main(int argc, char *argv[]){
     FILE* stream;
+    int i = 0, n = 10;
     if (argc < 2){
-        printf("Usage: tail <file>");
+        printf("Usage: tail [-n <num>] <file>");
         return 1;
     }
-    stream = fopen(argv[1], "r");
-    print_last_n_lines(stream, 10);
+    for (i = 1; i < argc; i++){
+        if(strcmp(argv[i], "-n") == 0){
+            n = atoi(argv[i + 1]);
+            i++;
+        } else {
+            stream = fopen(argv[i], "r");
+            if (stream == NULL){
+                fprintf(stderr, "Error opening file %s, %s", argv[1], strerror(errno));
+                return 1;
+            }
+        }
+    }
+    print_last_n_lines(stream, n);
 }
