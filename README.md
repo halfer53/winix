@@ -50,6 +50,7 @@ Winix includes full-featured kernel with process and memory management, in-memor
 - [df](user/commands/df.c)
 - [du](user/commands/du.c)
 - [ln](user/commands/ln.c)
+- [tail](user/commands/tail.c)
 
 ## Unit Test
 
