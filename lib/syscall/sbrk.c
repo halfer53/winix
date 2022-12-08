@@ -4,15 +4,11 @@
 static char *_brk = NULL;
 
 void *sbrk(int incr){
-    char *newbrk;
-
     if(_brk == NULL)
-        _brk = ptr_wramp_syscall(SBRK, 0);
+        goto ret;
     
     if (incr == 0)
         return _brk;
-
-    newbrk = ptr_wramp_syscall(SBRK, incr);
-    _brk = newbrk;
-    return newbrk;
+ret:
+    return (_brk = ptr_wramp_syscall(SBRK, incr));
 }
