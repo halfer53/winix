@@ -21,10 +21,10 @@ const char** get_environ();
 typedef struct { int quot, rem; } div_t;
 typedef struct { long quot, rem; } ldiv_t;
 
-void* malloc (long size);
+void* malloc (size_t size);
 void free(void *ptr);
-void* realloc(void *p,long size);
-void *calloc(long number , long size);
+void* realloc(void *p,size_t size);
+void *calloc(size_t number , size_t size);
 char *getenv(const char *name);
 int putenv(char *name);
 int setenv(const char *name, const char *value, int overwrite);
