@@ -461,6 +461,7 @@ int alloc_mem_welf(struct proc* who, struct winix_elf* elf, int stack_size, int 
     int vm_offset = elf->binary_offset;
     int proc_len;
     int td_aligned;
+    int data_residual;
     ptr_t *bss_start;
     ptr_t* mem_start;
 
@@ -490,10 +491,11 @@ int alloc_mem_welf(struct proc* who, struct winix_elf* elf, int stack_size, int 
     // set bss segment to 0
     bss_start = mem_start + elf->binary_size;
     memset(bss_start, 0, elf->bss_size);
-
+    
+    data_residual = td_aligned - (int)(elf->binary_size + elf->bss_size);
     who->heap_top = bss_start + elf->bss_size;
     who->heap_break = who->heap_top;
-    who->heap_bottom = who->heap_break + heap_size - 1;
+    who->heap_bottom = who->heap_break + heap_size + data_residual - 1;
     memset(who->heap_top, 0, heap_size);
 
     who->data_size = elf->data_size;
