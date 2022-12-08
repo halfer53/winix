@@ -2,7 +2,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 
-int getc(FILE* stream){
+int fgetc(FILE* stream){
     int ret;
     unsigned char* buf_end;
     if(stream->_flags & _IOEOF)
