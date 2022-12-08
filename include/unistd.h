@@ -61,7 +61,6 @@ int tcsetpgrp(int fd, pid_t pgrp);
 #define setsid()                            wramp_syscall(SETSID)
 #define sysconf(name)                       wramp_syscall(SYSCONF, name)
 #define getppid()                           wramp_syscall(GETPPID)
-#define sbrk(increment)                     ptr_wramp_syscall(SBRK, increment)
 #define brk(ptr)                            wramp_syscall(BRK, ptr)
 #define getcwd(buf, size)                   ptr_wramp_syscall(GETCWD, size, buf)
 #define execve(path, argv, envp)            wramp_syscall(EXECVE, path, argv, envp)
