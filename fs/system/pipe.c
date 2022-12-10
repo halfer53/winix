@@ -151,8 +151,8 @@ static int _pipe_read(struct proc* who, struct filp *filp, char *data, size_t co
         *data++ = pipe_data[i];
     }
     ret = (int)(i);
-    // KDEBUG(("%s[%d] pipe read ret %d \n", 
-    //     who->name, curr_syscall_caller->proc_nr, ret));
+    // kdebug("%s[%d] pipe read ret %d \n", 
+    //     who->name, curr_syscall_caller->proc_nr, ret);
     shift_pipe_data(filp, i);
     return ret;
 }
@@ -167,8 +167,8 @@ static int _pipe_write(struct proc* who, struct filp *filp, char *data, size_t c
     }
     ret = (int)(i - off);
     filp->pipe->pos += ret;
-    // KDEBUG((" proc %d writing data 0x%x ret %d pipe->pos %d\n",
-    //     who->proc_nr, data, ret, filp->pipe->pos));
+    // kdebug(" proc %d writing data 0x%x ret %d pipe->pos %d\n",
+    //     who->proc_nr, data, ret, filp->pipe->pos);
     return ret;
 }
 
@@ -267,8 +267,8 @@ int pipe_write ( struct filp *filp, char *data, size_t count, off_t offset){
         next->offset = offset;
         next->sys_call_num = WRITE;
         list_add(&next->list, &ino->pipe_writing_list);
-        // KDEBUG(("pipe: proc %d writing from 0x%x %d bytes is blocked\n",
-        //         curr_syscall_caller->pid, data, count));
+        // kdebug("pipe: proc %d writing from 0x%x %d bytes is blocked\n",
+        //         curr_syscall_caller->pid, data, count);
         // kdebug("\n");
         return SUSPEND;
     }
@@ -327,8 +327,8 @@ int pipe_close ( struct device* dev, struct filp *file){
         }
     }
 
-    // KDEBUG(("%s[%d] close file %d, mode %d, count %d ino count %d\n", curr_syscall_caller->name, curr_syscall_caller->proc_nr,
-    //     file->filp_ino->i_num, file->pipe_mode, file->filp_count, ino->i_count));
+    // kdebug("%s[%d] close file %d, mode %d, count %d ino count %d\n", curr_syscall_caller->name, curr_syscall_caller->proc_nr,
+    //     file->filp_ino->i_num, file->pipe_mode, file->filp_count, ino->i_count);
     return 0;
 }
 

@@ -62,8 +62,8 @@ int do_send(struct proc* src, int dest, struct message *m) {
             }
         }else {
             if(is_debugging_ipc()){
-                KDEBUG(("IPC: SEND to %d from %d blocked\n",
-                            dest, src->proc_nr));
+                kdebug("IPC: SEND to %d from %d blocked\n",
+                            dest, src->proc_nr);
             }
             // Otherwise, block current process and add it to
             // head of sending queue of the destination.

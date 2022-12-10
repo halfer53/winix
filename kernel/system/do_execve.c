@@ -228,8 +228,8 @@ int exec_welf(struct proc* who, char* path, char *argv[], char *envp[], bool is_
     if(ret)
         goto final;
 
-    // KDEBUG(("elf %s %x %x size: %d %d %d %d\n", path, elf.binary_offset, elf.binary_pc,
-        // elf.binary_size, elf.text_size, elf.data_size, elf.bss_size));
+    // kdebug("elf %s %x %x size: %d %d %d %d\n", path, elf.binary_offset, elf.binary_pc,
+        // elf.binary_size, elf.text_size, elf.data_size, elf.bss_size);
 
     ret = filp_read(who, filp, who->ctx.rbase + elf.binary_offset, elf.binary_size);
     if(ret != elf.binary_size){

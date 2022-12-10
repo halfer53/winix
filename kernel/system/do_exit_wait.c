@@ -138,8 +138,8 @@ int check_waiting(struct proc* who){
     // if this process if waiting for the current to be exited process
     // kreport_proc(parent);
     // kreport_proc(who);
-    // KDEBUG((" curr %d check waiting %d state %x parent %d wpid %d state %x\n", 
-    //     who->proc_nr,  who->proc_nr, who->state, parent->proc_nr, parent->wpid, parent->state));
+    // kdebug(" curr %d check waiting %d state %x parent %d wpid %d state %x\n", 
+    //     who->proc_nr,  who->proc_nr, who->state, parent->proc_nr, parent->wpid, parent->state);
     if(parent && parent->state & STATE_WAITING){
         pid_t pid = parent->wpid;
         if( (pid > 0 && pid == who->pid) ||

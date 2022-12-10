@@ -137,8 +137,8 @@ PRIVATE int sys_sig_handler(struct proc *who, int signum){
                 break;
 
             default:
-                KDEBUG(("Signal %d ignored by process \"%s [%d]\"\n"
-                                ,signum,who->name,who->pid));
+                kdebug("Signal %d ignored by process \"%s [%d]\"\n"
+                                ,signum,who->name,who->pid);
                 break;
         }
     }

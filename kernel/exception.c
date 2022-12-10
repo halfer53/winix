@@ -144,8 +144,8 @@ void _traceback_stack(struct proc* proc, ptr_t **stack_start, ptr_t** stack_end)
     vtext_start = get_virtual_addr(proc->text_top, proc);
     vtext_end = vtext_start + proc->text_size;
 
-    // KDEBUG(("vtext_top: %p vtext_end %p stack %p stack_end %p\n", 
-    //     (void *)vtext_start, (void *)vtext_end, (void *)p, (void *)stack_end));
+    // kdebug("vtext_top: %p vtext_end %p stack %p stack_end %p\n", 
+    //     (void *)vtext_start, (void *)vtext_end, (void *)p, (void *)stack_end);
 
     kprintf("Call Stack:\n");
     while (p < stack_end && i < LIMIT){
