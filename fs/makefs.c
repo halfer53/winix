@@ -77,7 +77,7 @@ int makefs( char* disk_raw, size_t disk_size)
     memcpy(pdisk, &s2, sizeof(superblock));
     pdisk += superblock.s_superblock_size;
 
-    // KDEBUG(("block in use %d\n", block_in_use));
+    // kdebug("block in use %d\n", block_in_use);
     bitmap_set_nbits((unsigned int *)pdisk, BLOCK_SIZE_DWORD, 0, block_in_use);
     pdisk += superblock.s_blockmap_size;
 

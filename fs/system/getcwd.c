@@ -22,7 +22,7 @@ int sys_getcwd(struct proc* who, char* pathname, int size, char** result){
         inum = get_parent_inode_num(inode);
         parent_inode = get_inode(inum, inode->i_dev);
         ret2 = get_child_inode_name(parent_inode, inode, string);
-        // KDEBUG(("cwd: ret %d curr %d (%s), parent %d\n", ret, inode->i_num, string, inum));
+        // kdebug("cwd: ret %d curr %d (%s), parent %d\n", ret, inode->i_num, string, inum);
         if(ret2 < 0){
             ret = ret2;
             goto end;

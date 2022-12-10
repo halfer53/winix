@@ -58,7 +58,7 @@ int do_send(struct proc* src, int dest, struct message *m) {
             pDest->ctx.m.regs[0] = m->reply_res;
             enqueue_head(ready_q[pDest->priority], pDest);
             if(is_debugging_ipc()){
-                KDEBUG(("IPC: msg delivered to %d from %d\n", dest, src->proc_nr));
+                kdebug("IPC: msg delivered to %d from %d\n", dest, src->proc_nr);
             }
         }else {
             if(is_debugging_ipc()){
@@ -120,7 +120,7 @@ int do_receive(struct message *m) {
             enqueue_head(ready_q[p->priority], p);
         
         // if(is_debugging_ipc())
-        //     KDEBUG(("IPC: %d REC from %d type %d\n",curr_scheduling_proc->proc_nr, m->src ,m->type));
+        //     kdebug("IPC: %d REC from %d type %d\n",curr_scheduling_proc->proc_nr, m->src ,m->type);
         
         return 0;
     }
@@ -149,7 +149,7 @@ int do_notify(int src, int dest, struct message *m) {
         if(pDest->state & STATE_ZOMBIE)
             return -EINVAL;
 
-        // KDEBUG(("\nNOTIFY %d from %d type %d| ",dest, src ,m->type));
+        // kdebug("\nNOTIFY %d from %d type %d| ",dest, src ,m->type);
             
         // If destination is waiting, deliver message immediately.
         if (pDest->state == STATE_RECEIVING) {

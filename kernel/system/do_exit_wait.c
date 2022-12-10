@@ -48,7 +48,7 @@ int do_waitpid(struct proc *parent, struct message *mesg){
     options = mesg->m1_i2;
     vptr = mesg->m1_p1;
 
-    // KDEBUG(("waitpid by %d, arg %d %d %x\n", parent->proc_nr, pid, options, vptr));
+    // kdebug("waitpid by %d, arg %d %d %x\n", parent->proc_nr, pid, options, vptr);
     if(vptr && !is_vaddr_accessible(vptr, parent))
         return -EFAULT;
     
@@ -83,7 +83,7 @@ int do_waitpid(struct proc *parent, struct message *mesg){
             release_zombie(child);
             return child->pid;
         }
-        // KDEBUG(("%d wait for %d\n", parent->proc_nr, child->proc_nr));
+        // kdebug("%d wait for %d\n", parent->proc_nr, child->proc_nr);
         children++;
         
     }
@@ -191,7 +191,7 @@ void exit_proc_in_interrupt(struct proc* who, int exit_val,int signum){
     vptr = copyto_user_heap(who, &em, sizeof(struct message));
     ptr = get_physical_addr(vptr, who);
     zombify(who);
-    // KDEBUG(("exit interrupt who %d, curr %d\n", who->proc_nr, curr_scheduling_proc->proc_nr));
+    // kdebug("exit interrupt who %d, curr %d\n", who->proc_nr, curr_scheduling_proc->proc_nr);
     do_send(who, SYSTEM, (struct message*) ptr);
 }
 

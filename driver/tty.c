@@ -130,7 +130,7 @@ void save_command_history(struct tty_state* state){
     strlcpy(cmd->command, state->read_ptr, len);
     cmd->len = len;
     list_add(&cmd->list, &state->commands);
-    // KDEBUG(("saving %s\n", state->read_ptr));
+    // kdebug("saving %s\n", state->read_ptr);
     return;
 }
 
@@ -193,7 +193,7 @@ void tty_exception_handler( struct tty_state* state){
                 signal =SIGTSTP;
             
             if(state->foreground_group > 0){
-                // KDEBUG(("Send sig to foreground %d\n", state->foreground_group));
+                // kdebug("Send sig to foreground %d\n", state->foreground_group);
                 (void)sys_kill(SYSTEM_TASK, -(state->foreground_group), signal);
             }
             goto end;
@@ -254,7 +254,7 @@ void tty_exception_handler( struct tty_state* state){
                 *state->bptr++ = val;
                 if(state->is_echoing){
                     __kputc(rex, val);
-                    // KDEBUG(("received %d\n", val));
+                    // kdebug("received %d\n", val);
                 }
             }
         }
@@ -312,7 +312,7 @@ int __tty_read(struct tty_state* state, char* data, size_t len){
         strlcpy(data, state->read_ptr, count);
         buffer_count -= count;
         state->read_ptr += count;
-        // KDEBUG(("count %d buffer %d, ptr %x %x\n", count, buffer_count, state->bptr, state->read_ptr));
+        // kdebug("count %d buffer %d, ptr %x %x\n", count, buffer_count, state->bptr, state->read_ptr);
         return count;
     }
     return 0;
@@ -394,7 +394,7 @@ int _tty_tiocspgrp ( struct tty_state* tty_data, struct proc* who, ptr_t* ptr){
         return -EINVAL;
     }
     tty_data->foreground_group = pgrp;
-    // KDEBUG(("set %x foreground to %d\n", tty_data->dev->dev_id, tty_data->foreground_group));
+    // kdebug("set %x foreground to %d\n", tty_data->dev->dev_id, tty_data->foreground_group);
     return 0;
 }
 

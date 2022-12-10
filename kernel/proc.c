@@ -504,7 +504,7 @@ int alloc_mem_welf(struct proc* who, struct winix_elf* elf, int stack_size, int 
     who->rbase_offset = elf->binary_offset;
     who->stack_size = stack_size;
 
-    // KDEBUG(("%d alloc from %p to %p\n", who->pid, mem_start, who->heap_bottom));
+    // kdebug("%d alloc from %p to %p\n", who->pid, mem_start, who->heap_bottom);
     return 0;
 }
 
@@ -549,7 +549,7 @@ vptr_t* copyto_user_heap(struct proc* who, void *src, size_t len){
     }
     memcpy(who->heap_break, src, len);
     who->heap_break += len;
-    // KDEBUG(("copy to proc %d heap len %d ret %p\n", who->pid, len, addr));
+    // kdebug("copy to proc %d heap len %d ret %p\n", who->pid, len, addr);
     return addr;
 }
 

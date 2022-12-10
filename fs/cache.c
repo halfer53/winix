@@ -124,7 +124,7 @@ int put_block_buffer_dirt(struct block_buffer *tbuf) {
 }
 
 int put_block_buffer(struct block_buffer *tbuf) {
-//    KDEBUG(("Buffer %d is dirty %d put\n", tbuf->b_blocknr, tbuf->b_dirt));
+//    kdebug("Buffer %d is dirty %d put\n", tbuf->b_blocknr, tbuf->b_dirt);
 
     enqueue_buf(tbuf);
     tbuf->b_count -= 1;
@@ -144,7 +144,7 @@ struct block_buffer *get_block_buffer(block_t blocknr, struct device* dev){
         if(tbuf->b_blocknr == blocknr){
             rm_lru(tbuf);
             tbuf->b_count += 1;
-//            KDEBUG(("Buffer %d cache returned\n", blocknr));
+//            kdebug("Buffer %d cache returned\n", blocknr);
             return tbuf;
         }
     }
@@ -158,7 +158,7 @@ struct block_buffer *get_block_buffer(block_t blocknr, struct device* dev){
     if(tbuf->b_dirt){
         ret = tbuf->b_dev->bops->flush_block(tbuf);
         tbuf->b_dirt = false;
-        // KDEBUG(("Sync block %d count %d before returning %d\n", tbuf->b_blocknr, tbuf->b_count, blocknr));
+        // kdebug("Sync block %d count %d before returning %d\n", tbuf->b_blocknr, tbuf->b_count, blocknr);
     }
 
     
@@ -199,7 +199,7 @@ void flush_super_block(struct device* dev){
 
 //    dev->dops->dev_read((char*)&sb1, 0, sizeof(struct superblock));
 //    memcpy(&sb2, DISK_RAW, sizeof(struct superblock));
-//    KDEBUG(("sb %d %d %d \n", sb1.s_inode_per_block, sb2.s_inode_per_block, sb->s_inode_per_block));
+//    kdebug("sb %d %d %d \n", sb1.s_inode_per_block, sb2.s_inode_per_block, sb->s_inode_per_block);
 }
 
 void init_buf(){

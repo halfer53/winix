@@ -330,7 +330,7 @@ end:
  * Breakpoint.
  **/
 PRIVATE void break_handler() {
-    KDEBUG(("break"));
+    kdebug("break");
 }
 
 /**

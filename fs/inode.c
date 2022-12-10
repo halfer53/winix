@@ -40,7 +40,7 @@ bool is_valid_inode_num(int num, struct device* id){
     unsigned int inodes_nr;
 
     inodes_nr = sb->s_inode_per_block * (sb->s_inode_table_size / BLOCK_SIZE);
-//    KDEBUG(("is valid inode num: %d, inode per block %d, inodes_nr %d\n", num, sb->s_inode_per_block, inodes_nr));
+//    kdebug("is valid inode num: %d, inode per block %d, inodes_nr %d\n", num, sb->s_inode_per_block, inodes_nr);
     return 1 <= num && num <= inodes_nr;
 }
 
@@ -54,12 +54,12 @@ bool is_inode_in_use(int num, struct device* id){
     bool ret;
     struct superblock* sb = get_sb(id);
     struct block_buffer *buf;
-    // KDEBUG(("is inode in use %d, inode map nr %d\n", num, sb->s_inodemapnr));
+    // kdebug("is inode in use %d, inode map nr %d\n", num, sb->s_inodemapnr);
     if(!is_valid_inode_num(num, id)){
         return false;
     }
     buf = get_block_buffer(sb->s_inodemapnr, id);
-    // KDEBUG(("inode map %08x for inode %d\n", *map_ptr, num));
+    // kdebug("inode map %08x for inode %d\n", *map_ptr, num);
     ret = is_bit_on((unsigned int*)buf->block, (int)TO_DWORD_SIZE(sb->s_inodemap_size), num);
     put_block_buffer(buf);
     return ret;
@@ -82,7 +82,7 @@ int alloc_block(inode_t *ino, struct device* id){
             sb->s_block_inuse += 1;
             sb->s_free_blocks -= 1;
             put_block_buffer_dirt(bmap);
-            // KDEBUG(("alloc_block %d for inode %d\n", free_bit, ino->i_num));
+            // kdebug("alloc_block %d for inode %d\n", free_bit, ino->i_num);
             return free_bit;
         }
         put_block_buffer(bmap);
@@ -152,7 +152,7 @@ void arch_inode(struct inode* ino){
     
 #ifdef __wramp__
     ARCH_CHAR_SIZE(ino->i_size);
-    // KDEBUG(("arch %d \n", ino->i_num));
+    // kdebug("arch %d \n", ino->i_num);
 #endif
     
 }
@@ -161,7 +161,7 @@ void dearch_inode(struct inode* ino){
 
 #ifdef __wramp__
     DEARCH_CHAR_SIZE(ino->i_size);
-    // KDEBUG(("dearch %d \n", ino->i_num));
+    // kdebug("dearch %d \n", ino->i_num);
 #endif
 }
 
@@ -188,7 +188,7 @@ int read_inode(int num, struct inode** ret_ino, struct device* id){
 
     put_block_buffer(buffer);
     *ret_ino = inode;
-    // KDEBUG(("read inode %d blk %d off %d zone %d\n", num, blocknr, offset, inode->i_zone[0]));
+    // kdebug("read inode %d blk %d off %d zone %d\n", num, blocknr, offset, inode->i_zone[0]);
     return 0;
 }
 
@@ -198,7 +198,7 @@ inode_t* get_inode(int num, struct device* id){
     for(i = 0; i < NR_INODES; i++ ){
         rep = &inode_table[i];
         if(rep->i_num == num){
-//            KDEBUG(("found ino %d in cache\n", num));
+//            kdebug("found ino %d in cache\n", num);
             rep->i_count += 1;
             return rep;
         }
@@ -234,7 +234,7 @@ int put_inode(inode_t *inode, bool is_dirty){
     arch_inode(inode);
     put_block_buffer_dirt(buffer);
     inode->i_flags &= ~INODE_FLAG_DIRTY;
-    // KDEBUG(("put inode %d blk %d offset %d\n", inode->i_num, inode->i_ndblock, inode_block_offset));
+    // kdebug("put inode %d blk %d offset %d\n", inode->i_num, inode->i_ndblock, inode_block_offset);
     return 0;
 }
 
@@ -275,7 +275,7 @@ inode_t* alloc_inode(struct device* parentdev, struct device* inodev){
     init_inode_non_disk(inode, inum, inodev, sb);
     inode->i_count += 1;
     inode->i_ctime = get_unix_time();
-    // KDEBUG(("alloc ino set bit %d\n", inum));
+    // kdebug("alloc ino set bit %d\n", inum);
     inode->i_ctime = unix_time;
     inode->i_mtime = unix_time;
     inode->i_atime = unix_time;
@@ -315,13 +315,13 @@ int _release_inode(inode_t *inode, bool is_indirect_zone){
         kwarn("%d is in use before releasing\n", inum);
         return -EINVAL;
     }
-    // KDEBUG(("releasing inode %d\n", inode->i_num));
+    // kdebug("releasing inode %d\n", inode->i_num);
 
     for(i = 0; i < NR_TZONES; i++){
         zone_id = inode->i_zone[i];
         if(zone_id > 0){
             if(is_indirect_zone || i < NR_DIRECT_ZONE){
-                // KDEBUG(("releasing block %d for %d\n", zone_id, inode->i_num));
+                // kdebug("releasing block %d for %d\n", zone_id, inode->i_num);
                 release_block(zone_id, id);
                 inode->i_zone[i] = 0;
             }else{

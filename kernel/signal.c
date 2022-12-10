@@ -111,7 +111,7 @@ PRIVATE int sys_sig_handler(struct proc *who, int signum){
             default:
                 klog("Signal %d: terminate process \"%s [%d]\"\n"
                                         ,signum,who->name,who->pid);
-                // KDEBUG(("Signal curr %x\n", curr_scheduling_proc));
+                // kdebug("Signal curr %x\n", curr_scheduling_proc);
                 exit_signal(who, signum);
         }
     }
@@ -152,7 +152,7 @@ PRIVATE int sys_sig_handler(struct proc *who, int signum){
 int handle_sig(struct proc* who, int signum){
     struct sigaction* act;
     sighandler_t handler = who->sig_table[signum].sa_handler;
-    // KDEBUG(("handle %d for %d\n", signum, who->proc_nr));
+    // kdebug("handle %d for %d\n", signum, who->proc_nr);
     sigdelset(&who->sig_pending, signum);
     // if the system can handle the signal
     if (handler == SIG_DFL || handler == SIG_IGN)

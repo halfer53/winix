@@ -51,7 +51,7 @@ int sys_dup2(struct proc* who, int oldfd, int newfd){
         return -EBADF;
     who->fp_filp[newfd] = file1;
     file1->filp_count += 1;
-    // KDEBUG(("dup2: %d %d by %s %d, filp dev %s\n", oldfd, newfd, who->name,  who->proc_nr, file1->filp_dev->init_name));
+    // kdebug("dup2: %d %d by %s %d, filp dev %s\n", oldfd, newfd, who->name,  who->proc_nr, file1->filp_dev->init_name);
     return newfd;
 }
 

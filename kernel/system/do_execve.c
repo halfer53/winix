@@ -151,7 +151,7 @@ int build_user_stack(struct proc* who, struct string_array* argv, struct string_
             copy_sarray_to_heap(who, argv, argv_ptr);
             init_stack.argc = argv->size - 1;
             init_stack.argv = (char**)copyto_user_heap(who, argv_ptr, argv->size);
-            // KDEBUG(("%d argc %d argv %p\n", who->pid, init_stack.argc, init_stack.argv));
+            // kdebug("%d argc %d argv %p\n", who->pid, init_stack.argc, init_stack.argv);
             kfree(argv_ptr);
         }
     }
@@ -162,7 +162,7 @@ int build_user_stack(struct proc* who, struct string_array* argv, struct string_
             // store the pointer to environment variable at the bottom of stack
             // this can be retrieved by get_environ() in lib/ansi/env.c
             *sp_btm = (unsigned long)copyto_user_heap(who, env_ptr, env->size);
-            // KDEBUG(("build stack env %p physical %p\n", *sp_btm , get_physical_addr(*sp_btm, who)));
+            // kdebug("build stack env %p physical %p\n", *sp_btm , get_physical_addr(*sp_btm, who));
             kfree(env_ptr);
         }
     }
@@ -194,7 +194,7 @@ int exec_welf(struct proc* who, char* path, char *argv[], char *envp[], bool is_
     memset(&m, 0, sizeof(m));
     if ((ret = copy_stirng_array(&argv_copy, argv, who, is_new)))
         return ret;
-    // KDEBUG(("copy argv string %d\n", argv_copy.size));
+    // kdebug("copy argv string %d\n", argv_copy.size);
     if ((ret = copy_stirng_array(&envp_copy, envp, who, is_new)))
         goto err_env;
 
@@ -250,10 +250,10 @@ int exec_welf(struct proc* who, char* path, char *argv[], char *envp[], bool is_
 final:
     filp_close(filp);
 err_open:
-    // KDEBUG(("freeing envp\n"));
+    // kdebug("freeing envp\n");
     kfree_string_array(&envp_copy);
 err_env:
-    // KDEBUG(("freeing argv\n"));
+    // kdebug("freeing argv\n");
     kfree_string_array(&argv_copy);
 
     if (trace_syscall || ret != 0){

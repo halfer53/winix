@@ -33,7 +33,7 @@ int blk_dev_io_read_write(char *buf, off_t off, size_t len, bool write_mode){
         count = rootfs_disk_size - off;
         len = count;
     }
-//    KDEBUG(("dev write blk %d %d\n", off / BLOCK_SIZE, len));
+//    kdebug("dev write blk %d %d\n", off / BLOCK_SIZE, len);
     ptr = rootfs_disk + off;
     while(count-- > 0){
         if(write_mode){
@@ -60,7 +60,7 @@ void __blk_dev_init(char *disk, size_t size){
     memcpy(&root_sb, rootfs_disk, sizeof(struct superblock));
     arch_superblock(&root_sb);
     ASSERT(root_sb.magic == SUPER_BLOCK_MAGIC);
-    // KDEBUG(("sb block in use %d inode table size %d\n", sb->s_block_inuse, sb->s_inode_table_size));
+    // kdebug("sb block in use %d inode table size %d\n", sb->s_block_inuse, sb->s_inode_table_size);
 }
 
 int blk_dev_init(){
@@ -205,7 +205,7 @@ int root_fs_read_write(struct filp *filp, char *data, size_t count, off_t offset
                 buffer->b_dirt = true;
             put_block_buffer(buffer);
         }
-        // KDEBUG(("file write for block %d, off %d len %d, size %d\n", curr_fp_index, off, r, filp->filp_ino->i_size + r));
+        // kdebug("file write for block %d, off %d len %d, size %d\n", curr_fp_index, off, r, filp->filp_ino->i_size + r);
         /* Read or write 'chunk' bytes. */
         if (r == 0)
             break;
@@ -216,7 +216,7 @@ int root_fs_read_write(struct filp *filp, char *data, size_t count, off_t offset
             filp->filp_ino->i_size += r;
         off = 0;
     }
-    // KDEBUG(("Rootfs %d write count %d, offset %d ret %d data %s\n",filp->filp_ino->i_num, count, offset, ret, get_buffer_data(data, count)));
+    // kdebug("Rootfs %d write count %d, offset %d ret %d data %s\n",filp->filp_ino->i_num, count, offset, ret, get_buffer_data(data, count));
     iter_zone_close(&iter);
     return ret;
 }
@@ -237,7 +237,7 @@ int root_fs_close (struct device* dev, struct filp *filp){
     filp->filp_count -= 1;
     if(filp->filp_count == 0){
         put_inode(filp->filp_ino, true);
-        // KDEBUG(("closing count %d link %d\n", filp->filp_ino->i_count, filp->filp_ino->i_nlinks));
+        // kdebug("closing count %d link %d\n", filp->filp_ino->i_count, filp->filp_ino->i_nlinks);
         if(filp->filp_ino->i_count == 0 && filp->filp_ino->i_nlinks == 0){
             release_inode(filp->filp_ino);
         }

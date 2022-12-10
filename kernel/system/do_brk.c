@@ -100,7 +100,7 @@ int do_brk(struct proc *who, struct message *m){
 
     
     m->m1_p1 = get_virtual_addr(who->heap_break, who);
-    // KDEBUG(("proc %d req brk %x curr brk %x \n", who->proc_nr, vaddr, m->m1_p1  ));
+    // kdebug("proc %d req brk %x curr brk %x \n", who->proc_nr, vaddr, m->m1_p1  );
     if(addr < who->heap_break){
         if(addr < who->heap_top){
             return -EINVAL;

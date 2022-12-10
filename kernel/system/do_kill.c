@@ -41,7 +41,7 @@ int sys_kill(struct proc* who, pid_t pid, int signum){
          */
         
         send_sig(to, signum);
-        // KDEBUG(("send sig %d to proc %s[%d]\n", signum, to->name, to->pid));
+        // kdebug("send sig %d to proc %s[%d]\n", signum, to->name, to->pid);
         if(to != who && to->state){
             handle_pendingsig(to, true);
         }

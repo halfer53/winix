@@ -90,7 +90,7 @@ struct mem_block* split_block(struct mem_block *b, size_t s)
     new->free = true;
     new->ptr = new->data;
 
-    // KDEBUG(("size %d new 0x%08x size %d orisize %d\n", s, new->data, new->size, b->size));
+    // kdebug("size %d new 0x%08x size %d orisize %d\n", s, new->data, new->size, b->size);
     b->size = b->size - s - SLAB_HEADER_SIZE;
     
     b->next = new;
@@ -149,7 +149,7 @@ void *_kmalloc(size_t size, void* ra) {
     size_t s = size;
 
     // s = align4(size);
-    // KDEBUG(("kmalloc begin size %d by %x\n", size, ra));
+    // kdebug("kmalloc begin size %d by %x\n", size, ra);
 
     if (base) {
         // kprintf("finding heap\n");
@@ -175,7 +175,7 @@ void *_kmalloc(size_t size, void* ra) {
     }
     b->ra = ra;
     b->free = false;
-    // KDEBUG(("kmalloc %x size %d to %x\n", b->data, size, ra));
+    // kdebug("kmalloc %x size %d to %x\n", b->data, size, ra);
     // printblock(b);
     return (b->data);
 }
@@ -194,7 +194,7 @@ bool valid_addr(void *p)
 
 struct mem_block *fusion(struct mem_block *b) {
     struct mem_block* next = b->next;
-    // KDEBUG(("before fusing %x ", b->data));
+    // kdebug("before fusing %x ", b->data);
     // kprint_slab();
     if (next && next->free && ((char *)(b->ptr) + b->size == (char *)next)) {
         b->size += SLAB_HEADER_SIZE + next->size;
@@ -205,7 +205,7 @@ struct mem_block *fusion(struct mem_block *b) {
         if (b->next)
             b->next->prev = b;
     }
-    // KDEBUG(("after fusing %x ", b->data));
+    // kdebug("after fusing %x ", b->data);
     // kprint_slab();
     return (b);
 }
@@ -229,7 +229,7 @@ void _kfree(void *p, void *ra)
             // kprintf("fuse next %x %x\n", b->next, b);
             fusion(b);
         }
-        // KDEBUG(("kfree %x by %x\n", p, ra));
+        // kdebug("kfree %x by %x\n", p, ra);
         // kprint_slab();
     }else{
         kwarn("invalid addr %p by %p\n", p, ra);

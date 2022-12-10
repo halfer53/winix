@@ -60,7 +60,7 @@ int copy_stack(struct proc* parent, struct proc* child){
         val = *stack_ptr;
         if (val >= vstack_top && val < vstack_bottom) {
             *stack_ptr = (unsigned long)get_virtual_addr(val - vstack_top + new_stack, child);
-            // KDEBUG(("%p: old %lx new %lx\n", (void *)get_virtual_addr(stack_ptr, child), val, *stack_ptr));
+            // kdebug("%p: old %lx new %lx\n", (void *)get_virtual_addr(stack_ptr, child), val, *stack_ptr);
         }
         stack_ptr++;
     }
@@ -68,11 +68,11 @@ int copy_stack(struct proc* parent, struct proc* child){
         val = child->ctx.m.regs[i];
         if (val >= vstack_top && val < vstack_bottom) {
             child->ctx.m.regs[i] = (unsigned long)get_virtual_addr(val - vstack_top + new_stack, child);
-            // KDEBUG(("reg %d: old %lx new %x\n", i+1, val, child->ctx.m.regs[i]));
+            // kdebug("reg %d: old %lx new %x\n", i+1, val, child->ctx.m.regs[i]);
         }
     }
 
-    // KDEBUG(("tfork %p %p for %d tp %d\n", (void *)new_stack, (void *)*sp, child->proc_nr, child->thread_parent));
+    // kdebug("tfork %p %p for %d tp %d\n", (void *)new_stack, (void *)*sp, child->proc_nr, child->thread_parent);
     proc_memctl(child, vir_old_stack, PROC_NO_ACCESS);
     return 0;
 }

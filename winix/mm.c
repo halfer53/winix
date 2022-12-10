@@ -249,7 +249,7 @@ void release_proc_mem(struct proc *who){
     if(parent->state & STATE_VFORKING){
         return;
     }
-    // KDEBUG(("release proc mem %d %d\n", who->proc_nr, who->thread_parent));
+    // kdebug("release proc mem %d %d\n", who->proc_nr, who->thread_parent);
 
     user_release_pages(who, who->stack_top, who->stack_size);
     // klog("release stack 0x%x of %s %d\n", who->stack_top, who->name, who->proc_nr);

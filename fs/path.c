@@ -56,7 +56,7 @@ int advance(inode_t *dirp, char string[NAME_MAX]){
     if(*string == '\0')
         return ret;
     iter_dirent_init(&iter, dirp, 0, 0);
-//    KDEBUG(("advancing %s in inode %d\n", string, dirp->i_num));
+//    kdebug("advancing %s in inode %d\n", string, dirp->i_num);
     while(iter_dirent_has_next(&iter)){
         dirstream = iter_dirent_get_next(&iter);
         if(char32_strcmp(dirstream->dirent.d_name, string) == 0){
@@ -74,7 +74,7 @@ int get_parent_inode_num(inode_t *dirp){
     int ret = -EINVAL;
 
     iter_dirent_init(&iter, dirp, 0, 0);
-//    KDEBUG(("advancing %s in inode %d\n", string, dirp->i_num));
+//    kdebug("advancing %s in inode %d\n", string, dirp->i_num);
     while(iter_dirent_has_next(&iter)){
         dirstream = iter_dirent_get_next(&iter);
         if(char32_strcmp(dirstream->dirent.d_name, dot2) == 0){
@@ -94,7 +94,7 @@ int get_child_inode_name(inode_t* parent, inode_t* child, char string[NAME_MAX])
     int len = -EINVAL;
 
     iter_dirent_init(&iter, parent, 0, 0);
-//    KDEBUG(("advancing %s in inode %d\n", string, dirp->i_num));
+//    kdebug("advancing %s in inode %d\n", string, dirp->i_num);
     while(iter_dirent_has_next(&iter)){
         dirstream = iter_dirent_get_next(&iter);
         if(dirstream->dirent.d_ino == child->i_num){
@@ -149,7 +149,7 @@ int __eath_path(struct inode* curr_ino, struct inode** last_dir,
 
         if(!(rip->i_mode & S_IFDIR))
             return -ENOTDIR; //if one of the pathname in the path is not directory
-//        KDEBUG(("path advance %d %s\n", rip->i_num, string));
+//        kdebug("path advance %d %s\n", rip->i_num, string);
         inum = advance(rip,string);
         if(inum == -EINVAL) {
             return 0;
@@ -157,7 +157,7 @@ int __eath_path(struct inode* curr_ino, struct inode** last_dir,
 
         put_inode(rip, false);
         new_rip = get_inode(inum, dev);
-//        KDEBUG(("got new rip %d ret %d\n", inum, new_rip->i_num));
+//        kdebug("got new rip %d ret %d\n", inum, new_rip->i_num);
         rip = new_rip;
         path = component_name;
     }
