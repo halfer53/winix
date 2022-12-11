@@ -1,6 +1,1 @@
-obj-y += ansi/ gen/ posix/ stdio/ stdlib/ syscall/ regex/ ipc/
-
-							
-
-
-
+obj-y += ansi/ gen/ posix/ stdio/ stdlib/ syscall/ regex/ ipc/ readline/
