@@ -181,11 +181,8 @@ void tty_exception_handler( struct tty_state* state){
         if (val == '\r')
             val = '\n';
         is_new_line = val == '\n';
-        if (val == BACKSPACE) { // backspace
-            terminal_backspace(state);
-            goto end;
-        }
-        else if(val == CTRL_C || val == CTRL_Z){ // Control C or Z
+        
+        if(val == CTRL_C || val == CTRL_Z){ // Control C or Z
             int signal;
             if(val == CTRL_C)
                 signal = SIGINT;
@@ -196,6 +193,10 @@ void tty_exception_handler( struct tty_state* state){
                 // kdebug("Send sig to foreground %d\n", state->foreground_group);
                 (void)sys_kill(SYSTEM_TASK, -(state->foreground_group), signal);
             }
+            goto end;
+        }
+        else if (val == BACKSPACE) { // backspace
+            terminal_backspace(state);
             goto end;
         }
         else if(val == CTRL_U){
