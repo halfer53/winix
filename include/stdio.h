@@ -93,6 +93,8 @@ int fprintf(FILE *stream, const char *format, ...) CHECK_EPRINTF;
 int printf(const char *format, ...) CHECK_PRINTF;
 void perror();
 
+#define fflush(output)	
+
 
 ssize_t getdelim(char **lineptr, size_t *n, int delimiter, FILE *stream);
 #define getline(lineptr, n, stream)		getdelim(lineptr, n, '\n', stream)
