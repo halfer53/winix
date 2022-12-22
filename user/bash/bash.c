@@ -303,16 +303,26 @@ int printenv(int argc, char **argv){
 int cmd_kill(int argc, char **argv){
     pid_t pid;
     int signum = SIGTERM;
+    char *endptr;
+    int pidposition = 1;
     if(argc < 2){
         printf("kill <-signal> [pid]\n");
         return 1;
     }
         
     if(*argv[1] == '-'){
-        signum = atoi(argv[1] + 1);
-        pid = atoi(argv[2]);
-    }else{
-        pid = atoi(argv[1]);
+        signum = strtol(argv[1] + 1, &endptr, 10);
+        if(*endptr){
+            fprintf(stderr, "Invalid number '%s'\n", argv[1] + 1);
+            return 1;
+        }
+        pidposition = 2;
+    }
+
+    pid = strtol(argv[pidposition], &endptr, 10);
+    if(*endptr){
+        fprintf(stderr, "Invalid number '%s'\n", argv[2]);
+        return 1;
     }
 
     if(kill(pid,signum))
@@ -391,8 +401,14 @@ int slab(int argc, char **argv){
 
 int cmd_exit(int argc, char **argv){
     int status = 0;
-    if(argc > 1)
-        status = atoi(argv[1]);
+    char *endptr;
+    if(argc > 1){
+        status = strtol(argv[1], &endptr, 10);
+        if(*endptr){
+            fprintf(stderr, "Invalid number '%s'\n", argv[1]);
+            status = EXIT_FAILURE;
+        }
+    }
     close(history_fd);
     printf("Bye!\n");
     // printf("Child %d [parent %d] exits\n",getpid(),getppid());
