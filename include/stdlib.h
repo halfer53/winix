@@ -30,7 +30,7 @@ int putenv(char *name);
 int setenv(const char *name, const char *value, int overwrite);
 void srand(unsigned int seed);
 int rand(void);
-int atoi(char *str);
+long strtol(const char * nptr, char ** endptr, int base);
 unsigned long strtoul(const char * nptr, char ** endptr, int base);
 void abort();
 
