@@ -401,22 +401,34 @@ int _tty_tiocspgrp ( struct tty_state* tty_data, struct proc* who, ptr_t* ptr){
     return 0;
 }
 
-int tty_ioctl(struct filp* file, int request, vptr_t* vptr){
+int tty_ioctl(struct filp* file, int request, ptr_t* stack_ptr){
     int ret = 0;
+    int result;
     struct proc* who = curr_syscall_caller;
     struct tty_state* tty_data;
-    ptr_t* ptr = get_physical_addr(vptr, who);
     tty_data = (struct tty_state*)file->filp_dev->private;
     
     switch (request)
     {
 
+    case TCGETS:
+        result = copy_to_user(who, (vptr_t *)(*(ptr_t**)stack_ptr), (ptr_t*)&tty_data->termios, sizeof(struct termios));
+        if (result < 0)
+            return result;
+        break;
+
+    case TCSETS:
+        result = copy_from_user(who, (ptr_t*)&tty_data->termios, (vptr_t *)(*(ptr_t**)stack_ptr), sizeof(struct termios));
+        if (result < 0)
+            return result;
+        break;
+
     case TIOCGPGRP:
-        *ptr = (pid_t)tty_data->foreground_group;
+        *stack_ptr = (pid_t)tty_data->foreground_group;
         break;
 
     case TIOCSPGRP:
-        return _tty_tiocspgrp(tty_data, who, ptr);
+        return _tty_tiocspgrp(tty_data, who, stack_ptr);
 
     case TIOCSCTTY:
         if(!IS_SESSION_LEADER(who)){
@@ -447,13 +459,7 @@ int tty_ioctl(struct filp* file, int request, vptr_t* vptr){
         tty_data->is_echoing = true;
         break;
 
-    case TCGETS:
-        copy_to_user(who, vptr, (ptr_t*)&tty_data->termios, sizeof(struct termios));
-        break;
-
-    case TCSETS:
-        copy_from_user(who, (ptr_t*)&tty_data->termios, vptr, sizeof(struct termios));
-        break;
+    
 
     default:
         return -EINVAL;

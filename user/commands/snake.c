@@ -134,6 +134,7 @@ void board_init(struct board_struct *board){
     int fd;
     clock_t clo = times(NULL);
     struct termios termios;
+
     INIT_LIST_HEAD(&board->foods);
     INIT_LIST_HEAD(&board->snake);
     fd = open("/var/log/snake.log", O_RDWR | O_CREAT | O_TRUNC, 0644);
@@ -147,6 +148,10 @@ void board_init(struct board_struct *board){
     ioctl(STDIN_FILENO, TIOCDISABLEECHO);
     srand(clo);
     disable_cursor();
+
+    tcgetattr(STDIN_FILENO, &termios);
+    termios.c_lflag &= (~ICANON & ~ECHO);
+    tcsetattr(STDIN_FILENO, TCSANOW, &termios);
 }
 
 void init_snake_food(struct board_struct *board){
