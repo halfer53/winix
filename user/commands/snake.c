@@ -30,6 +30,8 @@
 #define FAIL_EAT_SELF   (-6)
 #define FAIL_QUIT       (-7)
 
+void quit();
+
 struct termios prev_termios;
 bool tty_inited = false;
 
