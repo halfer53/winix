@@ -255,7 +255,7 @@ void tty_exception_handler( struct tty_state* state){
 
             if(isprint(val) || is_new_line){
                 *state->bptr++ = val;
-                if(state->is_echoing){
+                if(state->termios.c_lflag & ECHO){
                     __kputc(rex, val);
                     // kdebug("received %d\n", val);
                 }
@@ -421,6 +421,7 @@ int tty_ioctl(struct filp* file, int request, ptr_t* stack_ptr){
         result = copy_from_user(who, (ptr_t*)&tty_data->termios, (vptr_t *)(*(ptr_t**)stack_ptr), sizeof(struct termios));
         if (result < 0)
             return result;
+        klog("tty_ioctl: TCSETS %x\n", tty_data->termios.c_lflag);
         break;
 
     case TIOCGPGRP:
