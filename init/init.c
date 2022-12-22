@@ -9,6 +9,7 @@
 #include <string.h>
 #include <sys/wait.h>
 #include <assert.h>
+#include <termios.h>
 
 char shell_path[] = "/bin/bash";
 char *shell_argv[] = {
@@ -54,9 +55,42 @@ void init_dev()
     assert(ret == 0);
 }
 
+void init_termios(int fd){
+    struct termios termios;
+    int ret;
+
+    ret = tcgetattr(fd, &termios);
+    assert(ret == 0);
+    
+    termios.c_lflag = ISIG | ICANON | ECHO | ECHOE | ECHOK;
+    termios.c_iflag = ICRNL | IMAXBEL | IUTF8;
+    termios.c_oflag = ONLCR | OPOST;
+    termios.c_cflag = CREAD;
+    termios.c_cc[VINTR]    =   03;  /* ^C */
+    termios.c_cc[VQUIT]    =  034;  /* ^\ */
+    termios.c_cc[VERASE]   = 0177;
+    termios.c_cc[VKILL]    =  025;  /* ^X */
+    termios.c_cc[VEOF]     =   04;  /* ^D */
+    termios.c_cc[VSTART]   =  021;  /* ^Q */
+    termios.c_cc[VSTOP]    =  023;  /* ^S */
+    termios.c_cc[VSUSP]    =  032;  /* ^Z */
+    termios.c_cc[VLNEXT]   =  026;  /* ^V */
+    termios.c_cc[VWERASE]  =  027;  /* ^W */
+    termios.c_cc[VREPRINT] =  022;  /* ^R */
+    termios.c_cc[VEOL]     =    0;
+    termios.c_cc[VEOL2]    =    0;
+
+    termios.c_cc[VTIME]  = 0;
+    termios.c_cc[VMIN]   = 1;
+
+    ret = tcsetattr(fd, TCSANOW, &termios);
+    assert(ret == 0);
+}
+
 void init_tty()
 {
     int fd, ret;
+    
     ret = setsid();
     assert(ret == getpid());
     fd = open("/dev/tty1", O_RDWR);
@@ -70,6 +104,13 @@ void init_tty()
     pgid = getpgid(0);
     ret = tcsetpgrp(STDIN_FILENO, pgid);
     assert(ret == 0);
+
+    init_termios(STDIN_FILENO);
+
+    fd = open("/dev/tty2", O_RDWR);
+    assert(fd == 3);
+    init_termios(fd);
+    close(fd);
 }
 
 void start_init_routine()
