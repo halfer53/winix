@@ -18,7 +18,7 @@
 #include <winix/dev.h>
 #include <winix/ksignal.h>
 
-int atoi(char *str);
+long strtol(const char * nptr, char ** endptr, int base);
 
 const char *errlist[_NERROR] = {
     "OK",			/* OK */    
@@ -268,6 +268,7 @@ static int pass_number(const char **s_format){
     int ret = 0;
     char _buffer[PASS_NUMBER_BUF_SIZ];
     int count = 0;
+    char *endptr;
 
     while(isdigit(*format) && (count < (PASS_NUMBER_BUF_SIZ - 1))){
         _buffer[count++] = *format++;
@@ -275,7 +276,7 @@ static int pass_number(const char **s_format){
 
     if(count > 0 ){
         _buffer[count] = '\0';
-        ret = atoi(_buffer);
+        ret = strtol(_buffer, &endptr, 10);
     }
     *s_format = format;
     return ret;

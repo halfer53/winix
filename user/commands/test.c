@@ -292,8 +292,6 @@ void open_tty_as_stdin(char *str){
     assert(ret == STDIN_FILENO);
     ret = dup2(fd, STDOUT_FILENO);
     assert(ret == STDOUT_FILENO);
-    ret = dup2(fd, STDERR_FILENO);
-    assert(ret == STDERR_FILENO);
 
     ret = ioctl(STDIN_FILENO, TIOCSCTTY, 0);
     assert(ret == 0);
@@ -310,7 +308,7 @@ int test_eintr(int argc, char **argv){
     if(!tfork()){
         char __buffer[10];
         int ret;
-        clock_t seconds;
+        clock_t seconds = 0;
         suseconds_t microseconds = 1000;
         struct itimerval itv;
 
@@ -319,7 +317,13 @@ int test_eintr(int argc, char **argv){
         memset(&itv, 0, sizeof(itv));
         alarm_handler_called = false;
 
-        seconds = (argc > 1) ? strtol(argv[1], &endptr, 10) : 0;
+        if (argc > 1){
+            seconds = strtol(argv[1], &endptr, 10);
+            if (*endptr){
+                fprintf(stderr, "Invalid number: %s\n", argv[1]);
+                return 1;
+            }
+        }
         
         itv.it_value.tv_sec = seconds;
         itv.it_value.tv_usec = microseconds;
@@ -390,13 +394,13 @@ int test_coroutine(int argc, char **argv){
     void **thread_stack_op;
     ucontext_t *coroutines_list; 
     ucontext_t *coroutine;
-    sum = 0;
     char *endptr;
+    sum = 0;
 
     if(argc > 1){
         num = strtol(argv[1], &endptr, 10);
-        if (endptr || num < 1){
-            fprintf(stderr, "Invalid number: %s", argv[1]);
+        if (*endptr){
+            fprintf(stderr, "Invalid number: %s\n", argv[1]);
             return 1;
         }
     }

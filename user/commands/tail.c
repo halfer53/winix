@@ -49,8 +49,8 @@ int main(int argc, char *argv[]){
     for (i = 1; i < argc; i++){
         if(strcmp(argv[i], "-n") == 0){
             n = strtol(argv[i + 1], &endptr, 10);
-            if (endptr == argv[i + 1] || endptr != '\0'){
-                fprintf(stderr, "Invalid number of lines: %s", argv[i + 1]);
+            if (*endptr){
+                fprintf(stderr, "Invalid number of lines: %s\n", argv[i + 1]);
                 return 1;
             }
             i++;
@@ -59,7 +59,7 @@ int main(int argc, char *argv[]){
         } else {
             stream = fopen(argv[i], "r");
             if (stream == NULL){
-                fprintf(stderr, "Error opening file %s, %s", argv[1], strerror(errno));
+                fprintf(stderr, "Error opening file %s, %s\n", argv[1], strerror(errno));
                 return 1;
             }
         }

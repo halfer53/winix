@@ -59,7 +59,7 @@ static error_t parse_opt (int key, char *arg, struct argp_state *state)
     {
         case 't':
             arguments->offset = strtol(arg, &endptr, 0);
-            if (endptr == arg || *endptr != '\0'){
+            if (*endptr){
                 argp_usage (state);
                 return 1;
             }

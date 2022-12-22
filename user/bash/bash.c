@@ -406,7 +406,7 @@ int cmd_exit(int argc, char **argv){
         status = strtol(argv[1], &endptr, 10);
         if(*endptr){
             fprintf(stderr, "Invalid number '%s'\n", argv[1]);
-            status = EXIT_FAILURE;
+            return 1;
         }
     }
     close(history_fd);
