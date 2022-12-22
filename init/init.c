@@ -68,7 +68,7 @@ void init_termios(int fd){
     termios.c_cflag = CREAD;
     termios.c_cc[VINTR]    =   03;  /* ^C */
     termios.c_cc[VQUIT]    =  034;  /* ^\ */
-    termios.c_cc[VERASE]   = 0177;
+    termios.c_cc[VERASE]   =    8;  /* backspace */
     termios.c_cc[VKILL]    =  025;  /* ^X */
     termios.c_cc[VEOF]     =   04;  /* ^D */
     termios.c_cc[VSTART]   =  021;  /* ^Q */
