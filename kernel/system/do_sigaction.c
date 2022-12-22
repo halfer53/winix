@@ -16,7 +16,7 @@
 #include <kernel/kernel.h>
 
 int sys_sigaction(struct proc* who, int signum, struct sigaction* act, struct sigaction* oact){
-    if(signum < 1 || signum >= _NSIG)
+    if(signum < 1 || signum >= NSIG)
         return -EINVAL;
 
     if(signum == SIGKILL || signum == SIGSTOP)

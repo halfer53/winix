@@ -19,7 +19,7 @@
 int sys_kill(struct proc* who, pid_t pid, int signum){
     struct proc* to;
     int valid_targets = 0;
-    if(signum < 0 || signum >= _NSIG)
+    if(signum < 0 || signum >= NSIG)
         return -EINVAL;
 
     if(pid == 1 && (signum == SIGSTOP || signum == SIGKILL))

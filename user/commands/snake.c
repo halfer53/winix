@@ -169,7 +169,7 @@ void board_init(struct board_struct *board){
     init_tty();
     disable_cursor();
 
-    for(i = 0; i < _NSIG; i++){
+    for(i = 0; i < NSIG; i++){
         signal(i, restore_tty);
     }
 }

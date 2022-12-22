@@ -13,10 +13,10 @@
 /* Low bit of signal masks. */
 #define SIGBIT_0    ((sigset_t) 1)
 
-/* Mask of valid signals (0 - _NSIG). */
-#define SIGMASK        (((SIGBIT_0 << _NSIG) << 1) - 1)
+/* Mask of valid signals (0 - NSIG). */
+#define SIGMASK        (((SIGBIT_0 << NSIG) << 1) - 1)
 
-#define sigisvalid(signo) ((unsigned) (signo) <= _NSIG)
+#define sigisvalid(signo) ((unsigned) (signo) <= NSIG)
 
 int sigaddset(set, signo)
 sigset_t *set;

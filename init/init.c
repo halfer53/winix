@@ -26,7 +26,7 @@ void block_signals()
     sigfillset(&mask);
     sigdelset(&mask, SIGSEGV);
     sigprocmask(SIG_SETMASK, &mask, NULL);
-    for (i = 1; i < _NSIG; i++)
+    for (i = 1; i < NSIG; i++)
     {
         signal(i, SIG_IGN);
     }

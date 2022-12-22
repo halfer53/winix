@@ -220,7 +220,7 @@ int is_sigpending(struct proc* who){
     sigset_t blocked = who->sig_mask;
 
     if(pendings && pendings != blocked){
-        for(i = 1; i < _NSIG; i++){
+        for(i = 1; i < NSIG; i++){
             sigmask = 1 << i;
             if(pendings & sigmask && !(blocked & sigmask)){
                 return i;

@@ -47,7 +47,7 @@ int do_sigprocmask(struct proc* who, struct message* m){
             break;
 
         case SIG_BLOCK:
-            for( i = 1; i < _NSIG; i++){
+            for( i = 1; i < NSIG; i++){
                 if(sigismember(pset, i)){
                     sigaddset(pblocked, i);
                 }
@@ -55,7 +55,7 @@ int do_sigprocmask(struct proc* who, struct message* m){
             break;
 
         case SIG_UNBLOCK:
-            for( i = 1; i < _NSIG; i++){
+            for( i = 1; i < NSIG; i++){
                 if(sigismember(pset, i)){
                     sigdelset(pblocked, i);
                 }
