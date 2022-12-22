@@ -82,6 +82,10 @@ typedef unsigned int	tcflag_t;
 #define OFILL	0000100  /* Use fill characters for delay.  */
 #define OFDEL	0000200  /* Fill is DEL.  */
 
+#define TCSANOW        0
+#define TCSADRAIN      1
+#define TCSAFLUSH      2
+
 #define _HAVE_STRUCT_TERMIOS_C_ISPEED 1
 #define _HAVE_STRUCT_TERMIOS_C_OSPEED 1
 #define NCCS 32
