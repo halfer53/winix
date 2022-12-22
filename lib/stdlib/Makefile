@@ -1,2 +1,2 @@
 
-obj-y += atoi.o stdlib.o realloc.o calloc.o strtol.o
+obj-y += stdlib.o realloc.o calloc.o strtol.o
