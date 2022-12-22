@@ -2,6 +2,7 @@
 #define _TERMIOS_H_
 
 #include <stddef.h>
+#include <sys/ioctl.h>
 
 typedef unsigned char	cc_t;
 typedef unsigned int	speed_t;
@@ -12,8 +13,7 @@ typedef unsigned int	tcflag_t;
 #define ICANON	0000002   /* Canonical input (erase and kill processing).  */
 #define XCASE	0000004
 #define ECHO	0000010   /* Enable echo.  */
-#define ECHOE	0000020   /* Echo erase character as error-correcting
-			     backspace.  */
+#define ECHOE	0000020   /* Echo erase character as error-correcting backspace.  */
 #define ECHOK	0000040   /* Echo KILL.  */
 #define ECHONL	0000100   /* Echo NL.  */
 #define NOFLSH	0000200   /* Disable flush after interrupt or quit.  */
@@ -63,21 +63,18 @@ typedef unsigned int	tcflag_t;
 #define INLCR	0000100  /* Map NL to CR on input.  */
 #define IGNCR	0000200  /* Ignore CR.  */
 #define ICRNL	0000400  /* Map CR to NL on input.  */
-#define IUCLC	0001000  /* Map uppercase characters to lowercase on input
-			    (not in POSIX).  */
+#define IUCLC	0001000  /* Map uppercase characters to lowercase on input (not in POSIX).  */
 #define IXON	0002000  /* Enable start/stop output control.  */
 #define IXANY	0004000  /* Enable any character to restart output.  */
 #define IXOFF	0010000  /* Enable start/stop input control.  */
-#define IMAXBEL	0020000  /* Ring bell when input queue is full
-			    (not in POSIX).  */
+#define IMAXBEL	0020000  /* Ring bell when input queue is full (not in POSIX).  */
 #define IUTF8	0040000  /* Input is UTF8 (not in POSIX).  */
 
 
 
 /* c_oflag bits */
 #define OPOST	0000001  /* Post-process output.  */
-#define OLCUC	0000002  /* Map lowercase characters to uppercase on output.
-			    (not in POSIX).  */
+#define OLCUC	0000002  /* Map lowercase characters to uppercase on output. (not in POSIX).  */
 #define ONLCR	0000004  /* Map NL to CR-NL on output.  */
 #define OCRNL	0000010  /* Map CR to NL on output.  */
 #define ONOCR	0000020  /* No CR output at column 0.  */
@@ -105,6 +102,7 @@ struct termios
 /* Put the state of FD into *TERMIOS_P.  */
 int tcgetattr (int __fd, struct termios *__termios_p) ;
 
+
 /* Set the state of FD to *TERMIOS_P.  */
 int tcsetattr (int __fd, int __optional_actions, const struct termios *__termios_p);
 
@@ -129,5 +127,12 @@ int tcsetattr (int __fd, int __optional_actions, const struct termios *__termios
 
 
 // pid_t tcgetsid (int __fd);
+
+#if defined(__wramp__)
+
+#define tcgetattr(fd, termios_p)                    ioctl(fd, TCGETS, termios_p)
+#define tcsetattr(fd, optional_actions, termios_p)  ioctl(fd, TCSETS, termios_p)
+
+#endif
 
 #endif
