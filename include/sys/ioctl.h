@@ -25,9 +25,6 @@
 #define TIOCSCTTY   18
 #define TIOCNOTTY   19
 
-#define TIOCDISABLEECHO 20
-#define TIOCENABLEECHO  21
-
 int ioctl(int fd, unsigned long request, ...);
 
 #if defined(__wramp__) & !defined(LINTING) && !defined(_SYSTEM)

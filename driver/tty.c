@@ -450,16 +450,6 @@ int tty_ioctl(struct filp* file, int request, ptr_t* stack_ptr){
         tty_data->controlling_session = 0;
         break;
 
-    case TIOCDISABLEECHO:
-        tty_data->is_echoing = false;
-        break;
-
-    case TIOCENABLEECHO:
-        tty_data->is_echoing = true;
-        break;
-
-    
-
     default:
         return -EINVAL;
 
