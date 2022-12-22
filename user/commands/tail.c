@@ -44,10 +44,15 @@ int main(int argc, char *argv[]){
     int i = 0, n = 10;
     bool follow = false;
     struct timespec ts;
+    char *endptr;
 
     for (i = 1; i < argc; i++){
         if(strcmp(argv[i], "-n") == 0){
-            n = atoi(argv[i + 1]);
+            n = strtol(argv[i + 1], &endptr, 10);
+            if (endptr == argv[i + 1] || endptr != '\0'){
+                fprintf(stderr, "Invalid number of lines: %s", argv[i + 1]);
+                return 1;
+            }
             i++;
         } else if( strcmp(argv[i], "-f") == 0){
             follow = true;
