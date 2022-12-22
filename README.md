@@ -4,7 +4,7 @@
 
 Winix is a minimal, hobbyistic, educational and UNIX-style Operating System for the Waikato RISC Architecture Microprocessor (WRAMP).
 
-Inspired by the Minix1 operating system, Winix includes a full-featured kernel with features such as process and memory management, in-memory file system, exception control, and a user space bourne shell with interactive command line. And, for a bit of fun, you can even play the classic game of snake by simply typing "snake" in the command line.
+Inspired by the Minix1 operating system, Winix includes a full-featured kernel with features such as process and memory management, in-memory file system, exception control, and a user space bourne shell with interactive command line. And, for a bit of fun, you can even play the classic game of snake by simply typing `snake` in the command line.
 
 ## Demo
 
