@@ -251,7 +251,6 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
     }
 
 #ifdef __wramp__
-    ioctl(STDIN_FILENO, TIOCENABLEECHO);
     tcsetpgrp(STDIN_FILENO, pgid);
 #endif
     
