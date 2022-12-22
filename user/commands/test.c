@@ -306,6 +306,7 @@ void open_tty_as_stdin(char *str){
 
 int test_eintr(int argc, char **argv){
     int status;
+    char *endptr;
     if(!tfork()){
         char __buffer[10];
         int ret;
@@ -318,7 +319,8 @@ int test_eintr(int argc, char **argv){
         memset(&itv, 0, sizeof(itv));
         alarm_handler_called = false;
 
-        seconds = (argc > 1) ? atoi(argv[1]) : 0;
+        seconds = (argc > 1) ? strtol(argv[1], &endptr, 10) : 0;
+        
         itv.it_value.tv_sec = seconds;
         itv.it_value.tv_usec = microseconds;
 
@@ -389,9 +391,16 @@ int test_coroutine(int argc, char **argv){
     ucontext_t *coroutines_list; 
     ucontext_t *coroutine;
     sum = 0;
+    char *endptr;
 
-    if(argc > 1)
-        num = atoi(argv[1]);
+    if(argc > 1){
+        num = strtol(argv[1], &endptr, 10);
+        if (endptr || num < 1){
+            fprintf(stderr, "Invalid number: %s", argv[1]);
+            return 1;
+        }
+    }
+        
     // ucontext represents the context for each thread
     coroutines_list = malloc(sizeof(ucontext_t) * num);
     if(coroutines_list == NULL)
