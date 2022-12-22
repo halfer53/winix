@@ -519,10 +519,10 @@ int copy_from_user(struct proc* who, ptr_t *dest, vptr_t *src, size_t len){
 
 int copy_to_user(struct proc* who, vptr_t *dest, ptr_t *src, size_t len){
     ptr_t* p;
-    if (!is_vaddr_ok(src, len, who))
+    if (!is_vaddr_ok(dest, len, who))
         return -EFAULT;
-    p = get_physical_addr(src, who);
-    memcpy(dest, p, len);
+    p = get_physical_addr(dest, who);
+    memcpy(p, src, len);
     return len;
 }
 
