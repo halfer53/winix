@@ -53,11 +53,12 @@ static error_t parse_opt (int key, char *arg, struct argp_state *state)
     /* Get the input argument from argp_parse, which we
        know is a pointer to our arguments structure. */
     struct arguments *arguments = state->input;
+    char *endptr;
 
     switch (key)
     {
         case 't':
-            arguments->offset = atoi(arg);
+            arguments->offset = strtol(arg, &endptr, 0);
             break;
         case 'o':
             arguments->output_path = arg;
