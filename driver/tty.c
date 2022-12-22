@@ -17,6 +17,7 @@
 #include <bsd/string.h>
 #include <ctype.h>
 #include <winix/ksignal.h>
+#include <termios.h>
 
 
 #define CTRL_A  (1)
@@ -52,6 +53,7 @@ struct tty_state{
     struct filp* reader_filp;
     char *read_data;
     size_t read_count;
+    struct termios termios;
     char buffer[TTY_BUFFER_SIZ];
     pid_t foreground_group;
     pid_t controlling_session;
