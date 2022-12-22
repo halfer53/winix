@@ -27,7 +27,10 @@
 #define FAIL_DOWN       (-4)
 #define FAIL_UP         (-5)
 #define FAIL_EAT_SELF   (-6)
+#define FAIL_QUIT       (-7)
 
+struct termios prev_termios;
+bool snake_inited = false;
 
 struct point{
     int x;
@@ -35,7 +38,7 @@ struct point{
     struct list_head list;
 };
 
-enum direction {left, up, right, down};
+enum direction {left, up, right, down, quit};
 
 struct board_struct{
     struct list_head snake;
@@ -130,10 +133,23 @@ void print_border(struct board_struct* board){
     free(buffer);
 }
 
+void init_tty(){
+    struct termios termios;
+    tcgetattr(STDIN_FILENO, &prev_termios);
+    termios = prev_termios;
+    termios.c_lflag &= (~ICANON & ~ECHO);
+    tcsetattr(STDIN_FILENO, TCSANOW, &termios);
+}
+
+void restore_tty(){
+    if (snake_inited)
+        tcsetattr(STDIN_FILENO, TCSANOW, &prev_termios);
+}
+
 void board_init(struct board_struct *board){
     int fd;
     clock_t clo = times(NULL);
-    struct termios termios;
+    
 
     INIT_LIST_HEAD(&board->foods);
     INIT_LIST_HEAD(&board->snake);
@@ -145,13 +161,12 @@ void board_init(struct board_struct *board){
     dup2(fd, STDIN_FILENO);
     close(fd);
 
-    ioctl(STDIN_FILENO, TIOCDISABLEECHO);
     srand(clo);
+
+    init_tty();
     disable_cursor();
 
-    tcgetattr(STDIN_FILENO, &termios);
-    termios.c_lflag &= (~ICANON & ~ECHO);
-    tcsetattr(STDIN_FILENO, TCSANOW, &termios);
+    snake_inited = true;
 }
 
 void init_snake_food(struct board_struct *board){
@@ -204,8 +219,7 @@ enum direction get_direction(struct board_struct* board, char c){
             return left;
         return right;
     case 'q':
-        clear_screen();
-        exit(0);
+        return quit;
 
     default:
         break;
@@ -251,6 +265,9 @@ int _refresh(struct board_struct* board){
             return FAIL_DOWN;
         y++;
         break;
+
+    case quit:
+        return FAIL_QUIT;
     
     default:
         return FAIL;
@@ -283,7 +300,7 @@ int _refresh(struct board_struct* board){
 
 int refresh(struct board_struct* board){
     int ret = _refresh(board);
-    if(ret){
+    if(ret && ret != FAIL_QUIT){
         print_to_central_screen(NUM_ROWS / 2 - 1, "You lost :(");
         // printf("%d", ret);
     }
@@ -371,8 +388,11 @@ int main(int argc, char** argv){
                 }
             }
         }
+        if (ret == FAIL_QUIT)
+            break;
     }
-    
+    restore_tty();
+    clear_screen();
     return 0;
 }
 
