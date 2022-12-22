@@ -6,6 +6,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <time.h>
+#include <termios.h>
 #include "../../include_winix/winix/list.h"
 
 #define NUM_COLS                (50)
@@ -58,6 +59,7 @@ struct point* new_food(){
 void disable_cursor(){
     static char str[] = {0x1b, 0x5b ,0x3f ,0x32 ,0x35 ,0x6c, 0};
     printf("%s", str);
+    fflush(stdout);
 }
 
 void int2str(int value, int i, char* output){
@@ -79,6 +81,7 @@ void draw_coordinate(int x, int y, char character){
     int2str(x, 100, draw_format + 6);
     coordinate_format[2] = character;
     printf(coordinate_format, draw_pos);
+    fflush(stdout);
     // fprintf(stderr, "Draw %c at x %d y %d | ", character, pos->x, pos->y);
 }
 
@@ -86,6 +89,7 @@ void clear_screen(){
     // byte stream for \e[0;0H\e[2J
     static char cls[] = {0x1b, 0x5b, 0x30, 0x3b, 0x30, 0x48, 0x1b, 0x5b, 0x32, 0x4a, 0};
     printf("%s", cls);
+    fflush(stdout);
 }
 
 void print_to_central_screen(int y, char* str){
@@ -93,6 +97,7 @@ void print_to_central_screen(int y, char* str){
     int x = (NUM_COLS / 2) - (len / 2) - 1;
     draw_coordinate(x, y, ' ');
     printf("%s", str);
+    fflush(stdout);
 }
 
 void print_instruction(){
@@ -114,7 +119,8 @@ void print_border(struct board_struct* board){
     printf("%s", buffer);
     draw_coordinate(0, NUM_ROWS, '-');
     printf("%s", buffer);
-    
+    fflush(stdout);
+
     for (i = 1; i < NUM_ROWS; i++){
         draw_coordinate(0, i, '|');
     }
@@ -127,6 +133,7 @@ void print_border(struct board_struct* board){
 void board_init(struct board_struct *board){
     int fd;
     clock_t clo = times(NULL);
+    struct termios termios;
     INIT_LIST_HEAD(&board->foods);
     INIT_LIST_HEAD(&board->snake);
     fd = open("/var/log/snake.log", O_RDWR | O_CREAT | O_TRUNC, 0644);
