@@ -191,7 +191,7 @@ typedef struct proc {
     sigset_t sig_pending;
     sigset_t sig_mask;
     sigset_t sig_mask2;
-    struct sigaction sig_table[NSIG];
+    struct sigaction sig_table[_NSIG];
 
     /* Alarm */
     struct timer timer;
