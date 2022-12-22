@@ -402,6 +402,7 @@ int _tty_tiocspgrp ( struct tty_state* tty_data, struct proc* who, ptr_t* ptr){
 }
 
 int tty_ioctl(struct filp* file, int request, vptr_t* vptr){
+    int ret = 0;
     struct proc* who = curr_syscall_caller;
     struct tty_state* tty_data;
     ptr_t* ptr = get_physical_addr(vptr, who);
@@ -446,11 +447,19 @@ int tty_ioctl(struct filp* file, int request, vptr_t* vptr){
         tty_data->is_echoing = true;
         break;
 
+    case TCGETS:
+        copy_to_user(who, vptr, (ptr_t*)&tty_data->termios, sizeof(struct termios));
+        break;
+
+    case TCSETS:
+        copy_from_user(who, (ptr_t*)&tty_data->termios, vptr, sizeof(struct termios));
+        break;
+
     default:
         return -EINVAL;
 
     }
-    return 0;
+    return ret;
 }
 
 int tty_dev_init(){
