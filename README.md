@@ -2,9 +2,9 @@
 
 [![C/C++ CI](https://github.com/halfer53/winix/actions/workflows/ccpp.yml/badge.svg)](https://github.com/halfer53/winix/actions/workflows/ccpp.yml) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0) [![CodeFactor](https://www.codefactor.io/repository/github/halfer53/winix/badge/master)](https://www.codefactor.io/repository/github/halfer53/winix/overview/master)
 
-Winix is a minimal, hobbyistic, educational and UNIX-style Operating System for the Waikato RISC Architecture Microprocessor (WRAMP). It is a hybrid kernel with usability and performance in mind. Winix is mainly inspired by Minix1, which is the OS I learnt when I was in university.
+Winix is a minimal, hobbyistic, educational and UNIX-style Operating System for the Waikato RISC Architecture Microprocessor (WRAMP).
 
-Winix includes full-featured kernel with process and memory management, in-memory file system, exception control and user space bourne shell with interactive command line. Yes, you can even play snake on it by typing `snake` in the command line
+Inspired by the Minix1 operating system, Winix includes a full-featured kernel with features such as process and memory management, in-memory file system, exception control, and a user space bourne shell with interactive command line. And, for a bit of fun, you can even play the classic game of snake by simply typing "snake" in the command line.
 
 ## Demo
 
