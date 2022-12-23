@@ -3,9 +3,11 @@
 #include <unistd.h>
 #include <stdio.h>
 
+#define BUFFER_SIZ  512
+
 int main(int argc, char *argv[]){
     int fd, ret;
-    char buf[256]; 
+    char buf[BUFFER_SIZ]; 
     struct stat statbuf;
     char *file = argv[1];
 
@@ -29,7 +31,7 @@ int main(int argc, char *argv[]){
         }
     }
     
-    while((ret = read(fd, buf, 256 * sizeof(char))) > 0){
+    while((ret = read(fd, buf, BUFFER_SIZ * sizeof(char))) > 0){
         write(STDOUT_FILENO, buf, ret);
     }
     if(ret < 0){
