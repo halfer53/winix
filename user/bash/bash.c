@@ -212,7 +212,7 @@ pid_t run_cmd(struct cmdLine *cmd, int i, int *pipe_ptr, int *prev_pipe_ptr, pid
         }
         exit(1);
     }
-    
+
     return pid;
 }
 
@@ -221,7 +221,7 @@ pid_t run_cmd(struct cmdLine *cmd, int i, int *pipe_ptr, int *prev_pipe_ptr, pid
 /**
  * Handles any unknown command.
  **/
-int _exec_cmd(char *line, struct cmdLine *cmd) {
+int _exec_cmd(struct cmdLine *cmd) {
     
     int status;
     pid_t job_pgid = 0;
@@ -231,9 +231,6 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
 
     if(cmd->argc == 0)
         return 1;
-    if(*line == '#')
-        return 0;
-    
 
     for(i = 0; i < cmd->numCommands; i++){
         pipe_ptr = &pipe_fds[(i * 2)];
@@ -272,6 +269,9 @@ int exec_cmd(char *line){
     struct cmdLine cmd;
     char* buffer;
     struct cmd_internal *handler = NULL;
+
+    if(*line == '#')
+        return 0;
 
     (void)parse(line,&cmd);
 
