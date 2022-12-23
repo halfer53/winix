@@ -82,11 +82,12 @@ void test_given_pipe_read_when_proc_was_suspended_should_return(){
 
     ret = sys_write(&pcurr2, pipe_fd[1], "1234", 5);
     assert(ret == 5);
+    assert(*buffer == 0);
+
+    ret = sys_close(curr_scheduling_proc, pipe_fd[1]);
+    ret = sys_close(&pcurr2, pipe_fd[1]);
+    assert(ret == 0);
     assert(strcmp(buffer, "1234") == 0);
-
-    ret = sys_write(&pcurr2, pipe_fd[1], "5678", 5);
-    assert(ret == 5);
-
 }
 
 void test_given_pipe_read_when_data_is_written_should_return_data(){
@@ -150,27 +151,8 @@ void test_given_pipe_read_when_writer_write_fd_closed_should_return_suspend(){
 
     ret = sys_write(&pcurr2, pipe_fd[1], "abc", 4);
     assert(ret == 4);
-    assert(strcmp(buffer, "abc") == 0);
-
-}
-
-void test_given_pipe_read_when_reader_write_fd_closed_should_return_suspend(){
-
-    struct proc pcurr2;
-    int ret;
-    int pipe_fd[2];
-
-    _init_pipe(pipe_fd, &pcurr2);
-    memset(buffer, 0, PAGE_LEN);
-
     ret = sys_close(&pcurr2, pipe_fd[1]);
     assert(ret == 0);
-
-    ret = sys_read(&pcurr2, pipe_fd[0], buffer, 4);
-    assert(ret == SUSPEND);
-
-    ret = sys_write(curr_scheduling_proc, pipe_fd[1], "abc", 4);
-    assert(ret == 4);
     assert(strcmp(buffer, "abc") == 0);
 
 }
