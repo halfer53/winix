@@ -149,6 +149,12 @@ int run_cmd(struct cmdLine *cmd, int i, int *pipe_ptr, int *prev_pipe_ptr, char 
         return 1;
     }
 
+    if (i == 0 && cmd->infile) { //if redirecting input and first command
+        int sin = open(cmd->infile, O_RDONLY);
+        dup2(sin,STDIN_FILENO);
+        close(sin);
+    }
+
     if((i < cmd->numCommands - 1)){ // not the last command, create new pipe
         ret = pipe(pipe_ptr);
         if(ret){
@@ -204,7 +210,6 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
     char buffer[BUFFER_LEN];
     int status, options;
     pid_t pid;
-    int sin = STDIN_FILENO;
 
     if(cmd->argc == 0)
         return 1;
@@ -233,13 +238,6 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
         
         if (history_fd)
             close(history_fd);
-
-        if(cmd->infile){ //if redirecting input
-            // saved_stdin = dup(STDIN_FILENO); //backup stdin
-            sin = open(cmd->infile, O_RDONLY);
-            dup2(sin,STDIN_FILENO);
-            close(sin);
-        }
 
         for(i = 0; i < cmd->numCommands; i++){
             pipe_ptr = &pipe_fds[(i * 2)];
