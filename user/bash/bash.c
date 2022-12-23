@@ -225,7 +225,7 @@ int _exec_cmd(struct cmdLine *cmd) {
     
     int status;
     pid_t job_pgid = 0;
-    int i, ret;
+    int i, ret, j;
     int pipe_fds[10];
     int *pipe_ptr, *prev_pipe_ptr = NULL;
 
@@ -249,15 +249,11 @@ int _exec_cmd(struct cmdLine *cmd) {
         prev_pipe_ptr = pipe_ptr;
     }
 
-    while(1){
+    for(j = 0; j < cmd->numCommands; j++){
         ret = waitpid(-1, &status, WUNTRACED);
-        if(ret == -1 && errno == ECHILD){
-            break;
-        }else{
-            if(WIFSTOPPED(status)){
-                // printf("[%d] Stopped pg %d\n", pid, last_pgid);
-                last_stopped_pgid = job_pgid;
-            }
+        if(WIFSTOPPED(status)){
+            // printf("[%d] Stopped pg %d\n", pid, last_pgid);
+            last_stopped_pgid = job_pgid;
         }
     }
 
