@@ -4,9 +4,6 @@
 #include <unistd.h>
 
 
-
-
-
 FILE *fopen(const char *pathname, const char *mode){
     FILE* f = (FILE*)malloc(sizeof(FILE));
     if(!f)
