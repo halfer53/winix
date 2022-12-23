@@ -296,7 +296,7 @@ int exec_cmd(char *line){
     if(handler->name){
         return handler->handle(cmd.argc, cmd.argv);
     }
-    return _exec_cmd(line, &cmd);
+    return _exec_cmd(&cmd);
 }
 
 
