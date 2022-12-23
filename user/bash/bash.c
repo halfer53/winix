@@ -22,7 +22,6 @@ static char PREFIX[] = "WINIX> ";
 static char buf[MAX_LINE];
 static char prev_cmd[MAX_LINE];
 static pid_t pgid;
-static pid_t last_pgid;
 static pid_t last_stopped_pgid;
 static int history_fd;
 
@@ -113,8 +112,8 @@ int main(int argc, char *argv[]) {
         ret = read(0, buf, MAX_LINE * sizeof(char));
 
         if(ret == EOF){
-            perror("stdin: ");
-            continue;
+            perror("stdout");
+            break;
         }
 
         buf[ret] = '\0';
@@ -140,45 +139,57 @@ int search_path(char* path, int len, char* name){
 #define PIPE_WRITE  (1)
 #define BUFFER_LEN  (30)
 
-pid_t run_cmd(struct cmdLine *cmd, int i, int *pipe_ptr, int *prev_pipe_ptr, char buffer[BUFFER_LEN]){
+pid_t run_cmd(struct cmdLine *cmd, int i, int *pipe_ptr, int *prev_pipe_ptr, pid_t* job_pgid){
     int ret, sout;
     pid_t pid;
     int cmd_start = cmd->cmdStart[i];
+    char buffer[BUFFER_LEN];
 
     if(search_path(buffer, BUFFER_LEN, cmd->argv[cmd_start])){
         fprintf(stderr, "Unknown command '%s'\n", cmd->argv[cmd_start]);
         return 1;
     }
 
-    restore_shell_sysenv();
-    if (history_fd)
-        close(history_fd);
-
-    if (i == 0 && cmd->infile) { //if redirecting input and first command
-        int sin = open(cmd->infile, O_RDONLY);
-        dup2(sin,STDIN_FILENO);
-        close(sin);
-    }
-
-    if((i < cmd->numCommands - 1)){ // not the last command, create new pipe
-        ret = pipe(pipe_ptr);
-        if(ret){
-            perror("pipe");
-            exit(1);
-        }
-    }else if(cmd->outfile){ //if redirecting output and last command
-        int mode = O_WRONLY | O_CREAT;
-        if(cmd->append) //if append
-            mode |= O_APPEND;
-        else //else replace the original document
-            mode |= O_TRUNC;
-        sout = open(cmd->outfile, mode, 0664);
-        dup2(sout,STDOUT_FILENO);
-        close(sout);
-    }
-
     pid = tfork();
+    if (pid == -1){
+        perror("fork");
+        return -1;
+    }
+
     if(pid == 0){ // child, actual command
+
+        // if redirecting input and first command
+        if (i == 0 && cmd->infile) { 
+            int sin = open(cmd->infile, O_RDONLY);
+            dup2(sin,STDIN_FILENO);
+            close(sin);
+        }
+        
+        // if redirecting output and last command
+        if(i == cmd->numCommands - 1 && cmd->outfile){ 
+            int mode = O_WRONLY | O_CREAT;
+            if(cmd->append) //if append
+                mode |= O_APPEND;
+            else //else replace the original document
+                mode |= O_TRUNC;
+            sout = open(cmd->outfile, mode, 0664);
+            dup2(sout,STDOUT_FILENO);
+            close(sout);
+        }
+
+        restore_shell_sysenv();
+        if (history_fd)
+            close(history_fd);
+
+        if (*job_pgid){
+            setpgid(0, *job_pgid);
+        }else{
+            setpgid(0, 0);
+            *job_pgid = getpgid(0);
+            tcsetpgrp(STDIN_FILENO, *job_pgid);
+        }
+
+    
         if(cmd->numCommands > 1){
             if((i+1) < cmd->numCommands ){ // not the last command
                 dup2(pipe_ptr[PIPE_WRITE], STDOUT_FILENO);
@@ -213,52 +224,42 @@ pid_t run_cmd(struct cmdLine *cmd, int i, int *pipe_ptr, int *prev_pipe_ptr, cha
  * Handles any unknown command.
  **/
 int _exec_cmd(char *line, struct cmdLine *cmd) {
-    char buffer[BUFFER_LEN];
-    int status, options;
-    pid_t pid;
+    
+    int status;
+    pid_t job_pgid = 0;
+    int i, ret;
+    int pipe_fds[10];
+    int *pipe_ptr, *prev_pipe_ptr = NULL;
 
     if(cmd->argc == 0)
         return 1;
     if(*line == '#')
         return 0;
-
-    pid = tfork();
     
-    if(pid == -1){
-        perror("fork");
-    }else if(!pid){
-        
-        int i, ret;
-        int exit_code = 0;
-        int pipe_fds[10];
-        int *pipe_ptr, *prev_pipe_ptr = NULL;
 
-        ret = setpgid(0, 0);
-        last_pgid = getpgid(0);
-        ret = tcsetpgrp(STDIN_FILENO, last_pgid);
-
-        for(i = 0; i < cmd->numCommands; i++){
-            pipe_ptr = &pipe_fds[(i * 2)];
-            run_cmd(cmd, i, pipe_ptr, prev_pipe_ptr, buffer);
-            
-            prev_pipe_ptr = pipe_ptr;
-        }
-
-        while(1){
-            ret = wait(&status);
-            if(ret == -1 && errno == ECHILD){
-                break;
-            }else{
-                exit_code = WEXITSTATUS(status);
+    for(i = 0; i < cmd->numCommands; i++){
+        pipe_ptr = &pipe_fds[(i * 2)];
+        if((i < cmd->numCommands - 1)){ // not the last command, create new pipe
+            ret = pipe(pipe_ptr);
+            if(ret){
+                perror("pipe");
+                return -1;
             }
         }
-        exit(exit_code);
-    }else{
-        options =  WUNTRACED;
-        pid = waitpid(pid, &status, options);
-        if(WIFSTOPPED(status)){
-            // printf("[%d] Stopped pg %d\n", pid, last_pgid);
-            last_stopped_pgid = last_pgid;
+        run_cmd(cmd, i, pipe_ptr, prev_pipe_ptr, &job_pgid);
+        
+        prev_pipe_ptr = pipe_ptr;
+    }
+
+    while(1){
+        ret = waitpid(-1, &status, WUNTRACED);
+        if(ret == -1 && errno == ECHILD){
+            break;
+        }else{
+            if(WIFSTOPPED(status)){
+                // printf("[%d] Stopped pg %d\n", pid, last_pgid);
+                last_stopped_pgid = job_pgid;
+            }
         }
     }
 
