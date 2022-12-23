@@ -508,7 +508,7 @@ int alloc_mem_welf(struct proc* who, struct winix_elf* elf, int stack_size, int 
     return 0;
 }
 
-int copy_from_user(struct proc* who, ptr_t *dest, vptr_t *src, size_t len){
+int copy_from_user(struct proc* who, void *dest, vptr_t *src, size_t len){
     ptr_t* p;
     if (!is_vaddr_ok(src, len, who))
         return -EFAULT;
@@ -517,7 +517,7 @@ int copy_from_user(struct proc* who, ptr_t *dest, vptr_t *src, size_t len){
     return len;
 }
 
-int copy_to_user(struct proc* who, vptr_t *dest, ptr_t *src, size_t len){
+int copy_to_user(struct proc* who, vptr_t *dest, void *src, size_t len){
     ptr_t* p;
     if (!is_vaddr_ok(dest, len, who))
         return -EFAULT;
