@@ -391,7 +391,7 @@ int _tty_tiocspgrp ( struct tty_state* tty_data, struct proc* who, ptr_t* ptr){
     if(tty_data->controlling_session != who->session_id){
         return -ENOTTY;
     }
-    if (ret = copy_from_user(who, &pgrp, *(ptr_t **)ptr, sizeof(pid_t)))
+    if ((ret = copy_from_user(who, &pgrp, *(vptr_t **)ptr, sizeof(pid_t))) <= 0)
         return ret;
     foreach_proc(p){
         if(p->procgrp == pgrp && p->session_id == who->session_id){
@@ -417,13 +417,13 @@ int tty_ioctl(struct filp* file, int request, ptr_t* stack_ptr){
     {
 
     case TCGETS:
-        result = copy_to_user(who, (vptr_t *)(*(ptr_t**)stack_ptr), (ptr_t*)&tty_data->termios, sizeof(struct termios));
+        result = copy_to_user(who, (vptr_t *)(*(ptr_t**)stack_ptr), &tty_data->termios, sizeof(struct termios));
         if (result < 0)
             return result;
         break;
 
     case TCSETS:
-        result = copy_from_user(who, (ptr_t*)&tty_data->termios, (vptr_t *)(*(ptr_t**)stack_ptr), sizeof(struct termios));
+        result = copy_from_user(who, &tty_data->termios, (vptr_t *)(*(ptr_t**)stack_ptr), sizeof(struct termios));
         if (result < 0)
             return result;
         break;
