@@ -306,7 +306,9 @@ int __tty_init(RexSp_t* rex, struct device* dev, struct tty_state* state){
 }
 
 int __tty_read(struct tty_state* state, char* data, size_t len){
-    size_t buffer_count, count;
+    size_t buffer_count, count, ret = 0;
+
+    disable_interrupt();
     buffer_count = state->bptr - state->read_ptr;
     count = buffer_count < len ? buffer_count : len;
     
@@ -316,9 +318,11 @@ int __tty_read(struct tty_state* state, char* data, size_t len){
         buffer_count -= count;
         state->read_ptr += count;
         // kdebug("count %d buffer %d, ptr %x %x\n", count, buffer_count, state->bptr, state->read_ptr);
-        return count;
+        ret = count;
     }
-    return 0;
+    enable_interrupt();
+    
+    return ret;
 }
 
 char* get_buffer_data(char* data, size_t count);
