@@ -141,7 +141,8 @@ int search_path(char* path, int len, char* name){
 #define BUFFER_LEN  (30)
 
 pid_t run_cmd(struct cmdLine *cmd, int i, int *pipe_ptr, int *prev_pipe_ptr, char buffer[BUFFER_LEN]){
-    int ret = 0, sout;
+    int ret, sout;
+    pid_t pid;
     int cmd_start = cmd->cmdStart[i];
 
     if(search_path(buffer, BUFFER_LEN, cmd->argv[cmd_start])){
@@ -176,7 +177,8 @@ pid_t run_cmd(struct cmdLine *cmd, int i, int *pipe_ptr, int *prev_pipe_ptr, cha
         close(sout);
     }
 
-    if(tfork() == 0){ // child, actual command
+    pid = tfork();
+    if(pid == 0){ // child, actual command
         if(cmd->numCommands > 1){
             if((i+1) < cmd->numCommands ){ // not the last command
                 dup2(pipe_ptr[PIPE_WRITE], STDOUT_FILENO);
@@ -202,7 +204,7 @@ pid_t run_cmd(struct cmdLine *cmd, int i, int *pipe_ptr, int *prev_pipe_ptr, cha
         close(prev_pipe_ptr[PIPE_READ]);
         close(prev_pipe_ptr[PIPE_WRITE]);
     }
-    return ret;
+    return pid;
 }
 
 
