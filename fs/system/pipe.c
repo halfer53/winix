@@ -242,8 +242,22 @@ int pipe_write ( struct filp *filp, char *data, size_t count, off_t offset){
         return -ENOSPC;
 
     if(count > (PIPE_LIMIT - filp->pipe->pos)){
+        next = get_next_waiting(&ino->pipe_reading_list);
+        if(next!= NULL){
+            // kdebug("pipe: proc %d is awaken for reading\n", next->who->proc_nr);
+            list_del(&next->list);
+            ret2 = _pipe_read(next->who, next->filp, next->data, next->count, next->offset);
+            next->who->flags &= ~STATE_WAITING;
+            syscall_reply2(next->sys_call_num, ret2, next->who->proc_nr, &msg);
+            kfree(next);
+        }
+    }
+
+    if(count > (PIPE_LIMIT - filp->pipe->pos)){
+
         char *p, *p2;
         int len = count;
+
         if(filp->filp_flags & O_NONBLOCK)
             return 0;
         
@@ -270,18 +284,10 @@ int pipe_write ( struct filp *filp, char *data, size_t count, off_t offset){
         // kdebug("pipe: proc %d writing from 0x%x %d bytes is blocked\n",
         //         curr_syscall_caller->pid, data, count);
         // kdebug("\n");
+
         return SUSPEND;
     }
     ret = _pipe_write(curr_syscall_caller, filp, data, count, offset);
-    next = get_next_waiting(&ino->pipe_reading_list);
-    if(next!= NULL){
-        // kdebug("pipe: proc %d is awaken for reading\n", next->who->proc_nr);
-        list_del(&next->list);
-        ret2 = _pipe_read(next->who, next->filp, next->data, next->count, next->offset);
-        next->who->flags &= ~STATE_WAITING;
-        syscall_reply2(next->sys_call_num, ret2, next->who->proc_nr, &msg);
-        kfree(next);
-    }
     return ret;
 }
 
