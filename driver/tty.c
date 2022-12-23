@@ -386,11 +386,13 @@ int _tty_tiocspgrp ( struct tty_state* tty_data, struct proc* who, ptr_t* ptr){
     pid_t pgrp;
     struct proc* p;
     bool found = false;
+    int ret;
 
     if(tty_data->controlling_session != who->session_id){
         return -ENOTTY;
     }
-    pgrp = (pid_t)*get_physical_addr(*(ptr_t **)ptr, who);
+    if (ret = copy_from_user(who, &pgrp, *(ptr_t **)ptr, sizeof(pid_t)))
+        return ret;
     foreach_proc(p){
         if(p->procgrp == pgrp && p->session_id == who->session_id){
             found = true;
