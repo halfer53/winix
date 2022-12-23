@@ -71,10 +71,17 @@ void init_shell(){
     assert(ret == 0);
 }
 
-void init_signal(){
+void init_shell_sysenv(){
 #ifdef __wramp__
     signal(SIGINT, SIG_IGN);
     signal(SIGTSTP, SIG_IGN);
+#endif
+}
+
+void restore_shell_sysenv(){
+#ifdef __wramp__
+    signal(SIGINT, SIG_DFL);
+    signal(SIGTSTP, SIG_DFL);
 #endif
 }
 
@@ -93,7 +100,7 @@ int main(int argc, char *argv[]) {
     }
 
     init_shell();
-    init_signal();
+    init_shell_sysenv();
     history_fd = open(history_file, O_CREAT | O_RDWR | O_APPEND, 0664);
     if(history_fd < 0){
         perror(history_file);
