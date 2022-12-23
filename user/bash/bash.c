@@ -211,10 +211,8 @@ pid_t run_cmd(struct cmdLine *cmd, int i, int *pipe_ptr, int *prev_pipe_ptr, pid
             perror("execv");
         }
         exit(1);
-    }else if( i > 0 ){
-        close(prev_pipe_ptr[PIPE_READ]);
-        close(prev_pipe_ptr[PIPE_WRITE]);
     }
+    
     return pid;
 }
 
@@ -239,7 +237,7 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
 
     for(i = 0; i < cmd->numCommands; i++){
         pipe_ptr = &pipe_fds[(i * 2)];
-        if((i < cmd->numCommands - 1)){ // not the last command, create new pipe
+        if (i < cmd->numCommands - 1){ // not the last command, create new pipe
             ret = pipe(pipe_ptr);
             if(ret){
                 perror("pipe");
@@ -247,7 +245,10 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
             }
         }
         run_cmd(cmd, i, pipe_ptr, prev_pipe_ptr, &job_pgid);
-        
+        if (prev_pipe_ptr){
+            close(prev_pipe_ptr[PIPE_READ]);
+            close(prev_pipe_ptr[PIPE_WRITE]);
+        }
         prev_pipe_ptr = pipe_ptr;
     }
 
