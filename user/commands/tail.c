@@ -15,7 +15,7 @@ void print_last_n_lines(FILE* stream, int n){
     char** lines = (char**)malloc(n * sizeof(char*));
 
     while ((read = getline(&line, &len, stream)) != -1) {
-        int line_len = len * sizeof(char) + 1;
+        int line_len = read + 1;
         if (line_count >= n)
             free(lines[i]);
         
@@ -24,6 +24,10 @@ void print_last_n_lines(FILE* stream, int n){
         i = (i + 1) % n;
         line_count++;
     }
+    
+    if (line)
+        free(line);
+
     if (line_count < n){
         for (j = 0; j < line_count; j++){
             printf("%s", lines[j]);
