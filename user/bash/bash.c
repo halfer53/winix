@@ -140,6 +140,63 @@ int search_path(char* path, int len, char* name){
 #define PIPE_WRITE  (1)
 #define BUFFER_LEN  (30)
 
+int run_cmd(struct cmdLine *cmd, int i, int *pipe_ptr, int *prev_pipe_ptr, char buffer[BUFFER_LEN]){
+    int ret = 0, sout;
+    int cmd_start = cmd->cmdStart[i];
+
+    if(search_path(buffer, BUFFER_LEN, cmd->argv[cmd_start])){
+        fprintf(stderr, "Unknown command '%s'\n", cmd->argv[cmd_start]);
+        return 1;
+    }
+
+    if((i < cmd->numCommands - 1)){ // not the last command, create new pipe
+        ret = pipe(pipe_ptr);
+        if(ret){
+            perror("pipe");
+            exit(1);
+        }
+    }else if(cmd->outfile){ //if redirecting output and last command
+        int mode = O_WRONLY | O_CREAT;
+        if(cmd->append) //if append
+            mode |= O_APPEND;
+        else //else replace the original document
+            mode |= O_TRUNC;
+        sout = open(cmd->outfile, mode, 0664);
+        dup2(sout,STDOUT_FILENO);
+        close(sout);
+    }
+
+    if(tfork() == 0){ // child, actual command
+        if(cmd->numCommands > 1){
+            if((i+1) < cmd->numCommands ){ // not the last command
+                dup2(pipe_ptr[PIPE_WRITE], STDOUT_FILENO);
+                close(pipe_ptr[PIPE_WRITE]);
+                close(pipe_ptr[PIPE_READ]);
+                // printf("cmd %d %s pipe  %d %d\n", i, buffer, pipe_ptr[PIPE_READ], pipe_ptr[PIPE_WRITE]);
+            }
+            // printf("cmd %d %s com %d, res %d\n", i, buffer,  cmd->numCommands, (i+1) < cmd->numCommands);
+
+            if(i > 0){ // not the first command, read previous pipe
+                dup2(prev_pipe_ptr[PIPE_READ], STDIN_FILENO);
+                close(prev_pipe_ptr[PIPE_READ]);
+                close(prev_pipe_ptr[PIPE_WRITE]);
+                // printf("cmd %d %s dup read %d\n", i, buffer, prev_pipe_ptr[PIPE_READ]);
+            }
+        }
+        ret = execv(buffer, &cmd->argv[cmd_start]);
+        if(ret){
+            perror("execv");
+        }
+        exit(1);
+    }else if( i > 0 ){
+        close(prev_pipe_ptr[PIPE_READ]);
+        close(prev_pipe_ptr[PIPE_WRITE]);
+    }
+    return ret;
+}
+
+
+
 /**
  * Handles any unknown command.
  **/
@@ -147,7 +204,7 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
     char buffer[BUFFER_LEN];
     int status, options;
     pid_t pid;
-    int sin = STDIN_FILENO, sout = STDOUT_FILENO;
+    int sin = STDIN_FILENO;
 
     if(cmd->argc == 0)
         return 1;
@@ -160,7 +217,7 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
         perror("fork");
     }else if(!pid){
         
-        int i, ret, cmd_start;
+        int i, ret;
         int exit_code = 0;
         int pipe_fds[10];
         int *pipe_ptr, *prev_pipe_ptr = NULL;
@@ -185,57 +242,9 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
         }
 
         for(i = 0; i < cmd->numCommands; i++){
-            cmd_start = cmd->cmdStart[i];
             pipe_ptr = &pipe_fds[(i * 2)];
-            if(search_path(buffer, BUFFER_LEN, cmd->argv[cmd_start]) == 0){
-                if((i < cmd->numCommands - 1)){ // not the last command, create new pipe
-                    ret = pipe(pipe_ptr);
-                    if(ret){
-                        perror("pipe");
-                        exit(1);
-                    }
-                }else if(cmd->outfile){ //if redirecting output and last command
-                    int mode = O_WRONLY | O_CREAT;
-                    if(cmd->append) //if append
-                        mode |= O_APPEND;
-                    else //else replace the original document
-                        mode |= O_TRUNC;
-                    sout = open(cmd->outfile, mode, 0664);
-                    dup2(sout,STDOUT_FILENO);
-                    close(sout);
-                }
-
-                if(tfork() == 0){ // child, actual command
-                    if(cmd->numCommands > 1){
-                        if((i+1) < cmd->numCommands ){ // not the last command
-                            dup2(pipe_ptr[PIPE_WRITE], STDOUT_FILENO);
-                            close(pipe_ptr[PIPE_WRITE]);
-                            close(pipe_ptr[PIPE_READ]);
-                            // printf("cmd %d %s pipe  %d %d\n", i, buffer, pipe_ptr[PIPE_READ], pipe_ptr[PIPE_WRITE]);
-                        }
-                        // printf("cmd %d %s com %d, res %d\n", i, buffer,  cmd->numCommands, (i+1) < cmd->numCommands);
-
-                        if(i > 0){ // not the first command, read previous pipe
-                            dup2(prev_pipe_ptr[PIPE_READ], STDIN_FILENO);
-                            close(prev_pipe_ptr[PIPE_READ]);
-                            close(prev_pipe_ptr[PIPE_WRITE]);
-                            // printf("cmd %d %s dup read %d\n", i, buffer, prev_pipe_ptr[PIPE_READ]);
-                        }
-                    }
-                    ret = execv(buffer, &cmd->argv[cmd_start]);
-                    if(ret){
-                        perror("execv");
-                    }
-                    exit(1);
-                }else if( i > 0 ){
-                    close(prev_pipe_ptr[PIPE_READ]);
-                    close(prev_pipe_ptr[PIPE_WRITE]);
-                }
-            }else{
-                fprintf(stderr, "Unknown command '%s'\n", cmd->argv[cmd_start]);
-                exit_code = 1;
-                break;
-            }
+            run_cmd(cmd, i, pipe_ptr, prev_pipe_ptr, buffer);
+            
             prev_pipe_ptr = pipe_ptr;
         }
 
