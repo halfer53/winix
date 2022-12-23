@@ -263,10 +263,7 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
         }
     }
 
-#ifdef __wramp__
     tcsetpgrp(STDIN_FILENO, pgid);
-#endif
-    
     return WEXITSTATUS(status);
 }
 
