@@ -140,7 +140,7 @@ int search_path(char* path, int len, char* name){
 #define PIPE_WRITE  (1)
 #define BUFFER_LEN  (30)
 
-int run_cmd(struct cmdLine *cmd, int i, int *pipe_ptr, int *prev_pipe_ptr, char buffer[BUFFER_LEN]){
+pid_t run_cmd(struct cmdLine *cmd, int i, int *pipe_ptr, int *prev_pipe_ptr, char buffer[BUFFER_LEN]){
     int ret = 0, sout;
     int cmd_start = cmd->cmdStart[i];
 
@@ -148,6 +148,10 @@ int run_cmd(struct cmdLine *cmd, int i, int *pipe_ptr, int *prev_pipe_ptr, char 
         fprintf(stderr, "Unknown command '%s'\n", cmd->argv[cmd_start]);
         return 1;
     }
+
+    restore_shell_sysenv();
+    if (history_fd)
+        close(history_fd);
 
     if (i == 0 && cmd->infile) { //if redirecting input and first command
         int sin = open(cmd->infile, O_RDONLY);
@@ -229,15 +233,7 @@ int _exec_cmd(char *line, struct cmdLine *cmd) {
 
         ret = setpgid(0, 0);
         last_pgid = getpgid(0);
-        
-#ifdef __wramp__
-        signal(SIGINT, SIG_DFL);
-        signal(SIGTSTP, SIG_DFL);
         ret = tcsetpgrp(STDIN_FILENO, last_pgid);
-#endif
-        
-        if (history_fd)
-            close(history_fd);
 
         for(i = 0; i < cmd->numCommands; i++){
             pipe_ptr = &pipe_fds[(i * 2)];
