@@ -140,7 +140,7 @@ int search_path(char* path, int len, char* name){
 #define BUFFER_LEN  (30)
 
 pid_t run_cmd(struct cmdLine *cmd, int i, int *pipe_ptr, int *prev_pipe_ptr, pid_t* job_pgid){
-    int ret, sout;
+    int sout;
     pid_t pid;
     int cmd_start = cmd->cmdStart[i];
     char buffer[BUFFER_LEN];
@@ -206,8 +206,8 @@ pid_t run_cmd(struct cmdLine *cmd, int i, int *pipe_ptr, int *prev_pipe_ptr, pid
                 // printf("cmd %d %s dup read %d\n", i, buffer, prev_pipe_ptr[PIPE_READ]);
             }
         }
-        ret = execv(buffer, &cmd->argv[cmd_start]);
-        error("execv");
+        execv(buffer, &cmd->argv[cmd_start]);
+        perror("execv");
         exit(1);
     }
 
