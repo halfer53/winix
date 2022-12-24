@@ -22,6 +22,7 @@ static char PREFIX[] = "WINIX> ";
 static char buf[MAX_LINE];
 static char prev_cmd[MAX_LINE];
 static pid_t pgid;
+static pid_t last_pgid;
 static pid_t last_stopped_pgid;
 static int history_fd;
 
@@ -139,7 +140,7 @@ int search_path(char* path, int len, char* name){
 #define PIPE_WRITE  (1)
 #define BUFFER_LEN  (30)
 
-pid_t run_cmd(struct cmdLine *cmd, int i, int *pipe_ptr, int *prev_pipe_ptr, pid_t* job_pgid){
+pid_t run_cmd(struct cmdLine *cmd, int i, int *pipe_ptr, int *prev_pipe_ptr){
     int sout;
     pid_t pid;
     int cmd_start = cmd->cmdStart[i];
@@ -147,7 +148,7 @@ pid_t run_cmd(struct cmdLine *cmd, int i, int *pipe_ptr, int *prev_pipe_ptr, pid
 
     if(search_path(buffer, BUFFER_LEN, cmd->argv[cmd_start])){
         fprintf(stderr, "Unknown command '%s'\n", cmd->argv[cmd_start]);
-        return 1;
+        return -1;
     }
 
     pid = tfork();
@@ -181,12 +182,12 @@ pid_t run_cmd(struct cmdLine *cmd, int i, int *pipe_ptr, int *prev_pipe_ptr, pid
         if (history_fd)
             close(history_fd);
 
-        if (*job_pgid){
-            setpgid(0, *job_pgid);
+        if (last_pgid){
+            setpgid(0, last_pgid);
         }else{
             setpgid(0, 0);
-            *job_pgid = getpgid(0);
-            tcsetpgrp(STDIN_FILENO, *job_pgid);
+            last_pgid = getpgid(0);
+            tcsetpgrp(STDIN_FILENO, last_pgid);
         }
 
     
@@ -220,15 +221,16 @@ pid_t run_cmd(struct cmdLine *cmd, int i, int *pipe_ptr, int *prev_pipe_ptr, pid
  * Handles any unknown command.
  **/
 int _exec_cmd(struct cmdLine *cmd) {
-    
     int status;
-    pid_t job_pgid = 0;
-    int i, ret, j;
+    int i, ret;
     int pipe_fds[10];
     int *pipe_ptr, *prev_pipe_ptr = NULL;
+    pid_t jobid;
 
     if(cmd->argc == 0)
         return 1;
+
+    last_pgid = 0;
 
     for(i = 0; i < cmd->numCommands; i++){
         pipe_ptr = &pipe_fds[(i * 2)];
@@ -239,7 +241,9 @@ int _exec_cmd(struct cmdLine *cmd) {
                 return -1;
             }
         }
-        run_cmd(cmd, i, pipe_ptr, prev_pipe_ptr, &job_pgid);
+        jobid = run_cmd(cmd, i, pipe_ptr, prev_pipe_ptr);
+        cmd->job_pid[i] = jobid;
+        
         if (prev_pipe_ptr){
             close(prev_pipe_ptr[PIPE_READ]);
             close(prev_pipe_ptr[PIPE_WRITE]);
@@ -247,11 +251,13 @@ int _exec_cmd(struct cmdLine *cmd) {
         prev_pipe_ptr = pipe_ptr;
     }
 
-    for(j = 0; j < cmd->numCommands; j++){
-        ret = waitpid(-1, &status, WUNTRACED);
+    for(i = 0; i < cmd->numCommands; i++){
+        if (cmd->job_pid[i] == -1)
+            continue;
+        ret = waitpid(cmd->job_pid[i], &status, WUNTRACED);
         if(WIFSTOPPED(status)){
-            // printf("[%d] Stopped pg %d\n", pid, last_pgid);
-            last_stopped_pgid = job_pgid;
+            // printf("Stopped pg %d\n", last_pgid);
+            last_stopped_pgid = last_pgid;
         }
     }
 
