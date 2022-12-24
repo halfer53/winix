@@ -2,6 +2,7 @@
 #define _PARSE_H_ 1
 
 #include <ctype.h>
+#include <sys/types.h>
 
 #define MAX_LINE        100  /* longest accepted command line */
 #define BUF_LEN         32
