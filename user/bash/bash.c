@@ -207,9 +207,7 @@ pid_t run_cmd(struct cmdLine *cmd, int i, int *pipe_ptr, int *prev_pipe_ptr, pid
             }
         }
         ret = execv(buffer, &cmd->argv[cmd_start]);
-        if(ret){
-            perror("execv");
-        }
+        error("execv");
         exit(1);
     }
 
