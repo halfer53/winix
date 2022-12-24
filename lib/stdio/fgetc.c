@@ -14,7 +14,7 @@ int fgetc(FILE* stream){
     }
 
     buf_end = stream->_buf + stream->_count;
-    if(!(stream->_ptr) || stream->_ptr >= buf_end){
+    if(!stream->_ptr || stream->_ptr >= buf_end){
 
         ret = read(stream->_fd, stream->_buf, stream->_bufsiz);
         if(ret <= 0){
