@@ -26,7 +26,6 @@
 #define CTRL_F  (6)
 #define CTRL_P  (16)
 #define CTRL_N  (14)
-#define CTRL_C  (3)
 #define CTRL_Z  (26)
 #define BEEP    (7)
 #define BACKSPACE   (8)
@@ -175,6 +174,7 @@ void tty_exception_handler( struct tty_state* state){
     int val, stat, is_new_line;
     struct message* msg = get_exception_m();
     RexSp_t *rex = state->rex;
+    cc_t *cc = state->termios.c_cc;
     
     stat = rex->Stat;
     
@@ -184,11 +184,11 @@ void tty_exception_handler( struct tty_state* state){
             val = '\n';
         is_new_line = val == '\n';
         
-        if(val == CTRL_C || val == CTRL_Z){ // Control C or Z
+        if(val == cc[VINTR]|| val == cc[VSUSP]){ // Control C or Z
             int signal;
-            if(val == CTRL_C)
+            if(val == cc[VINTR])
                 signal = SIGINT;
-            else if(val == CTRL_Z)
+            else if(val == cc[VSUSP])
                 signal =SIGTSTP;
             
             if(state->foreground_group > 0){
