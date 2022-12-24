@@ -55,6 +55,7 @@ struct cmdLine
 
     int numCommands;
     int cmdStart[MAX_COMMANDS];
+    pid_t job_pid[MAX_COMMANDS];
     int argc;
     char *argv[MAX_ARGS+1];    /* +1 to hold the NULLs */
     char *infile, *outfile;
