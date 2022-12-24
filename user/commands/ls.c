@@ -157,7 +157,6 @@ static char permission_char[] = "-xwr";
 void print_long_format(char *pathname, int flag){
     struct stat statbuf;
     struct time_struct time;
-    char *unit_s;
     char *p = buffer;
     int i, j, k;
     int ret;
@@ -187,15 +186,13 @@ void print_long_format(char *pathname, int flag){
     if(flag & HUMAN_FORMAT){
         off_t rem = size % 1024;
         rem = rem >= 1000 ? 999 : rem;
-        printf("%3d.%.3d ", size / 1024, rem);
-        unit_s = "KB";
+        printf("%3d.%.3d %s", size / 1024, rem, "KB");
     }else{
         printf("%5d ", size);
-        unit_s = "";
     }
     
     parse_unix_time(statbuf.st_atime, &time);
-    printf("%s %02d/%02d/%04d %02d:%02d:%02d %s\n", unit_s, time.date, time.month, time.currYear,
+    printf("%02d/%02d/%04d %02d:%02d:%02d %s\n", time.date, time.month, time.currYear,
          time.hours, time.minutes, time.seconds, pathname);
 }
 
