@@ -214,11 +214,6 @@ void tty_exception_handler( struct tty_state* state){
                 (void)sys_kill(SYSTEM_TASK, -(state->foreground_group), SIGKILL);
                 goto end;
             }
-            else if(val == CTRL_L){
-                clear_screen(rex);
-                state->read_ptr = state->bptr = state->buffer;
-                val = '\n';
-            }
         }
         
         
