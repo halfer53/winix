@@ -100,6 +100,9 @@ test: $(UNIT_TEST)
 
 wsh: user/bash/*.c lib/ansi/strl.c
 	$(Q)gcc -DFSUTIL $(COMMON_CFLAGS) $(GCC_FLAG) $^ -o wsh
+
+snake: user/commands/snake.c lib/ansi/strl.c
+	$(Q)gcc $(COMMON_CFLAGS) $(GCC_FLAG) $^ -o snake
 	
 clean:
 	$(Q)rm -f $(depcache)
