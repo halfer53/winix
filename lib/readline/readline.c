@@ -14,12 +14,10 @@ struct termios _rl_termios;
 struct termios* rl_termios = &_rl_termios;
 
 void init_readline(){
-    cc_t *cc;
     tcgetattr(STDIN_FILENO, rl_termios);
     rl_termios->c_lflag &= ~(ICANON | ECHO);
-    cc = rl_termios->c_cc;
-    cc[VMIN] = 1;
-    cc[VTIME] = 0;
+    rl_termios->c_cc[VMIN] = 1;
+    rl_termios->c_cc[VTIME] = 0;
     tcsetattr(STDIN_FILENO, TCSANOW, rl_termios);
     rl_initied = true;
 }
@@ -38,33 +36,35 @@ int rl_getline(){
     rl_point = 0;
     rl_end = 0;
     rl_done = 0;
-    rl_line_buffer = calloc(sizeof(char), BUFFER_SIZ);
+    rl_line_buffer = malloc(sizeof(char) * BUFFER_SIZ);
     while(1){
         c = rl_readchar();
         if (c == '\r')
             c = '\n';
-        if(c == '\n'){
-            rl_line_buffer[rl_end] = '\0';
-            rl_done = 1;
-            return 0;
-        }
-        else if (c == rl_termios->c_cc[VERASE]){ // Backspace or Delete
+        
+        if (c == rl_termios->c_cc[VERASE]){ // Backspace or Delete
             if(rl_point > 0){
+                char erase = 9;
                 rl_point--;
                 rl_end--;
-                printf("%c", 8);
-                fflush(stdout);
+                fwrite(&erase, 1, sizeof(char), rl_outstream);
+                fflush(rl_outstream);
             }
             continue;
         }
         else if (c == EOF || c == rl_termios->c_cc[VEOF]) { // Control D
-            return EOF;
+            break;
         }
         
         if (rl_end >= BUFFER_SIZ)
-            return -1;
+            break;
+        
         rl_point++;
         rl_line_buffer[rl_end++] = c;
+        fwrite(&c, 1, sizeof(char), rl_outstream);
+        rl_line_buffer[rl_end] = '\0';
+        if (c == '\n')
+            break;
     }
     rl_line_buffer[rl_end] = '\0';
     return 0;
@@ -78,6 +78,9 @@ char *readline(char *prompt){
     rl_prompt = prompt;
     fwrite(rl_prompt, 1, strlen(rl_prompt), stdout);
     fflush(stdout);
+
+    if (rl_initied)
+        tcsetattr(STDIN_FILENO, TCSANOW, rl_termios);
     
     ret = rl_getline();
     if (ret)
