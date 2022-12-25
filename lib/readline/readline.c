@@ -10,14 +10,17 @@
 #define BUFFER_SIZ  (128)
 
 static bool rl_initied = false;
-struct termios rl_termios;
+struct termios _rl_termios;
+struct termios* rl_termios = &_rl_termios;
 
 void init_readline(){
-    tcgetattr(STDIN_FILENO, &rl_termios);
-    rl_termios.c_lflag &= ~(ICANON | ECHO);
-    rl_termios.c_cc[VMIN] = 1;
-    rl_termios.c_cc[VTIME] = 0;
-    tcsetattr(STDIN_FILENO, TCSANOW, &rl_termios);
+    cc_t *cc;
+    tcgetattr(STDIN_FILENO, rl_termios);
+    rl_termios->c_lflag &= ~(ICANON | ECHO);
+    cc = rl_termios->c_cc;
+    cc[VMIN] = 1;
+    cc[VTIME] = 0;
+    tcsetattr(STDIN_FILENO, TCSANOW, rl_termios);
     rl_initied = true;
 }
 
@@ -30,7 +33,7 @@ int rl_readchar(){
 }
 
 int rl_getline(){
-    int c;
+    int c = 0;
 
     rl_point = 0;
     rl_end = 0;
@@ -45,16 +48,16 @@ int rl_getline(){
             rl_done = 1;
             return 0;
         }
-        else if (c == rl_termios.c_cc[VERASE]){ // Backspace or Delete
+        else if (c == rl_termios->c_cc[VERASE]){ // Backspace or Delete
             if(rl_point > 0){
                 rl_point--;
                 rl_end--;
-                fwrite("\b", 1, sizeof(char), stdout);
+                printf("%c", 8);
                 fflush(stdout);
             }
             continue;
         }
-        else if (c == EOF || c == rl_termios.c_cc[VEOF]) { // Control D
+        else if (c == EOF || c == rl_termios->c_cc[VEOF]) { // Control D
             return EOF;
         }
         
