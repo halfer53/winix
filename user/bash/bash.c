@@ -18,13 +18,12 @@ int exec_cmd(char *line);
 static char history_file[] = ".bash_history";
 static char PREFIX[] = "WINIX> ";
 
-// Input buffer & tokeniser
-static char buf[MAX_LINE];
-static char prev_cmd[MAX_LINE];
 static pid_t pgid;
 static pid_t last_pgid;
 static pid_t last_stopped_pgid;
 static int history_fd;
+struct termios termios;
+bool termios_inited = false;
 
 // Prototypes
 CMD_PROTOTYPE(slab);
@@ -69,6 +68,8 @@ void init_shell(){
     init_pgid();
     ret = tcsetpgrp(STDIN_FILENO, pgid);
     assert(ret == 0);
+    tcgetattr(STDIN_FILENO, &termios);
+    termios_inited = true;
 }
 
 void init_shell_sysenv(){
@@ -86,11 +87,11 @@ void restore_shell_sysenv(){
 }
 
 int main(int argc, char *argv[]) {
-    int ret;
     init_pgid();
 
     if(argc > 2 && strcmp(argv[1], "-c") == 0){
         int i;
+        char buf[MAX_LINE];
         buf[0] = '\0';
         for(i = 2; i < argc; i++){
             strlcat(buf, argv[i], MAX_LINE);
@@ -108,25 +109,25 @@ int main(int argc, char *argv[]) {
     }
 
     while(1) {
-        int line_pos;
-        ret = write(STDOUT_FILENO, PREFIX, strlen(PREFIX));
-        ret = read(0, buf, MAX_LINE * sizeof(char));
+        int linelen;
+        char *line = readline(PREFIX);
 
-        if(ret == EOF){
-            perror("stdout");
+        if (line == NULL)
             break;
-        }
+        linelen = strlen(line);
+        if (linelen == 0)
+            continue;
 
-        buf[ret] = '\0';
-        strlcpy(prev_cmd, buf, MAX_LINE);
+        if (line[linelen - 1] == '\n')
+            line[linelen - 1] = '\0';
 
-        // delete new line
-        line_pos = ret - 1;
-        buf[line_pos] = '\0';
-        exec_cmd(buf);
+        exec_cmd(line);
 
-        write(history_fd, prev_cmd, ret);
+        write(history_fd, line, linelen);
+        free(line);
     }
+    if (termios_inited)
+        tcsetattr(STDIN_FILENO, TCSANOW, &termios);
     return 0;
 }
 
@@ -179,6 +180,8 @@ pid_t run_cmd(struct cmdLine *cmd, int i, int *pipe_ptr, int *prev_pipe_ptr){
         }
 
         restore_shell_sysenv();
+        if (termios_inited)
+            tcsetattr(STDIN_FILENO, TCSANOW, &termios);
         if (history_fd)
             close(history_fd);
 
