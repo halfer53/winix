@@ -220,35 +220,36 @@ void tty_exception_handler( struct tty_state* state){
             else if(val == cc[VEOF]){
                 send_response = true;
             }
-        }
-        
-        
-        if(val == CTRL_P || val == CTRL_N){ // control p or n, to navigate through history
-            struct tty_command* t1;
-            bool found = false;
-            
-            if(state->prev_history_cmd){
-                t1 = (val == CTRL_P) ? list_next_entry(struct tty_command, state->prev_history_cmd, list) : 
-                                    list_prev_entry(struct tty_command, state->prev_history_cmd, list);
-                found = true;
-            }else if(val == CTRL_P){
-                t1 = list_first_entry(&state->commands, struct tty_command, list);
-                found = true;
-            }
-            
-            if(found){
-                clear_terminal_buffer(state, true);
-                if(&t1->list == (&state->commands)){
-                    state->prev_history_cmd = NULL;
-                }else{
-                    state->prev_history_cmd = t1;
-                    strlcpy(state->bptr, t1->command, TTY_BUFFER_SIZ);
-                    state->bptr += t1->len;
-                    __kputs(rex, t1->command);
+            else if(val == CTRL_P || val == CTRL_N){ // control p or n, to navigate through history
+                struct tty_command* t1;
+                bool found = false;
+                
+                if(state->prev_history_cmd){
+                    t1 = (val == CTRL_P) ? list_next_entry(struct tty_command, state->prev_history_cmd, list) : 
+                                        list_prev_entry(struct tty_command, state->prev_history_cmd, list);
+                    found = true;
+                }else if(val == CTRL_P){
+                    t1 = list_first_entry(&state->commands, struct tty_command, list);
+                    found = true;
                 }
                 
+                if(found){
+                    clear_terminal_buffer(state, true);
+                    if(&t1->list == (&state->commands)){
+                        state->prev_history_cmd = NULL;
+                    }else{
+                        state->prev_history_cmd = t1;
+                        strlcpy(state->bptr, t1->command, TTY_BUFFER_SIZ);
+                        state->bptr += t1->len;
+                        __kputs(rex, t1->command);
+                    }
+                    
+                }
             }
         }
+        
+        
+        
 
         if(state->bptr < state->buffer_end){
             if(is_new_line){
