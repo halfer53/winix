@@ -63,8 +63,8 @@ void init_termios(int fd){
     assert(ret == 0);
     
     termios.c_lflag = ISIG | ICANON | ECHO | ECHOE | ECHOK;
-    termios.c_iflag = ICRNL | IMAXBEL | IUTF8;
-    termios.c_oflag = ONLCR | OPOST;
+    termios.c_iflag = ICRNL | IMAXBEL;
+    termios.c_oflag = 0;
     termios.c_cflag = CREAD;
     termios.c_cc[VINTR]    =   03;  /* ^C */
     termios.c_cc[VQUIT]    =  034;  /* ^\ */
