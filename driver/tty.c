@@ -209,7 +209,7 @@ void tty_exception_handler( struct tty_state* state){
                 terminal_backspace(state, termios->c_lflag & ECHOE);
                 goto end;
             }
-            else if(val == cc[VKILL]){
+            else if(termios->c_lflag & ECHOK && val == cc[VKILL]){
                 clear_terminal_buffer(state, termios->c_lflag & ECHOE);
                 goto end;
             }
@@ -245,11 +245,6 @@ void tty_exception_handler( struct tty_state* state){
                 
             }
         }
-
-        // reset ring buffer if buffer end is reached
-        // if(state->bptr >= state->buffer_end && state->read_ptr == state->bptr){
-        //     state->read_ptr = state->bptr = state->buffer;
-        // }
 
         if(state->bptr < state->buffer_end){
             if(is_new_line){
