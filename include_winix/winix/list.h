@@ -3,7 +3,7 @@
 #define _LINUX_LIST_H_
 
 #include <stddef.h>
-#include <winix/type.h>
+#include "type.h"
 
 #ifndef container_of
 /**
