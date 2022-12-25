@@ -17,6 +17,7 @@ tests/utest_runner.c
 /fsutil
 /unittest
 /wsh
+/snake
 
 fs/Debug/
 a.out
