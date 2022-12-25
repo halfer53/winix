@@ -252,18 +252,18 @@ void tty_exception_handler( struct tty_state* state){
         
 
         if(state->bptr < state->buffer_end){
-            if(is_new_line){
-                *state->bptr = '\0';
-                save_command_history(state);
-                state->prev_history_cmd = NULL;
-            }
-
-            if(isprint(val) || is_new_line){
+            if ( !(termios->c_lflag & ICANON) || (isprint(val) || is_new_line) ){
                 *state->bptr++ = val;
                 if(termios->c_lflag & ECHO){
                     __kputc(rex, val);
                     // kdebug("received %d\n", val);
                 }
+            }
+                
+            if(is_new_line){
+                *state->bptr = '\0';
+                save_command_history(state);
+                state->prev_history_cmd = NULL;
             }
 
             if (can_return_in_non_canonical(state)) {
@@ -343,6 +343,9 @@ int tty_write_rex(RexSp_t* rex, char* data, size_t len){
     char *p = data;
     
     while(len-- > 0){
+        if (*p == 8 ){
+            kdebug("printing backspace\n");
+        }
         if(IS_SERIAL_CODE(*p)){
             while(!(rex->Stat & 2));
             rex->Tx = *p;
