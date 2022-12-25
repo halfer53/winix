@@ -181,7 +181,7 @@ void tty_exception_handler( struct tty_state* state){
     
     if(stat & 1){
         val = rex->Rx;
-        if (val == '\r')
+        if (state->termios.c_iflag & ICRNL && val == '\r')
             val = '\n';
         is_new_line = val == '\n';
         
