@@ -8,6 +8,7 @@
 #include <time.h>
 #include <termios.h>
 #include <signal.h>
+#include <sys/times.h>
 #include "../../include_winix/winix/list.h"
 
 #define NUM_COLS                (50)
