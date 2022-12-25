@@ -141,6 +141,7 @@ void init_tty(){
     tcgetattr(STDIN_FILENO, &prev_termios);
     termios = prev_termios;
     termios.c_lflag &= (~ICANON & ~ECHO);
+    termios.c_cc[VMIN] = 0;
     tcsetattr(STDIN_FILENO, TCSANOW, &termios);
 
     tty_inited = true;
@@ -160,10 +161,6 @@ void board_init(struct board_struct *board){
     INIT_LIST_HEAD(&board->snake);
     fd = open("/var/log/snake.log", O_RDWR | O_CREAT | O_TRUNC, 0644);
     dup2(fd, STDERR_FILENO);
-    close(fd);
-
-    fd = open("/dev/tty1", O_RDWR | O_NONBLOCK);
-    dup2(fd, STDIN_FILENO);
     close(fd);
 
     init_tty();
@@ -378,7 +375,7 @@ int main(int argc, char** argv){
             nanosleep(&ts, NULL);
             ret = read(STDIN_FILENO, input, INPUT_SIZ * sizeof(char));
             if (ret == 0){
-                if((refresh(bp))){
+                if (refresh(bp)){
                     is_snake_alive = false;
                     break;
                 }
