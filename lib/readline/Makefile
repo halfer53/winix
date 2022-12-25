@@ -1,1 +1,1 @@
-obj-y += vars.o
+obj-y += vars.o readline.o
