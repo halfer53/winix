@@ -184,20 +184,21 @@ void tty_exception_handler( struct tty_state* state){
             val = '\n';
         is_new_line = val == '\n';
         
-        if(val == cc[VINTR]|| val == cc[VSUSP]){ // Control C or Z
-            int signal;
+        if (state->termios.c_lflag & ISIG){
+            int signal = 0;
             if(val == cc[VINTR])
                 signal = SIGINT;
             else if(val == cc[VSUSP])
                 signal =SIGTSTP;
             
-            if(state->foreground_group > 0){
+            if(signal && state->foreground_group > 0){
                 // kdebug("Send sig to foreground %d\n", state->foreground_group);
                 (void)sys_kill(SYSTEM_TASK, -(state->foreground_group), signal);
             }
             goto end;
         }
-        else if (val == cc[VERASE]) { // backspace
+        
+        if (val == cc[VERASE]) { // backspace
             terminal_backspace(state);
             goto end;
         }
