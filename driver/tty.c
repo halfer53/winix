@@ -135,20 +135,20 @@ void save_command_history(struct tty_state* state){
     return;
 }
 
-void terminal_backspace(struct tty_state* state){
+void terminal_backspace(struct tty_state* state, bool echo_erase){
     if(state->bptr > state->buffer){
         if(state->bptr == state->read_ptr){
             state->read_ptr--;
         }
         state->bptr--;
-        if (state->termios.c_lflag & ECHOE)
+        if (echo_erase)
             __kputc(state->rex, BACKSPACE);
     }
 }
 
-void clear_terminal_buffer(struct tty_state *state){
+void clear_terminal_buffer(struct tty_state *state, bool echo_erase){
     while(state->bptr > state->buffer){
-        terminal_backspace(state);
+        terminal_backspace(state, echo_erase);
     }
 }
 
@@ -175,17 +175,18 @@ void tty_exception_handler( struct tty_state* state){
     int val, stat, is_new_line;
     struct message* msg = get_exception_m();
     RexSp_t *rex = state->rex;
-    cc_t *cc = state->termios.c_cc;
+    struct termios *termios = &state->termios;
+    cc_t *cc = termios->c_cc;
     
     stat = rex->Stat;
     
     if(stat & 1){
         val = rex->Rx;
-        if (state->termios.c_iflag & ICRNL && val == '\r')
+        if (termios->c_iflag & ICRNL && val == '\r')
             val = '\n';
         is_new_line = val == '\n';
         
-        if (state->termios.c_lflag & ISIG){
+        if (termios->c_lflag & ISIG){
             int signal = 0;
             if (val == cc[VINTR])
                 signal = SIGINT;
@@ -201,13 +202,13 @@ void tty_exception_handler( struct tty_state* state){
             }
         }
 
-        if (state->termios.c_lflag & ICANON) {
+        if (termios->c_lflag & ICANON) {
             if (val == cc[VERASE]) {
-                terminal_backspace(state);
+                terminal_backspace(state, termios->c_lflag & ECHOE);
                 goto end;
             }
             else if(val == cc[VKILL]){
-                clear_terminal_buffer(state);
+                clear_terminal_buffer(state, termios->c_lflag & ECHOE);
                 goto end;
             }
             else if(val == CTRL_D){
@@ -258,7 +259,7 @@ void tty_exception_handler( struct tty_state* state){
 
             if(isprint(val) || is_new_line){
                 *state->bptr++ = val;
-                if(state->termios.c_lflag & ECHO){
+                if(termios->c_lflag & ECHO){
                     __kputc(rex, val);
                     // kdebug("received %d\n", val);
                 }
