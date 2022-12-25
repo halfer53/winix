@@ -114,16 +114,16 @@ int main(int argc, char *argv[]) {
 
         if (line == NULL)
             break;
+        
         linelen = strlen(line);
         if (linelen == 0)
             continue;
-
+        
+        write(history_fd, line, linelen);
         if (line[linelen - 1] == '\n')
             line[linelen - 1] = '\0';
 
         exec_cmd(line);
-
-        write(history_fd, line, linelen);
         free(line);
     }
     if (termios_inited)
