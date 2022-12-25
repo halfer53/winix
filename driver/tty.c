@@ -141,7 +141,8 @@ void terminal_backspace(struct tty_state* state){
             state->read_ptr--;
         }
         state->bptr--;
-        __kputc(state->rex, BACKSPACE);
+        if (state->termios.c_lflag & ECHOE)
+            __kputc(state->rex, BACKSPACE);
     }
 }
 
@@ -198,27 +199,30 @@ void tty_exception_handler( struct tty_state* state){
                 (void)sys_kill(SYSTEM_TASK, -(state->foreground_group), signal);
                 goto end;
             }
-            
+        }
+
+        if (state->termios.c_lflag & ICANON) {
+            if (val == cc[VERASE]) {
+                terminal_backspace(state);
+                goto end;
+            }
+            else if(val == cc[VKILL]){
+                clear_terminal_buffer(state);
+                goto end;
+            }
+            else if(val == CTRL_D){
+                (void)sys_kill(SYSTEM_TASK, -(state->foreground_group), SIGKILL);
+                goto end;
+            }
+            else if(val == CTRL_L){
+                clear_screen(rex);
+                state->read_ptr = state->bptr = state->buffer;
+                val = '\n';
+            }
         }
         
-        if (val == cc[VERASE]) { // backspace
-            terminal_backspace(state);
-            goto end;
-        }
-        else if(val == CTRL_U){
-            clear_terminal_buffer(state);
-            goto end;
-        }
-        else if(val == CTRL_D){
-            (void)sys_kill(SYSTEM_TASK, -(state->foreground_group), SIGKILL);
-            goto end;
-        }
-        else if(val == CTRL_L){
-            clear_screen(rex);
-            state->read_ptr = state->bptr = state->buffer;
-            val = '\n';
-        }
-        else if(val == CTRL_P || val == CTRL_N){ // control p or n, to navigate through history
+        
+        if(val == CTRL_P || val == CTRL_N){ // control p or n, to navigate through history
             struct tty_command* t1;
             bool found = false;
             
