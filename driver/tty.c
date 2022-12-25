@@ -197,7 +197,7 @@ void tty_exception_handler( struct tty_state* state){
             }
             goto end;
         }
-        else if (val == BACKSPACE) { // backspace
+        else if (val == cc[VERASE]) { // backspace
             terminal_backspace(state);
             goto end;
         }
