@@ -44,7 +44,7 @@ int rl_getline(){
         
         if (c == rl_termios->c_cc[VERASE]){ // Backspace or Delete
             if(rl_point > 0){
-                char erase = 9;
+                char erase = 8;
                 rl_point--;
                 rl_end--;
                 fwrite(&erase, 1, sizeof(char), rl_outstream);
@@ -62,7 +62,7 @@ int rl_getline(){
         rl_point++;
         rl_line_buffer[rl_end++] = c;
         fwrite(&c, 1, sizeof(char), rl_outstream);
-        rl_line_buffer[rl_end] = '\0';
+
         if (c == '\n')
             break;
     }
