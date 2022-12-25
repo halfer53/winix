@@ -4,6 +4,8 @@
 #include <unistd.h>
 #include <stdbool.h>
 #include <termios.h>
+#include <stdlib.h>
+#include <string.h>
 
 #define BUFFER_SIZ  (128)
 
@@ -33,7 +35,7 @@ int rl_getline(){
     rl_point = 0;
     rl_end = 0;
     rl_done = 0;
-    rl_line_buffer = malloc(BUFFER_SIZ);
+    rl_line_buffer = calloc(sizeof(char), BUFFER_SIZ);
     while(1){
         c = rl_readchar();
         if (c == '\r')
