@@ -35,6 +35,7 @@ int rl_getline(){
     rl_point = 0;
     rl_end = 0;
     rl_done = 0;
+    rl_eof_found = 0;
     rl_line_buffer = malloc(sizeof(char) * BUFFER_SIZ);
     while(1){
         c = rl_readchar();
@@ -52,6 +53,7 @@ int rl_getline(){
             continue;
         }
         else if (c == EOF || c == rl_termios->c_cc[VEOF]) { // Control D
+            rl_eof_found = 1;
             break;
         }
         
