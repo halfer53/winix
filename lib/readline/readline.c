@@ -18,7 +18,6 @@ void init_readline(){
     rl_termios->c_lflag &= ~(ICANON | ECHO);
     rl_termios->c_cc[VMIN] = 1;
     rl_termios->c_cc[VTIME] = 0;
-    tcsetattr(STDIN_FILENO, TCSANOW, rl_termios);
     rl_initied = true;
 }
 
