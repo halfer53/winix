@@ -186,10 +186,12 @@ void tty_exception_handler( struct tty_state* state){
         
         if (state->termios.c_lflag & ISIG){
             int signal = 0;
-            if(val == cc[VINTR])
+            if (val == cc[VINTR])
                 signal = SIGINT;
-            else if(val == cc[VSUSP])
-                signal =SIGTSTP;
+            else if (val == cc[VSUSP])
+                signal = SIGTSTP;
+            else if (val == cc[VQUIT])
+                signal = SIGQUIT;
             
             if(signal && state->foreground_group > 0){
                 // kdebug("Send sig to foreground %d\n", state->foreground_group);
