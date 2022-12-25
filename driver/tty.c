@@ -171,6 +171,10 @@ void clear_reader(struct tty_state* state){
     state->reader_filp = NULL;
 }
 
+bool can_return_in_non_canonical(struct tty_state* state){
+    return !(state->termios.c_lflag & ICANON) && ((state->bptr - state->read_ptr) >= state->termios.c_cc[VMIN]);
+}
+
 void tty_exception_handler( struct tty_state* state){
     int val, stat;
     bool is_new_line, send_response;
@@ -259,6 +263,10 @@ void tty_exception_handler( struct tty_state* state){
                     __kputc(rex, val);
                     // kdebug("received %d\n", val);
                 }
+            }
+
+            if (can_return_in_non_canonical(state)) {
+                send_response = true;
             }
         }
         else if(termios->c_iflag & IMAXBEL){
@@ -352,15 +360,17 @@ int tty_read ( struct filp *filp, char *data, size_t count, off_t offset){
         return DONTREPLY;
     }
 
-    if(state->reader){
+    if (state->reader){
         if(IS_INUSE(state->reader)){
             return -EBUSY;
         }
         clear_reader(state);
     }
-    if(filp->filp_flags & O_NONBLOCK){
+
+    if (filp->filp_flags & O_NONBLOCK || can_return_in_non_canonical(state)){
         return __tty_read(state, data, count);
     }
+
     state->read_data = data;
     state->read_count = count;
     state->reader = curr_syscall_caller;
