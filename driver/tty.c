@@ -196,8 +196,9 @@ void tty_exception_handler( struct tty_state* state){
             if(signal && state->foreground_group > 0){
                 // kdebug("Send sig to foreground %d\n", state->foreground_group);
                 (void)sys_kill(SYSTEM_TASK, -(state->foreground_group), signal);
+                goto end;
             }
-            goto end;
+            
         }
         
         if (val == cc[VERASE]) { // backspace
