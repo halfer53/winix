@@ -184,7 +184,7 @@ int sys_fork(struct proc *parent) {
 
         child->parent = parent->proc_nr;
         child->thread_parent = 0;
-
+        parent->priority = parent->priority == MIN_PRIORITY ? MIN_PRIORITY : parent->priority - 1;
         return child->proc_nr;
     }
     return -EAGAIN;
@@ -246,6 +246,7 @@ int do_tfork(struct proc* parent, struct message* m){
             return ret;
 
         syscall_reply2(TFORK, 0, child->proc_nr, m);
+        parent->priority = parent->priority == MIN_PRIORITY ? MIN_PRIORITY : parent->priority - 1;
         return child->proc_nr;
     }
     return -EAGAIN;
