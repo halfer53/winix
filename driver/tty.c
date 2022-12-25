@@ -172,7 +172,8 @@ void clear_reader(struct tty_state* state){
 }
 
 void tty_exception_handler( struct tty_state* state){
-    int val, stat, is_new_line;
+    int val, stat;
+    bool is_new_line, send_response;
     struct message* msg = get_exception_m();
     RexSp_t *rex = state->rex;
     struct termios *termios = &state->termios;
@@ -185,6 +186,7 @@ void tty_exception_handler( struct tty_state* state){
         if (termios->c_iflag & ICRNL && val == '\r')
             val = '\n';
         is_new_line = val == '\n';
+        send_response = is_new_line;
         
         if (termios->c_lflag & ISIG){
             int signal = 0;
@@ -211,9 +213,8 @@ void tty_exception_handler( struct tty_state* state){
                 clear_terminal_buffer(state, termios->c_lflag & ECHOE);
                 goto end;
             }
-            else if(val == CTRL_D){
-                (void)sys_kill(SYSTEM_TASK, -(state->foreground_group), SIGKILL);
-                goto end;
+            else if(val == cc[VEOF]){
+                send_response = true;
             }
         }
         
@@ -232,7 +233,7 @@ void tty_exception_handler( struct tty_state* state){
             }
             
             if(found){
-                clear_terminal_buffer(state);
+                clear_terminal_buffer(state, true);
                 if(&t1->list == (&state->commands)){
                     state->prev_history_cmd = NULL;
                 }else{
@@ -271,7 +272,7 @@ void tty_exception_handler( struct tty_state* state){
             syscall_reply2(READ, -EINTR, state->reader->proc_nr, msg);
             clear_reader(state);
         }
-        else if (state->reader && (is_new_line || state->bptr >= state->buffer_end || state->reader_filp->filp_flags & O_NONBLOCK))
+        else if (state->reader && (send_response || state->bptr >= state->buffer_end || state->reader_filp->filp_flags & O_NONBLOCK))
         {
             int len = state->bptr - state->read_ptr;
             memcpy(state->read_data, state->read_ptr, len);
