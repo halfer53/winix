@@ -261,6 +261,9 @@ void tty_exception_handler( struct tty_state* state){
                 }
             }
         }
+        else if(termios->c_iflag & IMAXBEL){
+            __kputc(rex, '\a');
+        }
 
         if (is_sigpending(state->reader))
         {   
