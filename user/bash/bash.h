@@ -18,6 +18,9 @@
 #include <bsd/string.h>
 #include "parse.h"
 #include <assert.h>
+#include <termios.h>
+#include <readline/readline.h>
+#include <stdbool.h>
 
 
 #define CMD_PROTOTYPE(name)    int name(int argc, char**argv)
