@@ -55,6 +55,7 @@ static void navigate_history(HIST_ENTRY *func (void)){
     HIST_ENTRY* entry;
 
     rl_clear();
+    rl_end = rl_point = 0;
     if (func == next_history && history_offset == -1){
         entry =current_history();
         history_offset = 0;
@@ -66,7 +67,7 @@ static void navigate_history(HIST_ENTRY *func (void)){
     else{
         entry = func();
     }
-    
+
     if (!entry){
         history_offset = func == previous_history ? -1 : 1;
         return;
@@ -89,7 +90,7 @@ static void navigate_history(HIST_ENTRY *func (void)){
 
 void reset_history_offset(){
     HISTORY_STATE* state = history_get_history_state();
-    state->offset = state->length;
+    state->offset = state->length - 1;
 }
 
 int rl_getline(){
