@@ -8,6 +8,8 @@
 #include <string.h>
 
 #define BUFFER_SIZ  (128)
+#define CTRL_P  (16)
+#define CTRL_N  (14)
 
 static bool rl_initied = false;
 struct termios _rl_termios;
