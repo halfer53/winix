@@ -30,7 +30,7 @@ Inspired by the Minix1 operating system, Winix includes a full-featured kernel w
 ## Supported Commands
 
 - [snake](user/commands/snake.c)
-- [bash](user/bash/bash.c)
+- [wsh](user/wsh/wsh.c)
 - [cat](user/commands/cat.c)
 - [cp](user/commands/cp.c)
 - [echo](user/commands/echo.c)
@@ -106,7 +106,7 @@ make V=1
 
 `kprintf()`: is your friend.
 
-`trace`: type trace in bash to print all the syscalls in serial port 2
+`trace`: type trace in shell to print all the syscalls in serial port 2
 
 ## Supported System Call
 
