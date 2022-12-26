@@ -120,7 +120,7 @@ int main(int argc, char *argv[]) {
             break;
         
         linelen = strlen(line);
-        if (linelen == 0)
+        if (linelen == 0 || line[0] == '#' || line[0] == '\n')
             continue;
         
         if (*line){
@@ -283,9 +283,6 @@ int exec_cmd(char *line){
     struct cmdLine cmd;
     char* buffer;
     struct cmd_internal *handler = NULL;
-
-    if(*line == '#')
-        return 0;
 
     (void)parse(line,&cmd);
 
