@@ -84,7 +84,7 @@ char *readline(char *prompt){
         tcsetattr(STDIN_FILENO, TCSANOW, rl_termios);
     
     ret = rl_getline();
-    if (ret)
+    if ((rl_eof_found && rl_end == 0) || ret)
         return NULL;
     return rl_line_buffer;
 }
