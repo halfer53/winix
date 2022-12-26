@@ -63,7 +63,7 @@
         "srec_import.h": "c",
         "cmath": "c",
         "*.tcc": "c",
-        "bash.h": "c",
+        "wsh.h": "c",
         "macro.h": "c",
         "wait.h": "c",
         "ipc.h": "c",

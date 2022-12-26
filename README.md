@@ -12,9 +12,9 @@ Inspired by the Minix1 operating system, Winix includes a full-featured kernel w
 
 ![play snake](demo/snake.gif)
 
-### Using Pipe in bash
+### Using Pipe in shell
 
-![bash pipe](demo/bash_pipe_ls.gif)
+![shell pipe](demo/bash_pipe_ls.gif)
 
 ## Features
 

@@ -11,7 +11,7 @@
 #include <assert.h>
 #include <termios.h>
 
-char shell_path[] = "/bin/bash";
+char shell_path[] = "/bin/wsh";
 char *shell_argv[] = {
     shell_path,
     NULL

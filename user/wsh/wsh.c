@@ -12,7 +12,7 @@
  * 
 */
 
-#include "bash.h"
+#include "wsh.h"
 
 int exec_cmd(char *line);
 static char history_file[] = ".bash_history";

@@ -1,1 +1,1 @@
-obj-y += bash/ commands/ 
+obj-y += wsh/ commands/ 

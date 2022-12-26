@@ -1,5 +1,5 @@
 #include <stddef.h>
-#include "../user/bash/parse.h"
+#include "../user/wsh/parse.h"
 #include <assert.h>
 #include <string.h>
 
