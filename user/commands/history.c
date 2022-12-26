@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <unistd.h>
 
-static char filename[] = "/.bash_history";
+static char filename[] = "/.history";
 #define SIZE    128
 static char buffer[SIZE];
 int main(int argc, char *argv[]){
