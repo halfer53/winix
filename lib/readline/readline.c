@@ -51,10 +51,11 @@ static void navigate_history(HIST_ENTRY *func (void)){
     size_t len;
     char *line;
     HIST_ENTRY* entry = func();
-    rl_clear();
+    
     if (!entry)
         return;
 
+    rl_clear();
     line = entry->line;
     len = strlen(line);
 
@@ -68,6 +69,11 @@ static void navigate_history(HIST_ENTRY *func (void)){
     strlcpy(rl_line_buffer, line, BUFFER_SIZ);
     rl_end = len;
     rl_point = len;
+}
+
+void reset_history_offset(){
+    HISTORY_STATE* state = history_get_history_state();
+    state->offset = state->length;
 }
 
 int rl_getline(){
@@ -117,6 +123,7 @@ int rl_getline(){
         if (c == '\n')
             break;
     }
+    reset_history_offset();
     rl_line_buffer[rl_end] = '\0';
     return 0;
 }
