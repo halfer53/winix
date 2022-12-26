@@ -8,6 +8,7 @@
 #include <string.h>
 #include <bsd/string.h>
 #include <readline/history.h>
+#include <ctype.h>
 
 #define BUFFER_SIZ  (128)
 #define CTRL_P  (16)
@@ -115,11 +116,13 @@ int rl_getline(){
         if (rl_end >= BUFFER_SIZ)
             break;
         
-        rl_point++;
-        rl_line_buffer[rl_end++] = c;
-        fwrite(&c, 1, sizeof(char), rl_outstream);
-        fflush(rl_outstream);
-
+        if (isprint(c) || c == '\n'){
+            rl_point++;
+            rl_line_buffer[rl_end++] = c;
+            fwrite(&c, 1, sizeof(char), rl_outstream);
+            fflush(rl_outstream);
+        }
+        
         if (c == '\n')
             break;
     }
