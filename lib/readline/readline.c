@@ -17,6 +17,7 @@
 static bool rl_initied = false;
 struct termios _rl_termios;
 struct termios* rl_termios = &_rl_termios;
+static int history_offset = 0;
 
 void init_readline(){
     tcgetattr(STDIN_FILENO, rl_termios);
@@ -51,12 +52,26 @@ void rl_clear(){
 static void navigate_history(HIST_ENTRY *func (void)){
     size_t len;
     char *line;
-    HIST_ENTRY* entry = func();
-    
-    if (!entry)
-        return;
+    HIST_ENTRY* entry;
 
     rl_clear();
+    if (func == next_history && history_offset == -1){
+        entry =current_history();
+        history_offset = 0;
+    }
+    else if (func == previous_history && history_offset == 1){
+        entry = current_history();
+        history_offset = 0;
+    }
+    else{
+        entry = func();
+    }
+    
+    if (!entry){
+        history_offset = func == previous_history ? -1 : 1;
+        return;
+    }
+    
     line = entry->line;
     len = strlen(line);
 
@@ -122,7 +137,7 @@ int rl_getline(){
             fwrite(&c, 1, sizeof(char), rl_outstream);
             fflush(rl_outstream);
         }
-        
+
         if (c == '\n')
             break;
     }
