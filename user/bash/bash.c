@@ -15,7 +15,7 @@
 #include "bash.h"
 
 int exec_cmd(char *line);
-// static char history_file[] = ".bash_history";
+static char history_file[] = ".bash_history";
 static char PREFIX[] = "WINIX> ";
 
 static pid_t pgid;
@@ -85,6 +85,16 @@ void restore_shell_sysenv(){
 #endif
 }
 
+int append_line_to_history_file (char *filename, char *line){
+    int ret;
+    int fd = open(filename, O_WRONLY | O_CREAT | O_APPEND, 0666);
+    if (fd < 0)
+        return -errno;
+    ret = write(fd, line, strlen(line));
+    close(fd);
+    return ret;
+}
+
 int main(int argc, char *argv[]) {
     init_pgid();
 
@@ -113,8 +123,10 @@ int main(int argc, char *argv[]) {
         if (linelen == 0)
             continue;
         
-        if (*line)
+        if (*line){
             add_history(line);
+            append_line_to_history_file(history_file, line);
+        }
 
         if (line[linelen - 1] == '\n')
             line[linelen - 1] = '\0';
