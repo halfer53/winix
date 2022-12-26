@@ -21,6 +21,7 @@
 #include <termios.h>
 #include <readline/readline.h>
 #include <stdbool.h>
+#include <sys/stat.h>
 
 
 #define CMD_PROTOTYPE(name)    int name(int argc, char**argv)

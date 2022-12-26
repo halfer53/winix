@@ -132,9 +132,14 @@ int main(int argc, char *argv[]) {
 }
 
 int search_path(char* path, int len, char* name){
+    int ret;
+    struct stat statbuf;
     strlcpy(path, "/bin/", len);
     strlcat(path, name, len);
-    return access(path, F_OK);
+    ret = stat(path, &statbuf);
+    if(ret)
+        return ret;
+    return statbuf.st_mode & S_IFREG ? 0 : -1;
 }
 
 #define PIPE_READ   (0)
