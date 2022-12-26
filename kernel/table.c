@@ -27,12 +27,6 @@ char *init_argv[] = {
     NULL
 };
 
-char *initial_env[] = {
-    "HOME=/",
-    "PATH=/bin",
-    NULL
-};
-
 
 char *syscall_str[_NSYSCALL];
 
