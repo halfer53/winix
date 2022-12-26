@@ -192,10 +192,12 @@ int exec_welf(struct proc* who, char* path, char *argv[], char *envp[], bool is_
     struct message m;
 
     memset(&m, 0, sizeof(m));
-    if ((ret = copy_stirng_array(&argv_copy, argv, who, is_new)))
+    memset(&argv_copy, 0, sizeof(struct string_array));
+    memset(&envp_copy, 0, sizeof(struct string_array));
+    if (argv && (ret = copy_stirng_array(&argv_copy, argv, who, is_new)))
         return ret;
     // kdebug("copy argv string %d\n", argv_copy.size);
-    if ((ret = copy_stirng_array(&envp_copy, envp, who, is_new)))
+    if (envp && (ret = copy_stirng_array(&envp_copy, envp, who, is_new)))
         goto err_env;
 
     ret = filp_open(who, &filp, path, O_RDONLY | O_DIRECT, 0);
@@ -254,10 +256,12 @@ final:
     filp_close(filp);
 err_open:
     // kdebug("freeing envp\n");
-    kfree_string_array(&envp_copy);
+    if (envp)
+        kfree_string_array(&envp_copy);
 err_env:
     // kdebug("freeing argv\n");
-    kfree_string_array(&argv_copy);
+    if (argv)
+        kfree_string_array(&argv_copy);
 
     if (trace_syscall || ret != 0){
         klog("%s[%d] execve() %s, return %s\n", who->name, who->pid, path, kstr_error(ret));
