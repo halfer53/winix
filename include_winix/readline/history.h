@@ -22,5 +22,6 @@ HIST_ENTRY * history_get (int offset);
 HIST_ENTRY * previous_history ();
 HIST_ENTRY * next_history ();
 HISTORY_STATE * history_get_history_state ();
+HIST_ENTRY * current_history ();
 
 #endif

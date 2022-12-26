@@ -52,3 +52,9 @@ HIST_ENTRY * next_history (){
     history_state.offset++;
     return history_state.entries[history_state.offset];
 }
+
+HIST_ENTRY* current_history (){
+    if (history_state.offset < 0 || history_state.offset >= history_state.length)
+        return NULL;
+    return history_state.entries[history_state.offset];
+}
