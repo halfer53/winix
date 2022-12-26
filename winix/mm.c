@@ -247,9 +247,9 @@ void* dup_vm(struct proc* parent, struct proc* child){
 int release_proc_mem(struct proc *who){
     int ret = 0;
     struct proc* parent = get_proc(who->parent);
-    if(parent->state & STATE_VFORKING){
-        return -EINVAL;
-    }
+    if(parent->state & STATE_VFORKING)
+        return ret;
+    
     // kdebug("release proc mem %d %d\n", who->proc_nr, who->thread_parent);
 
     ret = release_stack(who);
