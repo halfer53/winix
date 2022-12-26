@@ -451,6 +451,14 @@ int proc_memctl(struct proc* who ,vptr_t* page_addr, int flags){
     return -EINVAL;
 }
 
+bool validate_welf(struct winix_elf* elf){
+    if(elf->magic != WINIX_ELF_MAGIC)
+        return false;
+    if(elf->binary_size != elf->text_size + elf->data_size)
+        return false;
+    return true;
+}
+
 bool peek_mem_welf(struct winix_elf* elf, int stack_size, int heap_size){
     int td_aligned = align_page(elf->binary_size + elf->bss_size);
     int proc_len = stack_size + td_aligned + heap_size;
@@ -465,9 +473,7 @@ int alloc_mem_welf(struct proc* who, struct winix_elf* elf, int stack_size, int 
     ptr_t *bss_start;
     ptr_t* mem_start;
 
-    if(elf->magic != WINIX_ELF_MAGIC)
-        return -EINVAL;
-    if(elf->binary_size != elf->text_size + elf->data_size)
+    if (!validate_welf(elf))
         return -EINVAL;
 
     td_aligned = align_page(elf->binary_size + elf->bss_size);
