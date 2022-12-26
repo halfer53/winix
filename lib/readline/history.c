@@ -21,7 +21,7 @@ void init_history(){
 void add_history(char *line){
     HIST_ENTRY* entry = malloc(sizeof(HIST_ENTRY));
     init_history();
-    entry->line = line;
+    entry->line = strdup(line);
     entry->data = NULL;
     if (history_state.length >= history_state.size){
         history_state.size *= 2;
