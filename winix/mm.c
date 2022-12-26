@@ -244,23 +244,27 @@ void* dup_vm(struct proc* parent, struct proc* child){
  * release process memory
  * @param who 
  */
-void release_proc_mem(struct proc *who){
+int release_proc_mem(struct proc *who){
+    int ret = 0;
     struct proc* parent = get_proc(who->parent);
     if(parent->state & STATE_VFORKING){
-        return;
+        return -EINVAL;
     }
     // kdebug("release proc mem %d %d\n", who->proc_nr, who->thread_parent);
 
-    user_release_pages(who, who->stack_top, who->stack_size);
+    ret = release_stack(who);
+    if (ret)
+        return ret;
     // klog("release stack 0x%x of %s %d\n", who->stack_top, who->name, who->proc_nr);
 
     if (!IS_THREAD(who)){
         ptr_t* memstart = who->mem_start;
         int page_len = (int)(who->heap_bottom + 1 - who->mem_start);
-        user_release_pages(who, memstart, page_len);
+        ret = user_release_pages(who, memstart, page_len);
         // klog("release proc start 0x%x len %d of %s %d\n", memstart, page_len, who->name, who->proc_nr);
     }
     // _kreport_memtable(kprintf2);
+    return ret;
 }
 
 void _kreport_memtable(int (*func) (const char*, ...)){
