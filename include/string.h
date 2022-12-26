@@ -29,6 +29,7 @@ void *memmove(void *dest, const void *src, size_t n);
 char *strrchr(const char *str, int c);
 int memcmp(const void *str1, const void *str2, size_t n);
 char *strerror(int err);
+char *strdup(const char *s);
 
 #define strchr(s, c)    index(s, c)
 
