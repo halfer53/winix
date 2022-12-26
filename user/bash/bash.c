@@ -15,7 +15,7 @@
 #include "bash.h"
 
 int exec_cmd(char *line);
-static char history_file[] = ".bash_history";
+// static char history_file[] = ".bash_history";
 static char PREFIX[] = "WINIX> ";
 
 static pid_t pgid;
