@@ -30,7 +30,7 @@ Inspired by the Minix1 operating system, Winix includes a full-featured kernel w
 ## Supported Commands
 
 - [snake](user/commands/snake.c)
-- [wsh](user/wsh/wsh.c)
+- [shell](user/wsh/wsh.c)
 - [cat](user/commands/cat.c)
 - [cp](user/commands/cp.c)
 - [echo](user/commands/echo.c)
