@@ -19,30 +19,8 @@
 #include <winix/ksignal.h>
 #include <termios.h>
 
-
-#define CTRL_A  (1)
-#define CTRL_E  (5)
-#define CTRL_B  (2)
-#define CTRL_F  (6)
-#define CTRL_P  (16)
-#define CTRL_N  (14)
-#define CTRL_Z  (26)
-#define BEEP    (7)
-#define BACKSPACE   (8)
-#define CTRL_U  (21)
-#define CTRL_L  (12)
-#define CTRL_D  (4)
-
-#define CURSOR_LEFT     ('D')
-#define CURSOR_RIGHT    ('C')
-
+#define BACKSPACE   0x08
 #define TTY_BUFFER_SIZ  (64)
-
-struct tty_command{
-    int len;
-    struct list_head list;
-    char command[1];
-};
 
 struct tty_state{
     struct device* dev;
@@ -58,7 +36,6 @@ struct tty_state{
     pid_t controlling_session;
     bool is_echoing;
     struct list_head commands;
-    struct tty_command* prev_history_cmd;
 };
 
 
@@ -110,29 +87,6 @@ int kgetc_blocking(struct proc* who) {
 
     }while(try == 0);
     return RexSp1->Rx;
-}
-
-void save_command_history(struct tty_state* state){
-    struct tty_command* cmd;
-    int len;
-    struct tty_command *prev_state;
-    char c = *state->read_ptr;
-    if(c == '\n' || c == '\0')
-        return;
-    if(!list_empty(&state->commands)){
-        prev_state = list_first_entry(&state->commands, struct tty_command, list);
-        if(strcmp(prev_state->command, state->read_ptr)  == 0)
-            return;
-    }
-    len = strlen(state->read_ptr);
-    cmd = kmalloc(sizeof(struct tty_command) + len + 1);
-    if(!cmd)
-        return;
-    strlcpy(cmd->command, state->read_ptr, len);
-    cmd->len = len;
-    list_add(&cmd->list, &state->commands);
-    // kdebug("saving %s\n", state->read_ptr);
-    return;
 }
 
 void terminal_backspace(struct tty_state* state, bool echo_erase){
@@ -220,32 +174,6 @@ void tty_exception_handler( struct tty_state* state){
             else if(val == cc[VEOF]){
                 send_response = true;
             }
-            else if(val == CTRL_P || val == CTRL_N){ // control p or n, to navigate through history
-                struct tty_command* t1;
-                bool found = false;
-                
-                if(state->prev_history_cmd){
-                    t1 = (val == CTRL_P) ? list_next_entry(struct tty_command, state->prev_history_cmd, list) : 
-                                        list_prev_entry(struct tty_command, state->prev_history_cmd, list);
-                    found = true;
-                }else if(val == CTRL_P){
-                    t1 = list_first_entry(&state->commands, struct tty_command, list);
-                    found = true;
-                }
-                
-                if(found){
-                    clear_terminal_buffer(state, true);
-                    if(&t1->list == (&state->commands)){
-                        state->prev_history_cmd = NULL;
-                    }else{
-                        state->prev_history_cmd = t1;
-                        strlcpy(state->bptr, t1->command, TTY_BUFFER_SIZ);
-                        state->bptr += t1->len;
-                        __kputs(rex, t1->command);
-                    }
-                    
-                }
-            }
         }
         
         
@@ -254,21 +182,12 @@ void tty_exception_handler( struct tty_state* state){
         if(state->bptr < state->buffer_end){
             if ( !(termios->c_lflag & ICANON) || (isprint(val) || is_new_line) ){
                 *state->bptr++ = val;
-                if(termios->c_lflag & ECHO){
+                if(termios->c_lflag & ECHO)
                     __kputc(rex, val);
-                    // kdebug("received %d\n", val);
-                }
-            }
-                
-            if(is_new_line){
-                *state->bptr = '\0';
-                save_command_history(state);
-                state->prev_history_cmd = NULL;
             }
 
-            if (can_return_in_non_canonical(state)) {
+            if (can_return_in_non_canonical(state)) 
                 send_response = true;
-            }
         }
         else if(termios->c_iflag & IMAXBEL){
             __kputc(rex, '\a');
@@ -313,7 +232,6 @@ int __tty_init(RexSp_t* rex, struct device* dev, struct tty_state* state){
     state->is_echoing = true;
     state->read_ptr = buf;
     INIT_LIST_HEAD(&state->commands);
-    state->prev_history_cmd = NULL;
     return 0;
 }
 
