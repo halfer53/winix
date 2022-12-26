@@ -1,5 +1,6 @@
 #include <readline/history.h>
 #include <stdlib.h>
+#include <string.h>
 
 static HISTORY_STATE history_state;
 #define INITIAL_HISTORY_SIZE 10
