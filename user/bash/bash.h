@@ -22,6 +22,7 @@
 #include <readline/readline.h>
 #include <stdbool.h>
 #include <sys/stat.h>
+#include <readline/history.h>
 
 
 #define CMD_PROTOTYPE(name)    int name(int argc, char**argv)

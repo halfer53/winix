@@ -21,7 +21,6 @@ static char PREFIX[] = "WINIX> ";
 static pid_t pgid;
 static pid_t last_pgid;
 static pid_t last_stopped_pgid;
-static int history_fd;
 struct termios termios;
 bool termios_inited = false;
 
@@ -102,11 +101,6 @@ int main(int argc, char *argv[]) {
 
     init_shell();
     init_shell_sysenv();
-    history_fd = open(history_file, O_CREAT | O_RDWR | O_APPEND, 0664);
-    if(history_fd < 0){
-        perror(history_file);
-        return 1;
-    }
 
     while(1) {
         int linelen;
@@ -119,7 +113,9 @@ int main(int argc, char *argv[]) {
         if (linelen == 0)
             continue;
         
-        write(history_fd, line, linelen);
+        if (*line)
+            add_history(line);
+
         if (line[linelen - 1] == '\n')
             line[linelen - 1] = '\0';
 
@@ -187,8 +183,6 @@ pid_t run_cmd(struct cmdLine *cmd, int i, int *pipe_ptr, int *prev_pipe_ptr){
         restore_shell_sysenv();
         if (termios_inited)
             tcsetattr(STDIN_FILENO, TCSANOW, &termios);
-        if (history_fd)
-            close(history_fd);
 
         if (last_pgid){
             setpgid(0, last_pgid);
@@ -427,7 +421,7 @@ int cmd_exit(int argc, char **argv){
             return 1;
         }
     }
-    close(history_fd);
+
     printf("Bye!\n");
     // printf("Child %d [parent %d] exits\n",getpid(),getppid());
     exit(status);
