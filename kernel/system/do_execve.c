@@ -199,7 +199,10 @@ int exec_welf(struct proc* who, char* path, char *argv[], char *envp[], bool is_
         goto err_env;
 
     ret = filp_open(who, &filp, path, O_RDONLY | O_DIRECT, 0);
-    if(ret){
+    if(ret)
+        goto err_open;
+    if (filp->filp_ino->i_mode & S_IFDIR){
+        ret = -EISDIR;
         goto err_open;
     }
         
