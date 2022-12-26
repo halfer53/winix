@@ -16,6 +16,11 @@ char *shell_argv[] = {
     shell_path,
     NULL
 };
+char *initial_env[] = {
+    "HOME=/",
+    "PATH=/bin",
+    NULL
+};
 
 int pgid;
 
@@ -137,7 +142,7 @@ pid_t run_unit_test()
     char *argv[] = {shell_path, "-c", "test", "run", ">", "/var/log/test.log", NULL};
     pid = vfork();
     if (!pid){
-        execv(shell_path, argv);
+        execve(shell_path, argv, initial_env);
         _exit(1);
     }
     return pid;
@@ -164,7 +169,7 @@ void wait_for_unit_test(pid_t pid){
 void run_shell(){
     if (!vfork())
     {
-        execv(shell_path, shell_argv);
+        execve(shell_path, shell_argv, initial_env);
         _exit(1);
     }
 }
