@@ -60,7 +60,7 @@ ifeq ($(KBUILD_VERBOSE),0)
 	@echo "LD \t winix.srec"
 endif
 
-$(FSUTIL): $(FS_DEPEND) fs/fsutil/*.c lib/ansi/strl.c
+$(FSUTIL): $(FS_DEPEND) fs/fsutil/*.c lib/ansi/strl*.c
 ifeq ($(KBUILD_VERBOSE),0)
 	@echo "CC \t $(FSUTIL)"
 endif
@@ -89,7 +89,7 @@ include_build: $(DISK)
 $(UTEST_RUNNER): $(UNIT_TEST_DEPEND) tools/utest_generator.py
 	$(Q)python3 tools/utest_generator.py $(UNIT_TEST_DEPEND) > $(UTEST_RUNNER)
 
-$(UNIT_TEST): $(FS_DEPEND) $(UNIT_TEST_DEPEND) $(UTEST_RUNNER) user/bash/parse.c lib/ansi/strl.c
+$(UNIT_TEST): $(FS_DEPEND) $(UNIT_TEST_DEPEND) $(UTEST_RUNNER) user/bash/parse.c lib/ansi/strl*.c
 ifeq ($(KBUILD_VERBOSE),0)
 	@echo "CC \t $(UNIT_TEST)"
 endif
@@ -98,10 +98,10 @@ endif
 test: $(UNIT_TEST)
 	$(Q)./$(UNIT_TEST)
 
-wsh: user/bash/*.c lib/ansi/strl.c
+wsh: user/bash/*.c lib/ansi/strl*.c
 	$(Q)gcc -DFSUTIL $(COMMON_CFLAGS) $(GCC_FLAG) $^ -o wsh
 
-snake: user/commands/snake.c lib/ansi/strl.c
+snake: user/commands/snake.c lib/ansi/strl*.c
 	$(Q)gcc $(COMMON_CFLAGS) $(GCC_FLAG) $^ -o snake
 	
 clean:
