@@ -99,7 +99,7 @@ test: $(UNIT_TEST)
 	$(Q)./$(UNIT_TEST)
 
 wsh: user/wsh/*.c lib/ansi/strl*.c
-	$(Q)gcc $(COMMON_CFLAGS) $(GCC_FLAG) -L/usr/lib/x86_64-linux-gnu -L/usr/local/lib -I/usr/local/include -lreadline -lhistory $^ -o wsh
+	$(Q)gcc $(COMMON_CFLAGS) $(GCC_FLAG) $^ -lreadline -lhistory -o wsh
 
 snake: user/commands/snake.c lib/ansi/strl*.c
 	$(Q)gcc $(COMMON_CFLAGS) $(GCC_FLAG) $^ -o snake
