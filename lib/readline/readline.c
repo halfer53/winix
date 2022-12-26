@@ -29,6 +29,14 @@ int rl_readchar(){
     return -1;
 }
 
+void rl_backspace(){
+    char erase = 8;
+    rl_point--;
+    rl_end--;
+    fwrite(&erase, 1, sizeof(char), rl_outstream);
+    fflush(rl_outstream);
+}
+
 int rl_getline(){
     int c = 0;
 
@@ -43,13 +51,9 @@ int rl_getline(){
             c = '\n';
         
         if (c == rl_termios->c_cc[VERASE]){ // Backspace or Delete
-            if(rl_point > 0){
-                char erase = 8;
-                rl_point--;
-                rl_end--;
-                fwrite(&erase, 1, sizeof(char), rl_outstream);
-                fflush(rl_outstream);
-            }
+            if(rl_point > 0)
+                rl_backspace();
+                
             continue;
         }
         else if (c == EOF || c == rl_termios->c_cc[VEOF]) { // Control D
