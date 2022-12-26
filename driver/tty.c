@@ -343,9 +343,6 @@ int tty_write_rex(RexSp_t* rex, char* data, size_t len){
     char *p = data;
     
     while(len-- > 0){
-        if (*p == 8 ){
-            kdebug("printing backspace\n");
-        }
         if(IS_SERIAL_CODE(*p)){
             while(!(rex->Stat & 2));
             rex->Tx = *p;
