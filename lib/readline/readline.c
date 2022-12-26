@@ -37,6 +37,12 @@ void rl_backspace(){
     fflush(rl_outstream);
 }
 
+void rl_clear(){
+    while(rl_end > 0){
+        rl_backspace();
+    }
+}
+
 int rl_getline(){
     int c = 0;
 
@@ -53,7 +59,11 @@ int rl_getline(){
         if (c == rl_termios->c_cc[VERASE]){ // Backspace or Delete
             if(rl_point > 0)
                 rl_backspace();
-                
+
+            continue;
+        }
+        else if( c == rl_termios->c_cc[VKILL]){
+            rl_clear();
             continue;
         }
         else if (c == EOF || c == rl_termios->c_cc[VEOF]) { // Control D
@@ -67,6 +77,7 @@ int rl_getline(){
         rl_point++;
         rl_line_buffer[rl_end++] = c;
         fwrite(&c, 1, sizeof(char), rl_outstream);
+        fflush(rl_outstream);
 
         if (c == '\n')
             break;
