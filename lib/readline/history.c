@@ -44,3 +44,10 @@ HIST_ENTRY *previous_history (){
     history_state.offset--;
     return history_state.entries[history_state.offset];
 }
+
+HIST_ENTRY * next_history (){
+    if (history_state.offset >= history_state.length)
+        return NULL;
+    history_state.offset++;
+    return history_state.entries[history_state.offset];
+}
