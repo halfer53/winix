@@ -31,3 +31,9 @@ void add_history(char *line){
     history_state.offset++;
     history_state.length++;
 }
+
+HIST_ENTRY * history_get (int offset){
+    if (offset < 0 || offset >= history_state.length)
+        return NULL;
+    return history_state.entries[offset];
+}
