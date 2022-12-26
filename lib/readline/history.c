@@ -37,3 +37,10 @@ HIST_ENTRY * history_get (int offset){
         return NULL;
     return history_state.entries[offset];
 }
+
+HIST_ENTRY *previous_history (){
+    if (history_state.offset <= 0)
+        return NULL;
+    history_state.offset--;
+    return history_state.entries[history_state.offset];
+}
