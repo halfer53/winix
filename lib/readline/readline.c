@@ -6,6 +6,8 @@
 #include <termios.h>
 #include <stdlib.h>
 #include <string.h>
+#include <bsd/string.h>
+#include <readline/history.h>
 
 #define BUFFER_SIZ  (128)
 #define CTRL_P  (16)
@@ -45,6 +47,29 @@ void rl_clear(){
     }
 }
 
+static void navigate_history(HIST_ENTRY *func (void)){
+    size_t len;
+    char *line;
+    HIST_ENTRY* entry = func();
+    rl_clear();
+    if (!entry)
+        return;
+
+    line = entry->line;
+    len = strlen(line);
+
+    if (line[len - 1] == '\n'){
+        line[--len] = '\0';
+    }
+    
+    fwrite(line, 1, len, rl_outstream);
+    fflush(rl_outstream);
+
+    strlcpy(rl_line_buffer, line, BUFFER_SIZ);
+    rl_end = len;
+    rl_point = len;
+}
+
 int rl_getline(){
     int c = 0;
 
@@ -71,6 +96,14 @@ int rl_getline(){
         else if (c == EOF || c == rl_termios->c_cc[VEOF]) { // Control D
             rl_eof_found = 1;
             break;
+        }
+        else if (c == CTRL_P){
+            navigate_history(previous_history);
+            continue;
+        }
+        else if (c == CTRL_N){
+            navigate_history(next_history);
+            continue;
         }
         
         if (rl_end >= BUFFER_SIZ)
