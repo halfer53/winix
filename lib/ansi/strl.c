@@ -20,6 +20,7 @@ char *strlcat(char *dest, const char *src, size_t n) {
 
 char *strlcpy(char *dest, const char *src, size_t n){
     char *saved = dest;
+    n++;
     while (*src && n--) {
         *dest++ = *src++;
     }
