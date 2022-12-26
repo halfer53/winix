@@ -175,9 +175,6 @@ void tty_exception_handler( struct tty_state* state){
                 send_response = true;
             }
         }
-        
-        
-        
 
         if(state->bptr < state->buffer_end){
             if ( !(termios->c_lflag & ICANON) || (isprint(val) || is_new_line) ){
