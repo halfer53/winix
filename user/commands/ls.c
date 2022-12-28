@@ -186,7 +186,7 @@ void print_long_format(char *pathname, int flag){
     if(flag & HUMAN_FORMAT){
         off_t rem = size % 1024;
         rem = rem >= 1000 ? 999 : rem;
-        printf("%3d.%.3d %s", size / 1024, rem, "KB");
+        printf("%2d.%.3dKB ", size / 1024, rem);
     }else{
         printf("%5d ", size);
     }
