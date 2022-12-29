@@ -42,7 +42,7 @@
 
 #ifdef __wramp__
 
-/* Char is 32 bit in WRAMP since char is not even a standard */
+/* Char is 32 bit in WRAMP since byte size is not even a standard */
 #  define CHAR_BIT         32
 
 /* WRAMP architecture defines long as the same length as int */
