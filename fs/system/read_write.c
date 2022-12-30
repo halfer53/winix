@@ -35,6 +35,8 @@ int sys_write(struct proc *who,int fd, void *buf, size_t count){
     if(!is_fd_opened_and_valid(who, fd))
         return -EBADF;
     file = who->fp_filp[fd];
+    if (file->filp_ino->i_mode & S_IFDIR)
+        return -EISDIR;
     // kdebug("write fd %d for dev %s\n", fd, file->filp_dev->init_name);
     ret = filp_write(who, file, buf, count);
     if(ret > 0)
