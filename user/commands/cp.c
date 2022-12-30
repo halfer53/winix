@@ -32,7 +32,7 @@ int main(int argc, char *argv[]){
         return ret;
 
     if(!S_ISREG(src_buf.st_mode) ){
-        fprintf(stderr, "not regular file %s", src);
+        fprintf(stderr, "not regular file %s\n", src);
         return 1;
     }
     
