@@ -14,6 +14,8 @@ int sys_read(struct proc *who,int fd, void *buf, size_t count){
     if(!is_fd_opened_and_valid(who, fd))
         return -EBADF;
     file = who->fp_filp[fd];
+    if (file->filp_ino->i_mode & S_IFDIR)
+        return -EISDIR;
     ret = filp_read(who, file, buf, count);
     // kdebug("read ret %d, call %d, fops %p\n", ret, file->filp_dev->dev_id, (void *)file->filp_dev->fops->read);
     return ret;
