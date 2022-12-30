@@ -99,7 +99,7 @@ int rl_getline(){
         if (ret == -1){
             if (errno == EINTR)
                 continue;
-            break;
+            return ret;
         }
         else if (c == rl_termios->c_cc[VEOF]) { // Control D
             rl_eof_found = 1;
