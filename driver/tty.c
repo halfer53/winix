@@ -339,6 +339,7 @@ int _tty_tiocspgrp ( struct tty_state* tty_data, struct proc* who, ptr_t* ptr){
         return -EINVAL;
     }
     tty_data->foreground_group = pgrp;
+    // kdebug("setting tty foreground to %d in %x\n", pgrp, tty_data->dev->dev_id);
     return 0;
 }
 
