@@ -90,7 +90,7 @@ static void navigate_history(HIST_ENTRY *func (void)){
 
 void reset_history_offset(){
     HISTORY_STATE* state = history_get_history_state();
-    state->offset = state->length - 1;
+    state->offset = state->length;
 }
 
 int rl_getline(){
