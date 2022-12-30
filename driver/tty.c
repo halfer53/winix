@@ -269,9 +269,16 @@ int tty_write_rex(RexSp_t* rex, char* data, size_t len){
 
 int tty_read ( struct filp *filp, char *data, size_t count, off_t offset){
     struct tty_state* state = (struct tty_state*)filp->private;
-    if(curr_syscall_caller->session_id != state->controlling_session){
-        kwarn("tty_read: invalid reader %d session %d tty %x session %d\n", 
-            curr_syscall_caller->pid, curr_syscall_caller->session_id, filp->filp_dev->dev_id, state->controlling_session);
+
+    if(curr_syscall_caller->session_id != state->controlling_session || state->foreground_group != curr_syscall_caller->procgrp){
+
+        struct sigaction *action = &curr_syscall_caller->sig_table[SIGINT];
+        kwarn("tty_read: invalid reader %d session %d pgrp %d, tty %x session %d foreground grp %d\n", 
+            curr_syscall_caller->pid, curr_syscall_caller->session_id, curr_syscall_caller->procgrp,
+            filp->filp_dev->dev_id, state->controlling_session, state->foreground_group);
+
+        if (action->sa_handler == SIG_IGN || sigismember(&curr_syscall_caller->sig_mask, SIGINT))
+            return -EIO;
         send_sig(curr_syscall_caller, SIGINT);
         return DONTREPLY;
     }
