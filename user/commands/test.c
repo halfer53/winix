@@ -278,30 +278,6 @@ void alarm_handler(int signum){
     alarm_handler_called = true;
 }
 
-
-void open_tty_as_stdin(char *str){
-    int fd, ret, session_id;
-    pid_t pgid;
-
-    session_id = setsid();
-    assert(session_id == getpid());
-
-    fd = open(str, O_RDWR);
-    assert(fd);
-    ret = dup2(fd, STDIN_FILENO);
-    assert(ret == STDIN_FILENO);
-    ret = dup2(fd, STDOUT_FILENO);
-    assert(ret == STDOUT_FILENO);
-
-    ret = ioctl(STDIN_FILENO, TIOCSCTTY, 0);
-    assert(ret == 0);
-    pgid = getpgid(0);
-    ret = tcsetpgrp(fd, pgid);
-    assert(ret == 0);
-    ret = close(fd);
-    assert(ret == 0);
-}
-
 int test_eintr(int argc, char **argv){
     int status;
     char *endptr;
@@ -312,7 +288,6 @@ int test_eintr(int argc, char **argv){
         suseconds_t microseconds = 1000;
         struct itimerval itv;
 
-        open_tty_as_stdin("/dev/tty2");
 
         memset(&itv, 0, sizeof(itv));
         alarm_handler_called = false;
@@ -335,11 +310,6 @@ int test_eintr(int argc, char **argv){
         assert(ret == -1);
         assert(errno == EINTR);
         assert(alarm_handler_called == true);
-
-        // ignore SIGHUP triggered when tty is closed
-        signal(SIGHUP, SIG_IGN);
-        ret = ioctl(STDIN_FILENO, TIOCNOTTY, 0);
-        assert(ret == 0);
         exit(0);
     }else{
         wait(&status);
