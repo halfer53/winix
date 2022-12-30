@@ -635,3 +635,17 @@ void test_given_directory_when_read_should_return_eisdir(){
     ret = sys_close(curr_scheduling_proc, fd);
     assert(ret == 0);
 }
+
+void test_given_directory_when_write_should_return_eisdir(){
+    int ret = sys_mkdir(curr_scheduling_proc, DIR_NAME, 0755);
+    assert(ret == 0);
+
+    int fd = sys_open(curr_scheduling_proc, DIR_NAME, O_RDONLY, 0);
+    assert(fd == 0);
+
+    ret = sys_write(curr_scheduling_proc, fd, buffer, 3);
+    assert(ret == -EISDIR);
+
+    ret = sys_close(curr_scheduling_proc, fd);
+    assert(ret == 0);
+}
