@@ -2,6 +2,8 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <errno.h>
+#include <bsd/string.h>
+#include <libgen.h>
 
 #define BUFFER_SIZ  (256)
 
@@ -9,7 +11,7 @@ static char buffer[256];
 
 int main(int argc, char *argv[]){
     int ret;
-    char *src, *dest, *p, *buf;
+    char *src, *dest;
     int src_fd, dest_fd;
     struct stat src_buf, dest_buf;
     if(argc < 3){
@@ -36,17 +38,9 @@ int main(int argc, char *argv[]){
     
     ret = stat(dest, &dest_buf);
     if(ret == 0 && S_ISDIR(dest_buf.st_mode)){
-        p = dest;
-        buf = buffer;
-        while(*p){
-            *buf++ = *p++;
-        }
-        *buf++ = '/';
-        p = src;
-        while(*p){
-            *buf++ = *p++;
-        }
-        *buf = '\0';
+        strlcpy(buffer, dest, BUFFER_SIZ);
+        strlcat(buffer, "/", BUFFER_SIZ);
+        strlcat(buffer, basename(src), BUFFER_SIZ);
 
         dest_fd = open(buffer, O_WRONLY | O_CREAT, src_buf.st_mode);
         if(dest_fd < 0){
