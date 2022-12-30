@@ -621,3 +621,17 @@ void test_when_zone_full_should_return_enospc(){
 
     free(_buffer);
 }
+
+void test_given_directory_when_read_should_return_eisdir(){
+    int ret = sys_mkdir(curr_scheduling_proc, DIR_NAME, 0755);
+    assert(ret == 0);
+
+    int fd = sys_open(curr_scheduling_proc, DIR_NAME, O_RDONLY, 0);
+    assert(fd == 0);
+
+    ret = sys_read(curr_scheduling_proc, fd, buffer, 3);
+    assert(ret == -EISDIR);
+
+    ret = sys_close(curr_scheduling_proc, fd);
+    assert(ret == 0);
+}
