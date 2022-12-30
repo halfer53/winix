@@ -136,16 +136,10 @@ void start_init_routine()
     printf("Shutting down...\n");
 }
 
-pid_t run_unit_test()
+void run_unit_test()
 {
-    pid_t pid;
     char *argv[] = {shell_path, "-c", "test", "run", ">", "/var/log/test.log", NULL};
-    pid = vfork();
-    if (!pid){
-        execve(shell_path, argv, initial_env);
-        _exit(1);
-    }
-    return pid;
+    execve(shell_path, argv, initial_env);
 }
 
 void wait_for_unit_test(pid_t pid){
@@ -167,16 +161,16 @@ void wait_for_unit_test(pid_t pid){
 }
 
 void run_shell(){
-    if (!vfork())
-    {
-        execve(shell_path, shell_argv, initial_env);
-        _exit(1);
-    }
+    execve(shell_path, shell_argv, initial_env);
 }
 
-void start_tty2_shell(){
-    int ret;
-    int fd = open("/dev/tty2", O_RDWR);
+int init_tty2_environment(){
+    int ret, fd;
+
+    ret = setsid();
+    assert(ret == getpid());
+
+    fd = open("/dev/tty2", O_RDWR);
     assert(fd > 0);
     
     ret = ioctl(fd, TIOCSCTTY, 0);
@@ -184,35 +178,47 @@ void start_tty2_shell(){
     pgid = getpgid(0);
     ret = tcsetpgrp(fd, pgid);
     assert(ret == 0);
+    return fd;
+}
 
-    if(!tfork()){
-        
+pid_t run_in_tty2(int fd, void (*func)()){
+    int ret;
+    pid_t pid;
+    pid = tfork();
+    if (!pid){
         ret = dup2(fd, STDIN_FILENO);
         assert(ret == 0);
         ret = dup2(fd, STDOUT_FILENO);
         assert(ret == 1);
         ret = dup2(fd, STDERR_FILENO);
         assert(ret == 2);
+
         ret = close(fd);
         assert(ret == 0);
-
-        run_shell();
-        exit(0);
-    }else{
-        wait(NULL);
+        func();
+        _exit(1);
     }
+    return pid;
 }
 
 int main(int argc, char **argv)
 {
     pid_t pid;
+    int fd;
     init_dev();
     init_tty();
-    run_shell();
 
-    pid = run_unit_test();
-    wait_for_unit_test(pid);
-    start_tty2_shell();
+    if (!vfork())
+        run_shell();
+
+    if (!tfork()){
+        fd = init_tty2_environment();
+        pid = run_in_tty2(fd, run_unit_test);
+        wait_for_unit_test(pid);
+        run_in_tty2(fd, run_shell);
+        exit(0);
+    }
+    
     
     start_init_routine();
     return 0;
