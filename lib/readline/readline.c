@@ -27,14 +27,6 @@ void init_readline(){
     rl_initied = true;
 }
 
-int rl_readchar(){
-    char c;
-    int ret = read(STDIN_FILENO, &c, 1);
-    if(ret == 1)
-        return c;
-    return -1;
-}
-
 void rl_backspace(){
     char erase = 8;
     rl_point--;
@@ -94,7 +86,7 @@ void reset_history_offset(){
 }
 
 int rl_getline(){
-    int c = 0;
+    int c = 0, ret;
 
     rl_point = 0;
     rl_end = 0;
@@ -102,11 +94,18 @@ int rl_getline(){
     rl_eof_found = 0;
     rl_line_buffer = malloc(sizeof(char) * BUFFER_SIZ);
     while(1){
-        c = rl_readchar();
-        if (c == '\r')
-            c = '\n';
-        
-        if (c == rl_termios->c_cc[VERASE]){ // Backspace or Delete
+        ret = fread(&c, 1, sizeof(char), rl_instream);
+
+        if (ret == -1){
+            if (errno == EINTR)
+                continue;
+            break;
+        }
+        else if (c == rl_termios->c_cc[VEOF]) { // Control D
+            rl_eof_found = 1;
+            break;
+        }
+        else if (c == rl_termios->c_cc[VERASE]){ // Backspace or Delete
             if(rl_point > 0)
                 rl_backspace();
 
@@ -115,10 +114,6 @@ int rl_getline(){
         else if( c == rl_termios->c_cc[VKILL]){
             rl_clear();
             continue;
-        }
-        else if (c == EOF || c == rl_termios->c_cc[VEOF]) { // Control D
-            rl_eof_found = 1;
-            break;
         }
         else if (c == CTRL_P){
             navigate_history(previous_history);
@@ -131,6 +126,9 @@ int rl_getline(){
         
         if (rl_end >= BUFFER_SIZ)
             break;
+
+        if (c == '\r')
+            c = '\n';
         
         if (isprint(c) || c == '\n'){
             rl_point++;
