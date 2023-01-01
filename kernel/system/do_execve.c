@@ -228,6 +228,7 @@ int exec_welf(struct proc* who, char* path, char *argv[], char *envp[], bool is_
 
     if ((ret = release_proc_mem(who)))
         goto final;
+    bitmap_clear(who->ctx.ptable, PTABLE_LEN);
     
     ret = alloc_mem_welf(who, &elf, USER_STACK_SIZE, USER_HEAP_SIZE);
     if(ret)
