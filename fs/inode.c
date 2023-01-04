@@ -148,20 +148,13 @@ int init_inode_non_disk(struct inode* ino, ino_t num, struct device* dev, struct
 }
 
 void arch_inode(struct inode* ino){
-    
-#ifdef __wramp__
     ARCH_CHAR_SIZE(ino->i_size, ino->i_sb);
     // kdebug("arch %d \n", ino->i_num);
-#endif
-    
 }
 
 void dearch_inode(struct inode* ino){
-
-#ifdef __wramp__
     DEARCH_CHAR_SIZE(ino->i_size, ino->i_sb);
     // kdebug("dearch %d \n", ino->i_num);
-#endif
 }
 
 int read_inode(int num, struct inode** ret_ino, struct device* id){
