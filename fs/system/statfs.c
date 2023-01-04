@@ -25,7 +25,7 @@ int sys_statfs(struct proc* who, char *path, struct statfs *buf){
     buf->f_type = sb->magic;
     buf->f_bsize = sb->s_block_size;
     #ifdef __wramp__
-    DEARCH_CHAR_SIZE(buf->f_bsize);
+    DEARCH_CHAR_SIZE(buf->f_bsize, sb);
     #endif
     buf->f_blocks = sb->s_block_inuse + sb->s_free_blocks;
     buf->f_bfree = buf->f_bavail = sb->s_free_blocks;

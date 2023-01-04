@@ -13,7 +13,7 @@ void set_statbuf(struct inode* inode, struct stat* statbuf){
     statbuf->st_rdev = inode->i_dev->dev_id;
     statbuf->st_size = inode->i_size; 
 #ifdef __wramp__
-    DEARCH_CHAR_SIZE(statbuf->st_size); //convert words to bytes
+    DEARCH_CHAR_SIZE(statbuf->st_size, inode->i_sb); //convert words to bytes
 #endif
     statbuf->st_blksize = BLOCK_SIZE;
     statbuf->st_blocks = get_inode_blocks(inode);
