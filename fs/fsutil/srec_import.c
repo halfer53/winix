@@ -34,18 +34,6 @@ char* remove_extension(char *str)
     return mystr;
 }
 
-int toUpperCase(char *to, char *src)
-{
-    while (*src)
-    {
-        *to++ = islower(*src) ? TO_UPPER_CHAR(*src) : *src;
-        src++;
-    }
-    return 0;
-}
-
-
-
 int srec_add_binary(struct srec_binary* srec_result, unsigned int item){
 //    printf("%ld %x\n", srec_result->binary_idx, item);
     srec_result->binary_data[srec_result->binary_idx] = item;
