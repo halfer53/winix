@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
+#include <limits.h>
 
 int fill_dirent(inode_t* ino, struct winix_dirent* curr, char* string);
 char rootfs_name[] = "WINIX_ROOTFS";
@@ -29,30 +30,29 @@ int makefs( char* disk_raw, size_t disk_size)
     block_t root_node_block_nr = inode_table_block_nr + (inode_tablesize / BLOCK_SIZE);
     block_t block_in_use = root_node_block_nr + 1;
     block_t remaining_blocks = blocks_nr - block_in_use;
-    int inode_per_block = BLOCK_SIZE / INODE_DISK_SIZE;
     unsigned int free_inodes = inode_tablesize / INODE_DISK_SIZE - 1;
     unsigned int bitval = 0;
     struct superblock s2;
 
     struct superblock superblock = {
-            SUPER_BLOCK_MAGIC, // magic
-        block_in_use, // blocks in use
-        1, // inode in use
-            remaining_blocks, // free blocks
-        free_inodes, // free inodes
-        BLOCK_SIZE, // block size
-            INODE_DISK_SIZE, // inode size
-            root_inode_num, // root inode number
+        .magic = SUPER_BLOCK_MAGIC, // magic
+        .s_block_inuse = block_in_use, // blocks in use
+        .s_inode_inuse = 1, // inode in use
+        .s_free_blocks = remaining_blocks, // free blocks
+        .s_free_inodes = free_inodes, // free inodes
+        .s_block_size = BLOCK_SIZE, // block size
+        .s_inode_size = INODE_DISK_SIZE, // inode size
+        .s_rootnr = root_inode_num, // root inode number
 
-        sb_block_nr,
-        BLOCK_SIZE,
-            blockmap_block_nr, // block bitmap block index
-            BLOCK_SIZE,
-            inodemap_block_nr, // inode bitmap block index
-            BLOCK_SIZE,
-        inode_table_block_nr, // inode table block index
-            inode_tablesize,
-        inode_per_block, // inode per block
+        .s_superblock_nr = sb_block_nr,
+        .s_superblock_size = BLOCK_SIZE,
+        .s_blockmapnr = blockmap_block_nr, // block bitmap block index
+        .s_blockmap_size = BLOCK_SIZE,
+        .s_inodemapnr = inodemap_block_nr, // inode bitmap block index
+        .s_inodemap_size = BLOCK_SIZE,
+        .s_inode_tablenr = inode_table_block_nr, // inode table block index
+        .s_inode_table_size = inode_tablesize,
+        .s_char_bit = CHAR_BIT,
     };
     char32_strlcpy(superblock.s_name, rootfs_name, SUPERBLOCK_NAME_LEN);
     // printf("block nr %d %d %d inode table size %ld\n", blocks_nr, block_in_use, remaining_blocks, inode_tablesize / BLOCK_SIZE);
