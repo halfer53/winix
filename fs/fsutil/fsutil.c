@@ -107,11 +107,14 @@ void write_disk(char* path){
 void combine_srec_binary_debug(struct winix_elf_list* elf_list, struct srec_binary* binary, struct srec_debug* debug){
     struct winix_elf* elf = &elf_list->elf;
     elf->binary_pc = binary->binary_pc;
-    elf->binary_size = binary->binary_idx;
-    elf->bss_size = debug->bss_size;
-    elf->data_size = debug->data_size;
-    elf->text_size = debug->text_size;
-    elf->binary_offset = binary->binary_offset;
+    // binary_idx is the number of instructions in the binary
+    // one instruction is 4 bytes, 1 word in WRAMP architecture
+    // to convert to bytes, multiply by 4
+    elf->binary_size = binary->binary_idx * sizeof(unsigned int);
+    elf->bss_size = debug->bss_size * sizeof(unsigned int);
+    elf->data_size = debug->data_size * sizeof(unsigned int);
+    elf->text_size = debug->text_size * sizeof(unsigned int);
+    elf->binary_offset = binary->binary_offset * sizeof(unsigned int);
     elf->magic = WINIX_ELF_MAGIC;
     elf_list->binary_data = binary->binary_data;
 }
@@ -212,7 +215,7 @@ void write_srec_list(struct list_head* lists){
         ret = sys_write(curr_scheduling_proc, fd, &pos->elf, elf_size);
         assert(ret == elf_size);
 
-        binary_size = TO_CHAR_SIZE_FROM_WRAMP(pos->elf.binary_size);
+        binary_size = pos->elf.binary_size;
         ret = sys_write(curr_scheduling_proc, fd, pos->binary_data,  binary_size);
         assert(ret == binary_size);
 
@@ -240,7 +243,7 @@ void verify_srec_with_disk(struct list_head* lists){
 
     list_for_each_entry_safe(struct winix_elf_list, pos, tmp, lists, list){
         snprintf(path, PATH_LEN, "%s%s%s", bin_path, "/", pos->name);
-        binary_size = TO_CHAR_SIZE_FROM_WRAMP(pos->elf.binary_size);
+        binary_size = pos->elf.binary_size;
         struct winix_elf elf;
 
         fd = sys_open(curr_scheduling_proc, path, 0, 0);
