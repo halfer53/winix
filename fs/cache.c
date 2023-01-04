@@ -192,14 +192,9 @@ struct block_buffer *get_block_buffer(block_t blocknr, struct device* dev){
 }
 
 void flush_super_block(struct device* dev){
-//    struct superblock sb1, sb2;
     struct superblock* sb = get_sb(dev);
     dearch_superblock(sb);
     dev->dops->dev_write((char*)sb, 0, sizeof(struct superblock));
-
-//    dev->dops->dev_read((char*)&sb1, 0, sizeof(struct superblock));
-//    memcpy(&sb2, DISK_RAW, sizeof(struct superblock));
-//    kdebug("sb %d %d %d \n", sb1.s_inode_per_block, sb2.s_inode_per_block, sb->s_inode_per_block);
 }
 
 void init_buf(){
