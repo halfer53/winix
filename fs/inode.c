@@ -39,8 +39,7 @@ bool is_valid_inode_num(int num, struct device* id){
     struct superblock* sb = get_sb(id);
     unsigned int inodes_nr;
 
-    inodes_nr = sb->s_inode_per_block * (sb->s_inode_table_size / BLOCK_SIZE);
-//    kdebug("is valid inode num: %d, inode per block %d, inodes_nr %d\n", num, sb->s_inode_per_block, inodes_nr);
+    inodes_nr = sb->s_inode_table_size / sb->s_inode_size;
     return 1 <= num && num <= inodes_nr;
 }
 
