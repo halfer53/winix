@@ -24,6 +24,8 @@
 #include <winix/bitmap.h>
 #include <winix/page.h>
 #include <winix/dev.h>
+#include <limits.h>
+#include <fs/super.h>
 
 #define ASM_ADDUI_SP   (0x1ee10000)
 #define ASM_ADDUI_SP_SP_2   (0x1ee10002)
@@ -182,6 +184,14 @@ int build_user_stack(struct proc* who, struct string_array* argv, struct string_
     return 0;
 }
 
+void arch_elf(struct winix_elf* elf, struct superblock* sb){
+    ARCH_CHAR_SIZE(elf->binary_size, sb);
+    ARCH_CHAR_SIZE(elf->bss_size, sb);
+    ARCH_CHAR_SIZE(elf->data_size, sb);
+    ARCH_CHAR_SIZE(elf->text_size, sb);
+    ARCH_CHAR_SIZE(elf->binary_offset, sb);
+}
+
 int exec_welf(struct proc* who, char* path, char *argv[], char *envp[], bool is_new){
     int ret;
     struct filp* filp;
@@ -214,6 +224,7 @@ int exec_welf(struct proc* who, char* path, char *argv[], char *envp[], bool is_
         ret = -EIO;
         goto final;
     }
+    arch_elf(&elf, filp->filp_ino->i_sb);
 
     has_enough_ram = peek_mem_welf(&elf, USER_STACK_SIZE, USER_HEAP_SIZE);
     if (!has_enough_ram){
