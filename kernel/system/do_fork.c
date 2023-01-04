@@ -192,17 +192,21 @@ int sys_fork(struct proc *parent) {
 
 int do_fork(struct proc *who, struct message *m){
     int child_pr;
+    struct proc* child;
     child_pr = sys_fork(who);
     
     // if an error is encounted
     if(child_pr < 0)
         return child_pr;
 
+    child = get_proc(child_pr);
+
     // send 0 to child
     syscall_reply2(FORK, 0, child_pr, m);
 
     // send the child pid to parent
-    return get_proc(child_pr)->pid;
+    syscall_reply2(FORK, child->pid, who->proc_nr, m);
+    return DONTREPLY;
 }
 
 int do_vfork(struct proc* parent, struct message* m){
@@ -245,9 +249,12 @@ int do_tfork(struct proc* parent, struct message* m){
         if ((ret = copy_stack(parent, child)))
             return ret;
 
+        /* reply to parent */
+        syscall_reply2(TFORK, child->proc_nr, parent->proc_nr, m);
+
+        /* reply to child so child get scheduled first */
         syscall_reply2(TFORK, 0, child->proc_nr, m);
-        parent->priority = parent->priority == MIN_PRIORITY ? MIN_PRIORITY : parent->priority - 1;
-        return child->proc_nr;
+        return DONTREPLY;
     }
     return -EAGAIN;
 }
