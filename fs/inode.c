@@ -53,15 +53,25 @@ bool is_inode_in_use(int num, struct device* id){
     bool ret;
     struct superblock* sb = get_sb(id);
     struct block_buffer *buf;
+    block_t imap_end;
     // kdebug("is inode in use %d, inode map nr %d\n", num, sb->s_inodemapnr);
     if(!is_valid_inode_num(num, id)){
         return false;
     }
     buf = get_block_buffer(sb->s_inodemapnr, id);
-    // kdebug("inode map %08x for inode %d\n", *map_ptr, num);
-    ret = is_bit_on((unsigned int*)buf->block, (int)TO_DWORD_SIZE(sb->s_inodemap_size), num);
+    imap_end = buf->b_blocknr + (sb->s_inodemap_size / BLOCK_SIZE);
+
+    while (buf->b_blocknr < imap_end){
+        ret = is_bit_on((unsigned int*)buf->block, sb->s_inodemap_size / sizeof(unsigned int), num);
+        if(ret){
+            put_block_buffer(buf);
+            return true;
+        }
+        put_block_buffer(buf);
+        buf = get_block_buffer(buf->b_blocknr + 1, id);
+    }
     put_block_buffer(buf);
-    return ret;
+    return false;
 }
 
 int alloc_block(inode_t *ino, struct device* id){
