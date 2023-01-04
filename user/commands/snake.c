@@ -63,9 +63,17 @@ struct point* new_food(){
     return new_point(x, y);
 }
 
+// byte for \e[?25l
+static char cursor_str[] = {0x1b, 0x5b ,0x3f ,0x32 ,0x35 ,0x6c, 0};
+
 void disable_cursor(){
-    static char str[] = {0x1b, 0x5b ,0x3f ,0x32 ,0x35 ,0x6c, 0};
-    printf("%s", str);
+    printf("%s", cursor_str);
+    fflush(stdout);
+}
+
+void enable_cursor(){
+    cursor_str[5] = 'h';
+    printf("%s", cursor_str);
     fflush(stdout);
 }
 
@@ -149,8 +157,10 @@ void init_tty(){
 }
 
 void restore_tty(int signum){
-    if (tty_inited)
+    if (tty_inited){
         tcsetattr(STDIN_FILENO, TCSANOW, &prev_termios);
+        enable_cursor();
+    }
 }
 
 void board_init(struct board_struct *board){
