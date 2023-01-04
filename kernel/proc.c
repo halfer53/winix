@@ -298,7 +298,7 @@ struct proc *get_free_proc_slot() {
             proc_set_default(who);
             who->state = STATE_RUNNABLE;
             who->flags = IN_USE;
-            who->pid = i;
+            who->pid = get_next_pid();
             return who;
         }
     }
