@@ -24,7 +24,7 @@ struct superblock {
     block_t s_inode_tablenr; // inode map block index
     unsigned int s_inode_table_size;
 
-    int s_inode_per_block;
+    unsigned int char_bit;
     char32_t s_name[SUPERBLOCK_NAME_LEN];
 };
 
