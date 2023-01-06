@@ -368,7 +368,7 @@ int kprintf_vm( struct filp* file, const char *orignal_format, void *arg, struct
                 case 's':
                     vformat_str = *(vptr_t **)arg;
                     if (IS_USER_PROC(who) && !is_vaddr_accessible(vformat_str, who)){
-                        kwarn("%d sigsegv in kprintf\n", who->proc_nr);
+                        // kwarn("pid %d has sigsegv in printf\n", who->pid);
                         (void)send_sig(who, SIGSEGV);
                         return SUSPEND;
                     }else{
