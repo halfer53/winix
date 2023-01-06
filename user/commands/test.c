@@ -47,6 +47,7 @@ CMD_PROTOTYPE(test_signal);
 CMD_PROTOTYPE(test_while);
 CMD_PROTOTYPE(run_all);
 CMD_PROTOTYPE(test_timer);
+CMD_PROTOTYPE(test_times);
 
 struct cmd_internal test_commands[] = {
     { test_so, "stack", true },
@@ -55,6 +56,7 @@ struct cmd_internal test_commands[] = {
     { test_sigsegv, "null", true },
     { test_eintr, "eintr", true },
     { test_timer, "timer", true },
+    { test_times, "times", true },
     { test_signal, "signal", true },
     { test_while, "while", false },
     { run_all, "run", false },
@@ -410,6 +412,26 @@ int test_while(int argc, char **argv){
         printf("a");
         nanosleep(&ts, NULL);
     }
+    return 0;
+}
+
+int test_times(int argc, char **argv){
+    struct tms tms;
+    clock_t start, end;
+    struct timespec req;
+    
+    start = times(&tms);
+    assert(start > 0);
+    assert(tms.tms_utime > 0);
+    assert(tms.tms_stime > 0);
+    end = times((struct tms *)1);
+    assert(end == -1 && errno == EFAULT);
+    
+    memset(&req, 0, sizeof(struct timespec));
+    req.tv_nsec = 100000000;
+    nanosleep(&req, NULL);
+    end = times(NULL);
+    assert(end > 0 && end > start);
     return 0;
 }
 
