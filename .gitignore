@@ -10,8 +10,9 @@
 *.sublime-workspace
 *.obj
 *.log
-include_winix/srec/*.verbose
-include_winix/srec/*.srec
+*.verbose
+*.srec
+
 include_winix/*.c
 tests/utest_runner.c
 /fsutil
@@ -19,14 +20,6 @@ tests/utest_runner.c
 /wsh
 /snake
 
-fs/Debug/
-a.out
-cmake-build-debug
-
-RexSimulator.dll
-RexSimulatorGui.exe
-
-!tools/kdbg.py
 !include_winix/srec/.gitkeep
 !kernel/winix/kwramp.s
 !lib/gen/ucontext.s
