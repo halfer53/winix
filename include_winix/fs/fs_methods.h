@@ -44,7 +44,7 @@ void init_tty();
 int init_dirent(inode_t* dir, inode_t* ino);
 int fill_dirent(inode_t* ino, struct winix_dirent* curr, const char* string);
 bool has_file_access(struct proc* who, struct inode* ino, mode_t mode);
-int get_inode_by_path(struct proc* who, char *path, struct inode** inode);
+int get_inode_by_path(struct proc* who, const char *path, struct inode** inode);
 int alloc_block(inode_t *ino, struct device* id);
 int makefs( char* disk_raw, size_t disk_size_words);
 void init_fs();

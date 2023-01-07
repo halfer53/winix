@@ -184,7 +184,7 @@ int eat_path(struct proc* who, const char *path, struct inode** last_dir, struct
     return ret;
 }
 
-int get_inode_by_path(struct proc* who, char *path, struct inode** inode){
+int get_inode_by_path(struct proc* who, const char *path, struct inode** inode){
     int ret;
     inode_t *lastdir = NULL;
     char string[WINIX_NAME_LEN];
