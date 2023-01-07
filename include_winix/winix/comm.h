@@ -15,7 +15,6 @@
 #define _W_COMM_H_ 1
 
 #include <stdbool.h>
-#include <limits.h>
 
 // status to suspend caller, reply later
 #define SUSPEND         -998     
