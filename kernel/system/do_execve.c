@@ -192,7 +192,7 @@ void arch_elf(struct winix_elf* elf, struct superblock* sb){
     ARCH_CHAR_SIZE(elf->binary_offset, sb);
 }
 
-int exec_welf(struct proc* who, char* path, char *argv[], char *envp[], bool is_new){
+int exec_welf(struct proc* who, const char* path, char *argv[], char *envp[], bool is_new){
     int ret;
     struct filp* filp;
     bool has_enough_ram;

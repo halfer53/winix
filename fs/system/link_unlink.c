@@ -34,7 +34,7 @@ int sys_link(struct proc* who, char *oldpath, char *newpath){
     return ret;
 }
 
-int sys_unlink(struct proc* who, char *path){
+int sys_unlink(struct proc* who, const char* path){
     char string[WINIX_NAME_LEN];
     struct inode* lastdir = NULL, *ino = NULL;
     int ret;

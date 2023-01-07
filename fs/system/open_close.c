@@ -125,7 +125,7 @@ int sys_open(struct proc *who, const char *path, int flags, mode_t mode)
     return open_slot;
 }
 
-int sys_creat(struct proc *who, char *path, mode_t mode)
+int sys_creat(struct proc *who, const char* path, mode_t mode)
 {
     return sys_open(who, path, O_CREAT | O_EXCL, mode);
 }

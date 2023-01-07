@@ -29,7 +29,7 @@ int sys_fstat(struct proc* who, int fd, struct stat* statbuf){
     return 0;
 }
 
-int sys_stat(struct proc* who, char *pathname, struct stat *statbuf){
+int sys_stat(struct proc* who, const char* pathname, struct stat *statbuf){
     int ret;
     inode_t *inode = NULL;
 

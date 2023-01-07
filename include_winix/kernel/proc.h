@@ -291,7 +291,7 @@ void release_zombie(struct proc*p);
 int copyto_user_stack(struct proc *who, void *src, size_t len);
 vptr_t* copyto_user_heap(struct proc* who, void *src, size_t len);
 int build_initial_stack(struct proc* who, char** argv, char** env, struct proc* srcproc);
-int exec_welf(struct proc* who, char* path, char *argv[], char *envp[], bool is_new);
+int exec_welf(struct proc* who, const char* path, char *argv[], char *envp[], bool is_new);
 int release_proc_mem(struct proc *who);
 bool peek_mem_welf(struct winix_elf* elf, int stack_size, int heap_size);
 int alloc_mem_welf(struct proc* who, struct winix_elf* elf, int stack_size, int heap_size);

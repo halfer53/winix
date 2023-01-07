@@ -150,7 +150,7 @@ void debug_super_block(char* str){
 #define PATH_LEN   (1024)
 
 
-int get_srec_list(struct list_head *srec_list, char* path, int offset){
+int get_srec_list(struct list_head *srec_list, const char* path, int offset){
     struct list_head srec_binary_list;
     struct list_head srec_debug_list;
     struct dirent *dp;

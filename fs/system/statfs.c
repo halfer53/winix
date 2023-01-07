@@ -2,7 +2,7 @@
 #include <fs/fs.h>
 #include <sys/statfs.h>
 
-int sys_statfs(struct proc* who, char *path, struct statfs *buf){
+int sys_statfs(struct proc* who, const char* path, struct statfs *buf){
     int ret = 0;
     struct superblock *sb;
     inode_t *inode = NULL, *last_dir = NULL;

@@ -7,7 +7,7 @@
 #define PATH_LEN    (64)
 char slash[] = "/";
 
-void reset_path(char *dir_path, char *path){
+void reset_path(char *dir_path, char* path){
     strlcpy(path, dir_path, PATH_LEN);
     strlcat(path, slash, PATH_LEN);
 }

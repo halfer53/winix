@@ -15,7 +15,7 @@ int do_umask(struct proc* who, struct message* msg){
     return sys_umask(who, msg->m1_i1);
 }
 
-int sys_access(struct proc* who, char* pathname, int mode){
+int sys_access(struct proc* who, const char* pathname, int mode){
     struct inode *ino = NULL;
     int ret = 0;
     bool has_access;

@@ -4,7 +4,7 @@
 
 #include <fs/fs.h>
 
-int sys_chown(struct proc* who,  char *pathname, uid_t owner, gid_t group){
+int sys_chown(struct proc* who, const char* pathname, uid_t owner, gid_t group){
     return -EINVAL;
 }
 
@@ -15,7 +15,7 @@ int do_chown(struct proc* who, struct message* msg){
    return sys_chown(who, path, msg->m1_i1, msg->m1_i2);
 }
 
-int sys_chmod(struct proc* who, char *pathname, mode_t mode){
+int sys_chmod(struct proc* who, const char* pathname, mode_t mode){
     int ret;
     inode_t *inode = NULL;
 
