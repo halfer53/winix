@@ -72,7 +72,7 @@ extern FILE	_stdin, _stdout, _stderr;
 
 
 #include <sys/dirent.h>
-#define	FILENAME_MAX	DIRSIZ
+#define	FILENAME_MAX	NAME_MAX
 
 #define	TMP_MAX		999
 #define	L_tmpnam	(sizeof("/tmp/") + FILENAME_MAX)
