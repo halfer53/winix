@@ -542,10 +542,12 @@ int iter_zone_close(struct zone_iterator* iter){
     return 0;
 }
 
+#define has_dirent_iter_reached_end(iter)    ((iter)->dirent + 1 > (iter)->dirent_end)
+
 struct winix_dirent* _iter_dirent_get_current(struct dirent_iterator* iter){
     zone_t zone;
     struct block_buffer* buffer;
-    if(iter->dirent + 1 >= iter->dirent_end){
+    if(has_dirent_iter_reached_end(iter)){
         if(!iter_zone_has_next(&iter->zone_iter))
             return NULL;
         zone = iter_zone_get_next(&iter->zone_iter);
@@ -569,7 +571,7 @@ int iter_dirent_init(struct dirent_iterator* iter, struct inode* inode, int zone
 }
 
 bool iter_dirent_has_next(struct dirent_iterator* iter){
-    if(iter->dirent + 1 >= iter->dirent_end)
+    if(has_dirent_iter_reached_end(iter))
         if(!iter_zone_has_next(&iter->zone_iter))
             return false;
     
