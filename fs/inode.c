@@ -1,7 +1,8 @@
 #include <fs/fs.h>
 #include <kernel/clock.h>
+#include <sys/compiler.h>
 
-int fill_dirent(inode_t* ino, struct winix_dirent* curr, const char* string);
+BUILD_BUG_ON(sizeof(struct winix_dirent) > BLOCK_SIZE);
 
 #define INODE_ARC_MAP_LEN   (8)
 inode_t inode_table[NR_INODES];
@@ -349,7 +350,7 @@ int _release_inode(inode_t *inode, bool is_indirect_zone){
 
 int fill_dirent(inode_t* ino, struct winix_dirent* curr, const char* string){
     mode_t mode = ino->i_mode;
-    char32_strlcpy(curr->dirent.d_name, string, DIRNAME_LEN);
+    char32_strlcpy(curr->dirent.d_name, string, WINIX_NAME_LEN);
     curr->dirent.d_ino = ino->i_num;
 
     if(mode & S_IFDIR){
@@ -395,7 +396,7 @@ int add_inode_to_directory(struct proc* who, struct inode* dir, struct inode* in
         return -EINVAL;
     if(!has_file_access(who, dir, W_OK))
         return -EACCES;
-    if(strlen(string) >= DIRNAME_LEN)
+    if(strlen(string) > NAME_MAX)
         return -ENAMETOOLONG;
 
     iter_dirent_init(&iter, dir, 0, 0);
