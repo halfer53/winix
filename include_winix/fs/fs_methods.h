@@ -35,7 +35,7 @@ int sys_stat(struct proc* who, char *pathname, struct stat *statbuf);
 int sys_fstat(struct proc* who, int fd, struct stat* statbuf);
 int sys_link(struct proc* who, char *oldpath, char *newpath);
 int sys_unlink(struct proc* who, char *path);
-int sys_mknod(struct proc* who, char *pathname, mode_t mode, dev_t devid);
+int sys_mknod(struct proc* who, const char *pathname, mode_t mode, dev_t devid);
 int sys_getdents(struct proc* who, int fd, struct dirent* dirp_dst, unsigned int count);
 int sys_getcwd(struct proc* who, char* pathname, int size, char** result);
 

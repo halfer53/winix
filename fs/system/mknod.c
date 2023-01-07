@@ -5,7 +5,7 @@
 #include <fs/fs.h>
 
 
-int sys_mknod(struct proc* who, char *path, mode_t mode, dev_t devid){
+int sys_mknod(struct proc* who, const char *path, mode_t mode, dev_t devid){
     int ret;
     inode_t *inode = NULL, *lastdir = NULL;
     char string[WINIX_NAME_LEN];
