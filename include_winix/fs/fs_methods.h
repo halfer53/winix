@@ -12,8 +12,8 @@
 #include <fs/type.h>
 #include <stdbool.h>
 
-int sys_open(struct proc *who, char *path,int flags, mode_t mode);
-int filp_open(struct proc* who, struct filp** _filp, char *path, int flags, mode_t mode);
+int sys_open(struct proc *who, const char *path,int flags, mode_t mode);
+int filp_open(struct proc* who, struct filp** _filp, const char *path, int flags, mode_t mode);
 int filp_close(struct filp* filp);
 int filp_write(struct proc* who, struct filp* file, void *buf, size_t count);
 int filp_read(struct proc* who, struct filp* file, void *buf, size_t count);

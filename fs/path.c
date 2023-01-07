@@ -14,9 +14,10 @@ char* dot2 = "..";    /* permissions for . and ..            */
 * This routine follows the standard convention that /usr/ast, /usr// ast,
 * // usr/// ast and /usr/ast/ are all equivalent.
 */
-char *get_name(char *old_name, char string[WINIX_NAME_LEN]){
+const char *get_name(const char *old_name, char string[WINIX_NAME_LEN]){
     int c;
-    char *np, *rnp;
+    char *np;
+    const char*rnp;
 
     np = string;            /* 'np' points to current position */
     rnp = old_name;        /* 'rnp' points to unparsed string */
@@ -112,11 +113,11 @@ int get_child_inode_name(inode_t* parent, inode_t* child, char string[WINIX_NAME
  
 
 int __eath_path(struct inode* curr_ino, struct inode** last_dir,
-        struct inode** ret_ino, char *path, char string[WINIX_NAME_LEN]){
+        struct inode** ret_ino, const char *path, char string[WINIX_NAME_LEN]){
 
     inode_t *rip, *new_rip;
     ino_t inum;
-    char *component_name;
+    const char *component_name;
     struct device* dev;
 
     rip = curr_ino;
@@ -164,7 +165,7 @@ int __eath_path(struct inode* curr_ino, struct inode** last_dir,
     return -ENOENT;
 }
 
-int eat_path(struct proc* who, char *path, struct inode** last_dir, struct inode** ret_ino, char string[WINIX_NAME_LEN]){
+int eat_path(struct proc* who, const char *path, struct inode** last_dir, struct inode** ret_ino, char string[WINIX_NAME_LEN]){
     int ret;
     inode_t *curr_dir;
     if(who->fp_workdir == NULL || who->fp_rootdir == NULL){

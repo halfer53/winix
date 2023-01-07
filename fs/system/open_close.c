@@ -38,7 +38,7 @@ int alloc_inode_under_dir(struct proc* who, struct device* dev, inode_t** _inode
     return 0;
 }
 
-int filp_open(struct proc* who, struct filp** _filp, char *path, int flags, mode_t mode){
+int filp_open(struct proc* who, struct filp** _filp, const char *path, int flags, mode_t mode){
     filp_t *filp;
     int ret;
     inode_t *inode = NULL, *lastdir = NULL;
@@ -108,7 +108,7 @@ final:
     return ret;
 }
 
-int sys_open(struct proc *who, char *path, int flags, mode_t mode)
+int sys_open(struct proc *who, const char *path, int flags, mode_t mode)
 {
     int open_slot, ret;
     struct filp* filp;
