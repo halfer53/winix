@@ -7,10 +7,11 @@ int sys_getcwd(struct proc* who, char* pathname, int size, char** result){
     int inum;
     char string[WINIX_NAME_LEN];
     char *p;
-
     
     if(size <= 1)
         return -ERANGE;
+    if (!is_vaddr_ok((vptr_t*)pathname, size, who))
+        return -EFAULT;
 
     p = pathname + size - 1;
     *p = '\0';
