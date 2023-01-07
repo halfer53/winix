@@ -14,7 +14,7 @@ char* dot2 = "..";    /* permissions for . and ..            */
 * This routine follows the standard convention that /usr/ast, /usr// ast,
 * // usr/// ast and /usr/ast/ are all equivalent.
 */
-char *get_name(char *old_name, char string[NAME_MAX]){
+char *get_name(char *old_name, char string[WINIX_NAME_LEN]){
     int c;
     char *np, *rnp;
 
@@ -26,7 +26,7 @@ char *get_name(char *old_name, char string[NAME_MAX]){
 
     /* Copy the unparsed path, 'old_name', to the array, 'string'. */
     while ( rnp < &old_name[PATH_MAX]  &&  c != '/'   &&  c != '\0') {
-      if (np < &string[NAME_MAX]){
+      if (np < &string[WINIX_NAME_LEN]){
         *np++ = c;
       }
       c = *++rnp;        /* advance to next character */
@@ -37,7 +37,7 @@ char *get_name(char *old_name, char string[NAME_MAX]){
       c = *++rnp;
     }
 
-    if (np < &string[NAME_MAX]) *np = '\0';    /* Terminate string */
+    if (np < &string[WINIX_NAME_LEN]) *np = '\0';    /* Terminate string */
 
     if (rnp >= &old_name[PATH_MAX]) {
     //   err_code = ENAMETOOLONG;
@@ -48,7 +48,7 @@ char *get_name(char *old_name, char string[NAME_MAX]){
 
 // given a directory and a name component, lookup in the directory
 // and find the corresponding inode
-int advance(inode_t *dirp, char string[NAME_MAX]){
+int advance(inode_t *dirp, char string[WINIX_NAME_LEN]){
     struct winix_dirent* dirstream;
     struct dirent_iterator iter;
     int ret = -EINVAL;
@@ -86,7 +86,7 @@ int get_parent_inode_num(inode_t *dirp){
     return ret;
 }
 
-int get_child_inode_name(inode_t* parent, inode_t* child, char string[NAME_MAX]){
+int get_child_inode_name(inode_t* parent, inode_t* child, char string[WINIX_NAME_LEN]){
     struct winix_dirent* dirstream;
     struct dirent_iterator iter;
     int ret = -EINVAL;
@@ -112,7 +112,7 @@ int get_child_inode_name(inode_t* parent, inode_t* child, char string[NAME_MAX])
  
 
 int __eath_path(struct inode* curr_ino, struct inode** last_dir,
-        struct inode** ret_ino, char *path, char string[DIRSIZ]){
+        struct inode** ret_ino, char *path, char string[WINIX_NAME_LEN]){
 
     inode_t *rip, *new_rip;
     ino_t inum;
@@ -164,7 +164,7 @@ int __eath_path(struct inode* curr_ino, struct inode** last_dir,
     return -ENOENT;
 }
 
-int eat_path(struct proc* who, char *path, struct inode** last_dir, struct inode** ret_ino, char string[DIRSIZ]){
+int eat_path(struct proc* who, char *path, struct inode** last_dir, struct inode** ret_ino, char string[WINIX_NAME_LEN]){
     int ret;
     inode_t *curr_dir;
     if(who->fp_workdir == NULL || who->fp_rootdir == NULL){
@@ -186,7 +186,7 @@ int eat_path(struct proc* who, char *path, struct inode** last_dir, struct inode
 int get_inode_by_path(struct proc* who, char *path, struct inode** inode){
     int ret;
     inode_t *lastdir = NULL;
-    char string[DIRSIZ];
+    char string[WINIX_NAME_LEN];
 
     ret = eat_path(who, path, &lastdir, inode, string);
     put_inode(lastdir, false);

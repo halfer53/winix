@@ -8,7 +8,7 @@
 int sys_mknod(struct proc* who, char *path, mode_t mode, dev_t devid){
     int ret;
     inode_t *inode = NULL, *lastdir = NULL;
-    char string[DIRSIZ];
+    char string[WINIX_NAME_LEN];
     struct device* dev;
 
     dev = get_dev(devid);

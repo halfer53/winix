@@ -29,7 +29,7 @@ int sys_chdir(struct proc* who, char* pathname){
 }
 
 int sys_mkdir(struct proc* who, char* pathname, mode_t mode){
-    char string[DIRSIZ];
+    char string[WINIX_NAME_LEN];
     struct inode *lastdir = NULL, *ino = NULL;
     int ret = 0, bnr;
     bool is_dirty = false;

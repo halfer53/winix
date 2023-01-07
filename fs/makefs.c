@@ -4,7 +4,6 @@
 #include <assert.h>
 #include <limits.h>
 
-int fill_dirent(inode_t* ino, struct winix_dirent* curr, char* string);
 char rootfs_name[] = "WINIX_ROOTFS";
 
 unsigned int setBits(unsigned int n)

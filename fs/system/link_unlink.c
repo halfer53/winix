@@ -6,7 +6,7 @@
 
 int sys_link(struct proc* who, char *oldpath, char *newpath){
     struct inode* oldinode = NULL, *newinode = NULL, *lastdir = NULL;
-    char string[DIRSIZ];
+    char string[WINIX_NAME_LEN];
     int ret;
 
     if((ret = get_inode_by_path(who, oldpath, &oldinode)))
@@ -35,7 +35,7 @@ int sys_link(struct proc* who, char *oldpath, char *newpath){
 }
 
 int sys_unlink(struct proc* who, char *path){
-    char string[DIRSIZ];
+    char string[WINIX_NAME_LEN];
     struct inode* lastdir = NULL, *ino = NULL;
     int ret;
 
