@@ -29,7 +29,7 @@ int sys_dup(struct proc* who, int oldfd);
 int sys_dup2(struct proc* who, int oldfd, int newfd);
 int sys_umask(struct proc* who, mode_t mask);
 int sys_lseek(struct proc* who, int fd, off_t offset, int whence);
-int sys_mkdir(struct proc* who, char* pathname, mode_t mode);
+int sys_mkdir(struct proc* who, const char* pathname, mode_t mode);
 int sys_access(struct proc* who, char* pathname, int mode);
 int sys_stat(struct proc* who, char *pathname, struct stat *statbuf);
 int sys_fstat(struct proc* who, int fd, struct stat* statbuf);

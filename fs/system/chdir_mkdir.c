@@ -28,7 +28,7 @@ int sys_chdir(struct proc* who, char* pathname){
     return ret;
 }
 
-int sys_mkdir(struct proc* who, char* pathname, mode_t mode){
+int sys_mkdir(struct proc* who, const char* pathname, mode_t mode){
     char string[WINIX_NAME_LEN];
     struct inode *lastdir = NULL, *ino = NULL;
     int ret = 0, bnr;
