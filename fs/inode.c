@@ -4,7 +4,6 @@
 
 BUILD_BUG_ON(sizeof(struct winix_dirent) > BLOCK_SIZE);
 
-#define INODE_ARC_MAP_LEN   (8)
 inode_t inode_table[NR_INODES];
 
 struct inode* get_free_inode_slot(){
