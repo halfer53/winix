@@ -21,7 +21,7 @@ int sys_close(struct proc *who, int fd)
     return 0;
 }
 
-int alloc_inode_under_dir(struct proc* who, struct device* dev, inode_t** _inode, inode_t* lastdir, char string[WINIX_NAME_LEN]){
+int alloc_inode_under_dir(struct proc* who, struct device* dev, inode_t** _inode, inode_t* lastdir, char string[DIRSIZ]){
     inode_t* inode;
     int ret;
     dev = lastdir->i_dev;
@@ -42,7 +42,7 @@ int filp_open(struct proc* who, struct filp** _filp, char *path, int flags, mode
     filp_t *filp;
     int ret;
     inode_t *inode = NULL, *lastdir = NULL;
-    char string[WINIX_NAME_LEN];
+    char string[DIRSIZ];
     struct device *dev;
     clock_t unix_time = get_unix_time();
     bool is_new = false;

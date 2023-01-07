@@ -5,7 +5,7 @@ int sys_getcwd(struct proc* who, char* pathname, int size, char** result){
     int ret = 0, len, ret2;
     inode_t *inode, *parent_inode;
     int inum;
-    char string[WINIX_NAME_LEN];
+    char string[NAME_MAX];
     char *p;
 
     

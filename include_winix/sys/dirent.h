@@ -4,14 +4,23 @@
 
 #include <uchar.h>
 #include <sys/stat.h>
-#include <sys/limits.h>
 
 #define    DIRBLKSIZ    1024    /* size of directory block */
+
+
+// each direct occupies 32 words
+#ifndef DIRSIZ
+#define DIRSIZ    32
+#endif
+
+#ifndef DIRNAME_LEN
+#define DIRNAME_LEN 30
+#endif
 
 struct dirent {
     ino_t          d_ino;       /* inode number */
     unsigned int   d_type;      /* type of file; not supported */
-    char32_t   d_name[WINIX_NAME_LEN ]; /* filename */
+    char32_t   d_name[DIRNAME_LEN ]; /* filename */
 };
 
 struct winix_dirent {

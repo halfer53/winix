@@ -6,7 +6,7 @@ int sys_statfs(struct proc* who, char *path, struct statfs *buf){
     int ret = 0;
     struct superblock *sb;
     inode_t *inode = NULL, *last_dir = NULL;
-    char string[WINIX_NAME_LEN];
+    char string[DIRSIZ];
 
     if((ret = eat_path(who, path, &last_dir, &inode, string)))
         return ret;
@@ -29,7 +29,7 @@ int sys_statfs(struct proc* who, char *path, struct statfs *buf){
     buf->f_bfree = buf->f_bavail = sb->s_free_blocks;
     buf->f_files = sb->s_inode_inuse + sb->s_free_inodes;
     buf->f_ffree = sb->s_free_inodes;
-    buf->f_namelen = NAME_MAX;
+    buf->f_namelen = DIRNAME_LEN;
 
     final:
     put_inode(last_dir, false);
