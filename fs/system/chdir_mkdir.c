@@ -4,7 +4,7 @@
 
 #include <fs/fs.h>
 
-int sys_chdir(struct proc* who, char* pathname){
+int sys_chdir(struct proc* who, const char* pathname){
     int ret = 0;
     inode_t *inode = NULL, *curr_working;
 

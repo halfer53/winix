@@ -34,7 +34,7 @@ export WINIX_INCLUDE_PATH := -Iinclude_winix
 export INCLUDE_PATH := -Iinclude
 export WRAMP := -D__wramp__
 export COMMON_CFLAGS := -DTEXT_OFFSET=$(TEXT_OFFSET) -D_DEBUG 
-export GCC_FLAG := -g -Wall -Werror -pedantic -Wno-discarded-qualifiers -Wno-comment -Wno-stringop-overflow
+export GCC_FLAG := -g -Wall -Werror -pedantic -Wno-comment -Wno-stringop-overflow
 export CFLAGS := $(COMMON_CFLAGS) $(WINIX_INCLUDE_PATH) $(GCC_FLAG)
 		
 L_HEAD = winix/limits/limits_head.o
