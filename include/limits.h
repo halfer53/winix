@@ -1,6 +1,8 @@
 #ifndef _LIMITS_H_
 #define _LIMITS_H_
 
+#include <sys/limits.h>
+
 /* We don't have #include_next.
    Define ANSI <limits.h> for standard 32-bit words.  */
 
@@ -34,11 +36,13 @@
 /* Maximum value an `unsigned int' can hold.  (Minimum is 0.)  */
 #  define UINT_MAX        4294967295U
 
+#ifndef PATH_MAX
+#define PATH_MAX  WINIX_PATH_MAX
+#endif
 
-#define PATH_MAX  (128)
-#define NAME_MAX  (32)
-
-
+#ifndef NAME_MAX
+#define NAME_MAX  WINIX_NAME_MAX
+#endif
 
 #ifdef __wramp__
 
