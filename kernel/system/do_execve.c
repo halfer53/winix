@@ -53,13 +53,13 @@ int do_execve(struct proc *who, struct message *m){
     char* path = m->m1_p1;
     char** argv = m->m1_p2;
     char** envp = m->m1_p3;
-    char buffer[NAME_MAX];
+    char buffer[PATH_MAX];
     int ret;
 
     if(is_vaddr_accessible(path, who) && is_vaddr_accessible(argv, who) && is_vaddr_accessible(envp, who)){
         argv = (char**)get_physical_addr(argv, who);
         envp = (char**)get_physical_addr(envp, who);
-        if((ret = copy_from_user(who, (ptr_t *)buffer, (vptr_t *)path, NAME_MAX)) < 0)
+        if((ret = copy_from_user(who, (ptr_t *)buffer, (vptr_t *)path, PATH_MAX)) < 0)
             return ret;
         return exec_welf(who, buffer, argv, envp, false);
     }
