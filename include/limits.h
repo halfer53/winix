@@ -9,7 +9,7 @@
 /* These assume 8-bit `char's, 16-bit `short int's,
    and 32-bit `int's and `long int's.  */
 
-
+#  define ARG_MAX          10240
 
 /* Minimum and maximum values a `signed char' can hold.  */
 #  define SCHAR_MIN        (-128)
