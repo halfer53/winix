@@ -37,6 +37,13 @@ void block_signals()
     }
 }
 
+void init_system(){
+    int ret;
+
+    ret = mkdir("/tmp", 0777);
+    assert(ret == 0);
+}
+
 void init_dev()
 {
     int ret;
@@ -207,6 +214,7 @@ int main(int argc, char **argv)
     int fd;
     init_dev();
     init_tty();
+    init_system();
 
     if (!vfork())
         run_shell();
