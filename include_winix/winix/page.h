@@ -26,7 +26,7 @@ int align_page(int len);
 #define ALIGN1K_HB(x) 	                (((((x)-1)>>10)<<10)+PAGE_LEN)
 
 #define get_physical_addr(va,proc)      (((ptr_t*)(va))+(unsigned long)(proc)->ctx.rbase)
-#define get_virtual_addr(pa,proc)       (((ptr_t*)(pa))-(unsigned long)(proc)->ctx.rbase)
+#define get_virtual_addr(pa,proc)       (((vptr_t*)(pa))-(unsigned long)(proc)->ctx.rbase)
 
 #define PAGE_TO_PADDR(_index)           ((ptr_t *)((unsigned long)(_index) * PAGE_LEN))
 #define PADDR_TO_PAGED(addr)            ((unsigned long)(addr) / PAGE_LEN)
