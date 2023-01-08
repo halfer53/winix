@@ -36,3 +36,12 @@ void test_given_cmdline_when_args_5_pipes_should_return_5(){
     assert(strcmp(cmd.argv[cmd.cmdStart[3]], "cat") == 0);
     assert(strcmp(cmd.argv[cmd.cmdStart[4]], "cat") == 0);
 }
+
+void test_given_cmdline_when_line_break_should_return_2(){
+    struct cmdLine cmd;
+    int ret = parse("echo abc\\ndef\\nghn | grep def", &cmd);
+    assert(ret == 0);
+    assert(cmd.numCommands == 2);
+    assert(strcmp(cmd.argv[cmd.cmdStart[0]], "echo") == 0);
+    assert(strcmp(cmd.argv[cmd.cmdStart[1]], "grep") == 0);
+}
