@@ -67,8 +67,9 @@ int do_execve(struct proc *who, struct message *m){
 }
 
 int copy_stirng_array(struct string_array *arr, char* from[], struct proc* who, bool is_physical_addr){
-    int limit = 32;
-    int count = 32;
+    int limit_per_arg = PAGE_LEN * sizeof(char);
+    int limit_arg_num = ARG_MAX / limit_per_arg;
+    int count = limit_arg_num;
     int size = 0, i, strsize, j, ret;
     char* physical;
     char **pptr = from;
@@ -86,21 +87,21 @@ int copy_stirng_array(struct string_array *arr, char* from[], struct proc* who, 
     }
     arr->size = size;
     pptr = from;
-    count = limit;
+    count = limit_per_arg;
     for(i = 0; i < size - 1; i++){
         physical = from[i];
         if(!is_physical_addr){
             physical = (char*)get_physical_addr(physical, who);
         }
         strsize = strlen(physical);
-        strsize = strsize < limit ? strsize : limit;
+        strsize = strsize < limit_per_arg ? strsize : limit_per_arg;
         arr->array[i] = (char*)kmalloc(strsize + 1);
         if(!arr->array[i]){
             ret = -ENOMEM;
             goto err_free_all;
         }
         
-        strlcpy(arr->array[i], physical, limit);
+        strlcpy(arr->array[i], physical, limit_per_arg);
     }
     arr->array[i] = NULL;
     ret = 0;
