@@ -333,9 +333,9 @@ reg_t* alloc_kstack(struct proc *who, int size){
     reg_t *addr, *stack_top;
 
     if(size % PAGE_LEN == 0){
-        stack_top = (reg_t*)get_free_pages(size, GFP_HIGH);
+        stack_top = (reg_t*)get_free_pages(size * sizeof(char), GFP_HIGH);
     }else{
-        stack_top = (reg_t*)kmalloc(size);
+        stack_top = (reg_t*)kmalloc(size, sizeof(char));
     }
 
     addr = stack_top + size - 1;

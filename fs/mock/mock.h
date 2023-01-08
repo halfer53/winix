@@ -9,7 +9,7 @@
 #include <sys/ipc.h>
 #include <kernel/proc.h>
 
-void* kmalloc(unsigned int size);
+void* kmalloc(size_t nitimes, size_t size);
 void kfree(void *ptr);
 
 int do_ls(char* pathname);

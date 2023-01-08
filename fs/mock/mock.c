@@ -50,9 +50,9 @@ bool is_vaddr_ok(vptr_t* addr, size_t len, struct proc* who){
     return true;
 }
 
-void* kmalloc(unsigned int size){
+void* kmalloc(size_t nitimes, size_t size){
     void *ret;
-    if (curr + size >= MEM_SIZE){
+    if (curr + nitimes * size >= MEM_SIZE){
         return NULL;
     }
     ret = &mem[curr];

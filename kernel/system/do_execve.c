@@ -81,7 +81,7 @@ int copy_stirng_array(struct string_array *arr, char* from[], struct proc* who, 
         size++;
     }
     size++;
-    arr->array = (char**)kmalloc(size);
+    arr->array = (char**)kmalloc(size, sizeof(char *));
     if(!arr->array){
         return -ENOMEM;
     }
@@ -95,7 +95,7 @@ int copy_stirng_array(struct string_array *arr, char* from[], struct proc* who, 
         }
         strsize = strlen(physical);
         strsize = strsize < limit_per_arg ? strsize : limit_per_arg;
-        arr->array[i] = (char*)kmalloc(strsize + 1);
+        arr->array[i] = (char*)kmalloc(strsize + 1, sizeof(char));
         if(!arr->array[i]){
             ret = -ENOMEM;
             goto err_free_all;
@@ -149,7 +149,7 @@ int build_user_stack(struct proc* who, struct string_array* argv, struct string_
 
     // malloc the pointer for each environment and argv variable
     if(argv->size > 0){
-        argv_ptr = (ptr_t*)kmalloc(argv->size);
+        argv_ptr = (ptr_t*)kmalloc(argv->size, sizeof(ptr_t));
         if(argv_ptr){
             copy_sarray_to_heap(who, argv, argv_ptr);
             init_stack.argc = argv->size - 1;
@@ -159,7 +159,7 @@ int build_user_stack(struct proc* who, struct string_array* argv, struct string_
         }
     }
     if(env->size > 0){
-        env_ptr = (ptr_t*)kmalloc(env->size);
+        env_ptr = (ptr_t*)kmalloc(env->size, sizeof(ptr_t));
         if(env_ptr){
             copy_sarray_to_heap(who, env, env_ptr);
             // store the pointer to environment variable at the bottom of stack

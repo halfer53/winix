@@ -143,10 +143,10 @@ struct mem_block *extend_heap(struct mem_block *first , size_t s)
     return b;
 }
 
-void *_kmalloc(size_t size, void* ra) {
+void *_kmalloc(size_t nitimes, size_t size, void* ra) {
 
     struct mem_block *b, *first, *b2;
-    size_t s = size;
+    size_t s = size * nitimes;
 
     // s = align4(size);
     // kdebug("kmalloc begin size %d by %x\n", size, ra);

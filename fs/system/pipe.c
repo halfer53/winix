@@ -59,7 +59,7 @@ int sys_pipe(struct proc* who, int fd[2]){
     if(!ptr)
         return -ENOMEM;
 
-    pipe = kmalloc(sizeof(struct filp_pipe));
+    pipe = kmalloc(1, sizeof(struct filp_pipe));
     if(!pipe){
         ret = -ENOMEM;
         goto failed_filp_pipe;
@@ -188,7 +188,7 @@ int pipe_read ( struct filp *filp, char *data, size_t count, off_t offset){
         if(ino->i_count == 1) // write end is closed
             return 0;
 
-        next = (struct pipe_waiting*)kmalloc(sizeof(struct pipe_waiting));
+        next = (struct pipe_waiting*)kmalloc(1, sizeof(struct pipe_waiting));
         if(!next)
             return -ENOMEM;
         curr_syscall_caller->flags |= STATE_WAITING;
@@ -261,10 +261,10 @@ int pipe_write ( struct filp *filp, char *data, size_t count, off_t offset){
         if(filp->filp_flags & O_NONBLOCK)
             return 0;
         
-        next = (struct pipe_waiting*)kmalloc(sizeof(struct pipe_waiting));
+        next = (struct pipe_waiting*)kmalloc(1, sizeof(struct pipe_waiting));
         if(!next)
             return -ENOMEM;
-        p = (char *)kmalloc(count);
+        p = (char *)kmalloc(count, sizeof(char));
         if(!next){
             kfree(next);
             return -ENOMEM;
