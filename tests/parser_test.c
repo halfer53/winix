@@ -43,5 +43,6 @@ void test_given_cmdline_when_line_break_should_return_2(){
     assert(ret == 0);
     assert(cmd.numCommands == 2);
     assert(strcmp(cmd.argv[cmd.cmdStart[0]], "echo") == 0);
+    assert(strcmp(cmd.argv[cmd.cmdStart[0] + 1], "abc\\ndef\\nghn") == 0);
     assert(strcmp(cmd.argv[cmd.cmdStart[1]], "grep") == 0);
 }
