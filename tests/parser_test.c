@@ -37,7 +37,7 @@ void test_given_cmdline_when_args_5_pipes_should_return_5(){
     assert(strcmp(cmd.argv[cmd.cmdStart[4]], "cat") == 0);
 }
 
-void test_given_cmdline_when_line_break_should_return_2(){
+void test_given_cmdline_when_line_break_should_return_3(){
     struct cmdLine cmd;
     int ret = parse("echo abc\\\\ndef\\\\nghn | tail -n 2 | grep def", &cmd);
     assert(ret == 0);
