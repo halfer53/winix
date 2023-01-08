@@ -84,7 +84,7 @@ void kreport_all_procs(struct filp* file) {
 **/
 void kreport_proc(struct proc* curr, struct filp* file) {
     int ptable_idx = PADDR_TO_PAGED(curr->ctx.rbase)/32;
-    filp_kprint(file, "%-3d %-4d %-2d 0x%08lx 0x%08lx 0x%08lx 0x%08lx %d 0x%08x 0x%03x %s\n",
+    filp_kprint(file, "%-3d %-4d %-2d 0x%08lx 0x%08lx 0x%08lx 0x%08lx %d 0x%08lx 0x%03x %s\n",
             curr->pid,
             get_proc(curr->parent)->pid,
             curr->procgrp,
@@ -368,8 +368,8 @@ void set_proc(struct proc *p, void (*entry)(), const char *name) {
  */
  void kset_ptable(struct proc* who){
     if(IS_KERNEL_PROC(who)){
-        bitmap_fill(who->ctx.ptable, PTABLE_LEN);
-        bitmap_clear_bit(who->ctx.ptable, PTABLE_LEN, 0);
+        bitmap_fill((unsigned int *)who->ctx.ptable, PTABLE_LEN);
+        bitmap_clear_bit((unsigned int *)who->ctx.ptable, PTABLE_LEN, 0);
     }
 }
 
@@ -444,9 +444,9 @@ int proc_memctl(struct proc* who ,vptr_t* page_addr, int flags){
     int paged = PADDR_TO_PAGED(get_physical_addr(page_addr, who)); // get page descriptor
     
     if(flags == PROC_ACCESS){
-        return bitmap_set_bit(who->ctx.ptable, PTABLE_LEN, paged);
+        return bitmap_set_bit((unsigned int *)who->ctx.ptable, PTABLE_LEN, paged);
     }else if(flags == PROC_NO_ACCESS){
-        return bitmap_clear_bit(who->ctx.ptable, PTABLE_LEN, paged);
+        return bitmap_clear_bit((unsigned int *)who->ctx.ptable, PTABLE_LEN, paged);
     }
     return -EINVAL;
 }

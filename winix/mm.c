@@ -45,7 +45,7 @@ bool is_vaddr_ok(vptr_t* addr, size_t len, struct proc* who){
     start_page = PADDR_TO_PAGED(paddr);
     end_page = PADDR_TO_PAGED(paddr_end);
     for(; start_page <= end_page; start_page++){
-        ret = is_bit_on(who->ctx.ptable, PTABLE_LEN, start_page);
+        ret = is_bit_on((unsigned int *)who->ctx.ptable, PTABLE_LEN, start_page);
         if (!ret)
             return ret;
     }
@@ -144,7 +144,7 @@ ptr_t* user_get_free_pages(struct proc* who, int length, int flags){
         return NULL;
     index = PADDR_TO_PAGED(p);
     page_num = PADDR_TO_NUM_PAGES(length);
-    if(bitmap_set_nbits(who->ctx.ptable, PTABLE_LEN, index, page_num))
+    if(bitmap_set_nbits((unsigned int *)who->ctx.ptable, PTABLE_LEN, index, page_num))
         return NULL;
     return p;
 }
@@ -185,7 +185,7 @@ int user_get_free_pages_from(struct proc* who, ptr_t* addr, int size){
 
     index = PADDR_TO_PAGED(addr);
     page_num = PADDR_TO_NUM_PAGES(size);
-    return bitmap_set_nbits(who->ctx.ptable, PTABLE_LEN, index, page_num);
+    return bitmap_set_nbits((unsigned int *)who->ctx.ptable, PTABLE_LEN, index, page_num);
 }
 
 /**
@@ -221,7 +221,7 @@ int user_release_pages(struct proc* who, ptr_t* page, int len){
         return ret;
     index = PADDR_TO_PAGED(page);
     bitmaplen = PADDR_TO_PAGED(len);
-    return bitmap_clear_nbits(who->ctx.ptable, PTABLE_LEN, index, bitmaplen);
+    return bitmap_clear_nbits((unsigned int *)who->ctx.ptable, PTABLE_LEN, index, bitmaplen);
 }
 
 /**

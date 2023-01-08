@@ -120,7 +120,7 @@ int copy_pcb(struct proc* parent, struct proc* child){
 int copy_mm(struct proc* parent, struct proc* child){
     ptr_t *src, *dest;
 
-    bitmap_clear(child->ctx.ptable, PTABLE_LEN);
+    bitmap_clear((unsigned int *)child->ctx.ptable, PTABLE_LEN);
     child->mem_start = dup_vm(parent, child);
     if(child->mem_start == NULL)
         return -ENOMEM;
