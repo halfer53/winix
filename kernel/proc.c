@@ -44,16 +44,12 @@ PUBLIC struct proc *curr_syscall_caller;
  * 
  *              
  * Inaccessible Page (1024 words)   <- rbase
+ * Stack (1024 words)               
  * Text segment
  * Data segment
  * Bss segment
  * Heap data                        <- heap_bottom
  *              
- * 
- * 
- * 
- * Stack                            <- stack_top
- *
  * In the struct proc, rbase points to the first page for which 
  * the process does not have access. This is because NULL points to 0, which is 
  * effectively the first page of the process image. By setting the first page
