@@ -104,7 +104,8 @@ int main(int argc, char *argv[]) {
         buf[0] = '\0';
         for(i = 2; i < argc; i++){
             strlcat(buf, argv[i], MAX_LINE);
-            strlcat(buf, " ", MAX_LINE);
+            if (i < argc - 1)
+                strlcat(buf, " ", MAX_LINE);
         }
         return exec_cmd(buf);
     }
