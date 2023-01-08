@@ -102,10 +102,6 @@
 #define PROC_SIGAL_HANDLER          0x0008      /* process is in signal handler */
 #define PROC_NO_GPF                 0x0010      /* Do not generate GPF info for this process */
 
-// proc_memctll flags
-#define PROC_ACCESS                	1
-#define PROC_NO_ACCESS            	0
-
 
 struct k_context{
     mcontext_t m;
@@ -278,7 +274,7 @@ struct proc *start_user_proc(size_t *lines, size_t length, size_t entry, int pri
 struct proc *get_free_proc_slot();
 void enqueue_schedule(struct proc* p);
 reg_t* alloc_kstack(struct proc *who, int size);
-int proc_memctl(struct proc* who ,vptr_t* page_addr, int flags);
+int proc_memctl(struct proc* who ,vptr_t* page_addr, bool has_access);
 pid_t get_next_pid();
 struct proc* get_proc_by_pid(pid_t pid);
 struct proc *get_proc(int proc_nr);
