@@ -437,18 +437,14 @@ struct proc *start_kernel_proc(struct boot_image* task) {
  * process memory control, 
  * @param  who       
  * @param  page_addr the virtual address memory
- * @param  flags     PROC_ACCESS OR PROC_NO_ACCESS
+ * @param  has_access     whether proc has access to this virtual address
  * @return           
  */
-int proc_memctl(struct proc* who ,vptr_t* page_addr, int flags){
+int proc_memctl(struct proc* who ,vptr_t* page_addr, bool has_access){
     int paged = PADDR_TO_PAGED(get_physical_addr(page_addr, who)); // get page descriptor
+    int (*func)(unsigned int *map, int map_len,int start) = has_access ? bitmap_set_bit : bitmap_clear_bit;
     
-    if(flags == PROC_ACCESS){
-        return bitmap_set_bit((unsigned int *)who->ctx.ptable, PTABLE_LEN, paged);
-    }else if(flags == PROC_NO_ACCESS){
-        return bitmap_clear_bit((unsigned int *)who->ctx.ptable, PTABLE_LEN, paged);
-    }
-    return -EINVAL;
+    return func((unsigned int *)who->ctx.ptable, PTABLE_LEN, paged);
 }
 
 bool validate_welf(struct winix_elf* elf){
