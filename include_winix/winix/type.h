@@ -14,7 +14,7 @@
 #ifndef _W_TYPE_H_
 #define _W_TYPE_H_ 1
 
-typedef unsigned int reg_t;
+typedef unsigned long reg_t;
 typedef char ptr_t;  // physical address
 typedef char vptr_t; // virtual address
 
