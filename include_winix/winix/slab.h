@@ -15,11 +15,12 @@
 #define _W_SLAB_H_ 1
 
 #include <winix/gfp.h>
+#include <stddef.h>
 
-void* kmalloc(unsigned int size);
+void* kmalloc(size_t nitimes, size_t size);
 void kfree(void *ptr);
 
-void* _kmalloc(size_t size, void *ra);
+void* _kmalloc(size_t nitimes, size_t size, void *ra);
 void _kfree(void *ptr, void *ra);
 void* krealloc(void *p,unsigned int size);
 void *kcalloc(unsigned int number , unsigned int size);

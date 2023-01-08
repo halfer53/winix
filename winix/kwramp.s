@@ -9,13 +9,15 @@
 
 .global kmalloc
 kmalloc:
-	subui $sp, $sp, 2
-	lw $1, 2($sp)
+	subui $sp, $sp, 3
+	lw $1, 3($sp)
 	sw $1, 0($sp)
-	sw $ra, 1($sp)
+	lw $1, 4($sp)
+	sw $1, 1($sp)
+	sw $ra, 2($sp)
 	jal _kmalloc
-	lw $ra, 1($sp)
-	addui $sp, $sp, 2
+	lw $ra, 2($sp)
+	addui $sp, $sp, 3
 	jr $ra
 
 .global kfree
