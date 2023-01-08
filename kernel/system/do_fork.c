@@ -73,7 +73,7 @@ int copy_stack(struct proc* parent, struct proc* child){
     }
 
     // kdebug("tfork %p %p for %d tp %d\n", (void *)new_stack, (void *)*sp, child->proc_nr, child->thread_parent);
-    proc_memctl(child, vir_old_stack, PROC_NO_ACCESS);
+    proc_memctl(child, vir_old_stack, false);
     return 0;
 }
 

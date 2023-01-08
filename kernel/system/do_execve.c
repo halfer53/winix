@@ -260,7 +260,7 @@ int exec_welf(struct proc* who, const char* path, char *argv[], char *envp[], bo
 
     who->thread_parent = 0;
     build_user_stack(who, &argv_copy, &envp_copy);
-    proc_memctl(who, (void *)0, PROC_NO_ACCESS);
+    proc_memctl(who, (void *)0, false);
     ret = 0;
     goto final;
     
