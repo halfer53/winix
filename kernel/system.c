@@ -229,7 +229,7 @@ int no_syscall(struct proc* who, struct message* m){
 
 int syscall_not_implemented(struct proc* who, struct message *m){
     kerror("%s[%d] performed syscall %d that is not linked\n", 
-            who->name, who->proc_nr, m->type);
+            who->name, who->pid, m->type);
     return -ENOSYS;
 }
 
@@ -264,7 +264,7 @@ int syscall_reply2(int syscall_num, int reply, int dest, struct message* m){
         }else{
             kputd_buf(reply, buf);
         }
-        klog("Syscall %s return %s to Proc %s[%d]\n",syscall_str[syscall_num] , p, pDest->name, dest);
+        klog("Syscall %s return %s to Proc %s[%d]\n",syscall_str[syscall_num] , p, pDest->name, pDest->pid);
     }
     if(pDest){
         m->type = syscall_num;
