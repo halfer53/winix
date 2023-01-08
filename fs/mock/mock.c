@@ -52,11 +52,12 @@ bool is_vaddr_ok(vptr_t* addr, size_t len, struct proc* who){
 
 void* kmalloc(size_t nitimes, size_t size){
     void *ret;
-    if (curr + nitimes * size >= MEM_SIZE){
+    size_t total = nitimes * size;
+    if (curr + total >= MEM_SIZE){
         return NULL;
     }
     ret = &mem[curr];
-    curr += size;
+    curr += total;
     return ret;
 }
 void kfree(void *ptr){
