@@ -41,7 +41,7 @@
 #define SYSTEM                      0
 
 // Number of User procs
-#define NUM_PROCS               	8
+#define NUM_PROCS               	9
 
 // Total number of procs
 #define NUM_PROCS_AND_TASKS         (NUM_TASKS + NUM_PROCS)
