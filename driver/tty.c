@@ -179,7 +179,7 @@ void tty_exception_handler( struct tty_state* state){
         if(state->bptr < state->buffer_end){
             if ( !(termios->c_lflag & ICANON) || (isprint(val) || is_new_line) ){
                 *state->bptr++ = val;
-                if(termios->c_lflag & ECHO)
+                if(termios->c_lflag & ICANON && termios->c_lflag & ECHO)
                     __kputc(rex, val);
             }
 
