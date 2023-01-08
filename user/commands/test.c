@@ -27,6 +27,7 @@
 #include <stdbool.h>
 #include <sys/ioctl.h>
 #include <time.h>
+#include <sys/wait.h>
 
 #define CMD_PROTOTYPE(name)    int name(int argc, char**argv)
 
@@ -48,6 +49,7 @@ CMD_PROTOTYPE(test_while);
 CMD_PROTOTYPE(run_all);
 CMD_PROTOTYPE(test_timer);
 CMD_PROTOTYPE(test_times);
+CMD_PROTOTYPE(test_pipes);
 
 struct cmd_internal test_commands[] = {
     { test_so, "stack", true },
@@ -58,6 +60,7 @@ struct cmd_internal test_commands[] = {
     { test_timer, "timer", true },
     { test_times, "times", true },
     { test_signal, "signal", true },
+    { test_pipes, "pipe", true },
     { test_while, "while", false },
     { run_all, "run", false },
     { test_nohandler, NULL, false},
@@ -432,6 +435,34 @@ int test_times(int argc, char **argv){
     nanosleep(&req, NULL);
     end = times(NULL);
     assert(end > 0 && end > start);
+    return 0;
+}
+
+int test_pipes(int argc, char *argv[]){
+    int status, ret;
+    int pipefd[2];
+    char buffer[100];
+    char *wsh_argv[] = {"/bin/wsh", "-c", "echo abc\\\\ndef\\\\nghn | tail -n 2 | grep def", NULL};
+    assert(pipe(pipefd) == 0);
+
+    if (!tfork()){
+        close(pipefd[0]);
+        dup2(pipefd[1], STDOUT_FILENO);
+        close(pipefd[1]);
+        execv("/bin/wsh", wsh_argv);
+        exit(1);
+    }
+    wait(&status);
+    assert(WIFEXITED(status));
+    assert(WEXITSTATUS(status) == 0);
+
+    memset(buffer, 0, 100);
+    ret = read(pipefd[0], buffer, 100);
+    assert(ret == 4);
+    assert(strcmp(buffer, "def\n") == 0);
+    close(pipefd[0]);
+    close(pipefd[1]);
+
     return 0;
 }
 
