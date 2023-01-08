@@ -491,7 +491,7 @@ int alloc_mem_welf(struct proc* who, struct winix_elf* elf, int stack_size, int 
 
     who->stack_top = user_get_free_pages(who, stack_size, GFP_HIGH);
     *(who->stack_top) = STACK_MAGIC;
-    who->ctx.m.sp = get_virtual_addr(who->stack_top + stack_size - 1, who);
+    who->ctx.m.sp = (reg_t*)get_virtual_addr(who->stack_top + stack_size - 1, who);
     memset(who->stack_top, 0, stack_size);
 
     // set bss segment to 0
@@ -544,7 +544,7 @@ int copyto_user_stack(struct proc *who, void *src, size_t len){
     reg_t *sp = get_physical_addr(who->ctx.m.sp,who);
     sp -= len;
     memcpy(sp,src,len);
-    who->ctx.m.sp = get_virtual_addr(sp,who);
+    who->ctx.m.sp = (reg_t*)get_virtual_addr(sp,who);
     return 0;
 }
 

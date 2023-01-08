@@ -151,7 +151,7 @@ void _traceback_stack(struct proc* proc, ptr_t **stack_start, ptr_t** stack_end)
     while (p < stack_end && i < LIMIT){
         data = *p;
         instruction = get_physical_addr(data, proc);
-        if (*instruction > 0x100000 && vtext_start <= data && data <= vtext_end){
+        if (*instruction > 0x100000 && (reg_t*)vtext_start <= data && data <= (reg_t*)vtext_end){
             kprintf("  - Virtual Addr: 0x%lx, Instruction: 0x%x\n", (uintptr_t)data, *instruction);
             i++;
         }

@@ -118,7 +118,7 @@ int do_brk(struct proc *who, struct message *m){
     new_brk = sys_sbrk(who, size);
     if(new_brk == NULL)
         return -ENOMEM;
-    new_brk = get_virtual_addr(new_brk, who);
+    new_brk = (ptr_t*)get_virtual_addr(new_brk, who);
     m->m1_p1 = new_brk;
     return 0;
 }
