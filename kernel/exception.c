@@ -130,28 +130,28 @@ PRIVATE void serial2_handler() {
 
 #define LIMIT 10
 void _traceback_stack(struct proc* proc, ptr_t **stack_start, ptr_t** stack_end){
-    vptr_t *vtext_start, *vtext_end;
-    ptr_t **p = stack_start;
+    reg_t *vtext_start, *vtext_end;
+    reg_t **p = (reg_t**)stack_start;
     reg_t *data, *instruction;
     char *filename;
     int i = 0;
 
-    if (p >= stack_end){
+    if (p >= (reg_t**)stack_end){
         kwarn("sp %p past %p\n", (void *)p, (void *)stack_end);
         return;
     }
 
-    vtext_start = get_virtual_addr(proc->text_top, proc);
+    vtext_start = (reg_t*)get_virtual_addr(proc->text_top, proc);
     vtext_end = vtext_start + proc->text_size;
 
     // kdebug("vtext_top: %p vtext_end %p stack %p stack_end %p\n", 
     //     (void *)vtext_start, (void *)vtext_end, (void *)p, (void *)stack_end);
 
     kprintf("Call Stack:\n");
-    while (p < stack_end && i < LIMIT){
+    while (p < (reg_t**)stack_end && i < LIMIT){
         data = *p;
-        instruction = get_physical_addr(data, proc);
-        if (*instruction > 0x100000 && (reg_t*)vtext_start <= data && data <= (reg_t*)vtext_end){
+        instruction = (reg_t*)get_physical_addr(data, proc);
+        if (*instruction > 0x100000 && vtext_start <= data && data <= vtext_end){
             kprintf("  - Virtual Addr: 0x%lx, Instruction: 0x%x\n", (uintptr_t)data, *instruction);
             i++;
         }

@@ -334,17 +334,17 @@ void proc_set_default(struct proc *p) {
  * @return      virtual address of the stack
  */
 reg_t* alloc_kstack(struct proc *who, int size){
-    ptr_t *addr, *stack_top;
+    reg_t *addr, *stack_top;
 
     if(size % PAGE_LEN == 0){
-        stack_top = get_free_pages(size, GFP_HIGH);
+        stack_top = (reg_t*)get_free_pages(size, GFP_HIGH);
     }else{
-        stack_top = kmalloc(size);
+        stack_top = (reg_t*)kmalloc(size);
     }
 
     addr = stack_top + size - 1;
     *stack_top = STACK_MAGIC;
-    who->stack_top = stack_top;
+    who->stack_top = (ptr_t*)stack_top;
     return addr;
 }
 
@@ -485,12 +485,12 @@ int alloc_mem_welf(struct proc* who, struct winix_elf* elf, int stack_size, int 
     // _kreport_bitmap(who->ctx.ptable, MEM_MAP_LEN, kprintf2);
     // _kreport_memtable(kprintf2);
 
-    who->ctx.rbase = mem_start - vm_offset;
+    who->ctx.rbase = (reg_t*)(mem_start - vm_offset);
     who->mem_start = mem_start;
     who->text_top = mem_start;
 
     who->stack_top = user_get_free_pages(who, stack_size, GFP_HIGH);
-    *(who->stack_top) = STACK_MAGIC;
+    *((reg_t*)who->stack_top) = STACK_MAGIC;
     who->ctx.m.sp = (reg_t*)get_virtual_addr(who->stack_top + stack_size - 1, who);
     memset(who->stack_top, 0, stack_size);
 
@@ -541,7 +541,7 @@ int copy_to_user(struct proc* who, vptr_t *dest, void *src, size_t len){
  * @return     
  */
 int copyto_user_stack(struct proc *who, void *src, size_t len){
-    reg_t *sp = get_physical_addr(who->ctx.m.sp,who);
+    reg_t *sp = (reg_t*)get_physical_addr(who->ctx.m.sp,who);
     sp -= len;
     memcpy(sp,src,len);
     who->ctx.m.sp = (reg_t*)get_virtual_addr(sp,who);

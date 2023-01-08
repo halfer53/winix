@@ -22,7 +22,7 @@ int do_sigreturn(struct proc *who, struct message *m){
 
     
 
-    sp = get_physical_addr(who->ctx.m.sp, who);
+    sp = (reg_t*)get_physical_addr(who->ctx.m.sp, who);
 
     sp += sizeof(struct sigframe);
 
