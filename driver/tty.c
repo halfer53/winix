@@ -34,8 +34,6 @@ struct tty_state{
     char buffer[TTY_BUFFER_SIZ];
     pid_t foreground_group;
     pid_t controlling_session;
-    bool is_echoing;
-    struct list_head commands;
 };
 
 
@@ -226,9 +224,7 @@ int __tty_init(RexSp_t* rex, struct device* dev, struct tty_state* state){
     state->bptr = buf;
     state->buffer_end = buf + TTY_BUFFER_SIZ - 1;
     state->rex = rex;
-    state->is_echoing = true;
     state->read_ptr = buf;
-    INIT_LIST_HEAD(&state->commands);
     return 0;
 }
 
