@@ -143,11 +143,15 @@ void start_init_routine()
     printf("Shutting down...\n");
 }
 
+char testlog_path[] = "/var/log/test.log";
+
 void run_unit_test()
 {
-    char *argv[] = {shell_path, "-c", "test", "run", ">", "/var/log/test.log", NULL};
+    char* const argv[] = {shell_path, "-c", "test", "run", ">", testlog_path, NULL};
     execve(shell_path, argv, initial_env);
 }
+
+#define BUFFER_SIZE 64
 
 void wait_for_unit_test(pid_t pid){
     int status, exit_status, fd, ret;
@@ -155,12 +159,11 @@ void wait_for_unit_test(pid_t pid){
     ret = waitpid(pid, &status, 0);
     exit_status = WEXITSTATUS(status);
     if (exit_status){
-        char buf[64];
-        disable_syscall_tracing();
+        char buf[BUFFER_SIZE];
         printf("Unit test failed, exit status %d\n", exit_status);
-        fd = open("test.log", O_RDONLY);
-        while((ret = read(fd, buf, 64 * sizeof(char))) > 0){
-            write(STDOUT_FILENO, buf, ret);
+        fd = open(testlog_path, O_RDONLY);
+        while((ret = read(fd, buf, BUFFER_SIZE * sizeof(char))) > 0){
+            write(STDERR_FILENO, buf, ret);
         }
         close(fd);
     }
