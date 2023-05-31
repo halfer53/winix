@@ -45,7 +45,7 @@ void _close_delete_file(int fd, char *name){
     ret = sys_close(curr_scheduling_proc, fd);
     assert(ret == 0);
 
-    ret = sys_unlink(curr_scheduling_proc, FILE1);
+    ret = sys_unlink(curr_scheduling_proc, FILE1, false);
     assert(ret == 0);
 }
 
@@ -344,7 +344,7 @@ void test_given_link_stat_when_one_file_deleted_should_return_1_nlink(){
     assert(ret == 0);
     assert(statbuf.st_nlink == 2);
 
-    ret = sys_unlink(curr_scheduling_proc, FILE1);
+    ret = sys_unlink(curr_scheduling_proc, FILE1, false);
     assert(ret == 0);
 
     ret = sys_stat(curr_scheduling_proc, FILE2, &statbuf);

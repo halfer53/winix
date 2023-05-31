@@ -34,7 +34,7 @@ int sys_link(struct proc* who, char *oldpath, char *newpath){
     return ret;
 }
 
-int sys_unlink(struct proc* who, const char* path){
+int sys_unlink(struct proc* who, const char* path, bool allow_dir){
     char string[WINIX_NAME_LEN];
     struct inode* lastdir = NULL, *ino = NULL;
     int ret;
@@ -48,7 +48,7 @@ int sys_unlink(struct proc* who, const char* path){
         goto final;
     }
 
-    if(S_ISDIR(ino->i_mode)){
+    if(!allow_dir && S_ISDIR(ino->i_mode)){
         ret = -EISDIR;
         goto inode_err;
     }
@@ -82,7 +82,7 @@ int do_unlink(struct proc* who, struct message* msg){
     if(!is_vaddr_accessible(msg->m1_p1, who) ){
             return -EFAULT;
         }
-    return sys_unlink(who, (char*)get_physical_addr(msg->m1_p1, who));
+    return sys_unlink(who, (char*)get_physical_addr(msg->m1_p1, who), false);
 }
 
 

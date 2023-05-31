@@ -35,7 +35,7 @@ int sys_rmdir(struct proc* who, const char* path){
     iter_dirent_close(&iter);
     put_inode(inode, false);
     
-    ret = sys_unlink(who, path);    
+    ret = sys_unlink(who, path, true);    
     goto result;
     
 final:
