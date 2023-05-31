@@ -28,7 +28,7 @@ char *init_argv[] = {
 };
 
 
-char *syscall_str[_NSYSCALL];
+const char *syscall_str[_NSYSCALL];
 
 syscall_handler_t syscall_table[_NSYSCALL];
 

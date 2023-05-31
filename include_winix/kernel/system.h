@@ -40,11 +40,9 @@ int curr_syscall_num();
 int sys_kill(struct proc* who, pid_t pid, int signum);
 
 #ifdef _DEBUG
-#define SYSCALL_MAP(i,fn)   syscall_table[i] = fn;\
-                    syscall_str[i] = #i
+#define SYSCALL_MAP(i,fn)   _syscall_map(i,fn,#i)
 #else
-#define SYSCALL_MAP(i,fn)   syscall_table[i] = fn;\
-                    syscall_str[i] = #i
+#define SYSCALL_MAP(i,fn)   _syscall_map(i,fn, NULL)
 #endif
 
 

@@ -26,7 +26,7 @@ extern struct boot_image boot_table[NUM_TASKS];
 extern char *init_argv[];
 extern char INIT_PATH[];
 extern syscall_handler_t syscall_table[_NSYSCALL];
-extern char *syscall_str[_NSYSCALL];
+extern const char *syscall_str[_NSYSCALL];
 
 struct proc *start_kernel_proc(struct boot_image* task);
 

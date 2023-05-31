@@ -142,7 +142,7 @@ int do_receive(struct message *m) {
 int do_notify(int src, int dest, struct message *m) {
     struct proc *pDest, *pSrc;
     int syscall_num;
-    char *msg_type = "";
+    const char *msg_type = "";
     // Is the destination valid?
     if ((pDest = get_proc(dest))) {
 

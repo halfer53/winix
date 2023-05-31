@@ -265,7 +265,12 @@ int syscall_reply2(int syscall_num, int reply, int dest, struct message* m){
         }else{
             kputd_buf(reply, buf);
         }
-        klog("Syscall %s return %s to Proc %s[%d]\n",syscall_str[syscall_num] , p, pDest->name, pDest->pid);
+#ifdef _DEBUG
+        klog("Syscall %s return %s to Proc %s[%d]\n", syscall_str[syscall_num] , p, pDest->name, pDest->pid);
+#else
+        klog("Syscall %d return %s to Proc %s[%d]\n", syscall_num , p, pDest->name, pDest->pid);
+#endif
+
     }
     if(pDest){
         m->type = syscall_num;
@@ -273,6 +278,14 @@ int syscall_reply2(int syscall_num, int reply, int dest, struct message* m){
         return do_notify(SYSTEM, dest,m);
     }
     return -ESRCH;
+}
+
+void _syscall_map(int syscall_num, syscall_handler_t handler, const char* str){
+    if(syscall_num <= 0 || syscall_num >= _NSYSCALL)
+        PANIC("syscall number out of range");
+        
+    syscall_table[syscall_num] = handler;
+    syscall_str[syscall_num] = str;
 }
 
 
