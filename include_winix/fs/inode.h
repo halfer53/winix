@@ -12,14 +12,14 @@
 
 
 typedef struct inode {
-    mode_t i_mode;        /* file type, protection, etc. */ //8 bytes
-    nlink_t i_nlinks;        /* how many links to this file */ //8bytes
-    uid_t i_uid;            /* user id of the file's owner */ //8bytes
-    gid_t i_gid;            /* group number */ //8 bytes
-    off_t i_size;            /* current file size in bytes */ //8 bytes
-    time_t i_atime;        /* time of last access (V2 only) */ //8
-    time_t i_mtime;        /* when was file data last changed */ //8
-    time_t i_ctime;        /* when was inode itself changed (V2 only)*/ //8
+    mode_t i_mode;          /* file type, protection, etc. */ 
+    nlink_t i_nlinks;        /* number of hard links */ 
+    uid_t i_uid;            /* user id of the file's owner */ 
+    gid_t i_gid;            /* group number */ 
+    off_t i_size;            /* current file size in bytes */ 
+    time_t i_atime;        /* time of last access (V2 only) */ 
+    time_t i_mtime;        /* when was file data last changed */
+    time_t i_ctime;        /* when was inode itself changed (V2 only)*/
     zone_t i_zone[NR_TZONES]; /* zone numbers for data blocks */
 
     /* inode data stored on disk stops here */
