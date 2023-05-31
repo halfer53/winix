@@ -38,6 +38,7 @@ int sys_unlink(struct proc* who, const char* path, bool allow_dir);
 int sys_mknod(struct proc* who, const char *pathname, mode_t mode, dev_t devid);
 int sys_getdents(struct proc* who, int fd, struct dirent* dirp_dst, unsigned int count);
 int sys_getcwd(struct proc* who, char* pathname, int size, char** result);
+int sys_rmdir(struct proc* who, const char* pathname);
 
 void init_dev();
 void init_tty();
