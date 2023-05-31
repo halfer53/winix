@@ -16,7 +16,7 @@
 #ifndef _SYSCALL_H_
 #define _SYSCALL_H_ 1
 
-#define _NSYSCALL               56
+#define _NSYSCALL               57
 /**
  * System Call Numbers
  **/
