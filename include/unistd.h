@@ -36,6 +36,7 @@ int brk(void *addr);
 char *getcwd(char *buf, size_t size);
 int execve(const char *pathname, char *const argv[],char *const envp[]);
 int execv(const char *path, char *const argv[]);
+int rmdir(const char *pathname);
 
 pid_t tcgetpgrp(int fd);
 int tcsetpgrp(int fd, pid_t pgrp);
@@ -65,6 +66,7 @@ int tcsetpgrp(int fd, pid_t pgrp);
 #define getcwd(buf, size)                   ptr_wramp_syscall(GETCWD, size, buf)
 #define execve(path, argv, envp)            wramp_syscall(EXECVE, path, argv, envp)
 #define execv(path, argv)                   execve(path, argv, environ)
+#define rmdir(path)                         wramp_syscall(RMDIR, path)
 
 #define _exit(status)                       __exit(status)
 

@@ -76,6 +76,7 @@
 #define TFORK           53
 #define SCHED_YIELD     54
 #define SETITIMER       55
+#define RMDIR           56
 
 
 #define WINFO_PS                1
