@@ -129,4 +129,9 @@ const char* kstr_error(int err){
     return strerror(err);
 }
 
+int copy_from_user(struct proc* who, void *dest, vptr_t *src, size_t len){
+    memcpy(dest, src, len);
+    return 0;
+}
+
 
