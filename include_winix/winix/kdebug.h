@@ -29,7 +29,7 @@ void kprintf_syscall_request(int,pid_t);
 #ifdef _DEBUG
     #define kdebug(...)   klog(__VA_ARGS__)
 #else
-    #define kdebug(token)
+    #define kdebug(...)
 #endif
 
 #endif
