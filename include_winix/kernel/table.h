@@ -87,6 +87,7 @@ int do_getcwd(struct proc* who, struct message *m);
 int do_tfork(struct proc* who, struct message* m);
 int do_sched_yield(struct proc* who, struct message* m);
 int do_setitimer(struct proc* who, struct message* m);
+int do_rmdir(struct proc* who, struct message* m);
 
 
 #endif

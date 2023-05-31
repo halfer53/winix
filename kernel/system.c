@@ -186,6 +186,7 @@ void set_syscall_mesg_exception(int operation, ptr_t* osp, struct message *m, st
     case PIPE:
     case CHDIR:
     case UNLINK:
+    case RMDIR:
         m->m1_p1 = (void*)*sp;
         break;
 
@@ -332,6 +333,7 @@ void init_syscall_table(){
     SYSCALL_MAP(TFORK, do_tfork);
     SYSCALL_MAP(SCHED_YIELD, do_sched_yield);
     SYSCALL_MAP(SETITIMER, do_setitimer);
+    SYSCALL_MAP(RMDIR, do_rmdir);
 }
 
 
