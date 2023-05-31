@@ -23,22 +23,25 @@ int sys_rmdir(struct proc* who, const char* path){
     iter_dirent_init(&iter, inode, 0, 0);
     while(iter_dirent_has_next(&iter)){
         curr = iter_dirent_get_next(&iter);
-        if(char32_strcmp(curr->dirent.d_name, "..") || char32_strcmp(curr->dirent.d_name, ".") ){
+        if(char32_strcmp(curr->dirent.d_name, "..") != 0 && char32_strcmp(curr->dirent.d_name, ".") != 0 
+            && curr->dirent.d_name[0] != '\0' ){
+            
             iter_dirent_close(&iter);
             ret = -ENOTEMPTY;
             goto final;
-        }   
+        }
     }
+
     iter_dirent_close(&iter);
+    put_inode(inode, false);
     
-    if ((ret = sys_unlink(who, path)) < 0)
-        goto final;
-        
-    release_inode(inode);
+    ret = sys_unlink(who, path);    
+    goto result;
     
 final:
     if (inode)
         put_inode(inode, false);
+result:
     return ret;
 }
 
