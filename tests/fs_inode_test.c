@@ -6,7 +6,7 @@ void test_given_zone_iterator_should_return(){
     struct zone_iterator iter;
     struct device* dev = get_dev(ROOT_DEV);
     struct inode* root = get_inode(ROOT_INODE_NUM, dev);
-    int ret = iter_zone_init(&iter, root, 0);
+    int ret = iter_zone_init(&iter, root);
     assert(ret == 0);
     assert(iter.i_inode == root);
     assert(iter.i_zone_idx == 0);
@@ -19,7 +19,7 @@ void test_given_has_next_zone_when_exceed_max_should_return_false(){
     struct zone_iterator iter;
     struct device* dev = get_dev(ROOT_DEV);
     struct inode* root = get_inode(ROOT_INODE_NUM, dev);
-    int ret = iter_zone_init(&iter, root, MAX_ZONES);
+    int ret = _iter_zone_init(&iter, root, MAX_ZONES);
     assert(ret == 0);
     
     bool result = iter_zone_has_next(&iter);
@@ -35,7 +35,7 @@ void test_given_has_next_zone_when_no_zone_should_return_false(){
     struct filp* filp;
     int ret = filp_open(curr_scheduling_proc, &filp, FILE1, O_CREAT | O_RDWR, 0755);
 
-    ret = iter_zone_init(&iter, filp->filp_ino, 0);
+    ret = iter_zone_init(&iter, filp->filp_ino);
     assert(ret == 0);
     
     bool result = iter_zone_has_next(&iter);
@@ -55,7 +55,7 @@ void test_given_has_next_zone_when_have_zone_should_return_true(){
     struct zone_iterator iter;
     struct device* dev = get_dev(ROOT_DEV);
     struct inode* root = get_inode(ROOT_INODE_NUM, dev);
-    int ret = iter_zone_init(&iter, root, 0);
+    int ret = iter_zone_init(&iter, root);
     assert(ret == 0);
     
     bool result = iter_zone_has_next(&iter);
@@ -69,7 +69,7 @@ void test_given_has_next_zone_when_zone_exhausted_should_return_false(){
     struct zone_iterator iter;
     struct device* dev = get_dev(ROOT_DEV);
     struct inode* root = get_inode(ROOT_INODE_NUM, dev);
-    int ret = iter_zone_init(&iter, root, 0);
+    int ret = iter_zone_init(&iter, root);
     assert(ret == 0);
     
     bool result = iter_zone_has_next(&iter);
@@ -109,7 +109,7 @@ void test_given_has_next_zone_when_alloc_zone_should_continue(){
     int ret = filp_open(curr_scheduling_proc, &filp, FILE1, O_CREAT | O_RDWR, 0755);
     assert(ret == 0);
 
-    ret = iter_zone_init(&iter, filp->filp_ino, 0);
+    ret = iter_zone_init(&iter, filp->filp_ino);
     assert(ret == 0);
 
     struct inode* inode = iter.i_inode;
@@ -194,7 +194,7 @@ void test_given_iter_dirent_has_next_when_has_data_should_return_true(){
 
     struct filp* filp = curr_scheduling_proc->fp_filp[fd];
     struct inode* inode = filp->filp_ino;
-    ret = iter_dirent_init(&iter, inode, 0, 0);
+    ret = iter_dirent_init(&iter, inode);
     assert(ret == 0);
 
     bool result = iter_dirent_has_next(&iter);
@@ -228,7 +228,7 @@ void test_given_iter_dirent_has_next_when_dirent_exhausted_should_return_false()
 
     struct filp* filp = curr_scheduling_proc->fp_filp[fd];
     struct inode* inode = filp->filp_ino;
-    ret = iter_dirent_init(&iter, inode, 0, 0);
+    ret = iter_dirent_init(&iter, inode);
     assert(ret == 0);
 
     int dirent_per_block = BLOCK_SIZE / sizeof(struct winix_dirent);

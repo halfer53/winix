@@ -162,7 +162,7 @@ int root_fs_read_write(struct filp *filp, char *data, size_t count, off_t offset
         count = count < remaining ? count : remaining;
     }
 
-    iter_zone_init(&iter, ino, curr_fp_index);
+    _iter_zone_init(&iter, ino, curr_fp_index);
     while(count > 0){
         if(!iter_zone_has_next(&iter)){
             if(!write_mode)

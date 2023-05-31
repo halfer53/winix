@@ -20,7 +20,7 @@ int sys_rmdir(struct proc* who, const char* path){
     // if(!permission(dir, W_OK))
     //     return -EACCES;
     
-    iter_dirent_init(&iter, inode, 0, 0);
+    iter_dirent_init(&iter, inode);
     while(iter_dirent_has_next(&iter)){
         curr = iter_dirent_get_next(&iter);
         if(char32_strcmp(curr->dirent.d_name, "..") != 0 && char32_strcmp(curr->dirent.d_name, ".") != 0 

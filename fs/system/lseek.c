@@ -17,7 +17,7 @@ int extend_file(struct filp* file, off_t count, int whence){
         file->filp_pos = count;
         return count;
     }
-    iter_zone_init(&iter, ino, 0);
+    iter_zone_init(&iter, ino);
     user_increment = ALIGN1K( count - total_size);
     while(iter_zone_has_next(&iter));
     while(user_increment > 0){

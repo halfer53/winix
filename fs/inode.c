@@ -125,7 +125,7 @@ int release_block(block_t bnr, struct device* id){
 blkcnt_t get_inode_blocks(struct inode* ino){
     blkcnt_t ret = 0;
     struct zone_iterator iter;
-    iter_zone_init(&iter, ino, 0);
+    iter_zone_init(&iter, ino);
     while(iter_zone_has_next(&iter)){
         ret++;
         (void)iter_zone_get_next(&iter);
@@ -294,7 +294,7 @@ void init_inode_proc_field(struct inode* ino, struct proc* who, mode_t devtype, 
 
 int truncate_inode(inode_t *inode){
     struct zone_iterator iter;
-    iter_zone_init(&iter, inode, 0);
+    iter_zone_init(&iter, inode);
 
     while(iter_zone_has_next(&iter)){
         zone_t zone = iter_zone_get_next(&iter);
@@ -398,7 +398,7 @@ int add_inode_to_directory(struct proc* who, struct inode* dir, struct inode* in
     if(strlen(string) > NAME_MAX)
         return -ENAMETOOLONG;
 
-    iter_dirent_init(&iter, dir, 0, 0);
+    iter_dirent_init(&iter, dir);
     while(true){
         if(!iter_dirent_has_next(&iter)){
             ret = iter_dirent_alloc(&iter);
@@ -429,7 +429,7 @@ int remove_inode_from_dir(struct proc* who, struct inode* dir, struct inode* tar
     if(!has_file_access(who, dir, W_OK))
         return -EACCES;
 
-    iter_dirent_init(&iter, dir, 0, 0);
+    iter_dirent_init(&iter, dir);
     while(iter_dirent_has_next(&iter)){
         curr = iter_dirent_get_next(&iter);
         if(curr->dirent.d_ino == target->i_num && char32_strcmp(curr->dirent.d_name, name) == 0){
@@ -446,7 +446,7 @@ int remove_inode_from_dir(struct proc* who, struct inode* dir, struct inode* tar
     return ret;
 }
 
-int iter_zone_init(struct zone_iterator* iter, struct inode* inode, int zone_idx){
+int _iter_zone_init(struct zone_iterator* iter, struct inode* inode, int zone_idx){
     iter->i_inode = inode;
     inode->i_count++;
     iter->i_zone_idx = zone_idx;
@@ -560,10 +560,10 @@ struct winix_dirent* _iter_dirent_get_current(struct dirent_iterator* iter){
     return iter->dirent;
 }
 
-int iter_dirent_init(struct dirent_iterator* iter, struct inode* inode, int zone_idx, int dir_idx){
+int _iter_dirent_init(struct dirent_iterator* iter, struct inode* inode, int zone_idx, int dir_idx){
     iter->buffer = NULL;
     iter->dirent_end = NULL;
-    iter_zone_init(&iter->zone_iter, inode, zone_idx);
+    _iter_zone_init(&iter->zone_iter, inode, zone_idx);
     iter->dirent = _iter_dirent_get_current(iter);
     iter->dirent += dir_idx;
     return 0;

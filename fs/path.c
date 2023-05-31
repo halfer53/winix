@@ -56,7 +56,7 @@ int advance(inode_t *dirp, char string[WINIX_NAME_LEN]){
 
     if(*string == '\0')
         return ret;
-    iter_dirent_init(&iter, dirp, 0, 0);
+    iter_dirent_init(&iter, dirp);
 //    kdebug("advancing %s in inode %d\n", string, dirp->i_num);
     while(iter_dirent_has_next(&iter)){
         dirstream = iter_dirent_get_next(&iter);
@@ -74,7 +74,7 @@ int get_parent_inode_num(inode_t *dirp){
     struct dirent_iterator iter;
     int ret = -EINVAL;
 
-    iter_dirent_init(&iter, dirp, 0, 0);
+    iter_dirent_init(&iter, dirp);
 //    kdebug("advancing %s in inode %d\n", string, dirp->i_num);
     while(iter_dirent_has_next(&iter)){
         dirstream = iter_dirent_get_next(&iter);
@@ -94,7 +94,7 @@ int get_child_inode_name(inode_t* parent, inode_t* child, char string[WINIX_NAME
     char32_t *p;
     int len = -EINVAL;
 
-    iter_dirent_init(&iter, parent, 0, 0);
+    iter_dirent_init(&iter, parent);
 //    kdebug("advancing %s in inode %d\n", string, dirp->i_num);
     while(iter_dirent_has_next(&iter)){
         dirstream = iter_dirent_get_next(&iter);
