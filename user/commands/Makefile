@@ -1,11 +1,11 @@
 obj-y += ls.o test.o stat.o cat.o echo.o uptime.o wc.o \
 	grep.o cp.o rm.o mv.o touch.o mkdir.o history.o \
-	ps.o pwd.o df.o du.o snake.o ln.o tail.o
+	ps.o pwd.o df.o du.o snake.o ln.o tail.o rmdir.o
 
 srec-y += ls.srec test.srec stat.srec cat.srec echo.srec \
 	uptime.srec wc.srec grep.srec cp.srec rm.srec mv.srec \
 	touch.srec mkdir.srec history.srec ps.srec pwd.srec \
-	df.srec du.srec snake.srec ln.srec tail.srec
+	df.srec du.srec snake.srec ln.srec tail.srec rmdir.srec
 
 
 ls.srec = ls.o
@@ -29,4 +29,5 @@ du.srec = du.o
 snake.srec = snake.o
 ln.srec = ln.o
 tail.srec = tail.o
+rmdir.srec = rmdir.o
 
