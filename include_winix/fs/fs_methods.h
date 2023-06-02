@@ -89,8 +89,9 @@ int iter_zone_alloc(struct zone_iterator* iter);
 int iter_zone_close(struct zone_iterator* iter);
 bool iter_zone_has_next(struct zone_iterator* iter);
 
-int _iter_dirent_init(struct dirent_iterator* iter, struct inode* inode, int zone_idx, int dir_idx);
-#define iter_dirent_init(iter, inode) _iter_dirent_init(iter, inode, 0, 0)
+int _iter_dirent_init(struct dirent_iterator* iter, struct inode* inode, int zone_idx, int dir_idx, bool non_empty);
+#define iter_dirent_init(iter, inode) _iter_dirent_init(iter, inode, 0, 0, false)
+#define iter_dirent_init_non_empty(iter, inode) _iter_dirent_init(iter, inode, 0, 0, true)
 
 bool iter_dirent_has_next(struct dirent_iterator* iter);
 struct winix_dirent* iter_dirent_get_next(struct dirent_iterator* iter);

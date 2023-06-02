@@ -560,7 +560,7 @@ struct winix_dirent* _iter_dirent_get_current(struct dirent_iterator* iter){
     return iter->dirent;
 }
 
-int _iter_dirent_init(struct dirent_iterator* iter, struct inode* inode, int zone_idx, int dir_idx){
+int _iter_dirent_init(struct dirent_iterator* iter, struct inode* inode, int zone_idx, int dir_idx, bool non_empty){
     iter->buffer = NULL;
     iter->dirent_end = NULL;
     _iter_zone_init(&iter->zone_iter, inode, zone_idx);

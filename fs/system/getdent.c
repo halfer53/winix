@@ -20,7 +20,7 @@ int sys_getdents(struct proc* who, int fd, struct dirent* dirp_dst, unsigned int
     if(!S_ISDIR(dirp->i_mode))
         return -ENOTDIR;
 
-    _iter_dirent_init(&iter, dirp, file->getdents_zone_nr, file->getdents_dirstream_nr);
+    _iter_dirent_init(&iter, dirp, file->getdents_zone_nr, file->getdents_dirstream_nr, false);
     while(iter_dirent_has_next(&iter)){
         if(!count)
             break;
