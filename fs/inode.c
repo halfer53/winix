@@ -566,13 +566,21 @@ int _iter_dirent_init(struct dirent_iterator* iter, struct inode* inode, int zon
     _iter_zone_init(&iter->zone_iter, inode, zone_idx);
     iter->dirent = _iter_dirent_get_current(iter);
     iter->dirent += dir_idx;
+    iter->non_empty = non_empty;
     return 0;
 }
 
 bool iter_dirent_has_next(struct dirent_iterator* iter){
-    if(has_dirent_iter_reached_end(iter))
-        if(!iter_zone_has_next(&iter->zone_iter))
-            return false;
+    do {
+        if (has_dirent_iter_reached_end(iter))
+            if(!iter_zone_has_next(&iter->zone_iter))
+                return false;
+        
+        if (!iter->non_empty || iter->dirent->dirent.d_ino != 0)
+            break;
+        iter->dirent++;
+        
+    } while(true);
     
     return true;
 }

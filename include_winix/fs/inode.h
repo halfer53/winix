@@ -51,6 +51,7 @@ struct dirent_iterator{
     struct winix_dirent* dirent_end;
     struct block_buffer* buffer;
     struct zone_iterator zone_iter;
+    bool non_empty;
 };
 
 #define INODE_DISK_SIZE     offsetof(struct inode, i_dev)
