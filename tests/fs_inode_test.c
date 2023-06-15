@@ -213,6 +213,10 @@ void test_given_iter_dirent_has_next_when_has_data_should_return_true(){
 
     dir = iter_dirent_get_next(&iter);
     assert(char32_strcmp(dir->dirent.d_name, filename) == 0);
+
+    assert(iter_dirent_has_next(&iter) == true);
+    dir = iter_dirent_get_next(&iter);
+    assert(dir->dirent.d_ino == 0);
 }
 
 
@@ -248,6 +252,32 @@ void test_given_iter_dirent_has_next_when_dirent_exhausted_should_return_false()
     }
     ret = iter_dirent_alloc(&iter);
     assert(ret == -EFBIG);
+    assert(iter_dirent_has_next(&iter) == false);
+
+    assert(iter_dirent_close(&iter) == 0);
+}
+
+
+void test_given_iter_dirent_has_next_when_non_empty_option_should_return_false(){
+    struct dirent_iterator iter;
+    int ret = sys_mkdir(curr_scheduling_proc, DIR_NAME, 0755);
+    assert(ret == 0);
+
+    int fd = sys_open(curr_scheduling_proc, DIR_NAME, O_RDONLY, 0);
+    assert(fd == 0);
+
+    struct filp* filp = curr_scheduling_proc->fp_filp[fd];
+    struct inode* inode = filp->filp_ino;
+    ret = iter_dirent_init_non_empty(&iter, inode);
+    assert(ret == 0);
+
+    assert(iter_dirent_has_next(&iter) == true);
+    struct winix_dirent* dir = iter_dirent_get_next(&iter);
+    assert(char32_strcmp(dir->dirent.d_name, ".") == 0);
+
+    dir = iter_dirent_get_next(&iter);
+    assert(char32_strcmp(dir->dirent.d_name, "..") == 0);
+
     assert(iter_dirent_has_next(&iter) == false);
 
     assert(iter_dirent_close(&iter) == 0);
