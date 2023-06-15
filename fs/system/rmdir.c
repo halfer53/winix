@@ -24,7 +24,7 @@ int sys_rmdir(struct proc* who, const char* path){
     while(iter_dirent_has_next(&iter)){
         curr = iter_dirent_get_next(&iter);
         if(char32_strcmp(curr->dirent.d_name, "..") != 0 && char32_strcmp(curr->dirent.d_name, ".") != 0 
-            && curr->dirent.d_name[0] != '\0' ){
+            && curr->dirent.d_ino != 0 ){
             
             iter_dirent_close(&iter);
             ret = -ENOTEMPTY;

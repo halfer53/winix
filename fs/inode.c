@@ -407,7 +407,7 @@ int add_inode_to_directory(struct proc* who, struct inode* dir, struct inode* in
             dir->i_size += BLOCK_SIZE;
         }
         curr = iter_dirent_get_next(&iter);
-        if(curr->dirent.d_name[0] == '\0'){
+        if(curr->dirent.d_ino == 0){
             fill_dirent(ino, curr, string);
             curr->dev = ino->i_dev->dev_id;
             ino->i_nlinks += 1;
