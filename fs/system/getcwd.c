@@ -10,8 +10,6 @@ int sys_getcwd(struct proc* who, char* pathname, int size, char** result){
     
     if(size <= 1)
         return -ERANGE;
-    if (!is_vaddr_ok((vptr_t*)pathname, size, who))
-        return -EFAULT;
 
     p = pathname + size - 1;
     *p = '\0';
@@ -19,7 +17,7 @@ int sys_getcwd(struct proc* who, char* pathname, int size, char** result){
     inode = who->fp_workdir;
     inode->i_count += 1;
 
-    while(inode->i_num != ROOT_INODE_NUM){
+    while(inode->i_num != ROOT_INODE_NUM) {
         inum = get_parent_inode_num(inode);
         parent_inode = get_inode(inum, inode->i_dev);
         ret2 = get_child_inode_name(parent_inode, inode, string);
