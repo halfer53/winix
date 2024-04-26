@@ -99,6 +99,8 @@ void kreport_proc(struct proc* curr, struct filp* file) {
 **/
 pid_t get_next_pid(){
     static pid_t pid = 2;
+    if (pid == INT_MAX)
+        pid = 2;
     return pid++;
 }
 
