@@ -198,6 +198,8 @@ typedef struct proc {
     filp_t* fp_filp[OPEN_MAX];
     inode_t *fp_rootdir;
     inode_t *fp_workdir;
+
+    /* Pipe */
     struct list_head pipe_reading_list;
     struct list_head pipe_writing_list;
 
