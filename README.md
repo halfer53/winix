@@ -81,7 +81,7 @@ N.B. Linux environment is required for compilation
 Debian / Ubuntu
 
 ```shell
-sudo apt-get install xutils-dev gcc
+sudo apt-get install xutils-dev gcc libbsd-dev
 ```
 
 ### Clone and Compile
