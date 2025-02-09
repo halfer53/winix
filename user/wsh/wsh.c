@@ -140,7 +140,7 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
-int search_path(char* path, int len, char* name) {
+int search_path(char* path, int len, char* name){
     int ret;
     struct stat statbuf;
     strlcpy(path, "/bin/", len);
