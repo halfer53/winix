@@ -1,6 +1,6 @@
 #include <stddef.h>
 
-char *strlcat(char *dest, const char *src, size_t n) {
+size_t strlcat(char *dest, const char *src, size_t n) {
     char* saved = dest;
     size_t dst_len;
     while(*dest++);
@@ -8,11 +8,11 @@ char *strlcat(char *dest, const char *src, size_t n) {
     dst_len = (size_t)(dest - saved);
     n -= dst_len;
     if(n <= 0){
-        return saved;
+        return 0;
     }
     while (*src && n--) {
         *dest++ = *src++;
     }
     *dest = '\0';
-    return saved;
+    return dest - saved;
 }
