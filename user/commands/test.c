@@ -194,9 +194,11 @@ int test_float(int argc, char **argv){
     return 0;
 }
 
+#pragma GCC diagnostic ignored "-Wuninitialized"
 void stack_overflow(int a){
     stack_overflow(a);
 }
+#pragma GCC diagnostic pop
 
 pid_t do_fork(){
     return fork();
