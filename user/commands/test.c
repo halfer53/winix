@@ -194,7 +194,7 @@ int test_float(int argc, char **argv){
     return 0;
 }
 
-#pragma GCC diagnostic ignored "-Wuninitialized"
+#pragma GCC diagnostic ignored "-Winfinite-recursion"
 void stack_overflow(int a){
     stack_overflow(a);
 }
